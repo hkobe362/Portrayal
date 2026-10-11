@@ -11,7 +11,7 @@
 // route.js takes (`{chassisOf, guidesOf, portX, portY?, zeroUAperture?}`).
 
 import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers} from './model.js';
-import {ownRoute, trunkRoute, pointOf, portPoint, routeText, DIAMETERS} from './route.js';
+import {ownRoute, trunkRoute, trunkMeasures, pointOf, routeText, DIAMETERS} from './route.js';
 import {elementsOf, elementText, waypointKey, followTrunk, andList} from './bundle-route.js';
 import {zeroUOnLane, carriesLane} from './zero-u.js';
 import {cornersOf, STRAIGHT_DEG} from './route-path.js';
@@ -95,12 +95,9 @@ export function layoutOf(rack, b, ctx) {
     const members = b.members.map(m => {
       const cable = (rack.cables || []).find(c => c.id === m.cable);
       if (!cable) return null;
-      const own = ownRoute(rack, cable, rc).waypoints;
-      const aNearStart = () => {
-        const p = portPoint(rack, cable.a, rc), s = trunk.length && pointOf(rack, trunk[0], rc), e = trunk.length && pointOf(rack, trunk.at(-1), rc);
-        return !(p && s && e) || dist(p, s) <= dist(p, e);
-      };
-      const f = followTrunk(own, trunk, m, {aNearStart});
+      // as resolveRoute takes it: by the gutter where the bundle is drawn (#1012)
+      const own = ownRoute(rack, cable, rc, {gutter: trunk.length > 0 && b.members.length >= 2}).waypoints;
+      const f = followTrunk(own, trunk, m, trunkMeasures(rack, cable, trunk, rc));
       const idx = w => (w ? at.get(waypointKey(w)) : undefined);
       return {cable: m.cable, member: m, join: f.join, leave: f.leave, ji: idx(f.join), li: idx(f.leave), met: f.met, stale: f.stale, own};
     }).filter(Boolean);
@@ -184,8 +181,14 @@ export function bundleCheck(rack, b, ctx = {}) {
     const w = m.member[end];
     notes.push(`${m.cable}'s peel point ${isWaypoint(w) ? waypointText(rack, w) : JSON.stringify(w)} ${isWaypoint(w) && onTrunk(b, w) ? `is out of order with its other end on ${name}` : `is not on ${name}'s route`}, so it rides to the end.`);
   }
-  for (const m of L.members) if (!m.met && L.T.length && b.members.length >= 2)
-    notes.push(`${m.cable} does not meet ${name}'s route, so it runs straight to it and rides all of it.`);
+  // a member whose own route never meets the trunk (#1012): where it joins
+  // and leaves, the elements nearest its ports (bundle-route.js followTrunk)
+  for (const m of L.members) if (!m.met && L.T.length && b.members.length >= 2) {
+    const [j, l] = [m.join, m.leave].map(w => (w ? waypointText(rack, w) : null));
+    notes.push(`${m.cable} does not meet ${name}'s route, so it runs straight to it: ${!j || !l ? 'it rides all of it'
+      : j === l ? `it joins and leaves at ${j}, the point nearest its ports`
+      : `it joins at ${j} and leaves at ${l}, the points nearest its ports`}.`);
+  }
   if (b.members.length < 2 || !L.T.length) return {checked: true, size: null, bend: null, warnings, notes, gone: L.gone, layout: L};
   const byId = new Map((rack.cables || []).map(c => [c.id, c]));
   const unknown = new Set();

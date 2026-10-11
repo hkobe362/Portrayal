@@ -299,7 +299,10 @@ test('an edited route through a ring behind the port: a finding when level with 
   // 10 mm right (5 past its face): it only reaches into the ring to be held
   // (#949): within the ring's depth (10, estimated) and the Cat6's 6 mm
   assert.deepEqual(at(120).findings, []);
-  assert.deepEqual(at(120).rings.map(g => [g.via, g.passed, g.held, g.sense]), [['guide-4', true, true, -1], ['guide-5', true, undefined, 1]]);
+  // the two lays of a held ring are as long as each other, so the cord is
+  // laid from the end that sorts first (#986): here end b, and read from end
+  // a it goes on past the ring's near face and comes through it toward ring 5
+  assert.deepEqual(at(120).rings.map(g => [g.via, g.passed, g.held, g.sense]), [['guide-4', true, true, 1], ['guide-5', true, undefined, 1]]);
   // 30 mm below: steeper than 45 degrees, it comes up into the ring
   assert.deepEqual(at(120, 30).findings, []);
   assert.deepEqual(at(120, 30).rings.map(g => [g.via, g.passed, g.sense]), [['guide-4', true, 1], ['guide-5', true, 1]]);
