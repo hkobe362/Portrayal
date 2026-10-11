@@ -61,7 +61,7 @@ same way.
 | `startU`, `holes.style: round` | frame | section 7 | read, labelled, drawn, exported |
 | `channel` | zero-U entry | section 7 | read; overlap judged per channel |
 | `width`, `options` | frame | section 7 | read and kept; acted on only as section 7 states |
-| `heldBy` `{item, at, x, z, turn}` | item | section 7 | read and kept; fit refuses what it cannot yet judge |
+| `heldBy` `{item, at, x, z, turn}` | item | section 7 | read, and kept in step with its host; one that is no rack device is not checked, and fit refuses one whose host is gone or that is also `on` a device |
 
 The last five rows are the rack products keys. **That they ride is settled by
 the record,** and is not a question here: the decision of 2026-10-09 put them
@@ -409,7 +409,10 @@ affected, and the XCU10 draws no ears until its gap closes.
 - **A position below 1** is refused by the schema and by fit ("Below U1."),
   and is still loaded: a version-3 reader loaded any whole number, a
   hand-edited file may hold one, and refusing it on load would refuse the
-  whole file. The item is kept where the file says and fit refuses it.
+  whole file. The item is kept where the file says and fit refuses it. The
+  exports write its position as the file has it, which a DCIM import then
+  refuses; a shrink that has to pack moves it up from the bottom with its
+  cluster, and one that has nothing to pack leaves it.
 - **`shrinkRack`.** Clusters are formed by `spanOf` overlap, and a cluster
   height is its top edge less its bottom edge, in half units. Each cluster
   moves by one shift, so every item in it keeps its parity. **The shift is a
@@ -1114,13 +1117,29 @@ What each does in the first version-4 reader:
 
 | key | acts on day one | what a hand-written value gets |
 |---|---|---|
-| `setback` (frame, item) | **fully**, as rack products section 8 has it: the order (item, device default ear position, frame, flush), fit against `usableDepth` and the other face, routed port and guide depth, export notes; the 30 mm showcase default goes | the same: any user may set it |
-| `startU` (frame) | **fully**: an integer from 1, absent is 1; labels and `positionOf` (2.6); the NetBox rack row gains `starting_unit`; Nautobot has no field, so a comment line | the same |
+| `setback` (frame, item) | **fully**, as rack products section 8 has it: the order (item, device default ear position, frame, flush), fit against `usableDepth` and the other face, routed port and guide depth; the 30 mm showcase default goes (no export note is written: section 13) | the same: any user may set it |
+| `startU` (frame) | **fully**: an integer from 1, absent is 1; labels and `positionOf` (2.6). **Neither DCIM import takes it:** the NetBox model has `starting_unit` and its rack import form does not, and Nautobot has no such field. So both device files count positions from 1, each device comment gives the label on the rack, and the NetBox rack row says it in `comments` (below) | the same |
 | `holes.style: round` | **fully**: kept by `normalizeFrame`, drawn round, and the mounting hardware rows read as for square holes with the note "Round holes: check what fixing your rail takes." | the same |
 | `channel` (zero-U entry) | overlap is judged per channel when the frame `ref` names a product whose row lists that channel | with no such row: the part stands outside at its point, as today, and a notice says the channel is not known |
-| `width` (frame) | 19 is drawn and fitted as today; the NetBox rack row writes the value | another width is kept and exported, the rack is drawn as 19 in, and a notice says so |
+| `width` (frame) | 19 is drawn and fitted as today; the NetBox rack row writes the value when it is one its import takes (10, 19, 21, 23) | another width is kept, the rack is drawn as 19 in, and a notice says so; a width NetBox does not take is written as 19 with a comment |
 | `options` (frame) | kept, and listed in `describe` | the same; nothing reads an option until a product row defines one |
 | `heldBy` (item) | kept, and kept in step with its host as 7.1 sets out; fit says "i7 is held by i4, and DINRAIL2U states no rail to hold a device, so it is not checked."; exported in the rack with no position and a comment (rack products, 7.4) | the same; **placing a new one is refused** until the catalogue describes hosts |
+
+**Every DCIM column is checked against the import form, not the model.** A
+NetBox CSV import refuses a file whose header names a field its import form
+does not list, so a field of the model is no evidence. Read at
+netbox-community/netbox commit `84e19368`, `netbox/dcim/forms/bulk_import.py`:
+
+| file | columns this kit writes | where the form lists them |
+|---|---|---|
+| NetBox racks | `site`, `name`, `status`, `width`, `u_height`, `desc_units`, and `comments` only for a rack that has something to say | `RackImportForm` (line 271), `Meta.fields` lines 359 to 364. `width` is a choice field (lines 322 to 327) of `RackWidthChoices`, 10, 19, 21 or 23 (`netbox/dcim/choices.py` lines 87 to 99). **`starting_unit` is not in the list**; only `RackTypeImportForm` (line 218) has it |
+| NetBox devices | `position` in steps of 0.5, `face`, `comments` (and the columns of before) | `DeviceImportForm` (line 698), `Meta.fields` lines 760 to 765; the half step is the model rule section 2.3 cites |
+| Nautobot devices | `position` whole or blank, `face`, `comments` (and the columns of before); no column is added | read at nautobot/nautobot commit `c77e4255`, `nautobot/dcim/api/serializers.py`: `DeviceSerializer` (line 559) takes every model field (`fields = "__all__"`, line 565), and the model position is the whole number section 2.3 cites |
+
+A rack that numbers from 1 and is 19 in wide exports the six rack columns it
+always did, to the byte. The one column this version adds to any DCIM file
+is the rack `comments`, written only for a frame with `startU` other than 1
+or a width NetBox does not take.
 
 `setback`, `startU` and round holes can be set by a user on a generic frame,
 so they are built in full and have tests (section 9, part 3). The other four
@@ -1471,39 +1490,65 @@ as written. Each is built, and each waits for a person to confirm it.
 - **`width` is in inches** in the schema (19, 23), as the NetBox rack row
   takes it. `options` and the `turn` of an item `heldBy` have no type until a
   product or a host defines one.
-- **`startU` and Nautobot** (section 7). Nautobot numbers every rack from 1
-  and has no field for another start, so a position counted from `startU`
-  would name the wrong unit there. Built: a Nautobot device row keeps the
-  position counted from 1, and its comment gives the label on the rack ("U16
-  on the rack, which numbers from 5; Nautobot numbers every rack from 1.").
-  The NetBox rack row always carries `starting_unit`, 1 when the frame states
-  none.
+- **`startU` in the DCIM files** (section 7). Neither import takes a starting
+  unit. Built: both device files keep the position counted from 1, and every
+  device comment says how the rack is numbered ("U16 on the rack. The rack
+  numbers its units from 5, and a unit named here is its label; the NetBox
+  import counts from 1."), so a unit a comment names is never taken for a
+  position. The NetBox rack row says it in `comments`. A person who sets the
+  starting unit on the rack in NetBox by hand has to move each device too.
+- **The sentences of fit under `startU`** name a unit counted from the
+  bottom, from the number of the first unit ("Below U5.", "1U free from U46
+  to the top."). On a top-down frame they still count from the bottom, as
+  they did before, since "past the top" has no label there.
 - **Setback.** It applies to a rack device only: a part on the rail face or
-  beside the rack has none. A refusal names it after the depth ("700 mm
-  deep, set back 301 mm; this rack allows 1000 mm."). A larger rack default
-  is checked for every device it moves, and refused naming the first that no
-  longer fits. A proud faceplate (a negative setback) is not checked against
-  a door, since no frame states a door clearance yet. **No export note is
-  written for a setback:** rack products section 8 names none, so that step
-  is not built.
+  beside the rack has none, `patch` refuses it one ("CM bolts to the rail
+  face, so it has no setback."), and one written by hand is ignored. A
+  refusal names it after the depth ("700 mm deep, set back 301 mm; this rack
+  allows 1000 mm."), and a proud one reads "set forward 25 mm". **A larger
+  setback is REFUSED, on depth alone** (`fitsDepth`): never for an overlap in
+  height the rack already held, and also when the same command shrinks the
+  rack. Whether a larger rack default should refuse or only warn is for a
+  person: a smaller `usableDepth` is accepted silently today and leaves the
+  same devices past it, so the consistent choices are to check both or to
+  warn on both. A proud faceplate is not checked against a door, since no
+  frame states a door clearance yet. **No export note is written for a
+  setback:** rack products section 8 names none, so that step is not built.
+- **The setback order is untested on real data at its second step.** No
+  catalogue row carries `ears.default` (`rack_index.py` writes no ears until
+  #908), so the default ear position of a device is exercised on a fixture
+  only.
+- **The 30 mm showcase default** lives on the site. The kit is flush where
+  nothing is stated; the site has to drop its default in the release that
+  takes this kit, or every faceplate it draws stands 30 mm from where the
+  kit fits and routes it.
 - **The sentences of a held item** beyond the two section 7.1 gives: placing
   one ("The catalogue describes no host yet, so a device cannot be put on
   one; heldBy takes only null, which frees it."); a host that is gone ("i7 is held by i4, which is not in this
   rack: place it again, or free it."); removing a host ("DIN switch was held
-  by it and stays where it was, held by nothing."); and the DCIM comment ("On
-  Shelf, which holds it; NetBox has no field for that."). That `on` and
-  `heldBy` never share an item (rack products) is not enforced on load.
+  by it and stays where it was, held by nothing."); a shrink that drops a
+  host ("DIN switch was held by a removed device and stays in the rack, held
+  by nothing."), after which an item left above the new top stands in the
+  top unit; and the DCIM comment ("On Shelf, which holds it; NetBox has no
+  field for that."). An item with both `on` and `heldBy` is kept on load,
+  named in a notice and refused by fit until one is removed (rack products
+  7.2): "i2 is on i1 and held by i1: a part is bolted over a device or held
+  by one, not both, so remove one."
 - **The notices for kept keys** (`frameNotices` in `fit.js`): "This rack
   states 23 in rails; it is drawn and fitted as 19 in." and "PDU A names the
   channel rear-left, which is not known for this frame, so it stands at
   left-rear."
-- **Which parts `configs[].states` lists** (section 4). Built: every placement
-  with an id whose own `states`, group or part declares names, keyed by its
-  id. On the EVMA8365X that is the 42 outlets and the 42 lamps beside them,
-  since the lamp group declares the two colours; a breaker is not listed,
-  because its rocker declares its states on an element of the part and not
-  on the part. Whether a lamp may be set by its own path, when a state is
-  addressed by the outlet and follows `for:` to the lamp, is for part 6.
+- **Which parts `configs[].states` lists** (section 4). Built: what a part
+  ITSELF can be set to. A placement with an id is listed when its own
+  `states`, else its group, else its part declares a list of names, and it
+  is not a lamp (`class: led`). Lamps are left out because a state is
+  addressed by the outlet and follows `for:` to the lamp, whose own
+  vocabulary is already on the drawing; the mapping form
+  (`{led-a: [...]}`, on 230 placements) is left out because its keys are the
+  lamps inside a part and not state names. On the EVMA8365X that is its 42
+  outlets. Across the library the key then holds 91 parts on 6 devices and
+  under 4 KB, where listing every lamp held some 329 KB. A breaker is not
+  listed: its rocker declares its states on an element of the part.
 - **What counts as a slot** (section 5). Built: a placement of a
   `class: mount` part that declares `interface` and a `mate` point, the
   mirror of a mount point. No part in the library is one yet, so every

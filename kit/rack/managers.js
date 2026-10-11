@@ -79,7 +79,9 @@ export function moveItem(rack, id, patch, chassisOf) {
   const moved = new Map(managersOf(rack, id).map(m => [m.id, {...m, face: next.face, ru: hostedRu(next, m.unit)}]));
   // what it holds goes with it too: an item on its shelf or rail takes its
   // face and the unit its bottom is in, and its `heldBy` is unchanged
-  const carried = new Map(heldBy(rack, id, chassisOf).map(h => [h.id, {...h, face: next.face, ru: Math.floor(next.ru)}]));
+  // (a part that is also bolted over it, which fit refuses, goes by its unit)
+  const carried = new Map(heldBy(rack, id, chassisOf).filter(h => !moved.has(h.id))
+    .map(h => [h.id, {...h, face: next.face, ru: Math.floor(next.ru)}]));
   for (const [k, v] of carried) moved.set(k, v);
   const after = {...rack, items: rack.items.map(i => (i.id === id ? next : moved.get(i.id) ?? i))};
   // The host is checked in the rack as it will be, so its own managers are

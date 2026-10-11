@@ -5,13 +5,13 @@
 // and {chassisOf} in, a new rack out - and says no with a sentence. One that
 // changes nothing hands back the very rack it was given, so a caller can tell.
 
-import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf,
+import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf, firstU,
         nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor} from './model.js';
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
 import {ownRoute, pointOf, portPoint} from './route.js';
-import {fits, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, heldBy} from './fit.js';
+import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
 import {whereText, zeroUName} from './zero-u.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey,
@@ -47,7 +47,7 @@ const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 // reads oddly for a U past the top altogether; an agent can ask for any U.
 // The upper half of the top unit is in the rack; the unit after it is not.
 const pastTop = (rack, ru) => (ru != null && ru >= rack.frame.heightRU + 1
-  ? {error: `U${ru} is past the top of this ${rack.frame.heightRU}U rack.`} : null);
+  ? {error: `U${firstU(rack.frame) - 1 + ru} is past the top of this ${rack.frame.heightRU}U rack.`} : null);
 
 // ── items ───────────────────────────────────────────────────────────────
 // A CONFIGURATION THE DEVICE DOES NOT LIST is refused when its slots are
@@ -134,10 +134,14 @@ function patch(rack, {id, ...given}, ctx) {
     if ('heldBy' in it) drop.push('heldBy');
   }
   if ('setback' in given && (given.setback ?? null) !== (it.setback ?? null)) {
+    const c = ctx.chassisOf(it.ref);
+    // a part on the rail face or beside the rack bolts to the rail: it has none
+    if (given.setback != null && (isRackFace(c) || isZeroUPart(c)))
+      return {error: `${it.label} bolts to the rail face, so it has no setback.`};
     const {setback: _was, ...bare} = it;
     const trial = given.setback == null ? bare : {...bare, setback: given.setback};
     if (setbackOf(rack, trial, ctx.chassisOf) > setbackOf(rack, it, ctx.chassisOf)) {
-      const f = fits(rack, trial, ctx.chassisOf, {ignoreId: id});
+      const f = fitsDepth(rack, trial, ctx.chassisOf, {ignoreId: id});
       if (!f.ok) return {error: f.reason};
     }
     if (given.setback == null) drop.push('setback'); else changes.setback = given.setback;
@@ -418,12 +422,28 @@ function frame(rack, p, ctx) {
   return said ? {rack: z.rack, summary: `${r.summary} ${said}`, findings: [...r.findings, note(said)]} : r;
 }
 
+// A LARGER RACK SETBACK is checked for every device it moves back, on depth
+// alone (fit.js fitsDepth), in the rack as the command leaves it; a smaller
+// one is never refused.
+function setbackRefused(rack, next, chassisOf) {
+  if (!((next.frame.setback ?? 0) > (rack.frame.setback ?? 0))) return null;
+  const was = new Map(rack.items.map(i => [i.id, setbackOf(rack, i, chassisOf)]));
+  for (const it of next.items) {
+    if (setbackOf(next, it, chassisOf) <= (was.get(it.id) ?? 0)) continue;
+    const f = fitsDepth(next, it, chassisOf, {ignoreId: it.id});
+    if (!f.ok) return {error: `${it.label}: ${f.reason}`};
+  }
+  return null;
+}
+
 function frameItems(rack, p, {chassisOf}) {
   const want = p.holes ? {...p, holes: {...rack.frame.holes, ...p.holes}} : p;
   if ('heightRU' in want && want.heightRU < rack.frame.heightRU) {
     const {heightRU, ...rest} = want;
-    const {rack: shrunk, moved, removed} = shrinkRack(rack, heightRU, chassisOf);
+    const {rack: shrunk, moved, removed, orphaned} = shrinkRack(rack, heightRU, chassisOf);
     const next = Object.keys(rest).length ? withFrame(shrunk, rest) : shrunk;
+    const bad = setbackRefused(rack, next, chassisOf);
+    if (bad) return bad;
     if (!moved.length && !removed.length) return done(next, `Set the rack to ${heightRU}U.`);
     const dn = n => `device${n === 1 ? '' : 's'}`;
     const names = removed.map(i => i.label).join(', ');
@@ -433,18 +453,16 @@ function frameItems(rack, p, {chassisOf}) {
       ? `Moved ${moved.length} ${dn(moved.length)} down to fit ${heightRU}U.`
       : `Removed ${removed.length} ${dn(removed.length)} from the bottom to fit ${heightRU}U: ${names}.`;
     const cut = new Set(removed.flatMap(i => cablesOf(rack, i.id).map(c => c.id))).size;
-    const kept = cut ? ` ${cut} ${cut === 1 ? 'cable is kept as a loose end' : 'cables are kept as loose ends'}.` : '';
+    const cables = cut ? ` ${cut} ${cut === 1 ? 'cable is kept as a loose end' : 'cables are kept as loose ends'}.` : '';
+    // what a removed device held stays in the rack, held by nothing
+    const one = orphaned.length === 1;
+    const kept = cables + (orphaned.length ? ` ${orphaned.map(i => i.label).join(', ')} ${one ? 'was' : 'were'} held by a removed device and stay${one ? 's' : ''} in the rack, held by nothing.` : '');
     return {rack: next, summary: text + kept, findings: [note(text + kept)]};
   }
   const next = withFrame(rack, want);
   if (same(next.frame, rack.frame)) return unchanged(rack);
-  // a larger rack setback is checked for every device it moves; a smaller one is never refused
-  if ((next.frame.setback ?? 0) > (rack.frame.setback ?? 0))
-    for (const it of next.items) {
-      if (setbackOf(next, it, chassisOf) <= setbackOf(rack, it, chassisOf)) continue;
-      const f = fits(next, it, chassisOf, {ignoreId: it.id});
-      if (!f.ok) return {error: `${it.label}: ${f.reason}`};
-    }
+  const bad = setbackRefused(rack, next, chassisOf);
+  if (bad) return bad;
   return done(next, 'Changed the rack frame.');
 }
 

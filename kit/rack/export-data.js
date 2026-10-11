@@ -5,7 +5,7 @@
 // The Rack Builder's exports (the page that builds the files) do the
 // fetching and drawing, and ask here.
 
-import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, holderOf} from './model.js';
+import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, RAIL_WIDTH_IN, holderOf} from './model.js';
 import {routeText, trunkRoute} from './route.js';
 import {isRackMount, isZeroUPart, railOf, unitsOf, unitsText, spansMeet} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
@@ -870,39 +870,52 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
       const host = items.find(o => o.id === holder);
       notes.push(`On ${host ? names.get(host.id)?.name ?? host.label : 'a device that is no longer in the rack'}, which holds it; ${T} has no field for that.`);
     }
-    // NAUTOBOT NUMBERS EVERY RACK FROM 1, and has no field for another start:
-    // its position is counted from 1, and the comment gives the rack's own.
+    // BOTH IMPORTS COUNT A RACK FROM 1. Nautobot has no field for another
+    // start, and the NetBox rack import takes none (RackImportForm has no
+    // starting_unit), so a position is counted from 1 whatever `startU` is,
+    // and the comment says how the rack itself is numbered: every unit a
+    // comment names is the label on the rack.
     const from1 = positionOf({...rack.frame, startU: 1}, it.ru, it.u);
-    if (target === 'nautobot' && !zeroU && !held && firstU(rack.frame) !== 1 && !unplaced.has(it.id))
-      notes.push(`U${position} on the rack, which numbers from ${firstU(rack.frame)}; Nautobot numbers every rack from 1.`);
+    const none = zeroU || held || unplaced.has(it.id);
     if (target === 'nautobot' && !zeroU && !held) {
       const met = unplaced.get(it.id), where = unitsText(rack.frame, it.ru, uOf(it));
       if (met) notes.push(`In ${where}, ${it.ru > met.ru ? 'above' : 'with'} ${names.get(met.id).name}; no position, since Nautobot stores whole rack units.`);
       else if (!Number.isInteger(it.ru) || !Number.isInteger(uOf(it)))
         notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
     }
-    const none = zeroU || held || unplaced.has(it.id);
+    if (firstU(rack.frame) !== 1)
+      notes.push(`${none ? '' : `U${position} on the rack. `}The rack numbers its units from ${firstU(rack.frame)}, and a unit named here is its label; the ${T} import counts from 1.`);
     const comments = notes.join(' ');
     return target === 'nautobot'
       ? {name: n.name, role__name: role, device_type__manufacturer__name: t.manufacturer ?? '',
          device_type__model: t.model ?? '', status__name: 'Planned', location__name: site,
          rack__name: rack.name, rack__location__name: site, position: none ? '' : Math.floor(from1), face: none ? '' : it.face, comments}
       : {name: n.name, role, manufacturer: t.manufacturer ?? '', device_type: t.model ?? '',
-         status: 'planned', site, rack: rack.name, position: zeroU || held ? '' : position, face: zeroU || held ? '' : it.face, comments};
+         status: 'planned', site, rack: rack.name, position: zeroU || held ? '' : from1, face: zeroU || held ? '' : it.face, comments};
   });
   return {columns: target === 'nautobot' ? NAUTOBOT_COLUMNS : NETBOX_COLUMNS, rows, left};
 }
 
 // THE RACK, as NetBox imports one: written from the frame.
 // A device row names its rack, and the device import does not create it.
-// desc_units is NetBox's "units are numbered top-to-bottom", and starting_unit
-// the number of its first unit (`startU`, 1 when the frame states none). The
-// width is the frame's, in inches, 19 when it states none.
-export const NETBOX_RACK_COLUMNS = ['site', 'name', 'status', 'width', 'u_height', 'desc_units', 'starting_unit'];
+// desc_units is NetBox's "units are numbered top-to-bottom".
+// ONLY WHAT THE RACK IMPORT TAKES. The columns are fields of NetBox's
+// RackImportForm; a header it does not list refuses the whole file. It lists
+// no starting unit, and its width is one of four choices (10, 19, 21, 23
+// inches). So a frame that numbers from another unit, or states another
+// width, says so in `comments`, a column written only then: a rack with
+// neither is the six columns it always was.
+export const NETBOX_RACK_COLUMNS = ['site', 'name', 'status', 'width', 'u_height', 'desc_units'];
+export const NETBOX_RACK_WIDTHS = [10, 19, 21, 23];
 export function rackImportRows({rack, dcim = {}}) {
-  return {columns: NETBOX_RACK_COLUMNS, rows: [{site: String(dcim?.site ?? '').trim(), name: rack.name, status: 'planned',
-    width: railWidth(rack.frame), u_height: rack.frame.heightRU, desc_units: rack.frame.numbering === 'top-down' ? 'true' : 'false',
-    starting_unit: firstU(rack.frame)}]};
+  const f = rack.frame, width = railWidth(f), known = NETBOX_RACK_WIDTHS.includes(width), said = [];
+  if (firstU(f) !== 1)
+    said.push(`Its units are numbered from ${firstU(f)} on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1.`);
+  if (!known) said.push(`Its rails are ${width} in wide, which the NetBox rack import does not take; 19 is written.`);
+  const row = {site: String(dcim?.site ?? '').trim(), name: rack.name, status: 'planned',
+    width: known ? width : RAIL_WIDTH_IN, u_height: f.heightRU, desc_units: f.numbering === 'top-down' ? 'true' : 'false'};
+  return said.length ? {columns: [...NETBOX_RACK_COLUMNS, 'comments'], rows: [{...row, comments: said.join(' ')}]}
+    : {columns: NETBOX_RACK_COLUMNS, rows: [row]};
 }
 
 // ── THE BILL OF MATERIALS ───────────────────────────────────────────────

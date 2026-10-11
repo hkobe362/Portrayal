@@ -10,7 +10,7 @@
 // passes through, so there a U is never shared.
 
 import {RU} from './rails.js';
-import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN} from './model.js';
+import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN, firstU} from './model.js';
 
 // ── HEIGHTS, SPANS AND BOXES (docs/rack-file-v4-design.md section 2.4) ─────
 // PUBLIC: unitsOf, spanOf, itemBox, spanText (kit/README.md). The other names
@@ -87,9 +87,11 @@ export function unitsText(frame, ru, units) {
     return a === b ? `U${a}` : `U${a}-U${b}`;
   }
   if (units === 0.5) return `the ${Number.isInteger(ru) ? 'lower' : 'upper'} half of U${U(Math.floor(ru))}`;
-  const from = Number.isInteger(ru) ? `U${U(ru)}` : `the upper half of U${U(Math.floor(ru))}`;
-  const to = Number.isInteger(top) ? `U${U(top - 1)}` : `the lower half of U${U(Math.floor(top))}`;
-  return `${from} to ${to}`;
+  // its two ends, the lower-numbered first, as a whole span reads
+  const ends = [Number.isInteger(ru) ? [U(ru), `U${U(ru)}`] : [U(Math.floor(ru)), `the upper half of U${U(Math.floor(ru))}`],
+                Number.isInteger(top) ? [U(top - 1), `U${U(top - 1)}`] : [U(Math.floor(top)), `the lower half of U${U(Math.floor(top))}`]]
+    .sort((x, y) => x[0] - y[0]);
+  return `${ends[0][1]} to ${ends[1][1]}`;
 }
 // The span of an item, in those words.
 export const spanText = (frame, item, chassisOf) => unitsText(frame, item.ru, unitsOf(chassisOf(item.ref)));
@@ -131,10 +133,18 @@ const uSpanText = (frame, lo, hi) => {
 };
 export const zeroUSpanText = (frame, z, chassisOf) => uSpanText(frame, ...zeroUSpan(z, chassisOf));
 const no = reason => ({ok: false, reason});
+// A stored unit as a refusal names it: counted from the bottom, from the
+// number the frame gives its first unit (`startU`), so U1 of before is U1.
+const named = (f, ru) => firstU(f) - 1 + ru;
 const nameOf = (c, ref) => c?.model ?? ref;
 // A part too tall for the rack from its bottom unit.
 const tooTall = (f, u, lo) =>
   no(`${u}U tall; ${f.heightRU - lo + 1}U from U${uLabel(f, lo)} to the top of this ${f.heightRU}U rack.`);
+const below = f => no(`Below U${firstU(f)}.`);
+// AN ITEM IS BOLTED OVER A DEVICE (`on`) OR HELD BY ONE (`heldBy`), NOT BOTH
+// (docs/rack-products-design.md section 7.2): refused until one is removed.
+export const bothText = item => `${item.id} is on ${item.on} and held by ${holderOf(item)}: a part is bolted over a device or held by one, not both, so remove one.`;
+const isBoth = item => item.on != null && holderOf(item) != null;
 
 // NOT RACK-MOUNT. The catalogue states `mount` only when it is not "rack".
 export const isRackMount = chassis => !chassis?.mount || chassis.mount === 'rack';
@@ -187,6 +197,7 @@ export function frameNotices(rack, chassisOf) {
   for (const it of rack.items) {
     const id = holderOf(it);
     if (id == null) continue;
+    if (isBoth(it)) { out.push(bothText(it)); continue; }
     const host = rack.items.find(o => o.id === id);
     if (!host) out.push(unheldText(it));
     else if (isHeld(it, chassisOf)) out.push(uncheckedText(it, host, chassisOf));
@@ -201,11 +212,11 @@ function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
   const f = rack.frame, rd = between(f);
   const side = railOf(cand, () => c);
   const u = unitsOf(c), lo = cand.ru, hi = cand.ru + u;
-  if (cand.ru < 1) return {ok: false, reason: 'Below U1.'};
+  if (cand.ru < 1) return below(f);
   // its own position is a whole unit: it bolts over a unit of holes
   if (!Number.isInteger(cand.ru))
     return no(`${nameOf(c, cand.ref)} bolts to the rail face at a whole unit, and ${uText(f, cand.ru, u)} is a half unit.`);
-  if (cand.ru > f.heightRU) return {ok: false, reason: `U${cand.ru} is past the top of this ${f.heightRU}U rack.`};
+  if (cand.ru > f.heightRU) return {ok: false, reason: `U${named(f, cand.ru)} is past the top of this ${f.heightRU}U rack.`};
   if (hi > f.heightRU + 1) return tooTall(f, u, lo);
   if (cand.face === 'rear' && rd + c.d > f.usableDepth)
     return {ok: false, reason: `${mm(c.d)} mm out from the rear rail; this rack allows ${mm(f.usableDepth - rd)} mm there.`};
@@ -268,6 +279,7 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
   if (!c) return {ok: false, reason: `No size is known for ${cand.ref}.`};
   if (isZeroUPart(c)) return no(`${nameOf(c, cand.ref)} stands beside the rack, not on its rails: place it with zerou.place.`);
   if (!isPosition(cand.ru)) return no('A position is a whole unit or a half unit, counted from 1.');
+  if (isBoth(cand)) return no(bothText(cand));
   if (isRackFace(c)) return fitsRackFace(rack, cand, c, chassisOf, {ignoreId});
   // a held item: refused while its host is gone, and not checked on a host
   // the catalogue says nothing of
@@ -278,11 +290,11 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
   }
   const units = unitsOf(c), lo = cand.ru, hi = cand.ru + units;
   const s = setbackOf(rack, cand, chassisOf), reach = s + c.d;
-  if (lo < 1) return {ok: false, reason: 'Below U1.'};
+  if (lo < 1) return below(f);
   const half = halfRefusal(f, c, cand.ref, lo, units);
   if (half) return no(half);
   if (hi > f.heightRU + 1)
-    return {ok: false, reason: `${units}U needed; ${f.heightRU - lo + 1}U free from U${lo} to the top.`};
+    return {ok: false, reason: `${units}U needed; ${f.heightRU - lo + 1}U free from U${named(f, lo)} to the top.`};
   if (reach > f.usableDepth) return {ok: false, reason: `${deep(c, s)}; this rack allows ${mm(f.usableDepth)} mm.`};
   for (const o of rack.items) {
     if (o.id === ignoreId || isHeld(o, chassisOf)) continue;
@@ -299,6 +311,30 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
     const other = reachOf(rack, o, chassisOf);
     if (reach + other > f.railDepth)
       return {ok: false, reason: `${deep(c, s)}; ${Math.max(0, mm(f.railDepth - other))} mm free behind ${o.label}.`};
+  }
+  return {ok: true};
+}
+
+// DEPTH ALONE: does the body, with its setback, stay inside the usable depth
+// and clear of what is on the other face of the units it fills? What a larger
+// setback is checked by, so that it is never refused for a reason that has
+// nothing to do with depth (an overlap in height the rack already held).
+export function fitsDepth(rack, cand, chassisOf, {ignoreId = null} = {}) {
+  const f = rack.frame, c = chassisOf(cand.ref);
+  if (!c || isRackFace(c) || isZeroUPart(c) || isHeld(cand, chassisOf)) return {ok: true};
+  const s = setbackOf(rack, cand, chassisOf), reach = s + c.d, mine = spanOf(cand, chassisOf);
+  if (reach > f.usableDepth) return no(`${deep(c, s)}; this rack allows ${mm(f.usableDepth)} mm.`);
+  for (const o of rack.items) {
+    if (o.id === ignoreId || o.face === cand.face || isHeld(o, chassisOf)) continue;
+    const oc = chassisOf(o.ref);
+    if (!oc || !spansMeet(mine, spanOf(o, chassisOf))) continue;
+    if (isRackFace(oc)) {
+      if (reach > between(f)) return no(`${deep(c, s)}; it would reach past the ${o.face} rail into ${o.label}.`);
+      continue;
+    }
+    const other = reachOf(rack, o, chassisOf);
+    if (f.kind !== 'two-post' && reach + other > f.railDepth)
+      return no(`${deep(c, s)}; ${Math.max(0, mm(f.railDepth - other))} mm free behind ${o.label}.`);
   }
   return {ok: true};
 }
@@ -384,8 +420,25 @@ export function shrinkRack(rack, newHeight, chassisOf) {
   // a top edge of heightRU + 1 is the top of the rack
   const fitsUnder = top => top <= newHeight + 1;
 
-  if (rack.items.every(i => isHeld(i, chassisOf) || fitsUnder(topOf(i))))
-    return {rack: withFrameHeight(rack.items), moved: [], removed: []};
+  // A HELD ITEM WHOSE HOST IS GONE (dropped by this shrink, or not in the
+  // rack) is kept, held by nothing, and fit refuses it until it is placed
+  // again; one left above the new top is brought down to the top unit, so no
+  // item is outside the rack. `orphaned` are those this shrink left so.
+  const settleHeld = (list, removedIds, moved) => {
+    const ids = new Set(list.map(i => i.id)), orphaned = [];
+    const out = list.map(it => {
+      if (!isHeld(it, chassisOf) || ids.has(holderOf(it))) return it;
+      if (removedIds.has(holderOf(it))) orphaned.push(it);
+      if (it.ru <= newHeight) return it;
+      moved.push(it.id);
+      return {...it, ru: newHeight};
+    });
+    return {items: out, orphaned};
+  };
+  if (rack.items.every(i => isHeld(i, chassisOf) || fitsUnder(topOf(i)))) {
+    const moved = [], s = settleHeld(rack.items, new Set(), moved);
+    return {rack: withFrameHeight(s.items), moved, removed: [], orphaned: s.orphaned};
+  }
 
   // Group items into clusters by meeting spans (union-find), face
   // ignored - that is exactly what keeps a front/rear pair together.
@@ -457,7 +510,8 @@ export function shrinkRack(rack, newHeight, chassisOf) {
   const packedItems = rack.items
     .filter(it => !removedIds.has(it.id))
     .map(it => (shiftById.get(it.id) ? {...it, ru: it.ru + shiftById.get(it.id)} : it));
-  return {rack: withFrameHeight(packedItems), moved, removed};
+  const s = settleHeld(packedItems, removedIds, moved);
+  return {rack: withFrameHeight(s.items), moved, removed, orphaned: s.orphaned};
 }
 
 // ZERO-U (#926): a zero-U part on an attachment point of this frame, its
@@ -472,8 +526,8 @@ export function fitsZeroU(rack, cand, chassisOf, {ignoreId = null} = {}) {
   const points = attachPoints(f.kind);
   if (!points.includes(cand.at)) return no(`${cand.at} is not an attachment point of a ${f.kind} frame: use ${points.join(', ')}.`);
   const lo = cand.ru ?? zeroUBottom(cand);
-  if (!Number.isInteger(lo) || lo < 1) return no('Below U1.');
-  if (lo > f.heightRU) return no(`U${lo} is past the top of this ${f.heightRU}U rack.`);
+  if (!Number.isInteger(lo) || lo < 1) return below(f);
+  if (lo > f.heightRU) return no(`U${named(f, lo)} is past the top of this ${f.heightRU}U rack.`);
   const u = zeroUUnits(c), hi = lo + u - 1;
   if (hi > f.heightRU) return tooTall(f, u, lo);
   for (const o of zeroUOf(rack)) {

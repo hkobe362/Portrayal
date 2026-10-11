@@ -46,7 +46,7 @@ test('startU: labels and positions count from it, both ways, and it is written o
     [35, 35.5, 35, 5]);
   assert.equal(M.uText(up, 12.5, 0.5), 'U16.5');
   assert.equal(F.unitsText(up, 13, 2), 'U17-U18');
-  assert.equal(F.unitsText(down, 13, 1.5), 'U34 to the lower half of U33');
+  assert.equal(F.unitsText(down, 13, 1.5), 'the lower half of U33 to U34');
   // with none, every label is the one of before
   const plain = M.normalizeFrame({heightRU: 42});
   assert.deepEqual([M.uLabel(plain, 7), M.positionOf(plain, 7, 2), M.firstU(plain)], [7, 7, 1]);
@@ -67,20 +67,42 @@ test('startU reaches the commands, describe, the sheet and both DCIM files', () 
   assert.ok(Q.describe(r, ctx).split('\n').some(l => l.startsWith('i1 leaf U16 front')));
   assert.equal(X.titleLines(r, new Date(2026, 9, 11))[1], 'Four-post frame, 42U, U5 at the bottom');
   assert.equal(X.titleLines(rackOf(), new Date(2026, 9, 11))[1], 'Four-post frame, 42U, U1 at the bottom');
-  // NetBox: the rack row states it, and a device row counts from it
-  assert.deepEqual(X.rackImportRows({rack: r}).rows[0], {site: '', name: 'R1', status: 'planned', width: 19, u_height: 42,
-    desc_units: 'false', starting_unit: 5});
+  // NEITHER IMPORT TAKES A STARTING UNIT. NetBox's RackImportForm lists no
+  // such field and refuses a header it does not list, so the rack row keeps
+  // its six columns and says it in `comments`; both device files count from 1
+  // and each comment gives the label on the rack.
+  const rackRow = X.rackImportRows({rack: r});
+  assert.deepEqual(rackRow.columns, ['site', 'name', 'status', 'width', 'u_height', 'desc_units', 'comments']);
+  assert.equal(rackRow.columns.includes('starting_unit'), false);
+  assert.deepEqual(rackRow.rows[0], {site: '', name: 'R1', status: 'planned', width: 19, u_height: 42, desc_units: 'false',
+    comments: 'Its units are numbered from 5 on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1.'});
+  // a rack that numbers from 1 is the six columns it always was, to the byte
+  assert.equal(X.toCsv(...Object.values(X.rackImportRows({rack: {...rackOf(), name: 'R1'}}))),
+    'site,name,status,width,u_height,desc_units\r\n,R1,planned,19,42,false\r\n');
   const types = new Map([['i1', {manufacturer: 'A', model: 'SW-1', isFullDepth: true, guess: false}]]);
   const items = F.itemsWithU(r, chassisOf);
-  assert.deepEqual(X.deviceImportRows({rack: r, items, types}).rows.map(x => [x.position, x.comments]), [[16, '']]);
-  // Nautobot numbers every rack from 1 and has no field for another start
+  assert.deepEqual(X.deviceImportRows({rack: r, items, types}).rows.map(x => [x.position, x.comments]),
+    [[12, 'U16 on the rack. The rack numbers its units from 5, and a unit named here is its label; the NetBox import counts from 1.']]);
   assert.deepEqual(X.deviceImportRows({rack: r, items, types, target: 'nautobot'}).rows.map(x => [x.position, x.comments]),
-    [[12, 'U16 on the rack, which numbers from 5; Nautobot numbers every rack from 1.']]);
-  // top-down, from 5: the unit stored at 12 is 35
+    [[12, 'U16 on the rack. The rack numbers its units from 5, and a unit named here is its label; the Nautobot import counts from 1.']]);
+  // top-down, from 5: the unit stored at 12 is labelled 35, and is 31 counted from 1
   const down = {...r, frame: M.normalizeFrame({...r.frame, numbering: 'top-down'})};
-  assert.deepEqual(X.deviceImportRows({rack: down, items, types}).rows.map(x => x.position), [35]);
+  assert.deepEqual(X.deviceImportRows({rack: down, items, types}).rows.map(x => x.position), [31]);
   assert.deepEqual(X.deviceImportRows({rack: down, items, types, target: 'nautobot'}).rows.map(x => x.position), [31]);
-  assert.equal(X.rackImportRows({rack: down}).rows[0].starting_unit, 5);
+  assert.match(X.deviceImportRows({rack: down, items, types}).rows[0].comments, /^U35 on the rack\. /);
+  // a half kept with no position names the label of its unit, and says how the rack is numbered
+  const sizes = ref => (ref === 'half' ? {ru: 0.5, w: 440, h: 22, d: 200} : chassisOf(ref));
+  let two = {...rackOf({startU: 5}), name: 'R1'};
+  two = M.withItem(M.withItem(two, {ref: 'half', cfg: '', ru: 12, label: 'low'}).rack, {ref: 'half', cfg: '', ru: 12.5, label: 'high'}).rack;
+  const both = new Map(['i1', 'i2'].map(id => [id, types.get('i1')]));
+  const high = X.deviceImportRows({rack: two, items: F.itemsWithU(two, sizes), types: both, target: 'nautobot'}).rows.find(x => x.name === 'high');
+  assert.deepEqual([high.position, high.comments], ['', 'In the upper half of U16, above low; no position, since Nautobot stores whole rack units. ' +
+    'The rack numbers its units from 5, and a unit named here is its label; the Nautobot import counts from 1.']);
+  // the sentences of fit name a unit as the rack labels it, counted from the bottom
+  assert.deepEqual(F.fits(r, {ref: 'sw', ru: 0, face: 'front'}, chassisOf), {ok: false, reason: 'Below U5.'});
+  assert.deepEqual(F.fits(r, {ref: 'deep', ru: 42, face: 'front'}, chassisOf), {ok: false, reason: '2U needed; 1U free from U46 to the top.'});
+  assert.deepEqual(run(r, {op: 'place', ref: 'sw', face: 'front', ru: 43}), {error: 'U47 is past the top of this 42U rack.', index: 0});
+  assert.deepEqual(F.fits(rackOf(), {ref: 'sw', ru: 0, face: 'front'}, chassisOf), {ok: false, reason: 'Below U1.'});
 });
 
 // ── round holes ──────────────────────────────────────────────────────────
@@ -124,8 +146,11 @@ test('a hand-written width, options, channel and item heldBy survive a round tri
   // every frame edit keeps them
   const edited = run(r, {op: 'frame', numbering: 'top-down'}).rack;
   assert.deepEqual([edited.frame.width, edited.frame.options], [23, [{id: 'channels'}, 'castors']]);
-  // the width is exported, and the options listed
+  // the width is exported when it is one the NetBox rack import takes (10, 19, 21, 23), and the options listed
   assert.equal(X.rackImportRows({rack: r}).rows[0].width, 23);
+  assert.deepEqual(X.rackImportRows({rack: r}).columns, X.NETBOX_RACK_COLUMNS);
+  const odd = X.rackImportRows({rack: {...r, frame: {...r.frame, width: 24}}});
+  assert.deepEqual([odd.rows[0].width, odd.rows[0].comments], [19, 'Its rails are 24 in wide, which the NetBox rack import does not take; 19 is written.']);
   assert.match(Q.describe(r, ctx), /numbered bottom-up\. Options: channels, castors\./);
   // a width that is no width is dropped; the part with a channel still fits where it stands
   assert.equal('width' in M.normalizeFrame({...frame, width: 'wide'}), false);
@@ -177,6 +202,25 @@ test('a setback is fitted against the usable depth and the other face; a decreas
   assert.equal(run(none.rack, {op: 'patch', id: 'i1', setback: null}).noop, true);
   // the rack default: a larger one is checked for every device it moves, a smaller one is not
   assert.deepEqual(run(r, {op: 'frame', setback: 30}), {index: 0, error: 'front: 200 mm deep, set back 30 mm; 210 mm free behind rear.'});
+  // refused on depth alone: a rack that holds an overlap in height (as a version-3 rack could) is not refused for it
+  const over = put(put(rackOf(), 'sw', 1, {label: 'a'}), 'sw', 1, {label: 'b'});
+  assert.equal(F.fits(over, over.items[0], chassisOf, {ignoreId: 'i1'}).reason, 'Taken by b on the front.');
+  assert.equal(run(over, {op: 'frame', setback: 30}).rack.frame.setback, 30);
+  assert.equal(run(over, {op: 'patch', id: 'i1', setback: 30}).rack.items[0].setback, 30);
+  // and not bypassed by a shrink in the same command: 700 deep, set back 301, is past 1000
+  const tall = put(rackOf(), 'deep', 10, {label: 'srv'});
+  assert.deepEqual(run(tall, {op: 'frame', heightRU: 41, setback: 301}), {index: 0, error: 'srv: 700 mm deep, set back 301 mm; this rack allows 1000 mm.'});
+  assert.deepEqual(run(tall, {op: 'frame', heightRU: 5, setback: 301}), {index: 0, error: 'srv: 700 mm deep, set back 301 mm; this rack allows 1000 mm.'});
+  assert.equal(run(tall, {op: 'frame', heightRU: 41, setback: 300}).rack.frame.setback, 300);
+  // a part on the rail face has no setback: it is refused one, and one written by hand is not said
+  const mg = put(rackOf(), 'mgr', 5, {label: 'CM'});
+  assert.deepEqual(run(mg, {op: 'patch', id: 'i1', setback: 10}), {index: 0, error: 'CM bolts to the rail face, so it has no setback.'});
+  assert.ok(Q.describe(withKeys(mg, 'i1', {setback: 10}), ctx).split('\n').includes('i1 CM U5 front'));
+  // proud reads as fit says it
+  const proud = withKeys(put(rackOf({setback: -25}), 'sw', 5, {label: 'leaf'}), 'i1', {setback: -25});
+  assert.match(Q.describe(proud, ctx), /Faceplates set forward 25 mm\./);
+  assert.ok(Q.describe(proud, ctx).split('\n').includes('i1 leaf U5 front, set forward 25 mm'));
+  assert.ok(Q.describe(withKeys(proud, 'i1', {setback: 12}), ctx).split('\n').includes('i1 leaf U5 front, set back 12 mm'));
   const twenty = run(r, {op: 'frame', setback: 20});
   assert.equal(twenty.rack.frame.setback, 20);
   assert.equal(run(twenty.rack, {op: 'frame', setback: null}).rack.frame.setback, undefined);
@@ -263,6 +307,7 @@ test('a held item: its host moved, removed and shrunk with; itself moved by hand
   // a rack device standing on a shelf keeps its own unit and is fitted as any rack device
   const onShelf = withKeys(put(put(rackOf(), 'shelf', 20, {label: 'Shelf'}), 'sw', 22, {label: 'leaf'}), 'i2', HELD);
   assert.deepEqual(F.fits(onShelf, onShelf.items[1], chassisOf, {ignoreId: 'i2'}), {ok: true});
+  assert.ok(Q.describe(onShelf, ctx).split('\n').includes('i2 leaf U22 front, held by i1'), 'it is checked, so it is not said to be unchecked');
   assert.equal(F.fits(onShelf, {ref: 'sw', ru: 22, face: 'front'}, chassisOf).ok, false);
   assert.deepEqual(run(onShelf, {op: 'move', id: 'i1', ru: 30}).rack.items.map(i => i.ru), [30, 22]);
 });
@@ -278,3 +323,43 @@ test('a held item is exported in the rack with no position and a comment', () =>
     assert.deepEqual([shelf.position, shelf.face, shelf.comments], [20, 'front', '']);
   }
 });
+
+test('a shrink that drops a host says what it held, and no held item is left outside the rack', () => {
+  // the shelf at U2 is dropped by a shrink to 3U that keeps the deeper cluster above it; what it held stays
+  let r = withKeys(put(put(put(rackOf(), 'shelf', 2, {label: 'Shelf'}), 'din', 2, {label: 'DIN switch'}), 'deep', 10, {label: 'srv'}), 'i2', HELD);
+  r = put(r, 'sw', 12, {label: 'leaf'});
+  const s = F.shrinkRack(r, 3, chassisOf);
+  assert.deepEqual(s.removed.map(i => i.id), ['i1']);
+  assert.deepEqual(s.orphaned.map(i => i.id), ['i2']);
+  assert.deepEqual(s.rack.items.map(i => [i.id, i.ru]), [['i2', 2], ['i3', 1], ['i4', 3]]);
+  const res = run(r, {op: 'frame', heightRU: 3});
+  assert.equal(res.summary, 'Moved 2 devices down and removed 1 from the bottom to fit 3U: Shelf. ' +
+    'DIN switch was held by a removed device and stays in the rack, held by nothing.');
+  assert.equal(F.fits(res.rack, res.rack.items[0], chassisOf, {ignoreId: 'i2'}).ok, false, 'refused until it is placed again or freed');
+  // an item whose host is gone, left above the new top, comes down to the top unit
+  const orphan = withKeys(put(put(rackOf(), 'din', 30, {label: 'DIN switch'}), 'sw', 2, {label: 'leaf'}), 'i1', {heldBy: {item: 'i9'}});
+  const low = F.shrinkRack(orphan, 10, chassisOf);
+  assert.deepEqual(low.rack.items.map(i => [i.id, i.ru]), [['i1', 10], ['i2', 2]]);
+  assert.deepEqual([low.moved, low.removed, low.orphaned], [['i1'], [], []]);
+  assert.doesNotThrow(() => M.parseDoc(M.serialize({...M.newDoc(), racks: [low.rack]})));
+  // a held item whose host stays keeps its place beside it
+  assert.deepEqual(F.shrinkRack(shelfRack(), 30, chassisOf).rack.items.map(i => i.ru), [20, 20]);
+});
+
+test('an item bolted over a device and held by one is refused by fit until one is removed, and said on load', () => {
+  // a manager over the shelf that also names the shelf in heldBy
+  let r = put(put(rackOf(), 'shelf', 20, {label: 'Shelf'}), 'mgr', 21, {label: 'CM', on: 'i1', unit: 2});
+  r = withKeys(r, 'i2', {heldBy: {item: 'i1', at: 'rail', x: 0}});
+  const text = 'i2 is on i1 and held by i1: a part is bolted over a device or held by one, not both, so remove one.';
+  assert.deepEqual(F.fits(r, r.items[1], chassisOf, {ignoreId: 'i2'}), {ok: false, reason: text});
+  assert.deepEqual(F.frameNotices(r, chassisOf), [text]);
+  // the host moves: the part goes by its unit, as a manager does, not to the bottom of the host
+  const moved = M.parseDoc(M.serialize({...M.newDoc(), racks: [r]})).racks[0];
+  assert.deepEqual(moved.items[1].heldBy, {item: 'i1', at: 'rail', x: 0}, 'both keys are kept on load');
+  const m = run(withKeys(r, 'i2', {}), {op: 'move', id: 'i1', ru: 30});
+  assert.equal(m.error, `CM moves with it: ${text}`);
+  // freed of one, it fits and follows by its unit
+  const freed = run(r, {op: 'patch', id: 'i2', heldBy: null}).rack;
+  assert.deepEqual(run(freed, {op: 'move', id: 'i1', ru: 30}).rack.items.map(i => i.ru), [30, 31]);
+});
+

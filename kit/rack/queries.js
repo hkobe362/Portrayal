@@ -4,7 +4,7 @@
 // are handed their readers in `ctx`, since reading a face needs the network and
 // a DOMParser, which this module never touches.
 
-import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, unitsOf, spanText} from './fit.js';
+import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, unitsOf, spanText, isHeld} from './fit.js';
 import {placement, managersOf} from './managers.js';
 import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
@@ -96,10 +96,12 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
     `${beside.length ? `${count(beside.length, 'part')} beside the rack, ` : ''}${count(cables.length, 'cable')}` +
     `${bundles.length ? `, ${count(bundles.length, 'bundle')}` : ''}.`;
   // the optional frame keys, each said only when the frame has it
+  // a setback as fit says it: back into the rack, or forward of the rail
+  const setText = s => `set ${s < 0 ? 'forward' : 'back'} ${Math.abs(s)} mm`;
   const optionText = o => (typeof o === 'string' ? o : o && typeof o === 'object' && typeof o.id === 'string' ? o.id : JSON.stringify(o));
   const options = f.options == null ? '' : ` Options: ${(Array.isArray(f.options) ? f.options : [f.options]).map(optionText).join(', ') || 'none'}.`;
   const frameLine = `${f.heightRU}U ${f.kind}, ${holes}, numbered ${f.numbering}${firstU(f) !== 1 ? ` from U${firstU(f)}` : ''}.`
-    + (typeof f.setback === 'number' ? ` Faceplates set back ${f.setback} mm.` : '') + options;
+    + (typeof f.setback === 'number' ? ` Faceplates ${setText(f.setback)}.` : '') + options;
   // ONE LINE OF TOTALS FOR THE FINDINGS (#949), when routes can be read and
   // there is any: an agent that only describes the rack still sees them.
   const findingsLine = findingsText(rack, ctx);
@@ -109,11 +111,14 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
   const item = (i, short, full = false) => {
     const ms = managersOf(rack, i.id).map(m => m.id);
     const rail = railOf(i, chassisOf);
-    return [`${i.id}${short ? '' : ` ${i.label}`} ${span(i)} ${i.face}${rail ? ` ${rail} rail` : ''}${i.turned ? ' turned' : ''}`,
+    // a span that names a half is a phrase, set off from the label by commas
+    const where = span(i), plain = where.startsWith('U');
+    const c = chassisOf(i.ref);
+    return [`${i.id}${short ? '' : ` ${i.label}`}${plain ? ' ' : ', '}${where}${plain ? ' ' : ', '}${i.face}${rail ? ` ${rail} rail` : ''}${i.turned ? ' turned' : ''}`,
             ...(full ? [`${i.ref} ${i.cfg || '(no configuration)'}`] : []),
             ...(i.on ? [`on ${i.on} unit ${i.unit}`] : []), ...(ms.length ? [`carries ${ms.join(' ')}`] : []),
-            ...(typeof i.setback === 'number' ? [`set back ${i.setback} mm`] : []),
-            ...(holderOf(i) != null ? [`held by ${holderOf(i)}, not checked`] : []),
+            ...(typeof i.setback === 'number' && !isRackFace(c) && !isZeroUPart(c) ? [setText(i.setback)] : []),
+            ...(holderOf(i) != null ? [`held by ${holderOf(i)}${isHeld(i, chassisOf) ? ', not checked' : ''}`] : []),
             ...(holds(i).length ? [`holds ${holds(i).join(' ')}`] : [])].join(', ');
   };
   const part = (z, short, full = false) => [`${z.id}${short ? '' : ` ${z.label}`} ${whereText(rack, z, chassisOf)}`,

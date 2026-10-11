@@ -226,12 +226,15 @@ reader that does not know it finds every field it read before.
   states each under its own configuration. Always a list; `[]` on a device
   that offers none. Additive: `contract` is still 2.
 - **`configs[].states`** in `<device>.configs.json` (the same note, section
-  4): what each placed part of a configuration can be set to,
+  4): what each placed part of a configuration can ITSELF be set to,
   `{"outlet-a1": ["on", "off"]}`, keyed by placement id in sorted order. The
-  names are the ones the drawing carries on that part: the placement's own
-  `states`, else its group's, else its part's. A part that declares none has
-  no entry, so an outlet that cannot be switched is not listed. Always an
-  object; `{}` on a device that declares none. Additive.
+  names are the ones the part declares as a list: the placement's own
+  `states`, else its group's, else its part's. A lamp (`class: led`) is not
+  listed, since a state is set on the outlet and follows `for:` to its lamp;
+  nor is a part whose `states` is the mapping form, which names the lamps
+  inside it. A part that declares none has no entry, so an outlet that cannot
+  be switched is not listed. Always an object; `{}` on a device that
+  declares none. Additive.
 - **`attrs.power`** gains `input-plug` (now a `PART_POWER` slug, which on the
   one device that wrote it was prose), `input-cord`, `input-phase`,
   `input-wiring`, `input-voltage-v`, `input-current-a`, `plug-rating-a` and

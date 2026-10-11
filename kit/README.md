@@ -272,11 +272,19 @@ part and the `mountPoints` it hangs by, as its `configs.json` states them.
 `span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
 half a unit. Use `spanOf`, and read its second number as the top edge.
 
+`holderOf(item)` in `rack/model.js` is the id of the item that holds one on
+a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
+`rack/fit.js` says whether a held item is one the kit does not check: a page
+draws such an item on its host, and not in a unit of its own.
+
 The other names these modules export are the kit's own, shared between its
 files, and may change without notice: `spansMeet`, `anchorY`, `laneY`,
-`neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf` and
-`overlapNotices` in `rack/fit.js`; `isPosition` and `HOLE_STYLES` in
-`rack/model.js`; `HOLE_EDGE` in `rack/rails.js`.
+`neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf`,
+`overlapNotices`, `fitsDepth`, `reachOf`, `heldBy`, `uncheckedText`,
+`unheldText` and `bothText` in `rack/fit.js`; `isPosition`, `HOLE_STYLES`,
+`railWidth` and `RAIL_WIDTH_IN` in `rack/model.js`; `HOLE_EDGE` in
+`rack/rails.js`; `NO_HOSTS` in `rack/commands.js`; `NETBOX_RACK_WIDTHS` in
+`rack/export-data.js`.
 
 ### Where this came from
 

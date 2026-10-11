@@ -251,11 +251,14 @@ test('a span in words: whole units as before, and a half named as a half', () =>
   const down = M.normalizeFrame({heightRU: 42, numbering: 'top-down'});
   assert.deepEqual([text('r2', 13, down), text('xcu', 12, down), text('xcu', 12.5, down)],
     ['U29-U30', 'the lower half of U31', 'the upper half of U31']);
-  assert.equal(text('tm-7124s', 13, down), 'U30 to the lower half of U29');
+  // its two ends in the order a whole span reads on that frame, lower number first
+  assert.equal(text('tm-7124s', 13, down), 'the lower half of U29 to U30');
+  assert.equal(text('mx104', 10, down), 'the lower half of U30 to U33');
   const r = put(put(rackOf(), 'xcu', 12, {label: 'ODF A'}), 'xcu', 12.5, {label: 'ODF B'});
   const lines = Q.describe(r, ctx).split('\n');
-  assert.ok(lines.some(l => l.startsWith('i2 ODF B the upper half of U12 front')), lines.join(' | '));
-  assert.ok(lines.some(l => l.startsWith('i1 ODF A the lower half of U12 front')), lines.join(' | '));
+  assert.ok(lines.includes('i2 ODF B, the upper half of U12, front'), lines.join(' | '));
+  assert.ok(lines.includes('i1 ODF A, the lower half of U12, front'), lines.join(' | '));
+  assert.ok(Q.describe(put(rackOf(), 'qfx', 12, {label: 'leaf'}), ctx).split('\n').includes('i1 leaf U12 front'), 'a whole span reads as before');
 });
 
 test('no two placements read the same: every height of the catalogue at every whole and half position', () => {

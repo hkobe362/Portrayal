@@ -4735,8 +4735,17 @@ def config_states(device, cfg_name, cfg, lib):
 
     THE VOCABULARY A RACK FILE IS CHECKED AGAINST. A path is a placement id,
     which is what a rack entry keys `states` by (`outlet-a1`). Its names are
-    the ones the drawing carries on that part, found as the renderer finds
-    them: the placement's own `states`, else its group's, else its part's.
+    the ones the part declares, found as the renderer finds them: the
+    placement's own `states`, else its group's, else its part's.
+
+    WHAT A PART ITSELF CAN BE, NOT WHAT ITS LAMPS SHOW. Two things that carry
+    `states` are left out, because neither is a part a rack entry sets:
+    - a lamp (a `class: led` part). A state is addressed by the outlet and
+      follows `for:` to the lamp beside it, and the lamp's own vocabulary is
+      already on the drawing (`data-states`);
+    - the mapping form, `{<element>: [states]}`, which gives each lamp INSIDE
+      a part its own vocabulary (apply_states): its keys are element ids, not
+      state names, and it says nothing of what the part can be set to.
     A part that declares none is not listed, so an outlet that cannot be
     switched has no entry. Read over the views and placements this
     configuration draws; `{}` on a device that declares none."""
@@ -4746,11 +4755,12 @@ def config_states(device, cfg_name, cfg, lib):
         for p in view_parts(view)["placements"]:
             if not p.get("id") or (p.get("only-in") and cfg_name not in p["only-in"]):
                 continue
-            states = p.get("states") or (groups.get(p.get("group")) or {}).get("states")
-            if not states:
-                contract, _ = lib.resolve(p["ref"])
-                states = contract.get("states")
-            if states:
+            contract, _ = lib.resolve(p["ref"])
+            if contract.get("class") == "led":
+                continue
+            states = (p.get("states") or (groups.get(p.get("group")) or {}).get("states")
+                      or contract.get("states"))
+            if isinstance(states, list) and states:
                 out[p["id"]] = state_names(states)
     return dict(sorted(out.items()))
 

@@ -12,12 +12,12 @@
   `rack/model`: `uText(frame, ru, units)`. `rack/rails`: `holesIn(lo, hi)`.
   The other new exports of these modules are the kit's own and are listed as
   such in `kit/README.md`.
-- A frame takes `startU`, the number of its first unit: every label and
-  exported position counts from it, and the NetBox rack row gains
-  `starting_unit` (1 when the frame states none) and writes the frame
-  `width` where it wrote 19. Nautobot numbers every rack from 1, so a
-  Nautobot device row keeps its position from 1 and its comment gives the
-  label on the rack. `holes.style: round` is said in `describe` and the
+- A frame takes `startU`, the number of its first unit: every label counts
+  from it. Neither DCIM import takes a starting unit, so both device files
+  keep positions counted from 1 and each comment gives the label on the
+  rack. The NetBox rack row keeps its six columns; a rack that numbers from
+  another unit, or states a width NetBox does not take, gains a `comments`
+  column saying so, and a width of 10, 21 or 23 is written where 19 was. `holes.style: round` is said in `describe` and the
   sheet, and counted as square holes are, with a note.
 - `setback` on a frame and on an item, in mm behind the rail: found in the
   order item, default ear position of the device, frame, flush
@@ -34,8 +34,9 @@
   `mount-points`: `slots`, each slot it offers a hanging part as
   `{interface, at}`, and `states`, what each placed part can be set to as
   `{<placement id>: [names]}`. Both are derived, both additive, and
-  `contract` is still 2. The EVMA8365X lists its 42 switchable outlets and
-  their lamps; the EVMI2130X, which switches nothing, lists none. No part in
+  `contract` is still 2. `states` lists what a part itself can be set to,
+  not its lamps: the EVMA8365X lists its 42 switchable outlets; the
+  EVMI2130X, which switches nothing, lists none. No part in
   the library offers a slot yet. `rack/catalog` `loadSlots` keeps the
   `pdu-class` of a device, and `configFacts` and `meteringOf` read what a
   rack entry will be checked against.

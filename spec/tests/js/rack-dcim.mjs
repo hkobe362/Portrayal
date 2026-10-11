@@ -161,13 +161,13 @@ test('the import settings fill role and site, or role and location; blank ones s
 
 test('the rack row is written from the frame: 19 inch, its height, planned, and whether U1 is at the top', () => {
   assert.deepEqual(X.rackImportRows({rack: RACK, dcim: {site: 'Lab 1', role: 'Router'}}), {
-    columns: ['site', 'name', 'status', 'width', 'u_height', 'desc_units', 'starting_unit'],
-    rows: [{site: 'Lab 1', name: 'Export test', status: 'planned', width: 19, u_height: 24, desc_units: 'false', starting_unit: 1}]});
+    columns: ['site', 'name', 'status', 'width', 'u_height', 'desc_units'],
+    rows: [{site: 'Lab 1', name: 'Export test', status: 'planned', width: 19, u_height: 24, desc_units: 'false'}]});
   const down = {...RACK, frame: {...RACK.frame, numbering: 'top-down'}};
   assert.deepEqual(X.rackImportRows({rack: down}).rows[0], {site: '', name: 'Export test', status: 'planned', width: 19,
-    u_height: 24, desc_units: 'true', starting_unit: 1});
+    u_height: 24, desc_units: 'true'});
   assert.equal(X.toCsv(...Object.values(X.rackImportRows({rack: down, dcim: {site: 'A, B'}}))),
-    'site,name,status,width,u_height,desc_units,starting_unit\r\n"A, B",Export test,planned,19,24,true,1\r\n');
+    'site,name,status,width,u_height,desc_units\r\n"A, B",Export test,planned,19,24,true\r\n');
 });
 
 test('rows sort by each item\'s top U, not where it starts', () => {
