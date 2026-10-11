@@ -662,6 +662,27 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.23.0: a port on the back of a seated part.** The rear adapters of
+a patch panel and the trunk connector of a cassette take a cable. Nothing is
+removed, and the rack file and the export columns are as they were.
+
+- A zone read off a projection (`readSvg`, `readDrawing`, `loadFace`) has
+  the path of the part it shows, `bay-1/module/b01`, where it had the
+  element's id, `bay-1-rear--b01`, and says `projected: true`. **This is
+  the one thing that changed meaning:** a page that keyed anything on such a
+  zone's `path` now gets the address. Its `id` is the element's, as before.
+- The draw.io and OmniGraffle files name such a port as they did
+  (`exportName`), and a cable end finds it by either name.
+- `freePorts` offers `{ path: '<bay>/module/<part>', view }` for a port on
+  a back, and never an element id; `cable.add` and `cable.update` refuse an
+  element id and say what to give.
+- `rack/ports.js` is new: `seatedPort`, `seatedPorts`, `settleEnd`,
+  `settleEnds`. A page reading whether an end lands can ask `seatedPort`
+  for an end under a bay and keep its drawing lookups for the rest; where it
+  still looks in a drawing, a part on a back is `data-of`, not `data-path`.
+- `looseReason` reads one more fact, `onView`, and says which panel a port
+  is on when an end names the other one.
+
 **New in 0.22.0: rack file version 4.** One version for everything that had
 waited for one ([`docs/rack-file-v4-design.md`](../docs/rack-file-v4-design.md));
 [Heights, spans and half units](#heights-spans-and-half-units) has the names
