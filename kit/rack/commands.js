@@ -42,7 +42,8 @@ const note = text => ({kind: 'note', text});
 const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 // fits() measures a device against the top by the Us it has left there, which
 // reads oddly for a U past the top altogether; an agent can ask for any U.
-const pastTop = (rack, ru) => (ru != null && ru > rack.frame.heightRU
+// The upper half of the top unit is in the rack; the unit after it is not.
+const pastTop = (rack, ru) => (ru != null && ru >= rack.frame.heightRU + 1
   ? {error: `U${ru} is past the top of this ${rack.frame.heightRU}U rack.`} : null);
 
 // ── items ───────────────────────────────────────────────────────────────
@@ -766,7 +767,10 @@ const RACK = {type: 'string', description: 'The id of the rack to edit. Only the
 const AS = {type: 'string', minLength: 1, description: 'A name for what this creates; later commands in the same batch can use "@name" as its id.'};
 const ID = what => ({type: 'string', minLength: 1, description: `The id of the ${what}, as the rack's description lists it, or "@name" from earlier in this batch.`});
 const FACE = {enum: ['front', 'rear'], description: 'Which face of the rack: front or rear.'};
-const RU = {type: 'integer', minimum: 1, description: 'The U its bottom sits in, counted from 1 at the bottom of the rails.'};
+const RU = {type: 'number', minimum: 1, multipleOf: 0.5,
+  description: 'Its bottom, in units from 1 at the bottom of the rails, in steps of 0.5 (12.5 is the upper half of U12). A whole-unit device takes a whole unit.'};
+// A part that bolts to the rail face stands at a whole unit.
+const WHOLE_RU = {type: 'integer', minimum: 1, description: 'The U its bottom sits in, counted from 1 at the bottom of the rails.'};
 const END = {type: 'object', required: ['item', 'path', 'view'], additionalProperties: false,
   description: 'One end of a cable: a port on a device.',
   properties: {item: ID('device'), path: {type: 'string', minLength: 1, description: "The port, as the device's free ports name it (e.g. port-1)."},
@@ -846,7 +850,7 @@ export const COMMANDS = {
   'side.place': {run: sidePlace, description: 'Put a narrow rail part (a finger bracket narrower than the opening) on one rail, its bottom at a U. It takes that rail only, so another can stand on the other rail at the same U.',
     args: args(['ref', 'face', 'ru', 'side'], {ref: {type: 'string', minLength: 1, description: 'The part, as the catalogue lists it (its ref).'},
       cfg: {type: 'string', description: "Which of the part's configurations; its default when left out."},
-      face: FACE, ru: RU, side: {enum: ['left', 'right'], description: 'Which rail it is on, as seen from its face: left or right.'},
+      face: FACE, ru: WHOLE_RU, side: {enum: ['left', 'right'], description: 'Which rail it is on, as seen from its face: left or right.'},
       label: {type: 'string', description: 'The name shown on the drawing; its model when left out.'}, as: AS})},
   'side.set': {run: sideSet, description: 'Put a narrow rail part on the left or right rail, or (side null) across both, where it bolts onto a device behind it.',
     args: args(['id', 'side'], {id: ID('rail part'), side: {enum: ['left', 'right', null], description: 'left, right, or null for across both rails.'}})},
@@ -903,7 +907,8 @@ const typeWord = s => {
   if (s.enum) return `one of ${s.enum.filter(v => v !== null && v !== '').join(', ')}`;
   const t = [].concat(s.type ?? []).find(x => x !== 'null');
   return {integer: `a whole number${s.minimum != null ? ` from ${s.minimum}` : ''}${s.maximum != null ? ` to ${s.maximum}` : ''}`,
-          number: `a number${s.exclusiveMinimum === 0 ? ' above 0' : ''}`, string: 'some text',
+          number: `a number${s.exclusiveMinimum === 0 ? ' above 0' : ''}${s.multipleOf != null ? ` in steps of ${s.multipleOf}` : ''}` +
+                  `${s.multipleOf != null && s.minimum != null ? ` from ${s.minimum}` : ''}`, string: 'some text',
           boolean: 'true or false', object: 'an object', array: 'a list'}[t] || 'a value';
 };
 function sentence(op, e) {

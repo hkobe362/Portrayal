@@ -7,7 +7,7 @@
 
 import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName} from './model.js';
 import {routeText, trunkRoute} from './route.js';
-import {isRackMount, isZeroUPart, railOf} from './fit.js';
+import {isRackMount, isZeroUPart, railOf, unitsOf} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
 export {positionOf};
@@ -418,12 +418,16 @@ export function threeDNotes(rack) {
 // frame counts; what a DCIM calls a device's position). The height is the
 // item's own `u` when it carries one (fit.js itemsWithU), else its chassis's.
 export const uOfItem = (frame, item, chassisOf = () => null) =>
-  positionOf(frame, item.ru, item.u ?? Math.max(1, chassisOf(item.ref)?.ru ?? 1));
+  positionOf(frame, item.ru, item.u ?? unitsOf(chassisOf(item.ref)));
 
-// draw.io's cabinet counts from 1 at the TOP, and its `u` is the device's top U.
-export const drawioU = (heightRU, ru, u) => heightRU - (ru + u - 1) + 1;
+// draw.io's cabinet counts from 1 at the TOP, and its `u` is the top of the
+// device's box in units from the top, in steps of 0.5: the top U of a device
+// that ends on a whole unit.
+export const drawioU = (heightRU, ru, u) => heightRU + 2 - ru - u;
 
-const overlaps = (a, b) => a.ru <= b.ru + b.u - 1 && b.ru <= a.ru + a.u - 1;
+// Two items carrying their height (`u`) meet when each starts below the top
+// edge of the other (fit.js spansMeet): the spans are half-open.
+const overlaps = (a, b) => a.ru < b.ru + b.u && b.ru < a.ru + a.u;
 // ONE CABINET PER FACE. What you see from a side is what is mounted there,
 // plus the far panel of anything that nothing mounted on this side covers.
 // Behind a mounted device, the other side's device is hidden - two pictures
@@ -806,7 +810,7 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
   }
   // Top down by the U a device's TOP occupies, not where it starts (ru is
   // its bottom): a tall device reaches higher than its ru alone would say.
-  const topU = it => it.ru + it.u - 1;
+  const topU = it => it.ru + it.u;
   const sorted = [...kept].sort((a, b) => topU(b) - topU(a) || (a.face === b.face ? 0 : a.face === 'front' ? -1 : 1));
   const rows = sorted.map(it => {
     const t = types.get(it.id);
@@ -914,9 +918,11 @@ export function bomRows({devices = [], parts = [], frame, railUs = []}) {
   return [...rows, ...hardwareRows(frame, railUs)];
 }
 
-// 2 ears x 2 screws x each U a rail item covers.
+// 2 ears x 2 screws x each U a rail item covers, with no floor of one unit: a
+// half-unit panel has one slot an ear, so it takes 2. `railUs` are the heights
+// in units (fit.js unitsOf, in halves), so the count is always whole.
 export function hardwareRows(frame, railUs) {
-  const qty = 4 * railUs.reduce((s, u) => s + Math.max(1, u), 0);
+  const qty = 4 * railUs.reduce((s, u) => s + (Number(u) > 0 ? Number(u) : 1), 0);
   if (!qty) return [];
   const row = model => ({section: 'Mounting hardware', qty, manufacturer: '', model,
     description: 'Two per ear for each U a device covers', ref: ''});

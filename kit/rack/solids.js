@@ -41,7 +41,7 @@
 
 import {RU, SIDES} from './rails.js';
 import {zeroUOf, zeroUBottom} from './model.js';
-import {isZeroUPart, railOf} from './fit.js';
+import {isZeroUPart, railOf, itemBox} from './fit.js';
 import {zeroUX, faceOfAt, carriesLane} from './zero-u.js';
 
 // mm a detour keeps clear of a body, beyond the cable's own radius: the figure
@@ -109,7 +109,8 @@ function itemPlacer(rack, it, c) {
   const left = rail ? (rail === 'left') === !rear : null;
   const cx = rail ? (left ? SIDES[0] : SIDES[1]).hole : 0;
   const flip = rail === 'right';
-  return placer({cx, w, y0: (it.ru - 1) * RU, h, zFront, outward, mirror: flip ? !mirror : mirror, flipY: flip});
+  // where the body stands is fit.js itemBox's: centred in its span, always
+  return placer({cx, w, y0: itemBox(rack, it, () => c).y0, h, zFront, outward, mirror: flip ? !mirror : mirror, flipY: flip});
 }
 
 function zeroUPlacer(rack, z, c) {

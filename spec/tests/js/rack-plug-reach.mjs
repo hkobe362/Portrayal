@@ -168,7 +168,9 @@ test('the reach is in the length once, as path, and the end allowance is the OM4
 // the port (for c16 the side nearer the ring, 12 mm from its band). Each
 // cord is 20.6 to 101.3 mm longer (590.5, 589.3, 591.2, 592, 558.1, 564.8,
 // 546.9 and 552.6 before), and still a 1 m cord.
-const OVER_THE_EDGE = {c9: 611.1, c10: 613.2, c11: 616.1, c12: 623.4, c13: 645.7, c14: 617.4, c15: 648.2, c16: 575.8};
+// (c9 611.1, c13 645.7, c14 617.4, c15 648.2 and c16 575.8 before the lacer
+// stood centred in its unit, 0.225 mm up: fit.js itemBox)
+const OVER_THE_EDGE = {c9: 611.2, c10: 613.2, c11: 616.1, c12: 623.4, c13: 645.5, c14: 616.9, c15: 648, c16: 576.3};
 
 test('a cord that must clear its plug goes round the tray\'s front edge, and is measured that way', () => {
   const r = F.rack(), ctx = optics(F.ctxOf(r));

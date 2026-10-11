@@ -194,10 +194,17 @@ export const withDcim = (rack, patch) => {
 // U numbers are stored bottom-up always; this is only what a label says.
 export const uLabel = (frame, u) => (frame.numbering === 'top-down' ? frame.heightRU - u + 1 : u);
 // A DEVICE'S U, wherever it is named with one: its POSITION, the lowest-numbered
-// U it covers, counted the way this frame counts - what a DCIM calls a device's
-// position. `ru` is its bottom U as stored and `u` its height; on a bottom-up
-// frame that is the bottom U's own label, on a top-down one the top U's.
-export const positionOf = (frame, ru, u = 1) => Math.min(uLabel(frame, ru), uLabel(frame, ru + Math.max(1, u) - 1));
+// half unit it fills, counted the way this frame counts - what a DCIM calls a
+// device's position, in steps of 0.5. `ru` is its bottom as stored and `units`
+// its height in units (fit.js unitsOf); on a bottom-up frame that is the bottom
+// itself, on a top-down one the half unit under its top edge. On a 42U top-down
+// frame a 0.5U item stored at 12 is at 31.5, and one stored at 12.5 is at 31.
+export const positionOf = (frame, ru, units = 1) =>
+  (frame.numbering === 'top-down' ? frame.heightRU + 2 - ru - units : ru);
+// A position as a person reads it: "U12", "U12.5". It takes the height because
+// a top-down label of a half depends on it. uLabel stays for whole units
+// (lanes, managers, the rail numbers).
+export const uText = (frame, ru, units = 1) => `U${positionOf(frame, ru, units)}`;
 
 // A POSITION is a whole unit or a half (version 4): `ru` in steps of 0.5.
 export const isPosition = ru => typeof ru === 'number' && Number.isFinite(ru) && Number.isInteger(ru * 2);

@@ -14,7 +14,7 @@ import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan} from './fit.js';
+import {isZeroUPart, zeroUSpan, unitsOf, neighbourUnits, anchorY, laneY} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -55,21 +55,18 @@ export function ringOf(g) {
   return {run: ['x', 'y', 'z'].includes(g.run) ? g.run : 'x', depth: stated ? g.depth : RING_DEPTH, estimated: !stated};
 }
 
-const unitsOf = (ctx, it) => Math.max(1, ctx.chassisOf(it.ref)?.ru ?? 1);
-const spans = (ctx, it, u) => u >= it.ru && u <= it.ru + unitsOf(ctx, it) - 1;
-
 // The manager an end leaves through, in order: one hosted on its item on that
-// face; else, of the 1U devices adjacent on that face (ABOVE first, then
-// BELOW), the first with a manager hosted on it on that face, else itself if it
-// declares guides on that face. A manager must declare guides on that face.
-// null when there is none.
+// face; else, of the devices of a unit or less adjacent on that face (ABOVE
+// first, then BELOW: fit.js neighbourUnits), the first with a manager hosted on
+// it on that face, else itself if it declares guides on that face. A manager
+// must declare guides on that face. null when there is none.
 function managerOf(rack, it, pane, ctx) {
   const guided = m => ctx.guidesOf(m.id).some(g => g.face === pane);
   const hosted = rack.items.find(m => m.on === it.id && m.face === pane && guided(m));
   if (hosted) return hosted;
-  for (const u of [it.ru + unitsOf(ctx, it), it.ru - 1]) {
+  for (const u of neighbourUnits(it, ctx.chassisOf)) {
     for (const o of rack.items.filter(o => o.id !== it.id && o.face === pane && !o.on
-                                           && unitsOf(ctx, o) === 1 && spans(ctx, o, u))) {
+                                           && unitsOf(ctx.chassisOf(o.ref)) <= 1 && Math.floor(o.ru) === u)) {
       const carried = rack.items.find(m => m.on === o.id && m.face === pane && guided(m));
       if (carried) return carried;
       if (guided(o)) return o;
@@ -337,7 +334,7 @@ export function pointOf(rack, w, ctx) {
   const f = rack.frame;
   if (w.lane) {
     const [, pane = 'front'] = w.lane.split('-');
-    return {x: laneXAt(rack, w.lane, w.ru, ctx?.chassisOf), y: (w.ru - 0.5) * RU, z: planeZ(f, pane)};
+    return {x: laneXAt(rack, w.lane, w.ru, ctx?.chassisOf), y: laneY(w.ru), z: planeZ(f, pane)};
   }
   const it = itemOf(rack, w.item), g = it && ctx.guidesOf(it.id).find(x => x.via === w.via);
   if (!g) {
@@ -356,7 +353,7 @@ export function pointOf(rack, w, ctx) {
   const d = c.d ?? 0;
   const z = far ? (it.face === 'front' ? -d : -railDepthOf(f) + d)
     : g.face === 'rear' ? planeZ(f, 'rear') - out : planeZ(f, 'front') + out;
-  return {x: g.x, y: (it.ru - 0.5) * RU, z};
+  return {x: g.x, y: anchorY(rack, it, ctx.chassisOf), z};
 }
 
 export function portPoint(rack, end, ctx) {
@@ -368,7 +365,7 @@ export function portPoint(rack, end, ctx) {
   const f = rack.frame, d = ctx.chassisOf(it.ref)?.d ?? 0;
   // On its own face a panel is at that rail; the far panel is the chassis depth away.
   const z = pane === it.face ? planeZ(f, pane) : (it.face === 'front' ? -d : -railDepthOf(f) + d);
-  return {x, y: ctx.portY?.(end) ?? (it.ru - 0.5) * RU, z};
+  return {x, y: ctx.portY?.(end) ?? anchorY(rack, it, ctx.chassisOf), z};
 }
 
 const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);

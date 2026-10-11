@@ -4,7 +4,7 @@
 // are handed their readers in `ctx`, since reading a face needs the network and
 // a DOMParser, which this module never touches.
 
-import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits} from './fit.js';
+import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, unitsOf, spanText} from './fit.js';
 import {placement, managersOf} from './managers.js';
 import {uLabel, zeroUOf, zeroUBottom} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
@@ -23,8 +23,11 @@ export function fitsAt(rack, {ref, face, ru}, {chassisOf}) {
   return fits(rack, {ref, ...spot}, chassisOf);
 }
 
+// Every position the device fits at, in steps of 0.5: whole positions for a
+// device of a whole number of units (fit refuses it a half), and both for any
+// other.
 export const freeUs = (rack, {ref, face}, ctx) =>
-  Array.from({length: rack.frame.heightRU}, (_, k) => k + 1).filter(ru => fitsAt(rack, {ref, face, ru}, ctx).ok);
+  Array.from({length: rack.frame.heightRU * 2}, (_, k) => 1 + k / 2).filter(ru => fitsAt(rack, {ref, face, ru}, ctx).ok);
 
 // `text` matches the ref, maker and model, and what the device IS: its kind
 // ("patch panel", "switch", "cable manager", from rack.json) and its family.
@@ -96,11 +99,7 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
   // ONE LINE OF TOTALS FOR THE FINDINGS (#949), when routes can be read and
   // there is any: an agent that only describes the rack still sees them.
   const findingsLine = findingsText(rack, ctx);
-  const uOf = heightOf(chassisOf);
-  const span = i => {
-    const [a, b] = [uLabel(f, i.ru), uLabel(f, i.ru + uOf(i) - 1)].sort((x, y) => x - y);
-    return a === b ? `U${a}` : `U${a}-U${b}`;
-  };
+  const span = i => spanText(f, i, chassisOf);
   // `full` is a window's line: the ref and configuration, the purpose and length
   const item = (i, short, full = false) => {
     const ms = managersOf(rack, i.id).map(m => m.id);
@@ -201,7 +200,7 @@ function itemFacts(rack, item, ctx) {
     ? (slots.configs || []).map(k => ({name: k.name, description: k.description ?? '', airflow: k.airflow ?? null}))
     : (c?.configs || []).map(name => ({name, description: '', airflow: null}));
   const out = {kind: 'item', id: item.id, ref: item.ref, model: c?.model ?? null, manufacturer: c?.manufacturer ?? null,
-    label: item.label, cfg: item.cfg, configs, ru: item.ru, u: Math.max(1, c?.ru ?? 1), face: item.face, turned: !!item.turned,
+    label: item.label, cfg: item.cfg, configs, ru: item.ru, u: unitsOf(c), face: item.face, turned: !!item.turned,
     on: item.on ?? null, unit: item.unit ?? null, side: railOf(item, ctx.chassisOf ?? (() => null)),
     managers: managersOf(rack, item.id).map(m => m.id)};
   if (!slots) out.slots = 'not loaded';
