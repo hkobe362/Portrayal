@@ -1623,4 +1623,36 @@ numbers are kept: a later reading takes the next one.
   answers `orphaned` beside `moved` and `removed`: the held items a dropped
   host left behind. A quarter-turned item is exported at the position its
   rolled box starts at, with no comment, until part 9 writes one.
+29. **`measured` in the kit, though no longer in the file** (3.2). `pathLength`
+  still answers `measured`, the need and the end play at both ends, since
+  two lays of one cable are compared by it and it is the figure a routed
+  length was. It is never saved: a file holds `need`.
+30. **Units of a slack value.** Only metres and feet convert, as for a cable
+  length; `cable.slack` takes `m` or `ft`. A value in another unit is kept
+  and reads "a length in a unit that does not convert".
+31. **The sentences of slack beyond those section 3.5 gives:** a tray that
+  states no place ("CM-01 tray states no place for spare cable."), no
+  spool ("CM-01 tray states no spool."), a turn that cannot lie on the
+  floor ("A turn of c1 is 67.5 mm across, and the floor of CM-01 tray is
+  61.2 mm deep."), a second entry for the rest, and spare left at an end
+  given a form. In the finding of values past what there is to store, "to
+  spare" is the spare, the stock less the need. An entry kept on a tray the
+  cable cannot store in is a finding of its own kind, `spare-off-route`.
+32. **No command writes an empty list.** `cable.slack.clear` with a place
+  takes that entry off, and the key with the last; with none it takes the
+  key off, so nothing is said again. "Stored nowhere, by choice" can be
+  written in a file and is read, and no command yet says it.
+33. **With no routes known `cable.slack` records the place as given,** as a
+  bundle is made without being measured.
+34. **What part 7 left to part 9:** the BOM spare line, the draw.io edge
+  label and the `straps` column of the schedule. The schedule fills `spare`
+  and `stored` when its caller hands it `spareExports(rack, ctx)`, and
+  leaves both blank without it.
+35. **`cable.lay` and the `face` of a `lay` entry are not built:** no part of
+  section 9 lists them. The key is kept on a cable as written.
+36. **`inspect` of a cable** gains `spare_findings` where it has any, and
+  `describe` gives the spare a line of its own after the findings.
+37. **Found, not fixed:** a cable whose media is named like something every
+  object has (`constructor`) gets a path with a point that is no number,
+  and so no length. It is so on main, and is outside this version.
 

@@ -215,9 +215,16 @@ test('endPane: face, turned, and the end view', () => {
   }
 });
 
-test('stock lengths round up, then by 5 m past 30', () => {
-  assert.deepEqual([0.2, 0.5, 0.51, 1.62, 2.01, 9.9, 29.1, 30.2, 41].map(R.stockLength),
-    [0.5, 0.5, 1, 2, 3, 10, 30, 35, 45]);
+test('the stock size is the smallest that holds the need and the end play, to within the break tolerance; by 5 m past 30', () => {
+  // the need of each, with 0.2 m of end play: 0.2 -> 0.4, a 0.5 m cord; 0.31 -> 0.51, still one
+  // (10 mm short of full end play); 0.32 -> 0.52, a 1 m cord
+  const stock = need => R.stockLength(need);
+  assert.deepEqual([0.2, 0.3, 0.31, 0.3101, 0.32, 1.42, 1.81, 9.7, 9.81, 9.82, 29.81, 30, 40.9].map(stock),
+    [0.5, 0.5, 0.5, 1, 1, 2, 2, 10, 10, 15, 30, 35, 45]);
+  // what the slack entries state has to be inside it too
+  assert.equal(R.stockLength(0.42), 1);
+  assert.equal(R.stockLength(0.42, {values: 0.38}), 1);
+  assert.equal(R.stockLength(0.42, {values: 0.4}), 1.5);
 });
 
 test('a lane point sits in its gutter at the U middle, on its face\'s rail plane', () => {
@@ -239,10 +246,11 @@ test('a routed length measures the path, adds the end allowance at each end, and
   // port at U21.
   const dx = OPENING / 2 + RAIL_W + R.LANE_GAP / 2 - 100, ra = 39.4;
   const mm = 2 * (ra + Math.hypot(dx, ra)) + 20 * RU;
-  // and a cable with no media's end allowance at each end: the copper
-  // cord's 34.5 mm and the temporary 100 of dressing (#962; 0.15 m before)
-  assert.ok(Math.abs(got.measured - (mm / 1000 + 2 * (0.0345 + 0.1))) < 1e-9, `measured ${got.measured}`);
-  assert.equal(got.value, R.stockLength(got.measured));
+  // and a cable with no media's: 9.5 mm inside each port, the copper cord's
+  // 50 mm of short tolerance, and 100 of end play an end (0.15 m an end before #962)
+  assert.ok(Math.abs(got.need - (mm / 1000 + 2 * 0.0095 + 0.05)) < 1e-9, `need ${got.need}`);
+  assert.ok(Math.abs(got.measured - (got.need + 2 * R.END_PLAY_M)) < 1e-12);
+  assert.equal(got.value, R.stockLength(got.need));
 });
 
 test('fill: Cat6 through one ring, against 40% of its opening', () => {

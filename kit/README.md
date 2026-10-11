@@ -297,6 +297,16 @@ ctx)`, where a part hung on brackets stands or why it cannot,
 A page calls the two notice functions once it has loaded the parts lists
 (`loadSlots`); the editor cannot, since it holds none.
 
+A cable's lengths are named in `rack/route.js`: `needOf(path, cable,
+stock)`, `shortTolerance(cable, stock)`, `spareOf(rack, cable, ctx)` (need,
+stock, spare, end play and what is to store, in metres, or null without a
+path) and `stockLength(need, {values})`. `rack/slack.js` resolves a cable's
+`slack` list against its route: `slackOf` (each entry with its metres and
+whether the cable can store there), `storedText` (the words of the list),
+`slackFindings`, `spareLine` (one line for a rack) and `spareExports`, which
+is what `cableScheduleRows` takes as `spare` to fill its `spare` and `stored`
+columns. It returns no geometry: spare is listed, not drawn.
+
 `holderOf(item)` in `rack/model.js` is the id of the item that holds one on
 a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
 `rack/fit.js` says whether a held item is one the kit does not check: a page
@@ -306,7 +316,10 @@ Of the names these modules export, a page draws and calls with: `unitsOf`,
 `itemUnits`, `spanOf`, `itemBox`, `spanText`, `setbackOf`, `facePoint`,
 `isQuarter`, `isHeld`, `frameNotices` (`rack/fit.js`); `positionOf`,
 `uText`, `firstU`, `rollOf`, `ROLLS`, `holderOf` (`rack/model.js`);
-`holesIn` (`rack/rails.js`); `freeUs` (`rack/queries.js`); `configFacts`,
+`holesIn` (`rack/rails.js`); `freeUs` (`rack/queries.js`); `needOf`,
+`shortTolerance`, `spareOf`, `stockLength`, `END_PLAY_M`, `BREAK_TOL_M`,
+`UNPLACED_WARN_M` (`rack/route.js`); `slackOf`, `storedText`,
+`slackFindings`, `spareLine`, `spareExports` (`rack/slack.js`); `configFacts`,
 `meteringOf` (`rack/catalog.js`); `statesFor`, `readingsFor`, `stateNotices`
 (`rack/states.js`); `bracketPositions`, `hangNotices` (`rack/zero-u.js`).
 `facePoint` is the one a drawing calls for a point of a face; `rollPoint`,
@@ -318,7 +331,9 @@ between its files, and may change without notice: `spansMeet`, `anchorY`,
 `fillOf`, `overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `rollPoint`,
 `heldBy`, `uncheckedText`, `unheldText`, `bothText`, `zeroUExtent` and
 `notBracket` in `rack/fit.js`; `stateRefusal` in `rack/states.js`;
-`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `isPosition`,
+`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `toMetres`
+and `slackValues` in `rack/route.js`; `trayRefusal`, `trayText`, `mText`
+and `FORMS` in `rack/slack.js`; `SLACK_FORMS` in `rack/model.js`; `isPosition`,
 `HOLE_STYLES`, `railWidth`, `RAIL_WIDTH_IN`, `holdersOf` and `usableReadings`
 in `rack/model.js`; `HOLE_EDGE` in `rack/rails.js`; `NO_HOSTS` in
 `rack/commands.js`; `NETBOX_RACK_WIDTHS` in `rack/export-data.js`, since a

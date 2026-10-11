@@ -63,6 +63,16 @@
   moved by hand; one whose bracket is gone stays and is refused by fit.
   `fitsHang`, `hangNotices` and `bracketPositions` are in `rack/zero-u`.
   `zerou.update` takes `swaps` and `fields`.
+- The lengths of a cable are named: path, need, stock, spare, end play and
+  what is to store (`rack/route`: `needOf`, `shortTolerance`, `spareOf`,
+  `END_PLAY_M`, `BREAK_TOL_M`, `UNPLACED_WARN_M`). A cable takes `slack`, a
+  list of where its spare is stored, in a tray it rests on or at an end;
+  `cable.slack` and `cable.slack.clear` write it, and the new `rack/slack`
+  module resolves it and says it (`slackOf`, `storedText`, `slackFindings`,
+  `spareLine`, `spareExports`). Spare is recorded and listed, not drawn,
+  and the kit places none itself. `inspect` of a cable gives `slack` as
+  `{metres, at_ends_m, said, stored, unplaced_m}` and `need` beside its
+  length; `describe` gains one line for the rack.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file
@@ -81,6 +91,25 @@
   or less, sixteen rise by up to 6.35 mm and four ducts drop by up to 6.7 mm.
   A routed length that touches one moves by under a millimetre, and a cord
   that sat within that of a stock break changes size.
+- **Stock sizes.** A cord up to 10 mm short of full end play is still
+  chosen (`BREAK_TOL_M`), so a routed cord that was within 10 mm over a
+  stock size drops to it at its next measure: 41 of 2,336 cords on the
+  generated sample, each by one size, and none rises. A copper cord of 7 m
+  or more may rise one, since its short tolerance is now the greater of
+  50 mm and 1 per cent of its length. No measured length moves.
+- Beside a routed length the kit writes `need` and no longer writes
+  `measured`, which a cable loses at its next measure.
+  `END_ALLOWANCE_BY_MEDIA` holds what is inside the port alone (copper 9.5
+  mm where it was 34.5, DAC 0 where it was 25), `endAllowance` and the
+  `allowance` of a path are that figure without the 0.1 m of dressing, and
+  `stockLength` takes the need, with `{values}`. `pathLength` still answers
+  `measured`, now the need and the end play, and adds `need`.
+- **The cable schedule gains two columns, a download-format change:**
+  `spare` and `stored`, appended after `notes`, so no column read by
+  position moves. A reader that checks the column count has to take 19
+  where there were 17.
+- The slack `inspect` gives for an entered length is the spare, which is
+  0.2 m more than it read: the end play is now spare and not need.
 - Zero-U overlap is judged in millimetres. A part the kit placed at a whole
   unit overlaps as before; one whose `offsetMm` is between units is judged
   where it is, where it was rounded to a unit, and a frame change no longer

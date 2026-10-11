@@ -76,9 +76,12 @@ const mm = l => Math.round(l.measured * 10000) / 10;
 // 491.6, 522.2, 515.2, 505.9, 619.4, 611.1, 645.7, 617.4, 648.2 and 575.8
 // before). c2, which passed the 0.5 m break by 0.02 mm, is 0.2 mm under it
 // now: c2 and c4 are 0.5 m cords.
+// And since the stock break of version 4 (BREAK_TOL_M, 10 mm) c3 and c7, 2.7
+// and 5.8 mm over 0.5 m with full end play, are 0.5 m cords too. No length
+// moved for it: the figure here is the need and the end play, as before.
 const OWNER = {
-  c1: [[4], 514.2, 1], c2: [[4], 499.8, 0.5], c3: [[4], 502.7, 1], c4: [[4], 491.4, 0.5],
-  c5: [[4], 522, 1], c6: [[4], 515, 1], c7: [[4], 505.8, 1], c8: [[5], 619.2, 1],
+  c1: [[4], 514.2, 1], c2: [[4], 499.8, 0.5], c3: [[4], 502.7, 0.5], c4: [[4], 491.4, 0.5],
+  c5: [[4], 522, 1], c6: [[4], 515, 1], c7: [[4], 505.8, 0.5], c8: [[5], 619.2, 1],
   c9: [[3], 611.2, 1], c10: [[3], 613.2, 1], c11: [[3], 616.1, 1], c12: [[3], 623.4, 1],
   c13: [[4], 645.5, 1], c14: [[4], 616.9, 1], c15: [[4], 648, 1], c16: [[4], 576.3, 1],
 };
@@ -94,13 +97,14 @@ test('the owner\'s rack: each cord runs along the lacer through a ring, with no 
   assert.deepEqual(got, want);
   // nothing reaches a gutter
   assert.equal(r.cables.flatMap(c => R.autoRoute(r, c, ctx)).filter(w => w.lane).length, 0);
-  // no route is direct, and every cord but c2 and c4 passes the 0.5 m stock
-  // break (fifteen before the lacer stood centred in its unit, the lower
+  // no route is direct, and every cord but c2, c3, c4 and c7 passes the 0.5 m
+  // stock break (all but c2 and c4 before the 10 mm break tolerance of
+  // version 4; fifteen before the lacer stood centred in its unit, the lower
   // leaf's eight before #973, fifteen before #962's end allowance, thirteen
   // before #968)
   assert.equal(r.cables.filter(c => !R.autoRoute(r, c, ctx).length).length, 0);
   assert.deepEqual(r.cables.filter(c => R.routedLength(r, c, ctx).value > 0.5).map(c => c.id),
-    r.cables.map(c => c.id).filter(id => id !== 'c2' && id !== 'c4'));
+    r.cables.map(c => c.id).filter(id => !['c2', 'c3', 'c4', 'c7'].includes(id)));
   // and no corner of any is short of its 25 mm (#973)
   assert.deepEqual(r.cables.flatMap(c => R.routePath(r, c, ctx).bends), []);
   // every ring taken is passed. None now holds a cord that does not turn in
@@ -225,7 +229,11 @@ test('the site-facing outputs: ring marks, inspect and the route text read the r
   assert.equal(info.route.crosses, undefined);
   // and the length a page keeps current is this one
   const kept = R.withRoutedLengths(r, ctx);
-  assert.deepEqual(kept.cables.find(c => c.id === 'c13').length, {value: 1, unit: 'm', source: 'routed', measured: 0.65});
+  assert.deepEqual(kept.cables.find(c => c.id === 'c13').length, {value: 1, unit: 'm', source: 'routed', need: 0.45});
+  // a length saved before version 4 loses `measured` at its next measure, and nothing else of it moves
+  const old = {...r, cables: r.cables.map(c => (c.id === 'c13' ? {...c, length: {value: 1, unit: 'm', source: 'routed', measured: 0.65}} : c))};
+  assert.deepEqual(R.withRoutedLengths(old, ctx).cables.find(c => c.id === 'c13').length, {value: 1, unit: 'm', source: 'routed', need: 0.45});
+  assert.equal(R.withRoutedLengths(kept, ctx), kept, 'measured again, nothing changes');
 });
 
 // ── a cable whose ends use different managers ─────────────────────────────

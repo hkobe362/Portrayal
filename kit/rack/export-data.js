@@ -12,6 +12,7 @@ import {zeroUEntries, whereText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
 export {positionOf};
 import {endKey, endName, cableName, paneOf, mismatch, lengthText, lengthParts, MEDIA_LABELS} from './cable-rules.js';
+import {storedText} from './slack.js';
 
 export const uniq = list => [...new Set(list)];
 
@@ -225,7 +226,12 @@ const asWrittenNote = c => (c.lengthAsWritten != null ? `Length as written in th
 // `bundle` (#923) is the name of the bundle the cable is in, as its tag prints
 // it (model.js bundleName: its label, else "Bundle N"), blank for none.
 export const CABLE_COLUMNS = ['id', 'cable', 'a_device', 'a_u', 'a_port', 'b_device', 'b_u', 'b_port', 'media', 'purpose',
-  'length', 'length_unit', 'route', 'bundle', 'length_source', 'status', 'notes'];
+  'length', 'length_unit', 'route', 'bundle', 'length_source', 'status', 'notes', 'spare', 'stored'];
+// `spare` and `stored` (rack file version 4) are APPENDED AFTER THE LAST, so
+// no column read by position moves: `spare` is metres, the length bought less
+// what the cable needs; `stored` says where it is (slack.js storedText). Both
+// are blank for a cable with no length, a length kept as written, a loose
+// end or no path, and when the caller passes no `spare`.
 // `items` are the rack's items with their height `u` (fit.js itemsWithU), so a
 // device's U is the device import's position (positionOf). Without a height an
 // item counts as 1U.
@@ -240,7 +246,7 @@ export const CABLE_COLUMNS = ['id', 'cable', 'a_device', 'a_u', 'a_port', 'b_dev
 // `bundles` is bundleExports(rack, ctx) for the same render: each bundle's note
 // and its warnings join the file's notes. Without it the bundles are read
 // with no routing context, so each is listed as not measured.
-export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {bundles = null, bodies = null, bends = null, covers = null} = {}) {
+export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {spare = null, bundles = null, bodies = null, bends = null, covers = null} = {}) {
   const names = uniqueNames(rack.items);
   const byId = new Map(items.map(i => [i.id, i]));
   const named = new Set();
@@ -264,14 +270,23 @@ export function cableScheduleRows(rack, ends = new Map(), items = rack.items, ro
             route: routes?.get(c.id) ? routeText(routes.get(c.id).waypoints, id => names.get(id)?.name ?? id, rack.frame) : '',
             bundle: bundleOfCable(rack, c.id) ? flat(bundleName(bundleOfCable(rack, c.id))) : '',
             length_source: c.length ? (c.length.source || 'entered') : '',
-            status: !f.checked ? 'not checked' : f.loose.length ? 'loose end' : 'connected', notes: notes.join(' ')};
+            status: !f.checked ? 'not checked' : f.loose.length ? 'loose end' : 'connected', notes: notes.join(' '),
+            ...spareCells(rack, c, f.loose.length ? null : spare?.byCable?.get(c.id))};
   });
   const notes = [];
   if (!rows.length) notes.push('This rack has no cables, so there is nothing to list.');
   if (findings.some(f => !f.checked)) notes.push(UNCHECKED_NOTE);
   if (named.size) notes.push(`Devices that share a label are named as the device import names them: ${[...named].join(', ')}.`);
   notes.push(...bundleNotes(bundles ?? bundleExports(rack)));
+  // one line for the rack, never a line a cable
+  if (spare?.line) notes.push(spare.line);
   return {columns: CABLE_COLUMNS, rows, notes};
+}
+
+// The two spare cells of a cable: blank when nothing can be said.
+function spareCells(rack, c, s) {
+  const text = s ? storedText(rack, c, s) : '';
+  return {spare: text ? Math.round(s.spare.spare_m * 100) / 100 : '', stored: text};
 }
 
 // ── BUNDLES IN THE EXPORTS (#923, docs/cable-bundles-design.md section 7) ─

@@ -10,10 +10,11 @@ import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detache
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
-import {ownRoute, autoRoute, routedLength, pointOf, portPoint} from './route.js';
+import {ownRoute, autoRoute, routedLength, pointOf, portPoint, routePath} from './route.js';
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
 import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
 import {stateRefusal} from './states.js';
+import {trayRefusal, trayText, FORMS, mText} from './slack.js';
 import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey,
@@ -961,6 +962,51 @@ function bundleRemove(rack, {id}) {
     `Dissolved ${bundleName(b)}${n ? `; ${n === 1 ? 'its cable follows its own route' : `its ${n} cables follow their own routes`} again` : ''}.`);
 }
 
+// ── spare cable (docs/rack-file-v4-design.md sections 3.3 and 3.5) ───────
+// Where a cable's spare is stored: a tray it rests on, or one of its ends.
+// It is recorded and listed, never drawn, and the kit places none itself.
+const sameAt = (e, at) => ('end' in at ? e.end === at.end : e.item === at.item && e.via === at.via);
+function cableSlack(rack, {id, at: where, value, unit, form}, ctx) {
+  const c = cableOf(rack, id);
+  if (!c) return {error: CABLE_GONE};
+  const isEnd = where.end != null, isTray = where.item != null && where.via != null;
+  if (isEnd === isTray) return {error: 'cable.slack needs at as {item, via}, a tray on a device, or {end}, a or b.'};
+  if (isEnd && form != null) return {error: 'Spare left at an end has no form.'};
+  const entry = {...(isEnd ? {end: where.end} : {item: where.item, via: where.via, ...(form != null ? {form} : {})}),
+                 ...(value != null ? {value, unit: unit ?? 'm'} : {})};
+  const had = Array.isArray(c.slack) ? c.slack : [];
+  const others = had.filter(e => !sameAt(e, entry));
+  if (value == null && others.some(e => e.value == null))
+    return {error: `${c.id} already has an entry that takes the rest of its spare: give this one a value.`};
+  if (isTray) {
+    if (!itemOf(rack, where.item) && !zeroUById(rack, where.item)) return {error: `${where.item} is not in the rack.`};
+    // judged against the route when the routes are known; else recorded as given
+    let path = null;
+    if (ctx.route) { try { path = routePath(rack, c, ctx.route); } catch { path = null; } }
+    const no = trayRefusal(rack, c, entry, ctx.route, path);
+    if (no) return {error: no};
+  }
+  const next = [...others, entry];
+  if (same(next, had) && Array.isArray(c.slack)) return unchanged(rack);
+  const what = value != null ? `${mText(unit === 'ft' ? value * 0.3048 : value)} of the spare` : 'the spare';
+  return done(updateCable(rack, id, {slack: next}),
+    `Stored ${what} of ${cableName(c)} ${isEnd ? `at its ${where.end.toUpperCase()} end` : `in ${trayText(rack, entry)}`}.`);
+}
+
+// Without `at`, nothing is said of the cable's spare any more (no `slack`
+// key); with it, that one entry goes, and the key with the last of them.
+function cableSlackClear(rack, {id, at: where}) {
+  const c = cableOf(rack, id);
+  if (!c) return {error: CABLE_GONE};
+  if (!('slack' in c)) return unchanged(rack);
+  const left = where ? c.slack.filter(e => !sameAt(e, where)) : [];
+  if (where && left.length === c.slack.length) return unchanged(rack);
+  const {slack: _s, ...bare} = c;
+  const next = left.length ? {...c, slack: left} : bare;
+  return done({...rack, cables: rack.cables.map(x => (x.id === id ? next : x))},
+    left.length ? `Cleared one place for the spare of ${cableName(c)}.` : `Cleared where the spare of ${cableName(c)} is stored.`);
+}
+
 // ── the table an agent reads ────────────────────────────────────────────
 const RACK = {type: 'string', description: 'The id of the rack to edit. Only the first rack can be edited today.'};
 const AS = {type: 'string', minLength: 1, description: 'A name for what this creates; later commands in the same batch can use "@name" as its id.'};
@@ -1091,6 +1137,21 @@ export const COMMANDS = {
       route: {type: 'array', description: 'The waypoints, in order: {item, via} for a pathway on a device, {lane, ru} for a gutter at a U.',
         items: WAYPOINT},
       summary: SUMMARY})},
+  'cable.slack': {run: cableSlack, description: 'Say where the spare length of a cable is stored: in a tray it rests on, or at one of its ends. It is listed, not drawn. With no value the place takes whatever is left to store. Refused, with the reason, for a tray the cable cannot store in.',
+    args: args(['id', 'at'], {id: ID('cable'),
+      at: {type: 'object', additionalProperties: false, description: 'The place: {item, via} for a tray on a device, or {end} for an end of the cable.',
+        properties: {item: {type: 'string', minLength: 1, description: 'The device the tray is on, with via.'},
+                     via: {type: 'string', minLength: 1, description: 'The tray on that device, with item.'},
+                     end: {enum: ['a', 'b'], description: 'The end of the cable the spare is left at: a or b.'}}},
+      value: {type: 'number', exclusiveMinimum: 0, description: 'How much is stored there, above 0; the rest when left out.'},
+      unit: {enum: ['m', 'ft'], description: 'Metres (m) or feet (ft); m when left out.'},
+      form: {enum: FORMS, description: 'How it is stored in a tray: coil, serpentine or spool; coil when left out.'}})},
+  'cable.slack.clear': {run: cableSlackClear, description: 'Take back where the spare of a cable is stored: one place, or with no place all of them, so that nothing is said of it.',
+    args: args(['id'], {id: ID('cable'),
+      at: {type: 'object', additionalProperties: false, description: 'The place to clear: {item, via} or {end}; all of them when left out.',
+        properties: {item: {type: 'string', minLength: 1, description: 'The device the tray is on, with via.'},
+                     via: {type: 'string', minLength: 1, description: 'The tray on that device, with item.'},
+                     end: {enum: ['a', 'b'], description: 'The end of the cable: a or b.'}}}})},
   'cable.route.reset': {run: cableRouteReset, description: 'Drop a hand-made route; the cable takes its own route again.',
     args: args(['id'], {id: ID('cable'), summary: SUMMARY})},
   'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. A cable whose own route does not meet a given route joins and leaves it at the points nearest its two ports. Refused for a bundled cable.',

@@ -795,7 +795,11 @@ test('bundle.create works a trunk out for short hops too: each is taken by the g
   // from U32, where two of them first run together (c11 comes up alone from U31), to U42
   assert.deepEqual(made.rack.bundles[0].route, [{lane: 'left-front', ru: 32}, {lane: 'left-front', ru: 42}]);
   const rc = HOPS.ctxFor(made.rack);
-  assert.deepEqual(made.rack.cables.map(c => R.routedLength(made.rack, c, rc).value), [1, 1, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]);
+  assert.deepEqual(made.rack.cables.map(c => R.routedLength(made.rack, c, rc).value), [1, 1, 1, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]);
+  // (the fifth was a 1.5 m cord before rack file version 4: it needs under 10 mm more than a 1 m cord
+  // has with full end play, which the stock break now lets it be)
+  const fifth = R.routedLength(made.rack, made.rack.cables[4], rc);
+  assert.ok(fifth.measured > 1 && fifth.measured <= 1 + R.BREAK_TOL_M, `${fifth.measured}`);
   // two jumpers that hang side by side run together down the gutter once bundled
   const two = run(r, {op: 'bundle.create', cables: ['c1', 'c2']}, {route: ctx});
   assert.deepEqual(two.rack.bundles[0].route, [{lane: 'left-front', ru: 41}, {lane: 'left-front', ru: 42}]);

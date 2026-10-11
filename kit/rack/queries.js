@@ -11,6 +11,7 @@ import {whereText, carriesLane} from './zero-u.js';
 import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText} from './cable-rules.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
+import {slackOf, spareLine, slackFindings} from './slack.js';
 import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
 import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength,
@@ -133,6 +134,8 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
     + (typeof f.setback === 'number' ? ` Faceplates ${setText(f.setback)}.` : '') + options;
   // ONE LINE OF TOTALS FOR THE FINDINGS (#949), when routes can be read and
   // there is any: an agent that only describes the rack still sees them.
+  let spare = '';
+  if (ctx?.route) { try { spare = spareLine(rack, ctx.route); } catch { spare = ''; } }
   const findingsLine = findingsText(rack, ctx);
   const span = i => spanText(f, i, chassisOf);
   // `full` is a window's line: the ref and configuration, the purpose and length
@@ -173,12 +176,12 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
         body.push(`${title}:`, ...list.slice(from, from + n).map(line));
       }
     }
-    return [`${totals} ${shown.join(' ')}`, frameLine, ...(findingsLine ? [findingsLine] : []), ...body].join('\n');
+    return [`${totals} ${shown.join(' ')}`, frameLine, ...(findingsLine ? [findingsLine] : []), ...(spare ? [spare] : []), ...body].join('\n');
   }
 
   const bundleLines = bundles.map(b => bundleLine(rack, b, ctx));
   const build = (short, nItems, nCables, nBundles) => {
-    const lines = [totals, frameLine, ...(findingsLine ? [findingsLine] : []), items.length ? 'Items:' : 'No items.', ...items.slice(0, nItems).map(i => item(i, short)),
+    const lines = [totals, frameLine, ...(findingsLine ? [findingsLine] : []), ...(spare ? [spare] : []), items.length ? 'Items:' : 'No items.', ...items.slice(0, nItems).map(i => item(i, short)),
                    ...(beside.length ? ['Beside the rack:', ...beside.map(z => part(z, short))] : []),
                    ...(cables.length ? ['Cables:', ...cables.slice(0, nCables).map(c => cable(c))] : []),
                    ...(bundles.length ? ['Bundles:', ...bundleLines.slice(0, nBundles)] : [])];
@@ -314,9 +317,26 @@ async function cableInfo(rack, cable, ctx) {
   }
   // slack: the cable's own length less the routed one, in metres
   // (only metres and feet convert; any other unit leaves slack unknown)
-  const own = l && l.source !== 'routed' && typeof l.value === 'number' && ['m', 'ft'].includes(l.unit ?? 'm')
-    ? l.value * ((l.unit ?? 'm') === 'ft' ? 0.3048 : 1) : null;
-  const slack = own != null && routed ? {metres: Math.round((own - routed.metres) * 100) / 100} : null;
+  // THE SPARE (version 4): the cable's length less what it needs, where it is
+  // said to be stored, and what of it has no place. `said` is false when the
+  // cable has no `slack` key and true for a list, empty or not. For a routed
+  // length the stock size is the one the route gives now; for a pinned one it
+  // is the pinned length. null where there is no path or no usable length.
+  const r2 = v => Math.round(v * 100) / 100;
+  let slack = null, need = null, spareNote = null;
+  if (ctx.route && l) {
+    try {
+      const s = slackOf(rack, cable, ctx.route);
+      if (s) {
+        need = r2(s.spare.need_m);
+        slack = {metres: r2(s.spare.spare_m), at_ends_m: r2(s.at_ends_m), said: s.said,
+                 stored: s.entries.map(e => (e.end ? {end: e.end, metres: e.metres == null ? null : r2(e.metres)}
+                   : {item: e.item, via: e.via, form: e.form, metres: e.metres == null ? null : r2(e.metres), ok: e.ok, ...(e.why ? {why: e.why} : {})})),
+                 unplaced_m: r2(s.unplaced_m)};
+        spareNote = slackFindings({...rack, cables: [cable]}, ctx.route, label).map(f => ({kind: f.kind, text: f.text}));
+      }
+    } catch { slack = null; }
+  }
   // the devices a route through this cable's ends can name: its two, and the
   // cable managers bolted on them
   const near = [...new Set([cable.a.item, cable.b.item])].filter(id => rack.items.some(i => i.id === id))
@@ -336,7 +356,8 @@ async function cableInfo(rack, cable, ctx) {
     }
   }
   return {kind: 'cable', id: cable.id, a: end(cable.a), b: end(cable.b), media: cable.media, purpose: cable.purpose, label: cable.label,
-    length: l ? {value: l.value, unit: l.unit ?? 'm', source: l.source ?? 'entered'} : null, routed, slack,
+    length: l ? {value: l.value, unit: l.unit ?? 'm', source: l.source ?? 'entered', ...(need != null ? {need} : {})} : null, routed, slack,
+    ...(spareNote?.length ? {spare_findings: spareNote} : {}),
     route: {edited, waypoints, text: routeText(waypoints, label, rack.frame), ...(rings ? {rings} : {}), ...(crosses ? {crosses} : {}), ...(rests ? {rests} : {}),
             ...(bends ? {bends} : {}), ...(covers ? {covers} : {})}, lanes: lanesOf(rack.frame), passes,
     loose, mismatch: warn, ...(unchecked ? {unchecked: true} : {})};

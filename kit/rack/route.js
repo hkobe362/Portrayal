@@ -579,9 +579,11 @@ export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 //   - half of how much SHORTER than its nominal length the maker allows a
 //     cord to be (its minus tolerance). A plus tolerance only adds slack, so
 //     it adds nothing here.
-// Service loops and dressing slack are not in this table: they are explicit
-// slack held in a tray (#949 step 4), where they can be seen. Until that is
-// built, DRESSING_ALLOWANCE (below) stands in for them, apart from the table.
+//     That part is no longer in this table: it is shortTolerance (below),
+//     which has a floor and grows with the cord. THE TABLE IS THE INSIDE PART
+//     ALONE (rack file version 4, docs/rack-file-v4-design.md section 3.2).
+// Service loops and dressing slack are not in this table either: they are the
+// spare (END_PLAY_M and what is stored, below), where they can be seen.
 //   - LC fibre (os2, om3, om4, om5): 13.1 mm, the plug inside. generic/lc-plug@2:
 //     its rear stands 25.6 behind the housing's front, 12.5 of it out of the
 //     bore (an estimate in the bracket 12.2 to 13.97 that SENKO's
@@ -611,23 +613,62 @@ export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 // receptacle enters it as it would an adapter's, and an AOC's head enters
 // the cage; an SFP head (47.5 inside, SFF-8432) is taken at the QSFP figure.
 export const END_ALLOWANCE_BY_MEDIA = {os2: 0.0131, om3: 0.0131, om4: 0.0131, om5: 0.0131,
-  cat6: 0.0345, cat6a: 0.0345, dac: 0.025, aoc: 0.0524};
-const UNSET_ALLOWANCE = 0.0345;
-// TEMPORARY, until #949 step 4 (explicit tray slack) is built: a dressing
-// allowance of 0.1 m an end, for every media, on top of the table. It is not
-// a measured figure and has no maker's source: it is there by decision
-// (2026-10-10, #962), so that a routed cord is not bought with nothing to
-// dress it by while no tray can hold its slack. It is kept out of
-// END_ALLOWANCE_BY_MEDIA so that the table stays what the sources say; step
-// 4 removes this constant and its one use in endAllowance, and nothing else.
-const DRESSING_ALLOWANCE = 0.1;
-// What a routed length adds at each end of a cable: its media's figure from
-// the table (the copper cord's for a cable with no media, or none the table
-// knows) and, for now, the dressing allowance.
+  cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524};
+const UNSET_ALLOWANCE = 0.0095;
+// What is inside the port at each end of a cable, in metres: its media's
+// figure from the table (the copper cord's for a cable with no media, or
+// none the table knows).
 export const endAllowance = cable => ((typeof cable?.media === 'string'
   && Object.hasOwn(END_ALLOWANCE_BY_MEDIA, cable.media))
-  ? END_ALLOWANCE_BY_MEDIA[cable.media] : UNSET_ALLOWANCE) + DRESSING_ALLOWANCE;
-export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m / 5) * 5;
+  ? END_ALLOWANCE_BY_MEDIA[cable.media] : UNSET_ALLOWANCE);
+
+// ── THE LENGTHS, NAMED (docs/rack-file-v4-design.md section 3.2) ───────────
+// path     the routed points, port face to port face;
+// need     the path, what is inside the two ports, and the short tolerance
+//          of the maker: what the cord must at least be;
+// stock    the length bought: pinned by the user, or chosen here;
+// spare    stock less need: real cable, and it is somewhere;
+// end play the part of the spare that stays at the two ends, in the curves
+//          into the ports, and is never coiled: END_PLAY_M an end;
+// to store the spare less the end play, never below zero.
+// END_PLAY_M is the 0.1 m an end the kit added before as a dressing
+// allowance, under the name of what it is and moved out of the need into the
+// spare; no stock size changes for the move.
+export const END_PLAY_M = 0.1;
+// THE STOCK BREAK (#983): a cord up to this much short of full end play is
+// still chosen. A twentieth of the end play, and more than the spread of the
+// LC plug depth estimate at two ends.
+export const BREAK_TOL_M = 0.01;
+// More to store than this with nowhere said for it is a finding.
+export const UNPLACED_WARN_M = 0.3;
+// HOW MUCH SHORTER THAN ITS NOMINAL LENGTH A MAKER LETS A CORD BE, in metres
+// over both ends, for a cord of `stock` metres. Copper (and a cable with no
+// media, or one the table does not know): the greater of 50 mm and 1 per
+// cent of the length - to 5 m the 25 mm an end the table held, 70 mm at 7 m,
+// 300 mm at 30 m. DAC: its stated 50 mm at every length. Fibre and AOC: none,
+// their makers state plus tolerances only.
+const NO_SHORT = ['os2', 'om3', 'om4', 'om5', 'aoc'];
+export function shortTolerance(cable, stock) {
+  const media = typeof cable?.media === 'string' ? cable.media : '';
+  if (NO_SHORT.includes(media)) return 0;
+  if (media === 'dac') return 0.05;
+  return Math.max(0.05, 0.01 * (Number(stock) > 0 ? Number(stock) : 0));
+}
+const pathMetres = path => { let mm = 0; for (let k = 1; k < path.points.length; k++) mm += dist(path.points[k - 1], path.points[k]); return mm / 1000; };
+// What a cord of `stock` metres along `path` must at least be.
+export const needOf = (path, cable, stock) => pathMetres(path) + 2 * endAllowance(cable) + shortTolerance(cable, stock);
+// THE STOCK SIZE CHOSEN: the smallest with the need, the end play at both
+// ends and any `values` the slack entries state inside it, to within
+// BREAK_TOL_M. `needAt(s)` is the need of a cord of s metres, since a copper
+// cord's tolerance grows with it; sizes are tried in order.
+function chooseStock(needAt, values = 0) {
+  const fits = s => s + BREAK_TOL_M >= needAt(s) + 2 * END_PLAY_M + values - 1e-9;
+  for (const s of STOCK_M) if (fits(s)) return s;
+  for (let s = 35; s < 100000; s += 5) if (fits(s)) return s;
+  return null;
+}
+// The stock size for a need that is already known (it does not grow with the cord).
+export const stockLength = (need, {values = 0} = {}) => chooseStock(() => need, values);
 
 // THE PATH A CABLE TAKES, in rack coordinates (mm): its a port, every
 // waypoint's point, and its b port, each ring's centre expanded to where the
@@ -1308,7 +1349,7 @@ function layPath(rack, cable, ctx, given) {
       }
     }
   }
-  return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable)};
+  return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable), media: cable.media};
 }
 
 // CORNERS AT ONE POINT ARE ONE CORNER (#1007). Two points of a path can stand
@@ -1455,20 +1496,47 @@ export function ringMarks(rack, cable, ctx) {
   });
 }
 
-// A path's length, as routedLength gives it: {measured, value} in metres:
-// its points and its cable's end allowance at each end (routePath's
-// `allowance`, endAllowance's figure; a path built by hand without one takes
-// a cable with no media's).
-export function pathLength(path) {
+// A path's length, as routedLength gives it, in metres: `value`, the stock
+// size chosen; `need`, what a cord of that size must at least be; and
+// `measured`, the need and the end play at both ends, which is the figure a
+// routed length was before version 4 and is still what two lays are compared
+// by. `values` is what the cable's slack entries state, which the size has
+// to hold too. The path carries its cable's media and what is inside each
+// port (routePath's `media` and `allowance`); a path built by hand without
+// them takes a cable with no media's.
+export function pathLength(path, {values = 0} = {}) {
   if (!path) return null;
-  const pts = path.points;
-  let mm = 0;
-  for (let k = 1; k < pts.length; k++) mm += dist(pts[k - 1], pts[k]);
-  const end = typeof path.allowance === 'number' ? path.allowance : endAllowance(null);
-  const measured = mm / 1000 + 2 * end;
-  return {measured, value: stockLength(measured)};
+  const cable = {media: path.media};
+  const base = pathMetres(path) + 2 * (typeof path.allowance === 'number' ? path.allowance : endAllowance(cable));
+  const value = chooseStock(s => base + shortTolerance(cable, s), values);
+  const need = base + shortTolerance(cable, value);
+  return {measured: need + 2 * END_PLAY_M, value, need};
 }
-export const routedLength = (rack, cable, ctx) => pathLength(routePath(rack, cable, ctx));
+export const routedLength = (rack, cable, ctx) => pathLength(routePath(rack, cable, ctx), {values: slackValues(cable)});
+
+// A length in metres, or null: only metres and feet convert.
+const M_PER = {m: 1, ft: 0.3048};
+export const toMetres = (value, unit) => (typeof value === 'number' && Number.isFinite(value) && Object.hasOwn(M_PER, unit ?? 'm')
+  ? value * M_PER[unit ?? 'm'] : null);
+// What the slack entries of a cable state, added up, in metres.
+export const slackValues = cable => (Array.isArray(cable?.slack) ? cable.slack : [])
+  .reduce((sum, e) => sum + (toMetres(e?.value, e?.unit) ?? 0), 0);
+// THE SPARE OF A CABLE: {need_m, stock_m, spare_m, end_play_m, to_store_m,
+// pinned}, or null without a path. It measures the path it is given and
+// never reads a saved number but a length the user pinned (any source but
+// `routed`), which is the stock then; a pinned length in a unit that does
+// not convert, or one kept as written, gives null.
+export function spareOf(rack, cable, ctx) {
+  let path = null;
+  try { path = routePath(rack, cable, ctx); } catch { path = null; }
+  if (!path || cable.lengthAsWritten != null) return null;
+  const pinned = !!cable.length && cable.length.source !== 'routed';
+  const stock = pinned ? toMetres(cable.length.value, cable.length.unit) : pathLength(path, {values: slackValues(cable)})?.value;
+  if (stock == null) return null;
+  const need = needOf(path, cable, stock), spare = stock - need;
+  return {need_m: need, stock_m: stock, spare_m: spare, end_play_m: Math.max(0, Math.min(spare, 2 * END_PLAY_M)),
+          to_store_m: Math.max(0, spare - 2 * END_PLAY_M), pinned};
+}
 
 // Every ring a cable's route would enter and leave by one face, rack-wide,
 // with a sentence for each: what the page and an agent report. A cable whose
@@ -1682,16 +1750,19 @@ export function capacityOver(rack, ctx) {
 // an entered length is the user's and is never touched, nor is one the user
 // wrote that the page could not read (lengthAsWritten): that intent wins. Returns the same rack
 // when nothing changed, so the page can tell whether to save.
+// BESIDE A ROUTED LENGTH THE KIT WRITES `need` (version 4), to a centimetre,
+// and no longer writes `measured`, which a cable loses at its next measure:
+// no saved number changes its meaning under its old name.
 export function withRoutedLengths(rack, ctx) {
   let changed = false;
   const cables = (rack.cables || []).map(c => {
     if (c.lengthAsWritten != null || (c.length && c.length.source !== 'routed')) return c;
     const got = routedLength(rack, c, ctx);
     if (!got) return c;
-    const measured = Math.round(got.measured * 100) / 100;
-    if (c.length?.value === got.value && c.length?.measured === measured) return c;
+    const need = Math.round(got.need * 100) / 100;
+    if (c.length?.value === got.value && c.length?.need === need && !('measured' in c.length)) return c;
     changed = true;
-    return {...c, length: {value: got.value, unit: 'm', source: 'routed', measured}};
+    return {...c, length: {value: got.value, unit: 'm', source: 'routed', need}};
   });
   return changed ? {...rack, cables} : rack;
 }

@@ -71,9 +71,18 @@ test('inspect gives a cable its slack: its own length less the routed length', a
   // where it was 0.15 m; 1.17 (1.169) since #973, a run-out of 12.5 mm
   // from each plug and a shallower sag where the cord leaves the lane's top
   assert.equal(m, 1.17);
-  assert.deepEqual(await slack(withLength({value: 2, unit: 'm', source: 'entered'})), {metres: 0.83});
-  assert.deepEqual(await slack(withLength({value: 10, unit: 'ft', source: 'entered'})), {metres: Math.round((3.048 - m) * 100) / 100});
-  assert.equal(await slack(withLength({value: 2, unit: 'm', source: 'routed'})), null);
+  // Since rack file version 4 the slack is the SPARE: the length less the need
+  // (0.97 m: the 1.17 less the 0.2 m of end play, which is spare and stays at
+  // the ends), so it reads 0.2 m more than it did, and what is to store, the
+  // 0.83 m it read before, is `unplaced_m` while nothing says where it is.
+  assert.deepEqual(await slack(withLength({value: 2, unit: 'm', source: 'entered'})),
+    {metres: 1.03, at_ends_m: 0.2, said: false, stored: [], unplaced_m: 0.83});
+  const ft = await slack(withLength({value: 10, unit: 'ft', source: 'entered'}));
+  assert.deepEqual([ft.metres, ft.unplaced_m], [Math.round((3.048 - m + 0.2) * 100) / 100, Math.round((3.048 - m) * 100) / 100]);
+  // a routed length has a spare too: of the stock size its route gives now, 1.5 m
+  assert.deepEqual(await slack(withLength({value: 2, unit: 'm', source: 'routed'})),
+    {metres: 0.53, at_ends_m: 0.2, said: false, stored: [], unplaced_m: 0.33});
+  assert.equal(await slack(withLength({value: 2, unit: 'yd', source: 'entered'})), null, 'a unit that does not convert');
   assert.equal(await slack(base), null);
   assert.equal((await inspect(withLength({value: 2, unit: 'm', source: 'entered'}), 'c1', {chassisOf})).slack, null);
 });

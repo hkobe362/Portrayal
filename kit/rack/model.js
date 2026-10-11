@@ -375,6 +375,36 @@ const lengthValue = v => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && /^\d+(\.\d+)?$/.test(v) ? Number(v) : 0;
   return Number.isFinite(n) && n > 0 ? n : 0;
 };
+// A CABLE'S `slack` (version 4, docs/rack-file-v4-design.md section 3.3) is a
+// list, read entry by entry. An entry is usable when it is an object naming a
+// tray (`item` and `via`, non-empty text) or an end (`end`: a or b); `form`,
+// when present, is coil, serpentine or spool; `value`, when present, is a
+// number above 0 with a `unit` that is non-empty text or absent (metres). At
+// most one entry has no value, since only one can take the rest: a second is
+// not usable. When any entry is not usable, the usable ones stay in `slack`
+// and the list as written moves to `slackAsWritten`; nothing is thrown away.
+// A `slack` that is no list moves there whole, and the cable has no `slack`
+// key: nothing has been said.
+export const SLACK_FORMS = ['coil', 'serpentine', 'spool'];
+function readSlack(raw) {
+  if (raw === undefined) return {};
+  if (!Array.isArray(raw)) return {slackAsWritten: structuredClone(raw)};
+  let rest = false;
+  const usable = e => {
+    if (!plainObj(e)) return false;
+    const tray = typeof e.item === 'string' && e.item && typeof e.via === 'string' && e.via;
+    if (!tray && e.end !== 'a' && e.end !== 'b') return false;
+    if ('form' in e && !SLACK_FORMS.includes(e.form)) return false;
+    if ('unit' in e && e.unit != null && !(typeof e.unit === 'string' && e.unit.trim() !== '')) return false;
+    if (e.value != null) return typeof e.value === 'number' && Number.isFinite(e.value) && e.value > 0;
+    if ('value' in e || rest) return false;      // a value that is null, or a second entry for the rest
+    rest = true;
+    return true;
+  };
+  const kept = raw.filter(usable).map(e => structuredClone(e));
+  return kept.length === raw.length ? {slack: kept} : {slack: kept, slackAsWritten: structuredClone(raw)};
+}
+
 // `bundles`, as written: a repaired cable's fresh id is past every id a bundle
 // member names, so it cannot pick up another cable's membership.
 export function readCables(list, bundles = []) {
@@ -382,7 +412,7 @@ export function readCables(list, bundles = []) {
   const out = [];
   const seen = new Set();
   for (const raw of list) {
-    const {length: len, ...c} = raw && typeof raw === 'object' ? structuredClone(raw) : {};
+    const {length: len, slack: slackRaw, ...c} = raw && typeof raw === 'object' ? structuredClone(raw) : {};
     let id = c.id == null ? '' : String(c.id);
     if (!id || seen.has(id)) id = nextId([...declared, ...out], 'c');
     seen.add(id);
@@ -413,7 +443,7 @@ export function readCables(list, bundles = []) {
     out.push({...c, id, a: readEnd(c.a), b: readEnd(c.b), media: String(c.media ?? ''),
               purpose: String(c.purpose ?? ''), label: String(c.label ?? ''),
               route, ...(routeAsWritten ? {routeAsWritten} : {}),
-              ...(routeEdited === true ? {routeEdited: true} : {}),
+              ...(routeEdited === true ? {routeEdited: true} : {}), ...readSlack(slackRaw),
               ...(length ? {length} : len == null ? {} : {lengthAsWritten: len})});
   }
   return out;
