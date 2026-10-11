@@ -13,6 +13,9 @@
   gets shorter (0.81 m and a 1 m cord for the hop above), and its length in a
   saved rack is rewritten the next time routed lengths are refreshed. A
   member that met the trunk measures what it did.
+- The summary of `bundle.create` says when a jumper that hung gets longer in
+  the bundle, cable by cable ("c1 hung on its own and now runs with the
+  bundle: 0.60 m becomes 0.81 m.").
 - `bundle.create` with no route now works one out for short jumpers too, since
   each is taken by the gutter as a member is; it was refused as running with
   none of the others.

@@ -10,7 +10,7 @@ import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detache
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
-import {ownRoute, pointOf, portPoint} from './route.js';
+import {ownRoute, autoRoute, routedLength, pointOf, portPoint} from './route.js';
 import {fits, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU} from './fit.js';
 import {whereText, zeroUName} from './zero-u.js';
 import {placement, moveItem, managersOf} from './managers.js';
@@ -640,8 +640,34 @@ function bundleCreate(rack, {cables, label = '', number, route, straps}, ctx) {
              label: String(label), members: cables.map(cable => ({cable})), route: trunk,
              ...(straps ? {straps: structuredClone(straps)} : {})};
   const next = {...rack, bundles: [...bundlesOf(rack), b]};
-  return {rack: next, summary: `Bundled ${cables.length} cables as ${bundleName(b)}.`, created: {id: b.id},
+  const longer = hungLonger(rack, next, cables, ctx);
+  return {rack: next, summary: `Bundled ${cables.length} cables as ${bundleName(b)}.${longer ? ` ${longer}` : ''}`, created: {id: b.id},
           findings: [...spacingNote(straps), ...checksOf(next, b, ctx)]};
+}
+
+// WHAT BUNDLING COSTS A JUMPER THAT HUNG (#1012). A jumper within two units
+// hangs from port to port on its own; in a bundle it is taken to the trunk
+// and back, so it is longer: 0.60 m becomes 0.81 m for a one-unit hop to a
+// lane beside it. The summary says so, cable by cable, so that whoever
+// bundles it sees the length it buys. Each is a cable on its automatic
+// route with no waypoint of its own, whose measured length grows by a
+// centimetre or more. Nothing is said when the routes are not known, or a
+// reader throws.
+function hungLonger(before, after, ids, ctx) {
+  if (!ctx?.route) return '';
+  try {
+    const m = v => `${v.toFixed(2)} m`;
+    const grew = ids.flatMap(id => {
+      const c = cableOf(before, id);
+      if (!c || c.routeEdited === true || autoRoute(before, c, ctx.route).length) return [];
+      const was = routedLength(before, c, ctx.route), is = routedLength(after, cableOf(after, id), ctx.route);
+      return was && is && is.measured >= was.measured + 0.01 ? [{id, was: was.measured, is: is.measured}] : [];
+    });
+    if (!grew.length) return '';
+    return grew.length === 1
+      ? `${grew[0].id} hung on its own and now runs with the bundle: ${m(grew[0].was)} becomes ${m(grew[0].is)}.`
+      : `${andList(grew.map(g => g.id))} hung on their own and now run with the bundle: ${grew.map(g => `${g.id} ${m(g.was)} to ${m(g.is)}`).join(', ')}.`;
+  } catch { return ''; }
 }
 
 // A cable already in the bundle has its peel points cleared, and rides the

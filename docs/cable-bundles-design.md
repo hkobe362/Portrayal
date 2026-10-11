@@ -268,6 +268,14 @@ where they run together, unless given a route. A cable whose own route does
 not meet a given route joins and leaves it at the points nearest its two
 ports. Refused for a bundled cable."* (The third sentence is #1012.)
 
+The summary is "Bundled 11 cables as MGMT.", and says what bundling costs a
+jumper that hung (#1012): a cable on its automatic route with no waypoint of
+its own hangs from port to port, and in the bundle runs to the trunk and
+back, so it is longer. "c1 and c2 hung on their own and now run with the
+bundle: c1 0.60 m to 0.81 m, c2 0.61 m to 0.86 m." Each cable whose measured
+length grows by a centimetre or more is named; nothing is added when the
+routes are not known.
+
 - `route` left out: the trunk is worked out from the members' own routes, with
   the refusals section 4.1 lists (a fork, leaving and rejoining, groups that
   share nothing, a member that shares nothing). Without `ctx.route` it is

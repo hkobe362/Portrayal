@@ -733,6 +733,61 @@ test('followTrunk asks which element is nearest each port, and rides all of a tr
   assert.deepEqual(B.followTrunk([], trunk, {cable: 'c1'}, {nearest: () => null}).waypoints, trunk);
 });
 
+test('a member is taken by the gutter before the nearest element is asked: the two can differ', () => {
+  // A 2U device at U40-U41 whose port stands in its upper unit, cabled to the
+  // switch at U42: two units by its `ru`, so on its own the cord hangs. In a
+  // bundle down the left lane the gutter route takes it out at the device's
+  // own U, U40, as it takes every cable; the trunk element nearest the port
+  // is U41. So this fixture tells the two rules apart: the gutter route comes
+  // first, and `nearest` is only for a member that still does not meet.
+  const base = HOPS.rack(), lane = ru => ({lane: 'left-front', ru});
+  const item = (id, ref, ru, label) => ({...base.items[0], id, ref, ru, label});
+  const cable = (id, a, b, extra = {}) => ({...base.cables[0], id, a: {item: a, path: 'mgmt', view: 'front'}, b: {item: 'i1', path: b, view: 'front'}, ...extra});
+  const r = {...base, items: [item('i1', 'sw', 42, 'TOP'), item('i2', 'tall', 40, 'TALL'), item('i3', 'sw', 38, 'SW3'), item('i4', 'sw', 37, 'SW4')],
+    cables: [cable('c1', 'i2', 'port-1'), cable('c2', 'i3', 'port-3'), cable('c3', 'i4', 'port-5')],
+    bundles: [{id: 'b1', number: 1, label: '', members: [{cable: 'c1'}, {cable: 'c2'}, {cable: 'c3'}], route: [lane(37), lane(42)]}]};
+  const at = e => (e.item === 'i2' ? {x: 30.85, y: 40.5 * RU + 10} : HOPS.portAt(r, e));
+  const ctx = HOPS.ctxFor(r, {chassisOf: ref => (ref === 'tall' ? {ru: 2, w: 438.5, h: 88, d: 370} : HOPS.chassisOf(ref)),
+    portX: e => at(e)?.x ?? null, portY: e => at(e)?.y ?? null});
+  assert.deepEqual(R.autoRoute(r, r.cables[0], ctx), []);                                    // on its own it hangs
+  assert.deepEqual(R.autoRoute(r, r.cables[0], ctx, {gutter: true}), [lane(40), lane(42)]);  // asked, it takes the gutter
+  const got = R.resolveRoute(r, r.cables[0], ctx);
+  assert.deepEqual([got.join, got.leave, got.waypoints], [lane(40), lane(42), [lane(40), lane(42)]]);
+  assert.equal(B.layoutOf(r, r.bundles[0], {route: ctx}).members[0].met, true);
+  // with no route of its own to meet with, the nearest element is U41, where its port is
+  const bare = {...r, cables: r.cables.map(c => (c.id === 'c1' ? {...c, routeEdited: true, route: []} : c))};
+  const near = R.resolveRoute(bare, bare.cables[0], ctx);
+  assert.deepEqual([near.join, near.leave], [lane(41), lane(42)]);
+  assert.equal(B.layoutOf(bare, bare.bundles[0], {route: ctx}).members[0].met, false);
+});
+
+test('two trunk elements as near a port: the one whose key sorts first, whichever way the trunk is written', () => {
+  // a port level with the line between U41 and U42 is as far from one lane
+  // node as from the other
+  const r = HOPS.bundled(), lane = ru => ({lane: 'left-front', ru});
+  const ctx = HOPS.ctxFor(r, {portY: e => (e.path === 'mgmt' ? 41 * RU : HOPS.portAt(r, e).y)});
+  const c1 = r.cables[0];
+  for (const trunk of [[lane(31), lane(42)], [lane(42), lane(31)], [lane(41), lane(42)], [lane(42), lane(41)]]) {
+    const els = B.elementsOf(trunk), i = R.trunkMeasures(r, c1, trunk, ctx).nearest('a', els);
+    assert.deepEqual([els[i].kind, els[i].u], ['n', 41], JSON.stringify(trunk));
+    // and the other end, which is nearer U42, is not in doubt
+    assert.equal(els[R.trunkMeasures(r, c1, trunk, ctx).nearest('b', els)].u, 42);
+  }
+  // a port not found has no nearest element
+  assert.equal(R.trunkMeasures(r, c1, [lane(31), lane(42)], {...ctx, portX: () => null}).nearest('a', B.elementsOf([lane(31), lane(42)])), null);
+});
+
+test('bundle.create says what bundling costs a jumper that hung', () => {
+  const r = HOPS.rack(), ctx = HOPS.ctxFor(r), ids = r.cables.map(c => c.id);
+  const made = run(r, {op: 'bundle.create', cables: ids, route: HOPS.TRUNK, label: 'MGMT'}, {route: ctx});
+  assert.equal(made.summary, 'Bundled 11 cables as MGMT. c1 and c2 hung on their own and now run with the bundle: c1 0.60 m to 0.81 m, c2 0.61 m to 0.86 m.');
+  const one = run(r, {op: 'bundle.create', cables: ['c1', 'c3', 'c4']}, {route: ctx});
+  assert.equal(one.summary, 'Bundled 3 cables as Bundle 1. c1 hung on its own and now runs with the bundle: 0.60 m becomes 0.81 m.');
+  // no jumper that hung, or no routes to measure by: the summary is as it was
+  assert.equal(run(r, {op: 'bundle.create', cables: ['c3', 'c4']}, {route: ctx}).summary, 'Bundled 2 cables as Bundle 1.');
+  assert.equal(run(r, {op: 'bundle.create', cables: ids, route: HOPS.TRUNK}).summary, 'Bundled 11 cables as Bundle 1.');
+});
+
 test('bundle.create works a trunk out for short hops too: each is taken by the gutter', () => {
   const r = HOPS.rack(), ctx = HOPS.ctxFor(r);
   const made = run(r, {op: 'bundle.create', cables: r.cables.map(c => c.id)}, {route: ctx});
