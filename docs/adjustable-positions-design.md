@@ -1012,8 +1012,9 @@ what it built, what the first devices met, and what is left.
    value is a scene to rebuild.
 7. **The line that names the views** is read from the faces: a face shows the
    motion when a member on it has a `dx` or a `dy`. The control asks the
-   shell for the other faces once for each set of faces the shell holds, so
-   it asks again when a device is come back to. In 3D
+   shell for the other faces whenever it does not hold every face of the
+   device. A request that ends with a face still missing is sent once more,
+   and after that on the next change. In 3D
    the line is not shown. The page says which stage is showing with a `mode`
    event on the shell.
 8. **The slider is a native range input.** It takes the arrow keys, Page Up

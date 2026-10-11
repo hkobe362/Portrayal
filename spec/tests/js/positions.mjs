@@ -156,6 +156,7 @@ test('the line for a refusal is in the page before it has anything to say', () =
   assert.equal(msg.getAttribute('role'), 'status');
   assert.equal(msg.hidden, false);
   assert.equal(msg.hasAttribute('aria-hidden'), false);
+  assert.equal(msg.hasAttribute('style'), false);
   const css = document.head.children.map(n => n.textContent).find(t => t.includes('#positions'));
   const rules = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, sel]) => sel.includes('.msg'));
   assert.ok(rules.length >= 2, 'the rules of the line were read');
@@ -351,4 +352,40 @@ test('inside a module there is no control, and it is back on the way out', async
   assert.equal(shell.state.module, null);
   assert.equal(control.el.hidden, false);
   assert.equal(control.el.children.length, 2);
+});
+
+test('a module opened while the faces are on their way does not cost the line its views', async () => {
+  // the shell drops the faces that arrive while a module is open, and keeps
+  // its map on the way back: the control asks for what the map lacks
+  await shell.loadDevice('plain');
+  await shell.loadDevice('slider');
+  shell.openModule('fixture/slide-well@1');
+  await settle(); await settle();
+  assert.equal(control.el.hidden, true);
+  shell.el.crumb.querySelector('#back').onclick();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.deepEqual(Object.keys(shell.state.faces).sort(), [...VIEWS].sort());
+  assert.equal(part('panel-setback', 'note').textContent,
+               'The front view does not show this. See the top or right view, or 3D.');
+});
+
+test('a face that cannot be had is asked for twice and then left until the reader does something', async () => {
+  const real = shell.loadFaces;
+  let calls = 0;
+  await shell.loadDevice('plain');
+  shell.loadFaces = () => { calls++; return Promise.resolve(0); };   // nothing ever arrives
+  try {
+    await shell.loadDevice('slider');
+    for (let i = 0; i < 8; i++) await settle();
+    assert.equal(calls, 2);
+    assert.equal(part('panel-setback', 'note').textContent,
+                 'The front view does not show this. See it in 3D.');
+    control.refresh();                    // the next thing that happens asks once more
+    for (let i = 0; i < 8; i++) await settle();
+    assert.equal(calls, 3);
+  } finally { shell.loadFaces = real; }
+  control.refresh();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.equal(part('panel-setback', 'note').textContent,
+               'The front view does not show this. See the top or right view, or 3D.');
 });

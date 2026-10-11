@@ -216,20 +216,35 @@ export function positionControl(shell, opts = {}) {
     return `${first} See the ${anyOf(others)} view${threeD ? ', or 3D' : ''}.`;
   }
 
-  // THE OTHER FACES, asked for once for each set of faces the shell holds
-  // while an adjustment is declared: they are what the line above names, and
-  // a face the shell holds is moved with the rest. WHAT IS REMEMBERED IS THE
-  // MAP OF FACES ITSELF, not the names of the device and the configuration.
-  // The shell starts a new map whenever it lets the faces go, so a map this
-  // has not asked about is one that may lack them. A name would still match
-  // after a visit to a device with no adjustment and back, with every other
-  // face gone, and the line would name no view.
-  let asked = null;
+  // THE OTHER FACES are what the line above names, and a face the shell
+  // holds is moved with the rest. THEY ARE ASKED FOR WHENEVER THE SHELL LACKS
+  // ONE: the question is put to the map of faces at every refresh, and
+  // nothing is remembered once a request has ended. A note of what was asked
+  // goes stale, by name after a visit to a device with no adjustment, and by
+  // map when the shell drops what it fetched because a module was opened
+  // while the faces were on their way. `asking` is the map a request is out
+  // for, so one is not sent twice. A request that ends with a face still
+  // missing is sent once more at once, which is what a module opened and
+  // left needs; after that it waits for the next thing the reader does, so a
+  // face that cannot be had is not asked for in a loop.
+  let asking = null;              // the map a request is out for
+  let tried = null, tries = 0;    // the map of the requests that ended short
+  let resting = false;            // a refresh that must not ask
+  const lacking = () => (state.meta?.views || []).some(v => !state.faces?.[v]);
   function wantFaces() {
-    if (asked === state.faces || typeof shell.loadFaces !== 'function') return;
-    asked = state.faces;
-    Promise.resolve(shell.loadFaces()).then(refresh)
-      .catch(err => console.warn('[portrayal] faces for the position control', err));
+    if (resting || typeof shell.loadFaces !== 'function') return;
+    const map = state.faces;
+    if (tried !== map) { tried = map; tries = 0; }
+    if (!lacking()) { tries = 0; return; }
+    if (asking === map) return;
+    asking = map;
+    Promise.resolve().then(() => shell.loadFaces())
+      .catch(err => console.warn('[portrayal] faces for the position control', err))
+      .then(() => {
+        if (asking === map) asking = null;
+        resting = state.faces === map && lacking() && ++tries > 1;
+        try { refresh(); } finally { resting = false; }
+      });
   }
 
   function refresh() {

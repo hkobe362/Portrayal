@@ -181,8 +181,9 @@ declares no adjustment, or inside a module.
   does not show this. See the top, bottom, left or right view, or 3D." A face
   shows the motion when a member on it has a `dx` or a `dy` in its
   `data-moves-by`. The control asks the shell for the other faces
-  (`loadFaces`) once for each set of faces the shell holds while an
-  adjustment is declared, so it asks again when a device is come back to.
+  (`loadFaces`) whenever an adjustment is declared and the shell does not
+  hold every face of the device. A request that ends with a face still
+  missing is sent once more, and after that on the next change.
   In 3D the line is not shown.
 
 `positionControl(shell, opts)` answers `{el, refresh}`. `opts.before` is the
