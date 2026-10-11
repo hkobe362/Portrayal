@@ -6,13 +6,15 @@
 // changes nothing hands back the very rack it was given, so a caller can tell.
 
 import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf, firstU, rollOf,
-        nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor} from './model.js';
+        nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor, holdersOf, usableReadings} from './model.js';
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
 import {ownRoute, pointOf, portPoint} from './route.js';
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
-import {whereText, zeroUName} from './zero-u.js';
+import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
+import {stateRefusal} from './states.js';
+import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey,
         connectorOf, mediaKind, portPathOf, MEDIA, MEDIA_LABELS} from './cable-rules.js';
@@ -381,30 +383,134 @@ function zeroUPlace(rack, {ref, cfg, at: where, ru, between = false, label}, ctx
   return done(next, `Placed ${z.label} ${whereText(next, z, chassisOf)}.`, {created: {id}});
 }
 
-function zeroUUpdate(rack, {id, at: where, ru, between, label}, {chassisOf}) {
+// A part hung on brackets (`heldBy`) stands where they hold it: it is not
+// moved by hand, and a bracket that moves carries what hangs on it.
+function zeroUUpdate(rack, {id, at: where, ru, between, label, swaps, fields}, ctx) {
+  const {chassisOf} = ctx;
   const z = zeroUById(rack, id);
   if (!z) return {error: ZERO_GONE};
   const want = {at: where ?? z.at, ru: ru ?? zeroUBottom(z)};
-  const moved = want.at !== z.at || want.ru !== zeroUBottom(z);
+  const moved = (where != null && where !== z.at) || (ru != null && ru !== zeroUBottom(z));
+  if (moved && holdersOf(z).length)
+    return {error: `${zeroUName(z, chassisOf)} hangs on ${holdersOf(z).join(', ')}: move a bracket, or take it off them with zerou.hang.`};
   const {between: _b, ...rest} = z;
   const now = between == null ? z.between === true : !!between;
   const next = {...rest, at: want.at, ...(moved ? {offsetMm: zeroUOffset(want.ru)} : {}),
                 ...(label != null ? {label: String(label).trim() || chassisOf(z.ref)?.model || z.ref} : {}),
+                // what is seated in it and its part settings, each map replaced whole, as patch does on a device
+                ...(swaps !== undefined ? {swaps: {...swaps}} : {}), ...(fields !== undefined ? {fields: structuredClone(fields)} : {}),
                 ...(now ? {between: true} : {})};
   if (same(next, z)) return unchanged(rack);
   if (moved) {
-    const f = fitsZeroU(rack, {ref: z.ref, ...want}, chassisOf, {ignoreId: id});
+    const f = fitsZeroU(rack, {ref: z.ref, id, ...want}, chassisOf, {ignoreId: id});
     if (!f.ok) return {error: f.reason};
   }
-  const out = {...rack, zeroU: rack.zeroU.map(o => (o === z ? next : o))};
-  return done(out, moved ? `Moved ${zeroUName(next, chassisOf)} to ${whereText(out, next, chassisOf)}.`
-    : `Changed ${zeroUName(next, chassisOf)}, ${whereText(out, next, chassisOf)}.`);
+  let out = {...rack, zeroU: rack.zeroU.map(o => (o === z ? next : o))};
+  // what hangs on it goes with it, checked where it lands
+  const carried = [];
+  if (moved) for (const h of hangingOn(out, id)) {
+    const f = fitsHang(out, h, ctx);
+    if (!f.ok) return {error: `${zeroUName(h, chassisOf)} hangs on it: ${f.reason}`};
+    if (!f.place) continue;
+    const there = {...h, ...f.place};
+    const g = fitsZeroU(out, {...there, ru: undefined}, chassisOf, {ignoreId: h.id});
+    if (!g.ok) return {error: `${zeroUName(h, chassisOf)} hangs on it: ${g.reason}`};
+    out = {...out, zeroU: out.zeroU.map(o => (o.id === h.id ? there : o))};
+    carried.push(there);
+  }
+  const with_ = carried.length ? ` ${carried.map(h => zeroUName(h, chassisOf)).join(', ')} ${carried.length === 1 ? 'hangs' : 'hang'} on it and moved with it.` : '';
+  return done(out, (moved ? `Moved ${zeroUName(next, chassisOf)} to ${whereText(out, next, chassisOf)}.`
+    : `Changed ${zeroUName(next, chassisOf)}, ${whereText(out, next, chassisOf)}.`) + with_);
 }
 
 function zeroURemove(rack, {id}, {chassisOf}) {
   const z = zeroUById(rack, id);
   if (!z) return {error: ZERO_GONE};
-  return done({...rack, zeroU: rack.zeroU.filter(o => o !== z)}, `Removed ${zeroUName(z, chassisOf)} from beside the rack.`);
+  // what hung on it stays where it was, on a bracket that is gone, and fit
+  // refuses it until it is hung again or taken off
+  const hung = hangingOn(rack, id);
+  const stay = hung.length ? ` ${hung.map(h => zeroUName(h, chassisOf)).join(', ')} hung on it and stay${hung.length === 1 ? 's' : ''} where ${hung.length === 1 ? 'it was' : 'they were'}.` : '';
+  return done({...rack, zeroU: rack.zeroU.filter(o => o !== z)}, `Removed ${zeroUName(z, chassisOf)} from beside the rack.${stay}`);
+}
+
+// HANG A PART ON BRACKETS (`on`: their ids), or take it off them (`on: null`).
+// Hung, it stands where they hold it: the kit writes its `at` and `offsetMm`.
+function zeroUHang(rack, {id, on}, ctx) {
+  const {chassisOf} = ctx;
+  const z = zeroUById(rack, id);
+  if (!z) return {error: ZERO_GONE};
+  if (on === null) {
+    if (!('heldBy' in z)) return unchanged(rack);
+    const {heldBy: _h, ...free} = z;
+    return done({...rack, zeroU: rack.zeroU.map(o => (o === z ? free : o))},
+      `Took ${zeroUName(z, chassisOf)} off its brackets; it stands ${whereText(rack, free, chassisOf)}.`);
+  }
+  const ids = [...new Set(on)];
+  if (ids.includes(id)) return {error: `${zeroUName(z, chassisOf)} cannot hang on itself.`};
+  const s = slotsFor(ctx, z.ref);
+  if (!s) return {error: 'zerou.hang needs the parts lists of the devices, which the caller has not loaded.'};
+  if (s.error) return s;
+  const trial = {...z, heldBy: {...(z.heldBy && typeof z.heldBy === 'object' && !Array.isArray(z.heldBy) ? z.heldBy : {}), parts: ids}};
+  const f = fitsHang(rack, trial, ctx);
+  if (!f.ok) return {error: f.reason};
+  if (!f.place) return {error: partsMissingFor(ids, ctx)};
+  const next = {...trial, ...f.place};
+  if (same(next, z)) return unchanged(rack);
+  const g = fitsZeroU(rack, {...next, ru: undefined}, chassisOf, {ignoreId: id});
+  if (!g.ok) return {error: g.reason};
+  const out = {...rack, zeroU: rack.zeroU.map(o => (o === z ? next : o))};
+  return done(out, `Hung ${zeroUName(next, chassisOf)} on ${ids.join(', ')}, ${whereText(out, next, chassisOf)}.`);
+}
+const partsMissingFor = (ids, ctx) => `The parts list of ${ids.find(i => !ctx.slotsOf(i)) ?? 'a bracket'} could not be loaded.`;
+
+// ── states and readings (docs/rack-file-v4-design.md section 4) ──────────
+// On a device or on a part beside the rack, by its id.
+const entryOf = (rack, id) => itemOf(rack, id) ?? zeroUById(rack, id);
+const withEntry = (rack, id, next) => (itemOf(rack, id)
+  ? {...rack, items: rack.items.map(i => (i.id === id ? next : i))}
+  : {...rack, zeroU: rack.zeroU.map(o => (o?.id === id ? next : o))});
+const entryName = (e, chassisOf) => e.label || chassisOf(e.ref)?.model || e.ref;
+
+function stateSet(rack, {id, path, state}, ctx) {
+  const e = entryOf(rack, id);
+  if (!e) return {error: GONE};
+  const had = e.states && typeof e.states === 'object' ? e.states : {};
+  if (state == null) {
+    if (!Object.hasOwn(had, path)) return unchanged(rack);
+    const {[path]: _was, ...rest} = had;
+    const {states: _s, ...bare} = e;
+    return done(withEntry(rack, id, Object.keys(rest).length ? {...e, states: rest} : bare), `Cleared the state of ${path} on ${entryName(e, ctx.chassisOf)}.`);
+  }
+  if (had[path] === state) return unchanged(rack);
+  // checked against what the part declares, when the parts lists are loaded
+  const s = slotsFor(ctx, e.ref);
+  if (s?.error) return s;
+  if (s) {
+    const facts = configFacts(s, e.cfg);
+    const no = facts ? stateRefusal({...e, label: entryName(e, ctx.chassisOf)}, path, state, facts) : null;
+    if (no) return {error: no};
+  }
+  return done(withEntry(rack, id, {...e, states: {...had, [path]: state}}), `Set ${path} on ${entryName(e, ctx.chassisOf)} to ${state}.`);
+}
+
+function readingsSet(rack, {id, readings}, ctx) {
+  const e = entryOf(rack, id);
+  if (!e) return {error: GONE};
+  const name = entryName(e, ctx.chassisOf);
+  if (readings == null) {
+    if (!('readings' in e) && !('readingsAsWritten' in e)) return unchanged(rack);
+    const {readings: _r, readingsAsWritten: _w, ...bare} = e;
+    return done(withEntry(rack, id, bare), `Cleared the readings of ${name}.`);
+  }
+  if (!usableReadings(readings)) return {error: 'readings.set needs readings with a source, a time (at) that can be read, and values by part.'};
+  const s = slotsFor(ctx, e.ref);
+  if (s?.error) return s;
+  const facts = s ? configFacts(s, e.cfg) : null;
+  if (facts?.metering === 'none')
+    return {error: `${ctx.chassisOf(e.ref)?.model ?? e.ref} measures nothing, so there is no reading for ${Object.keys(readings.values || {}).join(', ') || 'it'}.`};
+  if (same(readings, e.readings)) return unchanged(rack);
+  const {readingsAsWritten: _w, ...rest} = e;
+  return done(withEntry(rack, id, {...rest, readings: structuredClone(readings)}), `Stored the readings of ${name}.`);
 }
 
 // What a frame change did to the parts beside the rack, as sentences.
@@ -924,7 +1030,20 @@ export const COMMANDS = {
       at: AT, ru: BOTTOM, between: BETWEEN, label: {type: 'string', description: 'The name shown on the drawing; its model when left out.'}, as: AS})},
   'zerou.update': {run: zeroUUpdate, description: 'Move a part beside the rack to another upright or U, say whether it stands between racks, or rename it.',
     args: args(['id'], {id: ID('part beside the rack'), at: AT, ru: BOTTOM, between: BETWEEN,
-      label: {type: 'string', description: 'The name shown on the drawing.'}})},
+      label: {type: 'string', description: 'The name shown on the drawing.'},
+      swaps: {type: 'object', description: 'Every slot path to the part ref seated there, replacing the whole map.'},
+      fields: {type: 'object', description: 'Every part path to its settings ({key: value}), replacing the whole map.'}})},
+  'zerou.hang': {run: zeroUHang, description: 'Hang a part beside the rack (a zero-U PDU) on brackets placed there, or take it off them. Hung, it stands where the brackets hold it, and moves when one moves. Refused, with the distance, when its mount points do not meet their slots.',
+    args: args(['id', 'on'], {id: ID('part beside the rack'),
+      on: {type: ['array', 'null'], minItems: 1, description: 'The ids of the brackets that hold it, or null to take it off them.',
+        items: {type: 'string', minLength: 1, description: 'A bracket id, or "@name" from earlier in this batch.'}}})},
+  'state.set': {run: stateSet, description: 'Set what one part of a placed device or of a part beside the rack is, such as an outlet of a PDU on or off; null clears it. Refused, with what the part can be, when it declares no such state.',
+    args: args(['id', 'path', 'state'], {id: ID('device or part beside the rack'),
+      path: {type: 'string', minLength: 1, description: 'The part, by its path on the device (e.g. outlet-a1).'},
+      state: {type: ['string', 'null'], minLength: 1, description: 'The state name, as the part declares it (e.g. on, off); null to clear.'}})},
+  'readings.set': {run: readingsSet, description: 'Store readings taken from a device or a part beside the rack, with where they came from and when; null clears them.',
+    args: args(['id', 'readings'], {id: ID('device or part beside the rack'),
+      readings: {type: ['object', 'null'], description: '{source, at, values}: where they came from, an RFC 3339 time, and part path to {current-a, power-w, energy-kwh}; null to clear.'}})},
   'zerou.remove': {run: zeroURemove, description: 'Take a part away from beside the rack.',
     args: args(['id'], {id: ID('part beside the rack')})},
   'cable.add': {run: cableAdd, description: 'Run a cable between two free ports. Refused when a port already has a cable or a device is gone.',
@@ -998,10 +1117,10 @@ function resolve(cmd, bound) {
   };
   const out = {...cmd};
   for (const k of ['id', 'cable']) if (k in out) { const s = swap(out[k]); if (s.error) return s; out[k] = s.v; }
-  if (Array.isArray(out.cables)) {
+  for (const k of ['cables', 'on']) if (Array.isArray(out[k])) {
     const list = [];
-    for (const v of out.cables) { const s = swap(v); if (s.error) return s; list.push(s.v); }
-    out.cables = list;
+    for (const v of out[k]) { const s = swap(v); if (s.error) return s; list.push(s.v); }
+    out[k] = list;
   }
   for (const k of ['a', 'b', 'at']) if (out[k]?.item != null) {
     const s = swap(out[k].item); if (s.error) return s; out[k] = {...out[k], item: s.v};

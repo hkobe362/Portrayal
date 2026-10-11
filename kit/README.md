@@ -286,6 +286,17 @@ context (`portX`, `portY`, `guidesOf`) gives its points for the upright
 item, and the kit turns them, so a page that rolls them itself turns them
 twice. `isQuarter(item)` says an item is an outline to a route.
 
+`rack/states.js` reads what an entry is set to against the facts of its
+device (`configFacts`): `statesFor(entry, facts)` is the `{path: state}` map
+to hand a drawing, holding only what each part declares and carried from an
+outlet to its lamps when `facts.bindings` gives them; `readingsFor(entry,
+facts)` is `{source, at, badges}`, or null; `stateNotices(rack, ctx)` names
+what is kept and not applied. `rack/zero-u.js` has `fitsHang(rack, entry,
+ctx)`, where a part hung on brackets stands or why it cannot,
+`hangNotices(rack, ctx)` and `bracketPositions(rack, {ref, cfg, ru}, ctx)`.
+A page calls the two notice functions once it has loaded the parts lists
+(`loadSlots`); the editor cannot, since it holds none.
+
 `holderOf(item)` in `rack/model.js` is the id of the item that holds one on
 a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
 `rack/fit.js` says whether a held item is one the kit does not check: a page
@@ -295,7 +306,9 @@ The other names these modules export are the kit's own, shared between its
 files, and may change without notice: `spansMeet`, `anchorY`, `laneY`,
 `neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf`,
 `overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `heldBy`, `uncheckedText`,
-`unheldText` and `bothText` in `rack/fit.js`; `isPosition`, `HOLE_STYLES`,
+`unheldText`, `bothText`, `zeroUExtent` and `notBracket` in `rack/fit.js`; `stateRefusal` in
+`rack/states.js`; `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `holdersOf` and
+`usableReadings` in `rack/model.js`; `isPosition`, `HOLE_STYLES`,
 `railWidth`, `RAIL_WIDTH_IN` and `ROLLS` in `rack/model.js`; `HOLE_EDGE` in
 `rack/rails.js`; `NO_HOSTS` in `rack/commands.js`; `NETBOX_RACK_WIDTHS` in
 `rack/export-data.js`.

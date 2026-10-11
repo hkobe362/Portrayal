@@ -41,7 +41,8 @@ export const MIGRATIONS = [d => ({...d, version: 2}), d => ({...d, version: 3}),
 const unknownOf = (o, known) => Object.fromEntries(Object.entries(o && typeof o === 'object' && !Array.isArray(o) ? o : {})
   .filter(([k]) => !known.includes(k)).map(([k, v]) => [k, structuredClone(v)]));
 const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref', 'startU', 'setback', 'width'];
-const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback', 'roll'];
+const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback', 'roll',
+                   'states', 'readings', 'readingsAsWritten'];
 const RACK_KEYS = ['id', 'name', 'frame', 'items', 'zeroU', 'cables', 'dcim', 'bundles'];
 const DOC_KEYS = ['format', 'version', 'id', 'racks'];
 // The rail hole styles. `round` (version 4) is an unthreaded round hole.
@@ -182,6 +183,11 @@ const plainObject = v => !!v && typeof v === 'object' && !Array.isArray(v);
 export const zeroUOf = rack => (Array.isArray(rack?.zeroU) ? rack.zeroU : []).filter(z => plainObject(z)
   && typeof z.id === 'string' && z.id && typeof z.ref === 'string' && z.ref && typeof z.at === 'string' && z.at);
 export const zeroUById = (rack, id) => zeroUOf(rack).find(z => z.id === id) ?? null;
+// WHAT A ZERO-U PART HANGS ON (version 4, `heldBy: {parts: [id, ...]}`): the
+// ids of the zero-U entries that hold it, such as the two brackets of a PDU;
+// none for a part that stands on its own.
+export const holdersOf = z => (plainObject(z?.heldBy) && Array.isArray(z.heldBy.parts)
+  ? z.heldBy.parts.filter(id => typeof id === 'string' && id) : []);
 // A part's bottom U and its offset, each from the other: U1 is offset 0.
 export const zeroUOffset = ru => Math.round((ru - 1) * RU * 100) / 100;
 export const zeroUBottom = z => Math.max(1, Math.round((Number(z?.offsetMm) || 0) / RU) + 1);
@@ -237,22 +243,55 @@ export const positionOf = (frame, ru, units = 1) =>
 // (lanes, managers, the rail numbers).
 export const uText = (frame, ru, units = 1) => `U${positionOf(frame, ru, units)}`;
 
+// STATES AND READINGS (version 4, docs/rack-file-v4-design.md section 4), on
+// an item and on a zero-U entry alike.
+// `states` is a map of part path to state name, both text. It is read entry
+// by entry: one that is not text for text is dropped, and `said` is told.
+// `readings` is {source, at, values} and is kept ONLY WHOLE: without a source
+// that is text, a time `at` that can be read, or with `values` that are not a
+// map of part path to an object, it moves as written to `readingsAsWritten`,
+// as an unusable length moves to `lengthAsWritten`, and nothing draws it.
+const isText = v => typeof v === 'string' && v !== '';
+export const usableReadings = r => plainRecord(r) && isText(r.source) && isText(r.at) && !Number.isNaN(Date.parse(r.at))
+  && (r.values === undefined || (plainRecord(r.values) && Object.values(r.values).every(plainRecord)));
+const plainRecord = v => !!v && typeof v === 'object' && !Array.isArray(v);
+function readSettings(src, who, said) {
+  const out = {};
+  if ('states' in src) {
+    const kept = {}, dropped = [];
+    for (const [k, v] of Object.entries(plainRecord(src.states) ? src.states : {})) (isText(v) ? kept : dropped)[k] = v;
+    if (!plainRecord(src.states)) said?.(`The states of ${who} were not a map of part to state, so they were dropped.`);
+    else if (Object.keys(dropped).length)
+      said?.(`${Object.keys(dropped).join(', ')} on ${who} had a state that is not a name, so ${Object.keys(dropped).length === 1 ? 'it was' : 'they were'} dropped.`);
+    if (plainRecord(src.states)) out.states = kept;
+  }
+  if ('readings' in src) {
+    if (usableReadings(src.readings)) out.readings = structuredClone(src.readings);
+    else {
+      out.readingsAsWritten = structuredClone(src.readings);
+      said?.(`The readings of ${who} have no source or no time that can be read, so they are kept as written and not shown.`);
+    }
+  } else if ('readingsAsWritten' in src) out.readingsAsWritten = structuredClone(src.readingsAsWritten);
+  return out;
+}
+
 // A POSITION is a whole unit or a half (version 4): `ru` in steps of 0.5.
 export const isPosition = ru => typeof ru === 'number' && Number.isFinite(ru) && Number.isInteger(ru * 2);
 
-function readItem(i, n) {
+function readItem(i, n, said) {
   if (!i || typeof i.ref !== 'string' || !i.ref || !isPosition(i.ru))
     throw new Error(`Item ${n} has no device or no U.`);
   return {...unknownOf(i, ITEM_KEYS), id: String(i.id ?? ''), ref: i.ref, cfg: String(i.cfg ?? ''), label: String(i.label ?? i.ref),
           ru: i.ru, face: i.face === 'rear' ? 'rear' : 'front', turned: !!i.turned,
           swaps: {...(i.swaps || {})}, fields: structuredClone(i.fields || {}),
-          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side), ...setbackOf(i.setback), ...rollKey(i.roll)};
+          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side), ...setbackOf(i.setback), ...rollKey(i.roll),
+          ...readSettings(i, String(i.label ?? i.ref), said)};
 }
 
 // The zero-U record as written, with an id given to each object entry that
 // has none, or one an earlier entry took (as items are repaired), past every
 // id the record declares. Anything else is kept as it is.
-function readZeroU(list) {
+function readZeroU(list, said) {
   const taken = list.filter(z => plainObject(z) && typeof z.id === 'string' && z.id).map(z => ({id: z.id}));
   const seen = new Set();
   return list.map(raw => {
@@ -260,7 +299,9 @@ function readZeroU(list) {
     if (!plainObject(z)) return z;
     if (typeof z.id !== 'string' || !z.id || seen.has(z.id)) z.id = nextId([...taken, ...[...seen].map(id => ({id}))], 'z');
     seen.add(z.id);
-    return z;
+    // what it is set to is read as on an item; where it stands is kept as written
+    const {states: _s, readings: _r, readingsAsWritten: _w, ...rest} = z;
+    return {...rest, ...readSettings(z, String(z.label ?? z.ref ?? z.id), said)};
   });
 }
 
@@ -271,12 +312,12 @@ function readZeroU(list) {
 // past every id an item in the file declares and every id a cable end names
 // (`cables`, as written) - so a repair never takes a later item's id, and
 // never picks up a cable that was not this item's.
-function readItems(list, cables, bundles) {
+function readItems(list, cables, bundles, said) {
   const taken = [...list.map(i => ({id: String(i?.id ?? '')})), ...endItems(cables), ...bundleItems(bundles)];
   const items = [];
   const seen = new Set();
   list.forEach((i, n) => {
-    const it = readItem(i, n + 1);
+    const it = readItem(i, n + 1, said);
     if (!it.id || seen.has(it.id)) it.id = nextId([...taken, ...items], 'i');
     seen.add(it.id);
     items.push(it);
@@ -392,8 +433,9 @@ export function parseDoc(input, {notes} = {}) {
     id: typeof d.id === 'string' && d.id ? d.id : `doc-${token()}`,
     racks: d.racks.map((r, k) => {
       const bundles = Array.isArray(r.bundles) ? r.bundles : null;
-      const items = readItems(r.items || [], r.cables, bundles);
-      const zeroU = readZeroU(Array.isArray(r.zeroU) ? r.zeroU : []);
+      const said = text => { if (Array.isArray(notes)) notes.push(`${String(r.name ?? 'Rack')}: ${text}`); };
+      const items = readItems(r.items || [], r.cables, bundles, said);
+      const zeroU = readZeroU(Array.isArray(r.zeroU) ? r.zeroU : [], said);
       const cables = readCables(Array.isArray(r.cables) ? r.cables : [], bundles ?? []);
       const rack = {
         ...unknownOf(r, RACK_KEYS),

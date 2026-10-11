@@ -1568,4 +1568,38 @@ as written. Each is built, and each waits for a person to confirm it.
 - **`describe` and `inspect`** say a roll only where an item has one
   ("rolled 90"; `roll: 90`). The export notes of a rolled item are part 9
   and are not written yet.
+- **Readings and the metering scope** (section 4). A PDU that meters nothing
+  shows no reading and is named ("BASIC-PDU measures nothing, so there is no
+  reading for outlet-a1, input."). **The check for a PDU that meters its
+  input or its branches is not built:** it has to know that `outlet-a1` is
+  an outlet and `breaker-a` a branch, and nothing the kit loads says what
+  kind of part a path is. It needs a key in `configs.json` that this note
+  does not give, so readings on such a PDU are kept and shown as given.
+- **The other sentences of states and readings.** A part that declares no
+  state ("breaker-a on PDU A cannot be set: it declares no state."); the
+  three loader notices (a state that is no name, states that are no map,
+  readings kept as written); and a refused `readings.set`. With no parts
+  lists loaded a state is stored unchecked, as a configuration is.
+- **`readings` is usable** with a `source`, a time `at` that can be read,
+  and `values` absent or a map of part to an object. The numbers inside a
+  value are not checked on load; the schema states them.
+- **Hanging** (section 5). The tolerance is 1 mm, since the connectors
+  registry states none for any mounting interface. A refusal that is not two
+  mount points on two brackets reads "A mount point of PDU A 1555.8 mm above
+  its lowest meets no slot of z3, z4."; a move of under a unit is given in
+  mm. A bracket of two cannot be moved alone, since the pitch would no
+  longer be met: the part is taken off first. A held part moved by hand is
+  refused ("PDU A hangs on z1, z2: move a bracket, or take it off them with
+  zerou.hang."). `zerou.hang` needs the parts lists loaded. A frame change
+  (`settleZeroU`) moves each part on its own and does not hang a part again;
+  `hangNotices` then says a part is not where its brackets hold it.
+- **`bracketPositions(rack, {ref, cfg, ru}, ctx)`** takes the part and the
+  unit of the lowest bracket, and answers one bracket a mount point, each a
+  whole number of units above the lowest, with `exact` saying the points
+  then land. It takes each bracket to offer its slot at one height, since
+  it is asked before a bracket is chosen.
+- **`swaps` and `fields` beside the rack** are taken by `zerou.update` and
+  kept; `patch` still takes a device only. Nothing in the kit draws them.
+- **The export comments of a hung PDU and of states** are part 9 and are
+  not written yet.
 

@@ -50,6 +50,19 @@
   gains `facePoint`, `rollPoint` and `itemUnits`. A routing context still
   gives each port and guide where an upright item would hold it; the kit
   turns it.
+- `states` and `readings` on an item and on a part beside the rack. The
+  loader keeps a state that is a name for a part, drops any other and says
+  so, and moves readings with no source or no time it can read to
+  `readingsAsWritten`. `state.set` and `readings.set` write them, refused
+  with what the part can be when the parts lists are loaded. The new
+  `rack/states` module has `statesFor`, the map to hand a drawing with each
+  outlet state carried to its lamps, `readingsFor` and `stateNotices`.
+- A zero-U PDU hangs on brackets: `heldBy: {parts}` on its entry,
+  `zerou.hang` to hang it or take it off, and the kit writes where it then
+  stands. A bracket that moves carries what hangs on it; a held part is not
+  moved by hand; one whose bracket is gone stays and is refused by fit.
+  `fitsHang`, `hangNotices` and `bracketPositions` are in `rack/zero-u`.
+  `zerou.update` takes `swaps` and `fields`.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file
@@ -68,6 +81,10 @@
   or less, sixteen rise by up to 6.35 mm and four ducts drop by up to 6.7 mm.
   A routed length that touches one moves by under a millimetre, and a cord
   that sat within that of a stock break changes size.
+- Zero-U overlap is judged in millimetres. A part the kit placed at a whole
+  unit overlaps as before; one whose `offsetMm` is between units is judged
+  where it is, where it was rounded to a unit, and a frame change no longer
+  moves it to one.
 - Exports: a NetBox device row, the cable schedule `a_u` and `b_u` and the
   draw.io unit carry a half position. A Nautobot device row is written at
   the whole unit, with a comment saying which part of it the device fills;

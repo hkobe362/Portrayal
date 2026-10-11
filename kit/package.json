@@ -61,6 +61,7 @@
     "./rack/route": "./rack/route.js",
     "./rack/route-path": "./rack/route-path.js",
     "./rack/solids": "./rack/solids.js",
+    "./rack/states": "./rack/states.js",
     "./rack/validate": "./rack/validate.js",
     "./rack/zero-u": "./rack/zero-u.js"
   },

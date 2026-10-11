@@ -10,7 +10,7 @@
 // passes through, so there a U is never shared.
 
 import {RU, OPENING, SIDES as RAILS} from './rails.js';
-import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN, firstU, rollOf} from './model.js';
+import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, holdersOf, railWidth, RAIL_WIDTH_IN, firstU, rollOf} from './model.js';
 
 // ── HEIGHTS, SPANS AND BOXES (docs/rack-file-v4-design.md section 2.4) ─────
 // PUBLIC: unitsOf, spanOf, itemBox, spanText (kit/README.md). The other names
@@ -574,24 +574,52 @@ export function shrinkRack(rack, newHeight, chassisOf) {
 }
 
 // ZERO-U (#926): a zero-U part on an attachment point of this frame, its
-// bottom level with a U (`ru`, or the `offsetMm` a file stores), within the
+// bottom level with a U (`ru`) or at the `offsetMm` a file stores, within the
 // rack's height by the units it states (zeroUUnits), and never overlapping
 // another zero-U part on the same attachment point. Parts on two attachment
 // points never meet, whatever their height.
+// OVERLAP IS JUDGED IN MILLIMETRES (version 4): from `offsetMm` to `offsetMm`
+// plus the stated units times one unit. A part the kit placed at a whole unit
+// overlaps exactly as it did when units were compared; a part hung on brackets
+// stands where they put it, which is no whole unit, and is judged there. A
+// PART DOES NOT OVERLAP THE PARTS THAT HOLD IT (`heldBy`), and one whose
+// holder is not in the rack is refused until it is hung again or freed.
+const MM_EPS = 1e-6;
+export const zeroUExtent = (z, chassisOf) => {
+  const lo = Number(z?.offsetMm) || 0;
+  return [lo, lo + zeroUUnits(chassisOf(z.ref)) * RU];
+};
+export const notBracket = id => `${id} is not a bracket in this rack.`;
 export function fitsZeroU(rack, cand, chassisOf, {ignoreId = null} = {}) {
   const f = rack.frame, c = chassisOf(cand.ref);
   if (!c) return no(`No size is known for ${cand.ref}.`);
   if (!isZeroUPart(c)) return no(`${nameOf(c, cand.ref)} does not stand beside the rack: it goes on the rails.`);
   const points = attachPoints(f.kind);
   if (!points.includes(cand.at)) return no(`${cand.at} is not an attachment point of a ${f.kind} frame: use ${points.join(', ')}.`);
-  const lo = cand.ru ?? zeroUBottom(cand);
-  if (!Number.isInteger(lo) || lo < 1) return below(f);
-  if (lo > f.heightRU) return no(`U${named(f, lo)} is past the top of this ${f.heightRU}U rack.`);
-  const u = zeroUUnits(c), hi = lo + u - 1;
-  if (hi > f.heightRU) return tooTall(f, u, lo);
+  const u = zeroUUnits(c);
+  let off;
+  if (cand.ru != null) {
+    // placed by its unit: a whole number of units, as the commands write it
+    const lo = cand.ru;
+    if (!Number.isInteger(lo) || lo < 1) return below(f);
+    if (lo > f.heightRU) return no(`U${named(f, lo)} is past the top of this ${f.heightRU}U rack.`);
+    if (lo + u - 1 > f.heightRU) return tooTall(f, u, lo);
+    off = (lo - 1) * RU;
+  } else {
+    // where the file has it, in mm
+    off = Number(cand.offsetMm) || 0;
+    if (off < -MM_EPS) return below(f);
+    const lo = Math.floor(off / RU + MM_EPS) + 1;
+    if (lo > f.heightRU) return no(`U${named(f, lo)} is past the top of this ${f.heightRU}U rack.`);
+    if (off + u * RU > f.heightRU * RU + MM_EPS) return tooTall(f, u, lo);
+  }
+  const mine = cand.id ?? ignoreId, holders = holdersOf(cand);
+  for (const id of holders) if (!zeroUOf(rack).some(o => o.id === id)) return no(notBracket(id));
   for (const o of zeroUOf(rack)) {
     if (o.id === ignoreId || o.at !== cand.at || !isZeroUPart(chassisOf(o.ref))) continue;
-    if (overlaps([lo, hi], zeroUSpan(o, chassisOf))) return no(`Overlaps ${o.label || o.ref} at ${o.at}.`);
+    if (holders.includes(o.id) || (mine != null && holdersOf(o).includes(mine))) continue;
+    const [lo, hi] = zeroUExtent(o, chassisOf);
+    if (off < hi - MM_EPS && lo < off + u * RU - MM_EPS) return no(`Overlaps ${o.label || o.ref} at ${o.at}.`);
   }
   return {ok: true};
 }
@@ -601,8 +629,9 @@ export function fitsZeroU(rack, cand, chassisOf, {ignoreId = null} = {}) {
 // left-rear to left; left to left-front), a lower height moves a part that now
 // runs past the top down until it fits, and a part that still does not fit -
 // taller than the rack, or overlapping one kept before it - is removed. Parts
-// are judged in the order the rack lists them. Returns the rack with `moved`
-// and `removed`, each a list of entries as they were.
+// are judged in the order the rack lists them, each where its `offsetMm` has
+// it. Returns the rack with `moved` and `removed`, each a list of entries as
+// they were.
 export function settleZeroU(rack, chassisOf) {
   const points = attachPoints(rack.frame.kind);
   const placeable = new Set(zeroUOf(rack).filter(z => isZeroUPart(chassisOf(z.ref))));
@@ -613,9 +642,16 @@ export function settleZeroU(rack, chassisOf) {
     const side = String(z.at).startsWith('right') ? 'right' : 'left';
     const at = points.includes(z.at) ? z.at : points.find(p => p.startsWith(side));
     const u = zeroUUnits(chassisOf(z.ref));
-    const lo = Math.max(1, Math.min(zeroUBottom(z), rack.frame.heightRU - u + 1));
-    const next = at === z.at && lo === zeroUBottom(z) ? z : {...z, at, offsetMm: zeroUOffset(lo)};
-    if (!fitsZeroU(kept, {ref: z.ref, at, ru: lo}, chassisOf, {ignoreId: z.id}).ok) {
+    const was = Number(z.offsetMm) || 0;
+    // down to the highest place it fits under the top, and never below the rails
+    const top = zeroUOffset(Math.max(1, rack.frame.heightRU - u + 1));
+    const off = Math.max(0, Math.min(was, top));
+    const next = at === z.at && off === was ? z : {...z, at, offsetMm: off};
+    // a part whose holder is gone is kept where it is, as fit will say; it is
+    // judged here for room alone
+    const here = holdersOf(next).filter(id => zeroUOf(rack).some(o => o.id === id));
+    const trial = here.length === holdersOf(next).length ? next : {...next, heldBy: {parts: here}};
+    if (!fitsZeroU(kept, {...trial, ru: undefined}, chassisOf, {ignoreId: z.id}).ok) {
       removed.push(z); gone.add(z);
       return z;
     }
