@@ -59,6 +59,8 @@ const routes = {
   'plain.configs.json': () => cfg('plain', ['front']),
   // a device that declares no adjustment
   'plain.base.front.svg': () => JSON.stringify({src: 'plain', parts: [chassis]}),
+  // the face of a component, which a reader opens as a module
+  'components/fixture--slide-well--v1--default.svg': () => JSON.stringify({src: 'well', parts: []}),
 };
 for (const v of VIEWS) {
   routes[`slider.base.${v}.svg`] = () => faces(60)[v];
@@ -146,10 +148,33 @@ test('nothing is held, and the reset has nothing to do, until a position is set'
   assert.equal(part('panel-setback', 'msg').textContent, '');
 });
 
-test('a stop button writes through setFields: the number is kept and every face moves', () => {
+test('the line for a refusal is in the page before it has anything to say', () => {
+  // a live region that is hidden until its text arrives is not reliably
+  // announced: the empty one is there, and no rule takes it out of the page
+  const msg = part('panel-setback', 'msg');
+  assert.equal(msg.textContent, '');
+  assert.equal(msg.getAttribute('role'), 'status');
+  assert.equal(msg.hidden, false);
+  assert.equal(msg.hasAttribute('aria-hidden'), false);
+  const css = document.head.children.map(n => n.textContent).find(t => t.includes('#positions'));
+  const rules = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, sel]) => sel.includes('.msg'));
+  assert.ok(rules.length >= 2, 'the rules of the line were read');
+  for (const [, sel, body] of rules)
+    assert.doesNotMatch(body, /display\s*:\s*none|visibility\s*:\s*hidden/, sel.trim());
+  // empty, it takes no room: no text and no margin
+  const empty = rules.find(([, sel]) => sel.includes('.msg:empty'));
+  assert.match(empty[2], /margin-top\s*:\s*0\s*;/);
+});
+
+test('a stop button writes through setFields: the name is sent, the number is kept and every face moves', () => {
   const events = [];
   shell.on('fields', e => events.push(e.path));
-  stop('panel-setback', 'rear').onclick();
+  // what the button hands the shell is the NAME of the stop, not its number
+  const sent = [];
+  const real = shell.setFields;
+  shell.setFields = (...a) => { sent.push(a); return real(...a); };
+  try { stop('panel-setback', 'rear').onclick(); } finally { shell.setFields = real; }
+  assert.deepEqual(sent, [['panel', {'panel-setback': 'rear'}]]);
   assert.equal(held(), '180');
   assert.deepEqual(events, ['panel']);
   assert.equal(topY(), 'translate(0 -120)');
@@ -288,10 +313,42 @@ test('a configuration built moved starts the control where it was built', async 
 });
 
 test('a device that declares no adjustment gets no control', async () => {
+  // the faces the last test asked for have arrived: nothing is on its way
+  // when the device is left, which is how a reader leaves one
+  await settle(); await settle();
   await shell.loadDevice('plain');
   assert.equal(control.el.hidden, true);
   assert.equal(control.el.children.length, 0);
   await shell.loadDevice('slider');
+  assert.equal(control.el.hidden, false);
+  assert.equal(control.el.children.length, 2);
+  // AND BACK, THE LINE STILL NAMES THE VIEWS. The shell let the other faces go
+  // on the way; the control asks for them again, though the device and the
+  // configuration are the ones it asked about before.
+  await settle(); await settle();
+  assert.deepEqual(Object.keys(shell.state.faces).sort(), [...VIEWS].sort());
+  assert.equal(part('panel-setback', 'note').textContent,
+               'The front view does not show this. See the top or right view, or 3D.');
+});
+
+test('inside a module there is no control, and it is back on the way out', async () => {
+  // the stand-in page parses no markup: the crumb answers the shell with a
+  // button of its own, which is the way out of the module
+  shell.el.crumb.byQuery = {};
+  shell.openModule('fixture/slide-well@1');
+  // the module is opened and its drawing not yet loaded: the face the shell
+  // holds is still the one of the device, and the control does not read it
+  assert.equal(shell.state.module, 'fixture/slide-well@1');
+  assert.ok(shell.state.svg.hasAttribute('data-adjustments'));
+  control.refresh();
+  assert.equal(control.el.hidden, true);
+  assert.equal(control.el.children.length, 0);
+  await settle(); await settle();
+  assert.equal(shell.state.svg.getAttribute('data-src'), 'well');
+  assert.equal(control.el.hidden, true);
+  shell.el.crumb.querySelector('#back').onclick();
+  await settle(); await settle();
+  assert.equal(shell.state.module, null);
   assert.equal(control.el.hidden, false);
   assert.equal(control.el.children.length, 2);
 });

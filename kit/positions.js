@@ -37,7 +37,8 @@ const CSS_TEXT = `
   #positions input:focus-visible, #positions button:focus-visible { outline:2px solid var(--ink); outline-offset:1px; }
   #positions .datum, #positions .note { color:var(--dim); font-size:0.68rem; line-height:1.45; margin-top:0.3rem; }
   #positions .msg { color:var(--warn); font-size:0.7rem; line-height:1.45; margin-top:0.3rem; }
-  #positions .note:empty, #positions .msg:empty { display:none; }
+  #positions .note:empty { display:none; }
+  #positions .msg:empty { margin-top:0; }
 `;
 
 // "a", "a or b", "a, b or c"
@@ -169,6 +170,10 @@ export function positionControl(shell, opts = {}) {
       g.append(ctl);
       n.datum = make('div', 'datum', {id: `${uid}-d`});
       n.note = make('div', 'note');
+      // THE LIVE REGION IS THERE BEFORE ITS TEXT. A status that is taken out
+      // of the page while empty (`display:none`) is not reliably announced
+      // when its sentence arrives, so the empty one stays in the
+      // accessibility tree: no text and no margin, which is no height.
       n.msg = make('div', 'msg', {role: 'status', 'aria-live': 'polite'});
       g.append(n.datum, n.note, n.msg);
       box.append(g);
@@ -211,14 +216,18 @@ export function positionControl(shell, opts = {}) {
     return `${first} See the ${anyOf(others)} view${threeD ? ', or 3D' : ''}.`;
   }
 
-  // THE OTHER FACES, asked for once for each device and configuration that
-  // declares an adjustment: they are what the line above names, and a face
-  // the shell holds is moved with the rest.
-  let asked = '';
+  // THE OTHER FACES, asked for once for each set of faces the shell holds
+  // while an adjustment is declared: they are what the line above names, and
+  // a face the shell holds is moved with the rest. WHAT IS REMEMBERED IS THE
+  // MAP OF FACES ITSELF, not the names of the device and the configuration.
+  // The shell starts a new map whenever it lets the faces go, so a map this
+  // has not asked about is one that may lack them. A name would still match
+  // after a visit to a device with no adjustment and back, with every other
+  // face gone, and the line would name no view.
+  let asked = null;
   function wantFaces() {
-    const key = `${state.device}.${state.cfg}`;
-    if (asked === key || typeof shell.loadFaces !== 'function') return;
-    asked = key;
+    if (asked === state.faces || typeof shell.loadFaces !== 'function') return;
+    asked = state.faces;
     Promise.resolve(shell.loadFaces()).then(refresh)
       .catch(err => console.warn('[portrayal] faces for the position control', err));
   }
