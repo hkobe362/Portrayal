@@ -15,6 +15,7 @@ import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shri
 import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
 import {stateRefusal} from './states.js';
 import {trayRefusal, trayText, FORMS, mText} from './slack.js';
+import {traysOf} from './solids.js';
 import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey,
@@ -1031,6 +1032,49 @@ function cableSlackClear(rack, {id, at: where}) {
     left.length ? `Cleared one place for the spare of ${cableName(c)}.` : `Cleared where the spare of ${cableName(c)} is stored.`);
 }
 
+// `cable.lay`: pin how a cable lies in one pathway, `{item, via}`: its
+// `face` on a tray (`top` or `underside`, named in the frame of the part)
+// and its `position` across the pathway. A key left out is kept, null
+// unpins it, and an entry with neither left is removed, the `lay` key with
+// the last. `face` is acted on by the routes (route.js layFaceOf);
+// `position` is kept and not acted on until lay order is built. What the
+// file holds that is no usable entry is kept as it was written.
+// A face is judged against the tray when the routes are known, and recorded
+// as given when they are not, as `cable.slack` records a place.
+const usableLay = e => !!e && typeof e === 'object' && !Array.isArray(e) && typeof e.item === 'string' && typeof e.via === 'string';
+function cableLay(rack, args, ctx) {
+  const {id, at: where} = args;
+  const c = cableOf(rack, id);
+  if (!c) return {error: CABLE_GONE};
+  const hasPos = 'position' in args, hasFace = 'face' in args;
+  if (!hasPos && !hasFace) return {error: 'cable.lay needs a position or a face: a value to pin it, or null to unpin it.'};
+  const it = itemOf(rack, where.item);
+  if (!it) return {error: `${where.item} is not in the rack.`};
+  const name = `${it.label || it.id} ${where.via}`;
+  if (args.face != null && ctx.route) {
+    let t = null;
+    try { t = traysOf(rack, ctx.route).find(x => x.item === where.item && x.via === where.via) || null; } catch { t = null; }
+    if (!t) return {error: `${name} is no tray, so a cable has no face to lie on there.`};
+    const held = t.flipped ? 'top' : 'underside';
+    if (args.face === held && !t.ties.length)
+      return {error: `${name} offers no held face: it states no tie slots, so nothing holds a cable to its ${held}.`};
+  }
+  const had = Array.isArray(c.lay) ? c.lay : [];
+  const old = had.find(e => usableLay(e) && e.item === where.item && e.via === where.via) || null;
+  const entry = {...(old || {item: where.item, via: where.via})};
+  for (const [given, key] of [[hasPos, 'position'], [hasFace, 'face']]) {
+    if (!given) continue;
+    if (args[key] == null) delete entry[key]; else entry[key] = args[key];
+  }
+  const keep = entry.position != null || entry.face != null;
+  const next = old ? had.flatMap(e => (e === old ? (keep ? [entry] : []) : [e])) : keep ? [...had, entry] : had;
+  if (same(next, had)) return unchanged(rack);
+  const {lay: _l, ...bare} = c;
+  const said = [entry.face != null ? `on the ${entry.face}` : null, entry.position != null ? `at position ${entry.position}` : null].filter(Boolean).join(', ');
+  return done({...rack, cables: rack.cables.map(x => (x.id === id ? (next.length ? {...c, lay: next} : bare) : x))},
+    keep ? `Laid ${cableName(c)} ${said} of ${name}.` : `${cableName(c)} is no longer pinned in ${name}.`);
+}
+
 // ── the table an agent reads ────────────────────────────────────────────
 const RACK = {type: 'string', description: 'The id of the rack to edit. Only the first rack can be edited today.'};
 const AS = {type: 'string', minLength: 1, description: 'A name for what this creates; later commands in the same batch can use "@name" as its id.'};
@@ -1181,6 +1225,13 @@ export const COMMANDS = {
         properties: {item: {type: 'string', minLength: 1, description: 'The device the tray is on, with via.'},
                      via: {type: 'string', minLength: 1, description: 'The tray on that device, with item.'},
                      end: {enum: ['a', 'b'], description: 'The end of the cable: a or b.'}}}})},
+  'cable.lay': {run: cableLay, description: 'Pin how a cable lies in one pathway: which face of a tray it lies on, and its place across the pathway. null unpins either; a key left out is kept. The face is acted on by the routes; the position is kept for when lay order is built.',
+    args: args(['id', 'at'], {id: ID('cable'),
+      at: {type: 'object', required: ['item', 'via'], additionalProperties: false, description: 'The pathway: {item, via}, a tray, ring or duct on a device.',
+        properties: {item: {type: 'string', minLength: 1, description: 'The device the pathway is on.'},
+                     via: {type: 'string', minLength: 1, description: 'The pathway on that device.'}}},
+      position: {type: ['integer', 'null'], minimum: 1, description: 'Its place across the pathway, counted from 1; null to unpin it.'},
+      face: {enum: ['top', 'underside', null], description: 'The face of a tray it lies on, as the part names its own: top or underside; null unpins it. Refused on a ring or a duct.'}})},
   'cable.route.reset': {run: cableRouteReset, description: 'Drop a hand-made route; the cable takes its own route again.',
     args: args(['id'], {id: ID('cable'), summary: SUMMARY})},
   'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. A cable whose own route does not meet a given route joins and leaves it at the points nearest its two ports. Refused for a bundled cable.',

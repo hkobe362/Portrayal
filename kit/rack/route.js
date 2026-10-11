@@ -1416,11 +1416,13 @@ function alongTray(rack, t, prev, next, cable, ctx, r) {
   const lo = Math.min(...t.floors.map(f => f[`${run}0`])), hi = Math.max(...t.floors.map(f => f[`${run}1`]));
   const clamp = v => Math.min(hi, Math.max(lo, v));
   const a = clamp(prev[run]), b = clamp(next[run]);
-  // which face: the page's pin, where the tray offers it (a held face needs
-  // tie slots along the stretch: heldStretch is null without one), else the
-  // face that looks up
-  let asked = null;
-  try { asked = typeof ctx?.trayFaceOf === 'function' ? ctx.trayFaceOf(cable, {item: t.item, via: t.via}) : null; } catch { asked = null; }
+  // which face: the one the file pins (the `face` of the cable's `lay`
+  // entry for this tray, rack file version 4), else the page's pin, where
+  // the tray offers it (a held face needs tie slots along the stretch:
+  // heldStretch is null without one), else the face that looks up
+  let asked = layFaceOf(cable, t);
+  if (asked == null)
+    try { asked = typeof ctx?.trayFaceOf === 'function' ? ctx.trayFaceOf(cable, {item: t.item, via: t.via}) : null; } catch { asked = null; }
   const heldName = t.flipped ? 'top' : 'underside', restName = t.flipped ? 'underside' : 'top';
   const rail = railZOf(rack, t.item);
   if (asked === heldName) {
@@ -1525,6 +1527,16 @@ export const toMetres = (value, unit) => (typeof value === 'number' && Number.is
 // What the slack entries of a cable state, added up, in metres.
 export const slackValues = cable => (Array.isArray(cable?.slack) ? cable.slack : [])
   .reduce((sum, e) => sum + (toMetres(e?.value, e?.unit) ?? 0), 0);
+// THE FACE A CABLE IS PINNED TO on one tray, from its `lay` list as the file
+// has it: `top` or `underside`, named in the frame of the part, or null. The
+// list is kept as written, so anything in it that is no such entry is
+// passed over. `position` is kept and not acted on.
+export function layFaceOf(cable, {item, via}) {
+  if (!Array.isArray(cable?.lay)) return null;
+  const e = cable.lay.find(x => x && typeof x === 'object' && x.item === item && x.via === via);
+  return e && (e.face === 'top' || e.face === 'underside') ? e.face : null;
+}
+
 // THE SPARE OF A CABLE: {need_m, stock_m, spare_m, end_play_m, to_store_m,
 // pinned}, or null without a path. It measures the path it is given and
 // never reads a saved number but a length the user pinned (any source but

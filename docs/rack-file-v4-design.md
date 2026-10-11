@@ -1705,8 +1705,14 @@ numbers are kept: a later reading takes the next one.
   `strapTexts(rack, ctx)`; the BOM notes and the draw.io cables take the
   same `spare`. Without them the columns are there and blank, and no line
   is written.
-35. **`cable.lay` and the `face` of a `lay` entry are not built:** no part of
-  section 9 lists them. The key is kept on a cable as written.
+35. **`cable.lay`, as part 10 built it.** The face the file pins is read
+  before the page's own pin, so a saved rack routes the same on any page.
+  A held face is refused where the tray states no tie slots; the cable lay
+  note also lets a ring on that face offer it, which no part yet has. With
+  no routes known the face is recorded as given, as a place for spare is.
+  An entry whose part or tray is gone is kept and passed over. `inspect`
+  of a cable shows `lay` where it has one, and `inspect` of a device of a
+  fractional height carries the ear-hole sentence of 2.5 under `notes`.
 36. **`inspect` of a cable** gains `spare_findings` where it has any, and
   `describe` gives the spare a line of its own after the findings.
 37. **Found on main and fixed here:** a cable whose media is named like

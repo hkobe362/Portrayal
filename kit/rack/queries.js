@@ -4,9 +4,9 @@
 // are handed their readers in `ctx`, since reading a face needs the network and
 // a DOMParser, which this module never touches.
 
-import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, itemUnits, spanText, isHeld} from './fit.js';
+import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, itemUnits, spanText, isHeld, isRackMount, isQuarter} from './fit.js';
 import {placement, managersOf} from './managers.js';
-import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf} from './model.js';
+import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf, uText} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
 import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText} from './cable-rules.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf} from './route.js';
@@ -249,6 +249,12 @@ function itemFacts(rack, item, ctx) {
     ...(rollOf(item) ? {roll: rollOf(item)} : {}),
     on: item.on ?? null, unit: item.unit ?? null, side: railOf(item, ctx.chassisOf ?? (() => null)),
     managers: managersOf(rack, item.id).map(m => m.id)};
+  // A DEVICE OF A HEIGHT THAT IS NO WHOLE NUMBER OF UNITS may start on a
+  // whole unit or on a half, and whether its ears meet the rail holes there
+  // is checked only when the catalogue states its ear slot heights. None
+  // does, so the check is silent and this says so, once for such a device.
+  if (c && isRackMount(c) && !isQuarter(item) && !Number.isInteger(out.u))
+    out.notes = [`The ear holes of ${c.model ?? item.ref} are not stated, so its holes at ${uText(rack.frame, item.ru, out.u)} are not checked.`];
   if (!slots) out.slots = 'not loaded';
   else {
     const env = slotEnv(item, slots, ctx.compByRef);
@@ -358,6 +364,8 @@ async function cableInfo(rack, cable, ctx) {
   return {kind: 'cable', id: cable.id, a: end(cable.a), b: end(cable.b), media: cable.media, purpose: cable.purpose, label: cable.label,
     length: l ? {value: l.value, unit: l.unit ?? 'm', source: l.source ?? 'entered', ...(need != null ? {need} : {})} : null, routed, slack,
     ...(spareNote?.length ? {spare_findings: spareNote} : {}),
+    // how it was laid by hand in a pathway, as the file has it (`cable.lay`)
+    ...(Array.isArray(cable.lay) && cable.lay.length ? {lay: cable.lay} : {}),
     route: {edited, waypoints, text: routeText(waypoints, label, rack.frame), ...(rings ? {rings} : {}), ...(crosses ? {crosses} : {}), ...(rests ? {rests} : {}),
             ...(bends ? {bends} : {}), ...(covers ? {covers} : {})}, lanes: lanesOf(rack.frame), passes,
     loose, mismatch: warn, ...(unchecked ? {unchecked: true} : {})};
