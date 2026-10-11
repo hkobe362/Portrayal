@@ -1076,7 +1076,7 @@ depth of the node as built, which a manifest does not state for decor.
 - **Step 7, the site.** The Rack Builder hands the fields of an item to the
   Explorer and takes them back. It gets no control.
 - **Step 8, hosts.** A rail host that is a member, when hosts are built.
-- **The four items marked still open in the table above**, none of which a
+- **The three items marked still open in the table above**, none of which a
   library device meets today.
 - **The gates that are run by hand**: the screenshots of the control, at the
   default, at each stop and at both ends, on a plan and in 3D, on the fixture
