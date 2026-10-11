@@ -1009,7 +1009,14 @@ rack-wide with a sentence in the words of the bundle check. It says where
 ("c9 turns 129.7 degrees between its port on LEAF-B and CM-01 ring 3") and
 then by how much ("with room for a 19.2 mm bend; the cable (aoc) needs 30
 mm, 10.8 mm short."). It warns and never refuses. A page that draws the kit's points can show these as they are.
-`inspect`, `describe` and the export notes do not carry them yet.
+`inspect` of a cable carries them as `route.bends` (each finding less its
+`kind` and `cable`, with its sentence), `describe` counts the cables that
+have one and names the cable shortest of its radius, and
+`cableScheduleRows(..., {bends})` writes one sentence into the notes of each
+such cable: the finding, or how many corners and the tightest of them
+(#1007). Corners at one point, to a tenth of a millimetre, are one finding
+(`mergeCorners`). A cable is told them wherever it has a path, a loose end
+or not; one whose port is not found has no path and is told nothing.
 
 **What is left.** On the reference rack, nothing. On one sample of 60
 generated racks (1,803 cables of mixed media, four-post and two-post, with
@@ -1749,8 +1756,18 @@ And the reads:
 - **`describe`**: one line of totals for the findings ("2 cables cross a
   body; 1 tray is full"), so an agent that only describes the rack still
   sees fault 1, as the session behind #949 did not.
-- **Bends** (3.4) are read from the kit, `bendFindings` and a path's
-  `bends`; `inspect` and `describe` do not carry them yet.
+- **Bends** (3.4) and **spans in front of other ports** (1.7) are in all
+  three reads (#1007). `inspect` of a cable gains `route.bends`, each tight
+  corner with its sentence, and `route.covers`, `{ports, between, text}`;
+  each key is there only when there is something to say. `describe` puts
+  them on the findings line with the bodies, each part only when it counts
+  something: "Findings: 2 cables cross a body; 3 cables have a tight bend
+  (the worst c9, 10.8 mm short); 9 cables cross in front of other ports (the
+  most c7, 5 ports)." The exports take the two lists as they take `bodies`:
+  `cableScheduleRows(..., {bends, covers})` adds a sentence for each to a
+  cable's notes, and `layNotes(rack, {bends, covers})` gives one line a
+  cable for a file with no row for one (a BOM, a drawing). The columns are
+  the same.
 
 The site prints these in `cableText`, as it prints `routed` and `slack`; that
 is the site check of step 2, a test that an agent reading `inspect` on a cable

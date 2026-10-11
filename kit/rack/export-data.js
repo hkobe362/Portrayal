@@ -231,10 +231,15 @@ export const CABLE_COLUMNS = ['id', 'cable', 'a_device', 'a_u', 'a_port', 'b_dev
 // `routes` is route-context.js's Map<cableId, {waypoints}>; without it no route is written.
 // `bodies` is route.js bodyFindings(rack, ctx, nameOf) for the same render:
 // each finding's sentence joins its cable's notes. Without it none is written.
+// `bends` is route.js bendFindings(rack, ctx, nameOf) and `covers` is
+// coverFindings(rack, ctx, nameOf), for the same render (#1007, #1013): a
+// cable's notes gain one sentence for its tight bends (the one, or how many
+// and the tightest) and one for the ports its spans cross in front of
+// (layNotesOf). Without them none is written.
 // `bundles` is bundleExports(rack, ctx) for the same render: each bundle's note
 // and its warnings join the file's notes. Without it the bundles are read
 // with no routing context, so each is listed as not measured.
-export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {bundles = null, bodies = null} = {}) {
+export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {bundles = null, bodies = null, bends = null, covers = null} = {}) {
   const names = uniqueNames(rack.items);
   const byId = new Map(items.map(i => [i.id, i]));
   const named = new Set();
@@ -251,6 +256,7 @@ export function cableScheduleRows(rack, ends = new Map(), items = rack.items, ro
     if (asWrittenNote(c)) notes.push(asWrittenNote(c));
     // each solid body its route still crosses (route.js bodyFindings, #949)
     for (const x of bodies || []) if (x.cable === c.id && x.text) notes.push(x.text);
+    notes.push(...layNotesOf(c.id, {bends, covers}));
     return {id: c.id, cable: cableName(c), a_device: aDev, a_u: aU, a_port: aPort, b_device: bDev, b_u: bU, b_port: bPort,
             media: mediaLabel(c.media), purpose: c.purpose, length: len ? len.value : '',
             length_unit: len ? len.unit : '',
@@ -937,6 +943,27 @@ export function hardwareNotes(frame) {
 // drawn with are part of the cable: they are never lines of their own.
 const FAMILY = {fiber: 'fiber', copper: 'copper', dac: 'DAC', aoc: 'AOC'};
 const familyOf = info => (info && Object.hasOwn(FAMILY, info.family ?? '') ? FAMILY[info.family] : null);
+// WHAT THE LAY FINDS FOR ONE CABLE, as sentences for a notes cell (#1007):
+// its tight bends in one sentence (route.js bendFindings: the one finding's
+// own, or how many corners and the tightest of them), then the ports its
+// spans cross in front of (coverFindings, #1013). `bends` and `covers` are
+// those lists for the whole rack, or null.
+export function layNotesOf(cableId, {bends = null, covers = null} = {}) {
+  const out = [];
+  const tight = (bends || []).filter(f => f.cable === cableId && f.text);
+  if (tight.length === 1) out.push(tight[0].text);
+  else if (tight.length) {
+    const worst = tight.reduce((m, f) => (f.short_mm > m.short_mm ? f : m));
+    const rest = worst.text.startsWith(`${cableId} `) ? worst.text.slice(cableId.length + 1) : worst.text;
+    out.push(`${cableId} has ${tight.length} corners with less room than the cable needs; the tightest ${rest}`);
+  }
+  for (const f of covers || []) if (f.cable === cableId && f.text) out.push(f.text);
+  return out;
+}
+// The same for a file's notes: one line a cable, in the rack's order, for
+// each cable the lay finds something for. What a BOM or a drawing's notes
+// carry, where there is no row for a cable.
+export const layNotes = (rack, found = {}) => (rack.cables || []).map(c => layNotesOf(c.id, found).join(' ')).filter(Boolean);
 function connectorText(a, b) {
   const known = [familyOf(a), familyOf(b)].filter(Boolean).sort();
   if (known.length === 2) return known[0] === known[1] ? `${known[0]} at both ends` : `${known[0]} at one end, ${known[1]} at the other`;

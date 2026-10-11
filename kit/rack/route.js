@@ -14,7 +14,7 @@
 import {uLabel, zeroUOf, bundlesOf} from './model.js';
 import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
-import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
+import {throughRings, cornersOf, mergeCorners, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
 import {isZeroUPart, zeroUSpan} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
@@ -646,6 +646,7 @@ export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m 
 //   largest bend its legs leave it (route-path.js cornersOf, a leg between
 //   two corners shared by what each needs of it), `need_mm` the cable's
 //   radius (`ctx.bendOf(cable)`, else its media's) and `short_mm` the miss.
+//   Corners at one point are one finding (#1007, route-path.js mergeCorners).
 //   The path is laid to leave none (the approach points, lead points and
 //   detours below, and no hang that would make one), so what is here is a
 //   bend the kit's rules found no room for: often the parts leave none, but
@@ -1148,7 +1149,9 @@ export function routePath(rack, cable, ctx) {
   // WHAT IS STILL TIGHT (#973, section 3.4): each corner of the path with
   // less room than the cable's installed bend radius, by the measure the
   // bundle check uses (cornersOf).
-  const bends = tightOf(final).map(c => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
+  // One finding a corner (#1007): corners at one point, to the tenth of a
+  // millimetre a finding gives its place to, are one (route-path.js mergeCorners).
+  const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
     between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
     angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
   // WHAT IT COVERS (#1013, section 1.7): with no manager a leg is a free span
@@ -1315,18 +1318,23 @@ export function ringFindings(rack, ctx, nameOf = id => id) {
 // refuses. A cable whose port is not found is not judged. `nameOf(itemId)`
 // names an item.
 export function bendFindings(rack, ctx, nameOf = id => id) {
+  return (rack.cables || []).flatMap(c => bendFindingsOf(rack, c, ctx, nameOf));
+}
+// The same for one cable (#1007): what `inspect` carries. `path` is the
+// cable's routePath, for a caller that already has it.
+export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath(rack, c, ctx)) {
   const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}`
     : w.lane ? `${w.lane} U${uLabel(rack.frame, w.ru)}`
     : `${nameOf(w.item)} ${/^guide-(\d+)$/.test(w.via) ? `ring ${w.via.slice(6)}` : w.via}`);
   const an = t => (/^(8|1[18](\.|$))/.test(t) ? 'an' : 'a');
-  return (rack.cables || []).flatMap(c => (routePath(rack, c, ctx)?.bends || []).map(f => {
+  return (path?.bends || []).map(f => {
     const [a, b] = f.between.map(w => lab(w, c));
     const where = a === b ? `at ${a}` : `between ${a} and ${b}`;
     const kind = c.type || c.media;
     const needs = `${kind ? `the cable (${kind})` : 'the cable'} needs ${f.need_mm} mm`;
     return {...f, text: f.room_mm === 0 ? `${c.id} doubles back ${where}, with no room for a bend; ${needs}.`
       : `${c.id} turns ${f.angle_deg} degrees ${where} with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`};
-  }));
+  });
 }
 
 // EVERY CABLE WHOSE SPAN PASSES IN FRONT OF OTHER PORTS (#1013,
@@ -1339,23 +1347,26 @@ export function bendFindings(rack, ctx, nameOf = id => id) {
 // names an item. A device's ports are named up to six; past that, the first
 // five and how many more.
 export function coverFindings(rack, ctx, nameOf = id => id) {
+  return (rack.cables || []).flatMap(c => coverFindingsOf(rack, c, ctx, nameOf));
+}
+// The same for one cable (#1007): none, or the one finding. `path` is the
+// cable's routePath, for a caller that already has it.
+export function coverFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath(rack, c, ctx)) {
   const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}` : `${w.lane} U${uLabel(rack.frame, w.ru)}`);
   const and = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
-  return (rack.cables || []).flatMap(c => {
-    const covers = routePath(rack, c, ctx)?.covers || [];
-    if (!covers.length) return [];
-    const by = new Map();
-    for (const f of covers) (by.get(f.item) || by.set(f.item, []).get(f.item)).push(f.view === 'rear' ? `${f.path} (rear)` : f.path);
-    for (const paths of by.values()) paths.sort((p, q) => p.localeCompare(q, 'en', {numeric: true}));
-    const said = [...by].map(([item, paths]) => `${paths.length > 6 ? `${paths.slice(0, 5).join(', ')} and ${paths.length - 5} more` : and(paths)} on ${nameOf(item)}`);
-    const between = [...new Map(covers.map(f => [JSON.stringify(f.between), f.between])).values()];
-    const where = between.map(bt => { const [a, b] = bt.map(w => lab(w, c)); return `between ${a} and ${b}`; });
-    // the devices its uncarried spans end at: a manager on one would carry it
-    const ends = [...new Set(between.flat().filter(w => w.end).map(w => (w.end === 'a' ? c.a : c.b).item))];
-    const at = (ends.length ? ends : [...by.keys()]).map(nameOf);
-    return [{kind: 'covers-ports', cable: c.id, ports: covers.map(f => ({item: f.item, path: f.path, view: f.view})), between,
-      text: `${c.id} crosses in front of ${and(said)} ${and(where)}: add a horizontal cable manager above or below ${at.join(' or ')} to carry it.`}];
-  });
+  const covers = path?.covers || [];
+  if (!covers.length) return [];
+  const by = new Map();
+  for (const f of covers) (by.get(f.item) || by.set(f.item, []).get(f.item)).push(f.view === 'rear' ? `${f.path} (rear)` : f.path);
+  for (const paths of by.values()) paths.sort((p, q) => p.localeCompare(q, 'en', {numeric: true}));
+  const said = [...by].map(([item, paths]) => `${paths.length > 6 ? `${paths.slice(0, 5).join(', ')} and ${paths.length - 5} more` : and(paths)} on ${nameOf(item)}`);
+  const between = [...new Map(covers.map(f => [JSON.stringify(f.between), f.between])).values()];
+  const where = between.map(bt => { const [a, b] = bt.map(w => lab(w, c)); return `between ${a} and ${b}`; });
+  // the devices its uncarried spans end at: a manager on one would carry it
+  const ends = [...new Set(between.flat().filter(w => w.end).map(w => (w.end === 'a' ? c.a : c.b).item))];
+  const at = (ends.length ? ends : [...by.keys()]).map(nameOf);
+  return [{kind: 'covers-ports', cable: c.id, ports: covers.map(f => ({item: f.item, path: f.path, view: f.view})), between,
+    text: `${c.id} crosses in front of ${and(said)} ${and(where)}: add a horizontal cable manager above or below ${at.join(' or ')} to carry it.`}];
 }
 
 // A word for a part of a body, as a finding names it.
