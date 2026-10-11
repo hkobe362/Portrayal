@@ -466,13 +466,15 @@ test('a leg through the tray floor that cannot be gone round is told to go over 
   const {rack, ctx} = shelved();
   const f = R.bodyFindings(rack, ctx, names).filter(x => x.cable === 'c6');
   // from U5 up to ring 2, inside the shelf: through the shelf and the floor
-  assert.deepEqual(f.map(x => [x.item, x.part]), [['i6', 'envelope'], ['i3', 'tray/floor'], ['i6', 'envelope'], ['i6', 'envelope'],
+  // (the two bodies of that first leg in the order the lay met them: it is
+  // laid from both ends and here the one from end b is kept, #986)
+  assert.deepEqual(f.map(x => [x.item, x.part]), [['i3', 'tray/floor'], ['i6', 'envelope'], ['i6', 'envelope'], ['i6', 'envelope'],
     ['i6', 'envelope']]);
   // the last: its plug in the panel port, reaching into the shelf (#960)
   assert.deepEqual(f[4].between, [{end: 'b'}, {end: 'b'}]);
   assert.equal(f[4].text, 'c6 passes through shelf at its port on fhd-panel: '
     + 'route it round shelf, or through a ring or a pass-through it fits.');
-  assert.equal(f[1].text, 'c6 passes through lacer tray between its port on sw-low and lacer ring 2: '
+  assert.equal(f[0].text, 'c6 passes through lacer tray between its port on sw-low and lacer ring 2: '
     + 'route it over the front edge of the tray, or through a ring.');
 });
 

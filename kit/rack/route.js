@@ -692,7 +692,89 @@ export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m 
 // pass-through must fit and a detour keeps clear by, is `ctx.diameterOf(cable)`
 // when the page gives it, else its media's typical one (DIAMETERS).
 // null when either port is not found on its drawing, as for routedLength.
+//
+// ONE LAY, WHICHEVER END IS WRITTEN FIRST (#986). The lay reads a path from
+// its start: cornersOf merges slight turns from the first point, a detour
+// goes round the first body it meets, a span at a plug hangs at one end and
+// not the other, and each offer at a ring is judged by corners counted from
+// the start. So the same cable written end for end could be laid another
+// way, measure another length and report other bends. Rather than make each
+// of those rules blind to direction, the cable is laid from BOTH ends, as
+// written and as its twin (the same cable with its ends exchanged, on the
+// same route reversed, the result turned round by turnPath), and one lay is
+// kept by a rule that does not know which end was written first: the one
+// that crosses fewer bodies, then the one whose corners are less short of
+// room in all, then the shorter, and on a tie the one laid from the end
+// whose port sorts first (endOrder, by item, then view, then path, which no
+// writing of the cable changes). So no cable is laid worse than it was from
+// its end a, and every reader still gets a path from its own end a to its
+// own end b. Which lay was kept is kept per rack, context and cable, as the
+// room is. The page's readers (`plugReachOf`, `trayFaceOf`, `bendOf`,
+// `diameterOf`) are handed the twin when it is the twin that is laid: the
+// same id, media and type, `a` and `b` exchanged.
 export function routePath(rack, cable, ctx) {
+  let twin = twins.get(cable);
+  if (!twin) twins.set(cable, twin = {...cable, a: cable.b, b: cable.a});
+  const asWritten = () => layPath(rack, cable, ctx, null);
+  const asTwin = () => { const p = layPath(rack, twin, ctx, [...resolveRoute(rack, cable, ctx).waypoints].reverse()); return p && turnPath(p); };
+  const keyed = ctx !== null && typeof ctx === 'object';
+  let per = wayMemo.get(rack);
+  if (!per) wayMemo.set(rack, per = new WeakMap());
+  let byCable = keyed ? per.get(ctx) : null;
+  if (keyed && !byCable) per.set(ctx, byCable = new WeakMap());
+  const known = byCable?.get(cable);
+  if (known) return known === 'twin' ? asTwin() : asWritten();
+  const p = asWritten();
+  if (!p) return null;
+  const q = asTwin();
+  const score = x => [x.crossings.length, x.bends.reduce((m, f) => m + f.short_mm, 0), pathLength(x).measured];
+  const sp = score(p), sq = score(q);
+  // a tenth of a millimetre of room, a micron of length: under that is a tie
+  const tol = [0, 0.05, 1e-6];
+  let pick = endOrder(cable.a, cable.b) <= 0 ? 'written' : 'twin';
+  for (let i = 0; i < 3; i++) if (Math.abs(sp[i] - sq[i]) > tol[i]) { pick = sp[i] < sq[i] ? 'written' : 'twin'; break; }
+  byCable?.set(cable, pick);
+  return pick === 'twin' ? q : p;
+}
+// a cable's twin, kept so that what is decided for it (roomMemo) is kept too
+const twins = new WeakMap();
+// which lay of a cable was kept, per rack and context
+const wayMemo = new WeakMap();
+// Which end a cable is laid from: negative when `a` sorts before `b`. Two
+// ends on one port (never a real cable) are laid as written.
+const endKey3 = e => [String(e?.item ?? ''), e?.view === 'rear' ? 'rear' : 'front', String(e?.path ?? '')];
+function endOrder(a, b) {
+  const p = endKey3(a), q = endKey3(b);
+  for (let i = 0; i < 3; i++) { const d = p[i].localeCompare(q[i], 'en', {numeric: true}); if (d) return d; }
+  return 0;
+}
+// A path laid from end b, as its cable reads it from end a: the points in the
+// other order, each port, reach and lead point given its other end, a ring's
+// entry and exit exchanged and its sense turned; the rings, findings, marks
+// (reverseMarks), detours, bends and covers in the other order, each
+// `between` the other way round with its ends renamed, a bend's legs
+// exchanged. A crossing's and a cover's `at` stay where the lay found them:
+// where the path meets the body or the port, from the end it was laid from.
+function turnPath(path) {
+  const other = e => (e === 'a' ? 'b' : e === 'b' ? 'a' : e);
+  const AT = {a: 'b', b: 'a', entry: 'exit', exit: 'entry'};
+  const ref = w => (w && w.end ? {...w, end: other(w.end)} : w);
+  const between = bt => [ref(bt[1]), ref(bt[0])];
+  const rev = list => [...list].reverse();
+  return {...path,
+    points: rev(path.points).map(p => ({...p, at: AT[p.at] ?? p.at, ...(p.end ? {end: other(p.end)} : {})})),
+    rings: rev(path.rings).map(g => (g.passed ? {...g, sense: -g.sense, entry: g.exit, exit: g.entry} : g)),
+    findings: rev(path.findings),
+    marks: reverseMarks(path.marks),
+    crossings: rev(path.crossings).map(c => ({...c, between: between(c.between)})),
+    detours: rev(path.detours).map(d => ({between: between(d.between), points: rev(d.points)})),
+    bends: rev(path.bends).map(f => ({...f, between: between(f.between), legs_mm: rev(f.legs_mm)})),
+    covers: path.covers.map(c => ({...c, between: between(c.between)})),
+    rests: path.rests};
+}
+// The lay itself, from the cable's end a; `given` is the route to lay it on
+// (a twin's: its cable's route reversed), else the cable's own.
+function layPath(rack, cable, ctx, given) {
   const a = portPoint(rack, cable.a, ctx), b = portPoint(rack, cable.b, ctx);
   if (!a || !b) return null;
   const diameter = cableDiameter(cable, ctx), r = diameter / 2;
@@ -702,7 +784,7 @@ export function routePath(rack, cable, ctx) {
   const ra = plugReach(cable, cable.a, ctx), rb = plugReach(cable, cable.b, ctx);
   const stops = [{p: a, at: 'a'}];
   if (ra > 0) stops.push({p: reachPoint(rack, cable.a, a, ra), at: 'reach', end: 'a', hold: true});
-  const wps = resolveRoute(rack, cable, ctx).waypoints;
+  const wps = given ?? resolveRoute(rack, cable, ctx).waypoints;
   const marks = wps.map(() => null);
   const rests = [];
   const rested = (o) => { if (!rests.some(x => x.kind === o.kind && x.item === o.item && (x.via ?? x.part) === (o.via ?? o.part))) rests.push(o); };
@@ -1051,11 +1133,12 @@ export function routePath(rack, cable, ctx) {
     // The best change on offer is made, and the offers are drawn up again,
     // until none helps or six have been made: the best of all of them each
     // time, whichever end of the cable they are nearer. That takes the order
-    // of the ends out of the choice; it does not make a cable written the
-    // other way round lay the same. What each offer is judged by still reads
-    // the path from end a (cornersOf merges slight turns from its start, a
-    // detour goes round the first body it meets), and two offers can differ
-    // by less than that.
+    // of the ends out of the choice; it does not by itself make a cable
+    // written the other way round lay the same. What each offer is judged by
+    // still reads the path from its start (cornersOf merges slight turns
+    // from there, a detour goes round the first body it meets), and two
+    // offers can differ by less than that: routePath lays the cable from
+    // both ends and keeps one (#986).
     for (let round = 0; round < 6 && short > 0; round++) {
       let best = null;
       for (const c of offers()) best = better(c, best);
@@ -1081,9 +1164,10 @@ export function routePath(rack, cable, ctx) {
   // span leaves it (#973, resting.js hang `fits`). Each span is judged with
   // every other span straight, so no span's hang waits on another's; and
   // where two spans that meet at a point each fit alone and together leave
-  // that point short, neither hangs. Which end the cable is read from can
-  // still matter: the corners a hang is judged by are counted from end a
-  // (cornersOf), so the same span can hang read one way and not the other.
+  // that point short, neither hangs. Which end the path is laid from can
+  // still matter here: the corners a hang is judged by are counted from its
+  // start (cornersOf), so the same span can hang laid one way and not the
+  // other; routePath lays both and keeps one (#986).
   const surfaces = surfacesOf(rack, ctx);
   const drape = drapeOf(cable, ctx);
   const hung = taut.map(() => null);

@@ -482,9 +482,12 @@ the box of a port that states no size and `COVER_DEPTH` (100 mm) how far out
 of a panel a span still covers a port; both are estimates. What is decided for a cable
 is kept per rack, context and cable, so, as for a route's side, build a new
 context when what it reads changes: a context changed in place can give a
-path placed for what it read before. A path is read from end a, and a cable
-written the other way round does not always lay the same or report the same
-bends. **Routed lengths change in 0.17.0** on
+path placed for what it read before. A cable is laid from both its ends and one lay is kept by a
+rule that does not know which was written first (fewer bodies crossed, then
+less short of room, then shorter, then the end whose port sorts first), so a
+cable written the other way round lays the same and reports the same bends
+(0.21.0, #986); the readers on the context are handed a twin of the cable,
+`a` and `b` exchanged, when the lay from its other end is the one tried. **Routed lengths change in 0.17.0** on
 every routed cable that turns at a ring, goes round a body or hangs. On the
 reference rack of #949 each of the sixteen cords is 10.9 to 179.2 mm longer
 and seven pass the 0.5 m break (c1 to c3 and c5 to c8 are 1 m cords again).
