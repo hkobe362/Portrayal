@@ -75,7 +75,8 @@ test('startU reaches the commands, describe, the sheet and both DCIM files', () 
   assert.deepEqual(rackRow.columns, ['site', 'name', 'status', 'width', 'u_height', 'desc_units', 'comments']);
   assert.equal(rackRow.columns.includes('starting_unit'), false);
   assert.deepEqual(rackRow.rows[0], {site: '', name: 'R1', status: 'planned', width: 19, u_height: 42, desc_units: 'false',
-    comments: 'Its units are numbered from 5 on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1.'});
+    comments: 'Its units are numbered from 5 on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1. ' +
+      'Leave its starting unit at 1 in NetBox; if it is set to 5, raise every device position by 4.'});
   // a rack that numbers from 1 is the six columns it always was, to the byte
   assert.equal(X.toCsv(...Object.values(X.rackImportRows({rack: {...rackOf(), name: 'R1'}}))),
     'site,name,status,width,u_height,desc_units\r\n,R1,planned,19,42,false\r\n');

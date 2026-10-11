@@ -144,6 +144,26 @@ test('a bracket removed leaves the PDU where it was, refused by fit and said, un
   assert.deepEqual(Z.hangNotices(gone.rack, ctx), ['PDU A: z2 is not a bracket in this rack.']);
   // a frame change keeps it: it is judged for room alone while its bracket is gone
   assert.deepEqual(F.settleZeroU(gone.rack, chassisOf).removed, []);
+  // A FRAME CHANGE NEVER MOVES A HUNG PART SILENTLY: 45U to 40U would bring the
+  // PDU down from 87.35 mm, so it is refused, naming the part and its brackets
+  assert.deepEqual(run(two, {op: 'frame', heightRU: 40}), {index: 0, error:
+    'PDU A hangs on z1, z2, and this frame would move it: take it off its brackets first with zerou.hang.'});
+  // and one that would move a bracket it hangs on (a two-post frame has no left-rear)
+  assert.deepEqual(run(two, {op: 'frame', kind: 'two-post'}).error,
+    'PDU A hangs on z1, z2, and this frame would move it: take it off its brackets first with zerou.hang.');
+  const short = run(rackOf(), [{op: 'zerou.place', ref: 'bracket', at: 'left-rear', ru: 40, label: 'Bracket'},
+                               {op: 'zerou.place', ref: 'duct', at: 'right-rear', ru: 1, label: 'Duct'}]).rack;
+  const tip = {...short, zeroU: short.zeroU.map(z => (z.id === 'z2' ? {...z, at: 'left-rear', offsetMm: 1700, heldBy: {parts: ['z1']}} : z))};
+  assert.equal(run(tip, {op: 'frame', heightRU: 39}).error,
+    'Duct hangs on z1, and this frame would move it: take it off its brackets first with zerou.hang.');
+  // a frame change that touches neither goes through, and the hung part is as it was
+  const taller = run(two, {op: 'frame', heightRU: 44});
+  assert.equal(taller.error, undefined);
+  assert.deepEqual(taller.rack.zeroU, two.zeroU);
+  assert.equal(run(two, {op: 'frame', numbering: 'top-down'}).rack.zeroU[2].offsetMm, 87.35);
+  // taken off its brackets, the frame may change, and the parts settle each on its own
+  const freed = run(two, {op: 'zerou.hang', id: 'z3', on: null}).rack;
+  assert.equal(run(freed, {op: 'frame', heightRU: 40}).error, undefined);
   // a file whose PDU is not where its brackets hold it says so
   const off = {...two, zeroU: two.zeroU.map(z => (z.id === 'z3' ? {...z, offsetMm: 44.45} : z))};
   assert.deepEqual(Z.hangNotices(off, ctx), ['PDU A is not where its brackets hold it: it hangs at left-rear, 87.35 mm up.']);
@@ -277,6 +297,15 @@ test('a reading with no source moves to readingsAsWritten, and nothing draws it'
   // a time that cannot be read, values that are no map, and a list, go the same way
   for (const r of [{...READ, at: 'yesterday'}, {...READ, at: 5}, {...READ, source: ''}, {...READ, values: [1]}, {...READ, values: {a: 2}}, 'none', []])
     assert.deepEqual(M.parseDoc(doc([{...PDU, readings: r}])).racks[0].zeroU[0].readingsAsWritten, r, JSON.stringify(r));
+  // each with the reason that applies: values that are no map are not a missing source
+  const n2 = [];
+  M.parseDoc(doc([{...PDU, readings: {...READ, values: [1]}}]), {notes: n2});
+  assert.deepEqual(n2, ['R1: The readings of PDU A have values that are not a map of part to what was read there, so they are kept as written and not shown.']);
+  // `readings: null` is no key at all, and neither is a null kept as written
+  for (const entry of [{...PDU, readings: null}, {...PDU, readingsAsWritten: null}, {...PDU, readings: undefined}]) {
+    const n3 = [], z = M.parseDoc(doc([entry]), {notes: n3}).racks[0].zeroU[0];
+    assert.deepEqual(['readings' in z, 'readingsAsWritten' in z, n3], [false, false, []]);
+  }
   // whole readings are kept as readings, with or without values, on an item too
   assert.deepEqual(M.parseDoc(doc([{...PDU, readings: READ}])).racks[0].zeroU[0].readings, READ);
   const bare = {source: 'poll', at: '2026-10-08T14:05:00Z'};

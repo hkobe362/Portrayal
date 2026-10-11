@@ -302,16 +302,27 @@ a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
 `rack/fit.js` says whether a held item is one the kit does not check: a page
 draws such an item on its host, and not in a unit of its own.
 
-The other names these modules export are the kit's own, shared between its
-files, and may change without notice: `spansMeet`, `anchorY`, `laneY`,
-`neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf`,
-`overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `heldBy`, `uncheckedText`,
-`unheldText`, `bothText`, `zeroUExtent` and `notBracket` in `rack/fit.js`; `stateRefusal` in
-`rack/states.js`; `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `holdersOf` and
-`usableReadings` in `rack/model.js`; `isPosition`, `HOLE_STYLES`,
-`railWidth`, `RAIL_WIDTH_IN` and `ROLLS` in `rack/model.js`; `HOLE_EDGE` in
-`rack/rails.js`; `NO_HOSTS` in `rack/commands.js`; `NETBOX_RACK_WIDTHS` in
-`rack/export-data.js`.
+Of the names these modules export, a page draws and calls with: `unitsOf`,
+`itemUnits`, `spanOf`, `itemBox`, `spanText`, `setbackOf`, `facePoint`,
+`isQuarter`, `isHeld`, `frameNotices` (`rack/fit.js`); `positionOf`,
+`uText`, `firstU`, `rollOf`, `ROLLS`, `holderOf` (`rack/model.js`);
+`holesIn` (`rack/rails.js`); `freeUs` (`rack/queries.js`); `configFacts`,
+`meteringOf` (`rack/catalog.js`); `statesFor`, `readingsFor`, `stateNotices`
+(`rack/states.js`); `bracketPositions`, `hangNotices` (`rack/zero-u.js`).
+`facePoint` is the one a drawing calls for a point of a face; `rollPoint`,
+which it goes through, is the kit's own.
+
+Every other name added with rack file version 4 is the kit's own, shared
+between its files, and may change without notice: `spansMeet`, `anchorY`,
+`laneY`, `neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`,
+`fillOf`, `overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `rollPoint`,
+`heldBy`, `uncheckedText`, `unheldText`, `bothText`, `zeroUExtent` and
+`notBracket` in `rack/fit.js`; `stateRefusal` in `rack/states.js`;
+`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `isPosition`,
+`HOLE_STYLES`, `railWidth`, `RAIL_WIDTH_IN`, `holdersOf` and `usableReadings`
+in `rack/model.js`; `HOLE_EDGE` in `rack/rails.js`; `NO_HOSTS` in
+`rack/commands.js`; `NETBOX_RACK_WIDTHS` in `rack/export-data.js`, since a
+page offers no choice of width.
 
 ### Where this came from
 

@@ -532,6 +532,12 @@ function frame(rack, p, ctx) {
   const r = frameItems(rack, p, ctx);
   if (r.error || r.rack === rack) return r;
   const z = settleZeroU(r.rack, ctx.chassisOf);
+  // A PART HUNG ON BRACKETS IS NEVER MOVED SILENTLY: the kit writes where it
+  // stands from where its brackets are, so a frame that would move or remove
+  // it, or one of the brackets it hangs on, is refused, naming them.
+  const touched = new Set([...z.moved, ...z.removed].map(e => e.id));
+  const hung = (r.rack.zeroU || []).find(e => holdersOf(e).length && (touched.has(e.id) || holdersOf(e).some(id => touched.has(id))));
+  if (hung) return {error: `${zeroUName(hung, ctx.chassisOf)} hangs on ${holdersOf(hung).join(', ')}, and this frame would move ${touched.has(hung.id) ? 'it' : 'a bracket it hangs on'}: take it off its brackets first with zerou.hang.`};
   const said = zeroUSaid(z, ctx.chassisOf);
   return said ? {rack: z.rack, summary: `${r.summary} ${said}`, findings: [...r.findings, note(said)]} : r;
 }

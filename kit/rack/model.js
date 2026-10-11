@@ -265,13 +265,18 @@ function readSettings(src, who, said) {
       said?.(`${Object.keys(dropped).join(', ')} on ${who} had a state that is not a name, so ${Object.keys(dropped).length === 1 ? 'it was' : 'they were'} dropped.`);
     if (plainRecord(src.states)) out.states = kept;
   }
-  if ('readings' in src) {
-    if (usableReadings(src.readings)) out.readings = structuredClone(src.readings);
+  // `readings: null` says there are none, and is no key at all
+  if (src.readings != null) {
+    const r = src.readings;
+    if (usableReadings(r)) out.readings = structuredClone(r);
     else {
-      out.readingsAsWritten = structuredClone(src.readings);
-      said?.(`The readings of ${who} have no source or no time that can be read, so they are kept as written and not shown.`);
+      out.readingsAsWritten = structuredClone(r);
+      const sourced = plainRecord(r) && isText(r.source) && isText(r.at) && !Number.isNaN(Date.parse(r.at));
+      said?.(sourced
+        ? `The readings of ${who} have values that are not a map of part to what was read there, so they are kept as written and not shown.`
+        : `The readings of ${who} have no source or no time that can be read, so they are kept as written and not shown.`);
     }
-  } else if ('readingsAsWritten' in src) out.readingsAsWritten = structuredClone(src.readingsAsWritten);
+  } else if (src.readingsAsWritten != null) out.readingsAsWritten = structuredClone(src.readingsAsWritten);
   return out;
 }
 

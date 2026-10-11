@@ -1037,8 +1037,9 @@ them:
   moved from under it, which is wrong. That is the bump case.
 - **Commands.** `zerou.hang {id, on: [ids]}` and `zerou.hang {id, on: null}`.
   `zerou.update` of a bracket carries its PDU. A query,
-  `bracketPositions(rack, {ref, at}, ctx)`, returns the offsets two brackets
-  need for a PDU, so a page or an agent can place them first.
+  `bracketPositions(rack, {ref, cfg, ru}, ctx)`, returns the offsets the
+  brackets need for a PDU, from the unit of the lowest, so a page or an
+  agent can place them first.
 - **Exports.** The brackets are lines of the BOM. The PDU comment in both
   DCIMs names what it hangs on ("0U, on 2 FS-PDUBK brackets at left-rear,
   from U4; NetBox has no field for that."), and each bracket is a zero-U
@@ -1083,9 +1084,11 @@ item is seen in the elevation of the face it is on, applied after `face` and
   of the XCU10 is not measured.
 - **Ports.** `facePoint(rack, item, {x, y}, chassisOf)` in `kit/rack/fit.js`
   turns a point of the face as drawn into the rack, through `face`, `turned`
-  and `roll`, on the box `itemBox` gives. `pointOf`, `portPoint`, the solids
-  and the site drawings go through it, so a port on a rolled item is where it
-  is drawn. Labels printed on the item are turned with it and are not
+  and `roll`, on the box `itemBox` gives. A drawing goes through it. `pointOf`
+  and `portPoint` are handed rack points by the routing context, not face
+  points, so they go through `rollPoint`, the turn `facePoint` itself ends
+  with; the solids are turned by their placer. A port on a rolled item is
+  where it is drawn. Labels printed on the item are turned with it and are not
   redrawn upright.
 - **A rack-face part hosted on a rolled item** keeps `on` and `unit`; `unit`
   counts from the bottom of the host as mounted.
@@ -1260,7 +1263,7 @@ and the kit suite runs at the end of each.
 | 6 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `heldBy`.** Overlap as decision 12 says; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
 | 7 | **Lengths and the slack record.** `readCables` normalising `slack` (3.3), `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackOf`, `storedText`, `cable.slack` and its refusals, `spare-unplaced`. No geometry. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For every cable, need plus spare equals stock, and end play plus what is to store equals spare. Each row of the table of 3.6 has a case asserting its text. Each refusal of 3.5 has a case. A bad `form`, a negative `value`, two entries with no value, an unknown `end` and a `slack` that is no list each load with the usable part kept and `slackAsWritten` holding what was written, and save unchanged. `inspect` gives `said: false` for no key and `said: true` for `[]`. `routePath` returns the same points with and without a `slack` entry. The #986 sample script reports no more cables differing by direction than before (38). |
 | 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. Peels at 0, 60 and 130 mm are one group from either end. `{breakout: false}` alone survives a round trip and turns breakouts off. A version-3 bundle with `every: null` has no strap of any kind after migration. `bundle.update` with one key leaves the others. The BOM count equals the three kinds summed. |
-| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. |
+| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. |
 | 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
 | 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
@@ -1466,42 +1469,45 @@ one-way.
 ## 13. Provisional
 
 Readings the build took where this note was silent or could not be followed
-as written. Each is built, and each waits for a person to confirm it.
+as written. Each is built, and each waits for a person to confirm it. The
+numbers are kept: a later reading takes the next one.
 
-- **Span text** (2.6). A draft of 2.6 printed "U13-U14.5", which follows from
+1. **Span text** (2.6). A draft of 2.6 printed "U13-U14.5", which follows from
   no rule that also keeps "U13-U14" for a 2U item. Built: whole units on a
   whole unit read as before; anything on a half names the half ("U13 to the
   lower half of U14", "the lower half of U7", "the upper half of U7"). A
   position alone is still a number (`uText`: "U12.5"), which is what the
   commands say and NetBox stores.
-- **The Nautobot comment for a height other than 0.5U** (2.7) uses the same
+2. **The Nautobot comment for a height other than 0.5U** (2.7) uses the same
   words: "Occupies U1 to the lower half of U2 (1.5U). Nautobot stores whole
   rack units." An item kept with no position beside one at the same stored
   `ru` reads "with" in place of "above". A device of whole units on a whole
   unit gets no such comment.
-- **The three refusal sentences** of 2.6.
-- **The manager neighbours** of 2.6, which keep every version-3 answer.
-- **A stock size can move with centring** (3.2).
-- **A position below 1 is loaded** and refused by fit (2.6).
-- **Zero-U keys in the schema.** A zero-U entry is described and not
+3. **The three refusal sentences** of 2.6.
+4. **The manager neighbours** of 2.6, which keep every version-3 answer.
+5. **A stock size can move with centring** (3.2).
+6. **A position below 1 is loaded** and refused by fit (2.6).
+7. **Zero-U keys in the schema.** A zero-U entry is described and not
   constrained, so that any entry is kept as written; `states`, `readings`,
   `swaps`, `fields` and `heldBy` on it are typed as section 4 and 5 give them,
   and nothing else of an entry is.
-- **`width` is in inches** in the schema (19, 23), as the NetBox rack row
+8. **`width` is in inches** in the schema (19, 23), as the NetBox rack row
   takes it. `options` and the `turn` of an item `heldBy` have no type until a
   product or a host defines one.
-- **`startU` in the DCIM files** (section 7). Neither import takes a starting
+9. **`startU` in the DCIM files** (section 7). Neither import takes a starting
   unit. Built: both device files keep the position counted from 1, and every
   device comment says how the rack is numbered ("U16 on the rack. The rack
   numbers its units from 5, and a unit named here is its label; the NetBox
   import counts from 1."), so a unit a comment names is never taken for a
-  position. The NetBox rack row says it in `comments`. A person who sets the
-  starting unit on the rack in NetBox by hand has to move each device too.
-- **The sentences of fit under `startU`** name a unit counted from the
+  position. The NetBox rack row says it in `comments`, and says what to do:
+  leave the starting unit of the rack at 1, or set it and raise every device
+  position by the difference (NetBox takes the change unless a device sits
+  below the new start, and each device is then that many units too low).
+10. **The sentences of fit under `startU`** name a unit counted from the
   bottom, from the number of the first unit ("Below U5.", "1U free from U46
   to the top."). On a top-down frame they still count from the bottom, as
   they did before, since "past the top" has no label there.
-- **Setback.** It applies to a rack device only: a part on the rail face or
+11. **Setback.** It applies to a rack device only: a part on the rail face or
   beside the rack has none, `patch` refuses it one ("CM bolts to the rail
   face, so it has no setback."), and one written by hand is ignored. A
   refusal names it after the depth ("700 mm deep, set back 301 mm; this rack
@@ -1514,15 +1520,15 @@ as written. Each is built, and each waits for a person to confirm it.
   warn on both. A proud faceplate is not checked against a door, since no
   frame states a door clearance yet. **No export note is written for a
   setback:** rack products section 8 names none, so that step is not built.
-- **The setback order is untested on real data at its second step.** No
+12. **The setback order is untested on real data at its second step.** No
   catalogue row carries `ears.default` (`rack_index.py` writes no ears until
   #908), so the default ear position of a device is exercised on a fixture
   only.
-- **The 30 mm showcase default** lives on the site. The kit is flush where
+13. **The 30 mm showcase default** lives on the site. The kit is flush where
   nothing is stated; the site has to drop its default in the release that
   takes this kit, or every faceplate it draws stands 30 mm from where the
   kit fits and routes it.
-- **The sentences of a held item** beyond the two section 7.1 gives: placing
+14. **The sentences of a held item** beyond the two section 7.1 gives: placing
   one ("The catalogue describes no host yet, so a device cannot be put on
   one; heldBy takes only null, which frees it."); a host that is gone ("i7 is held by i4, which is not in this
   rack: place it again, or free it."); removing a host ("DIN switch was held
@@ -1534,11 +1540,11 @@ as written. Each is built, and each waits for a person to confirm it.
   named in a notice and refused by fit until one is removed (rack products
   7.2): "i2 is on i1 and held by i1: a part is bolted over a device or held
   by one, not both, so remove one."
-- **The notices for kept keys** (`frameNotices` in `fit.js`): "This rack
+15. **The notices for kept keys** (`frameNotices` in `fit.js`): "This rack
   states 23 in rails; it is drawn and fitted as 19 in." and "PDU A names the
   channel rear-left, which is not known for this frame, so it stands at
   left-rear."
-- **Which parts `configs[].states` lists** (section 4). Built: what a part
+16. **Which parts `configs[].states` lists** (section 4). Built: what a part
   ITSELF can be set to. A placement with an id is listed when its own
   `states`, else its group, else its part declares a list of names, and it
   is not a lamp (`class: led`). Lamps are left out because a state is
@@ -1546,44 +1552,50 @@ as written. Each is built, and each waits for a person to confirm it.
   vocabulary is already on the drawing; the mapping form
   (`{led-a: [...]}`, on 230 placements) is left out because its keys are the
   lamps inside a part and not state names. On the EVMA8365X that is its 42
-  outlets. Across the library the key then holds 91 parts on 6 devices and
-  under 4 KB, where listing every lamp held some 329 KB. A breaker is not
+  outlets. Across the library the key then holds 99 parts on 10 devices and
+  under 4 KB (the three Eaton and Tripp Lite switched PDUs with 82 outlets;
+  the power supplies of three Smartoptics DCP shelves and the fans of the
+  three Edgecore EPS and the Juniper MX150, 17 parts whose part declares
+  `ok`, `fail` or `absent`), where listing every lamp held some 329 KB. A breaker is not
   listed: its rocker declares its states on an element of the part.
-- **What counts as a slot** (section 5). Built: a placement of a
+17. **What counts as a slot** (section 5). Built: a placement of a
   `class: mount` part that declares `interface` and a `mate` point, the
   mirror of a mount point. No part in the library is one yet, so every
   device publishes an empty list until the bracket of #939 is modelled.
-- **Roll and the routing context** (section 6). `facePoint` is built as the
+18. **Roll and the routing context** (section 6). `facePoint` is built as the
   note has it. The context a page hands the routes (`portX`, `portY`,
   `guidesOf`) gives rack points, not face points, and is left as it is: it
   gives each where the upright item would hold it, and the kit turns it
   (`rollPoint`). A page that rolls its own points would turn them twice, so
   this is a rule the site has to follow.
-- **A quarter turn.** Its units are its width over 44.45 mm, rounded up, and
-  never under one. It is refused where its height does not pass between the
+19. **A quarter turn.** A part on the rail face is refused one ("Bracket bolts
+  to the rail face, so it cannot be rolled a quarter turn."). Its units are
+  its width over 44.45 mm, rounded up, and never under one. It is refused where its height does not pass between the
   rails ("WIDE-13 is 577 mm high; rolled a quarter turn that is across the
   opening, which is 451 mm."). It is one solid, with no tray, ring or guide,
   centred across the opening, and a page is told so on load. A port on it is
   turned with it about the centre of its box.
-- **`describe` and `inspect`** say a roll only where an item has one
+20. **`describe` and `inspect`** say a roll only where an item has one
   ("rolled 90"; `roll: 90`). The export notes of a rolled item are part 9
   and are not written yet.
-- **Readings and the metering scope** (section 4). A PDU that meters nothing
+21. **Readings and the metering scope** (section 4). A PDU that meters nothing
   shows no reading and is named ("BASIC-PDU measures nothing, so there is no
   reading for outlet-a1, input."). **The check for a PDU that meters its
   input or its branches is not built:** it has to know that `outlet-a1` is
   an outlet and `breaker-a` a branch, and nothing the kit loads says what
   kind of part a path is. It needs a key in `configs.json` that this note
   does not give, so readings on such a PDU are kept and shown as given.
-- **The other sentences of states and readings.** A part that declares no
+22. **The other sentences of states and readings.** A part that declares no
   state ("breaker-a on PDU A cannot be set: it declares no state."); the
   three loader notices (a state that is no name, states that are no map,
   readings kept as written); and a refused `readings.set`. With no parts
   lists loaded a state is stored unchecked, as a configuration is.
-- **`readings` is usable** with a `source`, a time `at` that can be read,
-  and `values` absent or a map of part to an object. The numbers inside a
+23. **`readings` is usable** with a `source`, a time `at` that can be read,
+  and `values` absent or a map of part to an object. `readings: null` is no
+  key at all. The notice gives the reason that applies: no source or time,
+  or values that are no map. The numbers inside a
   value are not checked on load; the schema states them.
-- **Hanging** (section 5). The tolerance is 1 mm, since the connectors
+24. **Hanging** (section 5). The tolerance is 1 mm, since the connectors
   registry states none for any mounting interface. A refusal that is not two
   mount points on two brackets reads "A mount point of PDU A 1555.8 mm above
   its lowest meets no slot of z3, z4."; a move of under a unit is given in
@@ -1591,15 +1603,24 @@ as written. Each is built, and each waits for a person to confirm it.
   longer be met: the part is taken off first. A held part moved by hand is
   refused ("PDU A hangs on z1, z2: move a bracket, or take it off them with
   zerou.hang."). `zerou.hang` needs the parts lists loaded. A frame change
-  (`settleZeroU`) moves each part on its own and does not hang a part again;
-  `hangNotices` then says a part is not where its brackets hold it.
-- **`bracketPositions(rack, {ref, cfg, ru}, ctx)`** takes the part and the
+  that would move or remove a hung part, or a bracket it hangs on, is
+  REFUSED, naming the part and its brackets ("PDU A hangs on z1, z2, and
+  this frame would move it: take it off its brackets first with
+  zerou.hang."): a hung part is never moved silently, since the kit writes
+  where it stands. `hangNotices` says a part a file holds out of place is
+  not where its brackets hold it.
+25. **`bracketPositions(rack, {ref, cfg, ru}, ctx)`** takes the part and the
   unit of the lowest bracket, and answers one bracket a mount point, each a
   whole number of units above the lowest, with `exact` saying the points
   then land. It takes each bracket to offer its slot at one height, since
   it is asked before a bracket is chosen.
-- **`swaps` and `fields` beside the rack** are taken by `zerou.update` and
+26. **`swaps` and `fields` beside the rack** are taken by `zerou.update` and
   kept; `patch` still takes a device only. Nothing in the kit draws them.
-- **The export comments of a hung PDU and of states** are part 9 and are
+27. **The export comments of a hung PDU and of states** are part 9 and are
   not written yet.
+28. **Three things of the kit API the note did not decide.** `stateRefusal` is
+  the kit's own and not for a page, which reads `stateNotices`. `shrinkRack`
+  answers `orphaned` beside `moved` and `removed`: the held items a dropped
+  host left behind. A quarter-turned item is exported at the position its
+  rolled box starts at, with no comment, until part 9 writes one.
 

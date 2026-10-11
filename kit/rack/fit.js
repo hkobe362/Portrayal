@@ -269,6 +269,9 @@ function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
   const side = railOf(cand, () => c);
   const u = itemUnits(cand, () => c), lo = cand.ru, hi = cand.ru + u;
   if (cand.ru < 1) return below(f);
+  // it bolts to the rail face across its width, or on one rail: a quarter
+  // turn would stand it across the holes it bolts to
+  if (isQuarter(cand)) return no(`${nameOf(c, cand.ref)} bolts to the rail face, so it cannot be rolled a quarter turn.`);
   // its own position is a whole unit: it bolts over a unit of holes
   if (!Number.isInteger(cand.ru))
     return no(`${nameOf(c, cand.ref)} bolts to the rail face at a whole unit, and ${uText(f, cand.ru, u)} is a half unit.`);

@@ -187,6 +187,11 @@ test('a quarter-turned item takes its rolled units and refuses a neighbour', () 
   // its height has to pass between the rails
   assert.deepEqual(run(put(rackOf(), 'wide', 1), {op: 'patch', id: 'i1', roll: 90}), {index: 0, error:
     'WIDE-13 is 577 mm high; rolled a quarter turn that is across the opening, which is 451 mm.'});
+  // a part on the rail face is refused a quarter turn, across both rails or on one; a half turn it takes
+  const face = put(put(rackOf(), 'bracket', 5, {side: 'left', label: 'fb'}), 'bracket', 8, {label: 'wide'});
+  for (const id of ['i1', 'i2']) for (const q of [90, 270])
+    assert.deepEqual(run(face, {op: 'patch', id, roll: q}), {error: 'Bracket bolts to the rail face, so it cannot be rolled a quarter turn.', index: 0});
+  assert.equal(run(face, {op: 'patch', id: 'i1', roll: 180}).rack.items[0].roll, 180);
   // null puts it upright again, and the key goes
   const back = run(r, {op: 'patch', id: 'i1', roll: null});
   assert.equal('roll' in back.rack.items[0], false);

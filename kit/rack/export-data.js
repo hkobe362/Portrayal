@@ -916,7 +916,7 @@ export const NETBOX_RACK_WIDTHS = [10, 19, 21, 23];
 export function rackImportRows({rack, dcim = {}}) {
   const f = rack.frame, width = railWidth(f), known = NETBOX_RACK_WIDTHS.includes(width), said = [];
   if (firstU(f) !== 1)
-    said.push(`Its units are numbered from ${firstU(f)} on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1.`);
+    said.push(`Its units are numbered from ${firstU(f)} on the rack. The NetBox rack import takes no starting unit, so this rack and the positions in the devices file count from 1. Leave its starting unit at 1 in NetBox; if it is set to ${firstU(f)}, raise every device position by ${firstU(f) - 1}.`);
   if (!known) said.push(`Its rails are ${width} in wide, which the NetBox rack import does not take; 19 is written.`);
   const row = {site: String(dcim?.site ?? '').trim(), name: rack.name, status: 'planned',
     width: known ? width : RAIL_WIDTH_IN, u_height: f.heightRU, desc_units: f.numbering === 'top-down' ? 'true' : 'false'};
