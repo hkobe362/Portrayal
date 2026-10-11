@@ -6,5 +6,6 @@
   stock break of #983), outlet states and readings (#934), PDU brackets
   (#939) and `roll`, says which rack products keys ride with them (#935), and
   that a device on a shelf DIN rail (#972) needs no key beyond `heldBy`. It
-  lists eight decisions to take and what is one-way. Nothing is built: no
+  also covers breakout and anchor straps, lists twelve decisions to take, and
+  says what is one-way. Nothing is built: no
   schema, kit or library file changes.
