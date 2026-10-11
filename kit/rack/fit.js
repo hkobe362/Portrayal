@@ -10,9 +10,11 @@
 // passes through, so there a U is never shared.
 
 import {RU} from './rails.js';
-import {uLabel, uText, positionOf, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES} from './model.js';
+import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES} from './model.js';
 
 // ── HEIGHTS, SPANS AND BOXES (docs/rack-file-v4-design.md section 2.4) ─────
+// PUBLIC: unitsOf, spanOf, itemBox, spanText (kit/README.md). The other names
+// exported between here and isRackFace are for the kit's own files.
 // These own the answers, and no other file under kit/rack/ computes them: how
 // many units a device is, which half units an item fills, and where its body
 // is in millimetres. A position is a whole unit or a half (`ru` in steps of
@@ -54,41 +56,43 @@ export function anchorY(rack, item, chassisOf) {
 // The middle of the unit that starts at `ru`: a lane waypoint, which is always
 // on a whole unit, and the bottom unit of an item.
 export function laneY(ru) { return (ru - 0.5) * RU; }
-// THE WHOLE UNITS JUST ABOVE AND BELOW AN ITEM, [above, below]: where a 1U
-// neighbour would start. Above is the top edge of an item of a unit or more,
-// which no 1U device can start on when it is a half, and the next whole unit
-// for an item under a unit; below is the unit under the one its bottom is in.
-export function neighbourUnits(item, chassisOf) {
-  const [lo, hi] = spanOf(item, chassisOf);
-  return [hi - lo >= 1 ? hi : Math.ceil(hi), Math.floor(lo) - 1];
+// THE NEIGHBOURS A ROUTE LOOKS TO FOR A MANAGER: the devices of a unit or less
+// just above an item and just below it, on any face, above first and nearest
+// first. A caller filters them by face and by what they carry.
+// - Above an item of a unit or more: one that starts on its top edge. Above an
+//   item under a unit: one that starts anywhere from its top edge to the next
+//   whole unit, so a half-unit panel in the lower half of a unit still finds
+//   the 1U device over that unit, as it did when it counted as a unit itself.
+// - Below: one whose top edge is the bottom of the item; and one in the whole
+//   unit under the unit the bottom of the item is in, when the item starts on
+//   a whole unit or is under a unit itself.
+export function neighbours(rack, item, chassisOf) {
+  const [lo, hi] = spanOf(item, chassisOf), small = hi - lo < 1;
+  const near = rack.items.filter(o => o.id !== item.id && unitsOf(chassisOf(o.ref)) <= 1);
+  const above = near.filter(o => (small ? o.ru >= hi && o.ru <= Math.ceil(hi) : o.ru === hi)).sort((p, q) => p.ru - q.ru);
+  const under = Math.floor(lo) - 1;
+  const below = near.filter(o => spanOf(o, chassisOf)[1] === lo
+    || ((small || Number.isInteger(lo)) && Math.floor(o.ru) === under)).sort((p, q) => q.ru - p.ru);
+  return [...above, ...below];
 }
-// A span as a person reads it: "U12", "U12.5", "U13-U14". An item of whole
-// units on a whole unit reads as its first and last unit; any other as the
-// first and last HALF unit it fills, each named as a position is (model.js
-// positionOf).
-export function spanText(frame, item, chassisOf) {
-  const [lo, hi] = spanOf(item, chassisOf);
-  const ends = (Number.isInteger(lo) && Number.isInteger(hi) ? [uLabel(frame, lo), uLabel(frame, hi - 1)]
-    : [positionOf(frame, lo, 0.5), positionOf(frame, hi - 0.5, 0.5)]).sort((x, y) => x - y);
-  return ends[0] === ends[1] ? `U${ends[0]}` : `U${ends[0]}-U${ends[1]}`;
-}
-
-// WHICH UNITS AN ITEM FILLS, in words, for a reader that counts whole units:
-// "the lower half of U12", "U1 and the lower half of U2", "U10 to U12". Lower
-// and upper are as the item hangs, whichever way the frame counts.
-export function fillText(frame, ru, units) {
+// THE UNITS FROM `ru` UP, IN WORDS. Whole units on a whole unit read as they
+// always did: "U13", "U13-U14". Anything that starts or ends on a half names
+// the half, lower and upper as the item hangs whichever way the frame counts:
+// "the lower half of U7", "U13 to the lower half of U14". No two placements
+// read the same.
+export function unitsText(frame, ru, units) {
   const top = ru + units, U = n => uLabel(frame, n);
-  if (units === 0.5) return `the ${Number.isInteger(ru) ? 'lower' : 'upper'} half of U${U(Math.floor(ru))}`;
-  const parts = [];
-  if (!Number.isInteger(ru)) parts.push(`the upper half of U${U(Math.floor(ru))}`);
-  const first = Math.ceil(ru), last = Math.floor(top) - 1;
-  if (last >= first) {
-    const [a, b] = [U(first), U(last)].sort((x, y) => x - y);
-    parts.push(a === b ? `U${a}` : `U${a} to U${b}`);
+  if (Number.isInteger(ru) && Number.isInteger(top)) {
+    const [a, b] = [U(ru), U(top - 1)].sort((x, y) => x - y);
+    return a === b ? `U${a}` : `U${a}-U${b}`;
   }
-  if (!Number.isInteger(top)) parts.push(`the lower half of U${U(Math.floor(top))}`);
-  return parts.join(' and ');
+  if (units === 0.5) return `the ${Number.isInteger(ru) ? 'lower' : 'upper'} half of U${U(Math.floor(ru))}`;
+  const from = Number.isInteger(ru) ? `U${U(ru)}` : `the upper half of U${U(Math.floor(ru))}`;
+  const to = Number.isInteger(top) ? `U${U(top - 1)}` : `the lower half of U${U(Math.floor(top))}`;
+  return `${from} to ${to}`;
 }
+// The span of an item, in those words.
+export const spanText = (frame, item, chassisOf) => unitsText(frame, item.ru, unitsOf(chassisOf(item.ref)));
 
 export const REACH_MM = 50;   // within this of the far rail, a device's far panel is visible there
 
@@ -268,7 +272,8 @@ export const heightOf = chassisOf => item => unitsOf(chassisOf(item.ref));
 // WHAT THE FIT OF BEFORE ALLOWED AND THIS ONE DOES NOT (section 8): an item
 // whose height is not a whole number of units, with another in the unit its
 // top half fills. Both are kept where they are, as fit keeps an item it would
-// no longer accept; each pair is a sentence for the page to show.
+// no longer accept; each pair is a sentence, which the editor gives as a
+// finding when a document is loaded (editor.js loadDoc).
 export function overlapNotices(rack, chassisOf) {
   const out = [];
   for (const a of rack.items) {

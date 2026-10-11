@@ -202,3 +202,28 @@ test('round holes are a hole style the frame keeps, with no thread', () => {
   assert.deepEqual(M.normalizeFrame({...frame, holes: {style: 'round', thread: 'M6'}}).holes, {style: 'round', thread: null});
   assert.deepEqual(M.normalizeFrame({...frame, holes: {style: 'oval'}}).holes, {style: 'square', thread: null});
 });
+
+test('what a zero-U entry is set to is typed as on an item; where it stands is still not constrained', () => {
+  const at = z => errs(docOf({zeroU: [z]}));
+  assert.deepEqual(at({at: 5, offsetMm: 'low'}), [], 'an entry of another shape is kept as written, and is valid');
+  assert.deepEqual(at({id: 'z1', ref: 'pdu', at: 'left-rear', offsetMm: 0, swaps: {}, fields: {}, states: {'outlet-a1': 'on'},
+                       readings: {source: 'poll', at: '2026-10-08T14:05:00Z'}, heldBy: {parts: ['z3', 'z4']}}), []);
+  assert.deepEqual(at({id: 'z1', states: {'outlet-a1': 1}}), ['type at /racks/0/zeroU/0/states/outlet-a1']);
+  assert.deepEqual(at({id: 'z1', heldBy: {parts: 'z3'}}), ['type at /racks/0/zeroU/0/heldBy/parts']);
+  assert.deepEqual(at({id: 'z1', swaps: []}), ['type at /racks/0/zeroU/0/swaps']);
+  // readings: a source and a time, as the loader will require; values may be absent
+  assert.deepEqual(at({id: 'z1', readings: {source: 'poll'}}), ['required at /racks/0/zeroU/0/readings']);
+  assert.deepEqual(errs(docOf({items: [item('i1', 1, {readings: {at: '2026-10-08T14:05:00Z', values: {}}})]})),
+    ['required at /racks/0/items/0/readings']);
+});
+
+test('a position below 1 is still loaded, as a version-3 reader loaded it, and the schema and fit refuse it', () => {
+  const low = docOf({items: [item('i1', 0), item('i2', -2), item('i3', 0.5)]});
+  assert.deepEqual(M.parseDoc(structuredClone(low)).racks[0].items.map(i => i.ru), [0, -2, 0.5]);
+  assert.deepEqual(V3.parseDoc({...structuredClone(low), version: 3, racks: [{...low.racks[0], items: low.racks[0].items.slice(0, 2)}]})
+    .racks[0].items.map(i => i.ru), [0, -2]);
+  assert.deepEqual(errs(low), [0, 1, 2].map(k => `minimum at /racks/0/items/${k}/ru`));
+  // no fixture rack holds one
+  for (const f of FIXTURES)
+    for (const r of M.parseDoc(readFileSync(new URL(f, DIR), 'utf8')).racks) assert.ok(r.items.every(i => i.ru >= 1), f);
+});

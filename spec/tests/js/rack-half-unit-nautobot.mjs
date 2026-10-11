@@ -52,22 +52,37 @@ test('Nautobot: a panel alone, a front and rear pair, and a whole-unit rack as b
   const mixed = put(put(put(put(rackOf(), 'tm-7124s', 1, {label: 'agg'}), 'mx104', 10, {label: 'pe'}), 'qfx', 20, {label: 'leaf'}), 'r2', 30, {label: 'srv'});
   assert.deepEqual(rows(mixed), [
     ['srv', 30, 'front', ''], ['leaf', 20, 'front', ''],
-    ['pe', 10, 'front', 'Occupies U10 to U12 and the lower half of U13 (3.5U). Nautobot stores whole rack units.'],
-    ['agg', 1, 'front', 'Occupies U1 and the lower half of U2 (1.5U). Nautobot stores whole rack units.']]);
+    ['pe', 10, 'front', 'Occupies U10 to the lower half of U13 (3.5U). Nautobot stores whole rack units.'],
+    ['agg', 1, 'front', 'Occupies U1 to the lower half of U2 (1.5U). Nautobot stores whole rack units.']]);
   // the overlap the old fit allowed: the 1U item in U2 is kept with no position
   const over = put(put(rackOf(), 'tm-7124s', 1, {label: 'agg'}), 'qfx', 2, {label: 'leaf'});
   assert.deepEqual(rows(over)[0], ['leaf', '', '', 'In U2, above agg; no position, since Nautobot stores whole rack units.']);
 });
 
-test('fillText says which units an item fills, lower and upper as it hangs', () => {
-  const up = M.normalizeFrame({heightRU: 42}), down = M.normalizeFrame({heightRU: 42, numbering: 'top-down'});
-  assert.equal(F.fillText(up, 12, 0.5), 'the lower half of U12');
-  assert.equal(F.fillText(up, 12.5, 0.5), 'the upper half of U12');
-  assert.equal(F.fillText(down, 12, 0.5), 'the lower half of U31');
-  assert.equal(F.fillText(up, 1, 1.5), 'U1 and the lower half of U2');
-  assert.equal(F.fillText(up, 12.5, 1.5), 'the upper half of U12 and U13');
-  assert.equal(F.fillText(up, 10, 3.5), 'U10 to U12 and the lower half of U13');
-  assert.equal(F.fillText(down, 10, 3.5), 'U31 to U33 and the lower half of U30');
-  assert.equal(F.fillText(up, 2, 1), 'U2');
-  assert.equal(F.fillText(up, 2, 3), 'U2 to U4');
+test('the order is by stored ru, not by the order the rack lists them', () => {
+  // the upper panel placed first: the lower one is still the one positioned
+  const r = {...put(put(rackOf(), 'xcu', 12.5, {label: 'ODF B'}), 'xcu', 12, {label: 'ODF A'}), name: 'R1'};
+  assert.deepEqual(r.items.map(i => [i.id, i.label, i.ru]), [['i1', 'ODF B', 12.5], ['i2', 'ODF A', 12]]);
+  const rows = X.deviceImportRows({rack: r, items: F.itemsWithU(r, chassisOf), types: new Map([['i1', TYPE], ['i2', TYPE]]), target: 'nautobot'})
+    .rows.map(x => [x.name, x.position, x.face]);
+  assert.deepEqual(rows, [['ODF B', '', ''], ['ODF A', 12, 'front']]);
+  // two at one stored ru (front, as an old file could hold them): the one listed first
+  const same = {...r, items: r.items.map(i => ({...i, ru: 12}))};
+  const both = X.deviceImportRows({rack: same, items: F.itemsWithU(same, chassisOf), types: new Map([['i1', TYPE], ['i2', TYPE]]), target: 'nautobot'}).rows;
+  assert.deepEqual(both.map(x => [x.name, x.position]).sort(), [['ODF A', ''], ['ODF B', 12]]);
+  assert.equal(both.find(x => x.name === 'ODF A').comments, 'In the lower half of U12, with ODF B; no position, since Nautobot stores whole rack units.');
+});
+
+test('an item that carries no height takes it from the catalogue, and counts as 1U with none', () => {
+  const r = {...put(put(rackOf(), 'xcu', 12, {label: 'ODF A'}), 'xcu', 12.5, {label: 'ODF B'}), name: 'R1'};
+  const types = new Map([['i1', TYPE], ['i2', TYPE]]);
+  assert.ok(r.items.every(i => !('u' in i)));
+  const got = X.deviceImportRows({rack: r, items: r.items, types, target: 'nautobot', chassisOf}).rows.map(x => [x.name, x.position, x.comments]);
+  assert.deepEqual(got, X.deviceImportRows({rack: r, items: F.itemsWithU(r, chassisOf), types, target: 'nautobot'}).rows.map(x => [x.name, x.position, x.comments]));
+  assert.equal(got[1][2], 'Occupies the lower half of U12 (0.5U). Nautobot stores whole rack units.');
+  // NetBox too
+  assert.deepEqual(X.deviceImportRows({rack: r, items: r.items, types, chassisOf}).rows.map(x => x.position), [12.5, 12]);
+  // with no catalogue each is one unit: nothing is said of a half that is not known
+  const blind = X.deviceImportRows({rack: {...r, items: [r.items[0]]}, items: [r.items[0]], types, target: 'nautobot'}).rows[0];
+  assert.deepEqual([blind.position, blind.comments], [12, '']);
 });

@@ -20,7 +20,9 @@ export const HOLE_DY = [6.35, 22.22, 38.10];
 // rails): every hole centre at least HOLE_EDGE inside the range. A half unit
 // does not repeat the pattern: its lower half holds the hole at 6.35 and its
 // upper half the one at 38.10, and the middle hole sits on the line between
-// them, where no ear of either half can use it.
+// them, where no ear of either half can use it. A drawing lays the slots of
+// a generic ear through this, over the span fit.js itemBox gives (`lo`, `hi`);
+// the kit itself draws no ear, so its caller is the page.
 export const HOLE_EDGE = 3;
 export function holesIn(lo, hi) {
   const out = [];

@@ -232,6 +232,36 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
+### Heights, spans and half units
+
+A position (`ru` on an item) is a whole unit or a half, counted bottom-up
+from 1: 12 is the bottom of U12 and 12.5 its middle. `rack/fit.js` owns what
+follows from one, and no other module computes it:
+
+| name | answers |
+|---|---|
+| `unitsOf(chassis)` | the height of a device in units, in halves: its stated `ru` rounded up to the next half, never under 0.5, and 1 when it states none |
+| `spanOf(item, chassisOf)` | `[lo, hi)`: the units an item fills, half-open, so a 1.5U item at U1 is `[1, 2.5)` |
+| `itemBox(rack, item, chassisOf)` | `{y0, y1, h, lo, hi}` in mm above the bottom of the rails: the body, centred in its span, and the edges of the span. A drawing stands a body here |
+| `spanText(frame, item, chassisOf)` | the span in words: "U13", "U13-U14", "the lower half of U7", "U13 to the lower half of U14" |
+| `heightOf(chassisOf)`, `itemsWithU(rack, chassisOf)` | as before, and now 0.5 for a half-unit device |
+
+`rack/model.js` has `positionOf(frame, ru, units)`, the lowest-numbered half
+unit an item fills as the frame counts (what NetBox calls a position), and
+`uText(frame, ru, units)`, the same as "U12.5". `rack/queries.js` `freeUs`
+returns half positions for a device that may start on one. `rack/rails.js`
+has `holesIn(lo, hi)`, the rail holes an ear between two heights can use,
+for a page that draws ears.
+
+`span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
+half a unit. Use `spanOf`, and read its second number as the top edge.
+
+The other names these modules export are the kit's own, shared between its
+files, and may change without notice: `spansMeet`, `anchorY`, `laneY`,
+`neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf` and
+`overlapNotices` in `rack/fit.js`; `isPosition` and `HOLE_STYLES` in
+`rack/model.js`; `HOLE_EDGE` in `rack/rails.js`.
+
 ### Where this came from
 
 `kit/rack/` was moved here from `roc-ops/portrayal-site`, where it was

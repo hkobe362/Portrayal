@@ -14,6 +14,7 @@ import * as R from '../../../kit/rack/route.js';
 import * as S from '../../../kit/rack/solids.js';
 import * as X from '../../../kit/rack/export-data.js';
 import {apply, COMMANDS} from '../../../kit/rack/commands.js';
+import {createRackEditor} from '../../../kit/rack/editor.js';
 import {validate} from '../../../kit/rack/validate.js';
 import {RU, holesIn} from '../../../kit/rack/rails.js';
 import * as OWNER from './route-direct-fixture.mjs';
@@ -109,6 +110,17 @@ test('what a shrink drops is judged by the packed top edge, not by the heights a
   assert.deepEqual(nine.removed.map(i => i.id), ['i1']);
   assert.deepEqual(nine.rack.items.map(i => [i.id, i.ru]), [['i2', 1], ['i3', 2], ['i4', 6]]);
   assert.equal(Math.max(...nine.rack.items.map(i => F.spanOf(i, chassisOf)[1])), 7);
+  // the limit: a packed top exactly half a unit over the rack does not fit.
+  // 3.5U and 1.5U pack to a top edge of 6 (5U of rack); with a panel on top, 6.5
+  let half = put(put(put(rackOf(), 'mx104', 10), 'tm-7124s', 20), 'xcu', 30);
+  const fits5 = F.shrinkRack(half, 5, chassisOf);
+  assert.deepEqual([fits5.rack.items.map(i => i.ru), fits5.removed.map(i => i.id)], [[1, 2.5], ['i1']],
+    'a top edge of 6.5 is half a unit over 5U, so the lowest goes');
+  const fits6 = F.shrinkRack(half, 6, chassisOf);
+  assert.deepEqual([fits6.rack.items.map(i => i.ru), fits6.removed], [[1, 4.5, 6], []], 'a top edge of 6.5 is inside 6U');
+  half = {...half, items: half.items.slice(0, 2)};
+  assert.deepEqual(F.shrinkRack(half, 5, chassisOf).removed, [], 'a top edge of 6 is the top of 5U');
+  assert.deepEqual(F.shrinkRack(half, 4, chassisOf).removed.map(i => i.id), ['i1'], 'and a whole unit over 4U');
   for (const s of [ten, nine]) assert.doesNotThrow(() => M.parseDoc(M.serialize({...M.newDoc(), racks: [s.rack]})));
 });
 
@@ -217,21 +229,51 @@ test('positionOf and uText on a top-down frame: the lower half is 31.5 and the u
     assert.equal(M.positionOf(down, ru, u), M.uLabel(down, ru + u - 1), `${u}U at ${ru}`);
   }
   assert.equal(M.positionOf(down, 12), 31, 'one unit when no height is given');
+  // a height that is missing in any way counts as one unit, as it always did
+  for (const none of [null, 0, undefined, NaN]) {
+    assert.equal(M.positionOf(down, 12, none), 31, String(none));
+    assert.equal(M.positionOf(up, 12, none), 12, String(none));
+    assert.equal(M.uText(down, 12, none), 'U31');
+  }
   // a 1.5U item at U13 on the top-down frame: its top edge is 14.5 up
   assert.equal(M.positionOf(down, 13, 1.5), 29.5);
 });
 
-test('a span in words, and what describe prints for a half', () => {
+test('a span in words: whole units as before, and a half named as a half', () => {
   const up = M.normalizeFrame({heightRU: 42});
   const text = (ref, ru, frame = up) => F.spanText(frame, {ref, ru}, chassisOf);
-  assert.deepEqual([text('qfx', 12), text('r2', 13), text('xcu', 12), text('xcu', 12.5)], ['U12', 'U13-U14', 'U12', 'U12.5']);
-  assert.deepEqual([text('tm-7124s', 13), text('tm-7124s', 12.5), text('mx104', 10)], ['U13-U14', 'U12.5-U13.5', 'U10-U13']);
+  assert.deepEqual([text('qfx', 13), text('r2', 13)], ['U13', 'U13-U14']);
+  assert.deepEqual([text('xcu', 7), text('xcu', 7.5)], ['the lower half of U7', 'the upper half of U7']);
+  assert.equal(text('tm-7124s', 13), 'U13 to the lower half of U14');
+  assert.equal(text('tm-7124s', 12.5), 'the upper half of U12 to U13');
+  assert.equal(text('mx104', 10), 'U10 to the lower half of U13');
+  // lower and upper are as the item hangs, whichever way the frame counts
   const down = M.normalizeFrame({heightRU: 42, numbering: 'top-down'});
-  assert.deepEqual([text('r2', 13, down), text('xcu', 12, down), text('xcu', 12.5, down)], ['U29-U30', 'U31.5', 'U31']);
+  assert.deepEqual([text('r2', 13, down), text('xcu', 12, down), text('xcu', 12.5, down)],
+    ['U29-U30', 'the lower half of U31', 'the upper half of U31']);
+  assert.equal(text('tm-7124s', 13, down), 'U30 to the lower half of U29');
   const r = put(put(rackOf(), 'xcu', 12, {label: 'ODF A'}), 'xcu', 12.5, {label: 'ODF B'});
   const lines = Q.describe(r, ctx).split('\n');
-  assert.ok(lines.some(l => l.startsWith('i2 ODF B U12.5 front')), lines.join(' | '));
-  assert.ok(lines.some(l => l.startsWith('i1 ODF A U12 front')), lines.join(' | '));
+  assert.ok(lines.some(l => l.startsWith('i2 ODF B the upper half of U12 front')), lines.join(' | '));
+  assert.ok(lines.some(l => l.startsWith('i1 ODF A the lower half of U12 front')), lines.join(' | '));
+});
+
+test('no two placements read the same: every height of the catalogue at every whole and half position', () => {
+  // the heights rack.json can state, in halves, and a few more
+  const heights = new Set([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 7, 10, 13, 21]);
+  for (const c of Object.values(OWNER.SIZES)) heights.add(F.unitsOf(c));
+  for (const c of Object.values(SIZES)) heights.add(F.unitsOf(c));
+  for (const numbering of ['bottom-up', 'top-down']) {
+    const frame = M.normalizeFrame({heightRU: 24, numbering}), seen = new Map();
+    let n = 0;
+    for (const u of heights) for (let ru = 1; ru + u <= 25; ru += 0.5) {
+      const t = F.unitsText(frame, ru, u), was = seen.get(t);
+      assert.equal(was, undefined, `${numbering}: "${t}" is ${u}U at ${ru} and ${was}`);
+      seen.set(t, `${u}U at ${ru}`);
+      n++;
+    }
+    assert.ok(n > 400, `${n} placements were read`);
+  }
 });
 
 // ── queries and commands ─────────────────────────────────────────────────
@@ -286,6 +328,10 @@ test('a manager on a host that starts on a half stands on the whole unit the hos
   let r = put(put(rackOf(), 'xcu', 12, {label: 'ODF A'}), 'xcu', 12.5, {label: 'ODF B'});
   assert.equal(G.hostAt(r, 'front', 12, chassisOf).id, 'i1', 'the lower one when two fill the unit equally');
   assert.equal(G.hostAt(r, 'front', 13, chassisOf), null);
+  // whichever the rack lists first: the upper panel placed before the lower
+  const upperFirst = put(put(rackOf(), 'xcu', 12.5, {label: 'ODF B'}), 'xcu', 12, {label: 'ODF A'});
+  assert.deepEqual(upperFirst.items.map(i => [i.id, i.ru]), [['i1', 12.5], ['i2', 12]]);
+  assert.equal(G.hostAt(upperFirst, 'front', 12, chassisOf).id, 'i2');
   // the upper panel alone: it fills half of U12 and is the host there
   let one = put(rackOf(), 'xcu', 12.5, {label: 'ODF B'});
   assert.deepEqual(G.placement(one, {face: 'front', ru: 12}, chassisOf), {face: 'front', ru: 12, on: 'i1', unit: 1});
@@ -333,6 +379,11 @@ test('an overlap the old fit allowed is kept where it is, and named', () => {
   // the panel on the rear of U13 fits behind the MX104, so it is no overlap
   assert.equal(F.fits(r, r.items[3], chassisOf, {ignoreId: 'i4'}).ok, true);
   assert.deepEqual(F.overlapNotices(put(put(rackOf(), 'qfx', 1), 'qfx', 2), chassisOf), []);
+  // the editor says so when the document is loaded, and moves nothing
+  const ed = createRackEditor({doc: M.newDoc(), chassisOf});
+  const {findings} = ed.loadDoc(doc);
+  assert.deepEqual(findings, [{kind: 'note', text: 'TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is.'}]);
+  assert.deepEqual(ed.rack().items.map(i => i.ru), [1, 2, 10, 13]);
 });
 
 // ── a version-3 rack reads as it did ─────────────────────────────────────
@@ -358,6 +409,7 @@ test('every fixture rack has the heights, positions and fit it had before', () =
       const closedTop = it.ru + before - 1;
       assert.equal(M.positionOf(rack.frame, it.ru, before), Math.min(M.uLabel(rack.frame, it.ru), M.uLabel(rack.frame, closedTop)));
       assert.equal(F.spanText(rack.frame, it, of), before === 1 ? `U${it.ru}` : `U${it.ru}-U${closedTop}`);
+      assert.equal(F.unitsText(rack.frame, it.ru, before), F.spanText(rack.frame, it, of));
       // where it is, it fits, exactly when no other item shared a whole unit with it under the old rule
       const clash = rack.items.some(o => o.id !== it.id && o.face === it.face
         && it.ru <= o.ru + Math.max(1, sizes[o.ref].ru) - 1 && o.ru <= closedTop);
@@ -415,14 +467,31 @@ test('an item under one unit is met at the middle of its body', () => {
   assert.equal(R.portPoint(r, {item: 'i2', path: 'p1', view: 'front'}, rc).y, b);
 });
 
-test('the neighbours a route looks to for a manager: the whole units above and below', () => {
-  const n = (ref, ru) => F.neighbourUnits({ref, ru}, chassisOf);
-  assert.deepEqual(n('qfx', 12), [13, 11]);
-  assert.deepEqual(n('r2', 12), [14, 11]);
-  assert.deepEqual(n('xcu', 12), [13, 11], 'as before, when a half-unit panel counted as a unit');
-  assert.deepEqual(n('xcu', 12.5), [13, 11]);
-  assert.deepEqual(n('tm-7124s', 1), [2.5, 0], 'as before: no 1U device starts on its top edge');
-  assert.deepEqual(n('tm-7124s', 12.5), [14, 11]);
+test('the neighbours a route looks to for a manager: above first, and what touches', () => {
+  const at = (rack, id) => F.neighbours(rack, rack.items.find(i => i.id === id), chassisOf).map(o => o.id);
+  // whole units, as before: the 1U device on the top edge, then the one in the unit below
+  let r = put(put(put(rackOf(), 'qfx', 11), 'qfx', 12), 'qfx', 13);
+  assert.deepEqual(at(r, 'i2'), ['i3', 'i1']);
+  r = put(put(put(rackOf(), 'qfx', 11), 'r2', 12), 'qfx', 14);
+  assert.deepEqual(at(r, 'i2'), ['i3', 'i1']);
+  assert.deepEqual(at(put(put(rackOf(), 'r2', 12), 'r2', 14), 'i1'), [], 'a device over a unit is no neighbour');
+  // a half-unit panel in the lower half still finds the 1U device over its unit, as when it counted as a unit
+  r = put(put(put(rackOf(), 'qfx', 11), 'xcu', 12), 'qfx', 13);
+  assert.deepEqual(at(r, 'i2'), ['i3', 'i1']);
+  // two panels in one unit: each sees the other first, then the device past it
+  r = put(put(put(put(rackOf(), 'qfx', 11), 'xcu', 12), 'xcu', 12.5), 'qfx', 13);
+  assert.deepEqual(at(r, 'i2'), ['i3', 'i4', 'i1']);
+  assert.deepEqual(at(r, 'i3'), ['i4', 'i2', 'i1']);
+  // a 1.5U item: a 1U device half a unit over its top edge was no neighbour before and is none now
+  r = put(put(rackOf(), 'tm-7124s', 1), 'qfx', 3);
+  assert.deepEqual(at(r, 'i1'), []);
+  // but a half-unit panel directly on its top edge touches it, and is one
+  r = put(put(rackOf(), 'tm-7124s', 1), 'xcu', 2.5);
+  assert.deepEqual(at(r, 'i1'), ['i2']);
+  assert.deepEqual(at(r, 'i2'), ['i1'].filter(() => false), 'a 1.5U item is no device of a unit or less');
+  // and one directly under a device on a whole unit
+  r = put(put(rackOf(), 'xcu', 11.5), 'qfx', 12);
+  assert.deepEqual(at(r, 'i2'), ['i1']);
 });
 
 // ── the source scan ──────────────────────────────────────────────────────
@@ -500,4 +569,6 @@ test('the cable schedule, draw.io and the hardware count read a half position', 
   assert.deepEqual(qty([0.5]), [2, 2]);
   assert.deepEqual([qty([1.5]), qty([3.5]), qty([1]), qty([2, 1, 10])], [[6, 6], [14, 14], [4, 4], [52, 52]]);
   assert.deepEqual(qty(items.map(i => i.u)), [4, 4], 'two panels in one unit: 2 each');
+  // whatever a caller passes is read as a height in halves, so the count is whole
+  assert.deepEqual([qty([0.3]), qty([1.2]), qty([undefined]), qty([0]), qty(['2'])], [[2, 2], [6, 6], [4, 4], [4, 4], [8, 8]]);
 });

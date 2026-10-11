@@ -7,7 +7,7 @@
 
 import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName} from './model.js';
 import {routeText, trunkRoute} from './route.js';
-import {isRackMount, isZeroUPart, railOf, unitsOf, fillText} from './fit.js';
+import {isRackMount, isZeroUPart, railOf, unitsOf, unitsText, spansMeet} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
 export {positionOf};
@@ -425,9 +425,8 @@ export const uOfItem = (frame, item, chassisOf = () => null) =>
 // that ends on a whole unit.
 export const drawioU = (heightRU, ru, u) => heightRU + 2 - ru - u;
 
-// Two items carrying their height (`u`) meet when each starts below the top
-// edge of the other (fit.js spansMeet): the spans are half-open.
-const overlaps = (a, b) => a.ru < b.ru + b.u && b.ru < a.ru + a.u;
+// Two items carrying their height (`u`) meet as their spans do (fit.js spansMeet).
+const overlaps = (a, b) => spansMeet([a.ru, a.ru + a.u], [b.ru, b.ru + b.u]);
 // ONE CABINET PER FACE. What you see from a side is what is mounted there,
 // plus the far panel of anything that nothing mounted on this side covers.
 // Behind a mounted device, the other side's device is hidden - two pictures
@@ -786,7 +785,11 @@ export const otherVendorNote = ({label, ref, T, manufacturer, path}) =>
 // comment says where it is; any other whose span is not whole units is
 // written at floor(p), and its comment says which part of that it fills. So
 // the file imports, loses no device, and states no position that is false.
-export function deviceImportRows({rack, items, types, target = 'netbox', dcim = {}, why = new Map()}) {
+// `items` carry their height `u` (fit.js itemsWithU). One that does not is
+// given it from the catalogue when `chassisOf` is passed, and counts as 1U
+// otherwise.
+export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null}) {
+  const items = given.map(it => (it.u != null ? it : {...it, u: chassisOf ? unitsOf(chassisOf(it.ref)) : 1}));
   const T = TARGET_NAME[target] || 'NetBox';
   const names = uniqueNames(items);
   const site = String(dcim?.site ?? '').trim(), role = String(dcim?.role ?? '').trim();
@@ -821,7 +824,7 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
   // its bottom): a tall device reaches higher than its ru alone would say.
   // Nautobot: the items with no position there, each with the one it meets
   const unplaced = new Map();
-  const uOf = it => it.u ?? 1;
+  const uOf = it => it.u;
   if (target === 'nautobot') {
     const wholeSpan = it => { const p = positionOf(rack.frame, it.ru, uOf(it)); return [Math.floor(p), Math.ceil(p + uOf(it)) - 1]; };
     const placed = [];
@@ -859,7 +862,7 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
     }
     const position = positionOf(rack.frame, it.ru, it.u);
     if (target === 'nautobot' && !zeroU) {
-      const met = unplaced.get(it.id), where = fillText(rack.frame, it.ru, uOf(it));
+      const met = unplaced.get(it.id), where = unitsText(rack.frame, it.ru, uOf(it));
       if (met) notes.push(`In ${where}, ${it.ru > met.ru ? 'above' : 'with'} ${names.get(met.id).name}; no position, since Nautobot stores whole rack units.`);
       else if (!Number.isInteger(it.ru) || !Number.isInteger(uOf(it)))
         notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
@@ -950,8 +953,10 @@ export function bomRows({devices = [], parts = [], frame, railUs = []}) {
 // 2 ears x 2 screws x each U a rail item covers, with no floor of one unit: a
 // half-unit panel has one slot an ear, so it takes 2. `railUs` are the heights
 // in units (fit.js unitsOf, in halves), so the count is always whole.
+// Each is read through unitsOf, so whatever a caller passes is a height in
+// halves; one that is no height counts as a unit.
 export function hardwareRows(frame, railUs) {
-  const qty = 4 * railUs.reduce((s, u) => s + (Number(u) > 0 ? Number(u) : 1), 0);
+  const qty = 4 * railUs.reduce((s, u) => s + (Number(u) > 0 ? unitsOf({ru: Number(u)}) : 1), 0);
   if (!qty) return [];
   const row = model => ({section: 'Mounting hardware', qty, manufacturer: '', model,
     description: 'Two per ear for each U a device covers', ref: ''});

@@ -14,7 +14,7 @@ import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan, unitsOf, neighbourUnits, anchorY, laneY} from './fit.js';
+import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -57,16 +57,15 @@ export function ringOf(g) {
 
 // The manager an end leaves through, in order: one hosted on its item on that
 // face; else, of the devices of a unit or less adjacent on that face (ABOVE
-// first, then BELOW: fit.js neighbourUnits), the first with a manager hosted on
+// first, then BELOW: fit.js neighbours), the first with a manager hosted on
 // it on that face, else itself if it declares guides on that face. A manager
 // must declare guides on that face. null when there is none.
 function managerOf(rack, it, pane, ctx) {
   const guided = m => ctx.guidesOf(m.id).some(g => g.face === pane);
   const hosted = rack.items.find(m => m.on === it.id && m.face === pane && guided(m));
   if (hosted) return hosted;
-  for (const u of neighbourUnits(it, ctx.chassisOf)) {
-    for (const o of rack.items.filter(o => o.id !== it.id && o.face === pane && !o.on
-                                           && unitsOf(ctx.chassisOf(o.ref)) <= 1 && Math.floor(o.ru) === u)) {
+  {
+    for (const o of neighbours(rack, it, ctx.chassisOf).filter(o => o.face === pane && !o.on)) {
       const carried = rack.items.find(m => m.on === o.id && m.face === pane && guided(m));
       if (carried) return carried;
       if (guided(o)) return o;

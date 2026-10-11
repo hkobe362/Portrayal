@@ -199,8 +199,9 @@ export const uLabel = (frame, u) => (frame.numbering === 'top-down' ? frame.heig
 // its height in units (fit.js unitsOf); on a bottom-up frame that is the bottom
 // itself, on a top-down one the half unit under its top edge. On a 42U top-down
 // frame a 0.5U item stored at 12 is at 31.5, and one stored at 12.5 is at 31.
+// A height that is missing (null, 0) counts as one unit, as it always did.
 export const positionOf = (frame, ru, units = 1) =>
-  (frame.numbering === 'top-down' ? frame.heightRU + 2 - ru - units : ru);
+  (frame.numbering === 'top-down' ? frame.heightRU + 2 - ru - (units > 0 ? units : 1) : ru);
 // A position as a person reads it: "U12", "U12.5". It takes the height because
 // a top-down label of a half depends on it. uLabel stays for whole units
 // (lanes, managers, the rail numbers).

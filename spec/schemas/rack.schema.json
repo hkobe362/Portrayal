@@ -324,7 +324,7 @@
   },
   "zeroU": {
    "type": "object",
-   "description": "A part beside the rack. Its keys are described but not constrained, so any object is a valid entry; the kit places an entry whose id, ref and at are non-empty strings, and keeps any other as written.",
+   "description": "A part beside the rack. Its place (id, ref, at, offsetMm) is described but not constrained, so an entry of another shape is still a valid entry; the kit places an entry whose id, ref and at are non-empty strings, and keeps any other as written. What it is set to (swaps, fields, states, readings, heldBy) is typed as on an item.",
    "properties": {
     "id": {
      "description": "Unique within the rack's zeroU entries; z1, z2 and so on. The loader gives an entry without one an id."
@@ -348,22 +348,38 @@
      "description": "True when it stands between this rack and the next one, serving both."
     },
     "swaps": {
+     "type": "object",
      "description": "What is seated in it: slot path to part ref, as on an item."
     },
     "fields": {
+     "type": "object",
      "description": "Its part settings, as on an item."
     },
     "states": {
-     "description": "What each switchable part is set to: part path to state name, as on an item."
+     "$ref": "#/$defs/states"
     },
     "readings": {
-     "description": "Readings taken from it, as on an item: source, at and values."
+     "$ref": "#/$defs/readings"
     },
     "heldBy": {
-     "description": "An object with parts: the ids of the zero-U entries of this rack that hold it, such as the two brackets a PDU hangs on."
+     "type": "object",
+     "description": "What it hangs on, such as the two brackets of a PDU.",
+     "properties": {
+      "parts": {
+       "type": "array",
+       "description": "The ids of the zero-U entries of this rack that hold it, one or more.",
+       "items": {
+        "type": "string",
+        "minLength": 1
+       }
+      }
+     }
     },
     "channel": {
      "description": "The channel of the frame it stands in, by its id on the catalogue rack the frame names."
+    },
+    "readingsAsWritten": {
+     "description": "Readings the loader could not use, kept whole as they were written."
     }
    }
   },
@@ -668,8 +684,7 @@
    "type": "object",
    "required": [
     "source",
-    "at",
-    "values"
+    "at"
    ],
    "description": "Readings taken from the device, with where they came from and when.",
    "properties": {

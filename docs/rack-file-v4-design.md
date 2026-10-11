@@ -1,7 +1,9 @@
 # Rack file version 4: one version for everything held back
 
-Status: **decided 2026-10-11**, nothing built. The build of version 4 may
-start from this note. Issues #935 (the scope, decided 2026-10-10), #970,
+Status: **decided 2026-10-11**; the build is under way on one held branch
+(parts 1 to 4 of section 9). What the build read more narrowly than this note
+says, or had to choose where it was silent, is in section 13, and waits for a
+person to confirm. Issues #935 (the scope, decided 2026-10-10), #970,
 #949 (step 4), #934, #939, #972, with #983, #986, #1007, #966 and #908 read
 beside them. The thirteen questions it raised were each decided as it
 recommended and are recorded in section 10, with the options not taken.
@@ -80,7 +82,8 @@ item or frame key of 1.1 would need one for the same reason.
 
 **Version 4 keeps unknown keys at the four levels that drop them today, so
 at all seven** (decision 9). A later optional key that is safe to ignore
-then needs no bump, whichever level it sits at.
+then needs no bump, whichever level it sits at. A misspelt key is kept with
+the rest and is not reported, by the reader or by the schema.
 The validator (`kit/rack/validate.js`) gains the `multipleOf` keyword, since
 the schema needs it for `ru`; that is settled here.
 
@@ -280,8 +283,11 @@ until #908, and an ear that spans fewer units than the body (10U ears on a
 wrong for the cases it was written for. It is left for the device that needs
 it.
 
-Measured over the 230 rack devices that state both `ru` and `height`: the gap
-between span and body has a median of 0.65 mm. Sixteen bodies are more than
+Measured over the 230 rack devices that state both `ru` and `height` (a 231st,
+the Celestica DS6001, states a height of 94 mm and no `ru`; the rack index
+gives it 2U, so `rack.json` lists 231 and its body overhangs its span by
+2.55 mm at each edge, a fifth body that drops by more than a millimetre):
+the gap between span and body has a median of 0.65 mm. Sixteen bodies are more than
 2 mm short of their span, the most the FS DINRAIL4U at 12.7 mm. Fourteen are
 taller than their span: four finger ducts by 4.6 to 13.35 mm, and the other
 ten, a fifth duct among them, by 0.55 mm or less.
@@ -386,9 +392,24 @@ affected, and the XCU10 draws no ears until its gap closes.
   it. `uLabel` stays for whole units (lanes, managers, the rail numbers).
 - `fitsAt` and `freeUs` take and return half positions. `freeUs` lists whole
   positions for a whole-unit device and both for any other.
-- `describe` and `inspect` print spans as "U12.5" or "U13-U14.5".
-- The commands (`place`, `move`, `patch`) take `ru` as a number in steps of
-  0.5; `side.place` and a rack-face part are still refused a half.
+- `describe` and `inspect` print a span in words (`spanText`; provisional,
+  section 13): whole units on a whole unit as before ("U13", "U13-U14"), and
+  anything that starts or ends on a half with the half named, lower and upper
+  as the item hangs ("the lower half of U7", "U13 to the lower half of U14").
+  No two placements print the same text.
+- The commands that place and move (`place`, `move`) take `ru` as a number in
+  steps of 0.5. `patch` takes no `ru` and never did: `move` is the command.
+  `side.place` and a rack-face part are still refused a half.
+- **Three refusals the build worded,** since agents match them. A rack-face
+  part at a half: "FHD-CMP5DR bolts to the rail face at a whole unit, and
+  U12.5 is a half unit." A position that is no step of 0.5, which the command
+  schema refuses first and `fits` refuses for a caller that skips it: "A
+  position is a whole unit or a half unit, counted from 1." A command argument
+  off the step: "place needs ru, a number in steps of 0.5 from 1."
+- **A position below 1** is refused by the schema and by fit ("Below U1."),
+  and is still loaded: a version-3 reader loaded any whole number, a
+  hand-edited file may hold one, and refusing it on load would refuse the
+  whole file. The item is kept where the file says and fit refuses it.
 - **`shrinkRack`.** Clusters are formed by `spanOf` overlap, and a cluster
   height is its top edge less its bottom edge, in half units. Each cluster
   moves by one shift, so every item in it keeps its parity. **The shift is a
@@ -406,6 +427,19 @@ affected, and the XCU10 draws no ears until its gap closes.
   lowest cluster while that top is above the new height. Shrunk to 10U all
   four stay; shrunk to 9U the lowest goes and the other three pack to 6U.
   A device never lands on a half it would be refused at by rule 2 of 2.5.
+- **The neighbours a route looks to for a manager** (`neighbours` in
+  `fit.js`; before, the 1U device in the unit above and then the one below).
+  They are the devices of a unit or less just above an item and just below
+  it, above first and nearest first. Above an item of a unit or more: one
+  that starts on its top edge. Above an item under a unit: one that starts
+  anywhere from its top edge to the next whole unit, so a half-unit panel in
+  the lower half of a unit still finds the 1U device over that unit, as it
+  did when it counted as a unit. Below: one whose top edge is the bottom of
+  the item, and one in the whole unit under the unit its bottom is in, when
+  the item starts on a whole unit or is under a unit itself. So a half-unit
+  panel directly on the top edge of a 1.5U device is its neighbour, and a 1U
+  device half a unit over that edge is not, as it was not before. Every
+  answer for a rack of whole positions is the answer of version 3.
 
 ### 2.7 What the exports write
 
@@ -502,6 +536,13 @@ move.**
 - **What stock sizes change on a saved rack:** a cord within 10 mm over a
   break drops a size (decision 5), and a copper cord of 7 m or more may rise
   one. Nothing else. The test of section 9 names each on the reference rack.
+- **Centring can move a stock size at a break.** Decision 2 moves a body by
+  half its gap, a routed length that touches it by under a millimetre, and
+  so the stock size of a cord that sat within that of a break. Measured on
+  the routing fixture: the lacer rises 0.225 mm, thirteen of sixteen path
+  lengths move by 0.1 to 0.6 mm, and one cord (c2) goes from 500.0 to
+  499.8 mm, from a 1 m cord to a 0.5 m one. With `BREAK_TOL_M` of decision 5
+  the same cord drops a size regardless, being within 10 mm over the break.
 - **`length`** keeps its shape and its `source`: `routed` is a stock size the
   kit chose, `entered` a stock length the user pinned, which is never
   touched. No new key is needed to pin one. Beside a routed value the kit
@@ -873,7 +914,9 @@ file first. This section gives the keys their exact shape.
   string, with a string value, is kept; anything else is dropped with a
   notice. `readings` is kept only whole: without a `source` or a readable
   `at` it moves to `readingsAsWritten`, as an unusable length moves to
-  `lengthAsWritten`, and nothing draws it.
+  `lengthAsWritten`, and nothing draws it. The schema requires the same two
+  keys, `source` and `at`, and no other: a `readings` with no `values` is
+  usable and shows nothing.
 - **The catalogue check** is a settle step, as managers have, since
   `parseDoc` has no catalogue. A state a part does not declare is kept and
   not applied: "outlet-a1 on PDU A cannot be standby: it can be on or off." A
@@ -1105,9 +1148,9 @@ only `chassisOf`, which it has:
 - **Fit.** A held item that is not `mount: rack` claims no unit in the first
   reader, since nothing says how tall the space on its host is; `describe`
   lists it under its host as not checked.
-- **The held item is moved by hand.** A patch of its `ru` or `face` is
-  refused while it is held ("i7 is held by i4: move i4, or free it first.");
-  `patch {heldBy: null}` frees it.
+- **The held item is moved by hand.** A `move` of it (its `ru` or `face`;
+  `patch` takes neither) is refused while it is held ("i7 is held by i4: move
+  i4, or free it first."); `patch {heldBy: null}` frees it.
 
 ### 7.2 DIN devices on a shelf rail (#972)
 
@@ -1161,7 +1204,9 @@ file that has not been re-measured shows no spare and not a wrong one.
 1. **Overlaps the old fit allowed.** A 1.5U or 3.5U item with another in the
    unit its top half fills (2.2) now overlaps. Both are kept where they are,
    as fit keeps an item it would no longer accept, and a notice names them:
-   "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is."
+   "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is." The
+   sentences are `overlapNotices` in `fit.js`, by item label, and the editor
+   gives each as a finding when a document is loaded (`loadDoc`).
 2. **Bodies in 3D and the kit solids** move by half the gap between body and
    span under decision 2: a millimetre or less for 210 of 230 rack devices,
    up to 6.7 mm for the other twenty. Routed lengths move by about as much
@@ -1284,8 +1329,8 @@ one-way.
    rack and document, which dropped them, as well as cable, zero-U entry and
    bundle, which kept them). A later optional key that is safe to ignore
    then needs no bump, as `side` did not. The cost is that a misspelt key is
-   kept and not reported; the schema still reports it to anyone who
-   validates. Considered: items and the frame only; leaving it. One-way in
+   kept and not reported, by the reader or by the schema: no level of the
+   schema refuses a key it does not describe. Considered: items and the frame only; leaving it. One-way in
    practice: later keys will rely on it.
 
 10. **Straps on day one: all four of what was asked, on every part that
@@ -1398,3 +1443,32 @@ one-way.
 - The ear slot heights of a device in the catalogue, which turn on the hole
   check of 2.5.
 - The direction faults of #986.
+
+## 13. Provisional
+
+Readings the build took where this note was silent or could not be followed
+as written. Each is built, and each waits for a person to confirm it.
+
+- **Span text** (2.6). A draft of 2.6 printed "U13-U14.5", which follows from
+  no rule that also keeps "U13-U14" for a 2U item. Built: whole units on a
+  whole unit read as before; anything on a half names the half ("U13 to the
+  lower half of U14", "the lower half of U7", "the upper half of U7"). A
+  position alone is still a number (`uText`: "U12.5"), which is what the
+  commands say and NetBox stores.
+- **The Nautobot comment for a height other than 0.5U** (2.7) uses the same
+  words: "Occupies U1 to the lower half of U2 (1.5U). Nautobot stores whole
+  rack units." An item kept with no position beside one at the same stored
+  `ru` reads "with" in place of "above". A device of whole units on a whole
+  unit gets no such comment.
+- **The three refusal sentences** of 2.6.
+- **The manager neighbours** of 2.6, which keep every version-3 answer.
+- **A stock size can move with centring** (3.2).
+- **A position below 1 is loaded** and refused by fit (2.6).
+- **Zero-U keys in the schema.** A zero-U entry is described and not
+  constrained, so that any entry is kept as written; `states`, `readings`,
+  `swaps`, `fields` and `heldBy` on it are typed as section 4 and 5 give them,
+  and nothing else of an entry is.
+- **`width` is in inches** in the schema (19, 23), as the NetBox rack row
+  takes it. `options` and the `turn` of an item `heldBy` have no type until a
+  product or a host defines one.
+
