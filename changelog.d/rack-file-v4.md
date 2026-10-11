@@ -30,6 +30,15 @@
   not moved by hand, and none can be placed until the catalogue describes
   what holds one. `frameNotices` in `rack/fit` says what is kept and not yet
   acted on, and the editor gives it on load.
+- `<device>.configs.json` gains two keys on each configuration, beside
+  `mount-points`: `slots`, each slot it offers a hanging part as
+  `{interface, at}`, and `states`, what each placed part can be set to as
+  `{<placement id>: [names]}`. Both are derived, both additive, and
+  `contract` is still 2. The EVMA8365X lists its 42 switchable outlets and
+  their lamps; the EVMI2130X, which switches nothing, lists none. No part in
+  the library offers a slot yet. `rack/catalog` `loadSlots` keeps the
+  `pdu-class` of a device, and `configFacts` and `meteringOf` read what a
+  rack entry will be checked against.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file

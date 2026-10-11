@@ -216,6 +216,22 @@ reader that does not know it finds every field it read before.
   `mate`. A mount point is a placement of a `class: mount` part that declares
   `mates`. The pitch is the difference of two `at`s and is stated nowhere
   else. Always a list; `[]` on a device with none.
+- **`configs[].slots`** in `<device>.configs.json`
+  ([`rack-file-v4-design.md`](rack-file-v4-design.md) section 5): the other
+  side of a mount point. Each slot a configuration offers a hanging part,
+  `{"interface": "pdu-button", "at": 26.0}`, ascending by `at`, read as a
+  mount point is: a placement of a `class: mount` part that declares
+  `interface`, with `at` in millimetres from the bottom of its view to the
+  point where the button seats. A bracket whose mounting options differ
+  states each under its own configuration. Always a list; `[]` on a device
+  that offers none. Additive: `contract` is still 2.
+- **`configs[].states`** in `<device>.configs.json` (the same note, section
+  4): what each placed part of a configuration can be set to,
+  `{"outlet-a1": ["on", "off"]}`, keyed by placement id in sorted order. The
+  names are the ones the drawing carries on that part: the placement's own
+  `states`, else its group's, else its part's. A part that declares none has
+  no entry, so an outlet that cannot be switched is not listed. Always an
+  object; `{}` on a device that declares none. Additive.
 - **`attrs.power`** gains `input-plug` (now a `PART_POWER` slug, which on the
   one device that wrote it was prose), `input-cord`, `input-phase`,
   `input-wiring`, `input-voltage-v`, `input-current-a`, `plug-rating-a` and

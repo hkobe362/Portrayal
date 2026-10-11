@@ -263,3 +263,80 @@ def test_a_device_without_buttons_publishes_none():
     d = copy.deepcopy(load_yaml(EVMI))
     d["views"]["rear"]["components"]["placements"] = []
     assert render.mount_points(d, "base", {}, render.Library([LIB])) == []
+
+
+# --- slots and states in configs.json (rack file version 4, part 4) -------------
+
+KEYHOLE = """format: 1
+kind: component
+name: keyhole
+version: 1.0.0
+class: mount
+interface: pdu-button
+profile: power
+description: A fixture keyhole slot, for the test of configs[].slots.
+size: {w: 12, h: 20}
+connection-points:
+  mate: {at: [6, 14]}
+"""
+
+
+def _bracket(tmp_path):
+    """A fixture bracket with keyholes: two on its front option, and a third
+    that only its side option has."""
+    part = tmp_path / "components/fixture/keyhole/v1"
+    part.mkdir(parents=True)
+    (part / "contract.yaml").write_text(KEYHOLE)
+    device = {"views": {"front": {"size": {"w": 40, "h": 100}, "components": {"placements": [
+        {"id": "slot-1", "ref": "fixture/keyhole@1", "at": [14, 10]},
+        {"id": "slot-2", "ref": "fixture/keyhole@1", "at": [14, 60]},
+        {"id": "slot-3", "ref": "fixture/keyhole@1", "at": [14, 35], "only-in": ["side"]}]}}},
+        "configurations": {"front": {}, "side": {}}}
+    return device, render.Library([tmp_path, LIB])
+
+
+def test_a_part_with_keyholes_publishes_its_slots_and_each_configuration_its_own(tmp_path):
+    d, lib = _bracket(tmp_path)
+    # at: from the bottom of the 100 mm view to each mate point, 14 below the top of its part
+    assert render.config_slots(d, "front", d["configurations"]["front"], lib) == [
+        {"interface": "pdu-button", "at": 26.0}, {"interface": "pdu-button", "at": 76.0}]
+    assert render.config_slots(d, "side", d["configurations"]["side"], lib) == [
+        {"interface": "pdu-button", "at": 26.0}, {"interface": "pdu-button", "at": 51.0},
+        {"interface": "pdu-button", "at": 76.0}]
+    # a slot is not a mount point, and a button is not a slot
+    assert render.mount_points(d, "front", {}, lib) == []
+    evmi = load_yaml(EVMI)
+    assert render.config_slots(evmi, "base", evmi["configurations"]["base"], render.Library([LIB])) == []
+    # two brackets 35 units apart meet the G4 pitch to 0.05 mm, as section 5 of the note says
+    points = render.mount_points(evmi, "base", evmi["configurations"]["base"], render.Library([LIB]))
+    assert abs((points[1]["at"] - points[0]["at"]) - 35 * 44.45) <= 0.051
+
+
+def test_the_evma8365x_lists_its_switchable_outlets_under_states():
+    d = load_yaml(EVMA)
+    assert manifest.pdu_class(d) == "managed"
+    got = render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB]))
+    outlets = {k: v for k, v in got.items() if k.startswith("outlet-")}
+    assert len(outlets) == 42 and set(map(tuple, outlets.values())) == {("on", "off")}
+    assert got["outlet-a1"] == ["on", "off"] and got["outlet-f42"] == ["on", "off"]
+    # the lamp beside each outlet declares the same two, through its group
+    assert len([k for k in got if k.startswith("led-")]) == 42 and got["led-a1"] == ["on", "off"]
+    assert list(got) == sorted(got)
+
+
+def test_the_evmi2130x_lists_no_outlet_and_meters_its_branches():
+    d = load_yaml(EVMI)
+    assert render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB])) == {}
+    assert manifest.pdu_class(d) == "metered-branch"
+
+
+def test_a_placement_states_win_over_its_group_and_a_part_that_declares_none_is_left_out(tmp_path):
+    d, lib = _bracket(tmp_path)
+    d["groups"] = {"lamps": {"states": [{"name": "on", "color": "#22c55e"}, {"name": "off"}]}}
+    p = d["views"]["front"]["components"]["placements"]
+    p[0].update(group="lamps")
+    p[1].update(group="lamps", states=["on", "off", "standby"])
+    assert render.config_states(d, "front", {}, lib) == {"slot-1": ["on", "off"], "slot-2": ["on", "off", "standby"]}
+    p[2].update(states=["open"])
+    assert "slot-3" not in render.config_states(d, "front", {}, lib)
+    assert render.config_states(d, "side", {}, lib)["slot-3"] == ["open"]

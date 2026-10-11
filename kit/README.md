@@ -263,6 +263,12 @@ another), which the editor hands on as findings when a document is loaded.
 `firstU(frame)` in `rack/model.js` is the number of the first unit (`startU`,
 1 when absent); `uLabel` and `positionOf` count from it.
 
+`rack/catalog.js` `loadSlots` keeps the `pdu-class` of each device it reads,
+and `configFacts(slots, cfg)` gives what a rack entry is checked against for
+the configuration it names: what the device meters (`meteringOf`), the
+`states` each placed part can be set to, the `slots` it offers a hanging
+part and the `mountPoints` it hangs by, as its `configs.json` states them.
+
 `span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
 half a unit. Use `spanOf`, and read its second number as the top edge.
 

@@ -4685,6 +4685,15 @@ def mount_points(device, cfg_name, cfg, lib):
     Read over the views this configuration draws (resolve_views) and the
     placements it has (`only-in`), so a configuration that drops a button
     publishes one point fewer. A device with none publishes an empty list."""
+    return _mounts(device, cfg_name, cfg, lib, "mates")
+
+
+def _mounts(device, cfg_name, cfg, lib, key):
+    """The two sides of a mounting interface, read one way: every placement
+    this configuration draws of a `class: mount` part that declares `key`
+    (`mates` on a button, `interface` on a keyhole) and a `mate` connection
+    point, as `{<key>: <interface>, at}`, `at` in millimetres from the bottom
+    of its view to that point, ascending."""
     out = []
     for _face, (_name, view) in resolve_views(device, cfg).items():
         h = ((view or {}).get("size") or {}).get("h")
@@ -4695,13 +4704,55 @@ def mount_points(device, cfg_name, cfg, lib):
                 continue
             contract, _ = lib.resolve(p["ref"])
             mate = ((contract.get("connection-points") or {}).get("mate") or {}).get("at")
-            if contract.get("class") != "mount" or not contract.get("mates") or not mate:
+            if contract.get("class") != "mount" or not contract.get(key) or not mate:
                 continue
             size = contract.get("size") or {}
             at = seat_point(p["at"], {"w": size.get("w", 0), "h": size.get("h", 0)},
                             p.get("rotate", 0), mate)
-            out.append({"mates": contract["mates"], "at": round(float(h) - at[1], 2)})
-    return sorted(out, key=lambda m: (m["at"], m["mates"]))
+            out.append({key: contract[key], "at": round(float(h) - at[1], 2)})
+    return sorted(out, key=lambda m: (m["at"], m[key]))
+
+
+def config_slots(device, cfg_name, cfg, lib):
+    """`configs[].slots` (#939, docs/rack-file-v4-design.md section 5): each
+    slot one configuration offers, as `{interface, at}`, `at` ascending.
+
+    A SLOT is the other side of a mount point: a placement of a `class: mount`
+    part that declares `interface` - the keyhole of a bracket or a channel,
+    which presents `pdu-button` - with `at` in millimetres from the bottom of
+    the view it is placed on to its `mate` point, where the button seats.
+    Derived from the placements exactly as `mount-points` are, so the two can
+    be compared: a PDU hangs where each of its mount points meets a slot of
+    the interface it mates. Read for the configuration named, so a bracket
+    whose two mounting options differ publishes each. `[]` on a device that
+    offers none."""
+    return _mounts(device, cfg_name, cfg, lib, "interface")
+
+
+def config_states(device, cfg_name, cfg, lib):
+    """`configs[].states` (#934, docs/rack-file-v4-design.md section 4): what
+    each placed part of one configuration can be set to, `{<path>: [names]}`.
+
+    THE VOCABULARY A RACK FILE IS CHECKED AGAINST. A path is a placement id,
+    which is what a rack entry keys `states` by (`outlet-a1`). Its names are
+    the ones the drawing carries on that part, found as the renderer finds
+    them: the placement's own `states`, else its group's, else its part's.
+    A part that declares none is not listed, so an outlet that cannot be
+    switched has no entry. Read over the views and placements this
+    configuration draws; `{}` on a device that declares none."""
+    groups = device.get("groups") or {}
+    out = {}
+    for _face, (_name, view) in resolve_views(device, cfg).items():
+        for p in view_parts(view)["placements"]:
+            if not p.get("id") or (p.get("only-in") and cfg_name not in p["only-in"]):
+                continue
+            states = p.get("states") or (groups.get(p.get("group")) or {}).get("states")
+            if not states:
+                contract, _ = lib.resolve(p["ref"])
+                states = contract.get("states")
+            if states:
+                out[p["id"]] = state_names(states)
+    return dict(sorted(out.items()))
 
 
 def _published_part(ref, lib):
@@ -5872,6 +5923,14 @@ def main():
                               # the bottom of its view, derived from the button
                               # placements; `[]` on a device with none
                               "mount-points": mount_points(device, n, c, lib),
+                              # WHAT IT OFFERS A HANGING PART (#939): each slot
+                              # it draws, `{interface, at}`, the other side of
+                              # a mount point; `[]` on a device with none
+                              "slots": config_slots(device, n, c, lib),
+                              # WHAT EACH PLACED PART CAN BE SET TO (#934):
+                              # `{<placement id>: [state names]}`, the parts
+                              # that declare any; `{}` on a device with none
+                              "states": config_states(device, n, c, lib),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a

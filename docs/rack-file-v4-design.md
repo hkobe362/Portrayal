@@ -1497,3 +1497,14 @@ as written. Each is built, and each waits for a person to confirm it.
   states 23 in rails; it is drawn and fitted as 19 in." and "PDU A names the
   channel rear-left, which is not known for this frame, so it stands at
   left-rear."
+- **Which parts `configs[].states` lists** (section 4). Built: every placement
+  with an id whose own `states`, group or part declares names, keyed by its
+  id. On the EVMA8365X that is the 42 outlets and the 42 lamps beside them,
+  since the lamp group declares the two colours; a breaker is not listed,
+  because its rocker declares its states on an element of the part and not
+  on the part. Whether a lamp may be set by its own path, when a state is
+  addressed by the outlet and follows `for:` to the lamp, is for part 6.
+- **What counts as a slot** (section 5). Built: a placement of a
+  `class: mount` part that declares `interface` and a `mate` point, the
+  mirror of a mount point. No part in the library is one yet, so every
+  device publishes an empty list until the bracket of #939 is modelled.
