@@ -601,7 +601,7 @@ line and legs that fit a real tray (fault 2); a rule for a coil larger than
 a cell (fault 3); a measured stack bound (decision 13); and a part that can
 hold the spare of a rack, which a lacer tray cannot: a slack spool (the FHD
 enclosures, cable lay note section 6) or a vertical manager that states
-storage. Its test is the one the first draft wrote: path plus coiled plus
+storage. Its test is a sum: path plus coiled plus
 end play plus the inside ends plus the tolerance equals the stock length.
 
 ### 3.5 What version 4 does with `slack`
