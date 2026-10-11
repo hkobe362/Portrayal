@@ -8932,7 +8932,7 @@ def lint_device_adjustments(path, data, lib_roots):
                 by_value = _adjust._stops_by_value(adj)
                 stop, want = by_value[0] if what == "min" else by_value[-1]
                 named = (f"the {'lowest' if what == 'min' else 'highest'} stop of {aid}, "
-                         f"{stop!r}")
+                         f"{stop!r},")
             else:
                 continue                # no position at all: L1 and L173 say so
             try:
