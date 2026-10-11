@@ -1,0 +1,7 @@
+name,role__name,device_type__manufacturer__name,device_type__model,status__name,location__name,rack__name,rack__location__name,position,face,comments
+PDU A,Access,Eaton,EVMA8365X,Planned,DC1,R1,DC1,,,"0U, on 2 FS-PDUBK brackets at left-rear, from U42; Nautobot has no field for that. Outlets off: outlet-a2, outlet-a7."
+Bracket high,Access,FS,FS-PDUBK,Planned,DC1,R1,DC1,,,"0U, beside the rack at left-rear, U7; Nautobot has no field for that."
+leaf-1,Access,Acme,SW-1,Planned,DC1,R1,DC1,26,front,Mounted upside down. Off: psu-1.
+ODF B,Access,Fibrain,XCU10,Planned,DC1,R1,DC1,,,"In the upper half of U34, above ODF A; no position, since Nautobot stores whole rack units."
+ODF A,Access,Fibrain,XCU10,Planned,DC1,R1,DC1,34,front,Occupies the lower half of U34 (0.5U). Nautobot stores whole rack units.
+Bracket low,Access,FS,FS-PDUBK,Planned,DC1,R1,DC1,,,"0U, beside the rack at left-rear, U42; Nautobot has no field for that."

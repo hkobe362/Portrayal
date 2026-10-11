@@ -574,6 +574,16 @@ export function anchorsOf(rack, ctx = {}) {
     if (b.members.length >= 2 && strapKinds(b).anchors)
       for (const m of b.members) trunkTrays.set(m.cable, (b.route || []).filter(w => w.item).map(w => `${w.item}|${w.via}`));
   }
+  for (const s of cableSlots(rack, rc, trunkTrays)) for (const i of s.ties) at(s.item, s.via, i).cables.push(s.cable);
+  return [...out.values()];
+}
+// The tie slots each single cable is strapped at, a tray at a time:
+// [{cable, item, via, role, face, ties: [index]}]. `role` is where the cable
+// is in the rack (`held` or `resting`) and `face` which side of the part
+// (`top` or `underside`), as route.js names both. `skip` is the trays a
+// cable's bundle already anchors at, by cable id.
+function cableSlots(rack, rc, skip = new Map()) {
+  const out = [];
   let trays = [];
   try { trays = traysOf(rack, rc); } catch { trays = []; }
   for (const c of rack.cables || []) {
@@ -581,10 +591,11 @@ export function anchorsOf(rack, ctx = {}) {
     let path = null;
     try { path = routePath(rack, c, rc); } catch { path = null; }
     for (const r of path?.rests || []) {
-      if (r.kind !== 'tray' || (trunkTrays.get(c.id) || []).includes(`${r.item}|${r.via}`)) continue;
+      if (r.kind !== 'tray' || (skip.get(c.id) || []).includes(`${r.item}|${r.via}`)) continue;
       const t = trays.find(x => x.item === r.item && x.via === r.via);
       if (!t?.ties.length) continue;
-      if (r.role === 'held') { for (const i of r.ties || []) at(r.item, r.via, i).cables.push(c.id); continue; }
+      const lies = {cable: c.id, item: r.item, via: r.via, role: r.role, face: r.face};
+      if (r.role === 'held') { if (r.ties?.length) out.push({...lies, ties: [...r.ties]}); continue; }
       // its stretch there: the points of its path over a floor of the tray, on
       // it or on the sill of a ring that stands on it
       const ax = t.run === 'z' ? 'z' : 'x';
@@ -592,10 +603,35 @@ export function anchorsOf(rack, ctx = {}) {
         && t.floors.some(f => q.x >= f.x0 - 1e-6 && q.x <= f.x1 + 1e-6 && q.z >= f.z0 - 1e-6 && q.z <= f.z1 + 1e-6)).map(q => q[ax]);
       if (!on.length) continue;
       const tie = nearestTie(t, (Math.min(...on) + Math.max(...on)) / 2);
-      if (tie != null) at(r.item, r.via, tie).cables.push(c.id);
+      if (tie != null) out.push({...lies, ties: [tie]});
     }
   }
-  return [...out.values()];
+  return out;
+}
+// THE `straps` TEXT OF THE CABLE SCHEDULE, by cable id: for each tray a
+// single cable is strapped at, the tray, the face it lies on by role and by
+// name, and the tie slots it passes, counted from 1 ("mgr-1 tray, held face
+// (underside), ties 1 to 3"; on a tray turned over, "held face (top)"). It
+// names slots and not a count, since one strap at a slot serves every cable
+// there. A cable strapped nowhere has no entry; an empty Map without
+// `ctx.route`. `nameOf` gives an item's name in the file.
+const tiesText = ties => {
+  const n = [...new Set(ties)].sort((a, b) => a - b).map(i => i + 1);
+  if (n.length === 1) return `tie ${n[0]}`;
+  return n.at(-1) - n[0] === n.length - 1 ? `ties ${n[0]} to ${n.at(-1)}` : `ties ${andList(n)}`;
+};
+export function strapTexts(rack, ctx = {}, nameOf = null) {
+  const out = new Map(), rc = ctx?.route;
+  if (!rc) return out;
+  const label = nameOf || (id => (rack.items || []).find(i => i.id === id)?.label || id);
+  const trunk = new Map();
+  for (const b of bundlesOf(rack)) if (b.members.length >= 2 && strapKinds(b).anchors)
+    for (const m of b.members) trunk.set(m.cable, (b.route || []).filter(w => w.item).map(w => `${w.item}|${w.via}`));
+  for (const s of cableSlots(rack, rc, trunk)) {
+    const text = `${label(s.item)} ${s.via}, ${s.role === 'held' ? 'held' : 'resting'} face (${s.face}), ${tiesText(s.ties)}`;
+    out.set(s.cable, [...(out.get(s.cable) || []), text]);
+  }
+  return new Map([...out].map(([id, parts]) => [id, parts.join('; ')]));
 }
 // THE STRAPS A RACK BUYS: {spacing, breakout, anchor, total, widths}. Spacing
 // and breakout straps are each bundle's own; anchors are counted by slot.

@@ -130,6 +130,10 @@ const edgesOf = x => [...x.matchAll(edgeRe)].map(m => ({
 const cellIds = x => new Set([...x.matchAll(/ id="([^"]+)"/g)].map(m => m[1]));
 const valueOf = (x, id) => new RegExp(`<mxCell id="${id}" value="([^"]*)"`).exec(x)?.[1] ?? null;
 const commentOf = x => /<!--\n([\s\S]*?)\n-->/.exec(x)?.[1] ?? null;
+// a cable that carries what is spare of it: the label says so, the length
+// attribute stays the length, and a cable with no length says nothing
+out.spare = edgesOf(drawio.rackDiagram(plan, {cables: [{...cables[0], spare: '0.58 m'}, {...cables[5], spare: '0.2 m'}]}))
+  .map(e => [e.label, e.attrs['portrayal-length'] ?? null]);
 out.cables = {
   pages: pageXml.map(x => ({
     edges: edgesOf(x),

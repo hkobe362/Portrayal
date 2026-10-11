@@ -978,6 +978,12 @@ file first. This section gives the keys their exact shape.
     running-instance test of section 9 tries the CSV first and the script
     second; **if neither works, the states go in the device comment**, one
     line, as for Nautobot.
+    **As built:** the CSV is ruled out by the form. At the same commit,
+    `netbox/dcim/forms/bulk_import.py` lines 973 to 976,
+    `PowerOutletImportForm.Meta.fields` lists no `status`, so a file with
+    that column is refused. The script step was not tried on a running
+    instance, so it is not written: the states go in the device comment in
+    both files (section 13, item 44).
   - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."). Read
     at nautobot/nautobot commit `c77e4255`,
     `nautobot/dcim/models/device_components.py`: a `PowerOutlet` has `type`,
@@ -1461,6 +1467,8 @@ one-way.
 | `spare-unplaced`, `spare-short`, `spare-over`, `spare-off-route` as finding kinds of one cable, and `spareLine` as the one line for a rack | kit output | agents match the kinds |
 | `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port alone | kit API | a page that took the dressing as `endAllowance` less the table gets 0: the end play is `END_PLAY_M`, and the lengths of a cable are `spareOf` |
 | `strapBomRows(bundles)` counts single cables only when handed `{anchors: anchorsOf(rack, ctx)}` | kit API | a page that does not pass them leaves their straps out |
+| the comment line of what is set off, in both device files, naming parts by path | DCIM exports | section 13, item 44 |
+| the comment of a PDU on brackets and the note of one, worded by `hungText` | DCIM exports, BOM notes | a reader that matches "beside the rack at" for every part beside it |
 
 **That the scope fixed before any of those decisions:**
 
@@ -1658,13 +1666,13 @@ numbers are kept: a later reading takes the next one.
   it is asked before a bracket is chosen.
 26. **`swaps` and `fields` beside the rack** are taken by `zerou.update` and
   kept; `patch` still takes a device only. Nothing in the kit draws them.
-27. **The export comments of a hung PDU and of states** are part 9 and are
-  not written yet.
+27. **The export comments of a hung PDU and of states** are written by
+  part 9 (item 44 for the states).
 28. **Three things of the kit API the note did not decide.** `stateRefusal` is
   the kit's own and not for a page, which reads `stateNotices`. `shrinkRack`
   answers `orphaned` beside `moved` and `removed`: the held items a dropped
   host left behind. A quarter-turned item is exported at the position its
-  rolled box starts at, with no comment, until part 9 writes one.
+  rolled box starts at, and since part 9 its comment says it is turned.
 29. **`measured` in the kit, though no longer in the file** (3.2). `pathLength`
   still answers `measured`, the need and the end play at both ends, since
   two lays of one cable are compared by it and it is the figure a routed
@@ -1691,10 +1699,12 @@ numbers are kept: a later reading takes the next one.
   written in a file and is read, and no command yet says it.
 33. **With no routes known `cable.slack` records the place as given,** as a
   bundle is made without being measured.
-34. **What part 7 left to part 9:** the BOM spare line, the draw.io edge
-  label and the `straps` column of the schedule. The schedule fills `spare`
-  and `stored` when its caller hands it `spareExports(rack, ctx)`, and
-  leaves both blank without it.
+34. **The exports take what the routes know from their caller.** The
+  schedule fills `spare` and `stored` when it is handed
+  `spareExports(rack, ctx)` and `straps` when it is handed
+  `strapTexts(rack, ctx)`; the BOM notes and the draw.io cables take the
+  same `spare`. Without them the columns are there and blank, and no line
+  is written.
 35. **`cable.lay` and the `face` of a `lay` entry are not built:** no part of
   section 9 lists them. The key is kept on a cable as written.
 36. **`inspect` of a cable** gains `spare_findings` where it has any, and
@@ -1739,5 +1749,27 @@ numbers are kept: a later reading takes the next one.
   for that, the widest of the list that leaves 5 mm clear each side
   (`STRAP_CLEAR_MM`, an estimate). The 20 mm that keeps a strap off a ring
   (`STRAP_W`) is unchanged, so no strap of before moves.
-
+44. **Outlet states in the DCIM files** (section 4). Not tried on a running
+  instance. The NetBox outlet import takes no `status` column (file and
+  lines in section 4), and the script step is not written untried, so both
+  device files carry one comment line. It names each part by the path the
+  rack file names it by ("Outlets off: outlet-a2, outlet-a7."), where the
+  note's example gives the name the DCIM has (A2): the catalogue publishes
+  no name beside a state path. A part that is no outlet is in a line of its
+  own ("Off: psu-1."). Only `off` is written, and only for a part that
+  declares the state. The kit writes the line when its caller hands
+  `deviceImportRows` a `statesOf`.
+45. **The `straps` column** names a single cable's own slots, on either face
+  ("CM-01 tray, resting face (top), tie 11"), by slot number from 1; slots
+  that are no one run are each named ("ties 5, 6, 9 and 10"). A member of a
+  drawn bundle is blank at a tray its trunk lies on, as it is not counted
+  there. The BOM note a tray of the cable lay note (5.5) is not written:
+  the strap line of the BOM counts the slots.
+46. **Readings in the exports.** No export of the kit shows a reading, so
+  none states a source and a time; `readingsFor` gives both to a page that
+  shows one. A test holds that neither device file carries any.
+47. **Running instances.** No import was tried on a running NetBox or
+  Nautobot in this build. Each column of each file was read against the
+  import form at the cited commit instead; the golden files of part 9 hold
+  them.
 

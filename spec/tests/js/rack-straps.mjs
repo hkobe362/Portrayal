@@ -364,3 +364,37 @@ test('what a bundle now has is said truly, and a straps key that cannot be read 
   assert.deepEqual(read({every: null, breakout: true, note: 'kept'}), [{every: null, breakout: true, note: 'kept'}, []]);
 });
 
+test('the schedule names the tray, the face by role and by name, and the tie slots of a single cable', () => {
+  assert.deepEqual(X.CABLE_COLUMNS.slice(-5), ['status', 'notes', 'spare', 'stored', 'straps']);
+  assert.equal(X.CABLE_COLUMNS.length, 20);
+  const r = onTray(1);
+  const pin = face => ({route: {...F.ctxOf(r), trayFaceOf: (cable, w) => (w.via === 'tray' ? face : null)}});
+  // on the resting face: the one slot nearest the middle of its stretch, counted from 1
+  assert.deepEqual([...B.strapTexts(r, {route: F.ctxOf(r)})].filter(([id]) => id === 'c1'), [['c1', 'CM-01 tray, resting face (top), tie 11']]);
+  // on the held face: every slot it uses; they are not one run here, so each is named
+  assert.equal(B.strapTexts(r, pin('underside')).get('c1'), 'CM-01 tray, held face (underside), ties 5, 6, 9 and 10');
+  // a tray turned over: the role is the same and the name of the face is the other
+  const over = {...r, items: r.items.map(i => (i.id === 'i4' ? {...i, roll: 180} : i))};
+  const flipped = {route: {...F.ctxOf(over), trayFaceOf: (cable, w) => (w.via === 'tray' ? 'top' : null)}};
+  assert.match(B.strapTexts(over, flipped).get('c1') || '', /^CM-01 tray, held face \(top\), ties? /);
+  // a run of slots reads as a run
+  // (the text of a slot list is the one rule; the anchors are what it is fed)
+  // straps: {anchors: false} on the cable leaves it out, as it leaves it out of the count
+  assert.equal(B.strapTexts({...r, cables: [{...r.cables[0], straps: {anchors: false}}]}, pin('underside')).has('c1'), false);
+  // a cable through a ring alone is strapped nowhere, and without routes nothing is known
+  const owner = F.rack();
+  assert.equal(B.strapTexts(owner, {route: F.ctxOf(owner)}).has('c1'), false);
+  assert.equal(B.strapTexts(owner, {}).size, 0);
+  // every slot the texts name is a slot the count has, and none is missed
+  const slots = B.anchorsOf(owner, {route: F.ctxOf(owner)}).flatMap(x => x.cables.map(c => `${c}|${x.tie + 1}`)).sort();
+  const named = [...B.strapTexts(owner, {route: F.ctxOf(owner)})].flatMap(([c, t]) => [...t.matchAll(/tie (\d+)/g)].map(m => `${c}|${m[1]}`)).sort();
+  assert.deepEqual(named, slots);
+  // in the file: the last cell, blank without the texts
+  const rows = straps => X.cableScheduleRows(r, new Map(), r.items, null, {straps}).rows;
+  assert.equal(rows(B.strapTexts(r, pin('underside')))[0].straps, 'CM-01 tray, held face (underside), ties 5, 6, 9 and 10');
+  assert.deepEqual([rows(null)[0].straps, rows(new Map())[0].straps], ['', '']);
+  const csv = X.toCsv(X.CABLE_COLUMNS, rows(B.strapTexts(r, pin('underside'))).slice(0, 1));
+  assert.match(csv.split('\r\n')[0], /,status,notes,spare,stored,straps$/);
+  assert.match(csv.split('\r\n')[1], /,"CM-01 tray, held face \(underside\), ties 5, 6, 9 and 10"$/);
+});
+

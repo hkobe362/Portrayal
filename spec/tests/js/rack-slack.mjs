@@ -332,7 +332,7 @@ test('inspect tells no slack key from an empty list, and shows what is stored', 
 });
 
 test('the cable schedule ends with spare and stored, and one note line for the rack', () => {
-  assert.deepEqual(X.CABLE_COLUMNS.slice(-3), ['notes', 'spare', 'stored']);
+  assert.deepEqual(X.CABLE_COLUMNS.slice(-4), ['notes', 'spare', 'stored', 'straps']);
   const {r} = trayRack({}, {slack: [TRAY]});
   const ctx = F.ctxOf(r);
   const ends = new Map();
@@ -343,8 +343,8 @@ test('the cable schedule ends with spare and stored, and one note line for the r
   assert.ok(notes.some(n => /^Spare: \d+(\.\d+)? m; \d+ cords? not placed\.$/.test(n)), notes.join(' | '));
   // the CSV: the two cells last, after the notes
   const csv = X.toCsv(columns, rows.slice(0, 1));
-  assert.match(csv.split('\r\n')[0], /,status,notes,spare,stored$/);
-  assert.match(csv.split('\r\n')[1], /,0\.64,"CM-01 tray, coil, 0\.44 m; 0\.2 m at the ends"$/);
+  assert.match(csv.split('\r\n')[0], /,status,notes,spare,stored,straps$/);
+  assert.match(csv.split('\r\n')[1], /,0\.64,"CM-01 tray, coil, 0\.44 m; 0\.2 m at the ends",$/);
   // without `spare` the columns are there and blank, so the header is one
   const plain = X.cableScheduleRows(r, ends, r.items);
   assert.deepEqual([plain.columns, plain.rows[0].spare, plain.rows[0].stored], [X.CABLE_COLUMNS, '', '']);

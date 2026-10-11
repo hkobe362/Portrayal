@@ -134,6 +134,12 @@ def test_a_cable_on_one_page_is_an_edge_between_its_port_cells(out):
                           "portrayal-purpose": "uplink", "portrayal-length": "2 m"}
 
 
+def test_an_edge_label_states_the_spare_of_a_cable_with_a_length(out):
+    # rack file version 4: "1 m, 0.58 m spare". The attribute a round trip
+    # reads back is still the length alone.
+    assert out["spare"] == [["up-1 · 2 m, 0.58 m spare", "2 m"], ["a &lt;b&gt;", None]]
+
+
 def test_two_racks_on_one_page_are_one_edge(out):
     e = _edges(out, 0)["cable-c-6"]
     assert (e["source"], e["target"]) == ("sw-1-g0r0-front-p0", "pp-1-g0r1-front-p0")

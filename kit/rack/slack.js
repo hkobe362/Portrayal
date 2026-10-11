@@ -150,8 +150,22 @@ export function spareLine(rack, ctx) {
   }
   return n ? `Spare: ${mText(total)}; ${unplaced} cord${unplaced === 1 ? '' : 's'} not placed.` : '';
 }
-// What the cable schedule takes (export-data.js cableScheduleRows, `spare`):
-// each cable's resolved slack by id, and the one line for the rack.
+// The one line of the BOM notes: "Spare cable: 14.2 m of 31 m bought; 41
+// cords have spare that is not placed." '' as spareLine is.
+export function spareBomLine(rack, ctx) {
+  let total = 0, bought = 0, unplaced = 0, n = 0;
+  for (const c of rack.cables || []) {
+    let s = null;
+    try { s = slackOf(rack, c, ctx); } catch { s = null; }
+    if (!s || s.short || !c.length) continue;
+    n++; total += s.spare.spare_m; bought += s.spare.stock_m;
+    if (!s.said && s.unplaced_m > 0.005) unplaced++;
+  }
+  return n ? `Spare cable: ${mText(total)} of ${mText(bought)} bought; ${unplaced} cord${unplaced === 1 ? ' has' : 's have'} spare that is not placed.` : '';
+}
+// What the exports take (export-data.js cableScheduleRows, cableBomNotes and
+// drawioCables, `spare`): each cable's resolved slack by id, the one line of
+// the schedule for the rack, and the one line of the BOM.
 export function spareExports(rack, ctx) {
   const byCable = new Map();
   for (const c of rack.cables || []) {
@@ -159,5 +173,5 @@ export function spareExports(rack, ctx) {
     try { s = slackOf(rack, c, ctx); } catch { s = null; }
     if (s) byCable.set(c.id, s);
   }
-  return {byCable, line: spareLine(rack, ctx)};
+  return {byCable, line: spareLine(rack, ctx), bom: spareBomLine(rack, ctx)};
 }

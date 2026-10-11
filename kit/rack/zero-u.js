@@ -14,7 +14,7 @@
 
 import {RU, RAIL_W, OPENING} from './rails.js';
 import {isZeroUPart, zeroUUnits, zeroUSpan, zeroUSpanText, notBracket} from './fit.js';
-import {zeroUOf, zeroUBottom, zeroUById, zeroUOffset, holdersOf} from './model.js';
+import {zeroUOf, zeroUBottom, zeroUById, zeroUOffset, holdersOf, uLabel} from './model.js';
 import {configFacts} from './catalog.js';
 
 // The gap between a part and the upright it stands against: no source
@@ -31,6 +31,18 @@ export const zeroUName = (z, chassisOf) => z.label || chassisOf(z.ref)?.model ||
 // "beside the rack at left, U1-U45", or "between racks at ...".
 export const whereText = (rack, z, chassisOf) =>
   `${z.between ? 'between racks' : 'beside the rack'} at ${z.at}, ${zeroUSpanText(rack.frame, z, chassisOf)}`;
+// WHERE A PART THAT HANGS ON BRACKETS IS, for an export (`heldBy: {parts}`):
+// "on 2 FS-PDUBK brackets at left-rear, from U4", the unit that of the
+// lowest. The brackets are named by model when they are all one, and a
+// holder that is no longer beside the rack is not counted. null for a part
+// that hangs on none.
+export function hungText(rack, z, chassisOf) {
+  const on = holdersOf(z).map(id => zeroUOf(rack).find(o => o.id === id)).filter(Boolean);
+  if (!on.length) return null;
+  const models = [...new Set(on.map(o => chassisOf(o.ref)?.model || o.ref))];
+  const low = Math.min(...on.map(zeroUBottom));
+  return `on ${on.length} ${models.length === 1 ? `${models[0]} ` : ''}bracket${on.length === 1 ? '' : 's'} at ${z.at}, from U${uLabel(rack.frame, low)}`;
+}
 
 // Each zero-U part the catalogue knows as one, with what a drawing or an
 // export needs: its bottom U (`ru`), the units it runs beside (`u`), and its

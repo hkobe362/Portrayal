@@ -5,14 +5,14 @@
 // The Rack Builder's exports (the page that builds the files) do the
 // fetching and drawing, and ask here.
 
-import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, RAIL_WIDTH_IN, holderOf} from './model.js';
+import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, RAIL_WIDTH_IN, holderOf, rollOf} from './model.js';
 import {routeText, trunkRoute} from './route.js';
 import {isRackMount, isZeroUPart, railOf, unitsOf, itemUnits, unitsText, spansMeet} from './fit.js';
-import {zeroUEntries, whereText} from './zero-u.js';
+import {zeroUEntries, whereText, hungText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable, widthCounts} from './bundles.js';
 export {positionOf};
 import {endKey, endName, cableName, paneOf, mismatch, lengthText, lengthParts, MEDIA_LABELS} from './cable-rules.js';
-import {storedText} from './slack.js';
+import {storedText, mText} from './slack.js';
 
 export const uniq = list => [...new Set(list)];
 
@@ -226,12 +226,15 @@ const asWrittenNote = c => (c.lengthAsWritten != null ? `Length as written in th
 // `bundle` (#923) is the name of the bundle the cable is in, as its tag prints
 // it (model.js bundleName: its label, else "Bundle N"), blank for none.
 export const CABLE_COLUMNS = ['id', 'cable', 'a_device', 'a_u', 'a_port', 'b_device', 'b_u', 'b_port', 'media', 'purpose',
-  'length', 'length_unit', 'route', 'bundle', 'length_source', 'status', 'notes', 'spare', 'stored'];
+  'length', 'length_unit', 'route', 'bundle', 'length_source', 'status', 'notes', 'spare', 'stored', 'straps'];
 // `spare` and `stored` (rack file version 4) are APPENDED AFTER THE LAST, so
 // no column read by position moves: `spare` is metres, the length bought less
 // what the cable needs; `stored` says where it is (slack.js storedText). Both
 // are blank for a cable with no length, a length kept as written, a loose
 // end or no path, and when the caller passes no `spare`.
+// `straps` follows them: the tray, the face and the tie slots a single cable
+// is strapped at (bundles.js strapTexts, handed in as `straps`), blank for a
+// cable strapped nowhere and when the caller passes none.
 // `items` are the rack's items with their height `u` (fit.js itemsWithU), so a
 // device's U is the device import's position (positionOf). Without a height an
 // item counts as 1U.
@@ -246,7 +249,7 @@ export const CABLE_COLUMNS = ['id', 'cable', 'a_device', 'a_u', 'a_port', 'b_dev
 // `bundles` is bundleExports(rack, ctx) for the same render: each bundle's note
 // and its warnings join the file's notes. Without it the bundles are read
 // with no routing context, so each is listed as not measured.
-export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {spare = null, bundles = null, bodies = null, bends = null, covers = null} = {}) {
+export function cableScheduleRows(rack, ends = new Map(), items = rack.items, routes = null, {spare = null, straps = null, bundles = null, bodies = null, bends = null, covers = null} = {}) {
   const names = uniqueNames(rack.items);
   const byId = new Map(items.map(i => [i.id, i]));
   const named = new Set();
@@ -271,7 +274,8 @@ export function cableScheduleRows(rack, ends = new Map(), items = rack.items, ro
             bundle: bundleOfCable(rack, c.id) ? flat(bundleName(bundleOfCable(rack, c.id))) : '',
             length_source: c.length ? (c.length.source || 'entered') : '',
             status: !f.checked ? 'not checked' : f.loose.length ? 'loose end' : 'connected', notes: notes.join(' '),
-            ...spareCells(rack, c, f.loose.length ? null : spare?.byCable?.get(c.id))};
+            ...spareCells(rack, c, f.loose.length ? null : spare?.byCable?.get(c.id)),
+            straps: straps?.get?.(c.id) ?? ''};
   });
   const notes = [];
   if (!rows.length) notes.push('This rack has no cables, so there is nothing to list.');
@@ -418,13 +422,32 @@ export function mountPick(mount) {
   const m = mountOf(mount);
   return m && {tag: m.tag, fit: `Fits here, on ${m.where}: this is ${m.what}.`};
 }
+// A rolled item says so wherever its mounting is said (the BOM notes and the
+// comment of both device imports): '' for an upright one.
+export function rollNote(item) {
+  const roll = rollOf(item);
+  return roll === 180 ? 'Mounted upside down.'
+    : roll ? `Mounted rotated 90 degrees ${roll === 90 ? 'clockwise' : 'anticlockwise'}, as seen from its face.` : '';
+}
 export function mountNotes(items, chassisOf, frame) {
   const out = [];
   for (const it of items) {
+    const at = `${it.label} at U${frame ? uOfItem(frame, it, chassisOf) : it.ru}`;
     const t = mountText(chassisOf(it.ref)?.mount);
-    if (t) out.push(`${it.label} at U${frame ? uOfItem(frame, it, chassisOf) : it.ru}: ${t}.`);
+    if (t) out.push(`${at}: ${t}.`);
+    if (rollNote(it)) out.push(`${at}: ${rollNote(it)}`);
   }
   return out;
+}
+// WHAT IS SET OFF on one entry, as the one line a device comment carries
+// ("Outlets off: outlet-a2, outlet-a7."): '' when nothing is. `states` is
+// what states.js statesFor answers for the entry, so only what the part
+// declares is named, by the path the rack file names it by. A part that is
+// no outlet is in a line of its own ("Off: psu-1.").
+export function offNote(states) {
+  const off = Object.entries(states || {}).filter(([, s]) => s === 'off').map(([p]) => p);
+  const outlets = off.filter(p => /^outlet\b/.test(p)), rest = off.filter(p => !/^outlet\b/.test(p));
+  return [outlets.length ? `Outlets off: ${outlets.join(', ')}.` : '', rest.length ? `Off: ${rest.join(', ')}.` : ''].filter(Boolean).join(' ');
 }
 
 // WHERE EACH MANAGER IS, for the sheets, draw.io and the BOM; a narrow part
@@ -445,7 +468,7 @@ export function zeroUNotes(rack, chassisOf) {
   return zeroUEntries(rack, chassisOf).map(e => {
     const c = chassisOf(e.ref);
     const what = [c.manufacturer, c.model].filter(Boolean).join(' ') || e.ref;
-    return `${e.label}: ${what}, 0U, ${whereText(rack, byId.get(e.id), chassisOf)}` +
+    return `${e.label}: ${what}, 0U, ${hungText(rack, byId.get(e.id), chassisOf) ?? whereText(rack, byId.get(e.id), chassisOf)}` +
       `${e.between ? '; it serves the next rack too, which this file does not hold' : ''}.`;
   });
 }
@@ -454,8 +477,10 @@ export function zeroUNotes(rack, chassisOf) {
 // takes beside the rack's own items, one per part zeroUEntries lists, with
 // `mount` (rack-side), `at`, `between`, `ru` and `u`, and the text of where
 // it stands. A caller looks its device type up by ref as it does an item's.
-export const zeroUImportItems = (rack, chassisOf) => zeroUEntries(rack, chassisOf).map(e =>
-  ({...e, where: whereText(rack, zeroUOf(rack).find(z => z.id === e.id), chassisOf)}));
+export const zeroUImportItems = (rack, chassisOf) => zeroUEntries(rack, chassisOf).map(e => {
+  const z = zeroUOf(rack).find(o => o.id === e.id);
+  return {...e, where: hungText(rack, z, chassisOf) ?? whereText(rack, z, chassisOf), ...(z.states ? {states: z.states} : {})};
+});
 
 // createRackScene has no fields input yet (the Rack Builder's 3D scene).
 export function threeDNotes(rack) {
@@ -618,7 +643,9 @@ export const drawioCableStyle = color =>
   'edgeStyle=orthogonalEdgeStyle;rounded=1;endArrow=none;startArrow=none;strokeWidth=2;fontSize=8;' +
   `labelBackgroundColor=#FFFFFF;fontColor=#15171a;strokeColor=${color};`;
 
-export function drawioCables(rack, {ends = new Map(), idOf, drawn, hiddenBy = () => null, unchecked = false, uOf}) {
+// `spare` is slack.js spareExports(rack, ctx): a cable with a length and a
+// path carries what is spare of it, which its edge label states.
+export function drawioCables(rack, {ends = new Map(), idOf, drawn, hiddenBy = () => null, unchecked = false, uOf, spare = null}) {
   const byId = new Map(rack.items.map(i => [i.id, i]));
   // Ends that could not be checked: an edge may run to an empty cage, which
   // says "connected" where nothing is. None is drawn, and the file says so.
@@ -642,8 +669,10 @@ export function drawioCables(rack, {ends = new Map(), idOf, drawn, hiddenBy = ()
       continue;
     }
     const [a, b] = sides.map(s => ({item: idOf(s.it.id, s.pane), path: s.end.path}));
+    const s = c.length ? spare?.byCable?.get(c.id) : null;
     cables.push({id: c.id, a, b, media: drawioMediaKey(c), purpose: c.purpose, label: c.label,
-                 ...(c.length ? {length: c.length} : {})});
+                 ...(c.length ? {length: c.length} : {}),
+                 ...(s && !s.short && lengthText(c.length) ? {spare: mText(s.spare.spare_m)} : {})});
   }
   // draw.io draws each cable as its own edge, as it draws no routes (#923).
   const drawnBundles = bundlesOf(rack).filter(b => b.members.length >= 2);
@@ -838,7 +867,11 @@ export const otherVendorNote = ({label, ref, T, manufacturer, path}) =>
 // `items` carry their height `u` (fit.js itemsWithU). One that does not is
 // given it from the catalogue when `chassisOf` is passed, and counts as 1U
 // otherwise.
-export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null}) {
+// `statesOf(entry)` gives what an item or a part beside the rack is set to
+// (states.js statesFor with the facts of its device): what is off goes in
+// its comment, in both files, since neither device import has a column for
+// it. Without it no state is written. A reading is in neither file.
+export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null, statesOf = null}) {
   const items = given.map(it => (it.u != null ? it : {...it, u: chassisOf ? itemUnits(it, chassisOf) : 1}));
   const T = TARGET_NAME[target] || 'NetBox';
   const names = uniqueNames(items);
@@ -899,6 +932,7 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
     const mt = mountText(it.mount);
     if (mt) notes.push(`${mt[0].toUpperCase()}${mt.slice(1)}.`);
     if (it.turned) notes.push('Mounted turned: its rear panel faces out.');
+    if (rollNote(it)) notes.push(rollNote(it));
     // A part beside the rack (zeroUImportItems) and a manager on the rail face
     // take no position and no face: where each is goes in the comment.
     const beside = isZeroUPart({mount: it.mount});
@@ -932,6 +966,9 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
       else if (!Number.isInteger(it.ru) || !Number.isInteger(uOf(it)))
         notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
     }
+    let off = '';
+    try { off = typeof statesOf === 'function' ? offNote(statesOf(it)) : ''; } catch { off = ''; }
+    if (off) notes.push(off);
     if (firstU(rack.frame) !== 1)
       notes.push(`${none ? '' : `U${position} on the rack. `}The rack numbers its units from ${firstU(rack.frame)}, and a unit named here is its label; the ${T} import counts from 1.`);
     const comments = notes.join(' ');
@@ -1087,7 +1124,10 @@ function connectorText(a, b) {
 // A panel with no drawing leaves its cables' connectors blank: said once per
 // device panel, not once per cable. A length kept as written is listed as
 // "length not set": said once per such cable, as the schedule says it.
-export function cableBomNotes(rack, ends = new Map()) {
+// `spare` is slack.js spareExports(rack, ctx) for the same render: its one
+// line totals the spare and counts the cords with no place for it. Without
+// it none is written.
+export function cableBomNotes(rack, ends = new Map(), {spare = null} = {}) {
   const byId = new Map(rack.items.map(i => [i.id, i])), seen = new Set(), out = [];
   const names = cableNames(rack);
   for (const c of rack.cables || []) if (asWrittenNote(c)) out.push(`Cable ${names.get(c.id)}: ${asWrittenNote(c)}`);
@@ -1097,6 +1137,7 @@ export function cableBomNotes(rack, ends = new Map()) {
     seen.add(k);
     out.push(`${it.label}: its ${e.view} panel had no drawing, so the cable lines do not state its connectors.`);
   }
+  if (spare?.bom) out.push(spare.bom);
   return out;
 }
 // What the routes add to an export's notes: a pathway filled past its limit, a
