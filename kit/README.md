@@ -219,10 +219,10 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/managers.js` | cable managers: `placement` of a manager onto the device behind it, and moving one |
 | `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths |
 | `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres |
-| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
+| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
-| `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
+| `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, what the lay finds as notes (`layNotes`, `layNotesOf`), and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
 | `rack/dcim-rules.js` | what a NetBox or Nautobot import needs of a rack |
 | `rack/validate.js` | `validate(schema, value)`, a small JSON Schema validator, and `same` |
 | `rack/commands.js` | every edit as a named, validated command, and `apply` for a batch of them |
@@ -587,13 +587,81 @@ angle_deg, legs_mm, room_mm, need_mm, short_mm }`, and `bendFindings(rack,
 ctx, nameOf)` gives them rack-wide with a sentence, as `bodyFindings` does
 for crossings: where ("c9 turns 129.7 degrees between its port on LEAF-B and
 CM-01 ring 3") and by how much ("with room for a 19.2 mm bend; the cable
-(aoc) needs 30 mm, 10.8 mm short."). A page that draws the kit's points can show them as they are;
-`inspect` and `describe` do not carry them yet. What is decided for a cable
+(aoc) needs 30 mm, 10.8 mm short."). A page that draws the kit's points can show them as they are.
+`inspect` of a cable carries them as `route.bends`, `describe` counts the
+cables that have one on its `Findings:` line and names the worst, and
+`cableScheduleRows(..., { bends })` writes one sentence into each such
+cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
+a cable, for a file with no row for one. Corners at one point, to a tenth of
+a millimetre, are one finding.
+
+**New in 0.21.0, in `rack/`.** Four changes to where a cable runs and what is
+said about it; nothing is removed or renamed, and the rack file and the
+export columns are as they were.
+
+- A bundle member with no route of its own joins and leaves the trunk at the
+  elements nearest its two ports, and a member's own route is the gutter
+  route even for a jumper within two units ([Bundles](#bundles), #1012):
+  `ownRoute` and `autoRoute` take `{ gutter: true }`, `followTrunk` takes
+  `nearest`, and `trunkMeasures(rack, cable, trunk, ctx)` measures it.
+  **Measured lengths change** for a member whose own route never met its
+  trunk: it no longer rides to the far end and back.
+- A span that crosses in front of other ports is reported (below, #1013):
+  `routePath().covers`, `coverFindings`, `coverFindingsOf`, and the optional
+  reader `portBoxesOf(itemId)` on the routing context.
+- `inspect`, `describe` and the export notes carry the bend and span
+  findings (#1007): `route.bends` and `route.covers` on a cable, a fuller
+  `Findings:` line, `bends` and `covers` options on `cableScheduleRows`,
+  `layNotes` and `layNotesOf` in `rack/export-data`, `bendFindingsOf`, and
+  one finding a corner. The summary of `bundle.create` says when a jumper
+  that hung gets longer in the bundle.
+- The same cable written end for end gets the same lay and the same findings
+  (#986): `routePath` lays it from both ends and keeps one. **Routed lengths
+  change** on the few cables whose other lay is the better one (seven of a
+  sample of 1,803), and a reader on the routing context can be handed a twin
+  of the cable, `a` and `b` exchanged.
+
+**A span in front of other ports.** With no horizontal manager a cable runs
+from its lane to its port across the faces between, over their ports, and
+crosses no body. The path's `covers` lists each port such a span passes in
+front of, `{ kind: 'port-behind-span', cable, item, path, view, between:
+[from, to], at: [x, y, z], judged, estimated? }`, and `coverFindings(rack,
+ctx, nameOf)` gives one finding a cable, `{ kind: 'span-over-ports', cable,
+count, ports, between, judged, estimated?, text }`: "c10 crosses in front of
+port-2 and port-4 on MGMT-SW1 between left-front U42 and its port on
+MGMT-SW1: add a horizontal cable manager above or below MGMT-SW1 to carry it
+to the gutter." It warns and never refuses. Only a span with no pathway at
+either end is judged (port to lane, or port to port), never against the
+cable's own two ports, and never against a port beside one of them: one on
+the same panel whose box comes within the cable's bend radius of its own
+port's centre, the stacked partner of its port always among them, since no
+manager moves a cord off those. A jumper that only drops down its own column
+is not reported. `judged` says which ports were there: `all`, or `cabled`
+when the page listed none, and then the sentence ends "Only ports that hold a
+cable were judged."; `estimated: true` marks a port taken at the estimated
+box. The kit knows where the cabled ports are
+(`portX`, `portY`); give the context the optional reader
+`portBoxesOf(itemId) -> [{ path, view, x, y, w?, h? }]` (the centre of each
+port's box in the frame `portX` and `portY` use, and its size in mm) and
+every port of a device is judged, cabled or not. `inspect` carries a cable's
+finding as `route.covers`, `describe` counts them, and
+`cableScheduleRows(..., { covers })` writes the sentence into the cable's
+notes. A port that states no size is taken as 12 by 10 mm, and a span covers
+a port no further than 100 mm out of its panel; both are estimates. What is decided for a cable
 is kept per rack, context and cable, so, as for a route's side, build a new
 context when what it reads changes: a context changed in place can give a
-path placed for what it read before. A path is read from end a, and a cable
-written the other way round does not always lay the same or report the same
-bends. **Routed lengths change in 0.17.0** on
+path placed for what it read before. A cable is laid from both its ends and one lay is kept by a
+rule that does not know which was written first (fewer bodies crossed, then
+less short of room, then shorter, then the end whose port sorts first), so a
+cable written the other way round lays the same and reports the same bends
+(0.21.0, #986). That is the lay of a route, not the choice of one: the
+automatic route still breaks its own ties from end a (a manager's rings in
+order from end a, end a's side of two gutters as short), so a cable written
+the other way round can be given another route, and then another lay. The
+readers on the context (`plugReachOf`, `trayFaceOf`, `bendOf`, `diameterOf`,
+which take the cable, and `typeOf`, which takes its id) are asked for both
+lays, and those that take the cable are handed its twin, `a` and `b`
+exchanged, for the lay from its other end. **Routed lengths change in 0.17.0** on
 every routed cable that turns at a ring, goes round a body or hangs. On the
 reference rack of #949 each of the sixteen cords is 10.9 to 179.2 mm longer
 and seven pass the 0.5 m break (c1 to c3 and c5 to c8 are 1 m cords again).
@@ -696,7 +764,12 @@ and is reported not checked.
 `resolveRoute` follows the bundle: a member runs its own route to the trunk,
 the trunk, then its own route on, and the result names its `bundle`, `join` and
 `leave`, so routed lengths, fill and the drawings follow with no change of
-their own. `straps(rack, bundle, ctx)` places the straps, every 12 in unless
+their own. A member's own route is the gutter route even for a jumper within
+two units, which hangs when it is on its own (`ownRoute` and `autoRoute` take
+`{gutter: true}`), and a member whose route still does not meet the trunk
+joins and leaves it at the trunk elements nearest its two ports
+(`trunkMeasures(rack, cable, trunk, ctx)` measures them for `followTrunk`), so
+it never rides to an end its ports are not at. `straps(rack, bundle, ctx)` places the straps, every 12 in unless
 the bundle says otherwise, as `{ segment, t, along_mm }` along the trunk, kept
 off rings. `inspect` reads a bundle (`kind: 'bundle'`) and a member's
 `bundle`, `selectCables` takes `{ bundle }`, and `describe` lists them. A

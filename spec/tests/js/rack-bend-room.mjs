@@ -300,8 +300,11 @@ test('a bend the kit\'s rules find no room for is found, and the route still exi
   // gives, 80 mm, the turns it makes are found, each against that radius
   assert.deepEqual(R.bendFindings(r, ctx).filter(x => x.cable === 'c9'), []);
   const stiff = R.bendFindings(r, {...ctx, bendOf: () => 80}).filter(x => x.cable === 'c9');
-  // (13.9 and 60.8 at the two ends before the lacer stood centred in its unit)
-  assert.deepEqual(stiff.map(x => x.room_mm), [14, 10.1, 10.1, 67, 60.9]);
+  // laid from both ends and the better lay kept (#986): four corners short,
+  // 165 mm in all; laid from end a alone it was five, [13.9, 10.1, 10.1, 67,
+  // 60.8], 238 mm in all. Each is 0.1 mm more than on a lacer stood on the
+  // bottom of its unit ([12.9, 12.9, 68.4, 60.8]): it is centred, 0.225 mm up
+  assert.deepEqual(stiff.map(x => x.room_mm), [13, 13, 68.5, 60.9]);
   assert.ok(stiff.every(x => x.need_mm === 80 && x.short_mm === r1(80 - x.room_mm)));
 });
 
@@ -433,13 +436,47 @@ test('the measure reads a path from its start: the same points the other way rou
     const fwd = cornersOf(pts, {share}).map(c => c.k), back = cornersOf([...pts].reverse(), {share}).map(c => pts.length - 1 - c.k);
     assert.deepEqual([fwd, back], [[2], [1]], share);
   }
-  // on the owner's rack every cord has the same short corners (none) and the
-  // same length from either end; on the generated racks not every cable
-  // does, and a cable can be clean from one end and report a bend from the
-  // other: 38 of the 1,803 measure differently and 9 report a different
-  // number of bends (bend-room-sample.mjs prints both). Rack 7's c26 is one
-  // that measures differently
+  // THE LAY DOES NOT (#986). A lay read from end a alone took that on: on the
+  // generated racks 38 of the 1,803 cables measured differently written the
+  // other way round and 9 reported a different number of bends
+  // (bend-room-sample.mjs prints both, and prints none now). routePath lays
+  // a cable from both ends and keeps one lay by a rule that does not know
+  // which end was written first. Rack 7's c26 was one that measured
+  // differently, by more than a centimetre
   const {rack, ctx} = sampleRack(M, G, 7);
-  const [as, rev] = bothWays(R, rack, rack.cables.find(x => x.id === 'c26'), ctx).map(c => R.routedLength(rack, c, ctx).measured);
-  assert.ok(Math.abs(as - rev) > 0.01, `${as} and ${rev}`);
+  const [as, rev] = bothWays(R, rack, rack.cables.find(x => x.id === 'c26'), ctx).map(c => R.routePath(rack, c, ctx));
+  assert.ok(Math.abs(R.pathLength(as).measured - R.pathLength(rev).measured) < 1e-9, `${R.pathLength(as).measured} and ${R.pathLength(rev).measured}`);
+  // the same path, point for point, read from the other end
+  const xyz = p => [p.x, p.y, p.z].map(v => Math.round(v * 1e6) / 1e6);
+  assert.deepEqual(rev.points.map(xyz), as.points.map(xyz).reverse());
+  assert.deepEqual(rev.points.map(p => p.at), as.points.map(p => ({a: 'b', b: 'a', entry: 'exit', exit: 'entry'}[p.at] ?? p.at)).reverse());
+});
+
+test('every cable of a generated rack lays the same written end for end: points, rings, marks and findings', () => {
+  const flipEnd = w => (w.end ? {...w, end: w.end === 'a' ? 'b' : 'a'} : w);
+  const turned = bt => [flipEnd(bt[1]), flipEnd(bt[0])];
+  const xyz = p => [p.x, p.y, p.z].map(v => Math.round(v * 1e6) / 1e6);
+  let n = 0, withBend = 0, withRing = 0;
+  for (const seed of [7, 13, 22]) {
+    const {rack, ctx} = sampleRack(M, G, seed);
+    for (const c of rack.cables) {
+      const [fwd, back] = bothWays(R, rack, c, ctx);
+      const p = R.routePath(rack, fwd, ctx), q = R.routePath(rack, back, ctx);
+      if (!p) { assert.equal(q, null); continue; }
+      n++;
+      assert.deepEqual(q.points.map(xyz), p.points.map(xyz).reverse(), `${seed} ${c.id}`);
+      assert.deepEqual(q.rings.map(g => [g.via, g.passed, g.passed ? g.sense : null]),
+        p.rings.map(g => [g.via, g.passed, g.passed ? -g.sense : null]).reverse(), `${seed} ${c.id}`);
+      assert.deepEqual(q.marks, R.reverseMarks(p.marks), `${seed} ${c.id}`);
+      assert.deepEqual(q.bends.map(f => [f.at, f.angle_deg, f.room_mm, f.legs_mm, f.between]),
+        p.bends.map(f => [f.at, f.angle_deg, f.room_mm, [...f.legs_mm].reverse(), turned(f.between)]).reverse(), `${seed} ${c.id}`);
+      assert.deepEqual(q.findings, [...p.findings].reverse(), `${seed} ${c.id}`);
+      assert.deepEqual(q.crossings.map(x => [x.item, x.part]).sort(), p.crossings.map(x => [x.item, x.part]).sort(), `${seed} ${c.id}`);
+      assert.deepEqual(q.covers.map(x => [x.item, x.path]).sort(), p.covers.map(x => [x.item, x.path]).sort(), `${seed} ${c.id}`);
+      if (p.bends.length) withBend++;
+      if (p.rings.length) withRing++;
+    }
+  }
+  // it measured something: cables, some with a tight bend, some through rings
+  assert.ok(n > 60 && withBend > 5 && withRing > 20, `${n} cables, ${withBend} with a bend, ${withRing} through a ring`);
 });

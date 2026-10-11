@@ -209,6 +209,24 @@ test('a quarter-turned item is an outline: one solid, no tray, no ring, and a no
   assert.deepEqual(F.frameNotices(roll(r, 'i1', 180), G.chassisOf), []);
 });
 
+test('a port box stands where the body does: a span covers the port of a rolled item where the roll puts it', () => {
+  // three switches; a cord from the lowest to the highest runs up in front of
+  // the middle one at x -100. Its one listed port is at x +100 upright.
+  let r = rackOf();
+  for (const ru of [10, 11, 12]) r = put(r, 'sw', ru, {label: `s${ru}`});
+  const c = {id: 'c1', a: {item: 'i1', path: 'p', view: 'front'}, b: {item: 'i3', path: 'p', view: 'front'}, media: 'om4', route: []};
+  r = {...r, cables: [c]};
+  const ctxOf = rr => ({chassisOf, guidesOf: () => [], portX: () => -100,
+    portY: e => (rr.items.find(i => i.id === e.item).ru - 0.5) * RU,
+    portBoxesOf: id => (id === 'i2' ? [{path: 'q', view: 'front', x: 100, y: 10.5 * RU + 5, w: 12, h: 10}] : [])});
+  assert.deepEqual(R.routePath(r, c, ctxOf(r)).covers, [], 'upright, the port is 200 mm from the span');
+  const over = roll(r, 'i2', 180);
+  const covers = R.routePath(over, c, ctxOf(over)).covers;
+  assert.deepEqual(covers.map(f => [f.kind, f.item, f.path]), [['port-behind-span', 'i2', 'q']], 'turned over, it is behind the span');
+  // and the path itself is the same: the ends are not on the rolled item
+  assert.deepEqual(R.routePath(over, c, ctxOf(over)).points.map(q => q.x), R.routePath(r, c, ctxOf(r)).points.map(q => q.x));
+});
+
 test('an upright rack is untouched by any of it', () => {
   const r = put(put(rackOf(), 'sw', 10), 'half', 12.5);
   for (const it of r.items) {

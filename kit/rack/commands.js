@@ -10,7 +10,7 @@ import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detache
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
-import {ownRoute, pointOf, portPoint} from './route.js';
+import {ownRoute, autoRoute, routedLength, pointOf, portPoint} from './route.js';
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
 import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
 import {stateRefusal} from './states.js';
@@ -767,7 +767,9 @@ function workedOut(rack, ids, ctx) {
   if (!ctx?.route) return {error: NO_ROUTES};
   let members;
   try {
-    members = ids.map(id => ({id, waypoints: ownRoute(rack, cableOf(rack, id), ctx.route).waypoints}));
+    // each cable's route as a member takes it: by the gutter, where a short
+    // jumper would hang on its own (#1012, route.js resolveRoute)
+    members = ids.map(id => ({id, waypoints: ownRoute(rack, cableOf(rack, id), ctx.route, {gutter: true}).waypoints}));
   } catch { return {error: NO_ROUTES}; }
   return deriveTrunk(members, {nameOf: labelOf(rack), frame: rack.frame});
 }
@@ -804,8 +806,34 @@ function bundleCreate(rack, {cables, label = '', number, route, straps}, ctx) {
              label: String(label), members: cables.map(cable => ({cable})), route: trunk,
              ...(straps ? {straps: structuredClone(straps)} : {})};
   const next = {...rack, bundles: [...bundlesOf(rack), b]};
-  return {rack: next, summary: `Bundled ${cables.length} cables as ${bundleName(b)}.`, created: {id: b.id},
+  const longer = hungLonger(rack, next, cables, ctx);
+  return {rack: next, summary: `Bundled ${cables.length} cables as ${bundleName(b)}.${longer ? ` ${longer}` : ''}`, created: {id: b.id},
           findings: [...spacingNote(straps), ...checksOf(next, b, ctx)]};
+}
+
+// WHAT BUNDLING COSTS A JUMPER THAT HUNG (#1012). A jumper within two units
+// hangs from port to port on its own; in a bundle it is taken to the trunk
+// and back, so it is longer: 0.60 m becomes 0.81 m for a one-unit hop to a
+// lane beside it. The summary says so, cable by cable, so that whoever
+// bundles it sees the length it buys. Each is a cable on its automatic
+// route with no waypoint of its own, whose measured length grows by a
+// centimetre or more. Nothing is said when the routes are not known, or a
+// reader throws.
+function hungLonger(before, after, ids, ctx) {
+  if (!ctx?.route) return '';
+  try {
+    const m = v => `${v.toFixed(2)} m`;
+    const grew = ids.flatMap(id => {
+      const c = cableOf(before, id);
+      if (!c || c.routeEdited === true || autoRoute(before, c, ctx.route).length) return [];
+      const was = routedLength(before, c, ctx.route), is = routedLength(after, cableOf(after, id), ctx.route);
+      return was && is && is.measured >= was.measured + 0.01 ? [{id, was: was.measured, is: is.measured}] : [];
+    });
+    if (!grew.length) return '';
+    return grew.length === 1
+      ? `${grew[0].id} hung on its own and now runs with the bundle: ${m(grew[0].was)} becomes ${m(grew[0].is)}.`
+      : `${andList(grew.map(g => g.id))} hung on their own and now run with the bundle: ${grew.map(g => `${g.id} ${m(g.was)} to ${m(g.is)}`).join(', ')}.`;
+  } catch { return ''; }
 }
 
 // A cable already in the bundle has its peel points cleared, and rides the
@@ -1059,7 +1087,7 @@ export const COMMANDS = {
       summary: SUMMARY})},
   'cable.route.reset': {run: cableRouteReset, description: 'Drop a hand-made route; the cable takes its own route again.',
     args: args(['id'], {id: ID('cable'), summary: SUMMARY})},
-  'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. Refused for a bundled cable.',
+  'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. A cable whose own route does not meet a given route joins and leaves it at the points nearest its two ports. Refused for a bundled cable.',
     args: args(['cables'], {cables: BUNDLE_CABLES(2, 'The cables to bundle, two or more, by id, in combing order.'),
       label: {type: 'string', description: 'The name on its tags; "Bundle <number>" is used when there is none. Empty when left out.'},
       number: {type: 'integer', minimum: 1, description: 'Its number, unique in the rack; one past the highest in use when left out.'},
@@ -1072,7 +1100,7 @@ export const COMMANDS = {
     args: args(['id', 'cable'], {id: ID('bundle'), cable: ID('cable'),
       at: {...WAYPOINT, description: 'A waypoint on the bundle\'s route where the cable leaves it; when left out, the cable leaves the bundle altogether.'},
       end: {enum: ['a', 'b'], description: 'The end it heads for after it leaves at that waypoint; the end whose port is nearer when left out.'}})},
-  'bundle.update': {run: bundleUpdate, description: "Change a bundle's label, number or strap spacing, or route it by hand. A route of null works the route out again from its cables.",
+  'bundle.update': {run: bundleUpdate, description: "Change a bundle's label, number or strap spacing, or route it by hand. A cable whose own route does not meet a route given by hand joins and leaves it at the points nearest its two ports. A route of null works the route out again from its cables.",
     args: args(['id'], {id: ID('bundle'), label: {type: 'string', description: 'The name on its tags; empty for "Bundle <number>". Kept when left out.'},
       number: {type: 'integer', minimum: 1, description: 'Its number, unique in the rack. Kept when left out.'},
       straps: STRAPS,
