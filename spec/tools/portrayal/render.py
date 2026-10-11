@@ -4765,6 +4765,22 @@ def config_states(device, cfg_name, cfg, lib):
     return dict(sorted(out.items()))
 
 
+def config_names(device, states):
+    """`configs[].names` (docs/rack-file-v4-design.md section 4): the name a
+    DCIM knows each settable part by, `{<path>: <name>}`, for the paths of
+    `states` whose name is not the path itself.
+
+    ONE SOURCE WITH THE DEVICE-TYPE EXPORT. A rack PDU's outlet-a1 is exported
+    as the power outlet A1 because the device's own `interfaces:` names it
+    (dcim_export.outlet_rows, through listing_names). A rack export that says
+    which outlets are off has to say A1 too, so the names are read here
+    through the same function and the two cannot disagree. A part no rule
+    names keeps its path and has no entry; `{}` on a device with none."""
+    from portrayal.dcim_export import listing_names
+    named = listing_names(device) if device.get("interfaces") else {}
+    return {pid: named[pid][0] for pid in states if pid in named and named[pid][0] != pid}
+
+
 def _published_part(ref, lib):
     """What configs.json says of a kit's part or accessory beyond its ref: the
     version it was resolved at, its class and its geometry - `size` and `body`
@@ -5941,6 +5957,11 @@ def main():
                               # `{<placement id>: [state names]}`, the parts
                               # that declare any; `{}` on a device with none
                               "states": config_states(device, n, c, lib),
+                              # THE NAME A DCIM KNOWS EACH OF THOSE BY, where it
+                              # is not the placement id: `{<placement id>:
+                              # <name>}`, from the device's own `interfaces:`,
+                              # as the device-type export names its outlets
+                              "names": config_names(device, config_states(device, n, c, lib)),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a

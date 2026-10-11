@@ -328,7 +328,7 @@ export function bundleExports(rack, ctx = {}) {
             limit_at: size?.limitBy?.text ?? null, limit_estimated: !!size?.limitBy?.estimated,
             bend_mm: bend?.radius_mm ?? null, bend_by: bend?.by ?? null,
             bend_checked: !!bend && !bend.unchecked?.length,
-            warnings: [...check.warnings], notes: [...check.notes]};
+            warnings: [...check.warnings], notes: [...check.notes, ...(drawn && st?.notes ? st.notes : [])]};
   });
 }
 
@@ -440,13 +440,17 @@ export function mountNotes(items, chassisOf, frame) {
   return out;
 }
 // WHAT IS SET OFF on one entry, as the one line a device comment carries
-// ("Outlets off: outlet-a2, outlet-a7."): '' when nothing is. `states` is
-// what states.js statesFor answers for the entry, so only what the part
-// declares is named, by the path the rack file names it by. A part that is
-// no outlet is in a line of its own ("Off: psu-1.").
-export function offNote(states) {
+// ("Outlets off: A2, A7."): '' when nothing is. `states` is what states.js
+// statesFor answers for the entry, so only what the part declares is named.
+// `names` is what configFacts answers as `names` for its device: the name
+// the device-type export gives each part, from the one source, so a comment
+// names an outlet as the DCIM lists it. A part the catalogue gives no name is
+// named by its path. A part that is no outlet is in a line of its own
+// ("Off: psu-1.").
+export function offNote(states, names = null) {
   const off = Object.entries(states || {}).filter(([, s]) => s === 'off').map(([p]) => p);
-  const outlets = off.filter(p => /^outlet\b/.test(p)), rest = off.filter(p => !/^outlet\b/.test(p));
+  const nameOf = p => (names && Object.hasOwn(names, p) && typeof names[p] === 'string' && names[p] ? names[p] : p);
+  const outlets = off.filter(p => /^outlet\b/.test(p)).map(nameOf), rest = off.filter(p => !/^outlet\b/.test(p)).map(nameOf);
   return [outlets.length ? `Outlets off: ${outlets.join(', ')}.` : '', rest.length ? `Off: ${rest.join(', ')}.` : ''].filter(Boolean).join(' ');
 }
 
@@ -870,8 +874,10 @@ export const otherVendorNote = ({label, ref, T, manufacturer, path}) =>
 // `statesOf(entry)` gives what an item or a part beside the rack is set to
 // (states.js statesFor with the facts of its device): what is off goes in
 // its comment, in both files, since neither device import has a column for
-// it. Without it no state is written. A reading is in neither file.
-export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null, statesOf = null}) {
+// it. Without it no state is written. `namesOf(entry)` gives the names the
+// catalogue has for its parts (configFacts().names), so an outlet is named
+// as the device type names it. A reading is in neither file.
+export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null, statesOf = null, namesOf = null}) {
   const items = given.map(it => (it.u != null ? it : {...it, u: chassisOf ? itemUnits(it, chassisOf) : 1}));
   const T = TARGET_NAME[target] || 'NetBox';
   const names = uniqueNames(items);
@@ -967,7 +973,7 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
         notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
     }
     let off = '';
-    try { off = typeof statesOf === 'function' ? offNote(statesOf(it)) : ''; } catch { off = ''; }
+    try { off = typeof statesOf === 'function' ? offNote(statesOf(it), typeof namesOf === 'function' ? namesOf(it) : null) : ''; } catch { off = ''; }
     if (off) notes.push(off);
     if (firstU(rack.frame) !== 1)
       notes.push(`${none ? '' : `U${position} on the rack. `}The rack numbers its units from ${firstU(rack.frame)}, and a unit named here is its label; the ${T} import counts from 1.`);

@@ -35,14 +35,17 @@ const SIZES = {
 const chassisOf = ref => SIZES[ref] || null;
 const POINTS = [{mates: 'pdu-button', at: 72}, {mates: 'pdu-button', at: 1627.8}];
 const OUTLETS = Object.fromEntries(['a1', 'a2', 'a7'].map(n => [`outlet-${n}`, ['on', 'off']]));
+// the names the catalogue carries for them, as the device-type export names its outlets (configs[].names)
+const NAMES = {'outlet-a1': 'A1', 'outlet-a2': 'A2', 'outlet-a7': 'A7'};
 const SLOTS = {
-  pdu: {default: 'base', 'pdu-class': 'managed', configs: [{name: 'base', 'mount-points': POINTS, slots: [], states: OUTLETS}]},
+  pdu: {default: 'base', 'pdu-class': 'managed', configs: [{name: 'base', 'mount-points': POINTS, slots: [], states: OUTLETS, names: NAMES}]},
   bracket: {default: 'front', 'pdu-class': null, configs: [{name: 'front', 'mount-points': [], slots: [{interface: 'pdu-button', at: 26}], states: {}}]},
   sw: {default: 'base', 'pdu-class': null, configs: [{name: 'base', 'mount-points': [], slots: [], states: {'psu-1': ['on', 'off']}}]},
 };
 const slotsOf = ref => SLOTS[ref] ?? null;
 const ctx = {chassisOf, slotsOf};
 const statesOf = entry => ST.statesFor(entry, configFacts(slotsOf(entry.ref), entry.cfg));
+const namesOf = entry => configFacts(slotsOf(entry.ref), entry.cfg)?.names;
 const TYPE = ref => ({manufacturer: SIZES[ref].manufacturer, model: SIZES[ref].model, isFullDepth: false, guess: false});
 
 // Two half-unit panels in U12, a switch mounted upside down with one supply
@@ -62,7 +65,7 @@ function rackOf(numbering, extra = {}) {
     {op: 'state.set', id: 'z3', path: 'outlet-a2', state: 'off'},
     {op: 'state.set', id: 'z3', path: 'outlet-a7', state: 'off'},
     {op: 'state.set', id: 'z3', path: 'outlet-a1', state: 'on'},
-    {op: 'readings.set', id: 'z3', readings: {source: 'snmp poll', at: '2026-10-08T14:00:00Z', values: {'outlet-a1': {current_a: 1.2}}}},
+    {op: 'readings.set', id: 'z3', readings: {source: 'snmp poll', at: '2026-10-08T14:00:00Z', values: {'outlet-a1': {'current-a': 1.2}}}},
   ], ctx);
   assert.equal(res.error, undefined, res.error);
   return res.rack;
@@ -72,7 +75,7 @@ function files(numbering, extra) {
   const items = [...F.itemsWithU(rack, chassisOf), ...X.zeroUImportItems(rack, chassisOf)];
   const types = new Map(items.map(i => [i.id, TYPE(i.ref)]));
   const dcim = {site: 'DC1', role: 'Access'};
-  const devices = target => { const d = X.deviceImportRows({rack, items, types, target, dcim, chassisOf, statesOf}); assert.deepEqual(d.left, []); return X.toCsv(d.columns, d.rows); };
+  const devices = target => { const d = X.deviceImportRows({rack, items, types, target, dcim, chassisOf, statesOf, namesOf}); assert.deepEqual(d.left, []); return X.toCsv(d.columns, d.rows); };
   const rk = X.rackImportRows({rack, dcim});
   return {'netbox.devices': devices('netbox'), 'nautobot.devices': devices('nautobot'), 'netbox.rack': X.toCsv(rk.columns, rk.rows)};
 }
@@ -145,18 +148,25 @@ test('a PDU hung on brackets names them, and each bracket is a row of its own', 
 });
 
 test('what is set off goes in the comment of both imports; a reading is in neither', () => {
+  // named as the device type names its outlets, where the catalogue gives the name; by path where it gives none
+  assert.equal(X.offNote({'outlet-a2': 'off', 'outlet-a1': 'on', 'outlet-a7': 'off'}, NAMES), 'Outlets off: A2, A7.');
+  assert.equal(X.offNote({'outlet-a2': 'off', 'outlet-b9': 'off'}, NAMES), 'Outlets off: A2, outlet-b9.');
   assert.equal(X.offNote({'outlet-a2': 'off', 'outlet-a1': 'on', 'outlet-a7': 'off'}), 'Outlets off: outlet-a2, outlet-a7.');
+  assert.deepEqual(configFacts(slotsOf('pdu'), '').names, NAMES);
+  assert.deepEqual(configFacts(slotsOf('sw'), '').names, {});
   assert.equal(X.offNote({'psu-1': 'off', 'outlet-a2': 'off'}), 'Outlets off: outlet-a2. Off: psu-1.');
   assert.deepEqual([X.offNote({}), X.offNote(null), X.offNote({'outlet-a1': 'on'})], ['', '', '']);
   const rack = rackOf('bottom-up');
   const items = [...F.itemsWithU(rack, chassisOf), ...X.zeroUImportItems(rack, chassisOf)], types = new Map(items.map(i => [i.id, TYPE(i.ref)]));
   for (const target of ['netbox', 'nautobot']) {
-    const rows = X.deviceImportRows({rack, items, types, target, statesOf}).rows;
-    assert.match(rows.find(x => x.name === 'PDU A').comments, / Outlets off: outlet-a2, outlet-a7\.$/, target);
+    const rows = X.deviceImportRows({rack, items, types, target, statesOf, namesOf}).rows;
+    assert.match(rows.find(x => x.name === 'PDU A').comments, / Outlets off: A2, A7\.$/, target);
+    // without the names of the catalogue, the path the rack file has
+    assert.match(X.deviceImportRows({rack, items, types, target, statesOf}).rows.find(x => x.name === 'PDU A').comments, / Outlets off: outlet-a2, outlet-a7\.$/);
     // a state the part does not declare (fan-9) is kept in the file and is not exported
     assert.match(rows.find(x => x.name === 'leaf-1').comments, /^Mounted upside down\. Off: psu-1\.$/, target);
     const all = X.toCsv(X.deviceImportRows({rack, items, types, target, statesOf}).columns, rows);
-    assert.doesNotMatch(all, /snmp|current_a|1\.2|2026-10-08/, `${target}: no reading`);
+    assert.doesNotMatch(all, /snmp|current-a|1\.2|2026-10-08/, `${target}: no reading`);
     // without the states nothing is said of them
     assert.doesNotMatch(X.toCsv(X.NETBOX_COLUMNS, X.deviceImportRows({rack, items, types, target}).rows), /off/i);
     // and no column is new
@@ -189,3 +199,25 @@ test('the BOM notes total the spare, and a draw.io cable carries its own', () =>
   assert.equal(X.drawioCables(r, {ends, idOf: id => id, drawn: () => true}).cables.some(x => 'spare' in x), false);
   assert.equal(X.drawioCables(bare, {ends, idOf: id => id, drawn: () => true, spare: SL.spareExports(bare, ctx0)}).cables.some(x => 'spare' in x), false);
 });
+
+test('the draw.io writer puts the spare of a cable after its length in the edge label', async () => {
+  const drawio = await import('../../../kit/drawio.js');
+  const vb = [0, 0, 18, 14];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb.join(' ')}"/>`;
+  const face = {svg, vb, ports: [{id: 'p0', cls: 'port', path: 'p0', x: 4, y: 4, w: 2, h: 2}]};
+  const plan = [{label: 'Front', faces: ['front'], racks: [{label: 'R', mounted: [
+    {name: 'a', id: 'i1', u: 1, ru: 1, faces: {front: face}}, {name: 'b', id: 'i2', u: 1, ru: 2, faces: {front: face}}]}]}];
+  const end = item => ({item, path: 'p0', view: 'front'});
+  const cable = {id: 'c1', a: end('i1'), b: end('i2'), media: 'os2', label: 'up-1', length: {value: 1, unit: 'm', source: 'routed'}};
+  const labelOf = c => /<object label="([^"]*)"([^>]*) id="cable-c1"/.exec(drawio.rackDiagram(plan, {cables: [c]}));
+  const [, withSpare, attrs] = labelOf({...cable, spare: '0.58 m'});
+  assert.equal(withSpare, 'up-1 · 1 m, 0.58 m spare');
+  // the length a round trip reads back is the attribute, which is still the length alone
+  assert.match(attrs, / portrayal-length="1 m"/);
+  assert.doesNotMatch(attrs, /spare/);
+  assert.equal(labelOf(cable)[1], 'up-1 · 1 m');
+  // a cable with no length says nothing of spare, whatever it is handed
+  const {length: _l, ...bare} = cable;
+  assert.equal(labelOf({...bare, spare: '0.58 m'})[1], 'up-1');
+});
+

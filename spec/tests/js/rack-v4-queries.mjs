@@ -151,6 +151,17 @@ test('cable.lay refuses a face on a ring, a held face the tray does not offer, a
   assert.equal(err({at: TRAY}), 'cable.lay needs a position or a face: a value to pin it, or null to unpin it.');
   assert.equal(err({at: {item: 'i99', via: 'tray'}, face: 'top'}), 'i99 is not in the rack.');
   assert.equal(run(r, {op: 'cable.lay', id: 'c99', at: TRAY, face: 'top'}, ctx).error, run(r, {op: 'cable.update', id: 'c99', label: 'x'}, ctx).error);
+  // a pathway the device does not have is refused, whatever is pinned, and the sentence lists what it has
+  for (const pin of [{face: 'top'}, {position: 2}])
+    assert.match(err({at: {item: 'i4', via: 'no-such-via'}, ...pin}) || '', /^CM-01 has no ring, duct or tray called no-such-via\. It has: guide-1, .*tray\.$/, JSON.stringify(pin));
+  // unpinning one that is gone is still allowed: the entry is in the file and has to come off
+  const stale = {...r, cables: [{...r.cables[0], lay: [{item: 'i4', via: 'old-via', position: 1}]}, ...r.cables.slice(1)]};
+  assert.equal('lay' in run(stale, {op: 'cable.lay', id: 'c1', at: {item: 'i4', via: 'old-via'}, position: null}, ctx).rack.cables[0], false);
+  // a cable whose route does not rest on the tray cannot be said to lie on a face of it
+  const off = r.cables.find(x => !(R.routePath(r, x, ctx.route).rests || []).some(y => y.kind === 'tray'));
+  assert.ok(off, 'the rack has a cable that is not on the tray');
+  assert.equal(run(r, {op: 'cable.lay', id: off.id, at: TRAY, face: 'underside'}, ctx).error, `CM-01 tray is not on the route of ${off.id}.`);
+  assert.equal(run(r, {op: 'cable.lay', id: off.id, at: TRAY, face: 'underside'}, ctx).rack, undefined);
   // a tray that states no tie slots holds nothing to its underside
   const strip = v => (Array.isArray(v) ? v.map(strip) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'ties' ? [] : strip(x)])) : v);
   const bare = {route: {...ctx.route, chassisOf: ref => strip(FX.chassisOf(ref))}};

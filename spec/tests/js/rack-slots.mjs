@@ -78,13 +78,13 @@ test('loadSlots keeps the class of a PDU, and configFacts reads what an entry is
   const s = await loadSlots('/d', ['pdu', 'bracket', 'leaf']);
   assert.equal(s.slotsOf('pdu')['pdu-class'], 'managed');
   assert.deepEqual(configFacts(s.slotsOf('pdu'), ''), {config: 'base', pduClass: 'managed', metering: 'outlet',
-    states: PDU.configs[0].states, slots: [], mountPoints: PDU.configs[0]['mount-points']});
+    states: PDU.configs[0].states, names: {}, slots: [], mountPoints: PDU.configs[0]['mount-points']});
   // a bracket is judged by the configuration its entry names: each mounting option has its own slots
   assert.deepEqual(configFacts(s.slotsOf('bracket'), 'side').slots, BRACKET.configs[1].slots);
   assert.deepEqual(configFacts(s.slotsOf('bracket'), '').slots, BRACKET.configs[0].slots);
   assert.equal(configFacts(s.slotsOf('bracket'), 'side').metering, null);
   // a file written before these keys reads as declaring none
-  assert.deepEqual(configFacts(s.slotsOf('leaf'), 'base'), {config: 'base', pduClass: null, metering: null, states: {}, slots: [], mountPoints: []});
+  assert.deepEqual(configFacts(s.slotsOf('leaf'), 'base'), {config: 'base', pduClass: null, metering: null, states: {}, names: {}, slots: [], mountPoints: []});
   assert.equal(configFacts(s.slotsOf('leaf'), 'nope'), null);
   assert.equal(configFacts(null, 'base'), null);
 });

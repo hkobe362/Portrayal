@@ -814,14 +814,20 @@ neither (its decision 3, 2026-10-09).
   the strap less than its clearance. A spacing strap already in a short gap
   serves, and in a long gap one within 50 mm of where a breakout strap would
   go serves as it (`BREAKOUT_MERGE_MM`). The gap at either end of the trunk,
-  where the members fan out to their ports, gets none when it is under
-  50 mm. So at a pitch of one unit every cable has a strap before it leaves,
-  and at two units and over there is one each side of each peel point.
+  where the members fan out to their ports, is a gap like any other: it
+  takes a strap wherever one of some stock width fits with its clearance.
+  So at a pitch of one unit every cable has a strap before it leaves, and
+  at two units and over there is one each side of each peel point.
   A strap that would fall on a ring moves to its nearer edge, as now.
 - **How wide** (decision 15). A strap is cut from one of a few stock widths,
   `STRAP_WIDTHS_MM`: 12, 19 and 25 mm. Each strap carries `width_mm`: 19,
   or 25 where the pack it goes round is 25 mm across or more, and the
-  narrowest that fits where a gap is too tight for that.
+  narrowest that fits where a gap is too tight for that. **An anchor goes
+  through its tie slot, so it is no wider than the slot is long:** the
+  widest stock width that is. The FHD-CMP5DR slots are 22.5 mm, so a pack
+  that would take 25 mm is tied there with 19. Where even 12 mm does not
+  go through, no strap is counted at the slot and the bundle note says so.
+  The widths and the clearance are estimates, with no maker's sheet held.
 - Each strap that `straps()` returns gains `kind`: `spacing`, `breakout` or
   `anchor`. The count is the three together.
 
@@ -986,7 +992,8 @@ file first. This section gives the keys their exact shape.
     that column is refused. The script step was not tried on a running
     instance, so it is not written: the states go in the device comment in
     both files (section 13, item 44).
-  - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."). Read
+  - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."),
+    each outlet by the name the device-type export gives it. Read
     at nautobot/nautobot commit `c77e4255`,
     `nautobot/dcim/models/device_components.py`: a `PowerOutlet` has `type`,
     `power_port` and `feed_leg`, and no status.
@@ -1282,7 +1289,7 @@ and the kit suite runs at the end of each.
 | 7 | **Lengths and the slack record.** `readCables` normalising `slack` (3.3), `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackOf`, `storedText`, `cable.slack` and its refusals, `spare-unplaced`. No geometry. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For every cable, need plus spare equals stock, and end play plus what is to store equals spare. Each row of the table of 3.6 has a case asserting its text. Each refusal of 3.5 has a case. A bad `form`, a negative `value`, two entries with no value, an unknown `end` and a `slack` that is no list each load with the usable part kept and `slackAsWritten` holding what was written, and save unchanged. `inspect` gives `said: false` for no key and `said: true` for `[]`. `routePath` returns the same points with and without a `slack` entry. The #986 sample script reports no more cables differing by direction than before (38). |
 | 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. Peels at 0, 60 and 130 mm are one group from either end. `{breakout: false}` alone survives a round trip and turns breakouts off. A version-3 bundle with `every: null` has no strap of any kind after migration. `bundle.update` with one key leaves the others. The BOM count equals the three kinds summed. |
 | 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. **None of these was tried** (section 13, items 44 and 47). |
-| 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
+| 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table, and `cable.lay` with its `face` acted on by the routes (3.9, decision 17). | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
 | 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
 The site follows in portrayal-site once the kit is published: it serves the
@@ -1426,8 +1433,9 @@ one-way.
     75 mm of the one before, so a trunk whose cables join a unit apart was
     one group and had no breakout strap at all. Peel points are grouped
     only where no strap fits between them with its clearance (3.10). On
-    eleven cables down one lane a unit apart that is nine straps where
-    there were none; at two units and three it is what it was. Considered:
+    eleven cables down one lane a unit apart that is ten straps where
+    there were two, the spacing straps: a strap in each of the ten gaps
+    where two or more ride, eight of them breakout straps. Considered:
     the chained 75 mm of the first build. One-way: the strap count, and
     where a drawn strap is.
 
@@ -1441,6 +1449,15 @@ one-way.
 16. **Single-cable tie straps are kept as built (decided 2026-10-11):** one
     strap at each tray tie slot a lone cord rests at, shared by every cord
     at that slot (section 13, item 38, for how the slot is found).
+
+17. **The face a file pins is read before a page's own pin (to be
+    confirmed).** A cable with a `lay` entry for a tray lies on the face the
+    entry names, whatever `ctx.trayFaceOf` of the page says, so a saved rack
+    routes the same on every page and for an agent. The page's pin is read
+    only where the file says nothing. Chosen in the build, since 3.9 has
+    `face` acted on and does not say which wins. Considered: the page
+    first, which lets a page override a file it did not write; reading the
+    file only. One-way: where a cable with a pinned face is routed.
 
 ## 11. One-way items
 
@@ -1469,7 +1486,9 @@ one-way.
 | `spare-unplaced`, `spare-short`, `spare-over`, `spare-off-route` as finding kinds of one cable, and `spareLine` as the one line for a rack | kit output | agents match the kinds |
 | `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port alone | kit API | a page that took the dressing as `endAllowance` less the table gets 0: the end play is `END_PLAY_M`, and the lengths of a cable are `spareOf` |
 | `strapBomRows(bundles)` counts single cables only when handed `{anchors: anchorsOf(rack, ctx)}` | kit API | a page that does not pass them leaves their straps out |
-| the comment line of what is set off, in both device files, naming parts by path | DCIM exports | section 13, item 44 |
+| the comment line of what is set off, in both device files, naming each outlet as the device-type export does | DCIM exports | section 13, item 44 |
+| `configs[].names` in `<device>.configs.json` | published build | additive; the kit reads it as `configFacts().names` |
+| an anchor strap capped by the long side of its tie slot, and `notes` in what `straps()` returns | kit output, BOM | the widths of the BOM strap line |
 | the comment of a PDU on brackets and the note of one, worded by `hungText` | DCIM exports, BOM notes | a reader that matches "beside the rack at" for every part beside it |
 | the `straps` column of the cable schedule, after `stored` | download format | the schedule has 20 columns where main has 17; a reader that checks the count |
 | `cable.lay`, and the face the file pins read before a page's own pin | kit command, routes | agent sessions call it by name; a rack with a `lay` face routes by it on every page |
@@ -1481,7 +1500,7 @@ one-way.
 |---|---|---|
 | rack file version 4 under `/schemas/v3/`, with every key of 1.1 | rack file, schemas | an older page refuses a version-4 file; a label is never reused |
 | `unitsOf`, `spanOf` (half-open), `facePoint`, `holesIn` | kit API | pages place and route by them |
-| `END_PLAY_M` (the 0.2 m of today, renamed), `shortTolerance` with its 50 mm floor, `END_ALLOWANCE_BY_MEDIA` as the inside part alone | kit API | a page reads them by name; copper cords of 7 m and over may rise a stock size |
+| `END_PLAY_M` (0.1 m an end, the 0.2 m a cable has today, renamed), `shortTolerance` with its 50 mm floor, `END_ALLOWANCE_BY_MEDIA` as the inside part alone | kit API | a page reads them by name; copper cords of 7 m and over may rise a stock size |
 | `slack` entries `{item, via, form, value, unit}` and `{end, value, unit}`; absent against empty | rack file | saved files carry them |
 | `states`, `readings`, and `swaps` and `fields` on a zero-U entry | rack file | saved files carry them |
 | how outlet states reach NetBox (CSV, script or comment, as the test finds), and the Nautobot comment line | DCIM export | an import kit file or step |
@@ -1710,14 +1729,17 @@ numbers are kept: a later reading takes the next one.
   `strapTexts(rack, ctx)`; the BOM notes and the draw.io cables take the
   same `spare`. Without them the columns are there and blank, and no line
   is written.
-35. **`cable.lay`, as part 10 built it.** The face the file pins is read
-  before the page's own pin, so a saved rack routes the same on any page.
-  A held face is refused where the tray states no tie slots; the cable lay
-  note also lets a ring on that face offer it, which no part yet has. With
-  no routes known the face is recorded as given, as a place for spare is.
-  An entry whose part or tray is gone is kept and passed over. `inspect`
-  of a cable shows `lay` where it has one, and `inspect` of a device of a
-  fractional height carries the ear-hole sentence of 2.5 under `notes`.
+35. **`cable.lay`, as part 10 built it** (decision 17 for which pin wins).
+  With the routes known it is refused for a pathway the device does not
+  have, for a face on a ring or a duct, for a held face on a tray that
+  states no tie slots, and for a face the cable does not come to lie on:
+  a tray that is not on its route. The cable lay note also lets a ring on
+  the held face offer it, which no part yet has. With no routes known the
+  entry is recorded as given, as a place for spare is. Unpinning is never
+  refused. An entry whose part or tray is gone is kept and passed over.
+  `inspect` of a cable shows `lay` where it has one, and `inspect` of a
+  device of a fractional height carries the ear-hole sentence of 2.5 under
+  `notes`.
 36. **`inspect` of a cable** gains `spare_findings` where it has any, and
   `describe` gives the spare a line of its own after the findings.
 37. **Found on main and fixed here:** a cable whose media is named like
@@ -1750,8 +1772,9 @@ numbers are kept: a later reading takes the next one.
   each end), the trunk of 30 in through ducts (3 to 5), the fan-out up the
   lane (2 to 4), the three-member bundle of the exports test (4 to 6), the
   two drawn bundles of its three (4 to 6 each), the eleven cables down one
-  lane a unit apart (2 to 8 under decision 14; 2 before it) and the two
-  jumpers of that rack (1, unchanged).
+  lane a unit apart (2 to 10 under decision 14: the 2 spacing straps and 8
+  breakout straps, all 19 mm) and the two jumpers of that rack (1,
+  unchanged). Every strap of the sample is 19 mm.
 43. **The strap widths and the rule that picks one** (decision 15). The
   list is 12, 19 and 25 mm: the common inch sizes of hook-and-loop strap
   (1/2, 3/4 and 1 in) to a whole millimetre, an estimate with no maker's
@@ -1759,17 +1782,23 @@ numbers are kept: a later reading takes the next one.
   or more (`WIDE_PACK_MM`, a figure of this build); and in a gap too tight
   for that, the widest of the list that leaves 5 mm clear each side
   (`STRAP_CLEAR_MM`, an estimate). The 20 mm that keeps a strap off a ring
-  (`STRAP_W`) is unchanged, so no strap of before moves.
+  (`STRAP_W`) is unchanged, so no strap of before moves. An anchor is
+  capped by the long side of its tie slot, read from the `ties` of the
+  tray; that a strap needs no room beyond its own width in the slot is an
+  assumption.
 44. **Outlet states in the DCIM files** (section 4). Not tried on a running
   instance. The NetBox outlet import takes no `status` column (file and
   lines in section 4), and the script step is not written untried, so both
-  device files carry one comment line. It names each part by the path the
-  rack file names it by ("Outlets off: outlet-a2, outlet-a7."), where the
-  note's example gives the name the DCIM has (A2): the catalogue publishes
-  no name beside a state path. A part that is no outlet is in a line of its
-  own ("Off: psu-1."). Only `off` is written, and only for a part that
-  declares the state. The kit writes the line when its caller hands
-  `deviceImportRows` a `statesOf`.
+  device files carry one comment line ("Outlets off: A2, A7."). An outlet
+  is named as the device-type export names it: `<device>.configs.json`
+  gains `names` on each configuration, `{<path>: <name>}`, read from the
+  `interfaces:` of the device by the function that names the exported
+  outlets, so the two cannot disagree. It is additive, and the kit reads it
+  as `configFacts().names`. A part with no name there is named by its
+  path, and a part that is no outlet is in a line of its own ("Off:
+  psu-1."). Only `off` is written, and only for a part that declares the
+  state. The kit writes the line when its caller hands `deviceImportRows`
+  a `statesOf`, and uses the names when it is handed a `namesOf`.
 45. **The `straps` column** names a single cable's own slots, on either face
   ("CM-01 tray, resting face (top), tie 11"), by slot number from 1; slots
   that are no one run are each named ("ties 5, 6, 9 and 10"). A member of a

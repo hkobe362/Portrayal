@@ -85,11 +85,20 @@
   `anchorsOf`, `strapTotals` and the breakout distances. Each strap also
   carries `width_mm`, one of `STRAP_WIDTHS_MM` (12, 19 and 25): 19, 25 for
   a pack 25 mm across or more, and the narrowest that fits in a tight gap.
+  An anchor is no wider than its tie slot is long, and a slot no strap
+  goes through is said in `straps().notes` and counted nowhere. The widths
+  and the clearance are estimates, with no maker's sheet held.
+- `<device>.configs.json` gains `names` on each configuration, beside
+  `states`: the name a DCIM knows each settable part by where that is not
+  its placement id (`{"outlet-a1": "A1"}`), read from the device's own
+  `interfaces:` as the device-type export reads it. Additive; `contract`
+  is still 2. `configFacts` gives it as `names`.
 - `cable.lay {id, at: {item, via}, position?, face?}` pins how a cable lies
   in a pathway, as `lay` on the cable. The routes act on `face` (`top` or
   `underside` of a tray, as the part names its own), reading the file
   before a page's own pin (`layFaceOf` in `rack/route`); `position` is kept
-  for when lay order is built. `inspect` of a cable shows `lay`.
+  for when lay order is built. It is refused for a pathway the device does
+  not have and for a face the cable does not come to lie on. `inspect` of a cable shows `lay`.
 - `inspect` of a device whose height is no whole number of units carries
   `notes`, with the sentence that its ear holes are not checked.
 - The exports of version 4. `strapTexts` in `rack/bundles` gives the cable
@@ -103,7 +112,8 @@
   (`rollNote`, which `mountNotes` writes too), what a PDU hangs on
   (`hungText` in `rack/zero-u`: "0U, on 2 FS-PDUBK brackets at left-rear,
   from U4"), and, when `deviceImportRows` is handed `statesOf`, what is set
-  off (`offNote`: "Outlets off: outlet-a2, outlet-a7."). The NetBox outlet
+  off (`offNote`: "Outlets off: A2, A7.", each outlet by the name the
+  device-type export gives it when `namesOf` is handed too). The NetBox outlet
   import takes no status column, so the states are a comment in both
   files. A reading is in neither.
 
@@ -135,8 +145,9 @@
   that sat within that of a stock break changes size.
 - **Stock sizes.** A cord up to 10 mm short of full end play is still
   chosen (`BREAK_TOL_M`), so a routed cord that was within 10 mm over a
-  stock size drops to it at its next measure: 41 of 2,336 cords on the
-  generated sample, each by one size, and none rises. A copper cord of 7 m
+  stock size drops to it at its next measure: 41 of the 2,336 cords of the
+  78 generated sample racks and the reference rack of the routing tests,
+  each by one size, and none rises. A copper cord of 7 m
   or more may rise one, since its short tolerance is now the greater of
   50 mm and 1 per cent of its length. No measured length moves.
 - Beside a routed length the kit writes `need` and no longer writes
@@ -148,8 +159,9 @@
   `measured`, now the need and the end play, and adds `need`.
 - **The BOM strap count rises.** A bundle with spacing straps gains its
   breakout straps (a strap before each point where a cable leaves: one in
-  each gap between cables that leave a unit apart, and one each side of a
-  peel point at two units and over, unless a spacing strap already serves)
+  each gap between cables that leave a unit apart, the gap at either end
+  of the trunk among them, and one each side of a peel point at two units
+  and over, unless a spacing strap already serves)
   and an anchor at each tray with tie slots its trunk lies on. A single cable lying on such a tray is tied at
   one slot, shared by every cable there: about three or four straps a lacer
   tray on a full rack, where there were none. A bundle saved with
@@ -168,6 +180,10 @@
   `spare`, `stored` and `straps`, appended after `notes`, so no column read
   by position moves. A reader that checks the column count has to take 20
   where there were 17.
+- **Text an export or an agent reads gains lines.** The BOM notes gain one
+  line that totals the spare cable, when the page hands them the routes. A
+  draw.io edge label states the spare after the length ("1 m, 0.58 m
+  spare"). `describe` gains a `Spare:` line of its own after the findings.
 - The slack `inspect` gives for an entered length is the spare, which is
   0.2 m more than it read: the end play is now spare and not need.
 - Zero-U overlap is judged in millimetres. A part the kit placed at a whole

@@ -112,10 +112,14 @@ test('a strap before each leaving point: one in a short gap, two in a long one, 
   // 76 mm apart they are two groups, each strapped on both sides
   const wide = [-450, -150, -74, 100, 450];
   assert.deepEqual(at(got(along(wide, [null, null, 'guide-2', 'guide-3'], ONLY_BREAKOUT), wide), 'breakout'), [25, 275, 325, 351, 401, 875]);
-  // the gap at the end of the trunk with less than 50 mm of riding gets none: the trunk ends 40 mm after the last peel
+  // the gap at the end of the trunk is a gap like any other: the trunk ends 40 mm after the last peel, and a
+  // strap fits in that, 25 mm before the end
   const tail = [-450, -150, 0, 410, 450];
   const short = along(tail, [null, null, 'guide-4', 'guide-4'], ONLY_BREAKOUT);
-  assert.deepEqual(at(got(short, tail), 'breakout'), [25, 835], 'before the peel at 860, and none in the 40 mm after it');
+  assert.deepEqual(at(got(short, tail), 'breakout'), [25, 835, 875], 'before the peel at 860, and one in the 40 mm after it');
+  // where none fits there is none: 20 mm after the last peel is less than the narrowest strap and its clearance
+  const stub = [-450, -150, 0, 430, 450];
+  assert.deepEqual(at(got(along(stub, [null, null, 'guide-4', 'guide-4'], ONLY_BREAKOUT), stub), 'breakout'), [25, 855]);
 });
 
 test('a spacing strap 40 mm from a peel serves, and none is added on that side', () => {
@@ -313,20 +317,25 @@ test('eleven cables down one lane, joining a unit apart: every cable has a strap
     return [s.kinds.breakout, s.straps.map(x => x.along_mm), s.widths];
   };
   const [n, where, widths] = count(only(HOPS.bundled()));
-  // one in each gap of one unit where two or more ride, 25 mm before the cable that joins at its upper end;
-  // the first gap holds one cable alone, and the last, 44 mm of fan-out at the top switch, gets none
-  assert.equal(n, 9);
-  assert.deepEqual(widths, {19: 9});
-  assert.ok(where.every((a, k) => !k || Math.abs(a - where[k - 1] - 44.45) < 0.11), JSON.stringify(where));
+  // one in each of the ten gaps of one unit where two or more ride, 25 mm before the cable that joins at its
+  // upper end, the gap under the top switch where all eleven ride among them; the first gap of the lane holds
+  // one cable alone
+  assert.equal(n, 10);
+  assert.deepEqual(widths, {19: 10});
+  // a unit apart; the one in the top gap is in its middle, since cables peel at both of its ends
+  assert.ok(where.slice(0, -1).every((a, k) => !k || Math.abs(a - where[k - 1] - 44.45) < 0.11), JSON.stringify(where));
+  assert.ok(where.at(-1) - where.at(-2) > 22 && where.at(-1) - where.at(-2) < 67, JSON.stringify(where));
   // written end for end, the same straps
   assert.deepEqual(count(only(HOPS.bundled({flip: true}))), [n, where, widths]);
-  // every second and every third cable, so the peels are two and three units apart: as before, one each side of each
-  assert.equal(count(only(HOPS.bundled()), k => k % 2 === 0)[0], 8);
-  assert.equal(count(only(HOPS.bundled()), k => k % 3 === 0)[0], 4);
+  // every second and every third cable, so the peels are two and three units apart: one each side of each,
+  // and one in the gap under the top switch, which is one unit whatever the pitch
+  assert.equal(count(only(HOPS.bundled()), k => k % 2 === 0)[0], 9);
+  assert.equal(count(only(HOPS.bundled()), k => k % 3 === 0)[0], 5);
   // with its default spacing straps too: a spacing strap already in a gap serves it
   const [withSpacing, , w2] = count(HOPS.bundled());
-  assert.equal(withSpacing, 7);
-  assert.deepEqual(w2, {19: 9});
+  // eight, and the two spacing straps serve the other two gaps: all ten gaps have a strap
+  assert.equal(withSpacing, 8);
+  assert.deepEqual(w2, {19: 10});
   // and every: null is still strapless
   const none = HOPS.bundled();
   const s0 = B.straps({...none, bundles: [{...none.bundles[0], straps: {every: null}}]}, {...none.bundles[0], straps: {every: null}}, {route: HOPS.ctxFor(none)});
@@ -396,5 +405,61 @@ test('the schedule names the tray, the face by role and by name, and the tie slo
   const csv = X.toCsv(X.CABLE_COLUMNS, rows(B.strapTexts(r, pin('underside'))).slice(0, 1));
   assert.match(csv.split('\r\n')[0], /,status,notes,spare,stored,straps$/);
   assert.match(csv.split('\r\n')[1], /,"CM-01 tray, held face \(underside\), ties 5, 6, 9 and 10"$/);
+});
+
+test('an anchor strap is no wider than its tie slot is long, and a slot no strap goes through ties nothing', () => {
+  const r0 = onTray();
+  const r = {...r0, bundles: [{id: 'b1', number: 1, label: '', members: [{cable: 'c1'}, {cable: 'c2'}], route: [{item: 'i4', via: 'guide-4'}, TRAY]}]};
+  // two cords of 20 mm are a pack over 25 mm across: its straps are the wide ones
+  const fat = {route: {...F.ctxOf(r), diameterOf: () => 20}};
+  const s = B.straps(r, r.bundles[0], fat);
+  const [tray] = S.traysOf(r, F.ctxOf(r));
+  const a = s.straps.find(x => x.kind === 'anchor');
+  const long = Math.max(tray.ties[a.tie].x1 - tray.ties[a.tie].x0, tray.ties[a.tie].z1 - tray.ties[a.tie].z0);
+  // the slot is 22.5 mm long, so the 25 mm strap the pack would take does not go through it: 19
+  assert.deepEqual([a.tie, Math.round(long * 10) / 10, a.width_mm], [8, 22.5, 19]);
+  assert.ok(s.straps.filter(x => x.kind !== 'anchor').every(x => x.width_mm === 25), 'the pack still sets the width of the others');
+  assert.deepEqual(s.notes, []);
+  assert.equal(B.anchorsOf(r, fat).find(x => x.tie === 8).width_mm, 19);
+  // a thin pack is 19 either way
+  assert.equal(B.straps(r, r.bundles[0], {route: F.ctxOf(r)}).straps.find(x => x.kind === 'anchor').width_mm, 19);
+  // slots 15 mm long take the 12 mm strap; slots 10 mm long take none, and it is said
+  const slots = len => ref => {
+    const c = structuredClone(F.chassisOf(ref));
+    const walk = v => { if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) {
+      if (k === 'ties' && Array.isArray(x)) v[k] = x.map(t => ({...t, w: Math.min(t.w, len), d: Math.min(t.d, len)})); else walk(x); } };
+    walk(c);
+    return c;
+  };
+  const with_ = len => ({route: {...F.ctxOf(r), chassisOf: slots(len)}});
+  assert.equal(B.straps(r, r.bundles[0], with_(15)).straps.find(x => x.kind === 'anchor').width_mm, 12);
+  const none = B.straps(r, r.bundles[0], with_(10));
+  assert.equal(none.kinds.anchor, 0);
+  assert.equal(none.notes.length, 1);
+  assert.match(none.notes[0], /^Bundle 1 is not tied at CM-01 tray: tie slot \d+ is 10 mm long, and the narrowest strap is 12 mm wide\.$/);
+  assert.ok(X.bundleExports(r, with_(10))[0].notes.includes(none.notes[0]), 'and the exports carry the sentence');
+  // a single cable is held to the same rule
+  const lone = {...r0, cables: [r0.cables[0]]};
+  assert.deepEqual(B.anchorsOf(lone, with_(15)).map(x => x.width_mm), [12]);
+  assert.deepEqual(B.anchorsOf(lone, with_(10)), []);
+});
+
+test('the BOM counts each strap once by width: a bundle anchor is not counted with the slots again', () => {
+  const r0 = onTray();
+  const r = {...r0, bundles: [{id: 'b1', number: 1, label: '', members: [{cable: 'c1'}, {cable: 'c2'}], route: [{item: 'i4', via: 'guide-4'}, TRAY]}]};
+  const ctx = {route: F.ctxOf(r)};
+  const bundles = X.bundleExports(r, ctx), anchors = B.anchorsOf(r, ctx);
+  assert.ok(bundles[0].strap_kinds.anchor === 1 && anchors.some(x => x.bundles.includes('b1')) && anchors.some(x => !x.bundles.length),
+    'the rack has a bundle anchor and a slot of single cables');
+  const widthSum = row => [...row.description.matchAll(/(\d+) of \d+ mm/g)].reduce((n, m) => n + Number(m[1]), 0);
+  const [row] = X.strapBomRows(bundles, {anchors});
+  assert.equal(widthSum(row), row.qty, row.description);
+  assert.equal(row.qty, bundles[0].strap_kinds.spacing + bundles[0].strap_kinds.breakout + anchors.length);
+  const t = B.strapTotals(r, ctx);
+  assert.equal(Object.values(t.widths).reduce((a, b) => a + b, 0), t.total);
+  assert.equal(t.total, row.qty);
+  // without the slots, the bundle's own anchor is the one counted
+  const [own] = X.strapBomRows(bundles);
+  assert.equal(widthSum(own), own.qty);
 });
 

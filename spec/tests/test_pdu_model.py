@@ -325,6 +325,24 @@ def test_the_evma8365x_lists_its_switchable_outlets_under_states():
     assert list(got) == sorted(got)
 
 
+def test_the_evma8365x_names_its_outlets_as_its_device_type_export_does():
+    """`configs[].names` and the device-type export read one source, so a rack
+    comment that says which outlets are off names them as the DCIM lists
+    them: A1, not outlet-a1."""
+    d = load_yaml(EVMA)
+    states = render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB]))
+    names = render.config_names(d, states)
+    assert set(names) == set(states) and len(names) == 42
+    assert names["outlet-a1"] == "A1" and names["outlet-a2"] == "A2" and names["outlet-f42"] == "F42"
+    for target in ("netbox", "nautobot"):
+        exported = load_yaml(ROOT / "library/exports" / target / "device-types/Eaton/EVMA8365X.yaml")
+        assert sorted(names.values()) == sorted(o["name"] for o in exported["power-outlets"] if o["name"] in set(names.values()))
+        assert set(names.values()) <= {o["name"] for o in exported["power-outlets"]}, target
+    # a part no rule names has no entry, and a device with no rules has none
+    assert render.config_names(d, {"outlet-a1": ["on", "off"], "psu-1": ["on", "off"]}) == {"outlet-a1": "A1"}
+    assert render.config_names({}, states) == {}
+
+
 def test_a_per_lamp_mapping_is_not_a_state_vocabulary_of_its_part():
     """The mapping form on a real device: the AIS2001 gives each lamp of a jack
     its own vocabulary, `{led-a: [...], led-b: [...]}`. Those keys are element
@@ -407,8 +425,12 @@ def test_the_built_configs_json_carries_slots_and_states():
     for f in files:
         for c in json.loads(f.read_text())["configs"]:
             assert isinstance(c.get("slots"), list) and isinstance(c.get("states"), dict), f.name
+            # `names` is for the parts of `states` alone, each a name that is not its path
+            assert isinstance(c.get("names"), dict) and set(c["names"]) <= set(c["states"]), f.name
+            assert all(isinstance(v, str) and v and v != k for k, v in c["names"].items()), f.name
     evma = json.loads((dist / "evma8365x.configs.json").read_text())["configs"][0]
     assert len(evma["states"]) == 42 and evma["states"]["outlet-a1"] == ["on", "off"] and evma["slots"] == []
+    assert len(evma["names"]) == 42 and evma["names"]["outlet-a2"] == "A2"
     evmi = json.loads((dist / "evmi2130x.configs.json").read_text())
     assert evmi["configs"][0]["states"] == {} and evmi["pdu-class"] == "metered-branch"
     # and the key is small: no lamp vocabulary rides in it

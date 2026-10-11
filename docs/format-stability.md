@@ -60,7 +60,12 @@ file whole**, with its sentence, and does not open it in part.
 - **The exports.** The cable schedule has three more columns after `notes`:
   `spare`, `stored` and `straps`. A NetBox device row carries a half
   position; a Nautobot one is written at the whole unit with a comment.
-  Neither import takes a starting unit, so both count from 1.
+  Neither import takes a starting unit, so both count from 1. The comment
+  of a device row also says that it is mounted upside down or rotated,
+  what a PDU hangs on, and which outlets are off. The BOM strap line counts
+  each kind and width of strap, and the BOM notes gain one line that totals
+  the spare cable. A draw.io edge label states the spare after the length.
+  `describe` gains a `Spare:` line.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
@@ -263,6 +268,11 @@ reader that does not know it finds every field it read before.
   inside it. A part that declares none has no entry, so an outlet that cannot
   be switched is not listed. Always an object; `{}` on a device that
   declares none. Additive.
+- **`configs[].names`** beside it: the name a DCIM knows each of those parts
+  by, `{"outlet-a1": "A1"}`, where that is not the placement id. It is read
+  from the device's own `interfaces:` through the function that names the
+  outlets of the device-type export, so the two cannot disagree. A part no
+  rule names has no entry. Always an object. Additive.
 - **`attrs.power`** gains `input-plug` (now a `PART_POWER` slug, which on the
   one device that wrote it was prose), `input-cord`, `input-phase`,
   `input-wiring`, `input-voltage-v`, `input-current-a`, `plug-rating-a` and

@@ -313,7 +313,12 @@ columns. It returns no geometry: spare is listed, not drawn.
 alone are `kinds.spacing`. An anchor names its tray and the index of its tie
 slot. `anchorsOf(rack, ctx)` lists
 every tie slot a strap is at, rack-wide, with the bundles and cables tied
-there, and `strapTotals(rack, ctx)` is what the rack buys. A page draws a
+there, and `strapTotals(rack, ctx)` is what the rack buys. The stock widths
+(`STRAP_WIDTHS_MM`: 12, 19 and 25 mm) and the clearance a strap keeps from a
+peel point are estimates, with no maker's sheet held: 19 mm is the strap, 25
+for a pack 25 mm across or more, and an anchor is no wider than its tie slot
+is long. `straps()` also returns `notes`, a sentence for each tie slot no
+strap goes through. A page draws a
 band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
 {anchors})` so that single cables count.
 
@@ -326,8 +331,10 @@ spare, and `drawioCables(rack, {spare, ...})` gives each cable with a
 length its `spare`, which `kit/drawio.js` writes after the length in the
 edge label. `deviceImportRows({statesOf, ...})` writes what is set off in
 the comment of each row, when `statesOf(entry)` answers `statesFor` for it.
-`rollNote(item)` is the sentence of a rolled item and `offNote(states)` the
-line of what is off; `hungText(rack, entry, chassisOf)` in `rack/zero-u.js`
+`namesOf(entry)` beside it answers `configFacts(...).names`, so an outlet is
+named as the device-type export names it (A2, not outlet-a2).
+`rollNote(item)` is the sentence of a rolled item and `offNote(states,
+names)` the line of what is off; `hungText(rack, entry, chassisOf)` in `rack/zero-u.js`
 is where a part hung on brackets is, as an export words it.
 
 `cable.lay` pins how a cable lies in a pathway (`lay` on the cable), and
@@ -362,7 +369,9 @@ between its files, and may change without notice: `spansMeet`, `anchorY`,
 `fillOf`, `overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `rollPoint`,
 `heldBy`, `uncheckedText`, `unheldText`, `bothText`, `zeroUExtent` and
 `notBracket` in `rack/fit.js`; `stateRefusal` in `rack/states.js`;
-`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `toMetres`
+`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `STRAP_BASE_MM`,
+`STRAP_WIDE_MM`, `WIDE_PACK_MM`, `STRAP_CLEAR_MM` and `widthCounts` in
+`rack/bundles.js`; `toMetres`
 and `slackValues` in `rack/route.js`; `trayRefusal`, `trayText`, `mText`
 and `FORMS` in `rack/slack.js`; `SLACK_FORMS` in `rack/model.js`; `isPosition`,
 `HOLE_STYLES`, `railWidth`, `RAIL_WIDTH_IN`, `holdersOf` and `usableReadings`
