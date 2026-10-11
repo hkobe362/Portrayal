@@ -688,7 +688,8 @@ its side brackets, a support on a row of tapped holes.
 design. The format gains two optional keys, so `format` stays 1, and the build
 gains the fields below, so `contract` is not raised. A device that declares no
 adjustment gains no key and no attribute: its build is byte for byte what it
-was.
+was. The FS DINRAIL2U and DINRAIL4U are the first that declare one,
+`rail-setback`.
 
 **In a manifest.** A top-level `adjustments:` map, the key being the id of the
 adjustment, each entry with `label`, `carrier`, `axis` (`x`, `y` or `z`),

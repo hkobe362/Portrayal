@@ -1,8 +1,10 @@
 # Adjustable positions: a part that slides, its range, and where it is set
 
-Status: decided 2026-10-10. Steps 1 to 4 of section 11 are built, on a fixture
-device; steps 5 to 8 are not, and no library device states an adjustment yet.
-Issue #950. Section 15 says what the build fixed where this note left it open. Each section gives a
+Status: decided 2026-10-10. Steps 1 to 5 of section 11 are built: steps 1 to
+4 on a fixture device, and step 5, the Explorer control and the FS DINRAIL2U
+and DINRAIL4U, the first devices that state an adjustment. Steps 6 to 8 are
+not.
+Issue #950. Sections 15 and 16 say what the build fixed where this note left it open. Each section gives a
 decision and its reason. The nine questions the note first left open were
 decided as it recommended, and are listed in section 13. Section 14 lists the
 costs accepted, and section 10 the one-way doors the build steps open. This
@@ -33,6 +35,9 @@ a reader can put it somewhere else in that travel; and the drawing, the 3D
 view, the rack and its cables all follow.
 
 ## 1. What exists
+
+This section describes the library as it was before the work. Sections 15 and
+16 say what has changed.
 
 ### 1.1 The need
 
@@ -244,7 +249,8 @@ views:
   named by the id of the adjustment, and by nothing else.
 - **Provenance**: the device states `provenance.<id>` with a confidence and a
   note that gives the source of each end of the range and of the default. The
-  DINRAIL `provenance.setback` entry is that note already.
+  DINRAIL devices had that note as `provenance.setback`; step 5 renamed it
+  `provenance.rail-setback`.
 
 ### Alternatives considered
 
@@ -631,7 +637,7 @@ number.
 
 Each step is one change with its gate. Steps 2 to 4 are proved on a fixture
 device in the tests, so no library device changes before step 5. Steps 1 to 4
-are built (section 15).
+are built (section 15), and so is step 5 (section 16). Steps 6 to 8 remain.
 
 1. **Schema, lint and lock.** The keys, their descriptions, the rules of
    section 9, the lock buckets. Nothing is drawn differently.
@@ -680,7 +686,7 @@ are built (section 15).
 
 | part | does it fit | what it needs |
 |---|---|---|
-| FS DINRAIL2U, DINRAIL4U | yes, the first use | #971 on the main branch; step 5 |
+| FS DINRAIL2U, DINRAIL4U | yes, the first use | built in step 5 (section 16) |
 | a DIN rail host on those brackets (#935) | yes | the host as a member, in place of its `set-back` (question 2) |
 | a shelf or a bracket with a rear support bolted through a slot at a position a person picks | yes | nothing new: `axis: z`, a range, members |
 | a part on a row of tapped holes | yes | stops and no range |
@@ -965,34 +971,114 @@ alternatives:
 
 ### For step 5
 
-What the first devices will meet:
+Steps 1 to 4 named seven things the first devices would meet. Section 16
+lists them, with what DINRAIL2U and DINRAIL4U made of each.
 
-- **The Explorer has no control yet.** A position is set with `setFields` or a
-  `fields=` link.
-- **L182 asks for `provenance.<id>`.** The DINRAIL devices have
-  `provenance.setback`, and their adjustment is `rail-setback`: the entry is
-  renamed, or a second one is written.
-- **`mount-points` and `cages` in `configs.json` are computed from the
-  manifest as written**, for every configuration, one that is built moved
-  included. A mount point or a cage on a member is published where the
-  default puts it.
-- **A cut-out cannot say `moves-with`.** Section 1.1 counts the eight rear
-  cut-outs of DINRAIL2U among its 29 moving nodes. They are decor there
-  (`kind: cutout`) and can be members; an entry under `panel.cutouts` cannot.
-- **The build stops for a member under a group that is turned or scaled**
-  (28). A `rear` projection sits inside its cut-out, which has no transform
-  today.
-- **An occupant swapped into a member cage at runtime is left behind.**
-  `kit/swap.js` seats it from `cages[]` in `configs.json` (the item above) and
-  does not mark it. An occupant the build seated is marked and moves. No
-  library device has a cage that slides.
-- **Flat decor on a face that shows the motion as depth takes a lift.** By
-  section 6 a member that is not a well takes `dz` as `data-z-lift`. Decor
-  drawn flat on the rear view of a device whose adjustment is `axis: z` would
-  stand off the rear face by the distance moved. Whether such decor is a
-  member is a modelling question for the first device.
-- **`rack.json` and the rack core** read the default position (steps 6 to 8).
-- **The three `din-rail-setback` attrs stay on DINRAIL2U and DINRAIL4U**
-  (section 13, question 5). L183 never requires an attr, so nothing would say
-  if one were dropped: step 5 adds a test on those two devices that the three
-  attrs exist and pair with `rail-setback`.
+## 16. What step 5 built
+
+Step 5 is the Explorer control and the first two devices. This section lists
+what it built, what the first devices met, and what is left.
+
+### The control
+
+1. **A module of its own, `kit/positions.js`, with one export,
+   `positionControl(shell, opts)`.** Section 7 names no home for the control.
+   It is not in `shell.js`, because every page that mounts a shell would then
+   show it, and the control belongs to one page. It is not written into
+   `kit/index.html`, because a page cannot be tested under node, and the site
+   mounts the same control in step 7. `kit/index.html` mounts it with one
+   call. The kit is 0.20.0.
+2. **It is above the tree**, in the side panel, whatever is selected, in 2D
+   and in 3D. It is hidden for a device that declares no adjustment, and
+   inside a module.
+3. **Each adjustment is one group**: its label, the position in mm, a slider
+   over the range in steps of 0.1 mm, a number box, one button for each stop
+   in the order of their values, and a reset. With stops and no range the
+   buttons are the whole group. The button of the stop the part stands at is
+   pressed (`aria-pressed`).
+4. **It writes through `setFields(carrier, {id: value})` and holds no rule.**
+   A stop button sends the name of the stop. The reset sends an empty value,
+   so the part goes back to where the drawing was built: the default, or the
+   position the configuration on screen sets.
+5. **A refused value is said under the group**, in the sentence `setFields`
+   answers, in an element with `role="status"`. Only the number box can be
+   refused: the slider and the buttons cannot send a value outside the
+   adjustment.
+6. **The slider applies each value as it moves in 2D, and when it is let go in
+   3D.** Section 7 says it applies on release, and that the 2D faces can
+   follow while it is dragged. A 2D move is a transform on a few nodes, so
+   each value is written at once, and the location follows it. In 3D each
+   value is a scene to rebuild.
+7. **The line that names the views** is read from the faces: a face shows the
+   motion when a member on it has a `dx` or a `dy`. The control asks the
+   shell for the other faces once for each device and configuration. In 3D
+   the line is not shown. The page says which stage is showing with a `mode`
+   event on the shell.
+8. **The slider is a native range input.** It takes the arrow keys, Page Up
+   and Page Down, Home and End, and is named by the label of the adjustment
+   and described by its range and datum.
+
+### The devices
+
+9. **`rail-setback` on DINRAIL2U is 51.2 to 271.2 mm, drawn at 161.2; on
+   DINRAIL4U it is 50.5 to 269.4, drawn at 159.9.** Each end is read from the
+   slots on the datasheet side view, less the distance from the screw to the
+   panel face (18.2 and 17.8). The default is the middle of the travel. The
+   datum is the front face of the rail panel, behind the ear plane.
+10. **Three stops: `front`, `middle` and `rear`**, the two ends and the
+    default. No source names a position. A reader can type any position
+    between them.
+11. **29 members on each device**, on all six views: on the front the panel
+    well and the rail; on the rear the panel back and its eight cut-outs; on
+    each plan the plate, the rail and two tabs; on each side the flange, two
+    tabs and two screws. `test_dinrail_setback.py` states the list, so a part
+    added later without `moves-with` fails there.
+12. **`provenance.setback` is renamed `provenance.rail-setback`**, the key
+    L182 reads. A provenance key is surface in the lock, a patch. The `gaps`
+    entry that asked for a way to state the range is removed.
+13. **The three `din-rail-setback` attrs stay**, and the same test requires
+    them and their pairing with `rail-setback`, which L183 never does.
+14. **A minor each, to 1.1.0**, as the lock asks. At the default every
+    compiled face is the face of 1.0.0 with the new attributes added.
+15. **No configuration sets a position.** No source shows either bracket sold
+    at an end of its travel. So the four DCIM export files change in one
+    line each, the drawing version.
+
+### What the first devices met
+
+| what steps 1 to 4 named | on these devices |
+|---|---|
+| the Explorer has no control | built (1 to 8) |
+| L182 asks for `provenance.<id>` | renamed (12) |
+| `mount-points` and `cages` in `configs.json` are computed from the manifest as written | neither device publishes a mount point or a cage, so nothing is published at a wrong place. The build is as it was: still open for the first device that has one on a member |
+| a cut-out cannot say `moves-with` | neither device has a `panel.cutouts` entry. The eight rear cut-outs are decor, and are members. Still open for a device whose moving part is seen through a `panel.cutouts` entry |
+| the build stops for a member inside a member, or under a turned group | neither device has one. The build draws decor inside one group, which has no transform |
+| an occupant swapped into a member cage at runtime is left behind | neither device has a cage or a bay. Still open in `kit/swap.js` |
+| flat decor on a face that shows the motion as depth takes a lift | see below |
+
+**The rear view.** The panel back and its eight cut-outs are flat decor on
+the rear elevation, and they are members. In 2D nothing on the rear view moves
+at any position, which is right for an elevation. In 3D a member that is not
+a well takes the move as `data-z-lift`, and at the rear stop that number says
+the decor stands 110 mm off the rear face. Nothing is built from it: the kit
+builds a solid from a well, an `out`, a sunk decor or a part with relief, and
+never from a lift alone, and a sheet body paints none of its faces. The rear
+of both devices was looked at in 3D at both ends, and nothing stands off it.
+The cost accepted: the lift on such a node is a number no reader should
+build from. A reader that one day builds flat decor at a depth needs the
+depth of the node as built, which a manifest does not state for decor.
+
+### What remains
+
+- **Step 6, the rack core.** `rack.json` and the rack core still read the
+  default position. The `field` command, `inspect`, the export note line and
+  the rule that a position survives a change of configuration are not built.
+- **Step 7, the site.** The Rack Builder hands the fields of an item to the
+  Explorer and takes them back. It gets no control.
+- **Step 8, hosts.** A rail host that is a member, when hosts are built.
+- **The four items marked still open in the table above**, none of which a
+  library device meets today.
+- **The gates that are run by hand**: the screenshots of the control, at the
+  default, at each stop and at both ends, on a plan and in 3D, on the fixture
+  and on DINRAIL2U; and the review of each device at each end beside the
+  pictures of its maker.
