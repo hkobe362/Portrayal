@@ -73,6 +73,23 @@ export function spanText(frame, item, chassisOf) {
   return ends[0] === ends[1] ? `U${ends[0]}` : `U${ends[0]}-U${ends[1]}`;
 }
 
+// WHICH UNITS AN ITEM FILLS, in words, for a reader that counts whole units:
+// "the lower half of U12", "U1 and the lower half of U2", "U10 to U12". Lower
+// and upper are as the item hangs, whichever way the frame counts.
+export function fillText(frame, ru, units) {
+  const top = ru + units, U = n => uLabel(frame, n);
+  if (units === 0.5) return `the ${Number.isInteger(ru) ? 'lower' : 'upper'} half of U${U(Math.floor(ru))}`;
+  const parts = [];
+  if (!Number.isInteger(ru)) parts.push(`the upper half of U${U(Math.floor(ru))}`);
+  const first = Math.ceil(ru), last = Math.floor(top) - 1;
+  if (last >= first) {
+    const [a, b] = [U(first), U(last)].sort((x, y) => x - y);
+    parts.push(a === b ? `U${a}` : `U${a} to U${b}`);
+  }
+  if (!Number.isInteger(top)) parts.push(`the lower half of U${U(Math.floor(top))}`);
+  return parts.join(' and ');
+}
+
 export const REACH_MM = 50;   // within this of the far rail, a device's far panel is visible there
 
 // A RACK-FACE PART: bolted to the rail face at a U, projecting

@@ -7,7 +7,7 @@
 
 import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName} from './model.js';
 import {routeText, trunkRoute} from './route.js';
-import {isRackMount, isZeroUPart, railOf, unitsOf} from './fit.js';
+import {isRackMount, isZeroUPart, railOf, unitsOf, fillText} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
 export {positionOf};
@@ -777,11 +777,21 @@ export const otherVendorNote = ({label, ref, T, manufacturer, path}) =>
 //     and rear while either type is full depth. The rack's own order is the
 //     order they were placed. Nautobot 3.2 accepts such a pair, so its file
 //     keeps both.
+// NAUTOBOT STORES WHOLE RACK UNITS (docs/rack-file-v4-design.md section 2.7),
+// so there each item has a whole-unit span: from floor(p) to
+// ceil(p + units) - 1, where p is its position. Items are taken by their
+// stored `ru`, lowest first, and in the order given where two share one. An
+// item whose whole-unit span meets, on its face, that of one already written
+// with a position is KEPT IN THE RACK WITH NO POSITION AND NO FACE, and its
+// comment says where it is; any other whose span is not whole units is
+// written at floor(p), and its comment says which part of that it fills. So
+// the file imports, loses no device, and states no position that is false.
 export function deviceImportRows({rack, items, types, target = 'netbox', dcim = {}, why = new Map()}) {
   const T = TARGET_NAME[target] || 'NetBox';
   const names = uniqueNames(items);
   const site = String(dcim?.site ?? '').trim(), role = String(dcim?.role ?? '').trim();
   const kept = [], left = [];
+  const offRails = m => m === 'rack-face' || isZeroUPart({mount: m});
   for (const it of items) {
     const t = types.get(it.id) || null, name = names.get(it.id).name;
     if (!t) {
@@ -796,7 +806,6 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
         'Shorten its label and export again.'});
       continue;
     }
-    const offRails = m => m === 'rack-face' || isZeroUPart({mount: m});
     const clash = target === 'nautobot' || offRails(it.mount) ? null
       : kept.find(o => !offRails(o.mount) && o.face !== it.face && overlaps(o, it) && (t.isFullDepth || types.get(o.id).isFullDepth));
     if (clash) {
@@ -810,6 +819,19 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
   }
   // Top down by the U a device's TOP occupies, not where it starts (ru is
   // its bottom): a tall device reaches higher than its ru alone would say.
+  // Nautobot: the items with no position there, each with the one it meets
+  const unplaced = new Map();
+  const uOf = it => it.u ?? 1;
+  if (target === 'nautobot') {
+    const wholeSpan = it => { const p = positionOf(rack.frame, it.ru, uOf(it)); return [Math.floor(p), Math.ceil(p + uOf(it)) - 1]; };
+    const placed = [];
+    const order = kept.filter(it => !offRails(it.mount)).map((it, k) => ({it, k})).sort((a, b) => a.it.ru - b.it.ru || a.k - b.k);
+    for (const {it} of order) {
+      const [lo, hi] = wholeSpan(it);
+      const met = placed.find(o => o.face === it.face && wholeSpan(o)[0] <= hi && lo <= wholeSpan(o)[1]);
+      if (met) unplaced.set(it.id, met); else placed.push(it);
+    }
+  }
   const topU = it => it.ru + it.u;
   const sorted = [...kept].sort((a, b) => topU(b) - topU(a) || (a.face === b.face ? 0 : a.face === 'front' ? -1 : 1));
   const rows = sorted.map(it => {
@@ -836,11 +858,18 @@ export function deviceImportRows({rack, items, types, target = 'netbox', dcim = 
                  `${host ? `, over ${names.get(host.id)?.name ?? host.label}` : ''}; ${T} has no field for that.`);
     }
     const position = positionOf(rack.frame, it.ru, it.u);
+    if (target === 'nautobot' && !zeroU) {
+      const met = unplaced.get(it.id), where = fillText(rack.frame, it.ru, uOf(it));
+      if (met) notes.push(`In ${where}, ${it.ru > met.ru ? 'above' : 'with'} ${names.get(met.id).name}; no position, since Nautobot stores whole rack units.`);
+      else if (!Number.isInteger(it.ru) || !Number.isInteger(uOf(it)))
+        notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
+    }
+    const none = zeroU || unplaced.has(it.id);
     const comments = notes.join(' ');
     return target === 'nautobot'
       ? {name: n.name, role__name: role, device_type__manufacturer__name: t.manufacturer ?? '',
          device_type__model: t.model ?? '', status__name: 'Planned', location__name: site,
-         rack__name: rack.name, rack__location__name: site, position: zeroU ? '' : position, face: zeroU ? '' : it.face, comments}
+         rack__name: rack.name, rack__location__name: site, position: none ? '' : Math.floor(position), face: none ? '' : it.face, comments}
       : {name: n.name, role, manufacturer: t.manufacturer ?? '', device_type: t.model ?? '',
          status: 'planned', site, rack: rack.name, position: zeroU ? '' : position, face: zeroU ? '' : it.face, comments};
   });
