@@ -1,10 +1,10 @@
 # Rack file version 4: one version for everything held back
 
-Status: proposed 2026-10-11, nothing built. Issues #935 (the scope, decided
-2026-10-10), #970, #949 (step 4), #934, #939, #972, with #983, #986, #1007,
-#966 and #908 read beside them. Each section ends in a recommendation; the
-questions that need a person are gathered in section 10, and everything else
-is settled here and says so.
+Status: proposed 2026-10-11, revised after a first review, nothing built.
+Issues #935 (the scope, decided 2026-10-10), #970, #949 (step 4), #934, #939,
+#972, with #983, #986, #1007, #966 and #908 read beside them. The questions
+that need a person are gathered in section 10; everything else is settled
+here and says so.
 
 Builds on the rack file as it stands (`kit/rack/model.js`, `VERSION` 3,
 `spec/schemas/rack.schema.json` under `/schemas/v2/`), and on four notes that
@@ -32,8 +32,8 @@ unused label; a label is never reused), an identity migration from 3, and a
 reader that acts on each key or holds it safely.
 
 **It is not** a new document shape. A version-3 file is a valid version-4
-file, byte for byte apart from the number. Rows of racks, a room, and anything
-that needs a second rack in one drawing stay out (section 12).
+file apart from the number. Rows of racks, a room, and anything that needs a
+second rack in one drawing stay out (section 12).
 
 **Adjustable positions (#950) need no rack key.** A position is a field value,
 and a rack item already carries `fields`. Version 4 only gives a zero-U entry
@@ -42,7 +42,7 @@ same way.
 
 ### 1.1 Every key of version 4
 
-| key | on | from | what version 4 does with it |
+| key | on | from | what the first version-4 reader does with it |
 |---|---|---|---|
 | `ru` in steps of 0.5 | item | section 2 | read, fitted, drawn, exported |
 | `roll` (`90`, `180`, `270`) | item | section 6 | read, fitted by the rolled box; `180` drawn and routed; quarter turns drawn as an outline until #550 |
@@ -50,35 +50,35 @@ same way.
 | `swaps`, `fields` | zero-U entry | section 4 | read and applied, as on an item |
 | `heldBy` `{parts}` | zero-U entry | section 5 | read, fitted, exported |
 | `slack` | cable | section 3 | read, placed, measured, exported |
-| `lay` | cable | section 3.7 | `face` is acted on; `position` is kept, and read when lay order is built |
-| `straps` (`breakout`, `anchors`) | bundle, cable | section 3.8 | defined in the schema; needs no bump of its own |
-| `heldBy` `{item, at, x, z, turn}` | item | rack products, 7.2 | read and kept; fit refuses what it cannot yet judge (section 7) |
-| `setback` | frame, item | rack products, 8 | read, fitted, used by routes |
-| `channel` | zero-U entry | rack products, 3 | read; overlap judged per channel |
-| `width`, `startU`, `holes.style: round`, `options` | frame | rack products, 9 | read and kept; `startU` moves labels and exported positions |
+| `lay` | cable | section 3.9 | `face` is acted on; `position` is kept, and read when lay order is built |
+| `straps` (`every`, `breakout`, `anchors`) | bundle | section 3.10 | read, placed, counted |
+| `straps` (`anchors`) | cable | section 3.10 | read, placed, counted |
+| `setback` | frame, item | section 7 | read, fitted, used by routes |
+| `startU`, `holes.style: round` | frame | section 7 | read, labelled, drawn, exported |
+| `channel` | zero-U entry | section 7 | read; overlap judged per channel |
+| `width`, `options` | frame | section 7 | read and kept; acted on only as section 7 states |
+| `heldBy` `{item, at, x, z, turn}` | item | section 7 | read and kept; fit refuses what it cannot yet judge |
 
-The last four rows are the rack products keys. The 2026-10-10 scope names
-five features and does not repeat them, but the decision of 2026-10-09 put
-them in version 4 and the setback record on #908 says they ship with it. This
-note reads the two together: they ride. It is listed as decision 1 only
-because the two lists differ on their face.
+The last five rows are the rack products keys. **That they ride is settled by
+the record,** and is not a question here: the decision of 2026-10-09 put them
+in version 4, the setback record on #908 says they ship with it, and item 2
+of the 2026-10-10 decision says any rack-format change the rack products note
+needs goes into version 4. Section 7 says what each does on day one and why
+the two that are only kept are safe to publish that way.
 
-### 1.2 Two changes to the reader that every key relies on
+### 1.2 What the reader keeps
 
 Read in `model.js`: `readItem` rebuilds an item from a fixed list of keys and
 `normalizeFrame` does the same for the frame, so a key neither knows is
-dropped on load and erased on the next save. `readCables` and `readZeroU`
-keep what they do not know. That difference is why three of the five bumps so
-far were needed.
+dropped on load and erased on the next save. `parseDoc` rebuilds each rack and
+the document from fixed keys in the same way. `readCables`, `readZeroU` and
+`readBundles` keep what they do not know. There have been two bumps (1 to 2,
+2 to 3); the second, for `bundles`, was for exactly this erasure, and every
+item or frame key of 1.1 would need one for the same reason.
 
-**Settled here:** from version 4, `readItem` and `normalizeFrame` keep keys
-they do not know, as `readCables` does. The keys they know are still
-normalised. A later optional key that is safe to ignore then needs no bump
-(the `side` precedent of #926); a key that is unsafe to ignore still does.
-
-**Settled here:** `kit/rack/validate.js` gains the `multipleOf` keyword, since
-the schema needs it for `ru` and the validator covers only the keywords the
-schema uses.
+Whether version 4 should keep unknown keys at all four levels is decision 9.
+The validator (`kit/rack/validate.js`) gains the `multipleOf` keyword, since
+the schema needs it for `ru`; that is settled here.
 
 ## 2. Half-U positions (#970)
 
@@ -123,13 +123,15 @@ reported in #970 is in the Rack Builder and the rack file.
 
 ### 2.2 What the kit does today
 
-Measured, by running `fits` from `kit/rack/fit.js` on a 42U four-post frame:
+Measured, by running `fits` and `shrinkRack` from `kit/rack/fit.js` on a 42U
+four-post frame:
 
 | case | answer today | right answer |
 |---|---|---|
 | a 0.5U item at U20, then a second 0.5U item at U20 | refused, "Taken by" | allowed in the other half |
 | a 1U item at U2, over a 1.5U item at U1 | allowed | refused: the 1.5U item fills half of U2 |
 | a 1U item at U13, over a 3.5U item at U10 | allowed | refused |
+| a 3.5U item at U10 and a 1U item at U20, shrunk to 12U | the 1U item is packed to `ru: 4.5`, and `parseDoc` then refuses the saved file ("Item 2 has no device or no U.") | the 1U item at U5 |
 
 Read: every height in the kit is `Math.max(1, chassis.ru)` and every span is
 the closed whole-unit range `[ru, ru + u - 1]` (`fit.js` `span`, `fits`,
@@ -138,8 +140,8 @@ the closed whole-unit range `[ru, ru + u - 1]` (`fit.js` `span`, `fits`,
 device is therefore a 1U device, and a 1.5U device has a top of `ru + 0.5`,
 which a closed whole-unit test never meets. Three catalogue devices state a
 height that is not a whole number: the XCU10 (0.5), the BATM TM-7124S (1.5)
-and the Juniper MX104 (3.5). The second and third rows of the table are a
-fault in saved version-3 racks today, and version 4 fixes it with the first.
+and the Juniper MX104 (3.5). The last three rows of the table are faults in
+version-3 racks today, and version 4 fixes them with the first.
 
 Read: the loader refuses a file whose item `ru` is not an integer
 (`readItem`), the schema says `integer`, and the commands take an integer
@@ -188,8 +190,7 @@ collision, the elevation rows, the routing anchors and the exports all ask
 "which half units does it fill" and "where is its body in millimetres". Under
 (a) those come from one number and the device height. Under (b) every one of
 them must remember a second key, and the one that forgets is the fault of
-section 2.2 again, silently. Zero-U parts are untouched by all three: they
-already stand at `offsetMm`.
+section 2.2 again, silently.
 
 **Against a height that is not 0.5.** A 1.5U device at U13 needs no new
 position under any format; what it needs is a span that ends at 14.5 and not
@@ -202,14 +203,14 @@ bracket bolts wherever the upright has a hole. For a rail item it says more
 than the hardware allows: an item meets holes only at whole or half units
 (2.5), and both DCIMs want units.
 
-**Recommendation: (a).** `ru` stays the bottom of the item, counted bottom-up
-from 1, and may be any multiple of 0.5 from 1. The schema says
-`{"type": "number", "minimum": 1, "multipleOf": 0.5}`. It is the NetBox field,
-it is the unit the library already writes heights in, and it is the only one
-of the three that a careless reader cannot half read. Format (b) is the
-smaller diff and keeps `ru` an integer for a consumer that only labels by it;
-that is its one advantage, and the version gate already keeps such a consumer
-away from a file it would misread.
+**Recommendation: (a)** (decision 1). `ru` stays the bottom of the item,
+counted bottom-up from 1, and may be any multiple of 0.5 from 1. The schema
+says `{"type": "number", "minimum": 1, "multipleOf": 0.5}`. It is the NetBox
+field, it is the unit the library already writes heights in, and it is the
+only one of the three that a careless reader cannot half read. Format (b) is
+the smaller diff and keeps `ru` an integer for a consumer that only labels by
+it; that is its one advantage, and the version gate already keeps such a
+consumer away from a file it would misread.
 
 ```json
 {"id": "i8", "ref": "xcu", "cfg": "XCU10-21IC", "label": "ODF A", "ru": 12,
@@ -218,11 +219,24 @@ away from a file it would misread.
  "face": "front", "turned": false, "swaps": {}, "fields": {}}
 ```
 
-What stays whole: the frame `heightRU`, a lane waypoint `{lane, ru}` (a lane
-point is the middle of a unit), a rack-face part and its `unit` on a host, and
-a zero-U part (`offsetMm`, written as a whole number of units as today). A
-rack-face part over an item that starts on a half takes
-`unit = ru - floor(host.ru) + 1`.
+What stays whole:
+
+- the frame `heightRU`;
+- a lane waypoint `{lane, ru}`: a lane point is the middle of a unit;
+- **a rack-face part.** Its own `ru` is a whole unit, and a half is refused.
+  Its host is the rack device on its face that fills more of that unit than
+  any other, the lower one when two fill it equally. Its `unit` counts whole
+  units from the one the bottom of the host is in:
+  `unit = ru - floor(host.ru) + 1`, from 1 to
+  `ceil(host.ru + units) - floor(host.ru)`. `settleManagers` and `moveItem`
+  put it back at `floor(host.ru) + unit - 1`. For a host on a whole unit that
+  is the rule of today.
+
+A zero-U part is not on the rails and keeps `offsetMm`. The commands write a
+whole number of units for one placed by hand, as today; a part hung on
+brackets takes the offset its brackets give it, which is not a whole unit
+(section 5), and zero-U fit is judged in millimetres from version 4
+(decision 12).
 
 ### 2.4 Spans, and the one function that says where a body is
 
@@ -240,21 +254,53 @@ other file computes them:
   `{y0, y1, h, lo, hi}`, millimetres above the bottom of the rails. `lo` and
   `hi` are the span edges, `(ru - 1) * RU` and `(ru - 1 + units) * RU`.
 
-**The rule `itemBox` implements: a body is centred in its span.**
-`y0 = lo + (hi - lo - h) / 2`. The reason is the rail: a rack panel is made a
-little short of its units and its ears put it in the middle of them, so the
-gap is shared above and below (an EIA-310 1U panel is 43.66 mm in a 44.45 mm
-unit; that figure is from the standard as generally cited, not from a file
-here). A body that states more height than its span (a duct cover) stands on
-`lo`. With `unitsOf` right, the XCU10 is centred in a 22.225 mm span and the
-2D and 3D pictures agree to 0.0125 mm.
+With `unitsOf` right, a half-unit body fills its half-unit span either way
+(22.2 mm in 22.225), and the fault of #970 is gone whichever rule `itemBox`
+uses for a body shorter than its span. That rule is a separate choice.
 
-Every reader of a height moves to it: `solids.js` (its `y0`), `route.js`
-`pointOf` and the `portPoint` fallback (the middle of the box, not of the
-bottom unit), the routing context formula for `portY` and for a guide box
-(`y1` less the face `y`), the strap extents of the bundle note, and the two
-site drawings. A test asserts that the site imports it and computes no `y`
-from `ru` itself (section 9).
+**Bottom or centred.** What decides it on a real rack is the ear: the ear
+bolts to the holes, and the body hangs where the ear puts it.
+
+- Read in `kit/rack/rails.js`: the three holes of a unit are symmetric about its
+  middle (6.35 and 38.1 are each 15.875 from 22.225). Read in
+  `spec/tools/portrayal/ears.py` and `kit/relief.js`: the generic ear lays its
+  slots symmetrically over the height of the ear, and the ear is the height
+  of the body unless `chassis.ears.y` and `chassis.ears.h` say otherwise. So
+  the model the library already draws puts **the middle of the ear on the
+  middle of the span**, and with a default ear that is the middle of the body.
+- Standing a body on the bottom of its span says its bottom edge is level
+  with the unit line. That is true only of a body exactly as tall as its
+  units; for a shorter one it puts the ear slots below the holes they bolt
+  to, by half the difference.
+
+Measured over the 230 rack devices that state both `ru` and `height`: the
+gap between the span and the body has a median of 0.65 mm; 16 devices have a
+gap over 2 mm and 5 over 4 mm, the largest the FS DINRAIL4U at 12.7 mm (then
+the Casa C100G at 6.85 and the Juniper MX960 at 6.3); 13 bodies are taller
+than their span (finger ducts with covers). Centring moves a body by half its
+gap, so **in 3D and in the kit solids, 214 of 230 bodies rise by a millimetre
+or less, sixteen by 1 to 6.35 mm**, and their ports with them. The 2D
+elevation already centres and does not move.
+
+**Recommendation: the ear rule, which is centred for a default ear**
+(decision 2). `y0 = lo + (hi - lo - earH) / 2 - earY`, with `earY` 0 and
+`earH` the body height where the catalogue states no ear box. A body taller
+than its span stands on `lo`. The catalogue row gains the ear box when #908
+adds `ears` to `rack.json`; until then every body is centred.
+
+Readers of a height, and what each does:
+
+- `solids.js`: `y0` from `itemBox`. This is what moves in 3D.
+- The routing context `portY`, and a guide box: the face `y` is measured down
+  from `y1`. For a centred body this is the formula of today.
+- `route.js` `pointOf`, and the `portPoint` fallback: `lo + RU / 2` for an
+  item of one unit or more, which is the figure of today, so **no saved
+  routed length moves here**; the middle of the box for an item under one
+  unit, where the figure of today is the top edge of the box.
+- The strap extents of the bundle note, and the two site drawings.
+
+A test asserts that nothing under `kit/rack/` outside `fit.js` computes a
+height from `ru` (section 9).
 
 ### 2.5 The rack holes
 
@@ -283,9 +329,8 @@ above its bottom (`HOLE_DY`), so the spacing up a rail is 15.875, 15.875,
 1. A position is a multiple of 0.5. Anything else is refused by the schema
    and the commands.
 2. **A device whose height is a whole number of units is refused at a half
-   position**, with a sentence: "QFX5120-48Y is 1U; its ears meet the rail
-   holes only at a whole unit, and U12.5 is a half unit." The arithmetic above
-   is the reason, and it holds for any ear on the standard pattern.
+   position** (decision 3), with a sentence: "QFX5120-48Y is 1U; its ears
+   meet the rail holes only at a whole unit, and U12.5 is a half unit."
 3. **A device whose height is not a whole number may start on a whole unit or
    on a half.** Whether its ears meet the holes there is checked only when the
    catalogue states its ear slot heights. No catalogue row does today, so in
@@ -296,37 +341,49 @@ above its bottom (`HOLE_DY`), so the spacing up a rail is 15.875, 15.875,
 4. The top of the rack: `ru + units - 1 <= heightRU` becomes
    `ru + units <= heightRU + 1`.
 
-**For the drawn ears.** Read: `spec/tools/portrayal/ears.py` plans a generic
-ear with `units = max(1, floor(h / U + 0.5))` and spaces three slots across
-each unit, and `kit/relief.js` does the same in 3D. For a 22.2 mm body that
-is one unit squeezed to 22.2 mm with three slots 7.9 mm apart, which no rail
-takes. **Settled here:** the slot heights of a generic ear come from the rail
-pattern through one helper, `holesIn(lo, hi)` in `kit/rack/rails.js` (every
-hole centre at least 3 mm inside the range), mirrored in `ears.py`. A
-half-unit ear then has one slot, 6.35 mm up when the device is drawn alone
-and wherever its half puts it when it is in a rack. This is a drawing change
-in library tooling, not a rack-file change, so it is a follow-up issue beside
-the version-4 pull request and not part of it; the Rack Builder draws the ears
-of an item through `holesIn` from the start. Only the three devices of 2.2 are
+**For the drawn ears.** Read: `ears.py` plans a generic ear with
+`units = max(1, floor(h / U + 0.5))` and spaces three slots across each unit,
+and `kit/relief.js` does the same in 3D. For a 22.2 mm body that is one unit
+squeezed to 22.2 mm with three slots 7.9 mm apart, which no rail takes.
+**Settled here:** the slot heights of a generic ear come from the rail
+pattern through one helper, `holesIn(lo, hi)` in `kit/rack/rails.js` (every hole
+centre at least 3 mm inside the range), mirrored in `ears.py`. A half-unit
+ear then has one slot, 6.35 mm up when the device is drawn alone and wherever
+its half puts it when it is in a rack. This is a drawing change in library
+tooling, not a rack-file change, so it is a follow-up issue beside the
+version-4 pull request and not part of it; the Rack Builder draws the ears of
+an item through `holesIn` from the start. Only the three devices of 2.2 are
 affected, and the XCU10 draws no ears until its gap closes.
 
-### 2.6 Labels and queries
+### 2.6 Labels, queries and packing
 
-- **`uText(frame, ru)`** names a position: "U12", "U12.5". `positionOf` is
-  generalised to the lowest-numbered half unit the item fills, as NetBox
-  defines a position: `ru` on a bottom-up frame, and
-  `heightRU + 2 - (ru + units)` on a top-down one. That is the present
-  formula with a fractional height, and it gives 31 for the physical upper
-  half of the unit labelled 31 and 31.5 for the lower half, the order in
+- **Labels.** With `startU` (section 7, absent is 1) the label of a whole
+  unit `u` is `startU - 1 + u` on a bottom-up frame and
+  `startU - 1 + heightRU - u + 1` on a top-down one.
+- **`positionOf(frame, ru, units)`** is the lowest-numbered half unit the
+  item fills, as NetBox defines a position: `startU - 1 + ru` bottom-up, and
+  `startU - 1 + heightRU + 2 - ru - units` top-down. That is the present
+  formula with a fractional height. On a 42U top-down frame a 0.5U item
+  stored at `ru: 12` is at 31.5 and one stored at 12.5 is at 31, the order in
   which the NetBox `units` property lists a descending rack (read at the
-  commit above; the half-unit labelling of a descending rack was not tried on
-  a running instance, and the build does so).
+  commit above; not tried on a running instance, and the build does so).
+- **`uText(frame, ru, units)`** names a position through `positionOf`: "U12",
+  "U12.5". It takes the height because a top-down label of a half depends on
+  it. `uLabel` stays for whole units (lanes, managers, the rail numbers).
 - `fitsAt` and `freeUs` take and return half positions. `freeUs` lists whole
   positions for a whole-unit device and both for any other.
 - `describe` and `inspect` print spans as "U12.5" or "U13-U14.5".
-- The commands (`place`, `move`, `patch`, `side.place`) take `ru` as a number
-  in steps of 0.5; a rack-face part is still refused a half.
-- `shrinkRack` packs in half units.
+- The commands (`place`, `move`, `patch`) take `ru` as a number in steps of
+  0.5; `side.place` and a rack-face part are still refused a half.
+- **`shrinkRack`.** Clusters are formed by `spanOf` overlap, and a cluster
+  height is its top edge less its bottom edge, in half units. Each cluster
+  moves by one shift, so every item in it keeps its parity. **The shift is a
+  whole number of units for a cluster that holds any item of a whole-unit
+  height or any rack-face part, and a multiple of 0.5 otherwise.** The cursor
+  that packs clusters upward is therefore rounded up to the next position of
+  the parity the cluster already has. In the fourth row of 2.2 the 1U item
+  lands at U5 and half a unit stays free under it. A device never lands on a
+  half it would be refused at by rule 2 of 2.5.
 
 ### 2.7 What the exports write
 
@@ -342,36 +399,35 @@ For two XCU10 panels at `ru: 12` and `ru: 12.5` on a bottom-up frame:
 | draw.io | a cell from `itemBox`, half a unit high | the same, in the upper half |
 | BOM mounting hardware | 2 screws and 2 cage nuts | the same |
 
-- **Nautobot.** The rule is general: a device is written at the whole unit its
-  bottom is in, with a comment saying which part of it it fills; a later
-  device whose rounded span meets one already written is kept in the rack with
-  no position and no face, as a held item is (rack products, 7.4), and its
-  comment says where it is. It is not left out of the file, since both rows
-  import. That Nautobot refuses two devices in one unit on one face is
+- **Nautobot** (decision 7). Each item has a whole-unit span there: from
+  `floor(p)` to `ceil(p + units) - 1`, where `p` is its `positionOf`. Items
+  are taken in order of their stored `ru`, lowest first, and in the order the
+  rack lists them where two share a `ru`. An item whose whole-unit span meets,
+  on its face, that of one already written with a position is kept in the
+  rack with no position and no face, as a held item is (rack products, 7.4),
+  and its comment says where it is. The others are written at `floor(p)` with
+  a comment saying which part of the span they fill. On the top-down frame of
+  2.6 both panels have `floor(p)` 31; the one stored at `ru: 12` is written
+  there. That Nautobot refuses two devices in one unit on one face is
   inferred from its whole-unit walk and is tried on a running instance in the
   build.
-- **Mounting hardware.** A half unit has one hole an ear, so the count is 2
-  for an item under one unit and `4 * floor(units)` otherwise. The row text
-  changes from "Two per ear for each U a device covers" to "Two per ear for
-  each whole U a device covers, and one per ear for a device under 1U".
+- **Mounting hardware** is decision 11.
 - **draw.io** `drawioU` is whole units from the top. It becomes the top of the
-  box in units from the top, in steps of 0.5; the vendor cabinet shape takes a
-  fractional row.
-
-**Recommendation, for the whole feature:** format (a), spans half-open in half
-units from `spanOf`, bodies centred by `itemBox`, whole-unit devices refused
-at a half, and the upper of two half-unit devices unpositioned in Nautobot.
+  box in units from the top, in steps of 0.5.
 
 ## 3. Slack, stock length and lay (#949 step 4)
 
 ### 3.1 What is there today
 
 Read in `kit/rack/route.js`: a routed length is the path, plus an end
-allowance from a sourced table (`END_ALLOWANCE_BY_MEDIA`: what is inside the
-port, and for copper and DAC half of how short the maker lets a cord be), plus
-a `DRESSING_ALLOWANCE` of 0.1 m an end that has no source and is marked
-temporary until this step. `stockLength` then takes the next size in
-`STOCK_M`, with a tolerance of one nanometre. Only the path is drawn.
+allowance from a sourced table (`END_ALLOWANCE_BY_MEDIA`), plus a
+`DRESSING_ALLOWANCE` of 0.1 m an end that has no source and is marked
+temporary until this step. The table holds two things added together: what
+is inside the port, and for copper and DAC a constant 25 mm an end for how
+short the maker lets a cord be (copper: 9.5 inside and 25 short, 34.5 in
+all; a cable with no media takes the copper figure). `stockLength` then takes
+the next size in `STOCK_M`, with a tolerance of one nanometre. Only the path
+is drawn.
 
 Measured on the reference rack of #949: one cord has a 397 mm path, a
 measured length of 0.62 m (397 plus two ends of 113.1 mm) and a 1 m stock
@@ -385,45 +441,53 @@ reads it.
 
 ### 3.2 The lengths, named
 
-**Settled here.** Four words, each one number:
+**Settled here.** Each word is one number:
 
 - **path**: the routed points, port face to port face.
-- **need**: the path, plus what the end table says is inside the ports, plus
-  the short tolerance of the maker. It is what the cord must at least be.
+- **need**: the path, plus what is inside the two ports, plus the short
+  tolerance of the maker. It is what the cord must at least be.
 - **stock**: the length bought. Pinned by the user, or chosen by the kit.
 - **spare**: stock less need. It is real cable, and it is somewhere.
+- **end play**: the part of the spare that stays at the two ends, in the
+  curves into the ports, and is never coiled. `END_PLAY_M` is 0.1 m an end.
+- **to store**: the spare less the end play, never below zero.
 
-`DRESSING_ALLOWANCE` goes, as its comment says it will. What replaces it is
-named for what it is: **`MIN_SPARE_M`, 0.2 m a cable**, the least spare the
-kit will choose a stock size with. It is the same 0.2 m, moved out of the
-measured length and into the spare, so **no stock size on a saved rack
-changes because of the move**, while every measured length drops by 0.2 m and
-is at last what was measured.
+`DRESSING_ALLOWANCE` goes, as its comment says it will. `END_PLAY_M` is the
+same 0.1 m an end under the name of what it is, moved out of the need and
+into the spare. **No stock size on a saved rack changes because of the
+move.**
 
 - **The chosen stock** is the smallest size `s` in `STOCK_M` with
-  `s + BREAK_TOL_M >= need + MIN_SPARE_M` (and, where a slack entry states a
-  value, with that value in place of the minimum when it is larger).
-- **`BREAK_TOL_M`** settles #983. Recommended: 0.01 m. A cord may be chosen
-  with up to 10 mm less than the minimum spare, so 500.018 mm no longer buys
-  a metre. The figure is one twentieth of the minimum spare; it also covers
-  the spread of the LC plug depth estimate at two ends (1.8 mm each, read in
-  the `route.js` comment). It is applied in `stockLength` and nowhere else.
-  It is decision 5, since it moves stock sizes at the breaks.
-- **The copper tolerance becomes proportional** (the note on #949 of
-  2026-10-10). The table keeps what is inside the port (9.5 mm an end for an
-  RJ45 plug), and the short tolerance is 1 per cent of the stock length, half
-  at each end, solved with the stock size: 50 mm at 5 m as now, 300 mm at
-  30 m where the constant gave 50. DAC keeps its stated 50 mm to 5 m. Fibre
-  and AOC have none (their makers state plus tolerances only).
-- **`length`** keeps its shape. `{value, unit, source: "routed", measured}` is
-  a stock size the kit chose, with `measured` now the need; `source:
-  "entered"` is a stock length the user pinned, and is never touched. No new
-  key is needed to pin a stock length.
+  `s + BREAK_TOL_M >= need + 2 * END_PLAY_M`, and where the slack entries
+  state values, with their sum in place of nothing: `need + 2 * END_PLAY_M +
+  values`.
+- **`BREAK_TOL_M`** settles #983 (decision 5). Recommended: 0.01 m.
+- **The short tolerance, with its floor.** For copper (`cat6`, `cat6a`) and
+  for a cable with no media or a media the table does not know, it is
+  **the greater of 50 mm and 1 per cent of the stock length**, half at each
+  end. Up to 5 m that is the 25 mm an end of today, exactly, so no need and
+  no stock size moves there; at 7 m it is 70 mm, at 30 m 300 mm where the
+  constant gave 50. It is solved with the stock size, taking sizes in order.
+  DAC keeps its stated 50 mm at every length (its source covers lengths to
+  5 m). Fibre and AOC have none: their makers state plus tolerances only.
+  The floor is why the note on #949 (2026-10-10) is met without shortening
+  any cord: a bare 1 per cent would be 10 mm at 1 m, 40 mm less than today.
+- **The table** keeps its name, `END_ALLOWANCE_BY_MEDIA`, and becomes the
+  inside part alone: 13.1 mm for LC fibre, 9.5 for copper and for no media,
+  0 for DAC, 52.4 for AOC. `shortTolerance(cable, stock)` is the other part.
+- **What stock sizes change on a saved rack:** a cord within 10 mm over a
+  break drops a size (decision 5), and a copper cord of 7 m or more may rise
+  one. Nothing else. The test of section 9 names each on the reference rack.
+- **`length`** keeps its shape and its `source`: `routed` is a stock size the
+  kit chose, `entered` a stock length the user pinned, which is never
+  touched. No new key is needed to pin one. What the kit stores beside a
+  routed value is decision 6.
 - **A pinned length shorter than the need** is a finding ("c7 is 0.5 m and
   needs 0.62 m."), as `inspect` already shows a negative slack.
 
 For the reference cord: path 397 mm, need 423 mm (two LC ends of 13.1 mm),
-stock 1 m (0.5 m leaves 77 mm of spare, under the minimum), **spare 577 mm**.
+stock 1 m (0.5 m would leave 77 mm, under the end play), **spare 577 mm:
+200 mm of end play and 377 mm to store.**
 
 ### 3.3 What the file records
 
@@ -433,7 +497,7 @@ with one more kind of entry:
 ```json
 {"id": "c2", "a": {"item": "i3", "path": "bay-2/module/p1", "view": "front"},
  "b": {"item": "i5", "path": "p14", "view": "front"}, "media": "os2",
- "length": {"value": 1, "unit": "m", "source": "routed", "measured": 0.42},
+ "length": {"value": 1, "unit": "m", "source": "routed", "need": 0.42},
  "route": [{"item": "i4", "via": "r3"}],
  "slack": [{"item": "i4", "via": "tray", "form": "coil"}]}
 ```
@@ -444,18 +508,12 @@ with one more kind of entry:
 | `{end: "a" \| "b", value?, unit?}` | spare left at that end of the cable, on nothing the library describes |
 
 - **`form`** is `coil` (the default, decided 2026-10-09), `serpentine` or
-  `spool`. A `spool` entry names a tray whose `slack` is a spool.
-- **`value` absent means the rest.** At most one entry of a cable has no
-  value; entries with a value take theirs first. Values that add up to more
-  than the spare are a finding ("c7 stores 1.5 m in mgr-1 tray and has 0.6 m
-  to spare."), and the stock size is chosen to cover a stated value.
-- **No `slack` key** means the kit places the spare itself (3.5). An empty
-  list, `"slack": []`, means the user wants none placed; the spare is then
-  stated and marked as not placed.
-- **Lay order on a shared tray** is the cable key `lay`, each entry
-  `{item, via, position?, face?}`, as section 7 of the cable lay note fixed
-  it. A coil sits at the lay position of its cable, so coils on one tray are
-  ordered as the cables are.
+  `spool`. Version 4 gives a shape to `coil` only (3.6).
+- **`value` absent means the rest** of what is to store. At most one entry of
+  a cable has no value; entries with a value take theirs first.
+- **No `slack` key** means the kit places it (3.7, decision 8). An empty
+  list, `"slack": []`, means the user wants none placed.
+- **Lay order on a shared tray** is the cable key `lay` (3.9).
 
 An older reader keeps `slack` and `lay` (a cable keeps keys `readCables` does
 not know) and misreads `slack`: it measures without it and edits a tray off
@@ -465,65 +523,58 @@ that held `slack` without acting on it. **That guard is not needed:** version
 
 ### 3.4 Is the spare drawn?
 
-| | (1) stated, not drawn | (2) a loop sized to the stock length | (3) coils on a spool or in a manager volume |
+| | (1) stated, not drawn | (2) turns sized to the length stored | (3) a stylised hank |
 |---|---|---|---|
-| what is drawn | the path, with a tag | the path and one loop at the storage place, its length the spare | the path and a stylised hank at the storage place |
-| from the library | nothing | a place states that it holds slack and its floor: `tray.slack`, which exists | the same, plus a drum height on a spool for the turn count |
-| bend radius | not applicable | every turn at or above the installed radius, checked as the path is | by rule of the hank, not by geometry |
-| nothing in reach | no different | the spare is marked as not placed | the same |
-| cost in 3D | none | one tube a turn: three turns for the reference cord | one solid a cable |
-| what the picture can be trusted for | routes only; a 0.5 m and a 1 m cord are one picture | **the tube drawn is the cable bought**, where the spare is placed | that slack exists and where; not how much |
+| what is drawn | the path, with a tag | the path and flat turns at the storage place, as long as what is stored there | the path and one solid at the storage place |
+| from the library | nothing | a place states that it holds slack and its floor: `tray.slack`, which exists | the same, plus a drum height on a spool |
+| bend radius | not applicable | every turn at or above the installed radius | by rule of the hank, not by geometry |
+| nothing in reach | no different | marked as not placed | the same |
+| cost in 3D | none | one tube a turn, bounded a cell and a tray (3.5) | one solid a cable |
+| what the picture can be trusted for | routes only; a 0.5 m and a 1 m cord are one picture | the tube drawn is the cable bought, less what 3.6 lists | that slack exists and where; not how much |
 
 **Recommendation: (2), drawn as flat racetrack turns, with (1) as the stated
-fallback where nothing can hold it.** It is the only option that answers the
-report: two cords of different stock sizes then differ in the picture by
-exactly the cable that differs.
+fallback where nothing can hold it** (decision 4). It is the only option
+that answers the report: two cords of different stock sizes on one route
+then differ in the picture.
 
-**The geometry.** A coil is `n` turns lying flat on the resting face of the
-tray, each an oval of two half circles of radius `r` joined by two straights
-of length `s`, so a turn is `2 * pi * r + 2 * s` long. For a spare `L`:
+**The geometry of one coil.** `n` turns lie flat on the resting face of the
+tray, one above the other. Each is an oval: two half circles of radius `r`
+joined by two straights of length `s`, so a turn is `2 * pi * r + 2 * s`
+long. Let `R` be the installed bend radius of the cable (`bendOf`), `d` its
+diameter, `rMax` the largest radius the floor allows across the run (half of
+the floor depth less `d`), and `sMax` the longest straight the cell allows
+(the cell length along the run less `2 * rMax + d`).
 
-- `r` is the largest radius the floor allows across the run, and never less
-  than the installed bend radius of the cable (`bendOf`, from the cable types
-  table);
-- `n` is the fewest turns whose oval fits along the run, in the cell between
-  two ring bands or on the open floor;
-- `s` is then `(L - n * 2 * pi * r) / (2 * n)`, so the turns add up to `L`
-  exactly.
+- **A coil cannot be made** when `rMax < R`: the command refuses with the
+  sentence of the cable lay note (Cat6A, 7.5 mm at 30 mm, needs 67.5 mm of a
+  61.2 mm strip), and the automatic placement skips the tray.
+- A turn holds from `2 * pi * R` to `2 * pi * rMax + 2 * sMax`.
+- For a length `L` to store, `n` is the fewest turns that can hold it. If
+  `n` turns at their shortest are still longer than `L`, the coil takes
+  `n - 1` turns at their longest and **the remainder is not coiled**; it is
+  less than one shortest turn and is stated with the end play.
+- Otherwise: with `r = rMax`, `s = (L - n * 2 * pi * rMax) / (2 * n)` when
+  that is zero or more; when it is negative, `s` is 0 and
+  `r = L / (2 * pi * n)`, which lies between `R` and `rMax`. The turns add up
+  to `L` exactly.
+- **There are no legs.** The oval touches the line the cable already lies
+  along on the floor, at one point; the cable goes round and carries on from
+  the same point. Nothing joins the path to the coil, so nothing is left out
+  of the sum.
 
 Worked for the reference cord on the FHD-CMP5DR (floor strip 448.4 by 61.2 mm
 with five ring bands of 6.8 mm, so six cells of 69.1 mm; 3 mm cord, installed
-radius 25 mm): `r` is 29.1 mm (61.2 less the cord, halved), one turn at that
-radius is 182.8 mm, three turns take 548.5 mm, and `s` is 4.7 mm. The oval is
-66 mm long and fits its cell. Drawn tube: 397 mm of path and 577 mm of coil.
-
-**The invariant.** For a cable whose spare is placed, **the drawn tube is as
-long as the stock length, less what the end table says is inside the two
-ports and less the copper or DAC short tolerance**, which is not cable. It
-does not hold in four cases, and each is said on the drawing and in the list:
-
-1. **A spare under one turn at the bend radius** (157 mm for a 25 mm radius).
-   It cannot be coiled. It is stated ("0.12 m spare, in the dressing") and
-   not drawn. With a minimum spare of 0.2 m this arises only for a pinned
-   length.
-2. **Nothing in reach to hold it** (3.5). Marked "not placed".
-3. **An `{end}` entry.** No part holds it, so it has no shape. Stated ("0.6 m
-   spare at the A end"), tagged at that port, not drawn.
-4. **More than twelve turns in one place** (`TURNS_DRAWN`). The first twelve
-   are drawn and the tag gives the count and the length, so a 20 m spare does
-   not put a hundred tubes in the scene.
+radius 25 mm): `rMax` is 29.1 mm and `sMax` 7.9 mm, so a turn holds 157.1 to
+198.6 mm, and two hold 314.2 to 397.3. To store 377 mm: two turns at 29.1 mm
+with straights of 2.8 mm. Drawn tube: 397 mm of path and 377 mm of coil. On
+this narrow tray the ranges leave gaps (198.6 to 314.2, 397.3 to 471.2,
+595.9 to 628.3; none from five turns up), and a length in a gap leaves a
+remainder of up to 115.6 mm.
 
 **Bend rule.** The coil joins the path as points marked `at: "slack"` with
 their `item`, `via` and radius. `cornersOf` does not read them as corners; a
-coil is judged by its radius alone, and one below the installed radius cannot
-be made, since `r` is never chosen below it. The leg into and out of the coil
-is an ordinary corner and is in `bends` with the rest (kit 0.17.0). A cable
-whose loop is too wide for the floor is refused by the command with the
-sentence the cable lay note gives (Cat6A, 7.5 mm at 30 mm, needs 67.5 mm of a
-61.2 mm strip), and skipped by the automatic placement.
-
-**A full tray.** Decided 2026-10-09: storing into a full tray warns at
-`FILL_LIMIT` and draws the turns as they fall, above the lip if need be.
+coil is judged by its radius alone. Where the cable enters and leaves the
+oval it is tangent to its own line, so no corner is added.
 
 **2D.** Decided 2026-10-09: a marked loop at the tray, in the cable colour,
 with the stored length in its tag. An elevation sees a flat coil edge on, so
@@ -532,127 +583,250 @@ with the stored length in its tag. An elevation sees a flat coil edge on, so
 **From the library.** Nothing new for a tray: `slack: {kind: area}` and the
 floor are enough, and the FHD-CMP5DR states both. A spool
 (`slack: {kind: spool, at, diameter}`) gains an optional `height`, the drum
-between its flanges, so the kit can say how many turns it takes; without it a
-spool takes one layer. The FHD enclosures are the first parts with spools
-(cable lay note, section 6) and none is modelled with one yet. Vertical ducts
-state no `slack` and hold none in version 4 (section 12).
+between its flanges, when the first one is modelled; none is yet (cable lay
+note, section 6). Vertical ducts state no `slack` and hold none in version 4.
 
-### 3.5 Where the spare goes when the file does not say
+### 3.5 More than one cable on a tray
 
-**Recommendation: the kit places it, by a rule that does not depend on which
-end the cable is read from, and says so.**
+`lay.position` is not built in this pull request, so nothing here reads it.
+The rules below need only what the path already gives.
+
+- **The cell.** A floor is cut into cells by the ring bands across it; an
+  open floor is one cell. A coil goes in the cell that holds the middle of
+  the stretch its cable lies along on the tray, by distance along the path.
+  Read from either end that is the same cell.
+- **Stacking.** Turns in one cell lie one above another, in the order their
+  cables claimed the cell. A turn takes the diameter of its cable in height.
+- **The bound of a cell** is the stack height of the tray (its `lip`, or
+  where a ring bounds the stretch, the height of the ring opening: 29.5 mm
+  on the FHD-CMP5DR) times `FILL_LIMIT`. At 0.4 that is 11.8 mm: three turns
+  of a 3 mm cord a cell, **eighteen turns a tray, about 3.3 m of 3 mm cord.**
+  The cable lay note computed 42 m for the same tray from floor area times
+  height; no cord can fill that area at its bend radius, and this bound
+  replaces that figure.
+- **A full cell.** An automatic coil goes to the nearest cell of the same
+  tray with room (by distance between cell centres, the lower `x` on a tie),
+  then to the next candidate tray, then is not placed. A coil the user
+  pinned is placed all the same, warned about, and drawn as it falls
+  (decided 2026-10-09).
+- **The order cables claim room:** pinned entries first, then automatic
+  ones, each in order of cable id (the number in the id, then the text).
+  That order does not depend on the order of the file or on which end is
+  `a`.
+- **A bundle.** A member of a drawn bundle rides its trunk strapped, and one
+  member cannot be coiled out of a strapped trunk. Its spare is placed only
+  on a tray it lies on alone, after it leaves the bundle; a `cable.slack`
+  naming a tray it rides the trunk through is refused ("c7 rides Bundle 2
+  through mgr-1 tray: store its spare after it leaves the bundle."). With no
+  such tray it is not placed. A bundle storing its spare as one hank is left
+  for later; a `slack` key on a bundle is additive, since `readBundles` keeps
+  keys it does not know.
+- **What is drawn** is bounded by what fits: at most eighteen automatic turns
+  a tray on the FHD-CMP5DR. Pinned coils past the bound are drawn to twelve
+  turns a cell (`CELL_TURNS_DRAWN`) and then as one outline with a count.
+
+**What a full rack looks like.** A rack in use has 48 OS2 duplex cords
+through three FHD-CMP5DR lacers and two vertical managers, 1 m and 1.5 m
+stock against 0.8 to 1.2 m measured today. Worked from those figures, not
+measured on that rack: the need is 0.6 to 1.0 m, the spare 0.2 to 0.7 m, and
+after 0.2 m of end play each cord has 0 to 0.5 m to store, so a cord takes
+from no turn to three. At sixteen cords a lacer that is more turns than the
+eighteen a lacer holds: each cell shows its full stack of three ovals under
+the cords that pass over it, and the cords that claim last are marked as
+not placed because their lacer is full. The vertical managers show none.
+The scene gains at most 54 short tubes.
+
+### 3.6 What the picture can be trusted for
+
+**The rule.** For a cable whose spare is placed in coils, **the drawn tube is
+as long as the stock length, less what is inside the two ports, less the
+short tolerance, less the end play.** The list and the tag give the last
+three, so the three numbers a reader sees (path, coiled, at the ends) add up
+to what was bought.
+
+It does not hold, and the drawing and the list say so, in each of these
+cases. `stored` is the text column of 3.8; the mark is on the cable in 2D and
+3D.
+
+| case | what is drawn | what the list says |
+|---|---|---|
+| a pinned stock length under the need | the path, which is longer than the cable | the finding of 3.2; `stored` blank |
+| `"slack": []` | the path | "not placed (by choice)" |
+| a remainder under one turn (3.4) | the turns that fit | the remainder, added to "at the ends" |
+| less than one turn to store | the path | "0.12 m at the ends" |
+| valued entries that add up to less than what is to store | their coils | the rest as "not placed" |
+| valued entries that add up to more | their coils, to what there is | the finding "c7 stores 1.5 m in mgr-1 tray and has 0.6 m to spare." |
+| `form: serpentine` or `spool` | the path, and a tag at the place | the place and the length, "not drawn" |
+| an `{end}` entry | the path, and a tag at that port | "0.6 m at the A end" |
+| nothing on the route holds slack, or every cell is full | the path | "not placed", and a finding over 0.3 m (3.7) |
+| a member riding a bundle trunk through the tray | the path | "not placed: in Bundle 2" |
+| pinned coils past the drawn bound of a cell | twelve turns and an outline | the count and the length |
+| no length, a length kept as written, a loose end or no path | whatever path there is | `spare` blank |
+
+### 3.7 Where the spare goes when the file does not say
+
+**Recommendation: the kit places it, and says so** (decision 8).
 
 - **Candidates** are the supports the cable already rests on that state
   `slack` and whose floor takes a turn of this cable: the trays in the `rests`
   of its path. The kit **never reroutes a cable to reach a tray**, since that
-  would change the path that the spare is measured against.
-- **The choice**, in order: the candidate with the most free volume; then the
+  would change the path the spare is measured against.
+- **The choice**, in order: the candidate with the most free turns; then the
   one nearest the middle of the path, by distance along it; then the lowest
-  `item` id and `via`, compared as text. Each of the three reads the same from
-  either end, which is what #986 asks of the lay. A test writes each fixture
-  cable end for end and asserts the same place, the same turns and the same
-  length (section 9).
+  `item` id and `via`, compared as text.
 - **The automatic place is computed, not saved,** as an automatic route is.
-  It is saved when the user pins it (`cable.slack`), and then it is an entry
-  like any other. `inspect` marks which it is (`auto: true`).
+  It is saved when the user pins it (`cable.slack`). `inspect` marks which it
+  is (`auto: true`).
 - **No candidate:** the spare is not placed. It is a finding of kind
-  `spare-unplaced` when it is over 0.3 m (`UNPLACED_WARN_M`: one and a half
-  times the minimum, so a cord at the minimum never warns), with the sentence
-  "c2 has 0.58 m of spare and nothing on its route holds slack: route it
-  through a manager tray, or shorten it." Under that it is stated and not
-  warned about.
+  `spare-unplaced` when what is to store is over 0.3 m (`UNPLACED_WARN_M`),
+  with the sentence "c2 has 0.38 m to store and nothing on its route holds
+  slack: route it through a manager tray, or shorten it." Under that it is
+  stated and not warned about.
 
-The direction faults #986 lists in the path itself (`cornersOf` merging from
-one end, the first body met, the hang at one end) are not fixed by this note.
-The spare is measured against whichever path the kit lays, and the placement
-adds no new dependence on direction.
+**Direction (#986).** Read on #986: 38 of 1,803 sample cables measure
+differently when written end for end, because of the path, not of anything
+here. Version 4 does not fix #986. What it promises, and what its test
+asserts, is narrower: **given one path, the placement is the same when that
+path is read backwards** (the same tray, cell, turns and radius), because the
+cell rule, the choice and the claim order each read the same from either
+end. A cable whose path differs by direction will differ in its spare by the
+same amount, and the #986 sample must not gain a cable that differs
+(section 9).
 
-### 3.6 The exports
+### 3.8 The exports
 
 - **Cable schedule.** Two columns **appended after the last**, so no column
   read by position moves: `spare` (metres, a number) and `stored` (text:
-  "mgr-1 tray, coil, 3 turns", "A end", "not placed", or blank for a cable
-  with no length). The cable lay note planned one text column named `slack`;
-  two serve a spreadsheet better, since the length can be summed. Its
-  `straps` column follows them, as that note has it. **This is a download
-  format change**: a reader that takes columns by header is unaffected, one
-  that checks the column count is not.
+  "mgr-1 tray, coil, 2 turns, 0.38 m; 0.2 m at the ends", or one of the texts
+  of 3.6). The cable lay note planned one text column named `slack`; two
+  serve a spreadsheet better, since the length can be summed. Its `straps`
+  column follows them. **This is a download format change**: a reader that
+  takes columns by header is unaffected, one that checks the column count is
+  not.
 - **BOM.** The cable lines keep their shape; the length bought is the stock
   length, as now. One note line totals the spare ("Spare cable: 14.2 m of
-  31 m bought; 3 cords are not placed."), and one line names each cable whose
-  spare is not placed.
+  31 m bought; 3 cords are not placed."), and one line names each cable
+  whose spare is not placed.
 - **DCIM.** Nothing new: both targets import the stock length.
 - **draw.io.** The edge label of a cable gains its spare where it has a
   length ("1 m, 0.58 m spare").
 - **Bend findings (#1007)** join the same pass: one note line a cable in the
   schedule and BOM notes, `bends` on a cable in `inspect`, a count and the
-  worst in `describe`, and one finding a corner where two share a point. They
-  need no rack key, and they are built with this section because a coil adds
-  corners at its entry and exit that a reader must be told about.
+  worst in `describe`, and one finding a corner where two share a point.
+  They need no rack key.
 
-### 3.7 `lay`
+### 3.9 `lay`
 
-`lay` is in the schema as the cable lay note fixed it, with `position` and
-`face` each optional. `face` is acted on from the first build (the held face
-exists since step 3). `position` is kept and not acted on until lay order
-(step 5 of that note) is built; ignoring it moves a cable across its pathway
-by millimetres and is harmless, as that note argues.
+`lay` is in the schema as the cable lay note fixed it, each entry
+`{item, via, position?, face?}`. `face` is acted on from the first build (the
+held face exists since step 3 of that note). `position` is kept and not
+acted on until lay order is built; ignoring it moves a cable across its
+pathway by millimetres and is harmless, as that note argues.
 
 The gap behind a tray (#966) needs no key in version 4. If it becomes a
-pathway a user can pin, it is one more value in a `lay` entry, which is an
-additive schema change and needs no bump (1.2).
+pathway a user can pin, it is one more value in a `lay` entry, an additive
+schema change.
 
-### 3.8 Straps
+### 3.10 Straps
 
-Asked beside this note: a strap just before each point where a cable leaves a
-bundle, a strap securing a bundle to a manager or ring it passes, and the
-same for a single cable.
+Wanted from use, and added to the scope of this note: (1) a strap every
+12 in along a bundle; (2) at least one strap before each point where a cable
+leaves a bundle; (3) a bundle strapped to a cable manager it passes; (4) a
+single cable strapped to a manager too.
 
 Read: `straps()` in `kit/rack/bundles.js` places `ceil(L / every)` straps
-evenly along each run and moves one off a ring; a bundle carries
-`straps: {every}`; `readBundles` keeps the `straps` object whole when its
-`every` is valid. The tray contract states `ties`, the tie slots, and the
-cable lay note counts one strap a tie slot on the held face and none on the
-resting face (decided 2026-10-09).
+evenly along each run and moves one off a ring. A run is a stretch where two
+or more members ride, **merged across any point where two or more still ride
+on both sides**, so a cable leaving a bundle of four does not end a run. Each
+member carries where it joins and leaves the trunk (`ji`, `li` in
+`layoutOf`). A bundle carries `straps: {every}`; `readBundles` drops a
+`straps` whose `every` is not valid, and the command schema (`STRAPS` in
+`commands.js`) requires `every` and allows nothing else. The tray contract
+states `ties`, the tie slots. The cable lay note counts one strap a tie slot
+used on the held face of a tray and none on the resting face, and draws
+neither (its decision 3, 2026-10-09).
 
-**Whether any of it needs a rack key:**
+**Breakout straps (want 2).** Settled here, as geometry:
 
-- **Where the straps go is computed from version-3 data.** The end of a run
-  is already in what `straps()` returns (`runs`), and a peel point is on the
-  bundle member. A breakout strap is one strap within 50 mm before each end
-  of a run where a member leaves, unless an even strap is already that close.
-  An anchor strap is one at each tie slot the trunk or cable passes on a part
-  that states `ties`. Neither needs a key to exist.
-- **A ring states no tie point.** A strap at a D-ring would be geometry no
-  source gives. An anchor at a ring waits for a part that states one, which
-  is a library key on a guide and not a rack key.
-- **Turning a rule off, or on for one cable, is a rack key,** and an optional
-  one that is safe to ignore: a reader that ignores it only counts straps
-  differently. So it needs no bump (1.2). It is put in the version-4 schema
-  all the same, so the schema is published once:
-  `straps: {every?, breakout?: boolean, anchors?: boolean}` on a bundle, and
-  `straps: {anchors?: boolean}` on a cable.
-- **It changes the BOM strap count**, and anchors on the resting face reverse
-  part of the 2026-10-09 decision that straps under single cables are not
-  drawn or counted. That is decision 8.
+- **A peel point** is a place along the trunk where at least one member
+  joins or leaves it. The two ends of the trunk are peel points when members
+  fan out there.
+- **Which side.** A strap goes on each side of a peel point on which two or
+  more members ride, counting the member that peels there on the side it
+  rides. For a cable leaving a bundle of four that is both sides: four ride
+  before it and three after. For the last two members parting it is the one
+  side. The rule names sides by who rides, not by direction, so it is the
+  same when the bundle is written end for end.
+- **How far.** The strap centre is 25 mm from the peel point
+  (`BREAKOUT_MM`), which clears the 20 mm strap width.
+- **Within reason.** A spacing strap that already lies within 50 mm of where
+  a breakout strap would go, on the same side, serves as it and none is
+  added (`BREAKOUT_MERGE_MM`). Peel points closer than 75 mm along the trunk
+  are one group (`BREAKOUT_GROUP_MM`), strapped once on each outer side of
+  the group and not between. A side shorter than 50 mm of riding gets none.
+  A strap that would fall on a ring moves to its nearer edge, as now.
+- Each strap that `straps()` returns gains `kind`: `spacing`, `breakout` or
+  `anchor`. The count is the three together.
 
-### 3.9 What the kit gains
+**Anchor straps (wants 3 and 4).** An anchor ties what passes to the part it
+passes, and needs a place on the part to tie to. The only such place the
+library states is a tray tie slot.
 
-- `rack/route`: `needOf(path, cable)`, `spareOf(rack, cable, ctx)` returning
-  `{need_m, stock_m, spare_m, pinned}`; `MIN_SPARE_M`, `BREAK_TOL_M`,
-  `UNPLACED_WARN_M`, `TURNS_DRAWN`; `stockLength(need, {pinned})`.
-  `END_ALLOWANCE_BY_MEDIA` and `endAllowance` keep their names and lose the
-  dressing allowance and the copper tolerance; `shortTolerance(cable, stock)`
-  is new.
-- `rack/slack` (a new subpath): `slackPlan(rack, cable, ctx)` returning each
-  entry with `{item, via, form, metres, turns, r_mm, auto, points}` and
-  `unplaced_m`; `holdsOf(tray, cable)`; `slackFindings(rack, ctx, nameOf)`.
-- `routePath` returns the coil points in `points`, marked `at: "slack"`.
+- **A bundle:** one anchor at each tray with `ties` that its trunk lies on,
+  at the tie slot nearest the middle of its stretch there (the lower slot
+  index on a tie). On either face.
+- **A single cable on the held face:** one strap a tie slot used, as the
+  cable lay note already counts.
+- **A single cable on the resting face:** none today. Whether it gets one is
+  decision 10.
+- One strap at a slot serves every cable and bundle that passes it; the count
+  is by slot, never by cable.
+- **A ring states no tie point,** so nothing anchors to a ring or to a
+  vertical manager yet. That needs a library key, proposed as `guide.ties`
+  (the tray shape, `[{at, size}]`, on a ring or duct contract), and the parts
+  that would state it: `fs/d-ring-snap-in` (the FHD-CMP5DR rings) first, then
+  the `fs/cmh-*-ring` parts and the FS CMV vertical managers. It has no issue
+  yet; one is to be filed.
+
+**The keys.** `straps` on a bundle becomes
+`{every?, breakout?: boolean, anchors?: boolean}`: `every` absent is the
+default 12 in and `null` is none, as now; `breakout` and `anchors` absent are
+on. `straps` on a cable is `{anchors?: boolean}`. `readBundles` keeps a
+`straps` that has any valid key, and the command schema drops `required`.
+
+**Does it need the bump? Yes, for the bundle key.** A version-3 reader drops
+a `straps` with no valid `every`, so `{breakout: false}` alone is erased on
+its next save; with an `every` beside it the object is kept whole and the new
+keys ignored. Erasure is the bump case, and version 4 is the bump. The cable
+key alone would not need one (a cable keeps unknown keys).
+
+**Whether positions need a key: no.** Every strap position above is computed
+from what a version-3 file already holds and the `ties` of the library. The
+keys only turn a rule off.
+
+### 3.11 What the kit gains
+
+- `rack/route`: `needOf(path, cable, stock)`, `shortTolerance(cable, stock)`,
+  `spareOf(rack, cable, ctx)` returning
+  `{need_m, stock_m, spare_m, end_play_m, to_store_m, pinned}` (null without
+  a path: it never reads a saved number); `END_PLAY_M`, `BREAK_TOL_M`,
+  `UNPLACED_WARN_M`, `CELL_TURNS_DRAWN`; `stockLength(need, {values})`.
+- `rack/slack` (a new subpath): `slackPlan(rack, ctx)` for the whole rack
+  (cells are shared, so it is planned once), returning for each cable its
+  entries `{item, via, cell, form, metres, turns, r_mm, s_mm, auto, points}`,
+  `at_ends_m` and `unplaced_m`; `cellsOf(tray)`; `turnRange(tray, cable)`;
+  `slackFindings(rack, ctx, nameOf)`.
+- `routePath` returns the coil points in `points`, marked `at: "slack"`,
+  when the context carries the plan.
+- `rack/bundles`: `straps()` entries gain `kind`; `BREAKOUT_MM`,
+  `BREAKOUT_MERGE_MM`, `BREAKOUT_GROUP_MM`; `anchorsOf(rack, ctx)` for the
+  slots used by bundles and single cables.
 - Commands: `cable.slack {id, at: {item, via} | {end}, value?, unit?, form?}`
-  and `cable.slack.clear {id, at?}`; `cable.lay` as the cable lay note has it.
+  and `cable.slack.clear {id, at?}`; `cable.lay` as the cable lay note has
+  it; `bundle.update` and `cable.update` take the `straps` keys.
 - `inspect` of a cable: `slack` becomes
-  `{metres, stored: [...], unplaced_m}`, and `need` and `stock` join `length`.
-  `describe` gains one line ("Spare: 14.2 m; 3 cords not placed.").
+  `{metres, at_ends_m, stored: [...], unplaced_m}`, and `length` gains
+  `need`. `describe` gains one line ("Spare: 14.2 m; 3 cords not placed.").
 
 ## 4. Outlet states and readings (#934)
 
@@ -688,12 +862,14 @@ file first. This section gives the keys their exact shape.
   `parseDoc` has no catalogue. A state a part does not declare is kept and
   not applied: "outlet-a1 on PDU A cannot be standby: it can be on or off." A
   reading where the PDU meters nothing is kept and not shown: "EVMI2130X
-  meters its input only, so there is no reading for outlet-a1." The check
-  reads `pdu-class` and the state vocabulary, so `rack.json` gains each
-  device its switchable paths and its metering scope (additive, `format` 1).
+  meters its input only, so there is no reading for outlet-a1."
+- **The catalogue.** `rack.json` gains, for a device that has them,
+  `states: {<path>: [names]}` (the paths that declare a vocabulary) and
+  `metering: input | branch | outlet` beside the `pdu-class` it already
+  carries. Additive, `format` 1; written by `rack_index.py` (section 9,
+  part 4).
 - **Older readers.** A version-3 reader drops both keys from an item and
-  erases them on save; it keeps them on a zero-U entry and ignores them. The
-  first is why they need the bump.
+  erases them on save; it keeps them on a zero-U entry and ignores them.
 - **Applying them.** `statesFor(entry, facts)` in a new `rack/states` subpath
   returns the map to hand a drawing, expanded from each outlet to the lamps
   bound to it by `for:`, through the one expansion the PDU note requires for
@@ -704,26 +880,33 @@ file first. This section gives the keys their exact shape.
   refused with the sentences above. `patch` and `zerou.update` take `swaps`
   and `fields` on a zero-U entry.
 - **Exports.**
-  - **NetBox:** a new file in the import kit, `power-outlets.csv`, one row
-    for each outlet with a state set: `device`, `name`, `status`, with `on` as
-    `enabled` and `off` as `disabled`. Read at netbox-community/netbox commit
-    `84e19368`, `netbox/dcim/choices.py`: `PowerOutletStatusChoices` is
-    `enabled`, `disabled`, `faulty`. The file updates outlets the device type
-    created, so it is imported after the devices, and the kit README says so.
-  - **Nautobot:** nothing. Read at nautobot/nautobot commit `c77e4255`,
+  - **NetBox.** Decided 2026-10-08: `on` is `enabled` and `off` is
+    `disabled`. Read at netbox-community/netbox commit `84e19368`,
+    `netbox/dcim/choices.py`: `PowerOutletStatusChoices` is `enabled`,
+    `disabled`, `faulty`. **How the kit delivers it is not verified.** The
+    outlets exist once the device is created from its type, and a NetBox CSV
+    import creates rows unless each carries an `id`, which the kit cannot
+    know; a `power-outlets.csv` of `device`, `name`, `status` would most
+    likely be refused as duplicates. So the first choice is a step in the
+    import script the kit already ships for cables (`KIT_SCRIPT`), which
+    finds each outlet by device and name and sets its status. The
+    running-instance test of section 9 tries the CSV first and the script
+    second; **if neither works, the states go in the device comment**, one
+    line, as for Nautobot.
+  - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."). Read
+    at nautobot/nautobot commit `c77e4255`,
     `nautobot/dcim/models/device_components.py`: a `PowerOutlet` has `type`,
-    `power_port` and `feed_leg`, and no status. The states go in the device
-    comment, one line ("Outlets off: A2, A7.").
+    `power_port` and `feed_leg`, and no status.
   - **Readings** are in no DCIM file. The sheets, the BOM notes and draw.io
     that show one state its source and time (decided 2026-10-08).
 
 ## 5. PDU brackets (#939)
 
 A zero-U PDU on a frame with no zero-U channel hangs on two brackets bolted to
-an upright. The bracket is a library device (FS-PDUBK, to be modelled with #939 as a
-`mount: rack-side` part);
-its keyholes are placements whose part carries `interface: pdu-button`; the
-PDU mount points carry `mates: pdu-button` (PDU note, 6.2; rack products, 3).
+an upright. The bracket is a library device (FS-PDUBK, to be modelled with
+#939 as a `mount: rack-side` part); its keyholes are placements whose part
+carries `interface: pdu-button`; the PDU mount points carry
+`mates: pdu-button` (PDU note, 6.2; rack products, 3).
 
 **How the hosting is written.** Each bracket is a zero-U entry of its own, so
 the parts list counts it and it is drawn where it is. The PDU entry names
@@ -753,9 +936,10 @@ them:
   Every reader that sorts or labels a zero-U part by where it is goes on
   working, and `zeroUBottom` still names the unit.
 - **Off the whole unit.** A held PDU has an `offsetMm` that is not a whole
-  number of units (120.65 above). Zero-U overlap is therefore judged in
-  millimetres from version 4 (`offsetMm` to `offsetMm + h`), not in units,
-  and **a part does not overlap the parts that hold it**.
+  number of units (120.65 above). Read: `fitsZeroU` and `settleZeroU` judge
+  in whole units today (`zeroUBottom` rounds the offset). How overlap is
+  judged from version 4 is decision 12; either way **a part does not overlap
+  the parts that hold it**.
 - **Fit**, in order, each a sentence:
   1. every id in `parts` is a zero-U entry of the rack whose part offers a
      slot with the interface the PDU mates: "z9 is not a bracket in this
@@ -784,10 +968,12 @@ them:
   DCIMs names what it hangs on ("0U, on 2 FS-PDUBK brackets at left-rear,
   from U4; NetBox has no field for that."), and each bracket is a zero-U
   device row with its own comment, as a duct is today.
-- **Library.** FS-PDUBK is built with #939 as a plain device first; its
-  `mount-points` side is published in `rack.json` as `slots` for the part
-  (`[{interface, at}]`, millimetres above its own bottom), beside the
-  `mount-points` a PDU already gets.
+- **The catalogue.** `rack.json` gains, for a part that offers slots,
+  `slots: [{interface, at}]`, millimetres above its own bottom, derived from
+  its placements as a PDU `mount-points` already is. Additive, `format` 1;
+  written by `rack_index.py` (section 9, part 4). FS-PDUBK is built with
+  #939 as a plain device first, and this pull request tests against a
+  fixture part.
 
 ## 6. Roll
 
@@ -832,182 +1018,286 @@ item is seen in the elevation of the face it is on, applied after `face` and
 - **Commands.** `patch` takes `roll: 90 | 180 | 270 | null`, refused where
   the rolled box does not fit.
 
-## 7. DIN devices on a shelf rail (#972)
+## 7. The rack products keys, and DIN devices on a shelf rail (#972)
+
+The first review asked the right question of these keys: this note rejects
+publishing `slack` as a key that is read and kept before anything acts on
+it, so why may `heldBy`, `width` and `options` be published that way?
+
+**The difference is who can write the key.** `slack` is written by a command
+any user can run on any rack, and a reader that ignores it writes a wrong
+length into the file. `width`, `options`, `channel` and item `heldBy` can be
+written only by choosing a product frame or a host from the catalogue, and
+the catalogue has neither yet (read: there is no `library/racks/`, and
+`spec/schemas/device.schema.json` defines no `hosts`). The kit release that
+first offers a product frame or a host is the release that acts on its keys.
+A file edited by hand to carry one is kept whole and said to be unjudged; no
+number in it is rewritten.
+
+What each does in the first version-4 reader:
+
+| key | acts on day one | what a hand-written value gets |
+|---|---|---|
+| `setback` (frame, item) | **fully**, as rack products section 8 has it: the order (item, device default ear position, frame, flush), fit against `usableDepth` and the other face, routed port and guide depth, export notes; the 30 mm showcase default goes | the same: any user may set it |
+| `startU` (frame) | **fully**: an integer from 1, absent is 1; labels and `positionOf` (2.6); the NetBox rack row gains `starting_unit`; Nautobot has no field, so a comment line | the same |
+| `holes.style: round` | **fully**: kept by `normalizeFrame`, drawn round, and the mounting hardware rows read as for square holes with the note "Round holes: check what fixing your rail takes." | the same |
+| `channel` (zero-U entry) | overlap is judged per channel when the frame `ref` names a product whose row lists that channel | with no such row: the part stands outside at its point, as today, and a notice says the channel is not known |
+| `width` (frame) | 19 is drawn and fitted as today; the NetBox rack row writes the value | another width is kept and exported, the rack is drawn as 19 in, and a notice says so |
+| `options` (frame) | kept, and listed in `describe` | the same; nothing reads an option until a product row defines one |
+| `heldBy` (item) | kept; the item keeps the `ru` it has; fit says "i7 is held by i4, and DINRAIL2U states no rail to hold a device, so it is not checked."; exported in the rack with no position and a comment (rack products, 7.4) | the same; **placing a new one is refused** until the catalogue describes hosts |
+
+`setback`, `startU` and round holes can be set by a user on a generic frame,
+so they are built in full and have tests (section 9, part 3). The other four
+wait for catalogue data, and each has the one safe behaviour above and a test
+that it survives a round trip and is never rewritten.
+
+### 7.1 DIN devices on a shelf rail (#972)
 
 **The rack-file part is in version 4. The feature is not built with it, and
 needs no version 5.**
 
 What #972 needs from the rack file is one statement: this item is on that
-rail of that item, so far along it. The rack products note wrote that key
-(its 7.2), `heldBy: {item, at, x}`, with `at` the id of a host of `kind:
-rail`, and version 4 carries it (1.1). The depth of the rail follows the
+rail of that item, so far along it. That is `heldBy: {item, at, x}`, with
+`at` the id of a host of `kind: rail`. The depth of the rail follows the
 shelf adjustment through `fields` (#950, decided 2026-10-10), so it needs no
-key either. The DCIM answer is also written (rack products, 7.4): a device in
-the rack with no position and no face, and a comment saying what it is on.
+key either. The DCIM answer is written (rack products, 7.4).
 
 What is **not** ready, and why the build waits:
 
-- The library has no `hosts:` key yet (read: `spec/schemas/device.schema.json`
-  does not define it), and the DINRAIL2U and DINRAIL4U manifests state no
-  rail, profile or usable span. The profile has to be read from the FS
-  source, not assumed.
+- The library has no `hosts:` key, and the DINRAIL2U and DINRAIL4U manifests
+  state no rail, profile or usable span. The profile has to be read from the
+  FS source, not assumed.
 - A `mount: din-rail` device does not yet state the rail profiles it clips to
   in a form fit can compare (#734).
 - Whether a DIN device on a shelf should be a child device in either DCIM
   instead of an unpositioned one was asked in #972 and not checked upstream.
 
-So version 4 reads and keeps an item `heldBy`, writes its `ru` as the host
-bottom unit, moves it with its host, exports it unpositioned with its
-comment, and **refuses to place a new one** until the catalogue describes
-hosts: "DINRAIL2U states no rail to hold a device." When the library gains
-`hosts:`, placing starts to work on files version 4 already reads.
-
-This holds only if the rack products keys ride in version 4 (decision 1). If
-they do not, `heldBy` waits, and #972 with it, for version 5.
+When the library gains `hosts:`, placing starts to work on files version 4
+already reads.
 
 ## 8. Migration, and what each reader does
 
 - **3 to 4** is the identity: `d => ({...d, version: 4})`. Nothing in a
-  version-3 file changes shape or meaning. The bump is so that a version-3
-  page refuses a file it would erase keys from (`states`, `readings`, `roll`,
-  item `heldBy` and `setback`, the frame keys), misplace (`ru: 12.5` it
-  refuses outright; `channel`, zero-U `heldBy`) or measure wrongly (`slack`).
+  version-3 file changes shape or meaning on load. The bump is so that a
+  version-3 page refuses a file it would erase keys from (`states`,
+  `readings`, `roll`, item `heldBy` and `setback`, the frame keys, a bundle
+  `straps` without `every`), misplace (`ru: 12.5` it refuses outright;
+  `channel`, zero-U `heldBy`) or measure wrongly (`slack`).
 - **A version-3 reader given a version-4 file** refuses it whole, with the
   sentence it has today: "This rack file is version 4; this reader supports
   up to version 3." Nothing is read in part.
 - **A version-4 reader given a version-3 file** migrates it on load and saves
-  it as version 4. Three things then differ, none of them in the file:
-  1. **Overlaps the old fit allowed.** A 1.5U or 3.5U item with another in
-     the unit its top half fills (2.2) now overlaps. Both are kept where they
-     are, as fit keeps an item it would no longer accept, and a notice names
-     them: "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is."
-  2. **Measured lengths drop by 0.2 m** and stock sizes stay, except at a
-     break within `BREAK_TOL_M` and for copper of 7 m and over (3.2). The
-     page says once which stock sizes moved, as it does after any re-measure.
-  3. **Faceplates move** with the setback order of the rack products note
-     (its section 8): the 30 mm showcase default goes.
-- **Zero-U overlap** is judged in millimetres (section 5). Parts written at
-  whole units, which is every part a version-3 file holds, overlap exactly as
-  before.
-- **The schema** is `spec/schemas/rack.schema.json` with `version` const 4
-  and `$id` `https://portrayal.dev/schemas/v3/rack.schema.json`. The file
-  under `/v2/` stays as published. `docs/format-stability.md` gains the
-  version-4 section in the build.
+  it as version 4. `parseDoc` measures nothing, as today.
+
+**What then changes in the file, and when.** Only routed lengths, and only
+when a page measures them, which it does through `lengths.routed` exactly as
+today (`withRoutedLengths`: a cable with no length or a routed one; never an
+entered one). On that first measure each routed cable has its length object
+rewritten: the stock value where a size moved (3.2), and the stored figure
+beside it (decision 6). **The spare is never computed from a saved figure:**
+`spareOf` measures the path it is given and returns null without one, so a
+file that has not been re-measured shows no spare and not a wrong one.
+
+**What changes on the page, with nothing changed in the file:**
+
+1. **Overlaps the old fit allowed.** A 1.5U or 3.5U item with another in the
+   unit its top half fills (2.2) now overlaps. Both are kept where they are,
+   as fit keeps an item it would no longer accept, and a notice names them:
+   "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is."
+2. **Bodies in 3D and the kit solids** rise by half the gap between body and
+   span under decision 2: a millimetre or less for 214 of 230 rack devices,
+   up to 6.35 mm for the rest. A check of a tube against a solid moves with
+   them. Routed lengths do not move for this (2.4).
+3. **Coils appear** on every saved rack whose cables rest on a tray that
+   holds slack (decision 8).
+4. **Faceplates move** with the setback order: the 30 mm showcase default
+   goes (rack products, 8).
+5. **Strap counts rise** by the breakout and anchor straps (3.10).
+
+**The schema** is `spec/schemas/rack.schema.json` with `version` const 4 and
+`$id` `https://portrayal.dev/schemas/v3/rack.schema.json`. The file under
+`/v2/` stays as published, and the site must serve the new path beside the
+old one before a version-4 file is written anywhere, since a saved file may
+name its schema. `docs/format-stability.md` gains the version-4 section in
+the build.
 
 ## 9. Build order inside the one pull request
 
 One branch, one commit a part, in this order. Each part lands with its tests,
-and the full kit suite runs at the end of each.
+and the kit suite runs at the end of each.
 
 | | part | tests it needs |
 |---|---|---|
-| 1 | **The format.** `VERSION` 4, the migration, the schema under `/v3/`, `multipleOf` in the validator, `readItem` and `normalizeFrame` keeping unknown keys, every key of 1.1 read and round-tripped. | A version-3 fixture opens and saves as version 4 with nothing else changed. Each key of 1.1 survives parse and serialise. A version-3 `parseDoc`, kept as a fixture, refuses a version-4 file with its sentence. The schema accepts `ru: 12.5` and refuses `12.25`. A file with an unknown item key and frame key keeps both. |
-| 2 | **Spans and boxes.** `unitsOf`, `spanOf`, `itemBox`, `holesIn`, `uText`, `positionOf`; every site of `Math.max(1, ru)` moved to them; `freeUs`, `shrinkRack`, the commands. | The three rows of 2.2, each asserting the right answer. Two 0.5U items in one unit, no overlap, boxes that tile the unit. A 1U item refused at a half with its sentence. `positionOf` on a top-down frame for both halves. A source scan that fails when `kit/rack/` computes a height from `ru` outside `fit.js`. |
-| 3 | **Roll.** `facePoint`, the rolled box, `roll: 180` through solids, resting and routes. | Fixture 3 of the cable lay note (two managers back to back, the lower with `roll: 180`). A port on a rolled item at the mirrored point. A quarter-turned item taking its rolled units and refusing a neighbour. |
-| 4 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `channel`, `heldBy`.** Overlap in millimetres; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
-| 5 | **Lengths and slack.** `needOf`, `spareOf`, `MIN_SPARE_M`, `BREAK_TOL_M`, the proportional copper tolerance, `slackPlan`, the coil points, `cable.slack`, the automatic place, the findings. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm of a break changing, each named in the test. For each placed coil, the summed length of the drawn points equals stock less the inside ends, to 1 mm. Each fixture cable written end for end gives the same place, turns and length. A Cat6A cord is refused the FHD-CMP5DR tray with its sentence. A cable with no tray on its route gets `spare-unplaced` over 0.3 m and none under. The test asserts it placed at least one coil, so an empty plan cannot pass. |
-| 6 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, `power-outlets.csv`, the comments for roll, brackets and held items, the bend lines of #1007. | Golden files for both DCIM kits with two half-unit items in one unit. The schedule header ends `..., status, notes, spare, stored, straps`. An import of the NetBox kit, and of the Nautobot kit, into a running instance, with two half-unit devices in one unit: both files import whole. |
-| 7 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored` and `unplaced_m`. |
-| 8 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here, the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
+| 1 | **The format.** `VERSION` 4, the migration, the schema under `/v3/`, `multipleOf` in the validator, the reader keeping what decision 9 says, every key of 1.1 read and round-tripped. | A version-3 fixture opens and saves as version 4 with nothing else changed. Each key of 1.1 survives parse and serialise. A version-3 `parseDoc`, kept as a fixture, refuses a version-4 file with its sentence. The schema accepts `ru: 12.5` and refuses `12.25`. A file with an unknown key at each level decision 9 names keeps it. |
+| 2 | **Spans and boxes.** `unitsOf`, `spanOf`, `itemBox`, `holesIn`, `uText`, `positionOf`; every site of `Math.max(1, ru)` moved to them; `freeUs`, `shrinkRack`, the manager host rule, the commands. | The four rows of 2.2, each asserting the right answer, the shrink row also asserting that the result parses. Two 0.5U items in one unit, no overlap, boxes that tile the unit. A 1U item refused at a half with its sentence. `positionOf` and `uText` on a top-down frame for both halves (31 and 31.5). A manager on a host that starts on a half. A source scan that fails when `kit/rack/` computes a height from `ru` outside `fit.js`. A check that `pointOf` gives the figure of today for every item of one unit or more on the routing fixtures. |
+| 3 | **The frame and setback.** `startU`, round holes, `width` and `options` kept, `setback` on frame and item with its order, `channel` read. | Labels and exported positions with `startU: 5`, both directions. A setback fitted against `usableDepth` and the other face; a decrease never refused. A routed length that follows a setback. A hand-written `width: 23`, `options` and item `heldBy` each surviving a round trip unchanged, with its notice. Placing a held item refused with its sentence. |
+| 4 | **The catalogue.** `rack_index.py` writes `slots`, `states` and `metering` into `rack.json`; the `rack.json` section of `format-stability.md`. | `spec/tests/test_rack_index.py`: the EVMA8365X row lists its switchable outlet paths and `metering`; the EVMI2130X row lists no outlet states; a fixture part with keyholes gets `slots`. `rack.json` stays `format` 1. |
+| 5 | **Roll.** `facePoint`, the rolled box, `roll: 180` through solids, resting and routes. | Fixture 3 of the cable lay note (two managers back to back, the lower with `roll: 180`). A port on a rolled item at the mirrored point. A quarter-turned item taking its rolled units and refusing a neighbour. |
+| 6 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `heldBy`.** Overlap as decision 12 says; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
+| 7 | **Lengths and slack.** `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackPlan` with cells and bounds, the coil points, `cable.slack`, the automatic place, the findings. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For each placed coil, the summed length of the drawn points equals what the plan says is stored, to 1 mm, and path plus coiled plus at the ends plus inside plus tolerance equals the stock length. A length in each gap of 3.4 leaves the stated remainder; a length between the shortest and the longest single turn gives `s` of 0 and a radius in range. **Direction:** `slackPlan` on a path and on the same path reversed gives the same tray, cell, turns and radius; and the #986 sample script reports no more cables differing by direction than before (38). Twenty cords through one FHD-CMP5DR: eighteen turns placed at most, the rest not placed, none dropped. A bundle member is refused the trunk tray. A Cat6A cord is refused the tray. Each row of the table of 3.6 has a case asserting its `stored` text. The test asserts it placed at least one coil. |
+| 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. `{breakout: false}` alone survives a round trip and turns breakouts off. The BOM count equals the three kinds summed. |
+| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. |
+| 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
+| 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
-The site follows in portrayal-site once the kit is published: the 2D and 3D
-drawings read `itemBox` and `facePoint`, draw the coil points, and draw
+The site follows in portrayal-site once the kit is published: it serves the
+schema under `/v3/` beside `/v2/`; the 2D and 3D drawings read `itemBox` and
+`facePoint`, draw the coil points and the three kinds of strap, and draw
 bracket-hung PDUs. Its browser check asserts, for two half-unit items in one
 unit, that neither drawn box overlaps the other in 2D or in 3D, and that a
-0.5 m and a 1 m cord on one route draw tubes of different length.
+0.5 m and a 1 m cord on one route through a lacer draw tubes of different
+length.
 
 **Not in the pull request, and no format change when they come:** lay order
 by `position` (cable lay step 5), the quarter turns of #550, placing a new
-held item (section 7), the gap behind a tray (#966), the direction faults of
-#986, the generic ear slots in `ears.py` (2.5), and spools on the FHD
-enclosures.
+held item (7.1), the gap behind a tray (#966), the direction faults of #986,
+the generic ear slots in `ears.py` (2.5), spools, and ring anchors (3.10).
 
 ## 10. Decisions to take
 
-Each says what is one-way. Everything else in this note is settled above.
+Twelve. Each says what is one-way. Decisions 2, 6, 9, 11 and 12 are
+independent choices that the first draft settled silently and a person
+should see; the rest are the choices of design.
 
-1. **Do the rack products keys ride in version 4?** (`setback`, item
-   `heldBy`, `channel`, `width`, `startU`, round holes, `options`.)
-   Options: (a) yes, as decided 2026-10-09 and recorded on #908; (b) no, the
-   five features of 2026-10-10 only, and those keys wait for version 5.
-   **Recommend (a).** The one-bump rule is the reason version 4 exists, and
-   (b) makes a version 5 certain and sends #972 to it. One-way either way:
-   the version-4 schema is published once.
+1. **The half-U position format.** (a) `ru` in steps of 0.5; (b) integer
+   `ru` and `half: lower | upper`; (c) a millimetre offset. **Recommend (a)**
+   (2.3): it is the NetBox field, it is one number, and a reader cannot read
+   half of it. One-way: a saved key and a published schema.
 
-2. **The half-U position format.** Options: (a) `ru` in steps of 0.5;
-   (b) integer `ru` and `half: lower | upper`; (c) a millimetre offset.
-   **Recommend (a)** (section 2.3): it is the NetBox field, it is one number,
-   and a reader cannot read half of it. One-way: a saved-format key and a
-   published schema.
+2. **Where a body shorter than its span sits.** (a) by its ear, which is
+   centred for a default ear; (b) on the bottom of its span, as 3D and the
+   kit solids do today. **Recommend (a)** (2.4): the ear bolts to holes that
+   are symmetric about the middle of the unit, and (b) draws every short
+   body with its ear slots below the holes. Under (a) 3D and the solids
+   move: 214 of 230 rack devices by a millimetre or less, sixteen by up to
+   6.35 mm. Under (b) the 2D elevation moves down by the same amounts
+   instead. Either way one function answers for both. Two-way in the file;
+   one-way in that every published picture of a rack follows it.
 
-3. **A whole-unit device at a half position: refused, or warned about?**
-   Options: (a) refused, since its ears meet no hole there (2.5); (b) allowed
-   with a warning, as NetBox allows it. **Recommend (a).** The arithmetic
-   holds for every ear on the standard pattern, and a rack that cannot be
-   built should not be drawn as built. Two-way in the kit; loosening it later
-   breaks nothing saved.
+3. **A whole-unit device at a half position.** (a) refused, since its ears
+   meet no hole there (2.5); (b) allowed with a warning, as NetBox allows
+   it. **Recommend (a).** Two-way: it is a kit rule, nothing saved depends
+   on it, and loosening it later breaks no file. Agents match its sentence.
 
-4. **Is the spare drawn?** Options: (1) stated only; (2) drawn as flat
-   racetrack turns at the storage place, with the tube as long as the cable
-   bought; (3) a stylised hank. **Recommend (2)** with (1) as the fallback
-   where nothing holds it (section 3.4). Two-way for the picture. One-way
-   for what rides with it: the coil points in `routePath`, the `stored`
-   fields of `inspect`, and the `spare` and `stored` columns of the cable
-   schedule, which are a download format change.
+4. **Is the spare drawn?** (1) stated only; (2) flat racetrack turns at the
+   storage place; (3) a stylised hank. **Recommend (2)**, with (1) where
+   nothing holds it (3.4 to 3.6). The picture is two-way. One-way: the coil
+   points in `routePath`, the `stored` fields of `inspect`, and the `spare`
+   and `stored` columns of the cable schedule, a download format change.
 
-5. **The stock break.** Options: (a) `MIN_SPARE_M` 0.2 m and `BREAK_TOL_M`
-   0.01 m; (b) the same minimum and no tolerance; (c) another minimum.
-   **Recommend (a).** The minimum is the dressing allowance already decided,
-   under its right name, so no stock size moves for it; the tolerance settles
-   #983 with a figure that has a stated reason. One-way: stock sizes change
-   on saved racks at the breaks, and for copper of 7 m and over through the
-   proportional tolerance.
+5. **The stock break (#983).** (a) `BREAK_TOL_M` 0.01 m: a cord up to 10 mm
+   short of full end play is still chosen; (b) no tolerance; (c) another
+   figure. **Recommend (a).** It is one twentieth of the end play and covers
+   the spread of the LC plug depth estimate at two ends (1.8 mm each).
+   One-way: on a saved rack, each cord within 10 mm over a break drops a
+   stock size at its next measure. The end play itself (0.2 m) and the
+   copper floor (50 mm) keep the figures of today and move nothing.
 
-6. **Does the kit place the spare when the file names no place?** Options:
-   (a) yes, on a tray the cable already rests on, by the rule of 3.5, computed
-   and not saved; (b) no, the spare is unplaced until the user stores it.
-   **Recommend (a).** Under (b) the picture that prompted this note does not
-   change until someone edits every cable. Two-way: nothing is saved.
+6. **What is stored beside a routed length.** Today the file holds
+   `length.measured`, the path plus allowances plus 0.2 m of dressing.
+   (a) keep the name and change what it means, to the need; (b) keep the
+   name and its old meaning, and add nothing; (c) write a new field, `need`,
+   and stop writing `measured`, which is dropped from a cable at its next
+   measure. **Recommend (c).** No saved number then changes meaning under
+   its old name, and a file that still has `measured` is plainly one not yet
+   re-measured. One-way: a saved-format field.
 
-7. **Nautobot and two half-unit devices in one unit.** Options: (a) the
-   first positioned, the later kept in the rack with no position and a
-   comment; (b) the later left out of the file; (c) each given a whole unit
-   of its own in the export. **Recommend (a).** It imports, it loses no
-   device, and it says no position that is false; (c) would export a rack
-   taller than the one drawn. One-way: an imported device keeps where it was
-   put.
+7. **Nautobot and two half-unit devices in one unit.** (a) the lower stored
+   `ru` positioned, the other kept in the rack with no position and a
+   comment; (b) the other left out of the file; (c) each given a whole unit
+   of its own. **Recommend (a)** (2.7). It imports, loses no device, and
+   states no position that is false. One-way: an imported device keeps where
+   it was put.
 
-8. **Straps at breakouts and at tie points.** Options: (a) both computed
-   and counted, on by default for bundles, anchors for single cables only on
-   the held face as now, with the optional `straps` keys of 3.8 to turn each
-   off; (b) (a), and anchors for single cables on the resting face too, which
-   reverses part of the 2026-10-09 decision; (c) leave straps as they are.
-   **Recommend (a).** It gives the breakout strap and the anchor to a
-   manager without counting straps no source can place. The keys are
-   optional and need no bump. One-way: the BOM strap count changes.
+8. **Does the kit place the spare when the file names no place?** (a) yes,
+   on a tray the cable already rests on, computed and not saved; (b) no, it
+   is not placed until the user stores it. **Recommend (a)** (3.7). Under
+   (b) the picture that prompted this note does not change until someone
+   edits every cable. Nothing is saved, so the file is two-way; but **every
+   saved rack with a slack-holding tray is redrawn with coils the day it
+   lands**, and a reader should expect that.
+
+9. **Unknown keys.** Today an unknown key is kept on a cable, a zero-U
+   entry and a bundle, and dropped from an item, the frame, a rack and the
+   document. (a) keep them at all seven levels from version 4; (b) keep them
+   on items and the frame only; (c) leave it. **Recommend (a).** A later
+   optional key that is safe to ignore then needs no bump, whichever level
+   it sits at, as `side` did not. The cost is that a misspelt key is kept
+   and not reported; the schema still reports it to anyone who validates.
+   One-way in practice: later keys will rely on it.
+
+10. **Straps: what is delivered on day one.**
+
+    | wanted | (a) | (b) | (c) |
+    |---|---|---|---|
+    | every 12 in along a bundle | yes, as today | yes | yes |
+    | a strap before each point where a cable leaves a bundle | yes | yes | no |
+    | a bundle strapped to a manager it passes | yes, at a tray that states tie slots (the FHD-CMP5DR today); not at a ring or a vertical manager | the same | no |
+    | a single cable strapped to a manager | on the held face of a tray only, as the cable lay note counts now | on either face of a tray that states tie slots: one strap at the tie slot nearest its stretch, shared by every cable at that slot | no |
+
+    (b) reverses one clause of decision 3 of the cable lay note
+    (2026-10-09): that straps on the resting face are neither drawn nor
+    counted, because gravity holds the cable there. Under (b) they are
+    counted and drawn as a band at the slot, as a bundle strap is. Its cost
+    is in the BOM: up to one strap a tie slot a tray, sixteen on an
+    FHD-CMP5DR, and fewer in practice since cords in one cell share a slot.
+    Still deferred under (b): anything strapped to a ring or to a vertical
+    manager, until those parts state a tie point (`guide.ties`, 3.10; issue
+    to be filed). **Recommend (b):** it is what was asked for, on every part
+    that can honestly take it. One-way: the BOM strap count, and the `kind`
+    of a strap in the kit output.
+
+11. **The mounting hardware count.** Today it is `4 * max(1, units)` an
+    item. (a) `4 * units`, with no floor of 1: the XCU10 goes from 4 to 2,
+    and nothing else changes (the TM-7124S stays 6, the MX104 14); (b) by
+    whole units, `4 * floor(units)` and 2 under one unit: the MX104 goes
+    from 14 to 12 and the TM-7124S from 6 to 4; (c) leave it, and count 4
+    for a half-unit panel with one slot an ear. **Recommend (a).** It fixes
+    the one count the hole pattern shows to be wrong and moves no other.
+    One-way: a BOM line.
+
+12. **Zero-U overlap.** Today it is judged in whole units, from the offset
+    rounded to a unit and the units the part states. (a) in millimetres,
+    from `offsetMm` to `offsetMm` plus its stated units times 44.45; (b)
+    whole units as now, with only the rule that a part does not overlap its
+    holders added. **Recommend (a).** A part written at a whole unit, which
+    is every part a version-3 file holds, overlaps exactly as before, and a
+    PDU hung at 120.65 mm is judged where it is. Two-way in the file;
+    one-way in that fit answers follow it.
 
 ## 11. One-way items
+
+**That follow from a decision above**, and fall with it:
+
+| item | follows from |
+|---|---|
+| `ru` as a multiple of 0.5; `positionOf` and `uText` in halves; the half positions in every export | 1 |
+| `itemBox` and where 3D bodies and solids stand | 2 |
+| the coil geometry, `at: "slack"` points, cells and their bound, `CELL_TURNS_DRAWN`, the texts of 3.6, `spare` and `stored` in the schedule, the BOM spare lines, the draw.io label | 4 |
+| `BREAK_TOL_M` and the stock sizes it moves | 5 |
+| `length.need`, and `measured` no longer written | 6 |
+| the Nautobot order and its two comment lines | 7 |
+| the automatic place and its three-step choice; `UNPLACED_WARN_M`; `spare-unplaced` | 8 |
+| the reader keeping unknown keys | 9 |
+| breakout and anchor straps, their distances, `kind`, the strap count | 10 |
+| the hardware row and its text | 11 |
+| zero-U spans in millimetres | 12 |
+
+**That stand whatever is decided**, because the scope already fixes them:
 
 | item | where | why it is one-way |
 |---|---|---|
 | rack file version 4 under `/schemas/v3/`, with every key of 1.1 | rack file, schemas | an older page refuses a version-4 file; a label is never reused |
-| `ru` as a multiple of 0.5, the bottom of the item | rack file | saved files carry it |
-| `unitsOf`, `spanOf` (half-open), `itemBox` and the centred rule, `facePoint`, `holesIn`, `uText` | kit API | pages place and route by them; changing the centred rule moves every body |
-| a whole-unit device refused at a half position | kit fit | agents and pages match the sentence |
-| `positionOf` in halves, and the top-down formula | kit, exports | exported positions follow it |
-| the Nautobot rule for a shared unit, and its two comment lines | DCIM export | an imported device keeps its position and comment |
-| the mounting hardware count by ear hole, and its row text | BOM | a reader matches the row |
+| `unitsOf`, `spanOf` (half-open), `facePoint`, `holesIn` | kit API | pages place and route by them |
+| `END_PLAY_M` (the 0.2 m of today, renamed), `shortTolerance` with its 50 mm floor, `END_ALLOWANCE_BY_MEDIA` as the inside part alone | kit API | a page reads them by name; copper cords of 7 m and over may rise a stock size |
 | `slack` entries `{item, via, form, value, unit}` and `{end, value, unit}`; absent against empty | rack file | saved files carry them |
-| `MIN_SPARE_M`, `BREAK_TOL_M`, the proportional copper tolerance, `measured` meaning the need | kit, saved lengths | stock sizes and measured lengths on saved racks follow them |
-| the coil geometry, `at: "slack"` points, `TURNS_DRAWN`, `UNPLACED_WARN_M`, `spare-unplaced` | kit API, agent output | a page draws the points and an agent reads the finding |
-| the automatic place and its three-step order | kit | the picture of every saved rack follows it |
-| `spare` and `stored` appended to the cable schedule; the spare lines of the BOM notes; the draw.io edge label | exports | a download format change |
 | `states`, `readings`, and `swaps` and `fields` on a zero-U entry | rack file | saved files carry them |
-| `power-outlets.csv` in the NetBox kit, and the Nautobot comment line | DCIM export | an import kit file and its columns |
-| zero-U `heldBy: {parts}`, the kit writing `at` and `offsetMm` of a held part, overlap in millimetres | rack file, kit | saved files carry it; fit depends on it |
+| how outlet states reach NetBox (CSV, script or comment, as the test finds), and the Nautobot comment line | DCIM export | an import kit file or step |
+| zero-U `heldBy: {parts}`, and the kit writing `at` and `offsetMm` of a held part | rack file, kit | saved files carry it |
+| `straps` keys on a bundle and a cable | rack file | saved files carry them |
+| `startU`, `setback`, round holes, and the kept keys of section 7 | rack file | saved files carry them |
+| `slots`, `states` and `metering` in `rack.json` | the rack catalogue | the kit reads them; additive, `format` 1 |
 | `zerou.hang`, `state.set`, `readings.set`, `cable.slack`, `cable.slack.clear`, `roll` on `patch` | kit commands | agent sessions call them by name |
-| `straps.breakout`, `straps.anchors` | rack file | saved files carry them; the strap count follows |
-| `readItem` and `normalizeFrame` keeping unknown keys | kit reader | later optional keys rely on it to skip a bump |
 
 ## 12. Left for version 5, or later with no version
 
@@ -1025,10 +1315,14 @@ Each says what is one-way. Everything else in this note is settled above.
 - Lay order by `position`, and the gap behind a tray (#966).
 - The quarter turns of `roll` and the mount kit facts of #550.
 - Placing a device on a shelf, in a drawer or on a DIN rail (#972), once the
-  library has `hosts:`.
-- Slack in a vertical duct, and service loops with a shape at a device end:
-  both wait for a library part that states how it holds them.
-- An anchor strap at a ring, which waits for a ring that states a tie point.
+  library has `hosts:`; and acting on `width` and `options`, once a product
+  frame defines them.
+- A shape for `serpentine` and `spool`, slack in a vertical duct, a bundle
+  storing its spare as one hank, and a service loop with a shape at a device
+  end: each waits for a library part that states how it holds them.
+- An anchor strap at a ring or a vertical manager, which waits for
+  `guide.ties` (issue to be filed).
 - Readings in the marks format, a later decision of its own (PDU note, 3.4).
 - The ear slot heights of a device in the catalogue, which turn on the hole
   check of 2.5.
+- The direction faults of #986.
