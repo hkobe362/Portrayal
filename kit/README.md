@@ -229,6 +229,7 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/history.js` | undo and redo as snapshots |
 | `rack/editor.js` | `createRackEditor`: a rack document you edit by commands, with undo, redo and change events |
 | `rack/queries.js` | reading a rack: `fitsAt`, `freeUs`, `catalog`, `describe`, `inspect`, `selectCables`, `freePorts`, `suggestMedia`, `looseEnds` |
+| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `seatedPorts`, and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
@@ -806,6 +807,27 @@ checked, as before.
 and cage with what it holds and what it takes, and its parts' settings. For a
 cable it reads both ends, the route, the routed length (with `ctx.route`), the
 slack, the pathways it may name, and its loose ends (with `ctx.cableFacts`).
+A cable end is `{ item, path, view }`: the port's path, and the device's own
+panel that shows it. A port on a card in a bay is `<bay>/module/<part>` on the
+bay's panel. A port on the back of what a bay holds (the rear adapters of a
+patch panel, the trunk connector of a cassette) is the same form on the other
+panel: `{ path: 'bay-1/module/b01', view: 'rear' }`. `freePorts` offers both
+by path. An element id of a drawing (`bay-1-rear--b01`) is not an address:
+`cable.add` and `cable.update` refuse one and say what to give, and
+`freePorts` never offers one. `fit` counts the ports of a part's back as its
+ports, so a cable on one stays through a change of part that keeps the port
+and is reported as a loose end through one that does not.
+
+Whether such an end lands is answered from the parts lists where they are
+loaded: `seatedPort(item, end, ctx)` in `rack/ports.js` reads the item's
+swaps, the part in the bay and the parts of its back, and `looseEnds`,
+`inspect`, `selectCables` and `suggestMedia` lay its answer over
+`ctx.cableFacts` (`settleEnds`). It answers only for a port the part
+composes; a port drawn by a skin alone, and every port of the device itself,
+is still the page's to read off the drawing. The front and the rear port of
+one adapter are two ports, and each takes its own cable; that the glass
+joins them is not modelled here.
+
 `selectCables(rack, selector, ctx)` turns `{ item }`, `{ item, path }`,
 `{ loose: true }`, `{ purpose }`, `{ media }` or `{ bundle }` into cable ids, for a caller to
 expand into plain commands (with `{ loose: true }` and some ends unchecked, the
