@@ -2,8 +2,9 @@
 - Rack file version 4 (#935, #970, #949, #934, #939, #972), the build of
   `docs/rack-file-v4-design.md`, whose section 11 lists every one-way item
   and section 13 everything the build had to choose. It calls for a minor
-  kit release. No import was tried on a running NetBox or Nautobot: each
-  column was read against the import form at the commit the note cites.
+  kit release. The exports were tried on NetBox 4.7.2 and Nautobot 3.2.6,
+  and what that found wrong is fixed here; section 13, item 47 of the note
+  has what held, what did not and what is still not tried.
   `kit/rack/model.js` reads and writes `version` 4 with an identity migration
   from 3, and the schema is `spec/schemas/rack.schema.json` under
   `/schemas/v3/`. An item `ru` is a number in steps of 0.5. A reader keeps a
@@ -197,6 +198,20 @@
   position and no face, and its comment says where it is. The mounting
   hardware count is 4 a unit with no floor of one unit: 2 for a half-unit
   panel, and unchanged for every other device.
+
+### Fixed
+- **A Nautobot device file could be refused whole, on main too.** The kit
+  wrote two devices that share a unit front and rear to the Nautobot file
+  even when a type is full depth, on the belief that Nautobot takes the
+  pair. Nautobot 3.2.6 refuses it as NetBox does, and one refused row rolls
+  the whole file back. The later-placed device is now kept in the rack
+  with no position and no face, and its comment says where it is.
+- A rack whose name is over the 100 characters NetBox allows is not written
+  to the rack file, and `rackImportRows` says why in `left`.
+- The comment of a rack that numbers from another unit gives the order of
+  steps NetBox allows for setting its starting unit.
+- The comment of an item mounted a quarter turn says which units it fills,
+  since its row is its device type at the first of them.
 
 ### Removed
 - `span` from `rack/fit`. It returned the closed whole-unit pair

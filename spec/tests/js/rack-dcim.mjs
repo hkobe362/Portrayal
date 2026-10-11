@@ -182,11 +182,12 @@ test('rows sort by each item\'s top U, not where it starts', () => {
 test('positions follow a top-down frame', () => {
   const rack = {...RACK, frame: {...RACK.frame, numbering: 'top-down'}};
   assert.deepEqual(X.deviceImportRows({rack, items: ITEMS, types: TYPES}).rows.map(r => r.position), [5, 11, 14]);
-  assert.deepEqual(X.deviceImportRows({rack, items: ITEMS, types: TYPES, target: 'nautobot'}).rows.map(r => r.position), [5, 11, 11, 14]);
+  // Nautobot keeps the device NetBox leaves out, with no position: it refuses the pair as NetBox does
+  assert.deepEqual(X.deviceImportRows({rack, items: ITEMS, types: TYPES, target: 'nautobot'}).rows.map(r => r.position), [5, 11, '', 14]);
   assert.match(X.deviceImportRows({rack, items: ITEMS, types: TYPES}).left[0].reason, /^demarc-i3 is not in the devices file: it shares U11 with leaf-1/);
 });
 
-test('Nautobot rows use natural-key columns, keep two devices that share a U, and leave out a device with no type', () => {
+test('Nautobot rows use natural-key columns, keep two devices that share a U with one unpositioned, and leave out a device with no type', () => {
   const types = new Map([...TYPES, ['i1', null]]);
   const {columns, rows, left} = X.deviceImportRows({rack: RACK, items: ITEMS, types, target: 'nautobot', dcim: {site: ' Lab 1 ', role: 'R'}});
   assert.deepEqual(columns, ['name', 'role__name', 'device_type__manufacturer__name', 'device_type__model',
@@ -198,9 +199,16 @@ test('Nautobot rows use natural-key columns, keep two devices that share a U, an
   assert.ok(rows.every(r => r.location__name === 'Lab 1' && r.rack__location__name === 'Lab 1'));
   assert.ok(X.deviceImportRows({rack: RACK, items: ITEMS, types, target: 'nautobot'}).rows.every(r => r.rack__location__name === ''));
   assert.ok(!X.deviceImportRows({rack: RACK, items: ITEMS, types}).columns.some(c => c.includes('location')), 'NetBox has no such column');
-  // Nautobot 3.2.6 accepted leaf-1 and demarc-i3 at U14, front and rear: both rows stay, and neither is called refused.
-  assert.deepEqual(rows.map(r => r.name), ['demarc-i4', 'leaf-1', 'demarc-i3']);
-  assert.ok(rows.every(r => !/refuses/.test(r.comments)));
+  // Nautobot 3.2.6 REFUSES leaf-1 and demarc-i3 at U14, front and rear, while either type is full depth, and one
+  // refused row rolls the whole file back (Device.clean, nautobot/dcim/models/devices.py lines 804-818). Both rows
+  // stay in the rack; the later-placed has no position and no face, and its comment says where it is.
+  assert.deepEqual(rows.map(r => [r.name, r.position, r.face]), [['demarc-i4', 20, 'rear'], ['leaf-1', 14, 'front'], ['demarc-i3', '', '']]);
+  assert.equal(rows[2].comments, 'Named demarc-i3 because another device here is also demarc. In U14 on the rear, opposite leaf-1; no position, since Nautobot refuses two devices in one unit, front and rear, while either type is full depth.');
+  assert.ok(rows.slice(0, 2).every(r => !/refuses/.test(r.comments)));
+  // with neither type full depth Nautobot takes both, and both are positioned
+  const thin = new Map([...types].map(([id, t]) => [id, t && {...t, isFullDepth: false}]));
+  assert.deepEqual(X.deviceImportRows({rack: RACK, items: ITEMS, types: thin, target: 'nautobot'}).rows.map(r => [r.name, r.position]),
+    [['demarc-i4', 20], ['leaf-1', 14], ['demarc-i3', 14]]);
   assert.deepEqual(left, [{id: 'i1', name: 'core-1', reason:
     'core-1 is not in the devices file: there is no Nautobot device type for asr-9006 (base). Add the type and the device by hand.'}]);
 });

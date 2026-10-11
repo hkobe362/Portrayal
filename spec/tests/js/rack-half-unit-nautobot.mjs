@@ -45,7 +45,7 @@ test('Nautobot: a panel alone, a front and rear pair, and a whole-unit rack as b
   // the upper half alone is written at its unit, and says which half
   assert.deepEqual(rows(put(rackOf(), 'xcu', 12.5, {label: 'ODF B'})),
     [['ODF B', 12, 'front', 'Occupies the upper half of U12 (0.5U). Nautobot stores whole rack units.']]);
-  // front and rear are two faces: both are positioned
+  // front and rear are two faces: both are positioned, while neither type is full depth
   assert.deepEqual(rows(put(put(rackOf(), 'xcu', 12, {label: 'F'}), 'xcu', 12.5, {label: 'B', face: 'rear'})).map(x => x.slice(0, 3)),
     [['B', 12, 'rear'], ['F', 12, 'front']]);
   // a 1.5U and a 3.5U item, and whole-unit devices, whose rows carry no such comment
@@ -86,3 +86,32 @@ test('an item that carries no height takes it from the catalogue, and counts as 
   const blind = X.deviceImportRows({rack: {...r, items: [r.items[0]]}, items: [r.items[0]], types, target: 'nautobot'}).rows[0];
   assert.deepEqual([blind.position, blind.comments], [12, '']);
 });
+
+test('Nautobot refuses front and rear in one unit while a type is full depth: the later is kept with no position', () => {
+  // Tried on Nautobot 3.2.6: Device.clean (nautobot/dcim/models/devices.py lines 804-818) asks
+  // Rack.get_available_units (racks.py lines 302 and 349), which counts a full-depth device on the other face.
+  // One refused row rolls the whole file back, so the kit must not write the pair.
+  const FULL = {...TYPE, isFullDepth: true};
+  const rows = (r, types) => X.deviceImportRows({rack: {...r, name: 'R1'}, items: F.itemsWithU(r, chassisOf), types, target: 'nautobot'});
+  // a panel on the front at 12 and one on the rear at 12.5: one whole unit in Nautobot, whose type heights are whole
+  const pair = put(put(rackOf(), 'xcu', 12, {label: 'F'}), 'xcu', 12.5, {label: 'B', face: 'rear'});
+  const got = rows(pair, new Map([['i1', FULL], ['i2', FULL]]));
+  assert.deepEqual(got.rows.map(x => [x.name, x.position, x.face]), [['B', '', ''], ['F', 12, 'front']]);
+  assert.equal(got.rows[0].comments, 'In the upper half of U12 on the rear, opposite F; no position, since Nautobot refuses two devices in one unit, front and rear, while either type is full depth.');
+  assert.deepEqual(got.left, [], 'no device is lost');
+  // one full-depth type is enough, whichever it is
+  for (const types of [new Map([['i1', FULL], ['i2', TYPE]]), new Map([['i1', TYPE], ['i2', FULL]])])
+    assert.deepEqual(rows(pair, types).rows.map(x => x.position), ['', 12]);
+  // two 1U full-depth switches front and rear in U10, which uses nothing of version 4
+  const sw = put(put(rackOf(), 'qfx', 10, {label: 'front-sw'}), 'qfx', 10, {label: 'rear-sw', face: 'rear'});
+  const two = rows(sw, new Map([['i1', FULL], ['i2', FULL]]));
+  assert.deepEqual(two.rows.map(x => [x.name, x.position, x.face]), [['front-sw', 10, 'front'], ['rear-sw', '', '']]);
+  assert.match(two.rows[1].comments, /^In U10 on the rear, opposite front-sw; no position, since Nautobot refuses/);
+  // a tall full-depth device on the front claims every unit of its span on the rear too
+  const tall = put(put(rackOf(), 'mx104', 10, {label: 'pe'}), 'qfx', 13, {label: 'behind', face: 'rear'});
+  assert.deepEqual(rows(tall, new Map([['i1', FULL], ['i2', TYPE]])).rows.map(x => [x.name, x.position]), [['behind', ''], ['pe', 10]]);
+  // and the unit above its span is free
+  const above = put(put(rackOf(), 'mx104', 10, {label: 'pe'}), 'qfx', 14, {label: 'behind', face: 'rear'});
+  assert.deepEqual(rows(above, new Map([['i1', FULL], ['i2', TYPE]])).rows.map(x => [x.name, x.position]), [['behind', 14], ['pe', 10]]);
+});
+

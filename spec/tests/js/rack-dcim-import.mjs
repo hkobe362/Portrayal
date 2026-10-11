@@ -360,7 +360,7 @@ test('a rack with no cables gets a header and no rows', () => {
 
 // ── what a DCIM stores: the limits (Phase 2c fix round) ─────────────────
 test('the limits are one table', () => {
-  assert.deepEqual(D.DCIM_LIMITS, {deviceName: 64, cableLabel: 100, cableDescription: 200, netboxLengthBelow: 1000000, nautobotLengthMax: 32767});
+  assert.deepEqual(D.DCIM_LIMITS, {deviceName: 64, rackName: 100, cableLabel: 100, cableDescription: 200, netboxLengthBelow: 1000000, nautobotLengthMax: 32767});
   assert.equal(D.DCIM_LIMITS, X.DCIM_LIMITS);
 });
 

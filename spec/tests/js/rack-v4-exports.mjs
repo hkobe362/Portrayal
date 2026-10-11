@@ -122,6 +122,21 @@ test('a rolled item says so in the BOM notes and in the comment of both imports'
     // owed from part 5: the quarter-turned item says it is turned, at the position its rolled box starts at
     assert.match(rows.find(x => x.name === 'box-1').comments, /Mounted rotated 90 degrees clockwise, as seen from its face\./, target);
   }
+  // A QUARTER TURN FILLS MORE UNITS THAN ITS TYPE HAS: both DCIMs show the others free (seen on NetBox 4.7.2 and
+  // Nautobot 3.2.6), so the comment says which it fills. The 200 mm box turned is 5 units up the rack.
+  const turned = X.deviceImportRows({rack: r, items, types, target: 'netbox', chassisOf}).rows.find(x => x.name === 'box-1');
+  assert.equal(items.find(i => i.id === 'i2').u, 5);
+  assert.equal(turned.comments, 'Mounted rotated 90 degrees clockwise, as seen from its face. Turned, it occupies U30-U34 on the rack; the device type is 1U.');
+  assert.equal(turned.position, 30);
+  // an item upside down fills what its type does, and says no such thing
+  assert.doesNotMatch(X.deviceImportRows({rack: r, items, types, target: 'netbox', chassisOf}).rows.find(x => x.name === 'leaf-1').comments, /occupies/);
+
+  // a rack name NetBox would refuse is not written (Rack.name is 100 characters on NetBox 4.7.2)
+  const long = X.rackImportRows({rack: {...r, name: 'R'.repeat(101)}});
+  assert.deepEqual([long.rows, long.left.length], [[], 1]);
+  assert.match(long.left[0].reason, /its name is 101 characters, and NetBox allows 100\./);
+  assert.equal(X.rackImportRows({rack: {...r, name: 'R'.repeat(100)}}).rows.length, 1);
+  assert.equal('left' in X.rackImportRows({rack: r}), false);
   assert.deepEqual(X.mountNotes(items, chassisOf, r.frame), [
     'leaf-1 at U20: Mounted upside down.', 'box-1 at U30: Mounted rotated 90 degrees clockwise, as seen from its face.']);
   // an upright rack says nothing new

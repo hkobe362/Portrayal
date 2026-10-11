@@ -1,7 +1,8 @@
 # Rack file version 4: one version for everything held back
 
 Status: **decided 2026-10-11**; all eleven parts of section 9 are built, on
-one held branch. No import was tried on a running NetBox or Nautobot. What
+one held branch. The exports were tried on NetBox 4.7.2 and Nautobot 3.2.6
+(section 13, item 47). What
 the build read more narrowly than this note says, or had to choose where it
 was silent, is in section 13, and waits for a person to confirm. The kit
 release that carries it is a minor one, 0.22.0 after 0.21.0; the branch
@@ -388,7 +389,8 @@ affected, and the XCU10 draws no ears until its gap closes.
   formula with a fractional height. On a 42U top-down frame a 0.5U item
   stored at `ru: 12` is at 31.5 and one stored at 12.5 is at 31, the order in
   which the NetBox `units` property lists a descending rack (read at the
-  commit above; not tried on a running instance, and the build does so).
+  commit above, and confirmed on NetBox 4.7.2: on a 45U top-down rack the
+  lower panel is stored at 34.5 and the upper at 34).
 - **`uText(frame, ru, units)`** names a position through `positionOf`: "U12",
   "U12.5". It takes the height because a top-down label of a half depends on
   it. `uLabel` stays for whole units (lanes, managers, the rail numbers).
@@ -469,9 +471,16 @@ For two XCU10 panels at `ru: 12` and `ru: 12.5` on a bottom-up frame:
   and its comment says where it is. The others are written at `floor(p)` with
   a comment saying which part of the span they fill. On the top-down frame of
   2.6 both panels have `floor(p)` 31; the one stored at `ru: 12` is written
-  there. That Nautobot refuses two devices in one unit on one face is
-  inferred from its whole-unit walk and is tried on a running instance in the
-  build.
+  there. That Nautobot refuses two devices in one unit on one face was
+  inferred from its whole-unit walk and is confirmed on Nautobot 3.2.6, which
+  also refuses a position of 7.5 ("A valid integer is required."). **It
+  refuses a front and rear pair in one unit too, while either type is full
+  depth,** as NetBox does (`Device.clean`, `nautobot/dcim/models/devices.py`
+  lines 804 to 818, with `Rack.get_available_units`, `racks.py` lines 302
+  and 349), and one refused row rolls its whole file back. So the whole-unit
+  rule looks across both faces where a type is full depth: the later device
+  is kept in the rack with no position and a comment. The kit on main wrote
+  such a pair to the Nautobot file, on the belief that Nautobot took it.
 - **Mounting hardware** (decision 11) is `4 * units` an item, with no floor
   of 1: 2 for a half-unit panel, which has one slot an ear, and the counts
   of today for every other device.
@@ -989,9 +998,13 @@ file first. This section gives the keys their exact shape.
     **As built:** the CSV is ruled out by the form. At the same commit,
     `netbox/dcim/forms/bulk_import.py` lines 973 to 976,
     `PowerOutletImportForm.Meta.fields` lists no `status`, so a file with
-    that column is refused. The script step was not tried on a running
-    instance, so it is not written: the states go in the device comment in
-    both files (section 13, item 44).
+    that column is refused; NetBox 4.7.2 answers "Unrecognized header:
+    status" (the header check is `utilities/forms/forms.py` lines 134 to
+    139). The model, the REST serializer, the edit form and the bulk-edit
+    form of NetBox all take `status` (enabled, disabled, faulty), so a later
+    step of the import script could set it through the API. No such step
+    exists, so none was tried: the states go in the device comment in both
+    files (section 13, item 44).
   - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."),
     each outlet by the name the device-type export gives it. Read
     at nautobot/nautobot commit `c77e4255`,
@@ -1288,7 +1301,7 @@ and the kit suite runs at the end of each.
 | 6 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `heldBy`.** Overlap as decision 12 says; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
 | 7 | **Lengths and the slack record.** `readCables` normalising `slack` (3.3), `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackOf`, `storedText`, `cable.slack` and its refusals, `spare-unplaced`. No geometry. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For every cable, need plus spare equals stock, and end play plus what is to store equals spare. Each row of the table of 3.6 has a case asserting its text. Each refusal of 3.5 has a case. A bad `form`, a negative `value`, two entries with no value, an unknown `end` and a `slack` that is no list each load with the usable part kept and `slackAsWritten` holding what was written, and save unchanged. `inspect` gives `said: false` for no key and `said: true` for `[]`. `routePath` returns the same points with and without a `slack` entry. The #986 sample script reports no more cables differing by direction than before (38). |
 | 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. Peels at 0, 60 and 130 mm are one group from either end. `{breakout: false}` alone survives a round trip and turns breakouts off. A version-3 bundle with `every: null` has no strap of any kind after migration. `bundle.update` with one key leaves the others. The BOM count equals the three kinds summed. |
-| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. **None of these was tried** (section 13, items 44 and 47). |
+| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. **Tried on NetBox 4.7.2 and Nautobot 3.2.6** (section 13, item 47): the first two hold, and the outlet CSV is refused. |
 | 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table, and `cable.lay` with its `face` acted on by the routes (3.9, decision 17). | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
 | 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
@@ -1574,9 +1587,13 @@ numbers are kept: a later reading takes the next one.
   numbers its units from 5, and a unit named here is its label; the NetBox
   import counts from 1."), so a unit a comment names is never taken for a
   position. The NetBox rack row says it in `comments`, and says what to do:
-  leave the starting unit of the rack at 1, or set it and raise every device
-  position by the difference (NetBox takes the change unless a device sits
-  below the new start, and each device is then that many units too low).
+  leave the starting unit of the rack at 1, or set it in the one order
+  NetBox 4.7.2 allows. It refuses a starting unit above a device
+  (`netbox/dcim/models/racks.py` lines 459 to 464) and a position past the
+  top (`devices.py` lines 906 to 912), so the devices below the new start
+  are raised first, then the start is set, then the rest are raised. A
+  rack CSV with a `starting_unit` column is refused ("Unrecognized
+  header").
 10. **The sentences of fit under `startU`** name a unit counted from the
   bottom, from the number of the first unit ("Below U5.", "1U free from U46
   to the top."). On a top-down frame they still count from the bottom, as
@@ -1786,9 +1803,9 @@ numbers are kept: a later reading takes the next one.
   capped by the long side of its tie slot, read from the `ties` of the
   tray; that a strap needs no room beyond its own width in the slot is an
   assumption.
-44. **Outlet states in the DCIM files** (section 4). Not tried on a running
-  instance. The NetBox outlet import takes no `status` column (file and
-  lines in section 4), and the script step is not written untried, so both
+44. **Outlet states in the DCIM files** (section 4). The NetBox outlet
+  import refuses a `status` column (tried on 4.7.2; file and lines in
+  section 4), and no import-script step exists to try, so both
   device files carry one comment line ("Outlets off: A2, A7."). An outlet
   is named as the device-type export names it: `<device>.configs.json`
   gains `names` on each configuration, `{<path>: <name>}`, read from the
@@ -1808,8 +1825,30 @@ numbers are kept: a later reading takes the next one.
 46. **Readings in the exports.** No export of the kit shows a reading, so
   none states a source and a time; `readingsFor` gives both to a page that
   shows one. A test holds that neither device file carries any.
-47. **Running instances.** No import was tried on a running NetBox or
-  Nautobot in this build. Each column of each file was read against the
-  import form at the cited commit instead; the golden files of part 9 hold
-  them.
-
+47. **Running instances.** The exports were tried on NetBox 4.7.2 and
+  Nautobot 3.2.6, from the files the kit writes.
+  **Held as this note says:** a whole-unit rack; two half-unit panels in
+  one unit (NetBox stores 7.0 and 7.5; Nautobot takes the lower at 7 and
+  keeps the other in the rack with no position, no face and its comment);
+  a top-down rack (the lower stored at 34.5, the upper at 34, the labels
+  as `uText` gives them); 1.5U and 3.5U items with a half-unit panel
+  above; a rack row with `comments`; widths 10, 19, 21 and 23, and 24
+  written as 19 with a comment; a held item, a hung PDU and its brackets
+  with no position or face; the roll comments. An outlet CSV with `status`
+  and a rack CSV with `starting_unit` are each refused as an unrecognised
+  header. Nothing was stored differently from the file, and neither
+  platform limits the length of a comment.
+  **Found wrong, and fixed:** a front and rear pair in one unit in the
+  Nautobot file while a type is full depth (2.7; a fault of the export on
+  main too); the order of steps in the `startU` rack comment (item 9); a
+  quarter-turned item, which is a row of its 1U type, so both platforms
+  show the other units free: its comment now says which units it fills
+  ("Turned, it occupies U30-U34 on the rack; the device type is 1U.");
+  the outlet names (item 44); and the limits table, where the device name
+  of Nautobot is 255 characters and of NetBox 64, and the rack name of
+  NetBox is 100, which the rack row now screens.
+  **Still not tried:** Nautobot cables, whose import needs an API token;
+  NetBox cable bundles, since the kit writes none; an outlet-state step of
+  the import script, since none exists; and a real PDU bracket or shelf
+  host, since the catalogue has none: the bracket was a hand-made 0U type
+  and the sizes nominal.
