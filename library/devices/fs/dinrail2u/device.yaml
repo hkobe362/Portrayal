@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: dinrail2u
-version: 1.0.0
+version: 1.1.0
 maturity: modelled
 manufacturer: FS.com
 model: DINRAIL2U
@@ -47,7 +47,7 @@ provenance:
       line 43.75 below the top: the datasheet's front views draw it across the whole 400 panel
       at mid-height (the 4U's measures 82.2 down on the 300 dpi render, the 165.1 face's middle
       being 82.55).
-  setback:
+  rail-setback:
     confidence: drawing
     note: >-
       the rail panel's front face can stand from 51.2 to 271.2 mm behind the ears, and is
@@ -64,8 +64,9 @@ provenance:
       The gallery renders show it at both ends of that travel: g4 about 85 and g3 about 227
       behind the ears, each read along the near side bracket as a fraction of its 360 (a
       three-quarter render, so to perhaps 10 per cent). With no single photographed
-      position, the middle of the travel is the default; the range is in attrs and the
-      format cannot offer the other positions (see gaps).
+      position, the middle of the travel is the default. The travel is stated as the
+      `rail-setback` adjustment, whose three stops are the two ends and that middle; the
+      three din-rail-setback attrs restate it.
   joint:
     confidence: drawing
     note: >-
@@ -153,13 +154,6 @@ gaps:
   note: >-
     FS does not name the rail's profile; TS35 x 7.5 is read off the close-up render.
   wanted: the profile from FS or a ruler on the rail
-- what: setback
-  reason: vendor-silent
-  note: >-
-    the rail panel's face can stand from 51.2 to 271.2 mm behind the ears; it is drawn at 161.2,
-    the middle, and no configuration offers the other positions, because the format has no way
-    to move a part along a slot per configuration.
-  wanted: a setback field or configuration key for adjustable parts
 - what: panel-flange
   reason: needs-photo
   note: >-
@@ -192,6 +186,15 @@ groups:
     description: >-
       the four M5 screws that hold the rail panel to the side brackets through their slots, two
       a side
+adjustments:
+  rail-setback:
+    label: Rail setback
+    carrier: rail-panel
+    axis: z
+    range: [51.2, 271.2]
+    default: 161.2
+    stops: {front: 51.2, middle: 161.2, rear: 271.2}
+    datum: the front face of the rail panel, behind the ear plane
 views:
   front:
     size: {w: 484.0, h: 87.5}
@@ -201,8 +204,8 @@ views:
       - {id: side-right-edge, at: [452.6, 0.0], size: [1.5, 87.5], fill: '#1b1d20', kind: side-bracket}
     components:
       placements:
-      - {ref: fs/dinrail2u-panel@2, id: rail-panel, at: [31.4, 0.0], group: frame, rel-pos: 1}
-      - {ref: fs/din-rail-ts35-400@1, id: rail, at: [42.0, 26.25], group: rails, rel-pos: 1, in: rail-panel}
+      - {ref: fs/dinrail2u-panel@2, id: rail-panel, at: [31.4, 0.0], group: frame, rel-pos: 1, moves-with: rail-setback}
+      - {ref: fs/din-rail-ts35-400@1, id: rail, at: [42.0, 26.25], group: rails, rel-pos: 1, in: rail-panel, moves-with: rail-setback}
       - {ref: fs/dinrail2u-ear@1, id: ear-left, at: [0.0, 0.0], skin: left, group: ears, rel-pos: 1}
       - {ref: fs/dinrail2u-ear@1, id: ear-right, at: [454.1, 0.0], skin: right, group: ears, rel-pos: 2}
   rear:
@@ -211,61 +214,61 @@ views:
       decor:
       - {id: side-right-edge, at: [0.0, 0.0], size: [1.5, 87.5], fill: '#1b1d20', kind: side-bracket}
       - {id: side-left-edge, at: [422.7, 0.0], size: [1.5, 87.5], fill: '#1b1d20', kind: side-bracket}
-      - {id: panel-back, at: [1.5, 0.0], size: [421.2, 87.5], fill: '#15171a', kind: rail-panel}
-      - {id: cutout-1, at: [324.1, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-2, at: [224.3, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-3, at: [124.4, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-4, at: [24.5, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-5, at: [324.1, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-6, at: [224.3, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-7, at: [124.4, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
-      - {id: cutout-8, at: [24.5, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout}
+      - {id: panel-back, at: [1.5, 0.0], size: [421.2, 87.5], fill: '#15171a', kind: rail-panel, moves-with: rail-setback}
+      - {id: cutout-1, at: [324.1, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-2, at: [224.3, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-3, at: [124.4, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-4, at: [24.5, 14.2], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-5, at: [324.1, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-6, at: [224.3, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-7, at: [124.4, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
+      - {id: cutout-8, at: [24.5, 65.6], size: [73.7, 7.7], fill: '#0a0b0c', kind: cutout, moves-with: rail-setback}
   top:
     size: {w: 424.2, h: 360.0}
     panel:
       decor:
       - {id: side-left, at: [0.0, 0.0], size: &id001 [1.5, 360.0], fill: '#1b1d20', kind: side-bracket}
       - {id: side-right, at: [422.7, 0.0], size: &id002 [1.5, 360.0], fill: '#1b1d20', kind: side-bracket}
-      - {id: rail-panel, at: [1.5, 197.3], size: &id003 [421.2, 1.5], fill: '#1b1d20', kind: rail-panel}
-      - {id: rail, at: [12.1, 198.8], size: &id004 [400.0, 7.5], fill: '#b9bdc2', kind: din-rail}
-      - {id: tab-left, at: [0.0, 162.9], size: &tab [17.1, 35.9], fill: '#1b1d20', kind: panel-tab}
-      - {id: tab-right, at: [407.1, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab}
+      - {id: rail-panel, at: [1.5, 197.3], size: &id003 [421.2, 1.5], fill: '#1b1d20', kind: rail-panel, moves-with: rail-setback}
+      - {id: rail, at: [12.1, 198.8], size: &id004 [400.0, 7.5], fill: '#b9bdc2', kind: din-rail, moves-with: rail-setback}
+      - {id: tab-left, at: [0.0, 162.9], size: &tab [17.1, 35.9], fill: '#1b1d20', kind: panel-tab, moves-with: rail-setback}
+      - {id: tab-right, at: [407.1, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab, moves-with: rail-setback}
   bottom:
     size: {w: 424.2, h: 360.0}
     panel:
       decor:
       - {id: side-left, at: [422.7, 0.0], size: *id001, fill: '#1b1d20', kind: side-bracket}
       - {id: side-right, at: [0.0, 0.0], size: *id002, fill: '#1b1d20', kind: side-bracket}
-      - {id: rail-panel, at: [1.5, 197.3], size: *id003, fill: '#1b1d20', kind: rail-panel}
-      - {id: rail, at: [12.1, 198.8], size: *id004, fill: '#b9bdc2', kind: din-rail}
-      - {id: tab-left, at: [0.0, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab}
-      - {id: tab-right, at: [407.1, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab}
+      - {id: rail-panel, at: [1.5, 197.3], size: *id003, fill: '#1b1d20', kind: rail-panel, moves-with: rail-setback}
+      - {id: rail, at: [12.1, 198.8], size: *id004, fill: '#b9bdc2', kind: din-rail, moves-with: rail-setback}
+      - {id: tab-left, at: [0.0, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab, moves-with: rail-setback}
+      - {id: tab-right, at: [407.1, 162.9], size: *tab, fill: '#1b1d20', kind: panel-tab, moves-with: rail-setback}
   left:
     size: {w: 360.0, h: 87.5}
     panel:
       decor:
-      - {id: flange, at: [162.9, 6.1], size: [35.9, 75.3], fill: '#15171a', kind: panel-flange}
-      - {id: tab-top, at: [162.9, 2.2], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4}
-      - {id: tab-bottom, at: [162.9, 81.4], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4}
+      - {id: flange, at: [162.9, 6.1], size: [35.9, 75.3], fill: '#15171a', kind: panel-flange, moves-with: rail-setback}
+      - {id: tab-top, at: [162.9, 2.2], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4, moves-with: rail-setback}
+      - {id: tab-bottom, at: [162.9, 81.4], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4, moves-with: rail-setback}
     components:
       placements:
       - {ref: fs/dinrail2u-side@1, id: side-left, at: [0.0, 0.0], skin: left, group: frame, rel-pos: 2,
         under: [screw-upper, screw-lower]}
-      - {ref: common/pan-screw-m5@1, id: screw-upper, at: [175.85, 13.25], group: screws, rel-pos: 1, lift: 1.5}
-      - {ref: common/pan-screw-m5@1, id: screw-lower, at: [175.85, 64.75], group: screws, rel-pos: 2, lift: 1.5}
+      - {ref: common/pan-screw-m5@1, id: screw-upper, at: [175.85, 13.25], group: screws, rel-pos: 1, lift: 1.5, moves-with: rail-setback}
+      - {ref: common/pan-screw-m5@1, id: screw-lower, at: [175.85, 64.75], group: screws, rel-pos: 2, lift: 1.5, moves-with: rail-setback}
   right:
     size: {w: 360.0, h: 87.5}
     panel:
       decor:
-      - {id: flange, at: [161.2, 6.1], size: [35.9, 75.3], fill: '#15171a', kind: panel-flange}
-      - {id: tab-top, at: [161.2, 2.2], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4}
-      - {id: tab-bottom, at: [161.2, 81.4], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4}
+      - {id: flange, at: [161.2, 6.1], size: [35.9, 75.3], fill: '#15171a', kind: panel-flange, moves-with: rail-setback}
+      - {id: tab-top, at: [161.2, 2.2], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4, moves-with: rail-setback}
+      - {id: tab-bottom, at: [161.2, 81.4], size: [35.9, 3.9], fill: '#1b1d20', kind: panel-tab, out: 10.4, moves-with: rail-setback}
     components:
       placements:
       - {ref: fs/dinrail2u-side@1, id: side-right, at: [0.0, 0.0], skin: right, group: frame,
         rel-pos: 3, under: [screw-upper, screw-lower]}
-      - {ref: common/pan-screw-m5@1, id: screw-upper, at: [174.65, 13.25], group: screws, rel-pos: 3, lift: 1.5}
-      - {ref: common/pan-screw-m5@1, id: screw-lower, at: [174.65, 64.75], group: screws, rel-pos: 4, lift: 1.5}
+      - {ref: common/pan-screw-m5@1, id: screw-upper, at: [174.65, 13.25], group: screws, rel-pos: 3, lift: 1.5, moves-with: rail-setback}
+      - {ref: common/pan-screw-m5@1, id: screw-lower, at: [174.65, 64.75], group: screws, rel-pos: 4, lift: 1.5, moves-with: rail-setback}
 configurations:
   base:
     kind: base

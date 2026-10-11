@@ -1,4 +1,51 @@
 {
+ "adjustments": {
+  "rail-setback": {
+   "axis": "z",
+   "carrier": "rail-panel",
+   "default": 161.2,
+   "members": [
+    "bottom/decor/rail",
+    "bottom/decor/rail-panel",
+    "bottom/decor/tab-left",
+    "bottom/decor/tab-right",
+    "front/placements/rail",
+    "front/placements/rail-panel",
+    "left/decor/flange",
+    "left/decor/tab-bottom",
+    "left/decor/tab-top",
+    "left/placements/screw-lower",
+    "left/placements/screw-upper",
+    "rear/decor/cutout-1",
+    "rear/decor/cutout-2",
+    "rear/decor/cutout-3",
+    "rear/decor/cutout-4",
+    "rear/decor/cutout-5",
+    "rear/decor/cutout-6",
+    "rear/decor/cutout-7",
+    "rear/decor/cutout-8",
+    "rear/decor/panel-back",
+    "right/decor/flange",
+    "right/decor/tab-bottom",
+    "right/decor/tab-top",
+    "right/placements/screw-lower",
+    "right/placements/screw-upper",
+    "top/decor/rail",
+    "top/decor/rail-panel",
+    "top/decor/tab-left",
+    "top/decor/tab-right"
+   ],
+   "range": [
+    51.2,
+    271.2
+   ],
+   "stops": {
+    "front": 51.2,
+    "middle": 161.2,
+    "rear": 271.2
+   }
+  }
+ },
  "bay-accepts": {},
  "composed": "b54e8deb38062164",
  "composed-refs": {
@@ -12,7 +59,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "03f54e8245e63019",
+ "gaps": "009b4d6297a3e886",
  "groups": [
   "ears",
   "frame",
@@ -62,6 +109,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "893e1f3ba16a0dd4",
- "surface": "191d33f3798905ba",
- "version": "1.0.0"
+ "surface": "78b0837b8249e9ee",
+ "version": "1.1.0"
 }
