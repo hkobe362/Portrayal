@@ -1553,3 +1553,19 @@ as written. Each is built, and each waits for a person to confirm it.
   `class: mount` part that declares `interface` and a `mate` point, the
   mirror of a mount point. No part in the library is one yet, so every
   device publishes an empty list until the bracket of #939 is modelled.
+- **Roll and the routing context** (section 6). `facePoint` is built as the
+  note has it. The context a page hands the routes (`portX`, `portY`,
+  `guidesOf`) gives rack points, not face points, and is left as it is: it
+  gives each where the upright item would hold it, and the kit turns it
+  (`rollPoint`). A page that rolls its own points would turn them twice, so
+  this is a rule the site has to follow.
+- **A quarter turn.** Its units are its width over 44.45 mm, rounded up, and
+  never under one. It is refused where its height does not pass between the
+  rails ("WIDE-13 is 577 mm high; rolled a quarter turn that is across the
+  opening, which is 451 mm."). It is one solid, with no tray, ring or guide,
+  centred across the opening, and a page is told so on load. A port on it is
+  turned with it about the centre of its box.
+- **`describe` and `inspect`** say a roll only where an item has one
+  ("rolled 90"; `roll: 90`). The export notes of a rolled item are part 9
+  and are not written yet.
+

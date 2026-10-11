@@ -9,8 +9,8 @@
 // dFront + dRear <= railDepth. Two-post rails are one plane that every body
 // passes through, so there a U is never shared.
 
-import {RU} from './rails.js';
-import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN, firstU} from './model.js';
+import {RU, OPENING, SIDES as RAILS} from './rails.js';
+import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN, firstU, rollOf} from './model.js';
 
 // ── HEIGHTS, SPANS AND BOXES (docs/rack-file-v4-design.md section 2.4) ─────
 // PUBLIC: unitsOf, spanOf, itemBox, spanText (kit/README.md). The other names
@@ -27,8 +27,17 @@ export function unitsOf(chassis) {
   const r = chassis?.ru == null ? NaN : Number(chassis.ru);
   return Number.isFinite(r) ? Math.max(0.5, Math.ceil(r * 2 - 1e-9) / 2) : 1;
 }
+// ROLLED A QUARTER TURN (`roll: 90` or `270`, section 6) an item stands on its
+// side: its width is up the rack and its height across the opening.
+export const isQuarter = item => rollOf(item) === 90 || rollOf(item) === 270;
+// The height of an ITEM in units, as mounted: its device's, or, rolled a
+// quarter turn, its width over one unit, rounded up to a whole unit.
+export function itemUnits(item, chassisOf) {
+  const c = chassisOf(item.ref);
+  return isQuarter(item) && Number(c?.w) > 0 ? Math.max(1, Math.ceil(Number(c.w) / RU - 1e-9)) : unitsOf(c);
+}
 // [lo, hi): the units an item fills, from its bottom up to, not including, hi.
-export const spanOf = (item, chassisOf) => [item.ru, item.ru + unitsOf(chassisOf(item.ref))];
+export const spanOf = (item, chassisOf) => [item.ru, item.ru + itemUnits(item, chassisOf)];
 // Two spans meet when each starts below the end of the other.
 export const spansMeet = (a, b) => a[0] < b[1] && b[0] < a[1];
 // THE BODY AS MOUNTED, in mm above the bottom of the rails: {y0, y1, h, lo,
@@ -37,19 +46,63 @@ export const spansMeet = (a, b) => a[0] < b[1] && b[0] < a[1];
 // not as tall as its span is CENTRED in it, always, and one that is taller
 // overhangs both edges equally: the holes of a unit are symmetric about its
 // middle, and so is the ear that bolts to them.
+// Rolled 180 degrees it is the same box. Rolled a quarter turn its height and
+// width swap: `h` is the width of the device, and the box also gives `w`, the
+// height of the device, which then lies across the opening.
 export function itemBox(rack, item, chassisOf) {
-  const c = chassisOf(item.ref);
+  const c = chassisOf(item.ref), q = isQuarter(item);
   const [a, b] = spanOf(item, chassisOf);
   const lo = (a - 1) * RU, hi = (b - 1) * RU;
-  const h = Number(c?.h) > 0 ? Number(c.h) : hi - lo;
+  const tall = Number(q ? c?.w : c?.h);
+  const h = tall > 0 ? tall : hi - lo;
   const y0 = lo + (hi - lo - h) / 2;
-  return {y0, y1: y0 + h, h, lo, hi};
+  return {y0, y1: y0 + h, h, lo, hi, ...(q ? {w: Number(c?.h) > 0 ? Number(c.h) : RU} : {})};
+}
+// THE LINE AN ITEM IS CENTRED ON ACROSS THE RACK, in mm from the centre line
+// of the rack, right as seen from the front: 0 for anything across the
+// opening, and the hole line of its rail for a narrow part on one rail.
+export function centreX(item, chassisOf) {
+  const rail = railOf(item, chassisOf);
+  if (!rail) return 0;
+  return ((rail === 'left') === (item.face !== 'rear') ? RAILS[0] : RAILS[1]).hole;
+}
+// A POINT OF AN UPRIGHT ITEM, TURNED BY ITS ROLL. `p` is a point in the rack
+// ({x, y}: mm right of the centre line as seen from the front, and mm above
+// the bottom of the rails) where it would be were the item mounted upright;
+// the answer is where it is as mounted. The turn is about the centre of the
+// box, clockwise as the item is seen in the elevation of the face it is on,
+// which from the front of the rack is anticlockwise for an item on the rear.
+// An item with no roll is answered with the very point it was given.
+export function rollPoint(rack, item, p, chassisOf) {
+  const roll = rollOf(item);
+  if (!roll) return p;
+  const cx = centreX(item, chassisOf);
+  const box = itemBox(rack, item, chassisOf);
+  const up = itemBox(rack, {...item, roll: undefined}, chassisOf);
+  const dx = p.x - cx, dy = p.y - (up.y0 + up.y1) / 2, cy = (box.y0 + box.y1) / 2;
+  if (roll === 180) return {...p, x: cx - dx, y: cy - dy};
+  const cw = (roll === 90) === (item.face !== 'rear');   // clockwise as the front of the rack sees it
+  return {...p, x: cx + (cw ? dy : -dy), y: cy + (cw ? -dx : dx)};
+}
+// A POINT OF A FACE AS DRAWN, IN THE RACK: `x` mm from the left edge of the
+// drawing and `y` mm down from its top, on the item's own `view` (its front
+// panel when none is given), through `face`, `turned` and `roll`, on the box
+// itemBox gives. A panel that looks out of the back of the rack is mirrored,
+// since the rack is measured as its front sees it.
+export function facePoint(rack, item, {x, y, view = 'front'}, chassisOf) {
+  const c = chassisOf(item.ref) || {};
+  const w = Number(c.w) || 0;
+  const up = itemBox(rack, {...item, roll: undefined}, chassisOf);
+  const other = item.face === 'rear' ? 'front' : 'rear';
+  const pane = (view === 'rear') === !!item.turned ? item.face : other;
+  const cx = centreX(item, chassisOf);
+  return rollPoint(rack, item, {x: cx + (pane === 'rear' ? w / 2 - x : x - w / 2), y: up.y1 - y}, chassisOf);
 }
 // WHERE A ROUTE MEETS AN ITEM when nothing finer is known (a guide, or a port
 // the drawing gives no height for): the middle of its bottom unit for an item
 // of one unit or more, the middle of its body for one under a unit.
 export function anchorY(rack, item, chassisOf) {
-  if (unitsOf(chassisOf(item.ref)) >= 1) return laneY(item.ru);
+  if (itemUnits(item, chassisOf) >= 1) return laneY(item.ru);
   const box = itemBox(rack, item, chassisOf);
   return (box.y0 + box.y1) / 2;
 }
@@ -68,7 +121,7 @@ export function laneY(ru) { return (ru - 0.5) * RU; }
 //   a whole unit or is under a unit itself.
 export function neighbours(rack, item, chassisOf) {
   const [lo, hi] = spanOf(item, chassisOf), small = hi - lo < 1;
-  const near = rack.items.filter(o => o.id !== item.id && unitsOf(chassisOf(o.ref)) <= 1);
+  const near = rack.items.filter(o => o.id !== item.id && itemUnits(o, chassisOf) <= 1);
   const above = near.filter(o => (small ? o.ru >= hi && o.ru <= Math.ceil(hi) : o.ru === hi)).sort((p, q) => p.ru - q.ru);
   const under = Math.floor(lo) - 1;
   const below = near.filter(o => spanOf(o, chassisOf)[1] === lo
@@ -94,7 +147,7 @@ export function unitsText(frame, ru, units) {
   return `${ends[0][1]} to ${ends[1][1]}`;
 }
 // The span of an item, in those words.
-export const spanText = (frame, item, chassisOf) => unitsText(frame, item.ru, unitsOf(chassisOf(item.ref)));
+export const spanText = (frame, item, chassisOf) => unitsText(frame, item.ru, itemUnits(item, chassisOf));
 
 export const REACH_MM = 50;   // within this of the far rail, a device's far panel is visible there
 
@@ -194,6 +247,9 @@ export function frameNotices(rack, chassisOf) {
   for (const z of zeroUOf(rack))
     if (typeof z.channel === 'string' && z.channel)
       out.push(`${z.label || z.ref} names the channel ${z.channel}, which is not known for this frame, so it stands at ${z.at}.`);
+  for (const it of rack.items)
+    if (isQuarter(it) && chassisOf(it.ref))
+      out.push(`${it.label} is rolled a quarter turn: it is fitted by its rolled box and drawn and routed as an outline, since how it mounts that way is not described yet.`);
   for (const it of rack.items) {
     const id = holderOf(it);
     if (id == null) continue;
@@ -211,7 +267,7 @@ export function frameNotices(rack, chassisOf) {
 function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
   const f = rack.frame, rd = between(f);
   const side = railOf(cand, () => c);
-  const u = unitsOf(c), lo = cand.ru, hi = cand.ru + u;
+  const u = itemUnits(cand, () => c), lo = cand.ru, hi = cand.ru + u;
   if (cand.ru < 1) return below(f);
   // its own position is a whole unit: it bolts over a unit of holes
   if (!Number.isInteger(cand.ru))
@@ -223,7 +279,7 @@ function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
   if (cand.on != null) {
     const host = rack.items.find(i => i.id === cand.on), hc = host && chassisOf(host.ref);
     if (!host || isRackFace(hc)) return {ok: false, reason: 'A cable manager goes on a rack device.'};
-    const hu = unitsOf(hc);
+    const hu = itemUnits(host, chassisOf);
     if (!(Number.isInteger(cand.unit) && cand.unit >= 1 && cand.unit <= hostUnits(host, chassisOf)))
       return {ok: false, reason: `${host.label} is ${hu}U; there is no unit ${cand.unit} on it.`};
     if (host.face !== cand.face)
@@ -288,8 +344,11 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
     if (!host) return no(unheldText(cand));
     if (!isRackMount(c)) return {ok: true, unchecked: uncheckedText(cand, host, chassisOf)};
   }
-  const units = unitsOf(c), lo = cand.ru, hi = cand.ru + units;
+  const units = itemUnits(cand, () => c), lo = cand.ru, hi = cand.ru + units;
   const s = setbackOf(rack, cand, chassisOf), reach = s + c.d;
+  // rolled a quarter turn, its height lies across the opening and has to pass between the rails
+  if (isQuarter(cand) && Number(c.h) > OPENING)
+    return no(`${nameOf(c, cand.ref)} is ${mm(c.h)} mm high; rolled a quarter turn that is across the opening, which is ${mm(OPENING)} mm.`);
   if (lo < 1) return below(f);
   const half = halfRefusal(f, c, cand.ref, lo, units);
   if (half) return no(half);
@@ -365,7 +424,7 @@ export function availableDepth(rack, item, chassisOf) {
 // beside the item's own fields, so each draws the same rack.
 // heightOf(chassisOf) is that height as a lookup by item: what names a device
 // with its U (cable-rules.js endName) asks it.
-export const heightOf = chassisOf => item => unitsOf(chassisOf(item.ref));
+export const heightOf = chassisOf => item => itemUnits(item, chassisOf);
 
 // WHAT THE FIT OF BEFORE ALLOWED AND THIS ONE DOES NOT (section 8): an item
 // whose height is not a whole number of units, with another in the unit its
@@ -462,7 +521,7 @@ export function shrinkRack(rack, newHeight, chassisOf) {
     if (!groups.has(r)) groups.set(r, []);
     groups.get(r).push(it);
   });
-  const wholeOnly = it => { const c = chassisOf(it.ref); return isRackFace(c) || Number.isInteger(unitsOf(c)); };
+  const wholeOnly = it => isRackFace(chassisOf(it.ref)) || Number.isInteger(itemUnits(it, chassisOf));
   const clusters = [...groups.values()]
     .map(list => {
       const lo = Math.min(...list.map(i => i.ru));

@@ -41,7 +41,7 @@ export const MIGRATIONS = [d => ({...d, version: 2}), d => ({...d, version: 3}),
 const unknownOf = (o, known) => Object.fromEntries(Object.entries(o && typeof o === 'object' && !Array.isArray(o) ? o : {})
   .filter(([k]) => !known.includes(k)).map(([k, v]) => [k, structuredClone(v)]));
 const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref', 'startU', 'setback', 'width'];
-const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback'];
+const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback', 'roll'];
 const RACK_KEYS = ['id', 'name', 'frame', 'items', 'zeroU', 'cables', 'dcim', 'bundles'];
 const DOC_KEYS = ['format', 'version', 'id', 'racks'];
 // The rail hole styles. `round` (version 4) is an unthreaded round hole.
@@ -57,6 +57,12 @@ const finite = v => typeof v === 'number' && Number.isFinite(v);
 const startUOf = v => (Number.isInteger(v) && v >= 1 ? {startU: v} : {});
 const setbackOf = v => (finite(v) ? {setback: v} : {});
 const widthOf = v => (finite(v) && v > 0 ? {width: v} : {});
+// ROLL (version 4): how an item is turned in the plane of its face, 90, 180 or
+// 270 degrees clockwise as it is seen in the elevation of the face it is on,
+// after `face` and `turned`. Absent is upright; 0 is never written.
+export const ROLLS = [90, 180, 270];
+export const rollOf = item => (ROLLS.includes(item?.roll) ? item.roll : 0);
+const rollKey = v => (ROLLS.includes(v) ? {roll: v} : {});
 export const firstU = frame => (Number.isInteger(frame?.startU) && frame.startU >= 1 ? frame.startU : 1);
 export const RAIL_WIDTH_IN = 19;
 export const railWidth = frame => (finite(frame?.width) && frame.width > 0 ? frame.width : RAIL_WIDTH_IN);
@@ -240,7 +246,7 @@ function readItem(i, n) {
   return {...unknownOf(i, ITEM_KEYS), id: String(i.id ?? ''), ref: i.ref, cfg: String(i.cfg ?? ''), label: String(i.label ?? i.ref),
           ru: i.ru, face: i.face === 'rear' ? 'rear' : 'front', turned: !!i.turned,
           swaps: {...(i.swaps || {})}, fields: structuredClone(i.fields || {}),
-          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side), ...setbackOf(i.setback)};
+          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side), ...setbackOf(i.setback), ...rollKey(i.roll)};
 }
 
 // The zero-U record as written, with an id given to each object entry that

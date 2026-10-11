@@ -7,7 +7,7 @@
 
 import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, RAIL_WIDTH_IN, holderOf} from './model.js';
 import {routeText, trunkRoute} from './route.js';
-import {isRackMount, isZeroUPart, railOf, unitsOf, unitsText, spansMeet} from './fit.js';
+import {isRackMount, isZeroUPart, railOf, unitsOf, itemUnits, unitsText, spansMeet} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
 import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
 export {positionOf};
@@ -419,7 +419,7 @@ export function threeDNotes(rack) {
 // frame counts; what a DCIM calls a device's position). The height is the
 // item's own `u` when it carries one (fit.js itemsWithU), else its chassis's.
 export const uOfItem = (frame, item, chassisOf = () => null) =>
-  positionOf(frame, item.ru, item.u ?? unitsOf(chassisOf(item.ref)));
+  positionOf(frame, item.ru, item.u ?? itemUnits(item, chassisOf));
 
 // draw.io's cabinet counts from 1 at the TOP, and its `u` is the top of the
 // device's box in units from the top, in steps of 0.5: the top U of a device
@@ -790,7 +790,7 @@ export const otherVendorNote = ({label, ref, T, manufacturer, path}) =>
 // given it from the catalogue when `chassisOf` is passed, and counts as 1U
 // otherwise.
 export function deviceImportRows({rack, items: given, types, target = 'netbox', dcim = {}, why = new Map(), chassisOf = null}) {
-  const items = given.map(it => (it.u != null ? it : {...it, u: chassisOf ? unitsOf(chassisOf(it.ref)) : 1}));
+  const items = given.map(it => (it.u != null ? it : {...it, u: chassisOf ? itemUnits(it, chassisOf) : 1}));
   const T = TARGET_NAME[target] || 'NetBox';
   const names = uniqueNames(items);
   const site = String(dcim?.site ?? '').trim(), role = String(dcim?.role ?? '').trim();

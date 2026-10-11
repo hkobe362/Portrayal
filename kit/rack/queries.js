@@ -4,9 +4,9 @@
 // are handed their readers in `ctx`, since reading a face needs the network and
 // a DOMParser, which this module never touches.
 
-import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, unitsOf, spanText, isHeld} from './fit.js';
+import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, itemUnits, spanText, isHeld} from './fit.js';
 import {placement, managersOf} from './managers.js';
-import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf} from './model.js';
+import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
 import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText} from './cable-rules.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bodyFindings} from './route.js';
@@ -114,7 +114,7 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
     // a span that names a half is a phrase, set off from the label by commas
     const where = span(i), plain = where.startsWith('U');
     const c = chassisOf(i.ref);
-    return [`${i.id}${short ? '' : ` ${i.label}`}${plain ? ' ' : ', '}${where}${plain ? ' ' : ', '}${i.face}${rail ? ` ${rail} rail` : ''}${i.turned ? ' turned' : ''}`,
+    return [`${i.id}${short ? '' : ` ${i.label}`}${plain ? ' ' : ', '}${where}${plain ? ' ' : ', '}${i.face}${rail ? ` ${rail} rail` : ''}${i.turned ? ' turned' : ''}${rollOf(i) ? ` rolled ${rollOf(i)}` : ''}`,
             ...(full ? [`${i.ref} ${i.cfg || '(no configuration)'}`] : []),
             ...(i.on ? [`on ${i.on} unit ${i.unit}`] : []), ...(ms.length ? [`carries ${ms.join(' ')}`] : []),
             ...(typeof i.setback === 'number' && !isRackFace(c) && !isZeroUPart(c) ? [setText(i.setback)] : []),
@@ -213,7 +213,8 @@ function itemFacts(rack, item, ctx) {
     ? (slots.configs || []).map(k => ({name: k.name, description: k.description ?? '', airflow: k.airflow ?? null}))
     : (c?.configs || []).map(name => ({name, description: '', airflow: null}));
   const out = {kind: 'item', id: item.id, ref: item.ref, model: c?.model ?? null, manufacturer: c?.manufacturer ?? null,
-    label: item.label, cfg: item.cfg, configs, ru: item.ru, u: unitsOf(c), face: item.face, turned: !!item.turned,
+    label: item.label, cfg: item.cfg, configs, ru: item.ru, u: ctx.chassisOf ? itemUnits(item, ctx.chassisOf) : 1, face: item.face, turned: !!item.turned,
+    ...(rollOf(item) ? {roll: rollOf(item)} : {}),
     on: item.on ?? null, unit: item.unit ?? null, side: railOf(item, ctx.chassisOf ?? (() => null)),
     managers: managersOf(rack, item.id).map(m => m.id)};
   if (!slots) out.slots = 'not loaded';

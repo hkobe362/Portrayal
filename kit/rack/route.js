@@ -9,12 +9,12 @@
 // to the right as seen from the FRONT. This file imports no DOM and nothing of
 // the site's pages, so the rack kit can take it as it is.
 
-import {uLabel, zeroUOf, bundlesOf} from './model.js';
+import {uLabel, zeroUOf, bundlesOf, rollOf} from './model.js';
 import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY, setbackOf} from './fit.js';
+import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, isQuarter} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -55,13 +55,25 @@ export function ringOf(g) {
   return {run: ['x', 'y', 'z'].includes(g.run) ? g.run : 'x', depth: stated ? g.depth : RING_DEPTH, estimated: !stated};
 }
 
+// THE GUIDES OF AN ITEM AS IT IS MOUNTED. `ctx.guidesOf` gives each where the
+// item would hold it upright; rolled 180 degrees (`roll`) every guide is
+// across its centre line from there, so the ring nearest a port is another
+// ring. An item rolled a quarter turn is an outline and offers none.
+function mountedGuides(m, ctx) {
+  const gs = ctx.guidesOf(m.id);
+  if (isQuarter(m)) return [];
+  if (rollOf(m) !== 180) return gs;
+  const cx = centreX(m, ctx.chassisOf);
+  return gs.map(g => ({...g, x: 2 * cx - g.x}));
+}
+
 // The manager an end leaves through, in order: one hosted on its item on that
 // face; else, of the devices of a unit or less adjacent on that face (ABOVE
 // first, then BELOW: fit.js neighbours), the first with a manager hosted on
 // it on that face, else itself if it declares guides on that face. A manager
 // must declare guides on that face. null when there is none.
 function managerOf(rack, it, pane, ctx) {
-  const guided = m => ctx.guidesOf(m.id).some(g => g.face === pane);
+  const guided = m => mountedGuides(m, ctx).some(g => g.face === pane);
   const hosted = rack.items.find(m => m.on === it.id && m.face === pane && guided(m));
   if (hosted) return hosted;
   {
@@ -77,7 +89,7 @@ function managerOf(rack, it, pane, ctx) {
 // The waypoints through one end's manager, from the port out to `side`.
 function through(m, pane, portX, side, crossing, ctx) {
   if (!m) return [];
-  const gs = ctx.guidesOf(m.id).filter(g => g.face === pane);
+  const gs = mountedGuides(m, ctx).filter(g => g.face === pane);
   const rings = gs.filter(g => g.kind === 'ring');
   if (rings.length) {
     // The rings on the way out: from the port toward `side`. A ring behind
@@ -117,7 +129,7 @@ function through(m, pane, portX, side, crossing, ctx) {
 // along x never gives an empty route. A manager with no ring that runs along
 // x, but a duct, runs in the duct.
 function along(m, pane, ax, bx, ctx, passes = null) {
-  const gs = ctx.guidesOf(m.id).filter(g => g.face === pane);
+  const gs = mountedGuides(m, ctx).filter(g => g.face === pane);
   const rings = gs.filter(g => g.kind === 'ring' && ringOf(g).run === 'x');
   if (rings.length) {
     const lo = Math.min(ax, bx), hi = Math.max(ax, bx);
@@ -358,7 +370,8 @@ export function pointOf(rack, w, ctx) {
   const out = c.mount === 'rack-face' ? (c.d ?? 0) / 2 : 0;
   const z = c.mount !== 'rack-face' ? panelZ(rack, it, g.face, ctx)
     : g.face === 'rear' ? planeZ(f, 'rear') - out : planeZ(f, 'front') + out;
-  return {x: g.x, y: anchorY(rack, it, ctx.chassisOf), z};
+  // the guide where it is as mounted: turned with the item by its roll
+  return {...rollPoint(rack, it, {x: g.x, y: anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
 export function portPoint(rack, end, ctx) {
@@ -369,7 +382,9 @@ export function portPoint(rack, end, ctx) {
   if (x == null) return null;
   // On its own face a panel is at that rail, less its setback; the far panel is the chassis depth away.
   const z = panelZ(rack, it, pane, ctx);
-  return {x, y: ctx.portY?.(end) ?? anchorY(rack, it, ctx.chassisOf), z};
+  // `portX` and `portY` give the port as the item would hold it upright; its
+  // roll turns it to where it is drawn (fit.js rollPoint)
+  return {...rollPoint(rack, it, {x, y: ctx.portY?.(end) ?? anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
 const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);

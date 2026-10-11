@@ -272,6 +272,20 @@ part and the `mountPoints` it hangs by, as its `configs.json` states them.
 `span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
 half a unit. Use `spanOf`, and read its second number as the top edge.
 
+An item may be rolled in its face (`roll`: 90, 180 or 270 degrees clockwise
+as seen from the face it is on; `rollOf(item)` in `rack/model.js`).
+`itemUnits(item, chassisOf)` is its height in units as mounted, which is
+what `spanOf`, `itemBox`, `heightOf` and `itemsWithU` use: rolled a quarter
+turn it is the width of the device in whole units, and `itemBox` then also
+gives `w`, the height of the device, lying across the opening.
+`facePoint(rack, item, {x, y, view}, chassisOf)` turns a point of a face as
+drawn (mm from its left edge and down from its top) into the rack, through
+`face`, `turned` and `roll`; `rollPoint(rack, item, {x, y}, chassisOf)` turns
+a rack point of the upright item to where it is as mounted. A routing
+context (`portX`, `portY`, `guidesOf`) gives its points for the upright
+item, and the kit turns them, so a page that rolls them itself turns them
+twice. `isQuarter(item)` says an item is an outline to a route.
+
 `holderOf(item)` in `rack/model.js` is the id of the item that holds one on
 a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
 `rack/fit.js` says whether a held item is one the kit does not check: a page
@@ -280,9 +294,9 @@ draws such an item on its host, and not in a unit of its own.
 The other names these modules export are the kit's own, shared between its
 files, and may change without notice: `spansMeet`, `anchorY`, `laneY`,
 `neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`, `fillOf`,
-`overlapNotices`, `fitsDepth`, `reachOf`, `heldBy`, `uncheckedText`,
+`overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `heldBy`, `uncheckedText`,
 `unheldText` and `bothText` in `rack/fit.js`; `isPosition`, `HOLE_STYLES`,
-`railWidth` and `RAIL_WIDTH_IN` in `rack/model.js`; `HOLE_EDGE` in
+`railWidth`, `RAIL_WIDTH_IN` and `ROLLS` in `rack/model.js`; `HOLE_EDGE` in
 `rack/rails.js`; `NO_HOSTS` in `rack/commands.js`; `NETBOX_RACK_WIDTHS` in
 `rack/export-data.js`.
 

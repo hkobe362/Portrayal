@@ -40,6 +40,16 @@
   the library offers a slot yet. `rack/catalog` `loadSlots` keeps the
   `pdu-class` of a device, and `configFacts` and `meteringOf` read what a
   rack entry will be checked against.
+- `roll` on an item: 90, 180 or 270 degrees clockwise as it is seen from the
+  face it is on. `patch` takes it and refuses it where the rolled box does
+  not fit. Rolled 180 an item is the same box turned over: its solids, its
+  trays (the floor looks down and the rings hang) and its guides are turned
+  with it, and a route takes the ring that is nearest as mounted. Rolled a
+  quarter turn it takes its width in whole units up the rack, and is an
+  outline with no tray or ring until its mounting is described. `rack/fit`
+  gains `facePoint`, `rollPoint` and `itemUnits`. A routing context still
+  gives each port and guide where an upright item would hold it; the kit
+  turns it.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file

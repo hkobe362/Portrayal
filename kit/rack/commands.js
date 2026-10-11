@@ -5,7 +5,7 @@
 // and {chassisOf} in, a new rack out - and says no with a sentence. One that
 // changes nothing hands back the very rack it was given, so a caller can tell.
 
-import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf, firstU,
+import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf, firstU, rollOf,
         nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor} from './model.js';
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
@@ -145,6 +145,14 @@ function patch(rack, {id, ...given}, ctx) {
       if (!f.ok) return {error: f.reason};
     }
     if (given.setback == null) drop.push('setback'); else changes.setback = given.setback;
+  }
+  // ROLL: 90, 180 or 270, or null for upright; refused where the rolled box does not fit
+  if ('roll' in given && (given.roll ?? 0) !== rollOf(it)) {
+    const {roll: _r, ...bare} = it;
+    const trial = given.roll == null ? bare : {...bare, roll: given.roll};
+    const f = fits(rack, trial, ctx.chassisOf, {ignoreId: id});
+    if (!f.ok) return {error: f.reason};
+    if (given.roll == null) drop.push('roll'); else changes.roll = given.roll;
   }
   if (!Object.keys(changes).length && !drop.length) return findings.length ? {...unchanged(rack), findings} : unchanged(rack);
   const next = {...it, ...changes};
@@ -865,14 +873,15 @@ export const COMMANDS = {
       face: FACE, ru: RU, label: {type: 'string', description: 'The name shown on the drawing; its model when left out.'}, as: AS})},
   move: {run: move, description: 'Move a device to another U and/or face. Its cable managers move with it; a cable manager moved onto a device bolts onto it.',
     args: args(['id'], {id: ID('device'), ru: RU, face: FACE})},
-  patch: {run: patch, description: "Change a placed device's configuration, label, turned state or setback, or replace all of what is seated in it and all of its part settings at once. A new configuration on its own clears what was seated and set; to change one slot or one setting, use fit or field.",
+  patch: {run: patch, description: "Change a placed device's configuration, label, turned state, roll or setback, or replace all of what is seated in it and all of its part settings at once. A new configuration on its own clears what was seated and set; to change one slot or one setting, use fit or field.",
     args: args(['id'], {id: ID('device'), cfg: {type: 'string', description: 'Which of its configurations; it keeps its own when left out.'},
       swaps: {type: 'object', description: 'Every slot path to the part ref seated there, replacing the whole map. A slot left out holds what its configuration builds.'},
       fields: {type: 'object', description: 'Every part path to its settings ({key: value}), replacing the whole map.'},
       label: {type: 'string', description: 'The name shown on the drawing.'},
       turned: {type: 'boolean', description: 'true when mounted back to front.'},
       setback: {type: ['number', 'null'], description: 'Millimetres its faceplate stands behind its rail, into the rack; negative is proud. null for the default of the device or the rack.'},
-      heldBy: {type: ['object', 'null'], description: 'null frees a device held on a shelf or a rail. Nothing else is taken yet.'}})},
+      heldBy: {type: ['object', 'null'], description: 'null frees a device held on a shelf or a rail. Nothing else is taken yet.'},
+      roll: {enum: [90, 180, 270, null], description: 'Degrees it is turned clockwise in its face, as seen from that face: 180 is upside down. null for upright.'}})},
   remove: {run: remove, description: 'Take a device out of the rack. Its cables are kept as loose ends, or removed with it; its cable managers stay on the rack.',
     args: args(['id'], {id: ID('device'), cables: {enum: ['keep', 'remove'], description: 'keep its cables as loose ends, or remove them; keep when left out.'}})},
   attach: {run: attach, description: 'Bolt an unattached cable manager onto the device at its U.',
