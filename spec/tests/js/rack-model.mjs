@@ -62,8 +62,8 @@ test('a document survives serialize and parse unchanged', () => {
 test('parseDoc refuses what it cannot read, with a sentence', () => {
   assert.throws(() => M.parseDoc('{'), SyntaxError);
   assert.throws(() => M.parseDoc({format: 'other'}), /not a Portrayal rack file/);
-  assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 4, racks: []}),
-    /version 4; this reader supports up to version 3/);
+  assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 5, racks: []}),
+    /version 5; this reader supports up to version 4/);
   assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 1, racks: []}), /holds no rack/);
   assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 1,
     racks: [{frame: {}, items: [{ref: 'x'}]}]}), /Item 1 has no device or no U/);
@@ -116,7 +116,7 @@ test('the DCIM import settings are optional: an old file opens unchanged, a new 
   // Not an object: not settings.
   for (const bad of ['Lab 1', ['Lab 1'], null, 3]) assert.equal('dcim' in M.parseDoc(doc({dcim: bad})).racks[0], false);
   // The format's version did not change for it.
-  assert.equal(M.VERSION, 3);   // 3 since bundles (#921), not for this
+  assert.equal(M.VERSION, 4);   // 3 for bundles (#921) and 4 for its own keys, not for this
 });
 
 test('withDcim sets one name and keeps the other, and returns a new rack', () => {
@@ -158,8 +158,8 @@ test('version 2: a version-1 file opens unchanged, and a manager keeps its host'
 });
 
 test('a newer file than this page knows is refused with a sentence', () => {
-  assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 4, racks: [{}]}),
-    /version 4; this reader supports up to version 3/);
+  assert.throws(() => M.parseDoc({format: 'portrayal-rack', version: 5, racks: [{}]}),
+    /version 5; this reader supports up to version 4/);
 });
 
 test('a malformed host or unit is dropped on load, not guessed at', () => {

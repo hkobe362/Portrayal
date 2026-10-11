@@ -13,7 +13,10 @@ export const FORMAT = 'portrayal-rack';
 // version-2 reader keeps (`zeroU` as written) or drops (`side`), and no reader
 // older than this kit was ever published. Bundles (#921) did: a version-2
 // reader would drop `bundles`, a rack key, and erase them on its next save.
-export const VERSION = 3;
+// Version 4 (docs/rack-file-v4-design.md) is one bump for every key that
+// needed one: a version-3 reader refuses `ru: 12.5` outright, and erases or
+// misreads the others.
+export const VERSION = 4;
 export const THREADS = ['12-24', '10-32', 'M6'];
 // MIGRATIONS[n - 1] takes a version-n document to version n + 1.
 //   1 -> 2: rack-face managers (`on`, `unit` on an item). Nothing in a
@@ -23,7 +26,26 @@ export const THREADS = ['12-24', '10-32', 'M6'];
 //   changes; the bump is so an older page refuses a file holding bundles
 //   instead of opening it, dropping them and erasing them on its next save
 //   (docs/cable-bundles-design.md section 2.3).
-export const MIGRATIONS = [d => ({...d, version: 2}), d => ({...d, version: 3})];
+//   3 -> 4: half-unit positions and the keys of docs/rack-file-v4-design.md
+//   section 1.1. Nothing in a version-3 file changes shape or meaning; the
+//   bump is so a version-3 page refuses a file it would erase keys from,
+//   misplace or measure wrongly (section 8 of that note).
+export const MIGRATIONS = [d => ({...d, version: 2}), d => ({...d, version: 3}), d => ({...d, version: 4})];
+
+// WHAT A READER DOES NOT KNOW, IT KEEPS (version 4). An item, the frame, a rack
+// and the document are each rebuilt from the keys this file knows; every other
+// own key is carried over as written, as a cable, a zero-U entry and a bundle
+// always carried theirs. So a later optional key that is safe to ignore needs
+// no version bump, whichever level it sits at. A misspelt key is kept too, and
+// not reported here: the schema reports it to anyone who validates.
+const unknownOf = (o, known) => Object.fromEntries(Object.entries(o && typeof o === 'object' && !Array.isArray(o) ? o : {})
+  .filter(([k]) => !known.includes(k)).map(([k, v]) => [k, structuredClone(v)]));
+const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref'];
+const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side'];
+const RACK_KEYS = ['id', 'name', 'frame', 'items', 'zeroU', 'cables', 'dcim', 'bundles'];
+const DOC_KEYS = ['format', 'version', 'id', 'racks'];
+// The rail hole styles. `round` (version 4) is an unthreaded round hole.
+export const HOLE_STYLES = ['square', 'tapped', 'round'];
 
 const RAIL_DEPTH = 740;        // mm between front and rear rails: a common 4-post
 const USABLE_BEYOND = 260;     // mm a four-post allows past its rear rail by default
@@ -34,9 +56,10 @@ const token = () => Math.random().toString(36).slice(2, 10);
 export function normalizeFrame(f = {}) {
   const four = f.kind !== 'two-post';
   const railDepth = four ? (Number(f.railDepth) > 0 ? Number(f.railDepth) : RAIL_DEPTH) : null;
-  const style = f.holes?.style === 'tapped' ? 'tapped' : 'square';
+  const style = HOLE_STYLES.includes(f.holes?.style) ? f.holes.style : 'square';
   const height = Math.round(Number(f.heightRU));
   return {
+    ...unknownOf(f, FRAME_KEYS),
     kind: four ? 'four-post' : 'two-post',
     heightRU: height >= 1 ? height : 42,
     numbering: f.numbering === 'top-down' ? 'top-down' : 'bottom-up',
@@ -176,10 +199,13 @@ export const uLabel = (frame, u) => (frame.numbering === 'top-down' ? frame.heig
 // frame that is the bottom U's own label, on a top-down one the top U's.
 export const positionOf = (frame, ru, u = 1) => Math.min(uLabel(frame, ru), uLabel(frame, ru + Math.max(1, u) - 1));
 
+// A POSITION is a whole unit or a half (version 4): `ru` in steps of 0.5.
+export const isPosition = ru => typeof ru === 'number' && Number.isFinite(ru) && Number.isInteger(ru * 2);
+
 function readItem(i, n) {
-  if (!i || typeof i.ref !== 'string' || !i.ref || !Number.isInteger(i.ru))
+  if (!i || typeof i.ref !== 'string' || !i.ref || !isPosition(i.ru))
     throw new Error(`Item ${n} has no device or no U.`);
-  return {id: String(i.id ?? ''), ref: i.ref, cfg: String(i.cfg ?? ''), label: String(i.label ?? i.ref),
+  return {...unknownOf(i, ITEM_KEYS), id: String(i.id ?? ''), ref: i.ref, cfg: String(i.cfg ?? ''), label: String(i.label ?? i.ref),
           ru: i.ru, face: i.face === 'rear' ? 'rear' : 'front', turned: !!i.turned,
           swaps: {...(i.swaps || {})}, fields: structuredClone(i.fields || {}),
           ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side)};
@@ -323,6 +349,7 @@ export function parseDoc(input, {notes} = {}) {
   for (let v = d.version; v < VERSION; v++) d = MIGRATIONS[v - 1](d);
   if (!Array.isArray(d.racks) || !d.racks.length) throw new Error('This rack file holds no rack.');
   return {
+    ...unknownOf(d, DOC_KEYS),
     format: FORMAT, version: VERSION,
     id: typeof d.id === 'string' && d.id ? d.id : `doc-${token()}`,
     racks: d.racks.map((r, k) => {
@@ -331,6 +358,7 @@ export function parseDoc(input, {notes} = {}) {
       const zeroU = readZeroU(Array.isArray(r.zeroU) ? r.zeroU : []);
       const cables = readCables(Array.isArray(r.cables) ? r.cables : [], bundles ?? []);
       const rack = {
+        ...unknownOf(r, RACK_KEYS),
         id: String(r.id ?? `r${k + 1}`), name: String(r.name ?? 'Rack'),
         frame: normalizeFrame(r.frame), items, zeroU, cables,
         // Optional, and only when the file has it (dcimOf): no version bump, since a
@@ -373,8 +401,20 @@ export const bundleIdFor = rack => freshBundleId([...rackIds(rack), ...bundlesOf
 // {cable: <string>} is dropped; a number that is not a whole number from 1
 // goes past the highest in use; the trunk is read as a cable's route is, so an
 // unreadable entry keeps the trunk as written in `routeAsWritten`. A `straps`
-// that is not {every: null} or {every: {value above 0, unit in or mm}} says
-// nothing the default does not, and is dropped. Unknown fields are kept.
+// is kept when it has a key that says something: `every` (null, or {value
+// above 0, unit in or mm}), or `breakout` or `anchors` (true or false, version
+// 4). One of those three that is not valid is left out of it, and a `straps`
+// left with none of them says nothing the defaults do not, and is dropped.
+// Unknown fields are kept.
+const STRAP_KINDS = ['breakout', 'anchors'];
+function readStraps(straps) {
+  if (!plainObj(straps)) return null;
+  const out = {...straps};
+  if ('every' in out && !(out.every === null || isStrapSpacing(out.every))) delete out.every;
+  for (const k of STRAP_KINDS) if (k in out && typeof out[k] !== 'boolean') delete out[k];
+  return ['every', ...STRAP_KINDS].some(k => k in out) ? out : null;
+}
+
 function readBundles(list, others) {
   const objs = list.filter(plainObj);
   const declared = objs.filter(b => typeof b.id === 'string' && b.id).map(b => ({id: b.id}));
@@ -397,9 +437,9 @@ function readBundles(list, others) {
     // still the trunk, as a cable's route does, so a save and a reload keep it.
     const asWritten = r.routeAsWritten
       ?? (Array.isArray(incoming) && routesEqual(readableFromRouteAsWritten(incoming), r.route) ? incoming : null);
-    const strapsOk = plainObj(straps) && (straps.every === null || isStrapSpacing(straps.every));
+    const kept = readStraps(straps);
     out.push({...b, id, number: whole(b.number) ? b.number : ++top, label: String(b.label ?? ''), members, route: r.route,
-              ...(asWritten ? {routeAsWritten: asWritten} : {}), ...(strapsOk ? {straps} : {})});
+              ...(asWritten ? {routeAsWritten: asWritten} : {}), ...(kept ? {straps: kept} : {})});
   }
   return out;
 }

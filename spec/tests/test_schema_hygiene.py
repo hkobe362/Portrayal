@@ -75,10 +75,11 @@ def test_every_schema_id_names_its_published_home(path):
         # named by `format: "portrayal-rack"` and counts its own `version`.
         # Each rack version is published under the next unused label, never
         # under its version number (docs/format-stability.md): /v1/ described
-        # rack version 2 and stays as published; version 3 (#921, bundles) is /v2/.
-        assert doc["$id"] == f"https://portrayal.dev/schemas/v2/{path.name}", doc["$id"]
+        # rack version 2 and stays as published; version 3 (#921, bundles) is /v2/
+        # and stays too; version 4 (half-unit positions, #935) is /v3/.
+        assert doc["$id"] == f"https://portrayal.dev/schemas/v3/{path.name}", doc["$id"]
         assert doc["properties"]["format"]["const"] == "portrayal-rack"
-        assert doc["properties"]["version"]["const"] == 3
+        assert doc["properties"]["version"]["const"] == 4
         assert "(v%d)" % doc["properties"]["version"]["const"] in doc["title"], doc["title"]
         return
     assert doc["$id"] == f"https://portrayal.dev/schemas/v1/{path.name}", doc["$id"]

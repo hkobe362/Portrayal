@@ -55,14 +55,14 @@ const CAT6 = () => 24;
 
 // ── the record ───────────────────────────────────────────────────────────
 
-test('the rack file is version 3, and a version-2 file opens as it was', () => {
-  assert.equal(M.VERSION, 3);
-  assert.equal(M.newDoc().version, 3);
+test('a version-2 file opens as it was, at the version of today', () => {
+  assert.equal(M.VERSION, 4);            // 3 for bundles (#921); 4 is docs/rack-file-v4-design.md
+  assert.equal(M.newDoc().version, 4);
   const v2 = {format: 'portrayal-rack', version: 2, id: 'd', racks: [{id: 'r1', name: 'A', frame: {}, items: [], zeroU: [], cables: []}]};
   const d = M.parseDoc(v2);
-  assert.equal(d.version, 3);
+  assert.equal(d.version, 4);
   assert.equal('bundles' in d.racks[0], false);          // a rack never given a bundle saves as it was
-  assert.throws(() => M.parseDoc({...v2, version: 4}), /version 4; this reader supports up to version 3/);
+  assert.throws(() => M.parseDoc({...v2, version: 5}), /version 5; this reader supports up to version 4/);
 });
 
 test('a rack with bundles reads back whole and validates; the schema refuses a malformed bundle', () => {
@@ -73,7 +73,7 @@ test('a rack with bundles reads back whole and validates; the schema refuses a m
   const text = M.serialize(doc);
   assert.deepEqual(M.parseDoc(text).racks[0], r);
   assert.deepEqual(validate(SCHEMA, JSON.parse(text)), []);
-  assert.equal(SCHEMA.$id, 'https://portrayal.dev/schemas/v2/rack.schema.json');
+  assert.equal(SCHEMA.$id, 'https://portrayal.dev/schemas/v3/rack.schema.json');
   const bad = JSON.parse(text);
   bad.racks[0].bundles[0].number = 0;
   bad.racks[0].bundles[0].straps = {every: {value: 12, unit: 'cm'}};
