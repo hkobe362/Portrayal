@@ -451,6 +451,61 @@ it, so each of those still has 0.2 m and more over its path and plugs; when
 step 4 takes the allowance away, what is spare is what a tray is given to
 hold.
 
+### 1.7 A span in front of other ports (#1013)
+
+With no horizontal manager, a cable runs from its side lane to its port as a
+free span across the faces of the devices between, over their ports. It
+crosses no body, since only envelopes are solid (1.1) and the span is in
+front of the face, so `bodyFindings` and `ringFindings` say nothing: on a
+rack of twelve switches and no manager, with eleven cords bundled down one
+lane, every cord crossed a face diagonally and nothing was reported.
+
+**The finding.** A path's `covers` lists each port a span passes in front of,
+as `{kind: 'covers-port', cable, item, path, view, between: [from, to], at:
+[x, y, z]}`; `coverFindings(rack, ctx, nameOf)`, beside `bodyFindings` and
+`bendFindings`, gives one finding a cable, `{kind: 'covers-ports', cable,
+ports: [{item, path, view}], between, text}`, with a sentence: "c11 crosses
+in front of port-8, port-9 and port-10 on MGMT-SW1 between left-front U42 and
+its port on MGMT-SW1: add a horizontal cable manager above or below MGMT-SW1
+to carry it." A device with more than six ports covered has its first five
+named and the rest counted. It **warns and never refuses**: on a rack with no
+manager it is the truth about the rack.
+
+**Which spans.** Only a span with no pathway at either end is judged: from a
+port to a lane, or from port to port (a short jumper that hangs). That is the
+span no manager carries, and the one the advice fits. A leg into or out of a
+ring, a duct or a tray is not judged: it is where the cord is meant to run,
+and a cord between a port and the first ring of its manager crosses a port or
+two on any rack. A plug is not judged either, and a cable's own two ports are
+never listed.
+
+**Which ports.** A span covers a port when, seen square to the panel, it
+passes through the port's box grown by the cable's radius, while it stands in
+front of that panel and no further out than `COVER_DEPTH`, 100 mm. That
+figure is an estimate: the longest plug the kit knows stands 64.8 mm out of
+its cage, and the rest is room to hold it; no source states one. The spans
+judged stand within a plug and a bend radius of the panel, well inside it. A
+port on a neighbouring device counts as one on the cable's own: a span that
+sags into the face below covers the ports there.
+
+**What the context carries.** The routing context places a port only when it
+is asked for one (`portX`, `portY`, by a cable end), so the kit knows where
+the cabled ports are and nothing of the others. Two sources, then:
+
+- every port that holds a cable, from `portX` and `portY`, with a box of
+  `PORT_BOX`, 12 by 10 mm (an estimate, about the opening of an RJ45 jack or
+  an SFP cage);
+- **`ctx.portBoxesOf(itemId)`**, a new reader, optional and additive:
+  `[{path, view, x, y, w?, h?}]`, every port of the device, cabled or not,
+  `x` and `y` the centre of its box where `portX` and `portY` put a port, `w`
+  and `h` its size in mm (`PORT_BOX` when left out). A page that reads the
+  compiled faces has these boxes already. A reader that throws, and an entry
+  it cannot place, are left out.
+
+Without the reader a finding is still true and can miss a port with no cable
+in it; a cable that covers only such ports is then not reported. The list is
+read once per rack and context, as the solids are.
+
 ## 2. Trays: the library vocabulary
 
 **Recommendation: a tray is a pathway with a floor. It is declared as `tray`
@@ -1861,6 +1916,7 @@ published file or a saved rack file uses it.
 | a ring's part, and a zero-U part, met by the cable's tube in `legCrossings` and `detour`, the approach point (`at: 'approach'`) clear of the band by at least the radius and `CLEAR` (#968; the installed bend radius where the route turns there, #973) | kit API | a page checking its tubes and the routed lengths of saved racks follow it |
 | room for the bends (3.4, #973): the measure a path is judged by (`cornersOf` with `share: 'need'`, the plug's reach a leg), the approach point at the bend radius, the lead point (`at: 'lead'`, with a ring's `item` and `via` or a plug's `end`), a detour's `room` of two bend radii, the evenly sampled hang that leaves no corner short, and `ROOM_MAX` | kit API, routed lengths | a page reads the points by these names, and every routed length and stock size of a saved rack follows the rules; changing one moves them again |
 | `tight-bend` in a path's `bends` (`point`, `between`, `at`, `angle_deg`, `legs_mm`, `room_mm`, `need_mm`, `short_mm`), `bendFindings`, and its sentence ("turns N degrees between A and B with room for an R mm bend; the cable (type) needs M mm, S mm short.") | kit API, agent output | a page and an agent read the kind and the fields, and match the sentence |
+| `covers-port` in a path's `covers` (`item`, `path`, `view`, `between`, `at`), `coverFindings` with `covers-ports` (`ports`, `between`) and its sentence ("crosses in front of P on D between A and B: add a horizontal cable manager above or below D to carry it."), `PORT_BOX`, `COVER_DEPTH`, and the optional reader `ctx.portBoxesOf(itemId)` giving `[{path, view, x, y, w?, h?}]` (1.7, #1013) | kit API, the routing context, agent output | a page supplies the reader and reads the findings by these names; agents match the sentence |
 | `cornersOf` and `STRAIGHT_DEG` in `rack/route-path.js` (still exported from `rack/bundles.js`), and `cornersOf`'s `share` option with `half` (the default, the bundle check's) and `need` | kit API | a consumer imports them by these names from either path |
 | a doubled-back ring's path `face` point at its approach point, apart from the ring's own `rings[].face` on the band (#968) | kit API | a page that draws the face point, or compares the two, reads them by these names |
 | the ring advice in `bodyFindings`, "route it into the ring along its run, through its opening", and a ring's part named as "ring N front leg" (#968) | kit API, agent output, exports | agents and the export notes match the sentence |

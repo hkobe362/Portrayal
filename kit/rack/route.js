@@ -5,6 +5,8 @@
 //     'z'; 'x' when not given) and `depth` (mm along the run; RING_DEPTH when
 //     not given, and then estimated),
 //   ctx.portX(end) -> x or null,
+//   and optionally ctx.portBoxesOf(itemId) -> [{path, view, x, y, w?, h?}],
+//     every port of a device, cabled or not (#1013, portBoxesOn below),
 // with every x in RACK coordinates: mm from the rack's centre line, positive
 // to the right as seen from the FRONT. This file imports no DOM and nothing of
 // the site's pages, so the rack kit can take it as it is.
@@ -402,10 +404,87 @@ export function portPoint(rack, end, ctx) {
   // No port found on the drawing: no point, and so no length - never an invented x of 0.
   const x = ctx.portX(end);
   if (x == null) return null;
+  return {x, y: ctx.portY?.(end) ?? (it.ru - 0.5) * RU, z: panelZ(rack, it, pane, ctx)};
+}
+// Where the panel of an item seen from `pane` stands, as a z: on its own face
+// a panel is at that rail; the far panel is the chassis depth away.
+function panelZ(rack, it, pane, ctx) {
   const f = rack.frame, d = ctx.chassisOf(it.ref)?.d ?? 0;
-  // On its own face a panel is at that rail; the far panel is the chassis depth away.
-  const z = pane === it.face ? planeZ(f, pane) : (it.face === 'front' ? -d : -railDepthOf(f) + d);
-  return {x, y: ctx.portY?.(end) ?? (it.ru - 0.5) * RU, z};
+  return pane === it.face ? planeZ(f, pane) : (it.face === 'front' ? -d : -railDepthOf(f) + d);
+}
+
+// THE PORTS A SPAN CAN COVER (#1013, docs/cable-lay-design.md section 1.7).
+// Every port the kit can place, as a box on the panel it is on: {item, path,
+// view, x0, x1, y0, y1, z, out}, x and y in rack mm, `z` the panel and `out`
+// the way it looks (+1 out of the front, -1 out of the rear).
+// - `ctx.portBoxesOf(itemId)`, when the page gives it, lists every port of a
+//   device, cabled or not: [{path, view, x, y, w?, h?}], `x` and `y` the
+//   centre of the port's box where portX and portY put a port (x from the
+//   centre line, y up from the floor of U1), `w` and `h` its size in mm. It
+//   is an ADDITIVE, OPTIONAL reader: a context without it is as valid as it
+//   was. A reader that throws, or an entry it cannot read, is left out.
+// - Every cabled port is known without it (portX and portY place it), and is
+//   added where the reader did not list it. So with no reader a span is still
+//   judged against the ports that hold a cable, and against no others: what
+//   is reported is true, and a port with no cable in it can be missed.
+// PORT_BOX is the box of a port whose size is not given: ESTIMATED, about
+// the opening of an RJ45 jack or an SFP cage (no one figure fits every port).
+// Read once per rack and context, as solidsOf reads its bodies.
+export const PORT_BOX = {w: 12, h: 10};
+const portMemo = new WeakMap();
+function portBoxesOn(rack, ctx) {
+  const keyed = ctx !== null && typeof ctx === 'object';
+  let per = portMemo.get(rack);
+  if (!per) portMemo.set(rack, per = new WeakMap());
+  if (keyed && per.has(ctx)) return per.get(ctx);
+  const out = [], seen = new Set();
+  const size = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null);
+  const add = (it, path, view, x, y, w, h) => {
+    const pane = endPane(rack, {item: it.id, view});
+    const key = `${it.id}|${path}|${view}`;
+    if (!pane || seen.has(key) || !Number.isFinite(x) || !Number.isFinite(y)) return;
+    seen.add(key);
+    const hw = (size(w) ?? PORT_BOX.w) / 2, hh = (size(h) ?? PORT_BOX.h) / 2;
+    out.push({item: it.id, path, view, x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh,
+      z: panelZ(rack, it, pane, ctx), out: pane === 'rear' ? -1 : 1});
+  };
+  if (typeof ctx?.portBoxesOf === 'function') for (const it of rack.items) {
+    let list = null;
+    try { list = ctx.portBoxesOf(it.id); } catch { list = null; }
+    for (const b of Array.isArray(list) ? list : [])
+      if (b && typeof b.path === 'string') add(it, b.path, b.view === 'rear' ? 'rear' : 'front', b.x, b.y, b.w, b.h);
+  }
+  for (const c of rack.cables || []) for (const e of [c.a, c.b]) {
+    const it = e && itemOf(rack, e.item);
+    let p = null;
+    try { p = it ? portPoint(rack, e, ctx) : null; } catch { p = null; }
+    if (p) add(it, e.path, e.view === 'rear' ? 'rear' : 'front', p.x, p.y);
+  }
+  if (keyed) per.set(ctx, out);
+  return out;
+}
+// HOW FAR OUT OF A PANEL A CABLE STILL COVERS A PORT, mm: a span nearer the
+// panel than this, in front of a port, is in the way of the plug that seats
+// there and of the hand that seats it. ESTIMATED: the longest plug the kit
+// knows stands 64.8 out of its cage (PLUG_REACH, a DAC), and the figure is
+// that and room to hold it; no source states one. The spans it is for stand
+// within a plug and a bend radius of the panel, well inside it.
+export const COVER_DEPTH = 100;
+// Where the leg p -> q first passes in front of a port's box, the box grown by
+// the cable's radius `r`, no further out of the panel than COVER_DEPTH; null
+// when it does not. A leg that only touches the box's edge does not cover it.
+function legOver(p, q, b, r) {
+  let t0 = 0, t1 = 1;
+  const clip = (v0, v1, lo, hi) => {
+    const d = v1 - v0;
+    if (Math.abs(d) < 1e-12) return v0 >= lo && v0 <= hi;
+    const a = (lo - v0) / d, c = (hi - v0) / d;
+    t0 = Math.max(t0, Math.min(a, c)); t1 = Math.min(t1, Math.max(a, c));
+    return t0 < t1 - 1e-9;
+  };
+  if (!clip(p.x, q.x, b.x0 - r, b.x1 + r) || !clip(p.y, q.y, b.y0 - r, b.y1 + r)
+      || !clip((p.z - b.z) * b.out, (q.z - b.z) * b.out, -1e-6, COVER_DEPTH)) return null;
+  return {x: p.x + (q.x - p.x) * t0, y: p.y + (q.y - p.y) * t0, z: p.z + (q.z - p.z) * t0};
 }
 
 const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);
@@ -571,6 +650,14 @@ export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m 
 //   detours below, and no hang that would make one), so what is here is a
 //   bend the kit's rules found no room for: often the parts leave none, but
 //   a finding does not prove that no other lay would have it;
+// - `covers`: each port a span of the path passes in front of (#1013,
+//   section 1.7), as {kind: 'covers-port', cable, item, path, view, between:
+//   [from, to], at: [x, y, z]}: the port's device, path and view, the
+//   waypoints the span lies between (as for a crossing) and where it comes
+//   over the port, in mm. Only a span with no pathway at either end is
+//   judged, from a port to a lane or to the other port: that is the span no
+//   manager carries. The cable's own two ports are never listed, and a port
+//   is listed once. Which ports can be seen is portBoxesOn's (above);
 // - `rests`: what the cable lies on (docs/cable-lay-design.md section 3):
 //   {kind: 'ring', item, via} for a ring on a tray whose sill holds it;
 //   {kind: 'tray', item, via, face, role, ties?} for a tray it runs along or
@@ -1064,7 +1151,32 @@ export function routePath(rack, cable, ctx) {
   const bends = tightOf(final).map(c => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
     between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
     angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
-  return {points: final, rings, findings, marks, crossings, detours, rests, bends, allowance: endAllowance(cable)};
+  // WHAT IT COVERS (#1013, section 1.7): with no manager a leg is a free span
+  // from a lane to a port, or from port to port, across the faces of the
+  // devices between; it crosses no body (only envelopes are solid, 1.1), so
+  // nothing above reports it. Each port such a span passes in front of is
+  // listed. A leg into or out of a pathway is not judged: a ring, a duct or
+  // a tray is where the cord is meant to run, and the advice a finding gives
+  // (add a manager) would not apply. Nor is a plug, which stands out of its
+  // own port.
+  const covers = [];
+  const ports = portBoxesOn(rack, ctx);
+  if (ports.length) {
+    const same = (e, p) => p.item === e.item && p.path === e.path && p.view === (e.view === 'rear' ? 'rear' : 'front');
+    const plug = p => p.at === 'a' || p.at === 'b';
+    for (let k = 1; k < final.length; k++) {
+      const p = final[k - 1], q = final[k], between = legs[k - 1];
+      if (between.some(w => w.item) || plug(p) || plug(q) || (p.end && p.end === q.end)) continue;
+      for (const port of ports) {
+        if (same(cable.a, port) || same(cable.b, port)) continue;
+        if (covers.some(c => c.item === port.item && c.path === port.path && c.view === port.view)) continue;
+        const at = legOver(p, q, port, r);
+        if (at) covers.push({kind: 'covers-port', cable: cable.id, item: port.item, path: port.path, view: port.view,
+          between, at: [r1(at.x), r1(at.y), r1(at.z)]});
+      }
+    }
+  }
+  return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable)};
 }
 
 // The rail plane an item is fixed to, as a z: the front rail's 0, or the
@@ -1215,6 +1327,35 @@ export function bendFindings(rack, ctx, nameOf = id => id) {
     return {...f, text: f.room_mm === 0 ? `${c.id} doubles back ${where}, with no room for a bend; ${needs}.`
       : `${c.id} turns ${f.angle_deg} degrees ${where} with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`};
   }));
+}
+
+// EVERY CABLE WHOSE SPAN PASSES IN FRONT OF OTHER PORTS (#1013,
+// docs/cable-lay-design.md section 1.7), rack-wide: routePath's `covers`, one
+// finding a cable, as {kind: 'covers-ports', cable, ports: [{item, path,
+// view}], between: [[from, to]], text}, with a sentence that names the ports
+// by device and says where a horizontal manager would carry the cord. It
+// warns and never refuses: on a rack with no manager it is the truth about
+// the rack. A cable whose port is not found is not judged. `nameOf(itemId)`
+// names an item. A device's ports are named up to six; past that, the first
+// five and how many more.
+export function coverFindings(rack, ctx, nameOf = id => id) {
+  const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}` : `${w.lane} U${uLabel(rack.frame, w.ru)}`);
+  const and = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
+  return (rack.cables || []).flatMap(c => {
+    const covers = routePath(rack, c, ctx)?.covers || [];
+    if (!covers.length) return [];
+    const by = new Map();
+    for (const f of covers) (by.get(f.item) || by.set(f.item, []).get(f.item)).push(f.view === 'rear' ? `${f.path} (rear)` : f.path);
+    for (const paths of by.values()) paths.sort((p, q) => p.localeCompare(q, 'en', {numeric: true}));
+    const said = [...by].map(([item, paths]) => `${paths.length > 6 ? `${paths.slice(0, 5).join(', ')} and ${paths.length - 5} more` : and(paths)} on ${nameOf(item)}`);
+    const between = [...new Map(covers.map(f => [JSON.stringify(f.between), f.between])).values()];
+    const where = between.map(bt => { const [a, b] = bt.map(w => lab(w, c)); return `between ${a} and ${b}`; });
+    // the devices its uncarried spans end at: a manager on one would carry it
+    const ends = [...new Set(between.flat().filter(w => w.end).map(w => (w.end === 'a' ? c.a : c.b).item))];
+    const at = (ends.length ? ends : [...by.keys()]).map(nameOf);
+    return [{kind: 'covers-ports', cable: c.id, ports: covers.map(f => ({item: f.item, path: f.path, view: f.view})), between,
+      text: `${c.id} crosses in front of ${and(said)} ${and(where)}: add a horizontal cable manager above or below ${at.join(' or ')} to carry it.`}];
+  });
 }
 
 // A word for a part of a body, as a finding names it.

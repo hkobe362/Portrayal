@@ -165,7 +165,7 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/managers.js` | cable managers: `placement` of a manager onto the device behind it, and moving one |
 | `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths |
 | `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres |
-| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
+| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
@@ -453,7 +453,25 @@ ctx, nameOf)` gives them rack-wide with a sentence, as `bodyFindings` does
 for crossings: where ("c9 turns 129.7 degrees between its port on LEAF-B and
 CM-01 ring 3") and by how much ("with room for a 19.2 mm bend; the cable
 (aoc) needs 30 mm, 10.8 mm short."). A page that draws the kit's points can show them as they are;
-`inspect` and `describe` do not carry them yet. What is decided for a cable
+`inspect` and `describe` do not carry them yet.
+
+**A span in front of other ports.** With no horizontal manager a cable runs
+from its lane to its port across the faces between, over their ports, and
+crosses no body. The path's `covers` lists each port such a span passes in
+front of, `{ kind: 'covers-port', cable, item, path, view, between: [from,
+to], at: [x, y, z] }`, and `coverFindings(rack, ctx, nameOf)` gives one
+finding a cable, `{ kind: 'covers-ports', cable, ports, between, text }`:
+"c11 crosses in front of port-8, port-9 and port-10 on MGMT-SW1 between
+left-front U42 and its port on MGMT-SW1: add a horizontal cable manager above
+or below MGMT-SW1 to carry it." It warns and never refuses. Only a span with
+no pathway at either end is judged (port to lane, or port to port), and never
+against the cable's own two ports. The kit knows where the cabled ports are
+(`portX`, `portY`); give the context the optional reader
+`portBoxesOf(itemId) -> [{ path, view, x, y, w?, h? }]` (the centre of each
+port's box in the frame `portX` and `portY` use, and its size in mm) and
+every port of a device is judged, cabled or not. `PORT_BOX` (12 by 10 mm) is
+the box of a port that states no size and `COVER_DEPTH` (100 mm) how far out
+of a panel a span still covers a port; both are estimates. What is decided for a cable
 is kept per rack, context and cable, so, as for a route's side, build a new
 context when what it reads changes: a context changed in place can give a
 path placed for what it read before. A path is read from end a, and a cable

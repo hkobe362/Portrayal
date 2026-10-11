@@ -35,6 +35,13 @@ export const rack = ({flip = false} = {}) => ({
     return {id: `c${k + 1}`, a: flip ? top : low, b: flip ? low : top, media: 'cat6', purpose: 'management', label: '', route: []};
   }),
 });
+// the same rack with a horizontal manager on every switch (#1013): each cord
+// leaves through its manager's rings, so no span runs free from a port to a lane
+export const managed = () => {
+  const r = rack();
+  return {...r, items: [...r.items, ...r.items.map((it, k) => ({id: `m${k + 1}`, ref: 'mgr', cfg: 'x', label: `MGR${k + 1}`,
+    ru: it.ru, face: 'front', turned: false, swaps: {}, fields: {}, on: it.id, unit: 1}))]};
+};
 export const TRUNK = [{lane: 'left-front', ru: 31}, {lane: 'left-front', ru: 42}];
 export const bundled = ({flip = false, route = TRUNK} = {}) => ({...rack({flip}),
   bundles: [{id: 'b1', number: 1, label: 'MGMT', members: Array.from({length: N}, (_, k) => ({cable: `c${k + 1}`})), route}]});
@@ -48,6 +55,14 @@ export function portAt(r, e) {
   if (!(n >= 1)) return null;
   return {x: -203.57 + 14.6 * Math.floor((n - 1) / 2), y: mid(it.ru) + (n % 2 ? 0.8 : -10.7)};
 }
+// every port of a switch, as a page that reads the whole face lists them
+// (ctx.portBoxesOf, #1013): its 24 ports and its management port
+export const portsOf = (r, id) => {
+  const it = r.items.find(i => i.id === id);
+  if (it?.ref !== 'sw') return [];
+  return ['mgmt', ...Array.from({length: 24}, (_, k) => `port-${k + 1}`)]
+    .map(path => ({path, view: 'front', ...portAt(r, {item: id, path}), w: 12, h: 10}));
+};
 // the route context a page would hand the kit: no guides but a manager's
 // rings, a Cat 6 cord of 6 mm bent no tighter than 24 mm, an RJ45 plug
 // standing 13 mm out of its jack
