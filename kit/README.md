@@ -84,6 +84,7 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 | `drawio.js` | draw.io: a shape library, a rack elevation, or one live drawing as a `.drawio` (`toDrawio`), with a named connection point per port |
 | `omnigraffle.js` | OmniGraffle: a `.gstencil` with a named, magnetised shape per port, or one live drawing as a stencil (`toGraffle`) |
 | `ears2d.js` | generic rack ears over a published face in 2D (`drawEars`, `clearEars`), from the plan the 3D viewer builds (`earPlan`); see [Rack ears](#rack-ears) |
+| `positions.js` | the Explorer's control for a part that slides (`positionControl`): a slider over the range, a button for each named stop and a reset, written through the shell's `setFields`; see [A part that slides](#a-part-that-slides) |
 
 Plain ES modules. No bundler, no build step.
 
@@ -95,8 +96,10 @@ face carries `data-adjustments`, and each member node `data-moves-with` and
 `data-moves-by`. [`docs/format-stability.md`](../docs/format-stability.md) has
 the fields, and
 [`docs/adjustable-positions-design.md`](../docs/adjustable-positions-design.md)
-the design. No library device declares one yet, and the Explorer has no
-control for it yet: a position is set with `setFields` or a `fields=` link.
+the design. The FS DINRAIL2U and DINRAIL4U declare one, `rail-setback`, the
+distance of the rail panel behind the ears. The Explorer has a control for it
+(0.20.0, [below](#the-position-control)); a position can also be set with
+`setFields` or a `fields=` link.
 
 **A position is a field.** It is held at the path of the adjustment's carrier,
 under the adjustment's id, in the same map every other field is in:
@@ -140,6 +143,57 @@ the scene when a position changes, as it does for a switch position. A well is
 built at the depth the position gives, and what stands in it on that floor.
 `relief.js` exports `applyNodeAdjustments(root, scope)`, the same move applied
 from a viewer's field registry before a face is measured.
+
+### The position control
+
+New in 0.20.0. `positions.js` exports one function, the control the Explorer
+mounts above its tree:
+
+```js
+import { createShell } from '@portrayal/kit/shell';
+import { positionControl } from '@portrayal/kit/positions';
+
+const shell = createShell({dist});
+positionControl(shell, {threeD: () => true});
+shell.emit('mode', '3d');      // the page says which stage is showing
+```
+
+For each adjustment of the device on screen it draws one group: the label, the
+position in mm, a slider over the range in steps of 0.1 mm, a number box, one
+button for each named stop in order of position, and a reset. With stops and
+no range the buttons are the whole control. Nothing is drawn for a device that
+declares no adjustment, or inside a module.
+
+- **It writes through `shell.setFields(carrier, {[id]: value})`** and holds no
+  rule of its own. A stop button sends the name and the shell keeps the number;
+  the reset sends an empty value. So the position is in `state.cfgFields` with
+  every other field, and a page that puts that map in its location and hands
+  it to the 3D viewer, as `kit/index.html` does, needs nothing more.
+- **A value that is refused is said under the control**, in the sentence
+  `setFields` answers, in an element with `role="status"`. The drawing and the
+  number box stay where they were.
+- **The slider is a native range input**, so it takes the arrow keys, Page Up
+  and Page Down, Home and End. It is named by the label of the adjustment and
+  described by its range and datum. In 2D each value is written as it moves.
+  In 3D each position is a scene to rebuild, so the value is written when the
+  slider is let go.
+- **A view that cannot show the motion says which views do**: "The front view
+  does not show this. See the top, bottom, left or right view, or 3D." A face
+  shows the motion when a member on it has a `dx` or a `dy` in its
+  `data-moves-by`. The control asks the shell for the other faces
+  (`loadFaces`) when an adjustment is declared and the shell does not hold
+  every face of the device. A request that ends with a face still missing
+  is sent once more. After that the control does not ask again until the
+  shell emits `load` or starts a new set of faces, so a face that cannot be
+  fetched is not fetched at every step of a slider.
+  In 3D the line is not shown.
+
+`positionControl(shell, opts)` answers `{el, refresh}`. `opts.before` is the
+element the control goes in front of (the shell's tree by default), and
+`opts.threeD` a function that says whether the page offers a 3D view. The
+control hears the shell's `load`, `fields` and `mode` events. `mode` is the
+page's own: emit `'2d'` or `'3d'` on the shell when the stage changes. The
+control is styled from the shell's CSS variables, under `#positions`.
 
 The built scene cannot be measured under node.
 [`spec/tests/browser/viewer3d-adjustments.html`](../spec/tests/browser/viewer3d-adjustments.html)

@@ -128,6 +128,7 @@ import { createShell, esc } from './shell.js';
 import { statesOfEl, messagesOfEl, charactersOfEl, boundLamps, offIsSet } from './states.js';
 import { encodeSwaps, encodeTurns, searchWith } from './swap.js';
 import { encodeFields } from './fields.js';
+import { positionControl } from './positions.js';
 import { flatDist, packageDist, distResolver, faceFile } from './dist.js';
 import { drawEars, clearEars, earPlan, faceSize, frontWidthOfText } from './ears2d.js';
 
@@ -832,6 +833,19 @@ shell.on('mode', m => {
 });
 
 shell.on('select', path => { if (mode === '3d' && viewer) viewer.select(path); });
+
+// ---------------------------------------------------------------- positions
+// A PART THAT SLIDES IS SET HERE AND NOWHERE ELSE (#950,
+// docs/adjustable-positions-design.md section 7): a rail panel on slotted
+// brackets has a slider over its range, a button for each named stop and a
+// reset, above the tree, whatever is selected. positions.js builds it from
+// fields.js `adjustmentRows` and writes through `shell.setFields`, so the
+// value is in `state.cfgFields` with every other field: `writeLocation` puts
+// it in `fields=`, and `sync3d` hands it to the scene, which rebuilds at it.
+// Nothing is mounted for a device that declares no adjustment. The control
+// hears `mode` from the shell, emitted by setMode above: in 3D every face is
+// on screen, so it does not say which views show the motion.
+positionControl(shell, { threeD: () => !btn3d.disabled });
 
 // A SWAP IS THE SAME EVENT AS A CONFIG CHANGE as far as the scene is concerned:
 // the drawing now shows something the scene does not. In 2D sync3d returns
