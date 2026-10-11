@@ -165,7 +165,7 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/managers.js` | cable managers: `placement` of a manager onto the device behind it, and moving one |
 | `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths |
 | `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres |
-| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
+| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
@@ -561,7 +561,12 @@ and is reported not checked.
 `resolveRoute` follows the bundle: a member runs its own route to the trunk,
 the trunk, then its own route on, and the result names its `bundle`, `join` and
 `leave`, so routed lengths, fill and the drawings follow with no change of
-their own. `straps(rack, bundle, ctx)` places the straps, every 12 in unless
+their own. A member's own route is the gutter route even for a jumper within
+two units, which hangs when it is on its own (`ownRoute` and `autoRoute` take
+`{gutter: true}`), and a member whose route still does not meet the trunk
+joins and leaves it at the trunk elements nearest its two ports
+(`trunkMeasures(rack, cable, trunk, ctx)` measures them for `followTrunk`), so
+it never rides to an end its ports are not at. `straps(rack, bundle, ctx)` places the straps, every 12 in unless
 the bundle says otherwise, as `{ segment, t, along_mm }` along the trunk, kept
 off rings. `inspect` reads a bundle (`kind: 'bundle'`) and a member's
 `bundle`, `selectCables` takes `{ bundle }`, and `describe` lists them. A

@@ -601,7 +601,9 @@ function workedOut(rack, ids, ctx) {
   if (!ctx?.route) return {error: NO_ROUTES};
   let members;
   try {
-    members = ids.map(id => ({id, waypoints: ownRoute(rack, cableOf(rack, id), ctx.route).waypoints}));
+    // each cable's route as a member takes it: by the gutter, where a short
+    // jumper would hang on its own (#1012, route.js resolveRoute)
+    members = ids.map(id => ({id, waypoints: ownRoute(rack, cableOf(rack, id), ctx.route, {gutter: true}).waypoints}));
   } catch { return {error: NO_ROUTES}; }
   return deriveTrunk(members, {nameOf: labelOf(rack), frame: rack.frame});
 }
@@ -872,7 +874,7 @@ export const COMMANDS = {
       summary: SUMMARY})},
   'cable.route.reset': {run: cableRouteReset, description: 'Drop a hand-made route; the cable takes its own route again.',
     args: args(['id'], {id: ID('cable'), summary: SUMMARY})},
-  'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. Refused for a bundled cable.',
+  'bundle.create': {run: bundleCreate, description: 'Bundle two or more cables sharing part of their route. It runs where they run together, unless given a route. A cable whose own route does not meet a given route joins and leaves it at the points nearest its two ports. Refused for a bundled cable.',
     args: args(['cables'], {cables: BUNDLE_CABLES(2, 'The cables to bundle, two or more, by id, in combing order.'),
       label: {type: 'string', description: 'The name on its tags; "Bundle <number>" is used when there is none. Empty when left out.'},
       number: {type: 'integer', minimum: 1, description: 'Its number, unique in the rack; one past the highest in use when left out.'},
@@ -885,7 +887,7 @@ export const COMMANDS = {
     args: args(['id', 'cable'], {id: ID('bundle'), cable: ID('cable'),
       at: {...WAYPOINT, description: 'A waypoint on the bundle\'s route where the cable leaves it; when left out, the cable leaves the bundle altogether.'},
       end: {enum: ['a', 'b'], description: 'The end it heads for after it leaves at that waypoint; the end whose port is nearer when left out.'}})},
-  'bundle.update': {run: bundleUpdate, description: "Change a bundle's label, number or strap spacing, or route it by hand. A route of null works the route out again from its cables.",
+  'bundle.update': {run: bundleUpdate, description: "Change a bundle's label, number or strap spacing, or route it by hand. A cable whose own route does not meet a route given by hand joins and leaves it at the points nearest its two ports. A route of null works the route out again from its cables.",
     args: args(['id'], {id: ID('bundle'), label: {type: 'string', description: 'The name on its tags; empty for "Bundle <number>". Kept when left out.'},
       number: {type: 'integer', minimum: 1, description: 'Its number, unique in the rack. Kept when left out.'},
       straps: STRAPS,

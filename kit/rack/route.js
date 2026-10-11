@@ -171,7 +171,12 @@ function byGutter(rack, A, B, mA, mB, side, ctx) {
 // when they stand on opposite sides, the side whose path (routePath, with its
 // detours) is the shorter, end a's side on a tie or when either port is not
 // found and so cannot be measured.
-export function autoRoute(rack, cable, ctx) {
+// A jumper within SHORT units, on one face, with no manager at either end,
+// takes no gutter: it just hangs, and the route is empty. `{gutter: true}`
+// asks for the gutter route all the same: what a member of a bundle takes
+// (#1012, resolveRoute), since the bundle is dressed down a gutter and a cord
+// in it does not hang across the faces.
+export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
   const ends = [cable.a, cable.b].map(e => {
     const it = itemOf(rack, e.item), pane = it && endPane(rack, e);
     // A port not found only defaults the SIDE (to the left, as a port at the centre does);
@@ -181,7 +186,7 @@ export function autoRoute(rack, cable, ctx) {
   if (ends.some(x => !x)) return [];
   const [A, B] = ends;
   const mA = managerOf(rack, A.it, A.pane, ctx), mB = managerOf(rack, B.it, B.pane, ctx);
-  if (!mA && !mB && A.pane === B.pane && Math.abs(A.it.ru - B.it.ru) <= SHORT) return [];
+  if (!gutter && !mA && !mB && A.pane === B.pane && Math.abs(A.it.ru - B.it.ru) <= SHORT) return [];
   if (mA && mA === mB && A.pane === B.pane) {
     // whether the cord goes through a ring from port to port, as routePath
     // decides it; unknown (a port not found) counts as through. From the
@@ -237,9 +242,11 @@ export const trayOf = (rack, w, ctx) => (w?.item && !w.lane
 
 // A CABLE'S OWN ROUTE: the stored one once edited, else the automatic one. A
 // stored waypoint that no longer resolves is skipped, and reported.
-export function ownRoute(rack, cable, ctx) {
+// `{gutter: true}` is autoRoute's: the automatic route of a short jumper as a
+// bundle member takes it, by the gutter. A route edited by hand is as stored.
+export function ownRoute(rack, cable, ctx, {gutter = false} = {}) {
   const auto = cable.routeEdited !== true;
-  const list = auto ? autoRoute(rack, cable, ctx) : (cable.route || []);
+  const list = auto ? autoRoute(rack, cable, ctx, {gutter}) : (cable.route || []);
   const waypoints = [], gone = [];
   for (const w of list) (resolves(rack, w, ctx) ? waypoints : gone).push(w);
   return {waypoints, gone, auto};
@@ -265,18 +272,48 @@ export function drawnBundleOf(rack, cableId) {
 // names its `bundle`, `join` and `leave`, so a drawing can tell the bundled
 // part from the leads. `gone` is the cable's own; a trunk's is the bundle's
 // (trunkRoute). Any other cable follows its own route.
+// A MEMBER'S OWN ROUTE IS THE GUTTER ROUTE (#1012): a jumper within two units
+// that would hang on its own (autoRoute) is taken out to the gutter when it
+// is in a bundle, so it meets a trunk down that gutter where its own units
+// are. A member whose route still does not meet the trunk (the trunk is down
+// the other gutter, or through a manager it does not use) joins and leaves it
+// at the elements nearest its two ports (trunkMeasures).
 export function resolveRoute(rack, cable, ctx) {
-  const own = ownRoute(rack, cable, ctx);
   const b = drawnBundleOf(rack, cable.id);
-  if (!b) return own;
-  const trunk = trunkRoute(rack, b, ctx).waypoints;
-  if (!trunk.length) return own;
+  const trunk = b ? trunkRoute(rack, b, ctx).waypoints : [];
+  if (!trunk.length) return ownRoute(rack, cable, ctx);
+  const own = ownRoute(rack, cable, ctx, {gutter: true});
+  const f = followTrunk(own.waypoints, trunk, b.members.find(m => m.cable === cable.id), trunkMeasures(rack, cable, trunk, ctx));
+  return {...own, waypoints: f.waypoints, bundle: b.id, join: f.join, leave: f.leave};
+}
+
+// WHAT followTrunk ASKS OF THE DRAWINGS for a member whose own route never
+// meets the trunk (bundle-route.js): `aNearStart()`, whether its a port is
+// nearer the trunk's first waypoint than its last (true when a point is not
+// found), and `nearest(end, elements)`, the index of the trunk element (a
+// pathway or a lane node; a segment is not a place to join) nearest the port
+// of end 'a' or 'b', or null when the port is not found. Two elements as near
+// go to the one whose key sorts first, so the answer does not depend on which
+// way the trunk was written.
+export function trunkMeasures(rack, cable, trunk, ctx) {
   const aNearStart = () => {
-    const p = portPoint(rack, cable.a, ctx), s = pointOf(rack, trunk[0], ctx), e = pointOf(rack, trunk.at(-1), ctx);
+    const p = portPoint(rack, cable.a, ctx), s = trunk.length && pointOf(rack, trunk[0], ctx), e = trunk.length && pointOf(rack, trunk.at(-1), ctx);
     return !(p && s && e) || dist(p, s) <= dist(p, e);
   };
-  const f = followTrunk(own.waypoints, trunk, b.members.find(m => m.cable === cable.id), {aNearStart});
-  return {...own, waypoints: f.waypoints, bundle: b.id, join: f.join, leave: f.leave};
+  const nearest = (end, elements) => {
+    const p = portPoint(rack, cable[end], ctx);
+    if (!p) return null;
+    let best = null, least = Infinity;
+    elements.forEach((e, i) => {
+      if (e.kind === 's') return;
+      const q = pointOf(rack, e.kind === 'p' ? {item: e.item, via: e.via} : {lane: e.lane, ru: e.u}, ctx);
+      if (!q) return;
+      const d = dist(p, q);
+      if (d < least - 1e-9 || (Math.abs(d - least) <= 1e-9 && e.key < elements[best].key)) { least = d; best = i; }
+    });
+    return best;
+  };
+  return {aNearStart, nearest};
 }
 
 // The route as a line of text: "mgr-1 ring 3 > left-front U12-U24 > ...".
