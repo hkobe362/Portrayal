@@ -648,8 +648,8 @@ RULES = {
     "L182": ("device",     "each adjustment has a `provenance` entry under its own id", "add `provenance.<id>` with a confidence and a note that gives the source of each end of the range and of the default",
              "A range with no source is a guess that reads as a fact.",
              ERROR),
-    "L183": ("device",     "an attr that restates an adjustment equals it: an attr whose name is the id of the adjustment, with any words before it, followed by `-mm` holds the default, and one followed by `-min-mm` or `-max-mm`, or with `min` or `max` among the words before the id, holds that end of the range (`minimum` and `maximum` are read as `min` and `max`, and no other word names an end); a name that says both ends is not paired; an adjustment with stops and no range has no end to restate", "correct the attr or the adjustment so that the two agree, or rename an attr that measures something else",
-             "The attrs are how a range reaches the DCIM export comments, and two statements of one number drift apart.",
+    "L183": ("device",     "an attr that restates an adjustment equals it: an attr whose name is the id of the adjustment, with any words before it, followed by `-mm` holds the default, and one followed by `-min-mm` or `-max-mm`, or with `min` or `max` among the words before the id, holds that end of the range (`minimum` and `maximum` are read as `min` and `max`, and no other word names an end); a name that says both ends is not paired; on an adjustment with stops and no range, the minimum is the lowest stop and the maximum the highest", "correct the attr, or the range or the stop it restates, so that the two agree; rename an attr that measures something else",
+             "The attrs are how the travel of a part reaches the DCIM export comments, and two statements of one number drift apart: a range against its attrs, or a row of stops against the lowest and highest an attr claims.",
              ERROR),
 }
 
@@ -8922,13 +8922,19 @@ def lint_device_adjustments(path, data, lib_roots):
         flat = attrs_mod.flatten(data.get("attrs"))
         for key, what in sorted(_adjust.restating_attrs(aid, flat).items()):
             if what == "default":
-                want = default
+                want, named = default, f"the default of {aid}"
             elif rng:
                 want = rng[0] if what == "min" else rng[1]
+                named = f"the {what} of {aid}"
+            elif stops:
+                # STOPS AND NO RANGE: the lowest position the part takes is its
+                # lowest stop, and the highest its highest (decided 2026-10-11)
+                by_value = _adjust._stops_by_value(adj)
+                stop, want = by_value[0] if what == "min" else by_value[-1]
+                named = (f"the {'lowest' if what == 'min' else 'highest'} stop of {aid}, "
+                         f"{stop!r}")
             else:
-                err(path, "L183", f"attrs {key}: restates the {what} of {aid}, which has stops "
-                                  "and no `range`, so it has no end to restate")
-                continue
+                continue                # no position at all: L1 and L173 say so
             try:
                 got = float(flat[key])
             except (TypeError, ValueError):
@@ -8936,8 +8942,7 @@ def lint_device_adjustments(path, data, lib_roots):
                                   f"number: {flat[key]!r}")
                 continue
             if isinstance(flat[key], bool) or _adjust.round01(got) != _adjust.round01(want):
-                err(path, "L183", f"attrs {key}: is {flat[key]!r}, and the {what} of {aid} is "
-                                  f"{want:g}")
+                err(path, "L183", f"attrs {key}: is {flat[key]!r}, and {named} is {want:g}")
 
         if aid not in by_adj or (rng and not rng[0] < rng[1]):
             continue

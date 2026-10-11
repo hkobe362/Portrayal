@@ -394,14 +394,38 @@ def test_l183_pairs_an_attr_by_its_name_and_names_no_maker():
         "x-panel-setback-min-mm": "min"}
 
 
-def test_l183_says_stops_alone_have_no_end_to_restate():
+def _holes(d, attrs):
+    """The fixture's panel on a row of holes at 20, 60 and 180, with `attrs`
+    as its three restating attrs (default, min, max)."""
+    _stops_only(d, default=60.0, stops={"near": 20.0, "mid": 60.0, "far": 180.0})
+    d["attrs"]["physical"] = dict(zip(
+        ("slide-panel-setback-mm", "slide-panel-setback-min-mm", "slide-panel-setback-max-mm"),
+        attrs))
+
+
+def test_l183_holds_stops_alone_to_the_lowest_and_the_highest_stop():
+    """With stops and no range, the minimum an attr restates is the lowest
+    stop and the maximum the highest. Attrs that agree pass."""
+    assert "L183" not in broken(lambda d: _holes(d, (60, 20, 180)))
+
+
+@pytest.mark.parametrize("attrs, sentence", [
+    ((60, 25, 180), "attrs slide-panel-setback-min-mm: is 25, and the lowest stop of "
+                    "panel-setback, 'near', is 20"),
+    ((60, 20, 175.5), "attrs slide-panel-setback-max-mm: is 175.5, and the highest stop of "
+                      "panel-setback, 'far', is 180"),
+    ((61, 20, 180), "attrs slide-panel-setback-mm: is 61, and the default of panel-setback is 60"),
+], ids=["min", "max", "default"])
+def test_l183_refuses_an_attr_that_disagrees_with_a_stop(attrs, sentence):
+    msgs = broken(lambda d: _holes(d, attrs)).get("L183", [])
+    assert msgs == [sentence], msgs
+
+
+def test_l183_reads_the_stops_by_their_positions_and_not_their_order():
     def edit(d):
-        _stops_only(d, default=60.0, stops={"near": 60.0, "far": 180.0})
-    found = broken(edit)
-    msgs = found.get("L183", [])
-    assert len(msgs) == 2 and all("has stops and no `range`" in m for m in msgs), found
-    # the default is still restated, and still agrees
-    assert not any("slide-panel-setback-mm:" in m for m in msgs)
+        _holes(d, (60, 20, 180))
+        d["adjustments"][AID]["stops"] = {"far": 180.0, "mid": 60.0, "near": 20.0}
+    assert "L183" not in broken(edit)
 
 
 def test_an_attr_is_not_required():

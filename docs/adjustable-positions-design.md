@@ -767,8 +767,8 @@ These three were weighed and accepted with the design, decided 2026-10-10.
 Steps 1 to 4 are built on a fixture device, `fixture/slider`, in
 `spec/tests/fixtures/adjustments`. It has one part along each axis. This
 section lists every choice the build made that the sections above do not
-state, numbered so that each can be accepted or sent back by its number, and
-then what step 5 will meet.
+state, numbered, and then what step 5 will meet. The departures below were
+accepted on 2026-10-11, item 16 in the form it has here.
 
 ### The lint codes
 
@@ -849,9 +849,13 @@ Each is an error.
     both ends, in either order and in either place, is not paired. The id ends the name as whole words, so
     `rail-setback` pairs with `din-rail-setback-mm` and with no key that does
     not end in it.
-16. **L183 never requires the attr**, and **refuses an attr that restates an
-    end of an adjustment with stops and no range**, which has no end. Its
-    default is still compared.
+16. **L183 never requires the attr. On an adjustment with stops and no
+    range, an attr that restates the minimum is compared with the lowest stop
+    and one that restates the maximum with the highest** (decided 2026-10-11).
+    A disagreement is the L183 error, and names both figures and the stop.
+    The default is compared as with a range. Built first, and replaced: such
+    an attr was refused outright, because a row of stops has no end of a
+    range.
 17. **L90, the order of top-level keys, puts `adjustments` between `groups`
     and `views`.**
 
@@ -988,3 +992,7 @@ What the first devices will meet:
   stand off the rear face by the distance moved. Whether such decor is a
   member is a modelling question for the first device.
 - **`rack.json` and the rack core** read the default position (steps 6 to 8).
+- **The three `din-rail-setback` attrs stay on DINRAIL2U and DINRAIL4U**
+  (section 13, question 5). L183 never requires an attr, so nothing would say
+  if one were dropped: step 5 adds a test on those two devices that the three
+  attrs exist and pair with `rail-setback`.
