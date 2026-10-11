@@ -302,8 +302,9 @@ test('a bend the kit\'s rules find no room for is found, and the route still exi
   const stiff = R.bendFindings(r, {...ctx, bendOf: () => 80}).filter(x => x.cable === 'c9');
   // laid from both ends and the better lay kept (#986): four corners short,
   // 165 mm in all; laid from end a alone it was five, [13.9, 10.1, 10.1, 67,
-  // 60.8], 238 mm in all
-  assert.deepEqual(stiff.map(x => x.room_mm), [12.9, 12.9, 68.4, 60.8]);
+  // 60.8], 238 mm in all. Each is 0.1 mm more than on a lacer stood on the
+  // bottom of its unit ([12.9, 12.9, 68.4, 60.8]): it is centred, 0.225 mm up
+  assert.deepEqual(stiff.map(x => x.room_mm), [13, 13, 68.5, 60.9]);
   assert.ok(stiff.every(x => x.need_mm === 80 && x.short_mm === r1(80 - x.room_mm)));
 });
 
@@ -370,7 +371,7 @@ test('no change made for room puts a leg in front of a zero-U part: the offer is
 test('no span hangs down into the space in front of a zero-U part that it passes over', () => {
   // that space is as high as the part. Rack 4 of the generated sample with a
   // PDU 610 mm tall at its left-front upright: c6 leaves ring 1 of a lacer
-  // from its approach point (-234.2, 632.4, 73.7) for the lane (-327.4,
+  // from its approach point (-234.2, 632.6, 73.7) for the lane (-327.4,
   // 644.5, 0), 22 mm over the PDU's top and in front of its face. The
   // straight span passes over the space; hung, it would sag into it, 167
   // points every half millimetre (some 83 mm of cable in front of the
@@ -388,7 +389,7 @@ test('no span hangs down into the space in front of a zero-U part that it passes
   const k = p.points.findIndex((q, i) => q.at === 'approach' && q.via === 'guide-1' && p.points[i - 1]?.at === 'exit');
   const lane = p.points.findIndex((q, i) => i > k && q.at === 'lane');
   assert.ok(k > 0 && lane > k, JSON.stringify(p.points.map(q => q.at)));
-  assert.deepEqual([p.points[k].x, p.points[k].y, p.points[k].z].map(r1), [-234.2, 632.4, 73.7]);
+  assert.deepEqual([p.points[k].x, p.points[k].y, p.points[k].z].map(r1), [-234.2, 632.6, 73.7]);
   assert.ok(p.points[k].y - top > 20 && p.points[k].y - top < 25);
   assert.equal(inFrontOfZeroU(p.points, solids, 1.5), 0);
   // the check is not vacuous: the same span at its full hang does stand in

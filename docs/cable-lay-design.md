@@ -1555,6 +1555,12 @@ as a full tray (4.4), and slack stored in Mu does not.
 
 ## 5. Slack storage
 
+**Built as rack file version 4, and narrowed there.** [rack-file-v4-design.md](rack-file-v4-design.md) section 3 is what
+the kit follows. The spare of a cable is recorded and listed, not drawn or
+placed by the kit; the stored length does not count in the routed length,
+since the stock length already holds it; and the schedule has two columns,
+`spare` and `stored`, where 5.5 planned one named `slack`.
+
 **Recommendation: a tray states how it holds slack; a cable stores spare
 length in a named tray as a coil (or a serpentine, or on a spool); the stored
 length counts in the routed length; the exports say where it is.**
@@ -1575,6 +1581,9 @@ length counts in the routed length; the exports say where it is.**
   on the FHD-CMP5DR. Its slack area is the 448.4 x 61.2 strip less the five
   ring bands across it (5 x 6.8 x 61.2), about 25,360 square mm. That holds
   about 42 m of 3 mm fibre, or 10.6 m of 6 mm Cat6.
+  **These two figures are withdrawn.** They are floor area times height, and
+  no cord fills that area at its bend radius: stacked in turns the same tray
+  takes about 2.2 to 3 m of 3 mm cord (the version 4 note, section 3.4).
 - **A loop that does not fit is refused.** Cat6A is 7.5 mm with a 30 mm
   installed radius, so its loop needs 67.5 mm, and the strip is 61.2 deep:
   `cable.slack` refuses with that sentence. The tray geometry is fixed, so this
@@ -1672,6 +1681,11 @@ runs along gravity, so nothing rests in it, and its lane is already a pathway
 with an aperture (#926).
 
 ## 7. The rack file
+
+**Built as rack file version 4.** [rack-file-v4-design.md](rack-file-v4-design.md) sections 3.3, 3.9 and 6 have the
+keys as the kit reads them: `slack` gains an entry for spare left at an end,
+`{end, value?, unit?}`; the `face` of a `lay` entry is acted on and its
+`position` kept; `roll` is section 6 there.
 
 Two cable keys and one item key, read and written by the kit:
 

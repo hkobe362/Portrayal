@@ -232,6 +232,153 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
+### Heights, spans and half units
+
+A position (`ru` on an item) is a whole unit or a half, counted bottom-up
+from 1: 12 is the bottom of U12 and 12.5 its middle. `rack/fit.js` owns what
+follows from one, and no other module computes it:
+
+| name | answers |
+|---|---|
+| `unitsOf(chassis)` | the height of a device in units, in halves: its stated `ru` rounded up to the next half, never under 0.5, and 1 when it states none |
+| `spanOf(item, chassisOf)` | `[lo, hi)`: the units an item fills, half-open, so a 1.5U item at U1 is `[1, 2.5)` |
+| `itemBox(rack, item, chassisOf)` | `{y0, y1, h, lo, hi}` in mm above the bottom of the rails: the body, centred in its span, and the edges of the span. A drawing stands a body here |
+| `spanText(frame, item, chassisOf)` | the span in words: "U13", "U13-U14", "the lower half of U7", "U13 to the lower half of U14" |
+| `heightOf(chassisOf)`, `itemsWithU(rack, chassisOf)` | as before, and now 0.5 for a half-unit device |
+
+`rack/model.js` has `positionOf(frame, ru, units)`, the lowest-numbered half
+unit an item fills as the frame counts (what NetBox calls a position), and
+`uText(frame, ru, units)`, the same as "U12.5". `rack/queries.js` `freeUs`
+returns half positions for a device that may start on one. `rack/rails.js`
+has `holesIn(lo, hi)`, the rail holes an ear between two heights can use,
+for a page that draws ears.
+
+`setbackOf(rack, item, chassisOf)` is how far a faceplate stands behind its
+rail in mm: the item's own `setback`, else the default ear position the
+catalogue gives the device, else the frame's `setback`, else 0. A drawing
+moves a body back by it; fit and the routes already do. `frameNotices(rack,
+chassisOf)` gives a sentence for each key the kit keeps and does not yet act
+on (a rail width that is not 19 in, a zero-U `channel`, an item held by
+another), which the editor hands on as findings when a document is loaded.
+`firstU(frame)` in `rack/model.js` is the number of the first unit (`startU`,
+1 when absent); `uLabel` and `positionOf` count from it.
+
+`rack/catalog.js` `loadSlots` keeps the `pdu-class` of each device it reads,
+and `configFacts(slots, cfg)` gives what a rack entry is checked against for
+the configuration it names: what the device meters (`meteringOf`), the
+`states` each placed part can be set to, the `slots` it offers a hanging
+part and the `mountPoints` it hangs by, as its `configs.json` states them.
+
+`span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
+half a unit. Use `spanOf`, and read its second number as the top edge.
+
+An item may be rolled in its face (`roll`: 90, 180 or 270 degrees clockwise
+as seen from the face it is on; `rollOf(item)` in `rack/model.js`).
+`itemUnits(item, chassisOf)` is its height in units as mounted, which is
+what `spanOf`, `itemBox`, `heightOf` and `itemsWithU` use: rolled a quarter
+turn it is the width of the device in whole units, and `itemBox` then also
+gives `w`, the height of the device, lying across the opening.
+`facePoint(rack, item, {x, y, view}, chassisOf)` turns a point of a face as
+drawn (mm from its left edge and down from its top) into the rack, through
+`face`, `turned` and `roll`; `rollPoint(rack, item, {x, y}, chassisOf)` turns
+a rack point of the upright item to where it is as mounted. A routing
+context (`portX`, `portY`, `guidesOf`) gives its points for the upright
+item, and the kit turns them, so a page that rolls them itself turns them
+twice. `isQuarter(item)` says an item is an outline to a route.
+
+`rack/states.js` reads what an entry is set to against the facts of its
+device (`configFacts`): `statesFor(entry, facts)` is the `{path: state}` map
+to hand a drawing, holding only what each part declares and carried from an
+outlet to its lamps when `facts.bindings` gives them; `readingsFor(entry,
+facts)` is `{source, at, badges}`, or null; `stateNotices(rack, ctx)` names
+what is kept and not applied. `rack/zero-u.js` has `fitsHang(rack, entry,
+ctx)`, where a part hung on brackets stands or why it cannot,
+`hangNotices(rack, ctx)` and `bracketPositions(rack, {ref, cfg, ru}, ctx)`.
+A page calls the two notice functions once it has loaded the parts lists
+(`loadSlots`); the editor cannot, since it holds none.
+
+A cable's lengths are named in `rack/route.js`: `needOf(path, cable,
+stock)`, `shortTolerance(cable, stock)`, `spareOf(rack, cable, ctx)` (need,
+stock, spare, end play and what is to store, in metres, or null without a
+path) and `stockLength(need, {values})`. `rack/slack.js` resolves a cable's
+`slack` list against its route: `slackOf` (each entry with its metres and
+whether the cable can store there), `storedText` (the words of the list),
+`slackFindings`, `spareLine` (one line for a rack) and `spareExports`, which
+is what `cableScheduleRows` takes as `spare` to fill its `spare` and `stored`
+columns. It returns no geometry: spare is listed, not drawn.
+
+`straps(rack, bundle, ctx)` in `rack/bundles.js` gives each strap its `kind`
+(`spacing`, `breakout` or `anchor`) and its `width_mm`, with `kinds` and
+`widths`, the count of each; `count` is all of them, and the spacing straps
+alone are `kinds.spacing`. An anchor names its tray and the index of its tie
+slot. `anchorsOf(rack, ctx)` lists
+every tie slot a strap is at, rack-wide, with the bundles and cables tied
+there, and `strapTotals(rack, ctx)` is what the rack buys. The stock widths
+(`STRAP_WIDTHS_MM`: 12, 19 and 25 mm) and the clearance a strap keeps from a
+peel point are estimates, with no maker's sheet held: 19 mm is the strap, 25
+for a pack 25 mm across or more, and an anchor is no wider than its tie slot
+is long. `straps()` also returns `notes`, a sentence for each tie slot no
+strap goes through. A page draws a
+band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
+{anchors})` so that single cables count.
+
+The exports take what the routes know from the page. `cableScheduleRows`
+fills `spare` and `stored` from `{spare: spareExports(rack, ctx)}` and its
+last column, `straps`, from `{straps: strapTexts(rack, ctx)}`, a Map of
+cable id to the tray, the face and the tie slots a single cable is strapped
+at. `cableBomNotes(rack, ends, {spare})` adds the one line that totals the
+spare, and `drawioCables(rack, {spare, ...})` gives each cable with a
+length its `spare`, which `kit/drawio.js` writes after the length in the
+edge label. `deviceImportRows({statesOf, ...})` writes what is set off in
+the comment of each row, when `statesOf(entry)` answers `statesFor` for it.
+`namesOf(entry)` beside it answers `configFacts(...).names`, so an outlet is
+named as the device-type export names it (A2, not outlet-a2).
+`rollNote(item)` is the sentence of a rolled item and `offNote(states,
+names)` the line of what is off; `hungText(rack, entry, chassisOf)` in `rack/zero-u.js`
+is where a part hung on brackets is, as an export words it.
+
+`cable.lay` pins how a cable lies in a pathway (`lay` on the cable), and
+`layFaceOf(cable, {item, via})` in `rack/route.js` is the face the file pins
+on a tray, which a route reads before `ctx.trayFaceOf`.
+
+`holderOf(item)` in `rack/model.js` is the id of the item that holds one on
+a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
+`rack/fit.js` says whether a held item is one the kit does not check: a page
+draws such an item on its host, and not in a unit of its own.
+
+Of the names these modules export, a page draws and calls with: `unitsOf`,
+`itemUnits`, `spanOf`, `itemBox`, `spanText`, `setbackOf`, `facePoint`,
+`isQuarter`, `isHeld`, `frameNotices` (`rack/fit.js`); `positionOf`,
+`uText`, `firstU`, `rollOf`, `ROLLS`, `holderOf` (`rack/model.js`);
+`holesIn` (`rack/rails.js`); `freeUs` (`rack/queries.js`); `needOf`,
+`shortTolerance`, `spareOf`, `stockLength`, `END_PLAY_M`, `BREAK_TOL_M`,
+`UNPLACED_WARN_M`, `layFaceOf` (`rack/route.js`); `slackOf`, `storedText`,
+`slackFindings`, `spareLine`, `spareBomLine`, `spareExports`
+(`rack/slack.js`); `rollNote`, `offNote` (`rack/export-data.js`);
+`hungText` (`rack/zero-u.js`); `strapTexts`, `strapKinds`,
+`anchorsOf`, `strapTotals`, `STRAP_WIDTHS_MM`, `BREAKOUT_MM`,
+`BREAKOUT_MERGE_MM`, `BREAKOUT_GROUP_MM`, `BREAKOUT_TWO_MM` (`rack/bundles.js`); `configFacts`,
+`meteringOf` (`rack/catalog.js`); `statesFor`, `readingsFor`, `stateNotices`
+(`rack/states.js`); `bracketPositions`, `hangNotices` (`rack/zero-u.js`).
+`facePoint` is the one a drawing calls for a point of a face; `rollPoint`,
+which it goes through, is the kit's own.
+
+Every other name added with rack file version 4 is the kit's own, shared
+between its files, and may change without notice: `spansMeet`, `anchorY`,
+`laneY`, `neighbours`, `unitsText`, `hostUnits`, `unitOn`, `hostedRu`,
+`fillOf`, `overlapNotices`, `fitsDepth`, `reachOf`, `centreX`, `rollPoint`,
+`heldBy`, `uncheckedText`, `unheldText`, `bothText`, `zeroUExtent` and
+`notBracket` in `rack/fit.js`; `stateRefusal` in `rack/states.js`;
+`fitsHang`, `hangingOn` and `HANG_TOL_MM` in `rack/zero-u.js`; `STRAP_BASE_MM`,
+`STRAP_WIDE_MM`, `WIDE_PACK_MM`, `STRAP_CLEAR_MM` and `widthCounts` in
+`rack/bundles.js`; `toMetres`
+and `slackValues` in `rack/route.js`; `trayRefusal`, `trayText`, `mText`
+and `FORMS` in `rack/slack.js`; `SLACK_FORMS` in `rack/model.js`; `isPosition`,
+`HOLE_STYLES`, `railWidth`, `RAIL_WIDTH_IN`, `holdersOf` and `usableReadings`
+in `rack/model.js`; `HOLE_EDGE` in `rack/rails.js`; `NO_HOSTS` in
+`rack/commands.js`; `NETBOX_RACK_WIDTHS` in `rack/export-data.js`, since a
+page offers no choice of width.
+
 ### Where this came from
 
 `kit/rack/` was moved here from `roc-ops/portrayal-site`, where it was
@@ -240,7 +387,7 @@ truth: edit these modules here. portrayal-site vendors
 `kit/rack/*.js` read-only, and its contract check refuses a copy that has
 drifted. The rules these modules follow are stated in their own comments,
 and the rack file format in [`docs/format-stability.md`](../docs/format-stability.md)
-and `schemas/v2/rack.schema.json`.
+and `schemas/v3/rack.schema.json`.
 
 ### The catalogue
 
@@ -514,6 +661,50 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.22.0: rack file version 4.** One version for everything that had
+waited for one ([`docs/rack-file-v4-design.md`](../docs/rack-file-v4-design.md));
+[Heights, spans and half units](#heights-spans-and-half-units) has the names
+a page calls. A version-3 file opens as it was and is saved as version 4,
+**which a page or kit older than 0.22.0 refuses whole.**
+
+What a page gains:
+
+- A position in steps of 0.5 (`ru: 12.5`), with `unitsOf`, `spanOf`,
+  `itemBox`, `spanText` and `uText`; a frame `startU`, `setback` and round
+  holes; an item `setback`, `roll` and `heldBy`.
+- `states` and `readings` on an item and on a part beside the rack
+  (`rack/states`, `state.set`, `readings.set`), and a PDU hung on brackets
+  (`zerou.hang`, `fitsHang`, `bracketPositions`).
+- The lengths of a cable by name (`needOf`, `spareOf`, `END_PLAY_M`), where
+  its spare is stored (`cable.slack`, `rack/slack`), and the face of a tray
+  it is pinned to (`cable.lay`, which the routes act on).
+- Straps of three kinds, each with a width, and the tie slots they are at
+  (`straps().kinds`, `anchorsOf`, `strapTotals`, `strapTexts`).
+- Exports: `spare`, `stored` and `straps` on the cable schedule, a spare
+  line in the BOM notes, the spare in a draw.io edge label, and device
+  comments for a rolled item, a PDU on brackets and what is set off.
+
+What changed meaning, for a page that calls the kit:
+
+- `span` is removed: use `spanOf`, which is half-open, `[ru, ru + units)`.
+- `heightOf` and the `u` of `itemsWithU` are 0.5 for a half-unit device,
+  `positionOf` answers in halves, and `freeUs` may answer a half position.
+- A body is centred in its span in the solids, where it stood on the bottom.
+- `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port
+  alone; the 0.1 m of dressing an end is `END_PLAY_M`. `stockLength` takes
+  the need. A routed length holds `need`, not `measured`, and a cord up to
+  10 mm short of full end play keeps its stock size.
+- `straps().count` is every kind together; the spacing straps alone are
+  `straps().kinds.spacing`. `strapBomRows` counts the straps of single
+  cables only when handed `{ anchors: anchorsOf(rack, ctx) }`.
+- The cable schedule has 20 columns where it had 17.
+- The Nautobot device file is written at whole units, and leaves the later
+  of two devices that share a unit with no position: on one face always,
+  and front and rear while either type is full depth. **That last is a
+  fix:** Nautobot refuses such a pair, and earlier kits wrote it.
+- `rackImportRows` answers no row, and `left`, for a rack name over 100
+  characters.
+
 **New in 0.21.0, in `rack/`.** Four changes to where a cable runs and what is
 said about it; nothing is removed or renamed, and the rack file and the
 export columns are as they were.
@@ -741,8 +932,14 @@ repairs `parseDoc` makes to bundles come back through
 `parseDoc(input, { notes })`; hand the same array to `editor.loadDoc(doc, { notes })`
 and they are its first `findings`.
 
+**The rack file is version 4 from 0.22.0.** A version-3
+file opens as it was and is saved as version 4, which a page or kit that
+reads version 3 refuses whole. What the version holds is in
+[`docs/format-stability.md`](../docs/format-stability.md) and
+[`docs/rack-file-v4-design.md`](../docs/rack-file-v4-design.md).
+
 A rack file is described by
-[`rack.schema.json`](https://portrayal.dev/schemas/v2/rack.schema.json), rack file `version` 3.
+[`rack.schema.json`](https://portrayal.dev/schemas/v3/rack.schema.json), rack file `version` 4.
 
 ## Exporting to draw.io and OmniGraffle
 

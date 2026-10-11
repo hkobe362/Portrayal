@@ -121,6 +121,11 @@ Read from each project at the commits named: NetBox `dcim/choices.py` and
 
 ## 3. Outlet state
 
+**Built as rack file version 4.** [rack-file-v4-design.md](rack-file-v4-design.md) section 4 has `states` and `readings`
+as the kit reads them, the commands that write them, and how a state reaches
+each DCIM file: a comment line in both, since the NetBox outlet import takes
+no status column.
+
 ### 3.1 Where it lives
 
 Whether an outlet is on is a fact about one PDU in one rack at one time, not
@@ -415,6 +420,10 @@ one is a major: both move an imported outlet description or `feed_leg`. The
 EVMI2130X takes a minor bump when it states them.
 
 ## 6. Mounting a zero-U PDU
+
+**Built as rack file version 4.** [rack-file-v4-design.md](rack-file-v4-design.md) section 5 has the bracket key
+(`heldBy: {parts}` on the entry of the PDU), `zerou.hang`, and the `slots`
+a bracket publishes beside the `mount-points` of a PDU.
 
 ### 6.1 Today
 

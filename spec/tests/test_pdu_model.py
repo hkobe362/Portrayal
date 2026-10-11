@@ -263,3 +263,176 @@ def test_a_device_without_buttons_publishes_none():
     d = copy.deepcopy(load_yaml(EVMI))
     d["views"]["rear"]["components"]["placements"] = []
     assert render.mount_points(d, "base", {}, render.Library([LIB])) == []
+
+
+# --- slots and states in configs.json (rack file version 4, part 4) -------------
+
+KEYHOLE = """format: 1
+kind: component
+name: keyhole
+version: 1.0.0
+class: mount
+interface: pdu-button
+profile: power
+description: A fixture keyhole slot, for the test of configs[].slots.
+size: {w: 12, h: 20}
+connection-points:
+  mate: {at: [6, 14]}
+"""
+
+
+def _bracket(tmp_path):
+    """A fixture bracket with keyholes: two on its front option, and a third
+    that only its side option has."""
+    part = tmp_path / "components/fixture/keyhole/v1"
+    part.mkdir(parents=True)
+    (part / "contract.yaml").write_text(KEYHOLE)
+    device = {"views": {"front": {"size": {"w": 40, "h": 100}, "components": {"placements": [
+        {"id": "slot-1", "ref": "fixture/keyhole@1", "at": [14, 10]},
+        {"id": "slot-2", "ref": "fixture/keyhole@1", "at": [14, 60]},
+        {"id": "slot-3", "ref": "fixture/keyhole@1", "at": [14, 35], "only-in": ["side"]}]}}},
+        "configurations": {"front": {}, "side": {}}}
+    return device, render.Library([tmp_path, LIB])
+
+
+def test_a_part_with_keyholes_publishes_its_slots_and_each_configuration_its_own(tmp_path):
+    d, lib = _bracket(tmp_path)
+    # at: from the bottom of the 100 mm view to each mate point, 14 below the top of its part
+    assert render.config_slots(d, "front", d["configurations"]["front"], lib) == [
+        {"interface": "pdu-button", "at": 26.0}, {"interface": "pdu-button", "at": 76.0}]
+    assert render.config_slots(d, "side", d["configurations"]["side"], lib) == [
+        {"interface": "pdu-button", "at": 26.0}, {"interface": "pdu-button", "at": 51.0},
+        {"interface": "pdu-button", "at": 76.0}]
+    # a slot is not a mount point, and a button is not a slot
+    assert render.mount_points(d, "front", {}, lib) == []
+    evmi = load_yaml(EVMI)
+    assert render.config_slots(evmi, "base", evmi["configurations"]["base"], render.Library([LIB])) == []
+    # two brackets 35 units apart meet the G4 pitch to 0.05 mm, as section 5 of the note says
+    points = render.mount_points(evmi, "base", evmi["configurations"]["base"], render.Library([LIB]))
+    assert abs((points[1]["at"] - points[0]["at"]) - 35 * 44.45) <= 0.051
+
+
+def test_the_evma8365x_lists_its_switchable_outlets_under_states():
+    """The list form on a real device: each outlet states `['on', 'off']` on its
+    placement. The 42 lamps beside them, which take the two colours from their
+    group, are not listed: a state is set on the outlet and follows `for:`."""
+    d = load_yaml(EVMA)
+    assert manifest.pdu_class(d) == "managed"
+    got = render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB]))
+    assert len(got) == 42 and all(k.startswith("outlet-") for k in got)
+    assert set(map(tuple, got.values())) == {("on", "off")}
+    assert got["outlet-a1"] == ["on", "off"] and got["outlet-f42"] == ["on", "off"]
+    assert list(got) == sorted(got)
+
+
+def test_the_evma8365x_names_its_outlets_as_its_device_type_export_does():
+    """`configs[].names` and the device-type export read one source, so a rack
+    comment that says which outlets are off names them as the DCIM lists
+    them: A1, not outlet-a1."""
+    d = load_yaml(EVMA)
+    states = render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB]))
+    names = render.config_names(d, states)
+    assert set(names) == set(states) and len(names) == 42
+    assert names["outlet-a1"] == "A1" and names["outlet-a2"] == "A2" and names["outlet-f42"] == "F42"
+    for target in ("netbox", "nautobot"):
+        exported = load_yaml(ROOT / "library/exports" / target / "device-types/Eaton/EVMA8365X.yaml")
+        assert sorted(names.values()) == sorted(o["name"] for o in exported["power-outlets"] if o["name"] in set(names.values()))
+        assert set(names.values()) <= {o["name"] for o in exported["power-outlets"]}, target
+    # a part no rule names has no entry, and a device with no rules has none
+    assert render.config_names(d, {"outlet-a1": ["on", "off"], "psu-1": ["on", "off"]}) == {"outlet-a1": "A1"}
+    assert render.config_names({}, states) == {}
+
+
+def test_a_per_lamp_mapping_is_not_a_state_vocabulary_of_its_part():
+    """The mapping form on a real device: the AIS2001 gives each lamp of a jack
+    its own vocabulary, `{led-a: [...], led-b: [...]}`. Those keys are element
+    ids. Read as a list they were published as state names."""
+    path = next(LIB.glob("devices/**/ais2001/device.yaml"))
+    d = load_yaml(path)
+    placed = manifest.device_placements(d)
+    mapped = [k for k, p in placed.items() if isinstance(p.get("states"), dict)]
+    assert mapped, "the AIS2001 no longer states a per-lamp mapping: pick another device"
+    lib = render.Library([LIB])
+    for name, cfg in d["configurations"].items():
+        got = render.config_states(d, name, cfg, lib)
+        assert not set(mapped) & set(got), sorted(set(mapped) & set(got))
+        names = {n for v in got.values() for n in v}
+        elements = {el for k in mapped for el in placed[k]["states"]}
+        assert not names & elements, f"element ids published as state names: {sorted(names & elements)}"
+
+
+def test_no_device_publishes_an_element_id_or_a_lamp_under_states():
+    """Every device: no lamp is listed, and every name is a state name a
+    placement, its group or its part declares as a list."""
+    lib = render.Library([LIB])
+    listed = devices = 0
+    for path in sorted(LIB.glob("devices/**/device.yaml")):
+        d = load_yaml(path)
+        placed = manifest.device_placements(d)
+        groups = d.get("groups") or {}
+        for name, cfg in (d.get("configurations") or {}).items():
+            got = render.config_states(d, name, cfg, lib)
+            devices += 1
+            for pid, names in got.items():
+                p = placed[pid]
+                contract, _ = lib.resolve(p["ref"])
+                assert contract.get("class") != "led", (path.parent.name, pid)
+                want = p.get("states") or (groups.get(p.get("group")) or {}).get("states") or contract.get("states")
+                assert isinstance(want, list) and names == render.state_names(want), (path.parent.name, pid)
+                listed += 1
+    assert devices > 250 and listed >= 42, (devices, listed)
+
+
+def test_the_evmi2130x_lists_no_outlet_and_meters_its_branches():
+    d = load_yaml(EVMI)
+    assert render.config_states(d, "base", d["configurations"]["base"], render.Library([LIB])) == {}
+    assert manifest.pdu_class(d) == "metered-branch"
+
+
+def test_a_placement_states_win_over_its_group_and_its_group_over_its_part(tmp_path):
+    d, lib = _bracket(tmp_path)
+    d["groups"] = {"outlets": {"states": [{"name": "on", "color": "#22c55e"}, {"name": "off"}]}}
+    p = d["views"]["front"]["components"]["placements"]
+    p[0].update(group="outlets")
+    p[1].update(group="outlets", states=["on", "off", "standby"])
+    assert render.config_states(d, "front", {}, lib) == {"slot-1": ["on", "off"], "slot-2": ["on", "off", "standby"]}
+    # a placement only one configuration draws is listed only there
+    p[2].update(states=["open"])
+    assert "slot-3" not in render.config_states(d, "front", {}, lib)
+    assert render.config_states(d, "side", {}, lib)["slot-3"] == ["open"]
+    # the part states its own: the group still wins over it, and it is what an ungrouped placement has
+    part = tmp_path / "components/fixture/keyhole/v1/contract.yaml"
+    part.write_text(KEYHOLE + "states: [shut, open]\n")
+    lib = render.Library([tmp_path, LIB])
+    p[2].pop("states")
+    got = render.config_states(d, "side", {}, lib)
+    assert got == {"slot-1": ["on", "off"], "slot-2": ["on", "off", "standby"], "slot-3": ["shut", "open"]}
+    # the mapping form names lamps inside the part, and a lamp is not a part a rack entry sets
+    p[0]["states"] = {"led-a": ["on", "off"]}
+    assert "slot-1" not in render.config_states(d, "front", {}, lib)
+    part.write_text(KEYHOLE.replace("class: mount", "class: led") + "states: [shut, open]\n")
+    assert render.config_states(d, "side", {}, render.Library([tmp_path, LIB])) == {}
+
+
+def test_the_built_configs_json_carries_slots_and_states():
+    """The build, not the function: `main()` writes both keys on every
+    configuration of every device. Reads library/dist, as the suite does."""
+    import json
+    dist = LIB / "dist"
+    assert (dist / "evma8365x.configs.json").is_file(), "no library/dist: run ./build.sh first (the suite reads the build)"
+    files = sorted(dist.glob("*.configs.json"))
+    assert len(files) > 250
+    for f in files:
+        for c in json.loads(f.read_text())["configs"]:
+            assert isinstance(c.get("slots"), list) and isinstance(c.get("states"), dict), f.name
+            # `names` is for the parts of `states` alone, each a name that is not its path
+            assert isinstance(c.get("names"), dict) and set(c["names"]) <= set(c["states"]), f.name
+            assert all(isinstance(v, str) and v and v != k for k, v in c["names"].items()), f.name
+    evma = json.loads((dist / "evma8365x.configs.json").read_text())["configs"][0]
+    assert len(evma["states"]) == 42 and evma["states"]["outlet-a1"] == ["on", "off"] and evma["slots"] == []
+    assert len(evma["names"]) == 42 and evma["names"]["outlet-a2"] == "A2"
+    evmi = json.loads((dist / "evmi2130x.configs.json").read_text())
+    assert evmi["configs"][0]["states"] == {} and evmi["pdu-class"] == "metered-branch"
+    # and the key is small: no lamp vocabulary rides in it
+    total = sum(len(json.dumps(c["states"])) for f in files for c in json.loads(f.read_text())["configs"])
+    assert total < 40_000, total

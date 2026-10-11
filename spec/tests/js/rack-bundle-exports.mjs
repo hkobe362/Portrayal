@@ -80,10 +80,12 @@ test('bundleExports: each bundle measured as the kit measures it, with its tag f
   const st = B.straps(r, r.bundles[0], ctx), check = B.bundleCheck(r, r.bundles[0], ctx);
   assert.ok(st.count > 0, 'the fixture must place straps');
   assert.deepEqual(e, {id: 'b1', number: 1, label: '', name: 'Bundle 1', members: ['c1', 'c2', 'c3'], drawn: true, checked: true,
-    length_m: B.trunkLength(r, r.bundles[0], ctx).metres, every: {value: 12, unit: 'in'}, straps: st.count,
+    length_m: B.trunkLength(r, r.bundles[0], ctx).metres, every: {value: 12, unit: 'in'}, straps: st.count, strap_kinds: st.kinds,
+    strap_widths: st.widths, anchor_widths: {},
     size_mm: check.size.max_mm, limit_mm: 63.5, limit_at: null, limit_estimated: false,
     bend_mm: 25, bend_by: 'c2', bend_checked: true, warnings: check.warnings, notes: []});
-  assert.deepEqual([e.length_m, e.straps, e.size_mm], [0.98, 4, 10.1]);
+  // 4 spacing straps and, since rack file version 4, a breakout strap in from each end of the trunk
+  assert.deepEqual([e.length_m, e.straps, e.strap_kinds, e.size_mm], [0.98, 6, {spacing: 4, breakout: 2, anchor: 0}, 10.1]);
   // the bend warning comes through
   assert.deepEqual(e.warnings, ['Bundle 1 turns at left-front U10 with room for a 24.5 mm bend; c2 (om4) needs 25 mm, 0.5 mm short.']);
   // a label is the name a tag prints; a control character in it is a space
@@ -109,9 +111,9 @@ test('the note per bundle: size, members, straps, length and bend, then its warn
   const r = threeBundles();
   const got = X.bundleExports(r, ctxOf(r));
   assert.deepEqual(X.bundleNotes(got), [
-    'Bundle 1 (b1): 2 cables (c1-c2), 0.98 m, 4 straps every 12 in; 8 mm across, limit 63.5 mm; bend radius 25 mm (c2).',
+    'Bundle 1 (b1): 2 cables (c1-c2), 0.98 m, 6 straps (4 every 12 in, 2 where a cable leaves); 8 mm across, limit 63.5 mm; bend radius 25 mm (c2).',
     'Bundle 1 turns at left-front U10 with room for a 24.5 mm bend; c2 (om4) needs 25 mm, 0.5 mm short.',
-    'uplinks (b2): 2 cables (c3-c4), 0.98 m, 4 straps every 300 mm; 10 mm across, limit 63.5 mm; bend radius 24 mm (c3).',
+    'uplinks (b2): 2 cables (c3-c4), 0.98 m, 6 straps (4 every 300 mm, 2 where a cable leaves); 10 mm across, limit 63.5 mm; bend radius 24 mm (c3).',
     'Bundle 3 (b3): 1 cable (c5), no straps.',
     'Bundle 3 holds one cable, so it is not drawn.']);
   assert.deepEqual(X.bundleNotes(X.bundleExports(r)).slice(0, 1),
@@ -131,16 +133,17 @@ test('the BOM: one hook-and-loop strap line, every bundle summed, no manufacture
   const r = threeBundles();
   const got = X.bundleExports(r, ctxOf(r));
   const each = r.bundles.map(b => B.straps(r, b, ctxOf(r)).count);
-  assert.deepEqual(each, [4, 4, 0]);
-  assert.deepEqual(X.strapBomRows(got), [{section: 'Cables', qty: 8, manufacturer: '', model: 'Hook-and-loop cable strap',
-    description: 'For 2 bundles, one strap every 12 in or 300 mm along each; length and width to suit', ref: ''}]);
+  // 4 spacing straps each and, since rack file version 4, a breakout strap in from each end of each trunk
+  assert.deepEqual(each, [6, 6, 0]);
+  assert.deepEqual(X.strapBomRows(got), [{section: 'Cables', qty: 12, manufacturer: '', model: 'Hook-and-loop cable strap',
+    description: '8 along 2 bundles, one every 12 in or 300 mm; 4 where a cable joins or leaves a bundle; 12 of 19 mm wide; length to suit', ref: ''}]);
   assert.deepEqual(X.strapBomNotes(got), []);
   // one spacing, one bundle
-  assert.equal(X.strapBomRows(got.slice(0, 1))[0].description, 'For 1 bundle, one strap every 12 in along each; length and width to suit');
-  assert.equal(X.strapBomRows(got.slice(0, 1))[0].qty, 4);
+  assert.equal(X.strapBomRows(got.slice(0, 1))[0].description, '4 along 1 bundle, one every 12 in; 2 where a cable joins or leaves a bundle; 6 of 19 mm wide; length to suit');
+  assert.equal(X.strapBomRows(got.slice(0, 1))[0].qty, 6);
   // the line goes in the file like any other, through bomCell
   const csv = X.toCsv(X.BOM_COLUMNS, X.strapBomRows(got), [], {cell: X.bomCell});
-  assert.match(csv, /\r\nCables,8,,Hook-and-loop cable strap,"For 2 bundles, one strap every 12 in or 300 mm along each; length and width to suit",\r\n$/);
+  assert.match(csv, /\r\nCables,12,,Hook-and-loop cable strap,"8 along 2 bundles, one every 12 in or 300 mm; 4 where a cable joins or leaves a bundle; 12 of 19 mm wide; length to suit",\r\n$/);
   // no bundle, no line
   assert.deepEqual(X.strapBomRows(X.bundleExports({...r, bundles: []}, ctxOf(r))), []);
 });

@@ -1,0 +1,7 @@
+name,role,manufacturer,device_type,status,site,rack,position,face,comments
+PDU A,Access,Eaton,EVMA8365X,planned,DC1,R1,,,"0U, on 2 FS-PDUBK brackets at left-rear, from U42; NetBox has no field for that. Outlets off: A2, A7."
+Bracket high,Access,FS,FS-PDUBK,planned,DC1,R1,,,"0U, beside the rack at left-rear, U7; NetBox has no field for that."
+leaf-1,Access,Acme,SW-1,planned,DC1,R1,26,front,Mounted upside down. Off: psu-1.
+ODF B,Access,Fibrain,XCU10,planned,DC1,R1,34,front,
+ODF A,Access,Fibrain,XCU10,planned,DC1,R1,34.5,front,
+Bracket low,Access,FS,FS-PDUBK,planned,DC1,R1,,,"0U, beside the rack at left-rear, U42; NetBox has no field for that."

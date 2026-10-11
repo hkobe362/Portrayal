@@ -38,7 +38,7 @@ test('unknown commands and bad arguments are refused in words', () => {
   const rack = M.newRack();
   assert.deepEqual(apply(rack, {op: 'plce'}, ctx), {error: "There is no command called 'plce'.", index: 0});
   assert.deepEqual(apply(rack, {op: 'place', ref: 'as7726-32x', face: 'front'}, ctx),
-                   {error: 'place needs ru, a whole number from 1.', index: 0});
+                   {error: 'place needs ru, a number in steps of 0.5 from 1.', index: 0});
   assert.deepEqual(apply(rack, P(1, {face: 'side'}), ctx), {error: 'place needs face, one of front, rear.', index: 0});
   assert.deepEqual(apply(rack, P(1, {colour: 'red'}), ctx), {error: 'place does not take colour.', index: 0});
   assert.deepEqual(apply(rack, 'place', ctx), {error: 'A command is an object with an op.', index: 0});

@@ -4685,6 +4685,15 @@ def mount_points(device, cfg_name, cfg, lib):
     Read over the views this configuration draws (resolve_views) and the
     placements it has (`only-in`), so a configuration that drops a button
     publishes one point fewer. A device with none publishes an empty list."""
+    return _mounts(device, cfg_name, cfg, lib, "mates")
+
+
+def _mounts(device, cfg_name, cfg, lib, key):
+    """The two sides of a mounting interface, read one way: every placement
+    this configuration draws of a `class: mount` part that declares `key`
+    (`mates` on a button, `interface` on a keyhole) and a `mate` connection
+    point, as `{<key>: <interface>, at}`, `at` in millimetres from the bottom
+    of its view to that point, ascending."""
     out = []
     for _face, (_name, view) in resolve_views(device, cfg).items():
         h = ((view or {}).get("size") or {}).get("h")
@@ -4695,13 +4704,81 @@ def mount_points(device, cfg_name, cfg, lib):
                 continue
             contract, _ = lib.resolve(p["ref"])
             mate = ((contract.get("connection-points") or {}).get("mate") or {}).get("at")
-            if contract.get("class") != "mount" or not contract.get("mates") or not mate:
+            if contract.get("class") != "mount" or not contract.get(key) or not mate:
                 continue
             size = contract.get("size") or {}
             at = seat_point(p["at"], {"w": size.get("w", 0), "h": size.get("h", 0)},
                             p.get("rotate", 0), mate)
-            out.append({"mates": contract["mates"], "at": round(float(h) - at[1], 2)})
-    return sorted(out, key=lambda m: (m["at"], m["mates"]))
+            out.append({key: contract[key], "at": round(float(h) - at[1], 2)})
+    return sorted(out, key=lambda m: (m["at"], m[key]))
+
+
+def config_slots(device, cfg_name, cfg, lib):
+    """`configs[].slots` (#939, docs/rack-file-v4-design.md section 5): each
+    slot one configuration offers, as `{interface, at}`, `at` ascending.
+
+    A SLOT is the other side of a mount point: a placement of a `class: mount`
+    part that declares `interface` - the keyhole of a bracket or a channel,
+    which presents `pdu-button` - with `at` in millimetres from the bottom of
+    the view it is placed on to its `mate` point, where the button seats.
+    Derived from the placements exactly as `mount-points` are, so the two can
+    be compared: a PDU hangs where each of its mount points meets a slot of
+    the interface it mates. Read for the configuration named, so a bracket
+    whose two mounting options differ publishes each. `[]` on a device that
+    offers none."""
+    return _mounts(device, cfg_name, cfg, lib, "interface")
+
+
+def config_states(device, cfg_name, cfg, lib):
+    """`configs[].states` (#934, docs/rack-file-v4-design.md section 4): what
+    each placed part of one configuration can be set to, `{<path>: [names]}`.
+
+    THE VOCABULARY A RACK FILE IS CHECKED AGAINST. A path is a placement id,
+    which is what a rack entry keys `states` by (`outlet-a1`). Its names are
+    the ones the part declares, found as the renderer finds them: the
+    placement's own `states`, else its group's, else its part's.
+
+    WHAT A PART ITSELF CAN BE, NOT WHAT ITS LAMPS SHOW. Two things that carry
+    `states` are left out, because neither is a part a rack entry sets:
+    - a lamp (a `class: led` part). A state is addressed by the outlet and
+      follows `for:` to the lamp beside it, and the lamp's own vocabulary is
+      already on the drawing (`data-states`);
+    - the mapping form, `{<element>: [states]}`, which gives each lamp INSIDE
+      a part its own vocabulary (apply_states): its keys are element ids, not
+      state names, and it says nothing of what the part can be set to.
+    A part that declares none is not listed, so an outlet that cannot be
+    switched has no entry. Read over the views and placements this
+    configuration draws; `{}` on a device that declares none."""
+    groups = device.get("groups") or {}
+    out = {}
+    for _face, (_name, view) in resolve_views(device, cfg).items():
+        for p in view_parts(view)["placements"]:
+            if not p.get("id") or (p.get("only-in") and cfg_name not in p["only-in"]):
+                continue
+            contract, _ = lib.resolve(p["ref"])
+            if contract.get("class") == "led":
+                continue
+            states = (p.get("states") or (groups.get(p.get("group")) or {}).get("states")
+                      or contract.get("states"))
+            if isinstance(states, list) and states:
+                out[p["id"]] = state_names(states)
+    return dict(sorted(out.items()))
+
+
+def config_names(device, states):
+    """`configs[].names` (docs/rack-file-v4-design.md section 4): the name a
+    DCIM knows each settable part by, `{<path>: <name>}`, for the paths of
+    `states` whose name is not the path itself.
+
+    ONE SOURCE WITH THE DEVICE-TYPE EXPORT. A rack PDU's outlet-a1 is exported
+    as the power outlet A1 because the device's own `interfaces:` names it
+    (dcim_export.outlet_rows, through listing_names). A rack export that says
+    which outlets are off has to say A1 too, so the names are read here
+    through the same function and the two cannot disagree. A part no rule
+    names keeps its path and has no entry; `{}` on a device with none."""
+    from portrayal.dcim_export import listing_names
+    named = listing_names(device) if device.get("interfaces") else {}
+    return {pid: named[pid][0] for pid in states if pid in named and named[pid][0] != pid}
 
 
 def _published_part(ref, lib):
@@ -5872,6 +5949,19 @@ def main():
                               # the bottom of its view, derived from the button
                               # placements; `[]` on a device with none
                               "mount-points": mount_points(device, n, c, lib),
+                              # WHAT IT OFFERS A HANGING PART (#939): each slot
+                              # it draws, `{interface, at}`, the other side of
+                              # a mount point; `[]` on a device with none
+                              "slots": config_slots(device, n, c, lib),
+                              # WHAT EACH PLACED PART CAN BE SET TO (#934):
+                              # `{<placement id>: [state names]}`, the parts
+                              # that declare any; `{}` on a device with none
+                              "states": config_states(device, n, c, lib),
+                              # THE NAME A DCIM KNOWS EACH OF THOSE BY, where it
+                              # is not the placement id: `{<placement id>:
+                              # <name>}`, from the device's own `interfaces:`,
+                              # as the device-type export names its outlets
+                              "names": config_names(device, config_states(device, n, c, lib)),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a

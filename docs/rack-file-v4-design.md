@@ -1,7 +1,11 @@
 # Rack file version 4: one version for everything held back
 
-Status: **decided 2026-10-11**, nothing built. The build of version 4 may
-start from this note. Issues #935 (the scope, decided 2026-10-10), #970,
+Status: **decided 2026-10-11**; all eleven parts of section 9 are built, on
+one held branch. The exports were tried on NetBox 4.7.2 and Nautobot 3.2.6
+(section 13, item 47). What
+the build read more narrowly than this note says, or had to choose where it
+was silent, is in section 13, and waits for a person to confirm. The kit
+release that carries it is a minor one, kit 0.22.0 after 0.21.0. Issues #935 (the scope, decided 2026-10-10), #970,
 #949 (step 4), #934, #939, #972, with #983, #986, #1007, #966 and #908 read
 beside them. The thirteen questions it raised were each decided as it
 recommended and are recorded in section 10, with the options not taken.
@@ -59,7 +63,7 @@ same way.
 | `startU`, `holes.style: round` | frame | section 7 | read, labelled, drawn, exported |
 | `channel` | zero-U entry | section 7 | read; overlap judged per channel |
 | `width`, `options` | frame | section 7 | read and kept; acted on only as section 7 states |
-| `heldBy` `{item, at, x, z, turn}` | item | section 7 | read and kept; fit refuses what it cannot yet judge |
+| `heldBy` `{item, at, x, z, turn}` | item | section 7 | read, and kept in step with its host; one that is no rack device is not checked, and fit refuses one whose host is gone or that is also `on` a device |
 
 The last five rows are the rack products keys. **That they ride is settled by
 the record,** and is not a question here: the decision of 2026-10-09 put them
@@ -80,7 +84,8 @@ item or frame key of 1.1 would need one for the same reason.
 
 **Version 4 keeps unknown keys at the four levels that drop them today, so
 at all seven** (decision 9). A later optional key that is safe to ignore
-then needs no bump, whichever level it sits at.
+then needs no bump, whichever level it sits at. A misspelt key is kept with
+the rest and is not reported, by the reader or by the schema.
 The validator (`kit/rack/validate.js`) gains the `multipleOf` keyword, since
 the schema needs it for `ru`; that is settled here.
 
@@ -280,8 +285,11 @@ until #908, and an ear that spans fewer units than the body (10U ears on a
 wrong for the cases it was written for. It is left for the device that needs
 it.
 
-Measured over the 230 rack devices that state both `ru` and `height`: the gap
-between span and body has a median of 0.65 mm. Sixteen bodies are more than
+Measured over the 230 rack devices that state both `ru` and `height` (a 231st,
+the Celestica DS6001, states a height of 94 mm and no `ru`; the rack index
+gives it 2U, so `rack.json` lists 231 and its body overhangs its span by
+2.55 mm at each edge, a fifth body that drops by more than a millimetre):
+the gap between span and body has a median of 0.65 mm. Sixteen bodies are more than
 2 mm short of their span, the most the FS DINRAIL4U at 12.7 mm. Fourteen are
 taller than their span: four finger ducts by 4.6 to 13.35 mm, and the other
 ten, a fifth duct among them, by 0.55 mm or less.
@@ -380,15 +388,34 @@ affected, and the XCU10 draws no ears until its gap closes.
   formula with a fractional height. On a 42U top-down frame a 0.5U item
   stored at `ru: 12` is at 31.5 and one stored at 12.5 is at 31, the order in
   which the NetBox `units` property lists a descending rack (read at the
-  commit above; not tried on a running instance, and the build does so).
+  commit above, and confirmed on NetBox 4.7.2: on a 45U top-down rack the
+  lower panel is stored at 34.5 and the upper at 34).
 - **`uText(frame, ru, units)`** names a position through `positionOf`: "U12",
   "U12.5". It takes the height because a top-down label of a half depends on
   it. `uLabel` stays for whole units (lanes, managers, the rail numbers).
 - `fitsAt` and `freeUs` take and return half positions. `freeUs` lists whole
   positions for a whole-unit device and both for any other.
-- `describe` and `inspect` print spans as "U12.5" or "U13-U14.5".
-- The commands (`place`, `move`, `patch`) take `ru` as a number in steps of
-  0.5; `side.place` and a rack-face part are still refused a half.
+- `describe` and `inspect` print a span in words (`spanText`; provisional,
+  section 13): whole units on a whole unit as before ("U13", "U13-U14"), and
+  anything that starts or ends on a half with the half named, lower and upper
+  as the item hangs ("the lower half of U7", "U13 to the lower half of U14").
+  No two placements print the same text.
+- The commands that place and move (`place`, `move`) take `ru` as a number in
+  steps of 0.5. `patch` takes no `ru` and never did: `move` is the command.
+  `side.place` and a rack-face part are still refused a half.
+- **Three refusals the build worded,** since agents match them. A rack-face
+  part at a half: "FHD-CMP5DR bolts to the rail face at a whole unit, and
+  U12.5 is a half unit." A position that is no step of 0.5, which the command
+  schema refuses first and `fits` refuses for a caller that skips it: "A
+  position is a whole unit or a half unit, counted from 1." A command argument
+  off the step: "place needs ru, a number in steps of 0.5 from 1."
+- **A position below 1** is refused by the schema and by fit ("Below U1."),
+  and is still loaded: a version-3 reader loaded any whole number, a
+  hand-edited file may hold one, and refusing it on load would refuse the
+  whole file. The item is kept where the file says and fit refuses it. The
+  exports write its position as the file has it, which a DCIM import then
+  refuses; a shrink that has to pack moves it up from the bottom with its
+  cluster, and one that has nothing to pack leaves it.
 - **`shrinkRack`.** Clusters are formed by `spanOf` overlap, and a cluster
   height is its top edge less its bottom edge, in half units. Each cluster
   moves by one shift, so every item in it keeps its parity. **The shift is a
@@ -406,6 +433,19 @@ affected, and the XCU10 draws no ears until its gap closes.
   lowest cluster while that top is above the new height. Shrunk to 10U all
   four stay; shrunk to 9U the lowest goes and the other three pack to 6U.
   A device never lands on a half it would be refused at by rule 2 of 2.5.
+- **The neighbours a route looks to for a manager** (`neighbours` in
+  `fit.js`; before, the 1U device in the unit above and then the one below).
+  They are the devices of a unit or less just above an item and just below
+  it, above first and nearest first. Above an item of a unit or more: one
+  that starts on its top edge. Above an item under a unit: one that starts
+  anywhere from its top edge to the next whole unit, so a half-unit panel in
+  the lower half of a unit still finds the 1U device over that unit, as it
+  did when it counted as a unit. Below: one whose top edge is the bottom of
+  the item, and one in the whole unit under the unit its bottom is in, when
+  the item starts on a whole unit or is under a unit itself. So a half-unit
+  panel directly on the top edge of a 1.5U device is its neighbour, and a 1U
+  device half a unit over that edge is not, as it was not before. Every
+  answer for a rack of whole positions is the answer of version 3.
 
 ### 2.7 What the exports write
 
@@ -430,9 +470,16 @@ For two XCU10 panels at `ru: 12` and `ru: 12.5` on a bottom-up frame:
   and its comment says where it is. The others are written at `floor(p)` with
   a comment saying which part of the span they fill. On the top-down frame of
   2.6 both panels have `floor(p)` 31; the one stored at `ru: 12` is written
-  there. That Nautobot refuses two devices in one unit on one face is
-  inferred from its whole-unit walk and is tried on a running instance in the
-  build.
+  there. That Nautobot refuses two devices in one unit on one face was
+  inferred from its whole-unit walk and is confirmed on Nautobot 3.2.6, which
+  also refuses a position of 7.5 ("A valid integer is required."). **It
+  refuses a front and rear pair in one unit too, while either type is full
+  depth,** as NetBox does (`Device.clean`, `nautobot/dcim/models/devices.py`
+  lines 804 to 818, with `Rack.get_available_units`, `racks.py` lines 302
+  and 349), and one refused row rolls its whole file back. So the whole-unit
+  rule looks across both faces where a type is full depth: the later device
+  is kept in the rack with no position and a comment. The kit on main wrote
+  such a pair to the Nautobot file, on the belief that Nautobot took it.
 - **Mounting hardware** (decision 11) is `4 * units` an item, with no floor
   of 1: 2 for a half-unit panel, which has one slot an ear, and the counts
   of today for every other device.
@@ -502,6 +549,13 @@ move.**
 - **What stock sizes change on a saved rack:** a cord within 10 mm over a
   break drops a size (decision 5), and a copper cord of 7 m or more may rise
   one. Nothing else. The test of section 9 names each on the reference rack.
+- **Centring can move a stock size at a break.** Decision 2 moves a body by
+  half its gap, a routed length that touches it by under a millimetre, and
+  so the stock size of a cord that sat within that of a break. Measured on
+  the routing fixture: the lacer rises 0.225 mm, thirteen of sixteen path
+  lengths move by 0.1 to 0.6 mm, and one cord (c2) goes from 500.0 to
+  499.8 mm, from a 1 m cord to a 0.5 m one. With `BREAK_TOL_M` of decision 5
+  the same cord drops a size regardless, being within 10 mm over the break.
 - **`length`** keeps its shape and its `source`: `routed` is a stock size the
   kit chose, `entered` a stock length the user pinned, which is never
   touched. No new key is needed to pin one. Beside a routed value the kit
@@ -675,7 +729,7 @@ length gets one of these:
 | an entry naming a tray | "mgr-1 tray, coil, 0.38 m; 0.2 m at the ends" |
 | an `{end}` entry | "0.38 m at the A end; 0.2 m at the ends" |
 | entries with values that add up to less than what is to store | the entries, then "0.1 m not placed" |
-| entries with values that add up to more | the entries, and the finding "c7 stores 1.5 m in mgr-1 tray and has 0.6 m to spare." |
+| entries with values that add up to more | the entries, and the finding "c7 stores 1.5 m in mgr-1 tray and has 0.6 m to store.", past the stock break tolerance of 10 mm |
 | no `slack` key | "0.38 m not placed; 0.2 m at the ends" |
 | `"slack": []` | "0.38 m not placed, by choice; 0.2 m at the ends" |
 | nothing to store (the spare is all end play) | "0.15 m at the ends" |
@@ -757,15 +811,31 @@ neither (its decision 3, 2026-10-09).
   side. The rule names sides by who rides, not by direction, so it is the
   same when the bundle is written end for end.
 - **How far.** The strap centre is 25 mm from the peel point
-  (`BREAKOUT_MM`), which clears the 20 mm strap width.
-- **Within reason.** A spacing strap that already lies within 50 mm of where
-  a breakout strap would go, on the same side, serves as it and none is
-  added (`BREAKOUT_MERGE_MM`). Peel points are grouped by chaining: sorted
-  along the trunk, each one less than 75 mm from the one before it joins
-  the group of that one (`BREAKOUT_GROUP_MM`), however long the chain grows,
-  so peels at 0, 60 and 130 mm are one group read from either end. A group
-  is strapped once on each outer side and not between. A side shorter than 50 mm of riding gets none.
+  (`BREAKOUT_MM`).
+- **Where one fits** (decision 14). Peel points are grouped only where no
+  strap fits between them: closer than 22 mm (`BREAKOUT_GROUP_MM`), the
+  narrowest strap and its clearance of 5 mm each side. The grouping chains.
+  Between two groups, where two or more ride: a gap of 75 mm or more
+  (`BREAKOUT_TWO_MM`) takes a strap 25 mm in from each end; a shorter gap
+  takes one, 25 mm from the end at which a riding member peels, or in the
+  middle of the gap when members peel at both ends or when that would leave
+  the strap less than its clearance. A spacing strap already in a short gap
+  serves, and in a long gap one within 50 mm of where a breakout strap would
+  go serves as it (`BREAKOUT_MERGE_MM`). The gap at either end of the trunk,
+  where the members fan out to their ports, is a gap like any other: it
+  takes a strap wherever one of some stock width fits with its clearance.
+  So at a pitch of one unit every cable has a strap before it leaves, and
+  at two units and over there is one each side of each peel point.
   A strap that would fall on a ring moves to its nearer edge, as now.
+- **How wide** (decision 15). A strap is cut from one of a few stock widths,
+  `STRAP_WIDTHS_MM`: 12, 19 and 25 mm. Each strap carries `width_mm`: 19,
+  or 25 where the pack it goes round is 25 mm across or more, and the
+  narrowest that fits where a gap is too tight for that. **An anchor goes
+  through its tie slot, so it is no wider than the slot is long:** the
+  widest stock width that is. The FHD-CMP5DR slots are 22.5 mm, so a pack
+  that would take 25 mm is tied there with 19. Where even 12 mm does not
+  go through, no strap is counted at the slot and the bundle note says so.
+  The widths and the clearance are estimates, with no maker's sheet held.
 - Each strap that `straps()` returns gains `kind`: `spacing`, `breakout` or
   `anchor`. The count is the three together.
 
@@ -873,7 +943,9 @@ file first. This section gives the keys their exact shape.
   string, with a string value, is kept; anything else is dropped with a
   notice. `readings` is kept only whole: without a `source` or a readable
   `at` it moves to `readingsAsWritten`, as an unusable length moves to
-  `lengthAsWritten`, and nothing draws it.
+  `lengthAsWritten`, and nothing draws it. The schema requires the same two
+  keys, `source` and `at`, and no other: a `readings` with no `values` is
+  usable and shows nothing.
 - **The catalogue check** is a settle step, as managers have, since
   `parseDoc` has no catalogue. A state a part does not declare is kept and
   not applied: "outlet-a1 on PDU A cannot be standby: it can be on or off." A
@@ -922,7 +994,18 @@ file first. This section gives the keys their exact shape.
     running-instance test of section 9 tries the CSV first and the script
     second; **if neither works, the states go in the device comment**, one
     line, as for Nautobot.
-  - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."). Read
+    **As built:** the CSV is ruled out by the form. At the same commit,
+    `netbox/dcim/forms/bulk_import.py` lines 973 to 976,
+    `PowerOutletImportForm.Meta.fields` lists no `status`, so a file with
+    that column is refused; NetBox 4.7.2 answers "Unrecognized header:
+    status" (the header check is `utilities/forms/forms.py` lines 134 to
+    139). The model, the REST serializer, the edit form and the bulk-edit
+    form of NetBox all take `status` (enabled, disabled, faulty), so a later
+    step of the import script could set it through the API. No such step
+    exists, so none was tried: the states go in the device comment in both
+    files (section 13, item 44).
+  - **Nautobot:** the device comment, one line ("Outlets off: A2, A7."),
+    each outlet by the name the device-type export gives it. Read
     at nautobot/nautobot commit `c77e4255`,
     `nautobot/dcim/models/device_components.py`: a `PowerOutlet` has `type`,
     `power_port` and `feed_leg`, and no status.
@@ -991,8 +1074,9 @@ them:
   moved from under it, which is wrong. That is the bump case.
 - **Commands.** `zerou.hang {id, on: [ids]}` and `zerou.hang {id, on: null}`.
   `zerou.update` of a bracket carries its PDU. A query,
-  `bracketPositions(rack, {ref, at}, ctx)`, returns the offsets two brackets
-  need for a PDU, so a page or an agent can place them first.
+  `bracketPositions(rack, {ref, cfg, ru}, ctx)`, returns the offsets the
+  brackets need for a PDU, from the unit of the lowest, so a page or an
+  agent can place them first.
 - **Exports.** The brackets are lines of the BOM. The PDU comment in both
   DCIMs names what it hangs on ("0U, on 2 FS-PDUBK brackets at left-rear,
   from U4; NetBox has no field for that."), and each bracket is a zero-U
@@ -1037,9 +1121,11 @@ item is seen in the elevation of the face it is on, applied after `face` and
   of the XCU10 is not measured.
 - **Ports.** `facePoint(rack, item, {x, y}, chassisOf)` in `kit/rack/fit.js`
   turns a point of the face as drawn into the rack, through `face`, `turned`
-  and `roll`, on the box `itemBox` gives. `pointOf`, `portPoint`, the solids
-  and the site drawings go through it, so a port on a rolled item is where it
-  is drawn. Labels printed on the item are turned with it and are not
+  and `roll`, on the box `itemBox` gives. A drawing goes through it. `pointOf`
+  and `portPoint` are handed rack points by the routing context, not face
+  points, so they go through `rollPoint`, the turn `facePoint` itself ends
+  with; the solids are turned by their placer. A port on a rolled item is
+  where it is drawn. Labels printed on the item are turned with it and are not
   redrawn upright.
 - **A rack-face part hosted on a rolled item** keeps `on` and `unit`; `unit`
   counts from the bottom of the host as mounted.
@@ -1071,13 +1157,29 @@ What each does in the first version-4 reader:
 
 | key | acts on day one | what a hand-written value gets |
 |---|---|---|
-| `setback` (frame, item) | **fully**, as rack products section 8 has it: the order (item, device default ear position, frame, flush), fit against `usableDepth` and the other face, routed port and guide depth, export notes; the 30 mm showcase default goes | the same: any user may set it |
-| `startU` (frame) | **fully**: an integer from 1, absent is 1; labels and `positionOf` (2.6); the NetBox rack row gains `starting_unit`; Nautobot has no field, so a comment line | the same |
+| `setback` (frame, item) | **fully**, as rack products section 8 has it: the order (item, device default ear position, frame, flush), fit against `usableDepth` and the other face, routed port and guide depth; the 30 mm showcase default goes (no export note is written: section 13) | the same: any user may set it |
+| `startU` (frame) | **fully**: an integer from 1, absent is 1; labels and `positionOf` (2.6). **Neither DCIM import takes it:** the NetBox model has `starting_unit` and its rack import form does not, and Nautobot has no such field. So both device files count positions from 1, each device comment gives the label on the rack, and the NetBox rack row says it in `comments` (below) | the same |
 | `holes.style: round` | **fully**: kept by `normalizeFrame`, drawn round, and the mounting hardware rows read as for square holes with the note "Round holes: check what fixing your rail takes." | the same |
 | `channel` (zero-U entry) | overlap is judged per channel when the frame `ref` names a product whose row lists that channel | with no such row: the part stands outside at its point, as today, and a notice says the channel is not known |
-| `width` (frame) | 19 is drawn and fitted as today; the NetBox rack row writes the value | another width is kept and exported, the rack is drawn as 19 in, and a notice says so |
+| `width` (frame) | 19 is drawn and fitted as today; the NetBox rack row writes the value when it is one its import takes (10, 19, 21, 23) | another width is kept, the rack is drawn as 19 in, and a notice says so; a width NetBox does not take is written as 19 with a comment |
 | `options` (frame) | kept, and listed in `describe` | the same; nothing reads an option until a product row defines one |
 | `heldBy` (item) | kept, and kept in step with its host as 7.1 sets out; fit says "i7 is held by i4, and DINRAIL2U states no rail to hold a device, so it is not checked."; exported in the rack with no position and a comment (rack products, 7.4) | the same; **placing a new one is refused** until the catalogue describes hosts |
+
+**Every DCIM column is checked against the import form, not the model.** A
+NetBox CSV import refuses a file whose header names a field its import form
+does not list, so a field of the model is no evidence. Read at
+netbox-community/netbox commit `84e19368`, `netbox/dcim/forms/bulk_import.py`:
+
+| file | columns this kit writes | where the form lists them |
+|---|---|---|
+| NetBox racks | `site`, `name`, `status`, `width`, `u_height`, `desc_units`, and `comments` only for a rack that has something to say | `RackImportForm` (line 271), `Meta.fields` lines 359 to 364. `width` is a choice field (lines 322 to 327) of `RackWidthChoices`, 10, 19, 21 or 23 (`netbox/dcim/choices.py` lines 87 to 99). **`starting_unit` is not in the list**; only `RackTypeImportForm` (line 218) has it |
+| NetBox devices | `position` in steps of 0.5, `face`, `comments` (and the columns of before) | `DeviceImportForm` (line 698), `Meta.fields` lines 760 to 765; the half step is the model rule section 2.3 cites |
+| Nautobot devices | `position` whole or blank, `face`, `comments` (and the columns of before); no column is added | read at nautobot/nautobot commit `c77e4255`, `nautobot/dcim/api/serializers.py`: `DeviceSerializer` (line 559) takes every model field (`fields = "__all__"`, line 565), and the model position is the whole number section 2.3 cites |
+
+A rack that numbers from 1 and is 19 in wide exports the six rack columns it
+always did, to the byte. The one column this version adds to any DCIM file
+is the rack `comments`, written only for a frame with `startU` other than 1
+or a width NetBox does not take.
 
 `setback`, `startU` and round holes can be set by a user on a generic frame,
 so they are built in full and have tests (section 9, part 3). The other four
@@ -1105,9 +1207,9 @@ only `chassisOf`, which it has:
 - **Fit.** A held item that is not `mount: rack` claims no unit in the first
   reader, since nothing says how tall the space on its host is; `describe`
   lists it under its host as not checked.
-- **The held item is moved by hand.** A patch of its `ru` or `face` is
-  refused while it is held ("i7 is held by i4: move i4, or free it first.");
-  `patch {heldBy: null}` frees it.
+- **The held item is moved by hand.** A `move` of it (its `ru` or `face`;
+  `patch` takes neither) is refused while it is held ("i7 is held by i4: move
+  i4, or free it first."); `patch {heldBy: null}` frees it.
 
 ### 7.2 DIN devices on a shelf rail (#972)
 
@@ -1161,7 +1263,9 @@ file that has not been re-measured shows no spare and not a wrong one.
 1. **Overlaps the old fit allowed.** A 1.5U or 3.5U item with another in the
    unit its top half fills (2.2) now overlaps. Both are kept where they are,
    as fit keeps an item it would no longer accept, and a notice names them:
-   "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is."
+   "TM-7124S at U1 is 1.5U and reaches into U2, where QFX5120 is." The
+   sentences are `overlapNotices` in `fit.js`, by item label, and the editor
+   gives each as a finding when a document is loaded (`loadDoc`).
 2. **Bodies in 3D and the kit solids** move by half the gap between body and
    span under decision 2: a millimetre or less for 210 of 230 rack devices,
    up to 6.7 mm for the other twenty. Routed lengths move by about as much
@@ -1196,8 +1300,8 @@ and the kit suite runs at the end of each.
 | 6 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `heldBy`.** Overlap as decision 12 says; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
 | 7 | **Lengths and the slack record.** `readCables` normalising `slack` (3.3), `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackOf`, `storedText`, `cable.slack` and its refusals, `spare-unplaced`. No geometry. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For every cable, need plus spare equals stock, and end play plus what is to store equals spare. Each row of the table of 3.6 has a case asserting its text. Each refusal of 3.5 has a case. A bad `form`, a negative `value`, two entries with no value, an unknown `end` and a `slack` that is no list each load with the usable part kept and `slackAsWritten` holding what was written, and save unchanged. `inspect` gives `said: false` for no key and `said: true` for `[]`. `routePath` returns the same points with and without a `slack` entry. The #986 sample script reports no more cables differing by direction than before (38). |
 | 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. Peels at 0, 60 and 130 mm are one group from either end. `{breakout: false}` alone survives a round trip and turns breakouts off. A version-3 bundle with `every: null` has no strap of any kind after migration. `bundle.update` with one key leaves the others. The BOM count equals the three kinds summed. |
-| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. |
-| 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
+| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. **Tried on NetBox 4.7.2 and Nautobot 3.2.6** (section 13, item 47): the first two hold, and the outlet CSV is refused. |
+| 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table, and `cable.lay` with its `face` acted on by the routes (3.9, decision 17). | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
 | 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
 The site follows in portrayal-site once the kit is published: it serves the
@@ -1284,8 +1388,8 @@ one-way.
    rack and document, which dropped them, as well as cable, zero-U entry and
    bundle, which kept them). A later optional key that is safe to ignore
    then needs no bump, as `side` did not. The cost is that a misspelt key is
-   kept and not reported; the schema still reports it to anyone who
-   validates. Considered: items and the frame only; leaving it. One-way in
+   kept and not reported, by the reader or by the schema: no level of the
+   schema refuses a key it does not describe. Considered: items and the frame only; leaving it. One-way in
    practice: later keys will rely on it.
 
 10. **Straps on day one: all four of what was asked, on every part that
@@ -1336,6 +1440,37 @@ one-way.
     FHD-CMP5DR, about 2.2 to 3 m); turns stacked to the whole ring opening
     (thirty-six, about 6.6 to 9 m). Two-way.
 
+14. **Breakout straps at close pitch (decided 2026-10-11): a strap before
+    each leaving point.** The first build grouped every peel point within
+    75 mm of the one before, so a trunk whose cables join a unit apart was
+    one group and had no breakout strap at all. Peel points are grouped
+    only where no strap fits between them with its clearance (3.10). On
+    eleven cables down one lane a unit apart that is ten straps where
+    there were two, the spacing straps: a strap in each of the ten gaps
+    where two or more ride, eight of them breakout straps. Considered:
+    the chained 75 mm of the first build. One-way: the strap count, and
+    where a drawn strap is.
+
+15. **A strap has a width, from a short list (decided 2026-10-11).**
+    Narrower and wider hook-and-loop strap exists and may be used: each
+    strap carries `width_mm`, one of 12, 19 and 25, and the BOM line counts
+    each width. The list and the rule that picks one are provisional
+    (section 13, item 43). Considered: the one 20 mm figure of before.
+    One-way: the shape of a strap entry, and the text of the BOM line.
+
+16. **Single-cable tie straps are kept as built (decided 2026-10-11):** one
+    strap at each tray tie slot a lone cord rests at, shared by every cord
+    at that slot (section 13, item 38, for how the slot is found).
+
+17. **The face a file pins is read before a page's own pin (to be
+    confirmed).** A cable with a `lay` entry for a tray lies on the face the
+    entry names, whatever `ctx.trayFaceOf` of the page says, so a saved rack
+    routes the same on every page and for an agent. The page's pin is read
+    only where the file says nothing. Chosen in the build, since 3.9 has
+    `face` acted on and does not say which wins. Considered: the page
+    first, which lets a page override a file it did not write; reading the
+    file only. One-way: where a cable with a pinned face is routed.
+
 ## 11. One-way items
 
 **That follow from a decision of section 10:**
@@ -1353,13 +1488,31 @@ one-way.
 | the hardware row and its text | 11 |
 | zero-U spans in millimetres | 12 |
 
+**That the build added, and the note had not decided:**
+
+| item | where | what moves |
+|---|---|---|
+| the BOM strap line counts each kind of strap and each width, and ends "length to suit" | BOM | every rack with a bundle or a cord on a tray; before, it gave one count and one spacing |
+| `kinds` and `widths` in what `straps()` returns, `strap_kinds`, `strap_widths` and `anchor_widths` on a bundle in `bundleExports`, `kinds` in `inspect` of a bundle | kit output | `count` is all kinds together; the spacing straps alone are `kinds.spacing` |
+| `width_mm` on each strap, and on each slot of `anchorsOf` | kit output | decision 15 |
+| `spare-unplaced`, `spare-short`, `spare-over`, `spare-off-route` as finding kinds of one cable, and `spareLine` as the one line for a rack | kit output | agents match the kinds |
+| `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port alone | kit API | a page that took the dressing as `endAllowance` less the table gets 0: the end play is `END_PLAY_M`, and the lengths of a cable are `spareOf` |
+| `strapBomRows(bundles)` counts single cables only when handed `{anchors: anchorsOf(rack, ctx)}` | kit API | a page that does not pass them leaves their straps out |
+| the comment line of what is set off, in both device files, naming each outlet as the device-type export does | DCIM exports | section 13, item 44 |
+| `configs[].names` in `<device>.configs.json` | published build | additive; the kit reads it as `configFacts().names` |
+| an anchor strap capped by the long side of its tie slot, and `notes` in what `straps()` returns | kit output, BOM | the widths of the BOM strap line |
+| the comment of a PDU on brackets and the note of one, worded by `hungText` | DCIM exports, BOM notes | a reader that matches "beside the rack at" for every part beside it |
+| the `straps` column of the cable schedule, after `stored` | download format | the schedule has 20 columns where main has 17; a reader that checks the count |
+| `cable.lay`, and the face the file pins read before a page's own pin | kit command, routes | agent sessions call it by name; a rack with a `lay` face routes by it on every page |
+| `notes` on `inspect` of an item, `lay` on `inspect` of a cable | kit output | agents read them |
+
 **That the scope fixed before any of those decisions:**
 
 | item | where | why it is one-way |
 |---|---|---|
 | rack file version 4 under `/schemas/v3/`, with every key of 1.1 | rack file, schemas | an older page refuses a version-4 file; a label is never reused |
 | `unitsOf`, `spanOf` (half-open), `facePoint`, `holesIn` | kit API | pages place and route by them |
-| `END_PLAY_M` (the 0.2 m of today, renamed), `shortTolerance` with its 50 mm floor, `END_ALLOWANCE_BY_MEDIA` as the inside part alone | kit API | a page reads them by name; copper cords of 7 m and over may rise a stock size |
+| `END_PLAY_M` (0.1 m an end, the 0.2 m a cable has today, renamed), `shortTolerance` with its 50 mm floor, `END_ALLOWANCE_BY_MEDIA` as the inside part alone | kit API | a page reads them by name; copper cords of 7 m and over may rise a stock size |
 | `slack` entries `{item, via, form, value, unit}` and `{end, value, unit}`; absent against empty | rack file | saved files carry them |
 | `states`, `readings`, and `swaps` and `fields` on a zero-U entry | rack file | saved files carry them |
 | how outlet states reach NetBox (CSV, script or comment, as the test finds), and the Nautobot comment line | DCIM export | an import kit file or step |
@@ -1398,3 +1551,303 @@ one-way.
 - The ear slot heights of a device in the catalogue, which turn on the hole
   check of 2.5.
 - The direction faults of #986.
+
+## 13. Provisional
+
+Readings the build took where this note was silent or could not be followed
+as written. Each is built, and each waits for a person to confirm it. The
+numbers are kept: a later reading takes the next one.
+
+1. **Span text** (2.6). A draft of 2.6 printed "U13-U14.5", which follows from
+  no rule that also keeps "U13-U14" for a 2U item. Built: whole units on a
+  whole unit read as before; anything on a half names the half ("U13 to the
+  lower half of U14", "the lower half of U7", "the upper half of U7"). A
+  position alone is still a number (`uText`: "U12.5"), which is what the
+  commands say and NetBox stores.
+2. **The Nautobot comment for a height other than 0.5U** (2.7) uses the same
+  words: "Occupies U1 to the lower half of U2 (1.5U). Nautobot stores whole
+  rack units." An item kept with no position beside one at the same stored
+  `ru` reads "with" in place of "above". A device of whole units on a whole
+  unit gets no such comment.
+3. **The three refusal sentences** of 2.6.
+4. **The manager neighbours** of 2.6, which keep every version-3 answer.
+5. **A stock size can move with centring** (3.2).
+6. **A position below 1 is loaded** and refused by fit (2.6).
+7. **Zero-U keys in the schema.** A zero-U entry is described and not
+  constrained, so that any entry is kept as written; `states`, `readings`,
+  `swaps`, `fields` and `heldBy` on it are typed as section 4 and 5 give them,
+  and nothing else of an entry is.
+8. **`width` is in inches** in the schema (19, 23), as the NetBox rack row
+  takes it. `options` and the `turn` of an item `heldBy` have no type until a
+  product or a host defines one.
+9. **`startU` in the DCIM files** (section 7). Neither import takes a starting
+  unit. Built: both device files keep the position counted from 1, and every
+  device comment says how the rack is numbered ("U16 on the rack. The rack
+  numbers its units from 5, and a unit named here is its label; the NetBox
+  import counts from 1."), so a unit a comment names is never taken for a
+  position. The NetBox rack row says it in `comments`, and says what to do:
+  leave the starting unit of the rack at 1, or set it in the one order
+  NetBox 4.7.2 allows. It refuses a starting unit above a device
+  (`netbox/dcim/models/racks.py` lines 459 to 464) and a position past the
+  top (`devices.py` lines 906 to 912), so the devices below the new start
+  are raised first, then the start is set, then the rest are raised. A
+  rack CSV with a `starting_unit` column is refused ("Unrecognized
+  header").
+10. **The sentences of fit under `startU`** name a unit counted from the
+  bottom, from the number of the first unit ("Below U5.", "1U free from U46
+  to the top."). On a top-down frame they still count from the bottom, as
+  they did before, since "past the top" has no label there.
+11. **Setback.** It applies to a rack device only: a part on the rail face or
+  beside the rack has none, `patch` refuses it one ("CM bolts to the rail
+  face, so it has no setback."), and one written by hand is ignored. A
+  refusal names it after the depth ("700 mm deep, set back 301 mm; this rack
+  allows 1000 mm."), and a proud one reads "set forward 25 mm". **A larger
+  setback is REFUSED, on depth alone** (`fitsDepth`): never for an overlap in
+  height the rack already held, and also when the same command shrinks the
+  rack. Whether a larger rack default should refuse or only warn is for a
+  person: a smaller `usableDepth` is accepted silently today and leaves the
+  same devices past it, so the consistent choices are to check both or to
+  warn on both. A proud faceplate is not checked against a door, since no
+  frame states a door clearance yet. **No export note is written for a
+  setback:** rack products section 8 names none, so that step is not built.
+12. **The setback order is untested on real data at its second step.** No
+  catalogue row carries `ears.default` (`rack_index.py` writes no ears until
+  #908), so the default ear position of a device is exercised on a fixture
+  only.
+13. **The 30 mm showcase default** lives on the site. The kit is flush where
+  nothing is stated; the site has to drop its default in the release that
+  takes this kit, or every faceplate it draws stands 30 mm from where the
+  kit fits and routes it.
+14. **The sentences of a held item** beyond the two section 7.1 gives: placing
+  one ("The catalogue describes no host yet, so a device cannot be put on
+  one; heldBy takes only null, which frees it."); a host that is gone ("i7 is held by i4, which is not in this
+  rack: place it again, or free it."); removing a host ("DIN switch was held
+  by it and stays where it was, held by nothing."); a shrink that drops a
+  host ("DIN switch was held by a removed device and stays in the rack, held
+  by nothing."), after which an item left above the new top stands in the
+  top unit; and the DCIM comment ("On Shelf, which holds it; NetBox has no
+  field for that."). An item with both `on` and `heldBy` is kept on load,
+  named in a notice and refused by fit until one is removed (rack products
+  7.2): "i2 is on i1 and held by i1: a part is bolted over a device or held
+  by one, not both, so remove one."
+15. **The notices for kept keys** (`frameNotices` in `fit.js`): "This rack
+  states 23 in rails; it is drawn and fitted as 19 in." and "PDU A names the
+  channel rear-left, which is not known for this frame, so it stands at
+  left-rear."
+16. **Which parts `configs[].states` lists** (section 4). Built: what a part
+  ITSELF can be set to. A placement with an id is listed when its own
+  `states`, else its group, else its part declares a list of names, and it
+  is not a lamp (`class: led`). Lamps are left out because a state is
+  addressed by the outlet and follows `for:` to the lamp, whose own
+  vocabulary is already on the drawing; the mapping form
+  (`{led-a: [...]}`, on 230 placements) is left out because its keys are the
+  lamps inside a part and not state names. On the EVMA8365X that is its 42
+  outlets. Across the library the key then holds 99 parts on 10 devices and
+  under 4 KB (the three Eaton and Tripp Lite switched PDUs with 82 outlets;
+  the power supplies of three Smartoptics DCP shelves and the fans of the
+  three Edgecore EPS and the Juniper MX150, 17 parts whose part declares
+  `ok`, `fail` or `absent`), where listing every lamp held some 329 KB. A breaker is not
+  listed: its rocker declares its states on an element of the part.
+17. **What counts as a slot** (section 5). Built: a placement of a
+  `class: mount` part that declares `interface` and a `mate` point, the
+  mirror of a mount point. No part in the library is one yet, so every
+  device publishes an empty list until the bracket of #939 is modelled.
+18. **Roll and the routing context** (section 6). `facePoint` is built as the
+  note has it. The context a page hands the routes (`portX`, `portY`,
+  `guidesOf`) gives rack points, not face points, and is left as it is: it
+  gives each where the upright item would hold it, and the kit turns it
+  (`rollPoint`). A page that rolls its own points would turn them twice, so
+  this is a rule the site has to follow.
+19. **A quarter turn.** A part on the rail face is refused one ("Bracket bolts
+  to the rail face, so it cannot be rolled a quarter turn."). Its units are
+  its width over 44.45 mm, rounded up, and never under one. It is refused where its height does not pass between the
+  rails ("WIDE-13 is 577 mm high; rolled a quarter turn that is across the
+  opening, which is 451 mm."). It is one solid, with no tray, ring or guide,
+  centred across the opening, and a page is told so on load. A port on it is
+  turned with it about the centre of its box.
+20. **`describe` and `inspect`** say a roll only where an item has one
+  ("rolled 90"; `roll: 90`). The export notes of a rolled item are part 9
+  and are not written yet.
+21. **Readings and the metering scope** (section 4). A PDU that meters nothing
+  shows no reading and is named ("BASIC-PDU measures nothing, so there is no
+  reading for outlet-a1, input."). **The check for a PDU that meters its
+  input or its branches is not built:** it has to know that `outlet-a1` is
+  an outlet and `breaker-a` a branch, and nothing the kit loads says what
+  kind of part a path is. It needs a key in `configs.json` that this note
+  does not give, so readings on such a PDU are kept and shown as given.
+22. **The other sentences of states and readings.** A part that declares no
+  state ("breaker-a on PDU A cannot be set: it declares no state."); the
+  three loader notices (a state that is no name, states that are no map,
+  readings kept as written); and a refused `readings.set`. With no parts
+  lists loaded a state is stored unchecked, as a configuration is.
+23. **`readings` is usable** with a `source`, a time `at` that can be read,
+  and `values` absent or a map of part to an object. `readings: null` is no
+  key at all. The notice gives the reason that applies: no source or time,
+  or values that are no map. The numbers inside a
+  value are not checked on load; the schema states them.
+24. **Hanging** (section 5). The tolerance is 1 mm, since the connectors
+  registry states none for any mounting interface. A refusal that is not two
+  mount points on two brackets reads "A mount point of PDU A 1555.8 mm above
+  its lowest meets no slot of z3, z4."; a move of under a unit is given in
+  mm. A bracket of two cannot be moved alone, since the pitch would no
+  longer be met: the part is taken off first. A held part moved by hand is
+  refused ("PDU A hangs on z1, z2: move a bracket, or take it off them with
+  zerou.hang."). `zerou.hang` needs the parts lists loaded. A frame change
+  that would move or remove a hung part, or a bracket it hangs on, is
+  REFUSED, naming the part and its brackets ("PDU A hangs on z1, z2, and
+  this frame would move it: take it off its brackets first with
+  zerou.hang."): a hung part is never moved silently, since the kit writes
+  where it stands. `hangNotices` says a part a file holds out of place is
+  not where its brackets hold it.
+25. **`bracketPositions(rack, {ref, cfg, ru}, ctx)`** takes the part and the
+  unit of the lowest bracket, and answers one bracket a mount point, each a
+  whole number of units above the lowest, with `exact` saying the points
+  then land. It takes each bracket to offer its slot at one height, since
+  it is asked before a bracket is chosen.
+26. **`swaps` and `fields` beside the rack** are taken by `zerou.update` and
+  kept; `patch` still takes a device only. Nothing in the kit draws them.
+27. **The export comments of a hung PDU and of states** are written by
+  part 9 (item 44 for the states).
+28. **Three things of the kit API the note did not decide.** `stateRefusal` is
+  the kit's own and not for a page, which reads `stateNotices`. `shrinkRack`
+  answers `orphaned` beside `moved` and `removed`: the held items a dropped
+  host left behind. A quarter-turned item is exported at the position its
+  rolled box starts at, and since part 9 its comment says it is turned.
+29. **`measured` in the kit, though no longer in the file** (3.2). `pathLength`
+  still answers `measured`, the need and the end play at both ends, since
+  two lays of one cable are compared by it and it is the figure a routed
+  length was. It is never saved: a file holds `need`.
+30. **Units of a slack value.** Only metres and feet convert, as for a cable
+  length; `cable.slack` takes `m` or `ft`. A value in another unit is kept
+  and reads "a length in a unit that does not convert".
+31. **The sentences of slack beyond those section 3.5 gives:** a tray that
+  states no place ("CM-01 tray states no place for spare cable."), no
+  spool ("CM-01 tray states no spool."), a turn that cannot lie on the
+  floor ("A turn of c1 is 67.5 mm across, and the floor of CM-01 tray is
+  61.2 mm deep."), a second entry for the rest, and spare left at an end
+  given a form. The finding of values past what there is to store compares
+  them with what is to store and names it ("has 0.44 m to store"), and is
+  raised only past the stock break tolerance, 10 mm. An entry kept on a
+  tray the cable cannot store in is a finding of its own kind,
+  `spare-off-route`. `spare-unplaced` is a finding of one cable, which
+  `inspect` of that cable carries; the rack has one summary line
+  (`spareLine`) and never a line a cable. A cable with no length has no
+  spare, no finding and no part in that line.
+32. **No command writes an empty list.** `cable.slack.clear` with a place
+  takes that entry off, and the key with the last; with none it takes the
+  key off, so nothing is said again. "Stored nowhere, by choice" can be
+  written in a file and is read, and no command yet says it.
+33. **With no routes known `cable.slack` records the place as given,** as a
+  bundle is made without being measured.
+34. **The exports take what the routes know from their caller.** The
+  schedule fills `spare` and `stored` when it is handed
+  `spareExports(rack, ctx)` and `straps` when it is handed
+  `strapTexts(rack, ctx)`; the BOM notes and the draw.io cables take the
+  same `spare`. Without them the columns are there and blank, and no line
+  is written.
+35. **`cable.lay`, as part 10 built it** (decision 17 for which pin wins).
+  With the routes known it is refused for a pathway the device does not
+  have, for a face on a ring or a duct, for a held face on a tray that
+  states no tie slots, and for a face the cable does not come to lie on:
+  a tray that is not on its route. The cable lay note also lets a ring on
+  the held face offer it, which no part yet has. With no routes known the
+  entry is recorded as given, as a place for spare is. Unpinning is never
+  refused. An entry whose part or tray is gone is kept and passed over.
+  `inspect` of a cable shows `lay` where it has one, and `inspect` of a
+  device of a fractional height carries the ear-hole sentence of 2.5 under
+  `notes`.
+36. **`inspect` of a cable** gains `spare_findings` where it has any, and
+  `describe` gives the spare a line of its own after the findings.
+37. **Found on main and fixed here:** a cable whose media is named like
+  something every object has (`constructor`) got a path with a point that
+  is no number, no length, and `value: null` in a saved file. Every table
+  the kit reads by a media name is now read by its own keys only.
+38. **Where a cable lies on a tray, for its anchor** (3.10). A single cable is
+  tied at a tray its path rests on. Its stretch there is the part of its
+  path within 12 mm over a floor of the tray (on the floor, or on the sill
+  of a ring that stands on it), and the slot is the one whose middle is
+  nearest the middle of that stretch along the run, the lower index where
+  two are as near. A member of a drawn bundle is not counted again at a
+  tray its trunk lies on. For a trunk the stretch is what lies over the
+  floors of the way from the waypoint before to the one after.
+39. **A side of a peel point** is measured to the end of the run of two or
+  more riding, and a spacing strap serves only from its own side of the
+  peel.
+40. **The words of the strap count.** The BOM line says how many of each kind
+  ("3 along 1 bundle, one every 12 in; 4 where a cable joins or leaves a
+  bundle", then the slots and its closing words as before), and a bundle
+  note gives its kinds where it has more than spacing straps ("7 straps (3
+  every 12 in, 4 where a cable leaves)"). `strapBomRows` counts single
+  cables only when it is handed `anchorsOf` for the rack.
+41. **The kit draws no strap.** An anchor is an entry with its tray and slot;
+  the band at the slot is the page's to draw.
+42. **Measured.** On the generated sample (78 racks, 364 lacer trays, 2,320
+  cables, no bundle): 1,220 anchor straps where there were none, 3.4 a
+  tray; 1,699 cables rest on a tray. On the eight bundles the tests hold:
+  the trunk along five rings (5 straps, unchanged: a spacing strap serves
+  each end), the trunk of 30 in through ducts (3 to 5), the fan-out up the
+  lane (2 to 4), the three-member bundle of the exports test (4 to 6), the
+  two drawn bundles of its three (4 to 6 each), the eleven cables down one
+  lane a unit apart (2 to 10 under decision 14: the 2 spacing straps and 8
+  breakout straps, all 19 mm) and the two jumpers of that rack (1,
+  unchanged). Every strap of the sample is 19 mm.
+43. **The strap widths and the rule that picks one** (decision 15). The
+  list is 12, 19 and 25 mm: the common inch sizes of hook-and-loop strap
+  (1/2, 3/4 and 1 in) to a whole millimetre, an estimate with no maker's
+  sheet held. A strap is 19 mm; 25 mm where the pack at it is 25 mm across
+  or more (`WIDE_PACK_MM`, a figure of this build); and in a gap too tight
+  for that, the widest of the list that leaves 5 mm clear each side
+  (`STRAP_CLEAR_MM`, an estimate). The 20 mm that keeps a strap off a ring
+  (`STRAP_W`) is unchanged, so no strap of before moves. An anchor is
+  capped by the long side of its tie slot, read from the `ties` of the
+  tray; that a strap needs no room beyond its own width in the slot is an
+  assumption.
+44. **Outlet states in the DCIM files** (section 4). The NetBox outlet
+  import refuses a `status` column (tried on 4.7.2; file and lines in
+  section 4), and no import-script step exists to try, so both
+  device files carry one comment line ("Outlets off: A2, A7."). An outlet
+  is named as the device-type export names it: `<device>.configs.json`
+  gains `names` on each configuration, `{<path>: <name>}`, read from the
+  `interfaces:` of the device by the function that names the exported
+  outlets, so the two cannot disagree. It is additive, and the kit reads it
+  as `configFacts().names`. A part with no name there is named by its
+  path, and a part that is no outlet is in a line of its own ("Off:
+  psu-1."). Only `off` is written, and only for a part that declares the
+  state. The kit writes the line when its caller hands `deviceImportRows`
+  a `statesOf`, and uses the names when it is handed a `namesOf`.
+45. **The `straps` column** names a single cable's own slots, on either face
+  ("CM-01 tray, resting face (top), tie 11"), by slot number from 1; slots
+  that are no one run are each named ("ties 5, 6, 9 and 10"). A member of a
+  drawn bundle is blank at a tray its trunk lies on, as it is not counted
+  there. The BOM note a tray of the cable lay note (5.5) is not written:
+  the strap line of the BOM counts the slots.
+46. **Readings in the exports.** No export of the kit shows a reading, so
+  none states a source and a time; `readingsFor` gives both to a page that
+  shows one. A test holds that neither device file carries any.
+47. **Running instances.** The exports were tried on NetBox 4.7.2 and
+  Nautobot 3.2.6, from the files the kit writes.
+  **Held as this note says:** a whole-unit rack; two half-unit panels in
+  one unit (NetBox stores 7.0 and 7.5; Nautobot takes the lower at 7 and
+  keeps the other in the rack with no position, no face and its comment);
+  a top-down rack (the lower stored at 34.5, the upper at 34, the labels
+  as `uText` gives them); 1.5U and 3.5U items with a half-unit panel
+  above; a rack row with `comments`; widths 10, 19, 21 and 23, and 24
+  written as 19 with a comment; a held item, a hung PDU and its brackets
+  with no position or face; the roll comments. An outlet CSV with `status`
+  and a rack CSV with `starting_unit` are each refused as an unrecognised
+  header. Nothing was stored differently from the file, and neither
+  platform limits the length of a comment.
+  **Found wrong, and fixed:** a front and rear pair in one unit in the
+  Nautobot file while a type is full depth (2.7; a fault of the export on
+  main too); the order of steps in the `startU` rack comment (item 9); a
+  quarter-turned item, which is a row of its 1U type, so both platforms
+  show the other units free: its comment now says which units it fills
+  ("Turned, it occupies U30-U34 on the rack; the device type is 1U.");
+  the outlet names (item 44); and the limits table, where the device name
+  of Nautobot is 255 characters and of NetBox 64, and the rack name of
+  NetBox is 100, which the rack row now screens.
+  **Still not tried:** Nautobot cables, whose import needs an API token;
+  NetBox cable bundles, since the kit writes none; an outlet-state step of
+  the import script, since none exists; and a real PDU bracket or shelf
+  host, since the catalogue has none: the bracket was a hand-made 0U type
+  and the sizes nominal.

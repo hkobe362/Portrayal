@@ -74,7 +74,7 @@ test('inspect: a cable, with its routed length from a route context', async () =
   assert.deepEqual(got, {kind: 'cable', id: 'c1',
     a: {item: 'i1', path: 'port-1', view: 'front', name: 'leaf-1 (U10) port-1'},
     b: {item: 'i2', path: 'port-1', view: 'front', name: 'leaf-2 (U20) port-1'},
-    media: 'om4', purpose: 'uplink', label: 'A1', length: {value: 2, unit: 'm', source: 'entered'},
+    media: 'om4', purpose: 'uplink', label: 'A1', length: {value: 2, unit: 'm', source: 'entered', need: 0.97},
     // its free spans hang by the drape of fibre (#949 step 3): 1.15 m taut;
     // 1.27 m, 1.5 m stock and 0.73 slack before #962's end allowance (113.1
     // mm an end for an OM4 cord, not 150: 13.1 of plug in the port and the
@@ -83,7 +83,11 @@ test('inspect: a cable, with its routed length from a route context', async () =
     // and where it leaves the top of the lane for its port it sags a quarter
     // as deep, a span that hung to its full depth there turning back on the
     // lane too tightly
-    routed: {metres: 1.17, stock: 1.5}, slack: {metres: 0.83},
+    // (since rack file version 4 the slack is the spare, 2 m less the 0.97 m
+    // the cord needs: 0.2 m of it end play, and the 0.83 m it read before to
+    // store, with no place said for it, which is a finding past 0.3 m)
+    routed: {metres: 1.17, stock: 1.5}, slack: {metres: 1.03, at_ends_m: 0.2, said: false, stored: [], unplaced_m: 0.83},
+    spare_findings: [{kind: 'spare-unplaced', text: 'c1 has 0.83 m to store and no place for it.'}],
     route: {edited: false, waypoints: [{lane: 'left-front', ru: 10}, {lane: 'left-front', ru: 20}], text: 'left-front U10-U20'},
     lanes: ['left-front', 'right-front', 'left-rear', 'right-rear'],
     passes: {i3: ['guide-1', 'guide-2', 'window-1']},

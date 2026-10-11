@@ -22,7 +22,10 @@ import * as G from './cable-solids-fixture.mjs';
 const EPS = 1e-6;
 const r15 = 1.5;                                   // an OM4 cord's radius
 // the lacer of the owner's rack (i4) at U41, as placed
-const BOTTOM = 40 * RU;                            // the bottom of U41
+// A body is centred in its span (fit.js itemBox): the lacer is 44 mm in a
+// 44.45 mm unit, so it stands 0.225 mm above the bottom of its unit.
+const LIFT = (RU - 44) / 2;
+const BOTTOM = 40 * RU + LIFT;                     // the bottom of the lacer, in U41
 const TOP = BOTTOM + 3.0, UNDER = BOTTOM + 1.5;    // the floor's top and its underside
 const SILL = BOTTOM + 3.0 + 5.6;                   // each ring's lowest inside edge
 const near = (a, b, what, tol = 1e-6) => assert.ok(Math.abs(a - b) <= tol, `${what}: ${a}, want ${b}`);
@@ -374,7 +377,7 @@ test('a tray on the rear rails rests the cable on its sill at the side of the op
   near(o.box.z1, -740 - 72.2, 'rail side'); near(o.box.z0, -740 - 104.2, 'far side');
   const p = R.routePath({...r, cables: [c]}, c, ctx);
   const entry = p.points.find(q => q.at === 'entry');
-  near(entry.y, 11 * RU + 3 + 5.6 + r15, 'on the sill');
+  near(entry.y, 11 * RU + LIFT + 3 + 5.6 + r15, 'on the sill');
   near(entry.z, -740 - 72.2 - r15, 'at the rail side');
   assert.deepEqual(p.crossings, []);
 });
@@ -394,9 +397,9 @@ test('traysOf: a catalogue without trays gives none, and a narrow part turned en
   const ctx = {chassisOf: ref => (ref === 'narrow' ? narrow : null), guidesOf: () => [], portX: () => null};
   const [t] = S.traysOf(rr, ctx);
   assert.equal(t.flipped, true);
-  // turned about the middle of its 44 mm, from the bottom of U12: the plate
+  // turned about the middle of its 44 mm, centred in U12: the plate
   // is 3 mm below its top, and the rings hang below the plate
-  const top = 11 * RU + 44;
+  const top = 11 * RU + LIFT + 44;
   near(t.top, top - 1.5, 'its upward face is its own underside');
   near(t.under, top - 3, 'its downward face is its own top');
   const o = t.rings[0];

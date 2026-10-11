@@ -520,6 +520,12 @@ format, and settle the order in which a setback is found.**
 
 ## 9. The Rack Builder: product frames and the rack file
 
+**Built as rack file version 4.** The keys this section asks for are decided
+and built in [rack-file-v4-design.md](rack-file-v4-design.md): section 7 of that note has what each key does in the
+first reader, and section 7.1 a held item. Where the two differ, that note
+is the one the kit follows: neither DCIM import takes `startU`, so both
+device files count from 1 and the comment gives the label on the rack.
+
 **Recommendation: product frames are a catalogue in `rack.json`; choosing one
 copies its numbers into the frame and sets `frame.ref`; the frame keys the
 products need beyond today's are added in one rack file version, 4.**

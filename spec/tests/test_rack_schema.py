@@ -62,14 +62,14 @@ def test_a_manager_on_unit_0_is_refused():
 
 def test_a_version_the_schema_does_not_describe_is_refused():
     doc = current(ROOT / "spec/tests/fixtures/racks/doc-export-empty.json")
-    doc["version"] = 4
+    doc["version"] = 5
     assert errors(doc)
 
 
 def test_a_bundle_validates_and_a_malformed_one_is_refused():
     """Version 3 (#921): `bundles` on a rack, checked here by a second validator."""
     doc = current(ROOT / "spec/tests/fixtures/racks/doc-cable-fixture.json")
-    assert doc["version"] == 3
+    assert doc["version"] == 4
     rack = doc["racks"][0]
     ids = [c["id"] for c in rack["cables"]]
     assert len(ids) >= 2

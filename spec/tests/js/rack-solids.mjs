@@ -57,11 +57,13 @@ test('the solids of the owner\'s rack: four envelopes, the lacer\'s fifteen plat
   // and since #968 the five parts of each of its five rings
   assert.equal(s.length, 4 + 15 + 25);
   assert.deepEqual(s.filter(x => x.part === 'envelope').map(x => x.item), ['i1', 'i2', 'i4', 'i5']);
-  // the strip of the tray floor: 3 mm up U12, the sheet (1.5) thick, from 48.8
+  // the strip of the tray floor: 3 mm up the lacer, which is centred in U12
+  // (44 mm in 44.45: fit.js itemBox), the sheet (1.5) thick, from 48.8
   // to 110 out of the front rail plane, across the 448.4 between the ears
   const strip = s.find(x => x.item === 'i3' && x.part === 'tray/floor' && x.box.x1 - x.box.x0 > 400).box;
   const near = (a, b) => Math.abs(a - b) < 1e-9;
-  assert.ok(near(strip.y0, 11 * RU + 1.5) && near(strip.y1, 11 * RU + 3), JSON.stringify(strip));
+  const lift = (RU - 44) / 2;
+  assert.ok(near(strip.y0, 11 * RU + lift + 1.5) && near(strip.y1, 11 * RU + lift + 3), JSON.stringify(strip));
   assert.ok(near(strip.z0, 48.8) && near(strip.z1, 110) && near(strip.x0, -224.2) && near(strip.x1, 224.2));
   // a box device is its envelope, behind the front rail plane
   const panel = s.find(x => x.item === 'i2').box;
@@ -100,7 +102,7 @@ test('owner\'s fixture: today\'s routes cross the lacer\'s plates; with the deto
     assert.equal(p.detours.length, DETOURS[c.id], c.id);
     // the same cable's path without its detours: its end allowance too, which
     // is the cable's media's since #962
-    const grew = R.pathLength(p).measured - R.pathLength({points: raw(p), allowance: p.allowance}).measured;
+    const grew = R.pathLength(p).measured - R.pathLength({points: raw(p), allowance: p.allowance, media: p.media}).measured;
     assert.ok(DETOURS[c.id] ? grew > 0.005 : grew === 0, `${c.id} grew ${grew}`);
   }
   // the floor detour of c6 goes over the FRONT edge of the tray (section 1.3
@@ -144,7 +146,8 @@ test('a tray on the rear rails is gone round by its front edge too, which faces 
 test('a cable lying against the plate is not crossing it; a leg through it is, on either face', () => {
   const {rack, ctx} = owner();
   const s = S.solidsOf(rack, ctx);
-  const top = 11 * RU + 3, under = 11 * RU + 1.5, r = 1.5;
+  const lift = (RU - 44) / 2;      // the lacer is centred in its unit
+  const top = 11 * RU + lift + 3, under = 11 * RU + lift + 1.5, r = 1.5;
   const legs = {
     // the centre line one radius above the floor, along the strip, in front
     // of the rings (z 60; from 66.4 out to the front edge, every 'lying' leg

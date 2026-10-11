@@ -11,12 +11,12 @@
 // to the right as seen from the FRONT. This file imports no DOM and nothing of
 // the site's pages, so the rack kit can take it as it is.
 
-import {uLabel, zeroUOf, bundlesOf} from './model.js';
+import {uLabel, zeroUOf, bundlesOf, rollOf} from './model.js';
 import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan} from './fit.js';
+import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, isQuarter} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -57,21 +57,29 @@ export function ringOf(g) {
   return {run: ['x', 'y', 'z'].includes(g.run) ? g.run : 'x', depth: stated ? g.depth : RING_DEPTH, estimated: !stated};
 }
 
-const unitsOf = (ctx, it) => Math.max(1, ctx.chassisOf(it.ref)?.ru ?? 1);
-const spans = (ctx, it, u) => u >= it.ru && u <= it.ru + unitsOf(ctx, it) - 1;
+// THE GUIDES OF AN ITEM AS IT IS MOUNTED. `ctx.guidesOf` gives each where the
+// item would hold it upright; rolled 180 degrees (`roll`) every guide is
+// across its centre line from there, so the ring nearest a port is another
+// ring. An item rolled a quarter turn is an outline and offers none.
+function mountedGuides(m, ctx) {
+  const gs = ctx.guidesOf(m.id);
+  if (isQuarter(m)) return [];
+  if (rollOf(m) !== 180) return gs;
+  const cx = centreX(m, ctx.chassisOf);
+  return gs.map(g => ({...g, x: 2 * cx - g.x}));
+}
 
 // The manager an end leaves through, in order: one hosted on its item on that
-// face; else, of the 1U devices adjacent on that face (ABOVE first, then
-// BELOW), the first with a manager hosted on it on that face, else itself if it
-// declares guides on that face. A manager must declare guides on that face.
-// null when there is none.
+// face; else, of the devices of a unit or less adjacent on that face (ABOVE
+// first, then BELOW: fit.js neighbours), the first with a manager hosted on
+// it on that face, else itself if it declares guides on that face. A manager
+// must declare guides on that face. null when there is none.
 function managerOf(rack, it, pane, ctx) {
-  const guided = m => ctx.guidesOf(m.id).some(g => g.face === pane);
+  const guided = m => mountedGuides(m, ctx).some(g => g.face === pane);
   const hosted = rack.items.find(m => m.on === it.id && m.face === pane && guided(m));
   if (hosted) return hosted;
-  for (const u of [it.ru + unitsOf(ctx, it), it.ru - 1]) {
-    for (const o of rack.items.filter(o => o.id !== it.id && o.face === pane && !o.on
-                                           && unitsOf(ctx, o) === 1 && spans(ctx, o, u))) {
+  {
+    for (const o of neighbours(rack, it, ctx.chassisOf).filter(o => o.face === pane && !o.on)) {
       const carried = rack.items.find(m => m.on === o.id && m.face === pane && guided(m));
       if (carried) return carried;
       if (guided(o)) return o;
@@ -83,7 +91,7 @@ function managerOf(rack, it, pane, ctx) {
 // The waypoints through one end's manager, from the port out to `side`.
 function through(m, pane, portX, side, crossing, ctx) {
   if (!m) return [];
-  const gs = ctx.guidesOf(m.id).filter(g => g.face === pane);
+  const gs = mountedGuides(m, ctx).filter(g => g.face === pane);
   const rings = gs.filter(g => g.kind === 'ring');
   if (rings.length) {
     // The rings on the way out: from the port toward `side`. A ring behind
@@ -123,7 +131,7 @@ function through(m, pane, portX, side, crossing, ctx) {
 // along x never gives an empty route. A manager with no ring that runs along
 // x, but a duct, runs in the duct.
 function along(m, pane, ax, bx, ctx, passes = null) {
-  const gs = ctx.guidesOf(m.id).filter(g => g.face === pane);
+  const gs = mountedGuides(m, ctx).filter(g => g.face === pane);
   const rings = gs.filter(g => g.kind === 'ring' && ringOf(g).run === 'x');
   if (rings.length) {
     const lo = Math.min(ax, bx), hi = Math.max(ax, bx);
@@ -374,12 +382,20 @@ export function laneXAt(rack, lane, ru, chassisOf) {
   return s * (OPENING / 2 + RAIL_W + STANDOFF + (Number(chassisOf(p.ref)?.w) || 0) + LANE_GAP / 2);
 }
 const planeZ = (f, pane) => (pane === 'rear' ? -railDepthOf(f) : 0);
+// Where a panel of a rack device is, in depth: the one on the face it is
+// mounted on stands its setback behind that rail (fit.js setbackOf), and its
+// far panel the chassis depth beyond.
+function panelZ(rack, it, pane, ctx) {
+  const d = ctx.chassisOf(it.ref)?.d ?? 0, s = setbackOf(rack, it, ctx.chassisOf);
+  const own = it.face === 'front' ? 0 - s : -railDepthOf(rack.frame) + s;
+  return pane === it.face ? own : it.face === 'front' ? own - d : own + d;
+}
 
 export function pointOf(rack, w, ctx) {
   const f = rack.frame;
   if (w.lane) {
     const [, pane = 'front'] = w.lane.split('-');
-    return {x: laneXAt(rack, w.lane, w.ru, ctx?.chassisOf), y: (w.ru - 0.5) * RU, z: planeZ(f, pane)};
+    return {x: laneXAt(rack, w.lane, w.ru, ctx?.chassisOf), y: laneY(w.ru), z: planeZ(f, pane)};
   }
   const it = itemOf(rack, w.item), g = it && ctx.guidesOf(it.id).find(x => x.via === w.via);
   if (!g) {
@@ -394,11 +410,10 @@ export function pointOf(rack, w, ctx) {
   const c = ctx.chassisOf(it.ref) || {};
   // A guide on a rack device's FAR panel is the chassis depth in, as portPoint puts a port there.
   const out = c.mount === 'rack-face' ? (c.d ?? 0) / 2 : 0;
-  const far = c.mount !== 'rack-face' && g.face !== it.face;
-  const d = c.d ?? 0;
-  const z = far ? (it.face === 'front' ? -d : -railDepthOf(f) + d)
+  const z = c.mount !== 'rack-face' ? panelZ(rack, it, g.face, ctx)
     : g.face === 'rear' ? planeZ(f, 'rear') - out : planeZ(f, 'front') + out;
-  return {x: g.x, y: (it.ru - 0.5) * RU, z};
+  // the guide where it is as mounted: turned with the item by its roll
+  return {...rollPoint(rack, it, {x: g.x, y: anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
 export function portPoint(rack, end, ctx) {
@@ -407,13 +422,11 @@ export function portPoint(rack, end, ctx) {
   // No port found on the drawing: no point, and so no length - never an invented x of 0.
   const x = ctx.portX(end);
   if (x == null) return null;
-  return {x, y: ctx.portY?.(end) ?? (it.ru - 0.5) * RU, z: panelZ(rack, it, pane, ctx)};
-}
-// Where the panel of an item seen from `pane` stands, as a z: on its own face
-// a panel is at that rail; the far panel is the chassis depth away.
-function panelZ(rack, it, pane, ctx) {
-  const f = rack.frame, d = ctx.chassisOf(it.ref)?.d ?? 0;
-  return pane === it.face ? planeZ(f, pane) : (it.face === 'front' ? -d : -railDepthOf(f) + d);
+  // On its own face a panel is at that rail, less its setback; the far panel is the chassis depth away.
+  const z = panelZ(rack, it, pane, ctx);
+  // `portX` and `portY` give the port as the item would hold it upright; its
+  // roll turns it to where it is drawn (fit.js rollPoint)
+  return {...rollPoint(rack, it, {x, y: ctx.portY?.(end) ?? anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
 // THE PORTS A SPAN CAN COVER (#1013, docs/cable-lay-design.md section 1.7).
@@ -447,11 +460,17 @@ function portBoxesOn(rack, ctx) {
   if (keyed && per.has(ctx)) return per.get(ctx);
   const out = [], seen = new Set();
   const size = v => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null);
-  const add = (it, path, view, x, y, w, h) => {
+  // A PORT BOX STANDS WHERE THE BODY DOES: the reader gives each port where
+  // an upright item would hold it, as portX and portY do, and the roll of the
+  // item turns it (fit.js rollPoint), a quarter turn swapping its width and
+  // height. `mounted` is a point that is already as mounted (portPoint's).
+  const add = (it, path, view, ux, uy, w0, h0, mounted = false) => {
     const pane = endPane(rack, {item: it.id, view});
     const key = `${it.id}|${path}|${view}`;
-    if (!pane || seen.has(key) || !Number.isFinite(x) || !Number.isFinite(y)) return;
+    if (!pane || seen.has(key) || !Number.isFinite(ux) || !Number.isFinite(uy)) return;
     seen.add(key);
+    const {x, y} = mounted ? {x: ux, y: uy} : rollPoint(rack, it, {x: ux, y: uy}, ctx.chassisOf);
+    const [w, h] = isQuarter(it) ? [h0, w0] : [w0, h0];
     const hw = (size(w) ?? PORT_BOX.w) / 2, hh = (size(h) ?? PORT_BOX.h) / 2;
     out.push({item: it.id, path, view, x: x, y: y, x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh,
       z: panelZ(rack, it, pane, ctx), out: pane === 'rear' ? -1 : 1, ...(size(w) && size(h) ? {} : {estimated: true})});
@@ -467,7 +486,7 @@ function portBoxesOn(rack, ctx) {
     const it = e && itemOf(rack, e.item);
     let p = null;
     try { p = it ? portPoint(rack, e, ctx) : null; } catch { p = null; }
-    if (p) add(it, e.path, e.view === 'rear' ? 'rear' : 'front', p.x, p.y);
+    if (p) add(it, e.path, e.view === 'rear' ? 'rear' : 'front', p.x, p.y, undefined, undefined, true);
   }
   out.judged = all ? 'all' : 'cabled';
   if (keyed) per.set(ctx, out);
@@ -560,9 +579,11 @@ export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 //   - half of how much SHORTER than its nominal length the maker allows a
 //     cord to be (its minus tolerance). A plus tolerance only adds slack, so
 //     it adds nothing here.
-// Service loops and dressing slack are not in this table: they are explicit
-// slack held in a tray (#949 step 4), where they can be seen. Until that is
-// built, DRESSING_ALLOWANCE (below) stands in for them, apart from the table.
+//     That part is no longer in this table: it is shortTolerance (below),
+//     which has a floor and grows with the cord. THE TABLE IS THE INSIDE PART
+//     ALONE (rack file version 4, docs/rack-file-v4-design.md section 3.2).
+// Service loops and dressing slack are not in this table either: they are the
+// spare (END_PLAY_M and what is stored, below), where they can be seen.
 //   - LC fibre (os2, om3, om4, om5): 13.1 mm, the plug inside. generic/lc-plug@2:
 //     its rear stands 25.6 behind the housing's front, 12.5 of it out of the
 //     bore (an estimate in the bracket 12.2 to 13.97 that SENKO's
@@ -592,23 +613,62 @@ export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 // receptacle enters it as it would an adapter's, and an AOC's head enters
 // the cage; an SFP head (47.5 inside, SFF-8432) is taken at the QSFP figure.
 export const END_ALLOWANCE_BY_MEDIA = {os2: 0.0131, om3: 0.0131, om4: 0.0131, om5: 0.0131,
-  cat6: 0.0345, cat6a: 0.0345, dac: 0.025, aoc: 0.0524};
-const UNSET_ALLOWANCE = 0.0345;
-// TEMPORARY, until #949 step 4 (explicit tray slack) is built: a dressing
-// allowance of 0.1 m an end, for every media, on top of the table. It is not
-// a measured figure and has no maker's source: it is there by decision
-// (2026-10-10, #962), so that a routed cord is not bought with nothing to
-// dress it by while no tray can hold its slack. It is kept out of
-// END_ALLOWANCE_BY_MEDIA so that the table stays what the sources say; step
-// 4 removes this constant and its one use in endAllowance, and nothing else.
-const DRESSING_ALLOWANCE = 0.1;
-// What a routed length adds at each end of a cable: its media's figure from
-// the table (the copper cord's for a cable with no media, or none the table
-// knows) and, for now, the dressing allowance.
+  cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524};
+const UNSET_ALLOWANCE = 0.0095;
+// What is inside the port at each end of a cable, in metres: its media's
+// figure from the table (the copper cord's for a cable with no media, or
+// none the table knows).
 export const endAllowance = cable => ((typeof cable?.media === 'string'
   && Object.hasOwn(END_ALLOWANCE_BY_MEDIA, cable.media))
-  ? END_ALLOWANCE_BY_MEDIA[cable.media] : UNSET_ALLOWANCE) + DRESSING_ALLOWANCE;
-export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m / 5) * 5;
+  ? END_ALLOWANCE_BY_MEDIA[cable.media] : UNSET_ALLOWANCE);
+
+// ── THE LENGTHS, NAMED (docs/rack-file-v4-design.md section 3.2) ───────────
+// path     the routed points, port face to port face;
+// need     the path, what is inside the two ports, and the short tolerance
+//          of the maker: what the cord must at least be;
+// stock    the length bought: pinned by the user, or chosen here;
+// spare    stock less need: real cable, and it is somewhere;
+// end play the part of the spare that stays at the two ends, in the curves
+//          into the ports, and is never coiled: END_PLAY_M an end;
+// to store the spare less the end play, never below zero.
+// END_PLAY_M is the 0.1 m an end the kit added before as a dressing
+// allowance, under the name of what it is and moved out of the need into the
+// spare; no stock size changes for the move.
+export const END_PLAY_M = 0.1;
+// THE STOCK BREAK (#983): a cord up to this much short of full end play is
+// still chosen. A twentieth of the end play, and more than the spread of the
+// LC plug depth estimate at two ends.
+export const BREAK_TOL_M = 0.01;
+// More to store than this with nowhere said for it is a finding.
+export const UNPLACED_WARN_M = 0.3;
+// HOW MUCH SHORTER THAN ITS NOMINAL LENGTH A MAKER LETS A CORD BE, in metres
+// over both ends, for a cord of `stock` metres. Copper (and a cable with no
+// media, or one the table does not know): the greater of 50 mm and 1 per
+// cent of the length - to 5 m the 25 mm an end the table held, 70 mm at 7 m,
+// 300 mm at 30 m. DAC: its stated 50 mm at every length. Fibre and AOC: none,
+// their makers state plus tolerances only.
+const NO_SHORT = ['os2', 'om3', 'om4', 'om5', 'aoc'];
+export function shortTolerance(cable, stock) {
+  const media = typeof cable?.media === 'string' ? cable.media : '';
+  if (NO_SHORT.includes(media)) return 0;
+  if (media === 'dac') return 0.05;
+  return Math.max(0.05, 0.01 * (Number(stock) > 0 ? Number(stock) : 0));
+}
+const pathMetres = path => { let mm = 0; for (let k = 1; k < path.points.length; k++) mm += dist(path.points[k - 1], path.points[k]); return mm / 1000; };
+// What a cord of `stock` metres along `path` must at least be.
+export const needOf = (path, cable, stock) => pathMetres(path) + 2 * endAllowance(cable) + shortTolerance(cable, stock);
+// THE STOCK SIZE CHOSEN: the smallest with the need, the end play at both
+// ends and any `values` the slack entries state inside it, to within
+// BREAK_TOL_M. `needAt(s)` is the need of a cord of s metres, since a copper
+// cord's tolerance grows with it; sizes are tried in order.
+function chooseStock(needAt, values = 0) {
+  const fits = s => s + BREAK_TOL_M >= needAt(s) + 2 * END_PLAY_M + values - 1e-9;
+  for (const s of STOCK_M) if (fits(s)) return s;
+  for (let s = 35; s < 100000; s += 5) if (fits(s)) return s;
+  return null;
+}
+// The stock size for a need that is already known (it does not grow with the cord).
+export const stockLength = (need, {values = 0} = {}) => chooseStock(() => need, values);
 
 // THE PATH A CABLE TAKES, in rack coordinates (mm): its a port, every
 // waypoint's point, and its b port, each ring's centre expanded to where the
@@ -1289,7 +1349,7 @@ function layPath(rack, cable, ctx, given) {
       }
     }
   }
-  return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable)};
+  return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable), media: cable.media};
 }
 
 // CORNERS AT ONE POINT ARE ONE CORNER (#1007). Two points of a path can stand
@@ -1356,11 +1416,13 @@ function alongTray(rack, t, prev, next, cable, ctx, r) {
   const lo = Math.min(...t.floors.map(f => f[`${run}0`])), hi = Math.max(...t.floors.map(f => f[`${run}1`]));
   const clamp = v => Math.min(hi, Math.max(lo, v));
   const a = clamp(prev[run]), b = clamp(next[run]);
-  // which face: the page's pin, where the tray offers it (a held face needs
-  // tie slots along the stretch: heldStretch is null without one), else the
-  // face that looks up
-  let asked = null;
-  try { asked = typeof ctx?.trayFaceOf === 'function' ? ctx.trayFaceOf(cable, {item: t.item, via: t.via}) : null; } catch { asked = null; }
+  // which face: the one the file pins (the `face` of the cable's `lay`
+  // entry for this tray, rack file version 4), else the page's pin, where
+  // the tray offers it (a held face needs tie slots along the stretch:
+  // heldStretch is null without one), else the face that looks up
+  let asked = layFaceOf(cable, t);
+  if (asked == null)
+    try { asked = typeof ctx?.trayFaceOf === 'function' ? ctx.trayFaceOf(cable, {item: t.item, via: t.via}) : null; } catch { asked = null; }
   const heldName = t.flipped ? 'top' : 'underside', restName = t.flipped ? 'underside' : 'top';
   const rail = railZOf(rack, t.item);
   if (asked === heldName) {
@@ -1400,9 +1462,13 @@ function alongTray(rack, t, prev, next, cable, ctx, r) {
 // A cable's outside diameter in mm, for what it must fit and keep clear by:
 // the page's `ctx.diameterOf(cable)` (the cable types table, #919: its
 // diameterLookup), else its media's typical one.
+// A TABLE KEYED BY MEDIA IS READ BY ITS OWN KEYS ONLY: a cable whose media is
+// named like something every object has (`constructor`) is a media the table
+// does not know, never the function of that name.
+const ownMedia = (table, media) => (typeof media === 'string' && Object.hasOwn(table, media) ? table[media] : undefined);
 const cableDiameter = (cable, ctx) => {
   const d = typeof ctx?.diameterOf === 'function' ? ctx.diameterOf(cable) : null;
-  return typeof d === 'number' && d > 0 ? d : DIAMETERS[cable?.media] ?? UNSET_D;
+  return typeof d === 'number' && d > 0 ? d : ownMedia(DIAMETERS, cable?.media) ?? UNSET_D;
 };
 
 // The marks of a path drawn from its other end, for its points reversed: the
@@ -1436,20 +1502,57 @@ export function ringMarks(rack, cable, ctx) {
   });
 }
 
-// A path's length, as routedLength gives it: {measured, value} in metres:
-// its points and its cable's end allowance at each end (routePath's
-// `allowance`, endAllowance's figure; a path built by hand without one takes
-// a cable with no media's).
-export function pathLength(path) {
+// A path's length, as routedLength gives it, in metres: `value`, the stock
+// size chosen; `need`, what a cord of that size must at least be; and
+// `measured`, the need and the end play at both ends, which is the figure a
+// routed length was before version 4 and is still what two lays are compared
+// by. `values` is what the cable's slack entries state, which the size has
+// to hold too. The path carries its cable's media and what is inside each
+// port (routePath's `media` and `allowance`); a path built by hand without
+// them takes a cable with no media's.
+export function pathLength(path, {values = 0} = {}) {
   if (!path) return null;
-  const pts = path.points;
-  let mm = 0;
-  for (let k = 1; k < pts.length; k++) mm += dist(pts[k - 1], pts[k]);
-  const end = typeof path.allowance === 'number' ? path.allowance : endAllowance(null);
-  const measured = mm / 1000 + 2 * end;
-  return {measured, value: stockLength(measured)};
+  const cable = {media: path.media};
+  const base = pathMetres(path) + 2 * (typeof path.allowance === 'number' ? path.allowance : endAllowance(cable));
+  const value = chooseStock(s => base + shortTolerance(cable, s), values);
+  const need = base + shortTolerance(cable, value);
+  return {measured: need + 2 * END_PLAY_M, value, need};
 }
-export const routedLength = (rack, cable, ctx) => pathLength(routePath(rack, cable, ctx));
+export const routedLength = (rack, cable, ctx) => pathLength(routePath(rack, cable, ctx), {values: slackValues(cable)});
+
+// A length in metres, or null: only metres and feet convert.
+const M_PER = {m: 1, ft: 0.3048};
+export const toMetres = (value, unit) => (typeof value === 'number' && Number.isFinite(value) && Object.hasOwn(M_PER, unit ?? 'm')
+  ? value * M_PER[unit ?? 'm'] : null);
+// What the slack entries of a cable state, added up, in metres.
+export const slackValues = cable => (Array.isArray(cable?.slack) ? cable.slack : [])
+  .reduce((sum, e) => sum + (toMetres(e?.value, e?.unit) ?? 0), 0);
+// THE FACE A CABLE IS PINNED TO on one tray, from its `lay` list as the file
+// has it: `top` or `underside`, named in the frame of the part, or null. The
+// list is kept as written, so anything in it that is no such entry is
+// passed over. `position` is kept and not acted on.
+export function layFaceOf(cable, {item, via}) {
+  if (!Array.isArray(cable?.lay)) return null;
+  const e = cable.lay.find(x => x && typeof x === 'object' && x.item === item && x.via === via);
+  return e && (e.face === 'top' || e.face === 'underside') ? e.face : null;
+}
+
+// THE SPARE OF A CABLE: {need_m, stock_m, spare_m, end_play_m, to_store_m,
+// pinned}, or null without a path. It measures the path it is given and
+// never reads a saved number but a length the user pinned (any source but
+// `routed`), which is the stock then; a pinned length in a unit that does
+// not convert, or one kept as written, gives null.
+export function spareOf(rack, cable, ctx) {
+  let path = null;
+  try { path = routePath(rack, cable, ctx); } catch { path = null; }
+  if (!path || cable.lengthAsWritten != null) return null;
+  const pinned = !!cable.length && cable.length.source !== 'routed';
+  const stock = pinned ? toMetres(cable.length.value, cable.length.unit) : pathLength(path, {values: slackValues(cable)})?.value;
+  if (stock == null) return null;
+  const need = needOf(path, cable, stock), spare = stock - need;
+  return {need_m: need, stock_m: stock, spare_m: spare, end_play_m: Math.max(0, Math.min(spare, 2 * END_PLAY_M)),
+          to_store_m: Math.max(0, spare - 2 * END_PLAY_M), pinned};
+}
 
 // Every ring a cable's route would enter and leave by one face, rack-wide,
 // with a sentence for each: what the page and an agent report. A cable whose
@@ -1582,7 +1685,7 @@ export function bodyFindings(rack, ctx, nameOf = id => id) {
 export const DIAMETERS = {cat6: 6.0, cat6a: 7.5, os2: 3.0, om3: 3.0, om4: 3.0, om5: 3.0, dac: 5.0, aoc: 3.0};
 const UNSET_D = 6.0;
 export const FILL_LIMIT = 0.4;
-const areaOf = media => Math.PI * ((DIAMETERS[media] ?? UNSET_D) / 2) ** 2;
+const areaOf = media => Math.PI * ((ownMedia(DIAMETERS, media) ?? UNSET_D) / 2) ** 2;
 
 // Every pathway with an aperture that a cable passes through, filled against
 // FILL_LIMIT of its opening. Lanes have no limit and are not listed.
@@ -1663,16 +1766,19 @@ export function capacityOver(rack, ctx) {
 // an entered length is the user's and is never touched, nor is one the user
 // wrote that the page could not read (lengthAsWritten): that intent wins. Returns the same rack
 // when nothing changed, so the page can tell whether to save.
+// BESIDE A ROUTED LENGTH THE KIT WRITES `need` (version 4), to a centimetre,
+// and no longer writes `measured`, which a cable loses at its next measure:
+// no saved number changes its meaning under its old name.
 export function withRoutedLengths(rack, ctx) {
   let changed = false;
   const cables = (rack.cables || []).map(c => {
     if (c.lengthAsWritten != null || (c.length && c.length.source !== 'routed')) return c;
     const got = routedLength(rack, c, ctx);
     if (!got) return c;
-    const measured = Math.round(got.measured * 100) / 100;
-    if (c.length?.value === got.value && c.length?.measured === measured) return c;
+    const need = Math.round(got.need * 100) / 100;
+    if (c.length?.value === got.value && c.length?.need === need && !('measured' in c.length)) return c;
     changed = true;
-    return {...c, length: {value: got.value, unit: 'm', source: 'routed', measured}};
+    return {...c, length: {value: got.value, unit: 'm', source: 'routed', need}};
   });
   return changed ? {...rack, cables} : rack;
 }

@@ -13,7 +13,10 @@ import {RU} from '../../../kit/rack/rails.js';
 import * as F from './route-direct-fixture.mjs';
 
 const r15 = 1.5;                                   // an OM4 cord's radius
-const BASE = 40 * RU + 3.0;                        // the floor of U41, what each ring stands on
+// A body is centred in its span (fit.js itemBox): the lacer is 44 mm in a
+// 44.45 mm unit, so it stands 0.225 mm above the bottom of its unit.
+const LIFT = (RU - 44) / 2;
+const BASE = 40 * RU + LIFT + 3.0;                 // the floor of the lacer in U41, what each ring stands on
 const near = (a, b, what, tol = 1e-6) => assert.ok(Math.abs(a - b) <= tol, `${what}: ${a}, want ${b}`);
 const isRing = s => /^ring\//.test(s.part);
 const dist = (p, b) => Math.hypot(Math.max(b.x0 - p.x, 0, p.x - b.x1), Math.max(b.y0 - p.y, 0, p.y - b.y1),
@@ -177,11 +180,11 @@ test('every ring is entered from an approach point, and no detour ends at the ri
   // approach points stands the bend radius (25 mm) from the band or more;
   // but for two before ring 4: c7's, 6.5 mm from it, which the cord comes
   // down to from over the ring with 50 mm of leg (at 25 mm it would be led
-  // 65 mm back along the leaf's face to reach it); and c16's, 12 mm from it,
+  // 65 mm back along the leaf's face to reach it); and c16's, 12.5 mm from it,
   // where the detour round the tray's edge has its room with the point 21.5
   // mm to the ring's side of the port, and would need it 55 mm out on the other
   assert.equal(offs.length, 32);
-  assert.deepEqual(offs.filter(v => v < 25 - 1e-6).map(v => Math.round(v * 10) / 10), [6.5, 12]);
+  assert.deepEqual(offs.filter(v => v < 25 - 1e-6).map(v => Math.round(v * 10) / 10), [6.5, 12.5]);
   // ten detours (thirteen before #973, when five upper cords went over
   // their ring: four are led square to its approach point now, and c7
   // still goes over it)
@@ -219,7 +222,7 @@ test('a leg that grazes a ring crosses it, and the finding names the part', () =
   assert.deepEqual(S.legCrossings({x: -30, y, z: leg.z1 + r15}, {x: 30, y, z: leg.z1 + r15}, solids, {diameter: 3}), []);
   // and a plate is still met by the centre line: a cord lying on the floor
   // in front of the rings crosses nothing
-  const top = 40 * RU + 3.0;
+  const top = 40 * RU + LIFT + 3.0;
   assert.deepEqual(S.legCrossings({x: -150, y: top + 1, z: 60}, {x: 150, y: top + 1, z: 60}, solids, {diameter: 3}), []);
   // a leg that ends inside a ring cannot be gone round, and its finding
   // names the part: c9 with its panel end's plug reaching 107 mm out at x 0,
