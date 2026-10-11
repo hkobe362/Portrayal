@@ -7,32 +7,60 @@ about it while the package is at 0.x.
 | Number | Where it appears | What it versions |
 |---|---|---|
 | `format` | every device manifest, component contract, listing and lab (`format: 1`) | the **file format** a manifest is written in |
-| schema `v1` | the schema `$id`s and titles in `spec/schemas/` (device, component, listing and lab; the marked-up drawing; and the rack file) | for the manifest schemas, the same thing, named: schema v1 *is* format 1. `marks.schema.json` is v1 of the marked-up drawing, whose own key is `v` (1). `rack.schema.json` was first published under `/v1/`, describing rack file `version` 2; it now describes `version` 3 and is published under `/v2/`, the next unused label, never under its rack version number (below) |
+| schema `v1` | the schema `$id`s and titles in `spec/schemas/` (device, component, listing and lab; the marked-up drawing; and the rack file) | for the manifest schemas, the same thing, named: schema v1 *is* format 1. `marks.schema.json` is v1 of the marked-up drawing, whose own key is `v` (1). `rack.schema.json` was first published under `/v1/`, describing rack file `version` 2, then under `/v2/` for `version` 3; it now describes `version` 4 and is published under `/v3/`, the next unused label, never under its rack version number (below) |
 | package | `version` in `pyproject.toml` (0.2.0) | the **tools**: the linter, the compiler, the indexers and the exporter |
 | rack catalogue `format` | `rack.json` (`format: 1`) | the **catalogue** a rack tool reads in one fetch; its own number, apart from the manifests' `format` |
-| rack file `version` | the Rack Builder's file (`format: "portrayal-rack"`, `version: 3`) | the **rack file** a user saves; `parseDoc` migrates an older one on load |
+| rack file `version` | the Rack Builder's file (`format: "portrayal-rack"`, `version: 4`) | the **rack file** a user saves; `parseDoc` migrates an older one on load |
 | `contract` | `devices.json` (`contract: 2` at 0.1.0 and at 0.2.0) | the **published build** a consumer reads from `library/dist/`; `CHANGELOG.md` records each one |
 
 Each schema's `$id` is a URL under `https://portrayal.dev/schemas/`, one file
 per schema: `device.schema.json`, `component.schema.json`,
 `listing.schema.json`, `lab.schema.json` and `marks.schema.json` under `/v1/`,
-and `rack.schema.json` under `/v2/`. A schema is served at its `$id` once the
+and `rack.schema.json` under `/v3/`. A schema is served at its `$id` once the
 site has published it, so an editor or a validator that follows the `$id`
 finds the schema it names. The device, component, listing and rack schemas
 are served there. The lab and marks schemas are new in 0.2.0 and are served
 from the site publish that follows the 0.2.0 tag; until then their `$id`s do
 not resolve. `rack.schema.json` describes
-the Rack Builder's own file (`format: "portrayal-rack"`, its own `version`, now 3), not a
+the Rack Builder's own file (`format: "portrayal-rack"`, its own `version`, now 4), not a
 manifest, so it is published as a schema of this repository but does not carry
 format 1. Its label is a publication label only; the rack file's own `version` is
 migrated on load by `parseDoc`, so each rack version is published under the next
 unused label rather than overwriting the one before: version 2 under `/v1/`, which
-stays as published, and version 3 (#921) under `/schemas/v2/rack.schema.json`,
-since no manifest format had taken `/v2/`. The label is never a rack version
+stays as published, version 3 (#921) under `/schemas/v2/rack.schema.json`,
+since no manifest format had taken `/v2/`, and version 4 under
+`/schemas/v3/rack.schema.json`. The label is never a rack version
 number, and a label once published is not reused. A new manifest format number is
-published beside the old one under the next label no schema has taken (`/schemas/v3/`
-now that the rack file holds `/v2/`); a published label is never reused for a
+published beside the old one under the next label no schema has taken (`/schemas/v4/`
+now that the rack file holds `/v3/`); a published label is never reused for a
 different format.
+
+### Rack file version 4
+
+One version for everything that had waited for one
+([`rack-file-v4-design.md`](rack-file-v4-design.md)). The migration from 3
+changes nothing but the number: a version-3 file opens as it was and is
+saved as version 4. **A page or kit that reads version 3 refuses a version-4
+file whole**, with its sentence, and does not open it in part.
+
+- **Additive keys.** Frame: `startU`, `setback`, `width`, `options`,
+  `holes.style: round`. Item: `setback`, `heldBy`, `roll`, `states`,
+  `readings`. Zero-U entry: `channel`, `heldBy: {parts}`, `swaps`, `fields`,
+  `states`, `readings`. Cable: `slack`, `lay`, `straps`; a routed length
+  holds `need` where it held `measured`. Bundle: `straps` takes `breakout`
+  and `anchors` beside `every`.
+- **A position is a number in steps of 0.5.** `ru: 12.5` is the upper half of
+  U12. This is the change an older reader cannot read past, and why the
+  version is bumped.
+- **A reader keeps what it does not know.** An unknown key on the document,
+  a rack, the frame, an item, a cable, a zero-U entry and a bundle is read,
+  kept and written back, so a later additive key needs no version.
+- **What was written and could not be used is kept beside what could:**
+  `slackAsWritten`, `readingsAsWritten`, and a cable `length` as written.
+- **The exports.** The cable schedule has three more columns after `notes`:
+  `spare`, `stored` and `straps`. A NetBox device row carries a half
+  position; a Nautobot one is written at the whole unit with a comment.
+  Neither import takes a starting unit, so both count from 1.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,

@@ -419,6 +419,11 @@ both.
 
 ## 8. The rack
 
+**The setback of this note is built as rack file version 4.** [rack-file-v4-design.md](rack-file-v4-design.md) section 7
+has `setback` on a frame and on an item, the order it is found in (item,
+the default ear position of the device, frame, flush), and how fit and the
+routes follow it.
+
 ### 8.1 How the position comes back
 
 The Rack Builder opens the item in the Explorer with the `fields` of the item,

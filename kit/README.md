@@ -317,6 +317,23 @@ there, and `strapTotals(rack, ctx)` is what the rack buys. A page draws a
 band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
 {anchors})` so that single cables count.
 
+The exports take what the routes know from the page. `cableScheduleRows`
+fills `spare` and `stored` from `{spare: spareExports(rack, ctx)}` and its
+last column, `straps`, from `{straps: strapTexts(rack, ctx)}`, a Map of
+cable id to the tray, the face and the tie slots a single cable is strapped
+at. `cableBomNotes(rack, ends, {spare})` adds the one line that totals the
+spare, and `drawioCables(rack, {spare, ...})` gives each cable with a
+length its `spare`, which `kit/drawio.js` writes after the length in the
+edge label. `deviceImportRows({statesOf, ...})` writes what is set off in
+the comment of each row, when `statesOf(entry)` answers `statesFor` for it.
+`rollNote(item)` is the sentence of a rolled item and `offNote(states)` the
+line of what is off; `hungText(rack, entry, chassisOf)` in `rack/zero-u.js`
+is where a part hung on brackets is, as an export words it.
+
+`cable.lay` pins how a cable lies in a pathway (`lay` on the cable), and
+`layFaceOf(cable, {item, via})` in `rack/route.js` is the face the file pins
+on a tray, which a route reads before `ctx.trayFaceOf`.
+
 `holderOf(item)` in `rack/model.js` is the id of the item that holds one on
 a shelf or a rail (`heldBy`), or null, and `isHeld(item, chassisOf)` in
 `rack/fit.js` says whether a held item is one the kit does not check: a page
@@ -328,8 +345,10 @@ Of the names these modules export, a page draws and calls with: `unitsOf`,
 `uText`, `firstU`, `rollOf`, `ROLLS`, `holderOf` (`rack/model.js`);
 `holesIn` (`rack/rails.js`); `freeUs` (`rack/queries.js`); `needOf`,
 `shortTolerance`, `spareOf`, `stockLength`, `END_PLAY_M`, `BREAK_TOL_M`,
-`UNPLACED_WARN_M` (`rack/route.js`); `slackOf`, `storedText`,
-`slackFindings`, `spareLine`, `spareExports` (`rack/slack.js`); `strapKinds`,
+`UNPLACED_WARN_M`, `layFaceOf` (`rack/route.js`); `slackOf`, `storedText`,
+`slackFindings`, `spareLine`, `spareBomLine`, `spareExports`
+(`rack/slack.js`); `rollNote`, `offNote` (`rack/export-data.js`);
+`hungText` (`rack/zero-u.js`); `strapTexts`, `strapKinds`,
 `anchorsOf`, `strapTotals`, `STRAP_WIDTHS_MM`, `BREAKOUT_MM`,
 `BREAKOUT_MERGE_MM`, `BREAKOUT_GROUP_MM`, `BREAKOUT_TWO_MM` (`rack/bundles.js`); `configFacts`,
 `meteringOf` (`rack/catalog.js`); `statesFor`, `readingsFor`, `stateNotices`
@@ -359,7 +378,7 @@ truth: edit these modules here. portrayal-site vendors
 `kit/rack/*.js` read-only, and its contract check refuses a copy that has
 drifted. The rules these modules follow are stated in their own comments,
 and the rack file format in [`docs/format-stability.md`](../docs/format-stability.md)
-and `schemas/v2/rack.schema.json`.
+and `schemas/v3/rack.schema.json`.
 
 ### The catalogue
 
@@ -860,8 +879,14 @@ repairs `parseDoc` makes to bundles come back through
 `parseDoc(input, { notes })`; hand the same array to `editor.loadDoc(doc, { notes })`
 and they are its first `findings`.
 
+**The rack file is version 4 from the release that carries it.** A version-3
+file opens as it was and is saved as version 4, which a page or kit that
+reads version 3 refuses whole. What the version holds is in
+[`docs/format-stability.md`](../docs/format-stability.md) and
+[`docs/rack-file-v4-design.md`](../docs/rack-file-v4-design.md).
+
 A rack file is described by
-[`rack.schema.json`](https://portrayal.dev/schemas/v2/rack.schema.json), rack file `version` 3.
+[`rack.schema.json`](https://portrayal.dev/schemas/v3/rack.schema.json), rack file `version` 4.
 
 ## Exporting to draw.io and OmniGraffle
 

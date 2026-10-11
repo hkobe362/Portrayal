@@ -1,9 +1,11 @@
 # Rack file version 4: one version for everything held back
 
-Status: **decided 2026-10-11**; the build is under way on one held branch
-(parts 1 to 4 of section 9). What the build read more narrowly than this note
-says, or had to choose where it was silent, is in section 13, and waits for a
-person to confirm. Issues #935 (the scope, decided 2026-10-10), #970,
+Status: **decided 2026-10-11**; all eleven parts of section 9 are built, on
+one held branch. No import was tried on a running NetBox or Nautobot. What
+the build read more narrowly than this note says, or had to choose where it
+was silent, is in section 13, and waits for a person to confirm. The kit
+release that carries it is a minor one, 0.22.0 after 0.21.0; the branch
+does not bump the version. Issues #935 (the scope, decided 2026-10-10), #970,
 #949 (step 4), #934, #939, #972, with #983, #986, #1007, #966 and #908 read
 beside them. The thirteen questions it raised were each decided as it
 recommended and are recorded in section 10, with the options not taken.
@@ -1279,7 +1281,7 @@ and the kit suite runs at the end of each.
 | 6 | **Zero-U: `swaps`, `fields`, `states`, `readings`, `heldBy`.** Overlap as decision 12 says; `zerou.hang`; `bracketPositions`; the state and reading settle step and commands. | A PDU hung on two brackets 35U apart fits; 34U apart is refused with the sentence and the distance. Moving a bracket moves the PDU. A state the part does not declare is kept, not applied, and named. A reading with no `source` moves to `readingsAsWritten`. An outlet state reaches its lamp path in the map handed to a drawing. |
 | 7 | **Lengths and the slack record.** `readCables` normalising `slack` (3.3), `needOf`, `shortTolerance`, `spareOf`, `END_PLAY_M`, `BREAK_TOL_M`, `slackOf`, `storedText`, `cable.slack` and its refusals, `spare-unplaced`. No geometry. | On the reference rack of #949: every stock size before and after, with only the cords within 10 mm over a break changing, each named. A copper cord at each stock size: need unchanged to 5 m, 20 mm more at 7 m. For every cable, need plus spare equals stock, and end play plus what is to store equals spare. Each row of the table of 3.6 has a case asserting its text. Each refusal of 3.5 has a case. A bad `form`, a negative `value`, two entries with no value, an unknown `end` and a `slack` that is no list each load with the usable part kept and `slackAsWritten` holding what was written, and save unchanged. `inspect` gives `said: false` for no key and `said: true` for `[]`. `routePath` returns the same points with and without a `slack` entry. The #986 sample script reports no more cables differing by direction than before (38). |
 | 8 | **Straps.** `kind` on each strap, breakout and anchor straps, the `straps` keys on bundle and cable, `readBundles` and the `STRAPS` schema. | A bundle of four with one cable leaving mid-trunk: a breakout strap 25 mm each side of the peel, and the same set when the bundle is written end for end. Two peels 60 mm apart share the outer straps. A spacing strap 40 mm from a peel serves and none is added. A trunk over the FHD-CMP5DR tray gets one anchor at the nearest tie slot. Peels at 0, 60 and 130 mm are one group from either end. `{breakout: false}` alone survives a round trip and turns breakouts off. A version-3 bundle with `every: null` has no strap of any kind after migration. `bundle.update` with one key leaves the others. The BOM count equals the three kinds summed. |
-| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. |
+| 9 | **Exports.** Positions in halves, the Nautobot rule, the hardware count, `spare` and `stored`, outlet states, the comments for roll, brackets and held items, the bend lines of #1007. **Owed from part 5:** until this part a quarter-turned item is exported at the position its rolled box starts at, with no comment saying it is rolled. | Golden files for both DCIM kits with two half-unit items in one unit, on a bottom-up and a top-down frame. The schedule header ends `..., status, notes, spare, stored, straps`. **On running instances:** both device files import whole with two half-unit devices in one unit; NetBox shows the upper at 12.5; the outlet states arrive by CSV or, failing that, by the script, and the test records which. **None of these was tried** (section 13, items 44 and 47). |
 | 10 | **Queries and agent output.** `describe`, `inspect`, `fitsAt`, the command table. | The agent command schema validates each new argument. `inspect` of a cable shows `stored`, `at_ends_m` and `unplaced_m`. |
 | 11 | **Docs and release.** `format-stability.md`, the four notes of the header amended to point here (the 42 m figure of the cable lay note among them), the kit minor version, the changelog fragment naming each one-way item. | Preflight and the docs tests. |
 
@@ -1469,6 +1471,9 @@ one-way.
 | `strapBomRows(bundles)` counts single cables only when handed `{anchors: anchorsOf(rack, ctx)}` | kit API | a page that does not pass them leaves their straps out |
 | the comment line of what is set off, in both device files, naming parts by path | DCIM exports | section 13, item 44 |
 | the comment of a PDU on brackets and the note of one, worded by `hungText` | DCIM exports, BOM notes | a reader that matches "beside the rack at" for every part beside it |
+| the `straps` column of the cable schedule, after `stored` | download format | the schedule has 20 columns where main has 17; a reader that checks the count |
+| `cable.lay`, and the face the file pins read before a page's own pin | kit command, routes | agent sessions call it by name; a rack with a `lay` face routes by it on every page |
+| `notes` on `inspect` of an item, `lay` on `inspect` of a cable | kit output | agents read them |
 
 **That the scope fixed before any of those decisions:**
 

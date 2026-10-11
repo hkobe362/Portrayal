@@ -1,7 +1,9 @@
 ### Added
-- Rack file version 4, the format and half-unit positions (#935, #970), the
-  first parts of the build of `docs/rack-file-v4-design.md`. On a held
-  branch: nothing here is released until the whole version is.
+- Rack file version 4 (#935, #970, #949, #934, #939, #972), the build of
+  `docs/rack-file-v4-design.md`, whose section 11 lists every one-way item
+  and section 13 everything the build had to choose. It calls for a minor
+  kit release. No import was tried on a running NetBox or Nautobot: each
+  column was read against the import form at the commit the note cites.
   `kit/rack/model.js` reads and writes `version` 4 with an identity migration
   from 3, and the schema is `spec/schemas/rack.schema.json` under
   `/schemas/v3/`. An item `ru` is a number in steps of 0.5. A reader keeps a
@@ -83,10 +85,40 @@
   `anchorsOf`, `strapTotals` and the breakout distances. Each strap also
   carries `width_mm`, one of `STRAP_WIDTHS_MM` (12, 19 and 25): 19, 25 for
   a pack 25 mm across or more, and the narrowest that fits in a tight gap.
+- `cable.lay {id, at: {item, via}, position?, face?}` pins how a cable lies
+  in a pathway, as `lay` on the cable. The routes act on `face` (`top` or
+  `underside` of a tray, as the part names its own), reading the file
+  before a page's own pin (`layFaceOf` in `rack/route`); `position` is kept
+  for when lay order is built. `inspect` of a cable shows `lay`.
+- `inspect` of a device whose height is no whole number of units carries
+  `notes`, with the sentence that its ear holes are not checked.
+- The exports of version 4. `strapTexts` in `rack/bundles` gives the cable
+  schedule its `straps` column: the tray, the face by role and by name and
+  the tie slots of a single cable. `spareBomLine` in `rack/slack` is the
+  one BOM note that totals the spare, and `spareExports` carries it as
+  `bom`; `cableBomNotes` and `drawioCables` take `{spare}`, and a draw.io
+  edge label states the spare after the length ("1 m, 0.58 m spare"), the
+  length attribute staying the length. Both device imports say in the
+  comment that an item is mounted upside down or rotated a quarter turn
+  (`rollNote`, which `mountNotes` writes too), what a PDU hangs on
+  (`hungText` in `rack/zero-u`: "0U, on 2 FS-PDUBK brackets at left-rear,
+  from U4"), and, when `deviceImportRows` is handed `statesOf`, what is set
+  off (`offNote`: "Outlets off: outlet-a2, outlet-a7."). The NetBox outlet
+  import takes no status column, so the states are a comment in both
+  files. A reading is in neither.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file
-  opens unchanged and is saved as version 4.
+  opens unchanged and is saved as version 4. The other one-way items, each
+  under its own heading below or above: positions in halves in every
+  export; where a body stands in its span; the stock sizes the 10 mm
+  tolerance moves; `need` written where `measured` was; the Nautobot order
+  and its comments; unknown keys kept; the strap kinds, widths and count
+  and the wording of the BOM strap line; the hardware count; zero-U overlap
+  in millimetres; the three schedule columns; the comments of a rolled
+  item, of a PDU on brackets and of what is set off; `cable.lay` and the
+  face of the file read before a page's pin; and the kit names a page
+  calls, `span` among them, which is removed.
 - Fit judges half units. A 1U item is refused over the top half of a 1.5U or
   3.5U item, where it was allowed; a rack opened with such a pair keeps both
   and says so. A device of a whole number of units is refused at a half
@@ -132,9 +164,9 @@
   the dressing as `endAllowance` less the table now gets 0. The end play is
   `END_PLAY_M`, and `spareOf(rack, cable, ctx)` gives every length of a
   cable. `pathLength().measured` is unchanged in value.
-- **The cable schedule gains two columns, a download-format change:**
-  `spare` and `stored`, appended after `notes`, so no column read by
-  position moves. A reader that checks the column count has to take 19
+- **The cable schedule gains three columns, a download-format change:**
+  `spare`, `stored` and `straps`, appended after `notes`, so no column read
+  by position moves. A reader that checks the column count has to take 20
   where there were 17.
 - The slack `inspect` gives for an entered length is the spare, which is
   0.2 m more than it read: the end play is now spare and not need.
