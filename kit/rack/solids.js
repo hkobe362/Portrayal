@@ -41,7 +41,7 @@
 
 import {RU, SIDES} from './rails.js';
 import {zeroUOf, zeroUBottom} from './model.js';
-import {isZeroUPart, railOf, itemBox} from './fit.js';
+import {isZeroUPart, railOf, itemBox, setbackOf} from './fit.js';
 import {zeroUX, faceOfAt, carriesLane} from './zero-u.js';
 
 // mm a detour keeps clear of a body, beyond the cable's own radius: the figure
@@ -86,7 +86,10 @@ function placer({cx, w, y0, h, zFront, outward, mirror, flipY}) {
 function itemPlacer(rack, it, c) {
   const f = rack.frame, rear = it.face === 'rear', turned = !!it.turned;
   const w = num(c.w), h = num(c.h), d = num(c.d);
-  const plane = rear ? -railDepthOf(f) : 0;
+  // its faceplate stands its setback behind the rail, into the rack (0 for a
+  // part on the rail face)
+  const s = setbackOf(rack, it, () => c);
+  const plane = rear ? -railDepthOf(f) + s : 0 - s;
   // A rack-face part has its mounting face on the rail plane and its body
   // outward; a rack device's body runs between the rails (rack3d.js, route.js
   // pointOf).

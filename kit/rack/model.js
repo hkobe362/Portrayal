@@ -40,12 +40,31 @@ export const MIGRATIONS = [d => ({...d, version: 2}), d => ({...d, version: 3}),
 // not reported here: the schema reports it to anyone who validates.
 const unknownOf = (o, known) => Object.fromEntries(Object.entries(o && typeof o === 'object' && !Array.isArray(o) ? o : {})
   .filter(([k]) => !known.includes(k)).map(([k, v]) => [k, structuredClone(v)]));
-const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref'];
-const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side'];
+const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref', 'startU', 'setback', 'width'];
+const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback'];
 const RACK_KEYS = ['id', 'name', 'frame', 'items', 'zeroU', 'cables', 'dcim', 'bundles'];
 const DOC_KEYS = ['format', 'version', 'id', 'racks'];
 // The rail hole styles. `round` (version 4) is an unthreaded round hole.
 export const HOLE_STYLES = ['square', 'tapped', 'round'];
+// THE OPTIONAL NUMBERS OF VERSION 4, each written only when it says something
+// and left out otherwise, so a frame or an item never given one saves as it
+// was. `startU`: the number of the first unit, a whole number from 1 (absent
+// is 1). `setback`: millimetres a faceplate stands behind its rail, into the
+// rack from the face it is on; negative is proud. `width`: the rail width in
+// inches (absent is 19). A value that is none of these is dropped, as a bad
+// thread is. `options` on a frame and `heldBy` on an item are kept as written.
+const finite = v => typeof v === 'number' && Number.isFinite(v);
+const startUOf = v => (Number.isInteger(v) && v >= 1 ? {startU: v} : {});
+const setbackOf = v => (finite(v) ? {setback: v} : {});
+const widthOf = v => (finite(v) && v > 0 ? {width: v} : {});
+export const firstU = frame => (Number.isInteger(frame?.startU) && frame.startU >= 1 ? frame.startU : 1);
+export const RAIL_WIDTH_IN = 19;
+export const railWidth = frame => (finite(frame?.width) && frame.width > 0 ? frame.width : RAIL_WIDTH_IN);
+// WHAT HOLDS AN ITEM that is not bolted to the rails itself (`heldBy`): the id
+// of its host item, or null. The key is kept whatever its shape; this is what
+// the kit acts on.
+export const holderOf = item => (item?.heldBy && typeof item.heldBy === 'object' && !Array.isArray(item.heldBy) && typeof item.heldBy.item === 'string' && item.heldBy.item
+  ? item.heldBy.item : null);
 
 const RAIL_DEPTH = 740;        // mm between front and rear rails: a common 4-post
 const USABLE_BEYOND = 260;     // mm a four-post allows past its rear rail by default
@@ -68,6 +87,7 @@ export function normalizeFrame(f = {}) {
     usableDepth: Number(f.usableDepth) > 0 ? Number(f.usableDepth)
       : four ? railDepth + USABLE_BEYOND : TWO_POST_USABLE,
     ref: f.ref ?? null,
+    ...startUOf(f.startU), ...setbackOf(f.setback), ...widthOf(f.width),
   };
 }
 
@@ -191,8 +211,10 @@ export const withDcim = (rack, patch) => {
   return !rack.dcim && !Object.keys(next).length ? rack : {...rack, dcim: next};
 };
 
-// U numbers are stored bottom-up always; this is only what a label says.
-export const uLabel = (frame, u) => (frame.numbering === 'top-down' ? frame.heightRU - u + 1 : u);
+// U numbers are stored bottom-up from 1 always; this is only what a label
+// says: counted the way the frame counts, from the number its first unit has
+// (`startU`, absent is 1).
+export const uLabel = (frame, u) => firstU(frame) - 1 + (frame.numbering === 'top-down' ? frame.heightRU - u + 1 : u);
 // A DEVICE'S U, wherever it is named with one: its POSITION, the lowest-numbered
 // half unit it fills, counted the way this frame counts - what a DCIM calls a
 // device's position, in steps of 0.5. `ru` is its bottom as stored and `units`
@@ -200,8 +222,10 @@ export const uLabel = (frame, u) => (frame.numbering === 'top-down' ? frame.heig
 // itself, on a top-down one the half unit under its top edge. On a 42U top-down
 // frame a 0.5U item stored at 12 is at 31.5, and one stored at 12.5 is at 31.
 // A height that is missing (null, 0) counts as one unit, as it always did.
+// With `startU` it counts from there: a frame that starts at 5 has its bottom
+// unit at 5 bottom-up, and its top unit at 5 top-down.
 export const positionOf = (frame, ru, units = 1) =>
-  (frame.numbering === 'top-down' ? frame.heightRU + 2 - ru - (units > 0 ? units : 1) : ru);
+  firstU(frame) - 1 + (frame.numbering === 'top-down' ? frame.heightRU + 2 - ru - (units > 0 ? units : 1) : ru);
 // A position as a person reads it: "U12", "U12.5". It takes the height because
 // a top-down label of a half depends on it. uLabel stays for whole units
 // (lanes, managers, the rail numbers).
@@ -216,7 +240,7 @@ function readItem(i, n) {
   return {...unknownOf(i, ITEM_KEYS), id: String(i.id ?? ''), ref: i.ref, cfg: String(i.cfg ?? ''), label: String(i.label ?? i.ref),
           ru: i.ru, face: i.face === 'rear' ? 'rear' : 'front', turned: !!i.turned,
           swaps: {...(i.swaps || {})}, fields: structuredClone(i.fields || {}),
-          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side)};
+          ...hostOf({on: i.on == null ? undefined : String(i.on), unit: i.unit}), ...sideOf(i.side), ...setbackOf(i.setback)};
 }
 
 // The zero-U record as written, with an id given to each object entry that

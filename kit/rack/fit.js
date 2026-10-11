@@ -10,7 +10,7 @@
 // passes through, so there a U is never shared.
 
 import {RU} from './rails.js';
-import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES} from './model.js';
+import {uLabel, uText, isPosition, zeroUOf, zeroUBottom, zeroUOffset, SIDES, holderOf, railWidth, RAIL_WIDTH_IN} from './model.js';
 
 // ── HEIGHTS, SPANS AND BOXES (docs/rack-file-v4-design.md section 2.4) ─────
 // PUBLIC: unitsOf, spanOf, itemBox, spanText (kit/README.md). The other names
@@ -142,6 +142,58 @@ export const isRackMount = chassis => !chassis?.mount || chassis.mount === 'rack
 // two-post rails are one plane, so any body does.
 const between = f => (f.kind === 'two-post' ? 0 : f.railDepth);
 
+// ── SETBACK (docs/rack-products-design.md section 8) ───────────────────────
+// How far a faceplate stands behind the plane of its rail, in mm into the rack
+// from the face it is on; negative is proud. Found in this order: the item's
+// own `setback`; the device's default ear position in the catalogue
+// (`ears.default`: `-at`, or 0 when it is named `flush` and states no `at`);
+// the frame's `setback`; 0, flush. A part on the rail face or beside the rack
+// has none: it bolts to the rail, and is not between them.
+const finite = v => typeof v === 'number' && Number.isFinite(v);
+export function setbackOf(rack, item, chassisOf) {
+  const c = chassisOf(item.ref);
+  if (isRackFace(c) || isZeroUPart(c)) return 0;
+  if (finite(item.setback)) return item.setback;
+  const ear = c?.ears?.default;
+  if (ear && finite(ear.at)) return -ear.at;
+  if (ear?.name === 'flush') return 0;
+  return finite(rack.frame?.setback) ? rack.frame.setback : 0;
+}
+// How far the body reaches into the rack from the plane of its rail: its
+// setback and its depth.
+export const reachOf = (rack, item, chassisOf) => setbackOf(rack, item, chassisOf) + (chassisOf(item.ref)?.d ?? 0);
+const deep = (c, s) => `${mm(c.d)} mm deep${s ? `, set ${s > 0 ? 'back' : 'forward'} ${mm(Math.abs(s))} mm` : ''}`;
+
+// ── HELD ITEMS (docs/rack-file-v4-design.md section 7.1) ───────────────────
+// An item with `heldBy` is on a shelf, a drawer or a rail of another item. The
+// catalogue describes no host yet, so one that is not itself a rack device is
+// kept in step with its host, claims no unit, and is not checked; a rack
+// device standing on a shelf is fitted as any rack device is.
+export const isHeld = (item, chassisOf) => holderOf(item) != null && !isRackMount(chassisOf(item.ref));
+export const heldBy = (rack, hostId, chassisOf) => rack.items.filter(i => holderOf(i) === hostId && isHeld(i, chassisOf));
+export const uncheckedText = (item, host, chassisOf) =>
+  `${item.id} is held by ${host.id}, and ${nameOf(chassisOf(host.ref), host.ref)} states no rail to hold a device, so it is not checked.`;
+export const unheldText = item => `${item.id} is held by ${holderOf(item)}, which is not in this rack: place it again, or free it.`;
+
+// WHAT A PAGE SAYS OF A RACK IT HAS OPENED (section 7): the keys this kit
+// keeps and does not yet act on, one sentence each.
+export function frameNotices(rack, chassisOf) {
+  const out = [], f = rack.frame;
+  if (railWidth(f) !== RAIL_WIDTH_IN)
+    out.push(`This rack states ${railWidth(f)} in rails; it is drawn and fitted as ${RAIL_WIDTH_IN} in.`);
+  for (const z of zeroUOf(rack))
+    if (typeof z.channel === 'string' && z.channel)
+      out.push(`${z.label || z.ref} names the channel ${z.channel}, which is not known for this frame, so it stands at ${z.at}.`);
+  for (const it of rack.items) {
+    const id = holderOf(it);
+    if (id == null) continue;
+    const host = rack.items.find(o => o.id === id);
+    if (!host) out.push(unheldText(it));
+    else if (isHeld(it, chassisOf)) out.push(uncheckedText(it, host, chassisOf));
+  }
+  return out;
+}
+
 // Every unit the part spans is judged, on its face and, for a narrow part on
 // one rail, on that rail only (#926). A `side` on a part that is not narrow is
 // no rail (railOf): it is judged across both, as it is drawn.
@@ -167,7 +219,7 @@ function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
       return {ok: false, reason: `${host.label} is on the ${host.face}; a manager on it goes on the ${host.face} too.`};
   }
   for (const o of rack.items) {
-    if (o.id === ignoreId) continue;
+    if (o.id === ignoreId || isHeld(o, chassisOf)) continue;
     const oc = chassisOf(o.ref);
     if (!oc || !spansMeet([lo, hi], spanOf(o, chassisOf))) continue;
     if (isRackFace(oc)) {
@@ -176,8 +228,8 @@ function fitsRackFace(rack, cand, c, chassisOf, {ignoreId = null} = {}) {
         return {ok: false, reason: `Taken by ${o.label} on the ${o.face}${rail ? `, ${rail} rail` : ''}.`};
       continue;
     }
-    if (o.face !== cand.face && oc.d > rd)
-      return {ok: false, reason: `${o.label} is ${mm(oc.d)} mm deep and reaches past the ${cand.face} rail; ` +
+    if (o.face !== cand.face && reachOf(rack, o, chassisOf) > rd)
+      return {ok: false, reason: `${o.label} is ${deep(oc, setbackOf(rack, o, chassisOf))} and reaches past the ${cand.face} rail; ` +
                                  `a ${cand.face} manager here would hit it.`};
   }
   return {ok: true};
@@ -217,27 +269,36 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
   if (isZeroUPart(c)) return no(`${nameOf(c, cand.ref)} stands beside the rack, not on its rails: place it with zerou.place.`);
   if (!isPosition(cand.ru)) return no('A position is a whole unit or a half unit, counted from 1.');
   if (isRackFace(c)) return fitsRackFace(rack, cand, c, chassisOf, {ignoreId});
+  // a held item: refused while its host is gone, and not checked on a host
+  // the catalogue says nothing of
+  if (holderOf(cand) != null) {
+    const host = rack.items.find(o => o.id === holderOf(cand));
+    if (!host) return no(unheldText(cand));
+    if (!isRackMount(c)) return {ok: true, unchecked: uncheckedText(cand, host, chassisOf)};
+  }
   const units = unitsOf(c), lo = cand.ru, hi = cand.ru + units;
+  const s = setbackOf(rack, cand, chassisOf), reach = s + c.d;
   if (lo < 1) return {ok: false, reason: 'Below U1.'};
   const half = halfRefusal(f, c, cand.ref, lo, units);
   if (half) return no(half);
   if (hi > f.heightRU + 1)
     return {ok: false, reason: `${units}U needed; ${f.heightRU - lo + 1}U free from U${lo} to the top.`};
-  if (c.d > f.usableDepth) return {ok: false, reason: `${mm(c.d)} mm deep; this rack allows ${mm(f.usableDepth)} mm.`};
+  if (reach > f.usableDepth) return {ok: false, reason: `${deep(c, s)}; this rack allows ${mm(f.usableDepth)} mm.`};
   for (const o of rack.items) {
-    if (o.id === ignoreId) continue;
+    if (o.id === ignoreId || isHeld(o, chassisOf)) continue;
     const oc = chassisOf(o.ref);
     if (!oc || !spansMeet([lo, hi], spanOf(o, chassisOf))) continue;
     if (isRackFace(oc)) {
-      if (o.face !== cand.face && c.d > between(f))
-        return {ok: false, reason: `${mm(c.d)} mm deep; it would reach past the ${o.face} rail into ${o.label}.`};
+      if (o.face !== cand.face && reach > between(f))
+        return {ok: false, reason: `${deep(c, s)}; it would reach past the ${o.face} rail into ${o.label}.`};
       continue;
     }
     if (o.face === cand.face) return {ok: false, reason: `Taken by ${o.label} on the ${o.face}.`};
     if (f.kind === 'two-post')
       return {ok: false, reason: `Taken by ${o.label}; two-post rails are shared by front and rear.`};
-    if (c.d + oc.d > f.railDepth)
-      return {ok: false, reason: `${mm(c.d)} mm deep; ${Math.max(0, mm(f.railDepth - oc.d))} mm free behind ${o.label}.`};
+    const other = reachOf(rack, o, chassisOf);
+    if (reach + other > f.railDepth)
+      return {ok: false, reason: `${deep(c, s)}; ${Math.max(0, mm(f.railDepth - other))} mm free behind ${o.label}.`};
   }
   return {ok: true};
 }
@@ -246,20 +307,21 @@ export function fits(rack, cand, chassisOf, {ignoreId = null} = {}) {
 // a ghost of the space it takes?
 export function reaches(item, rack, chassisOf) {
   if (rack.frame.kind === 'two-post') return true;
-  return (chassisOf(item.ref)?.d ?? 0) >= rack.frame.railDepth - REACH_MM;
+  return reachOf(rack, item, chassisOf) >= rack.frame.railDepth - REACH_MM;
 }
 
 // The depth this item could have where it stands: what the other face leaves
-// on the U range it shares, or the rack's usable depth.
+// on the U range it shares, or the rack's usable depth, less its own setback.
 export function availableDepth(rack, item, chassisOf) {
   const f = rack.frame;
-  if (f.kind === 'two-post') return f.usableDepth;
+  const own = setbackOf(rack, item, chassisOf);
+  if (f.kind === 'two-post') return f.usableDepth - own;
   const mine = spanOf(item, chassisOf);
   const other = rack.items.filter(o => o.id !== item.id && o.face !== item.face
-                                       && !isRackFace(chassisOf(o.ref))
+                                       && !isRackFace(chassisOf(o.ref)) && !isHeld(o, chassisOf)
                                        && spansMeet(mine, spanOf(o, chassisOf)));
-  if (!other.length) return f.usableDepth;
-  return Math.min(f.usableDepth, f.railDepth - Math.max(...other.map(o => chassisOf(o.ref)?.d ?? 0)));
+  if (!other.length) return f.usableDepth - own;
+  return Math.min(f.usableDepth, f.railDepth - Math.max(...other.map(o => reachOf(rack, o, chassisOf)))) - own;
 }
 
 // Every item with the U height its chassis entry gives it (unitsOf: in halves,
@@ -278,12 +340,12 @@ export function overlapNotices(rack, chassisOf) {
   const out = [];
   for (const a of rack.items) {
     const ac = chassisOf(a.ref);
-    if (!ac || isRackFace(ac)) continue;
+    if (!ac || isRackFace(ac) || isHeld(a, chassisOf)) continue;
     const [lo, hi] = spanOf(a, chassisOf);
     if (Number.isInteger(hi)) continue;
     for (const b of rack.items) {
       const bc = chassisOf(b.ref);
-      if (b === a || !bc || isRackFace(bc) || b.ru !== Math.floor(hi) || b.ru <= lo) continue;
+      if (b === a || !bc || isRackFace(bc) || isHeld(b, chassisOf) || b.ru !== Math.floor(hi) || b.ru <= lo) continue;
       if (fits({...rack, items: [b]}, a, chassisOf).ok) continue;
       out.push(`${a.label} at ${uText(rack.frame, lo, hi - lo)} is ${hi - lo}U and reaches into U${uLabel(rack.frame, b.ru)}, where ${b.label} is.`);
     }
@@ -322,12 +384,16 @@ export function shrinkRack(rack, newHeight, chassisOf) {
   // a top edge of heightRU + 1 is the top of the rack
   const fitsUnder = top => top <= newHeight + 1;
 
-  if (rack.items.every(i => fitsUnder(topOf(i))))
+  if (rack.items.every(i => isHeld(i, chassisOf) || fitsUnder(topOf(i))))
     return {rack: withFrameHeight(rack.items), moved: [], removed: []};
 
   // Group items into clusters by meeting spans (union-find), face
   // ignored - that is exactly what keeps a front/rear pair together.
-  const items = rack.items;
+  // A held item that is no rack device is not a cluster of its own: it takes
+  // the shift of its host, and stays where it was when its host is dropped or
+  // is not in the rack.
+  const held = rack.items.filter(i => isHeld(i, chassisOf));
+  const items = rack.items.filter(i => !held.includes(i));
   const n = items.length;
   const parent = items.map((_, i) => i);
   const find = x => (parent[x] === x ? x : (parent[x] = find(parent[x])));
@@ -384,7 +450,11 @@ export function shrinkRack(rack, newHeight, chassisOf) {
   }
   const {shiftById, moved} = packed;
   const removedIds = new Set(removed.map(i => i.id));
-  const packedItems = items
+  for (const h of held) {
+    const shift = shiftById.get(holderOf(h));
+    if (shift) { shiftById.set(h.id, shift); moved.push(h.id); }
+  }
+  const packedItems = rack.items
     .filter(it => !removedIds.has(it.id))
     .map(it => (shiftById.get(it.id) ? {...it, ru: it.ru + shiftById.get(it.id)} : it));
   return {rack: withFrameHeight(packedItems), moved, removed};

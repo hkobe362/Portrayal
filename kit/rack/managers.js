@@ -4,7 +4,7 @@
 // `ru` always says where it is. Everything that moves a manager or its host
 // comes through here, so the two can never drift apart.
 
-import {fits, isRackFace, railOf, hostUnits, unitOn, hostedRu, fillOf} from './fit.js';
+import {fits, isRackFace, railOf, hostUnits, unitOn, hostedRu, fillOf, heldBy} from './fit.js';
 import {detached, uLabel} from './model.js';
 
 // The rack device on `face` that fills more of the whole unit `ru` than any
@@ -77,12 +77,17 @@ export function moveItem(rack, id, patch, chassisOf) {
     return f.ok ? {ok: true, rack: {...rack, items: rack.items.map(i => (i.id === id ? placed : i))}} : f;
   }
   const moved = new Map(managersOf(rack, id).map(m => [m.id, {...m, face: next.face, ru: hostedRu(next, m.unit)}]));
+  // what it holds goes with it too: an item on its shelf or rail takes its
+  // face and the unit its bottom is in, and its `heldBy` is unchanged
+  const carried = new Map(heldBy(rack, id, chassisOf).map(h => [h.id, {...h, face: next.face, ru: Math.floor(next.ru)}]));
+  for (const [k, v] of carried) moved.set(k, v);
   const after = {...rack, items: rack.items.map(i => (i.id === id ? next : moved.get(i.id) ?? i))};
   // The host is checked in the rack as it will be, so its own managers are
   // already beside it and not at their old places.
   const f = fits(after, next, chassisOf, {ignoreId: id});
   if (!f.ok) return f;
   for (const m of moved.values()) {
+    if (carried.has(m.id)) continue;         // not checked: nothing says how its host holds it
     const g = fits(after, m, chassisOf, {ignoreId: m.id});
     if (!g.ok) return {ok: false, reason: `${m.label} moves with it: ${g.reason}`};
   }

@@ -5,13 +5,13 @@
 // and {chassisOf} in, a new rack out - and says no with a sentence. One that
 // changes nothing hands back the very rack it was given, so a caller can tell.
 
-import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint,
+import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf,
         nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor} from './model.js';
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
         spacingText, DEFAULT_STRAPS} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
 import {ownRoute, pointOf, portPoint} from './route.js';
-import {fits, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU} from './fit.js';
+import {fits, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, heldBy} from './fit.js';
 import {whereText, zeroUName} from './zero-u.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey,
@@ -28,6 +28,9 @@ export const NOT_ADDED = 'The cable was not added because a device it ran to was
 export const CLEARED = 'Its swaps and fields were for the old configuration, so they were cleared.';
 export const ZERO_GONE = 'That part is no longer beside the rack.';
 export const BUNDLE_GONE = 'That bundle is no longer in the rack.';
+// A held item is kept and kept in step (docs/rack-file-v4-design.md 7.1), and
+// a new one cannot be placed until the catalogue describes what holds one.
+export const NO_HOSTS = 'The catalogue describes no host yet, so a device cannot be put on one; heldBy takes only null, which frees it.';
 
 const itemOf = (rack, id) => rack.items.find(i => i.id === id) || null;
 // An item command given the id of a part beside the rack: say which command
@@ -86,6 +89,7 @@ function move(rack, {id, ru, face}, {chassisOf}) {
   if (top) return top;
   const patch = {...(ru == null ? {} : {ru}), ...(face == null ? {} : {face})};
   if (Object.entries(patch).every(([k, v]) => it[k] === v)) return unchanged(rack);
+  if (holderOf(it) != null) return {error: `${it.id} is held by ${holderOf(it)}: move ${holderOf(it)}, or free it first.`};
   // Through managers.js: a manager is re-hosted by where it lands, and a host
   // takes its managers with it.
   const m = moveItem(rack, id, patch, chassisOf);
@@ -122,11 +126,28 @@ function patch(rack, {id, ...given}, ctx) {
   }
   const changes = Object.fromEntries(['cfg', 'swaps', 'fields', 'label', 'turned']
     .filter(k => k in p && !same(p[k], it[k]) && !(k === 'cfg' && !newCfg)).map(k => [k, p[k]]));
-  if (!Object.keys(changes).length) return findings.length ? {...unchanged(rack), findings} : unchanged(rack);
+  // SETBACK AND heldBy (version 4): null takes the key off the item. A larger
+  // setback is checked against the rack; a smaller one is never refused.
+  const drop = [];
+  if ('heldBy' in given) {
+    if (given.heldBy !== null) return {error: NO_HOSTS};
+    if ('heldBy' in it) drop.push('heldBy');
+  }
+  if ('setback' in given && (given.setback ?? null) !== (it.setback ?? null)) {
+    const {setback: _was, ...bare} = it;
+    const trial = given.setback == null ? bare : {...bare, setback: given.setback};
+    if (setbackOf(rack, trial, ctx.chassisOf) > setbackOf(rack, it, ctx.chassisOf)) {
+      const f = fits(rack, trial, ctx.chassisOf, {ignoreId: id});
+      if (!f.ok) return {error: f.reason};
+    }
+    if (given.setback == null) drop.push('setback'); else changes.setback = given.setback;
+  }
+  if (!Object.keys(changes).length && !drop.length) return findings.length ? {...unchanged(rack), findings} : unchanged(rack);
   const next = {...it, ...changes};
+  for (const k of drop) delete next[k];
   const had = Object.keys(it.swaps ?? {}).length || Object.keys(it.fields ?? {}).length;
   const has = Object.keys(next.swaps ?? {}).length || Object.keys(next.fields ?? {}).length;
-  return {rack: updateItem(rack, id, changes), summary: `Changed ${it.label}.`,
+  return {rack: {...rack, items: rack.items.map(i => (i.id === id ? next : i))}, summary: `Changed ${it.label}.`,
           findings: [...('cfg' in changes && had && !has ? [note(CLEARED)] : []), ...findings]};
 }
 
@@ -135,7 +156,11 @@ function remove(rack, {id, cables = 'keep'}) {
   if (!it) return goneItem(rack, id, 'remove');
   const k = cablesOf(rack, id).length, n = count(k, 'cable');
   const ms = managersOf(rack, id);
-  const stay = ms.length ? ` Its cable manager${ms.length === 1 ? '' : 's'} ${ms.map(m => m.label).join(', ')} stay${ms.length === 1 ? 's' : ''} on the rack.` : '';
+  // what it held stays where it was, naming a host that is gone, until it is
+  // placed again or freed (fit refuses it meanwhile)
+  const hs = rack.items.filter(i => holderOf(i) === id);
+  const stay = (ms.length ? ` Its cable manager${ms.length === 1 ? '' : 's'} ${ms.map(m => m.label).join(', ')} stay${ms.length === 1 ? 's' : ''} on the rack.` : '')
+    + (hs.length ? ` ${hs.map(h => h.label).join(', ')} ${hs.length === 1 ? 'was' : 'were'} held by it and stay${hs.length === 1 ? 's' : ''} where ${hs.length === 1 ? 'it was' : 'they were'}, held by nothing.` : '');
   if (cables === 'remove') {
     // through withoutCables, so a bundle never names a cable that is gone
     const {rack: next, said} = withoutCables(withoutItem(rack, id), cablesOf(rack, id).map(c => c.id));
@@ -387,7 +412,7 @@ function zeroUSaid({moved, removed}, chassisOf) {
 // and off it when they no longer fit; each is named.
 function frame(rack, p, ctx) {
   const r = frameItems(rack, p, ctx);
-  if (r.rack === rack) return r;
+  if (r.error || r.rack === rack) return r;
   const z = settleZeroU(r.rack, ctx.chassisOf);
   const said = zeroUSaid(z, ctx.chassisOf);
   return said ? {rack: z.rack, summary: `${r.summary} ${said}`, findings: [...r.findings, note(said)]} : r;
@@ -412,7 +437,15 @@ function frameItems(rack, p, {chassisOf}) {
     return {rack: next, summary: text + kept, findings: [note(text + kept)]};
   }
   const next = withFrame(rack, want);
-  return same(next.frame, rack.frame) ? unchanged(rack) : done(next, 'Changed the rack frame.');
+  if (same(next.frame, rack.frame)) return unchanged(rack);
+  // a larger rack setback is checked for every device it moves; a smaller one is never refused
+  if ((next.frame.setback ?? 0) > (rack.frame.setback ?? 0))
+    for (const it of next.items) {
+      if (setbackOf(next, it, chassisOf) <= setbackOf(rack, it, chassisOf)) continue;
+      const f = fits(next, it, chassisOf, {ignoreId: it.id});
+      if (!f.ok) return {error: `${it.label}: ${f.reason}`};
+    }
+  return done(next, 'Changed the rack frame.');
 }
 
 function rename(rack, {name}) {
@@ -814,12 +847,14 @@ export const COMMANDS = {
       face: FACE, ru: RU, label: {type: 'string', description: 'The name shown on the drawing; its model when left out.'}, as: AS})},
   move: {run: move, description: 'Move a device to another U and/or face. Its cable managers move with it; a cable manager moved onto a device bolts onto it.',
     args: args(['id'], {id: ID('device'), ru: RU, face: FACE})},
-  patch: {run: patch, description: "Change a placed device's configuration, label or turned state, or replace all of what is seated in it and all of its part settings at once. A new configuration on its own clears what was seated and set; to change one slot or one setting, use fit or field.",
+  patch: {run: patch, description: "Change a placed device's configuration, label, turned state or setback, or replace all of what is seated in it and all of its part settings at once. A new configuration on its own clears what was seated and set; to change one slot or one setting, use fit or field.",
     args: args(['id'], {id: ID('device'), cfg: {type: 'string', description: 'Which of its configurations; it keeps its own when left out.'},
       swaps: {type: 'object', description: 'Every slot path to the part ref seated there, replacing the whole map. A slot left out holds what its configuration builds.'},
       fields: {type: 'object', description: 'Every part path to its settings ({key: value}), replacing the whole map.'},
       label: {type: 'string', description: 'The name shown on the drawing.'},
-      turned: {type: 'boolean', description: 'true when mounted back to front.'}})},
+      turned: {type: 'boolean', description: 'true when mounted back to front.'},
+      setback: {type: ['number', 'null'], description: 'Millimetres its faceplate stands behind its rail, into the rack; negative is proud. null for the default of the device or the rack.'},
+      heldBy: {type: ['object', 'null'], description: 'null frees a device held on a shelf or a rail. Nothing else is taken yet.'}})},
   remove: {run: remove, description: 'Take a device out of the rack. Its cables are kept as loose ends, or removed with it; its cable managers stay on the rack.',
     args: args(['id'], {id: ID('device'), cables: {enum: ['keep', 'remove'], description: 'keep its cables as loose ends, or remove them; keep when left out.'}})},
   attach: {run: attach, description: 'Bolt an unattached cable manager onto the device at its U.',
@@ -831,10 +866,12 @@ export const COMMANDS = {
       heightRU: {type: 'integer', minimum: 1, maximum: 100, description: 'How many U tall, from 1 to 100.'},
       numbering: {enum: ['bottom-up', 'top-down'], description: 'Which way the U labels count.'},
       holes: {type: 'object', additionalProperties: false, description: 'The rail holes.',
-        properties: {style: {enum: ['square', 'tapped'], description: 'square or tapped.'},
+        properties: {style: {enum: ['square', 'tapped', 'round'], description: 'square, tapped or round.'},
                      thread: {enum: ['12-24', '10-32', 'M6', null], description: 'The thread of tapped holes.'}}},
       railDepth: {type: 'number', exclusiveMinimum: 0, description: 'Millimetres between the front and rear rails (four-post).'},
-      usableDepth: {type: 'number', exclusiveMinimum: 0, description: 'Millimetres from the front rail to the deepest point a device may reach.'}})},
+      usableDepth: {type: 'number', exclusiveMinimum: 0, description: 'Millimetres from the front rail to the deepest point a device may reach.'},
+      startU: {type: 'integer', minimum: 1, description: 'The number of the first unit, for a rack whose labels do not start at 1.'},
+      setback: {type: ['number', 'null'], description: 'Millimetres a faceplate stands behind its rail in this rack, for a device that states none; null for flush.'}})},
   rename: {run: rename, description: 'Rename the rack.', args: args(['name'], {name: {type: 'string', description: 'The new name.'}})},
   dcim: {run: dcim, step: false, description: 'Set the names a NetBox or Nautobot import needs: the site (or location) and the device role. Not an undo step.',
     args: args([], {site: {type: 'string', description: "NetBox's site, Nautobot's location."}, role: {type: 'string', description: 'The device role.'}})},

@@ -253,6 +253,16 @@ returns half positions for a device that may start on one. `rack/rails.js`
 has `holesIn(lo, hi)`, the rail holes an ear between two heights can use,
 for a page that draws ears.
 
+`setbackOf(rack, item, chassisOf)` is how far a faceplate stands behind its
+rail in mm: the item's own `setback`, else the default ear position the
+catalogue gives the device, else the frame's `setback`, else 0. A drawing
+moves a body back by it; fit and the routes already do. `frameNotices(rack,
+chassisOf)` gives a sentence for each key the kit keeps and does not yet act
+on (a rail width that is not 19 in, a zero-U `channel`, an item held by
+another), which the editor hands on as findings when a document is loaded.
+`firstU(frame)` in `rack/model.js` is the number of the first unit (`startU`,
+1 when absent); `uLabel` and `positionOf` count from it.
+
 `span`, the closed whole-unit pair `[ru, ru + u - 1]`, is gone: it cannot say
 half a unit. Use `spanOf`, and read its second number as the top edge.
 

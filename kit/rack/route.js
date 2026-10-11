@@ -14,7 +14,7 @@ import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY} from './fit.js';
+import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY, setbackOf} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -328,6 +328,14 @@ export function laneXAt(rack, lane, ru, chassisOf) {
   return s * (OPENING / 2 + RAIL_W + STANDOFF + (Number(chassisOf(p.ref)?.w) || 0) + LANE_GAP / 2);
 }
 const planeZ = (f, pane) => (pane === 'rear' ? -railDepthOf(f) : 0);
+// Where a panel of a rack device is, in depth: the one on the face it is
+// mounted on stands its setback behind that rail (fit.js setbackOf), and its
+// far panel the chassis depth beyond.
+function panelZ(rack, it, pane, ctx) {
+  const d = ctx.chassisOf(it.ref)?.d ?? 0, s = setbackOf(rack, it, ctx.chassisOf);
+  const own = it.face === 'front' ? 0 - s : -railDepthOf(rack.frame) + s;
+  return pane === it.face ? own : it.face === 'front' ? own - d : own + d;
+}
 
 export function pointOf(rack, w, ctx) {
   const f = rack.frame;
@@ -348,9 +356,7 @@ export function pointOf(rack, w, ctx) {
   const c = ctx.chassisOf(it.ref) || {};
   // A guide on a rack device's FAR panel is the chassis depth in, as portPoint puts a port there.
   const out = c.mount === 'rack-face' ? (c.d ?? 0) / 2 : 0;
-  const far = c.mount !== 'rack-face' && g.face !== it.face;
-  const d = c.d ?? 0;
-  const z = far ? (it.face === 'front' ? -d : -railDepthOf(f) + d)
+  const z = c.mount !== 'rack-face' ? panelZ(rack, it, g.face, ctx)
     : g.face === 'rear' ? planeZ(f, 'rear') - out : planeZ(f, 'front') + out;
   return {x: g.x, y: anchorY(rack, it, ctx.chassisOf), z};
 }
@@ -361,9 +367,8 @@ export function portPoint(rack, end, ctx) {
   // No port found on the drawing: no point, and so no length - never an invented x of 0.
   const x = ctx.portX(end);
   if (x == null) return null;
-  const f = rack.frame, d = ctx.chassisOf(it.ref)?.d ?? 0;
-  // On its own face a panel is at that rail; the far panel is the chassis depth away.
-  const z = pane === it.face ? planeZ(f, pane) : (it.face === 'front' ? -d : -railDepthOf(f) + d);
+  // On its own face a panel is at that rail, less its setback; the far panel is the chassis depth away.
+  const z = panelZ(rack, it, pane, ctx);
   return {x, y: ctx.portY?.(end) ?? anchorY(rack, it, ctx.chassisOf), z};
 }
 

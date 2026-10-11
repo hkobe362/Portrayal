@@ -6,7 +6,7 @@
 
 import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, unitsOf, spanText} from './fit.js';
 import {placement, managersOf} from './managers.js';
-import {uLabel, zeroUOf, zeroUBottom} from './model.js';
+import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
 import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText} from './cable-rules.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bodyFindings} from './route.js';
@@ -85,7 +85,7 @@ function findingsText(rack, ctx) {
 export function describe(rack, ctx, {section, offset, limit} = {}) {
   const {chassisOf} = ctx;
   const f = rack.frame;
-  const holes = f.holes.style === 'tapped' ? `tapped${f.holes.thread ? ` ${f.holes.thread}` : ''} holes` : 'square holes';
+  const holes = f.holes.style === 'tapped' ? `tapped${f.holes.thread ? ` ${f.holes.thread}` : ''} holes` : `${f.holes.style === 'round' ? 'round' : 'square'} holes`;
   const items = [...rack.items].sort((a, b) => b.ru - a.ru);
   const cables = rack.cables || [];
   // the parts beside the rack (#926), top down; counted only when there are any
@@ -95,18 +95,26 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
   const totals = `${rack.name} (${rack.id}): ${count(items.length, 'item')}, ` +
     `${beside.length ? `${count(beside.length, 'part')} beside the rack, ` : ''}${count(cables.length, 'cable')}` +
     `${bundles.length ? `, ${count(bundles.length, 'bundle')}` : ''}.`;
-  const frameLine = `${f.heightRU}U ${f.kind}, ${holes}, numbered ${f.numbering}.`;
+  // the optional frame keys, each said only when the frame has it
+  const optionText = o => (typeof o === 'string' ? o : o && typeof o === 'object' && typeof o.id === 'string' ? o.id : JSON.stringify(o));
+  const options = f.options == null ? '' : ` Options: ${(Array.isArray(f.options) ? f.options : [f.options]).map(optionText).join(', ') || 'none'}.`;
+  const frameLine = `${f.heightRU}U ${f.kind}, ${holes}, numbered ${f.numbering}${firstU(f) !== 1 ? ` from U${firstU(f)}` : ''}.`
+    + (typeof f.setback === 'number' ? ` Faceplates set back ${f.setback} mm.` : '') + options;
   // ONE LINE OF TOTALS FOR THE FINDINGS (#949), when routes can be read and
   // there is any: an agent that only describes the rack still sees them.
   const findingsLine = findingsText(rack, ctx);
   const span = i => spanText(f, i, chassisOf);
   // `full` is a window's line: the ref and configuration, the purpose and length
+  const holds = i => rack.items.filter(o => holderOf(o) === i.id).map(o => o.id);
   const item = (i, short, full = false) => {
     const ms = managersOf(rack, i.id).map(m => m.id);
     const rail = railOf(i, chassisOf);
     return [`${i.id}${short ? '' : ` ${i.label}`} ${span(i)} ${i.face}${rail ? ` ${rail} rail` : ''}${i.turned ? ' turned' : ''}`,
             ...(full ? [`${i.ref} ${i.cfg || '(no configuration)'}`] : []),
-            ...(i.on ? [`on ${i.on} unit ${i.unit}`] : []), ...(ms.length ? [`carries ${ms.join(' ')}`] : [])].join(', ');
+            ...(i.on ? [`on ${i.on} unit ${i.unit}`] : []), ...(ms.length ? [`carries ${ms.join(' ')}`] : []),
+            ...(typeof i.setback === 'number' ? [`set back ${i.setback} mm`] : []),
+            ...(holderOf(i) != null ? [`held by ${holderOf(i)}, not checked`] : []),
+            ...(holds(i).length ? [`holds ${holds(i).join(' ')}`] : [])].join(', ');
   };
   const part = (z, short, full = false) => [`${z.id}${short ? '' : ` ${z.label}`} ${whereText(rack, z, chassisOf)}`,
     ...(full ? [`${z.ref} ${z.cfg || '(no configuration)'}`] : [])].join(', ');

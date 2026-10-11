@@ -5,7 +5,7 @@
 // The Rack Builder's exports (the page that builds the files) do the
 // fetching and drawing, and ask here.
 
-import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName} from './model.js';
+import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, holderOf} from './model.js';
 import {routeText, trunkRoute} from './route.js';
 import {isRackMount, isZeroUPart, railOf, unitsOf, unitsText, spansMeet} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
@@ -47,6 +47,7 @@ export function toCsv(columns, rows, notes = [], {cell = csvCell} = {}) {
 }
 
 export function holesText(frame) {
+  if (frame.holes?.style === 'round') return 'Round holes';
   if (frame.holes?.style !== 'tapped') return 'Square holes (cage nuts)';
   return `Tapped holes, ${frame.holes.thread || 'thread not stated'}`;
 }
@@ -56,7 +57,7 @@ export function holesText(frame) {
 export function titleLines(rack, date, {source = 'Portrayal'} = {}) {
   const f = rack.frame;
   const kind = f.kind === 'two-post' ? 'Two-post' : 'Four-post';
-  const numbering = f.numbering === 'top-down' ? 'U1 at the top' : 'U1 at the bottom';
+  const numbering = `U${firstU(f)} at the ${f.numbering === 'top-down' ? 'top' : 'bottom'}`;
   const depth = f.kind === 'two-post'
     ? `Usable depth ${Math.round(f.usableDepth)} mm`
     : `Rail depth ${Math.round(f.railDepth)} mm · usable depth ${Math.round(f.usableDepth)} mm`;
@@ -828,7 +829,8 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
   if (target === 'nautobot') {
     const wholeSpan = it => { const p = positionOf(rack.frame, it.ru, uOf(it)); return [Math.floor(p), Math.ceil(p + uOf(it)) - 1]; };
     const placed = [];
-    const order = kept.filter(it => !offRails(it.mount)).map((it, k) => ({it, k})).sort((a, b) => a.it.ru - b.it.ru || a.k - b.k);
+    // a held item that is no rack device claims no unit
+    const order = kept.filter(it => !offRails(it.mount) && !(holderOf(it) != null && it.mount != null)).map((it, k) => ({it, k})).sort((a, b) => a.it.ru - b.it.ru || a.k - b.k);
     for (const {it} of order) {
       const [lo, hi] = wholeSpan(it);
       const met = placed.find(o => o.face === it.face && wholeSpan(o)[0] <= hi && lo <= wholeSpan(o)[1]);
@@ -861,31 +863,46 @@ export function deviceImportRows({rack, items: given, types, target = 'netbox', 
                  `${host ? `, over ${names.get(host.id)?.name ?? host.label}` : ''}; ${T} has no field for that.`);
     }
     const position = positionOf(rack.frame, it.ru, it.u);
-    if (target === 'nautobot' && !zeroU) {
+    // A HELD ITEM (on a shelf or a rail of another) is in the rack with no
+    // position and no face; its comment says what it is on.
+    const holder = holderOf(it), held = !zeroU && holder != null && it.mount != null;
+    if (held) {
+      const host = items.find(o => o.id === holder);
+      notes.push(`On ${host ? names.get(host.id)?.name ?? host.label : 'a device that is no longer in the rack'}, which holds it; ${T} has no field for that.`);
+    }
+    // NAUTOBOT NUMBERS EVERY RACK FROM 1, and has no field for another start:
+    // its position is counted from 1, and the comment gives the rack's own.
+    const from1 = positionOf({...rack.frame, startU: 1}, it.ru, it.u);
+    if (target === 'nautobot' && !zeroU && !held && firstU(rack.frame) !== 1 && !unplaced.has(it.id))
+      notes.push(`U${position} on the rack, which numbers from ${firstU(rack.frame)}; Nautobot numbers every rack from 1.`);
+    if (target === 'nautobot' && !zeroU && !held) {
       const met = unplaced.get(it.id), where = unitsText(rack.frame, it.ru, uOf(it));
       if (met) notes.push(`In ${where}, ${it.ru > met.ru ? 'above' : 'with'} ${names.get(met.id).name}; no position, since Nautobot stores whole rack units.`);
       else if (!Number.isInteger(it.ru) || !Number.isInteger(uOf(it)))
         notes.push(`Occupies ${where} (${uOf(it)}U). Nautobot stores whole rack units.`);
     }
-    const none = zeroU || unplaced.has(it.id);
+    const none = zeroU || held || unplaced.has(it.id);
     const comments = notes.join(' ');
     return target === 'nautobot'
       ? {name: n.name, role__name: role, device_type__manufacturer__name: t.manufacturer ?? '',
          device_type__model: t.model ?? '', status__name: 'Planned', location__name: site,
-         rack__name: rack.name, rack__location__name: site, position: none ? '' : Math.floor(position), face: none ? '' : it.face, comments}
+         rack__name: rack.name, rack__location__name: site, position: none ? '' : Math.floor(from1), face: none ? '' : it.face, comments}
       : {name: n.name, role, manufacturer: t.manufacturer ?? '', device_type: t.model ?? '',
-         status: 'planned', site, rack: rack.name, position: zeroU ? '' : position, face: zeroU ? '' : it.face, comments};
+         status: 'planned', site, rack: rack.name, position: zeroU || held ? '' : position, face: zeroU || held ? '' : it.face, comments};
   });
   return {columns: target === 'nautobot' ? NAUTOBOT_COLUMNS : NETBOX_COLUMNS, rows, left};
 }
 
 // THE RACK, as NetBox imports one: written from the frame.
 // A device row names its rack, and the device import does not create it.
-// desc_units is NetBox's "units are numbered top-to-bottom".
-export const NETBOX_RACK_COLUMNS = ['site', 'name', 'status', 'width', 'u_height', 'desc_units'];
+// desc_units is NetBox's "units are numbered top-to-bottom", and starting_unit
+// the number of its first unit (`startU`, 1 when the frame states none). The
+// width is the frame's, in inches, 19 when it states none.
+export const NETBOX_RACK_COLUMNS = ['site', 'name', 'status', 'width', 'u_height', 'desc_units', 'starting_unit'];
 export function rackImportRows({rack, dcim = {}}) {
   return {columns: NETBOX_RACK_COLUMNS, rows: [{site: String(dcim?.site ?? '').trim(), name: rack.name, status: 'planned',
-    width: 19, u_height: rack.frame.heightRU, desc_units: rack.frame.numbering === 'top-down' ? 'true' : 'false'}]};
+    width: railWidth(rack.frame), u_height: rack.frame.heightRU, desc_units: rack.frame.numbering === 'top-down' ? 'true' : 'false',
+    starting_unit: firstU(rack.frame)}]};
 }
 
 // ── THE BILL OF MATERIALS ───────────────────────────────────────────────
@@ -964,6 +981,8 @@ export function hardwareRows(frame, railUs) {
   return [row('Cage nut, M6'), row('Screw, M6')];
 }
 export function hardwareNotes(frame) {
+  // round holes are counted as square ones are, and say so
+  if (frame.holes?.style === 'round') return ['Round holes: check what fixing your rail takes.'];
   if (frame.holes?.style !== 'tapped')
     return ["Cage nuts and screws are counted as M6, the usual size for square-hole rails; check your rack's own."];
   return frame.holes.thread ? [] : ['The rail thread is not set under Frame, so the screws are listed without one.'];

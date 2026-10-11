@@ -1471,4 +1471,29 @@ as written. Each is built, and each waits for a person to confirm it.
 - **`width` is in inches** in the schema (19, 23), as the NetBox rack row
   takes it. `options` and the `turn` of an item `heldBy` have no type until a
   product or a host defines one.
-
+- **`startU` and Nautobot** (section 7). Nautobot numbers every rack from 1
+  and has no field for another start, so a position counted from `startU`
+  would name the wrong unit there. Built: a Nautobot device row keeps the
+  position counted from 1, and its comment gives the label on the rack ("U16
+  on the rack, which numbers from 5; Nautobot numbers every rack from 1.").
+  The NetBox rack row always carries `starting_unit`, 1 when the frame states
+  none.
+- **Setback.** It applies to a rack device only: a part on the rail face or
+  beside the rack has none. A refusal names it after the depth ("700 mm
+  deep, set back 301 mm; this rack allows 1000 mm."). A larger rack default
+  is checked for every device it moves, and refused naming the first that no
+  longer fits. A proud faceplate (a negative setback) is not checked against
+  a door, since no frame states a door clearance yet. **No export note is
+  written for a setback:** rack products section 8 names none, so that step
+  is not built.
+- **The sentences of a held item** beyond the two section 7.1 gives: placing
+  one ("The catalogue describes no host yet, so a device cannot be put on
+  one; heldBy takes only null, which frees it."); a host that is gone ("i7 is held by i4, which is not in this
+  rack: place it again, or free it."); removing a host ("DIN switch was held
+  by it and stays where it was, held by nothing."); and the DCIM comment ("On
+  Shelf, which holds it; NetBox has no field for that."). That `on` and
+  `heldBy` never share an item (rack products) is not enforced on load.
+- **The notices for kept keys** (`frameNotices` in `fit.js`): "This rack
+  states 23 in rails; it is drawn and fitted as 19 in." and "PDU A names the
+  channel rear-left, which is not known for this frame, so it stands at
+  left-rear."
