@@ -42,8 +42,9 @@ test('the defaults are the library\'s plug and boot, per media', () => {
   // it is asked per end, with the cable
   const asked = [];
   R.routePath(r, c1, {...base, plugReachOf: (end, cable) => { asked.push([end.item, cable.id]); return 1; }});
-  // (more than once an end: the cable is laid from both ends, #986)
+  // (twice an end and no more: the cable is laid from both ends, #986)
   assert.deepEqual([...new Set(asked.map(x => x.join(' ')))].sort(), ['i1 c1', 'i2 c1']);
+  assert.ok(asked.length <= 4, `${asked.length} calls`);
   // the helpers that compute it are not part of the kit's API
   assert.equal(R.plugReach, undefined);
   assert.equal(R.reachPoint, undefined);

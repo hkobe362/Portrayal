@@ -511,8 +511,8 @@ CM-01 ring 3") and by how much ("with room for a 19.2 mm bend; the cable
 cables that have one on its `Findings:` line and names the worst, and
 `cableScheduleRows(..., { bends })` writes one sentence into each such
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
-a cable, for a file with no row for one. Corners at one point are one finding
-(`mergeCorners` in `rack/route-path`).
+a cable, for a file with no row for one. Corners at one point, to a tenth of
+a millimetre, are one finding.
 
 **New in 0.21.0, in `rack/`.** Four changes to where a cable runs and what is
 said about it; nothing is removed or renamed, and the rack file and the
@@ -526,14 +526,14 @@ export columns are as they were.
   **Measured lengths change** for a member whose own route never met its
   trunk: it no longer rides to the far end and back.
 - A span that crosses in front of other ports is reported (below, #1013):
-  `routePath().covers`, `coverFindings`, `coverFindingsOf`, `PORT_BOX`,
-  `COVER_DEPTH`, and the optional reader `portBoxesOf(itemId)` on the routing
-  context.
+  `routePath().covers`, `coverFindings`, `coverFindingsOf`, and the optional
+  reader `portBoxesOf(itemId)` on the routing context.
 - `inspect`, `describe` and the export notes carry the bend and span
   findings (#1007): `route.bends` and `route.covers` on a cable, a fuller
   `Findings:` line, `bends` and `covers` options on `cableScheduleRows`,
   `layNotes` and `layNotesOf` in `rack/export-data`, `bendFindingsOf`, and
-  one finding a corner (`mergeCorners` in `rack/route-path`).
+  one finding a corner. The summary of `bundle.create` says when a jumper
+  that hung gets longer in the bundle.
 - The same cable written end for end gets the same lay and the same findings
   (#986): `routePath` lays it from both ends and keeps one. **Routed lengths
   change** on the few cables whose other lay is the better one (seven of a
@@ -543,31 +543,44 @@ export columns are as they were.
 **A span in front of other ports.** With no horizontal manager a cable runs
 from its lane to its port across the faces between, over their ports, and
 crosses no body. The path's `covers` lists each port such a span passes in
-front of, `{ kind: 'covers-port', cable, item, path, view, between: [from,
-to], at: [x, y, z] }`, and `coverFindings(rack, ctx, nameOf)` gives one
-finding a cable, `{ kind: 'covers-ports', cable, ports, between, text }`:
-"c11 crosses in front of port-8, port-9 and port-10 on MGMT-SW1 between
-left-front U42 and its port on MGMT-SW1: add a horizontal cable manager above
-or below MGMT-SW1 to carry it." It warns and never refuses. Only a span with
-no pathway at either end is judged (port to lane, or port to port), and never
-against the cable's own two ports. The kit knows where the cabled ports are
+front of, `{ kind: 'port-behind-span', cable, item, path, view, between:
+[from, to], at: [x, y, z], judged, estimated? }`, and `coverFindings(rack,
+ctx, nameOf)` gives one finding a cable, `{ kind: 'span-over-ports', cable,
+count, ports, between, judged, estimated?, text }`: "c10 crosses in front of
+port-2 and port-4 on MGMT-SW1 between left-front U42 and its port on
+MGMT-SW1: add a horizontal cable manager above or below MGMT-SW1 to carry it
+to the gutter." It warns and never refuses. Only a span with no pathway at
+either end is judged (port to lane, or port to port), never against the
+cable's own two ports, and never against a port beside one of them: one on
+the same panel whose box comes within the cable's bend radius of its own
+port's centre, the stacked partner of its port always among them, since no
+manager moves a cord off those. A jumper that only drops down its own column
+is not reported. `judged` says which ports were there: `all`, or `cabled`
+when the page listed none, and then the sentence ends "Only ports that hold a
+cable were judged."; `estimated: true` marks a port taken at the estimated
+box. The kit knows where the cabled ports are
 (`portX`, `portY`); give the context the optional reader
 `portBoxesOf(itemId) -> [{ path, view, x, y, w?, h? }]` (the centre of each
 port's box in the frame `portX` and `portY` use, and its size in mm) and
 every port of a device is judged, cabled or not. `inspect` carries a cable's
 finding as `route.covers`, `describe` counts them, and
 `cableScheduleRows(..., { covers })` writes the sentence into the cable's
-notes. `PORT_BOX` (12 by 10 mm) is
-the box of a port that states no size and `COVER_DEPTH` (100 mm) how far out
-of a panel a span still covers a port; both are estimates. What is decided for a cable
+notes. A port that states no size is taken as 12 by 10 mm, and a span covers
+a port no further than 100 mm out of its panel; both are estimates. What is decided for a cable
 is kept per rack, context and cable, so, as for a route's side, build a new
 context when what it reads changes: a context changed in place can give a
 path placed for what it read before. A cable is laid from both its ends and one lay is kept by a
 rule that does not know which was written first (fewer bodies crossed, then
 less short of room, then shorter, then the end whose port sorts first), so a
 cable written the other way round lays the same and reports the same bends
-(0.21.0, #986); the readers on the context are handed a twin of the cable,
-`a` and `b` exchanged, when the lay from its other end is the one tried. **Routed lengths change in 0.17.0** on
+(0.21.0, #986). That is the lay of a route, not the choice of one: the
+automatic route still breaks its own ties from end a (a manager's rings in
+order from end a, end a's side of two gutters as short), so a cable written
+the other way round can be given another route, and then another lay. The
+readers on the context (`plugReachOf`, `trayFaceOf`, `bendOf`, `diameterOf`,
+which take the cable, and `typeOf`, which takes its id) are asked for both
+lays, and those that take the cable are handed its twin, `a` and `b`
+exchanged, for the lay from its other end. **Routed lengths change in 0.17.0** on
 every routed cable that turns at a ring, goes round a body or hangs. On the
 reference rack of #949 each of the sixteen cords is 10.9 to 179.2 mm longer
 and seven pass the 0.5 m break (c1 to c3 and c5 to c8 are 1 m cords again).

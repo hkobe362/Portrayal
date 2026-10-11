@@ -15,6 +15,8 @@
 import {RU} from '../../../kit/rack/rails.js';
 
 export const SIZES = {sw: {ru: 1, w: 438.5, h: 43.6, d: 370, kind: 'switch', model: 'SW'},
+  // a 48-port switch, two rows of twenty-four (patched, below)
+  sw48: {ru: 1, w: 438.5, h: 43.6, d: 370, kind: 'switch', model: 'SW48'},
   // a horizontal manager, 1U, with five rings along x (rack-bundles.mjs)
   mgr: {ru: 1, d: 110, mount: 'rack-face', model: 'MGR', guides: {front: ['guide-1', 'guide-2', 'guide-3', 'guide-4', 'guide-5']}}};
 export const chassisOf = ref => SIZES[ref] || null;
@@ -42,6 +44,17 @@ export const managed = () => {
   return {...r, items: [...r.items, ...r.items.map((it, k) => ({id: `m${k + 1}`, ref: 'mgr', cfg: 'x', label: `MGR${k + 1}`,
     ru: it.ru, face: 'front', turned: false, swaps: {}, fields: {}, on: it.id, unit: 1}))]};
 };
+// TWO 48-PORT SWITCHES PATCHED PORT FOR PORT (#1013), `gap` units apart (1:
+// one above the other, every cord a jumper that hangs; 3 or more: every cord
+// by the gutter), with no manager. Port n of the upper to port n of the
+// lower, or with `shift`, to port n + 2 * shift, `shift` columns along.
+export const patched = ({gap = 1, shift = 0} = {}) => {
+  const base = rack();
+  const n = 48 - 2 * shift;
+  return {...base, items: [{...sw('i1', TOP, 'SW-A'), ref: 'sw48'}, {...sw('i2', TOP - gap, 'SW-B'), ref: 'sw48'}],
+    cables: Array.from({length: n}, (_, k) => ({id: `c${k + 1}`, a: end('i1', `port-${k + 1}`), b: end('i2', `port-${k + 1 + 2 * shift}`),
+      media: 'cat6', purpose: 'uplink', label: '', route: []}))};
+};
 export const TRUNK = [{lane: 'left-front', ru: 31}, {lane: 'left-front', ru: 42}];
 export const bundled = ({flip = false, route = TRUNK} = {}) => ({...rack({flip}),
   bundles: [{id: 'b1', number: 1, label: 'MGMT', members: Array.from({length: N}, (_, k) => ({cable: `c${k + 1}`})), route}]});
@@ -49,6 +62,11 @@ export const bundled = ({flip = false, route = TRUNK} = {}) => ({...rack({flip})
 // where a port is: {x, y} in rack mm
 export function portAt(r, e) {
   const it = r.items.find(i => i.id === e.item);
+  if (it?.ref === 'sw48') {
+    // forty-eight ports, 14.6 mm apart along the face, the rows 11.5 mm apart
+    const n = Number(/^port-(\d+)$/.exec(e.path)?.[1]);
+    return n >= 1 && n <= 48 ? {x: -167.9 + 14.6 * Math.floor((n - 1) / 2), y: mid(it.ru) + (n % 2 ? 5.75 : -5.75)} : null;
+  }
   if (!it || it.ref !== 'sw') return null;
   if (e.path === 'mgmt') return {x: 30.85, y: mid(it.ru) + 15.3};
   const n = Number(/^port-(\d+)$/.exec(e.path)?.[1]);
@@ -59,6 +77,8 @@ export function portAt(r, e) {
 // (ctx.portBoxesOf, #1013): its 24 ports and its management port
 export const portsOf = (r, id) => {
   const it = r.items.find(i => i.id === id);
+  if (it?.ref === 'sw48') return Array.from({length: 48}, (_, k) => `port-${k + 1}`)
+    .map(path => ({path, view: 'front', ...portAt(r, {item: id, path}), w: 12, h: 10}));
   if (it?.ref !== 'sw') return [];
   return ['mgmt', ...Array.from({length: 24}, (_, k) => `port-${k + 1}`)]
     .map(path => ({path, view: 'front', ...portAt(r, {item: id, path}), w: 12, h: 10}));

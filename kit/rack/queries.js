@@ -74,14 +74,16 @@ function bundleLine(rack, b, ctx) {
 // or when the routes cannot be read (no `ctx.route`, or a reader throws):
 // "Findings: 2 cables cross a body; 3 cables have a tight bend (the worst c9,
 // 10.8 mm short); 9 cables cross in front of other ports (the most c7, 5
-// ports)." Each part is there only when it counts something: the cables whose
-// path still crosses a body (#949), those with a corner short of their bend
-// radius and the cable shortest of it (#973, #1007), and those with a span in
-// front of other ports and the cable that covers most (#1013). Each cable's
-// path is read once.
+// ports; only ports that hold a cable were judged)." Each part is there only
+// when it counts something: the cables whose path still crosses a body
+// (#949), those with a corner short of their bend radius and the cable
+// shortest of it (#973, #1007), and those with a span in front of other
+// ports and the cable that covers most (#1013), with what was judged when
+// the page listed no ports (`ctx.route.portBoxesOf`). Each cable's path is
+// read once.
 function findingsText(rack, ctx) {
   if (!ctx?.route) return null;
-  let bodies = 0, bends = 0, covers = 0, worst = null, most = null;
+  let bodies = 0, bends = 0, covers = 0, worst = null, most = null, cabled = false;
   try {
     for (const c of rack.cables || []) {
       const path = routePath(rack, c, ctx.route);
@@ -94,6 +96,7 @@ function findingsText(rack, ctx) {
       }
       if (path.covers?.length) {
         covers++;
+        if (path.covers.some(f => f.judged !== 'all')) cabled = true;
         if (!most || path.covers.length > most.n) most = {id: c.id, n: path.covers.length};
       }
     }
@@ -101,7 +104,7 @@ function findingsText(rack, ctx) {
   const parts = [
     ...(bodies ? [`${count(bodies, 'cable')} cross${bodies === 1 ? 'es' : ''} a body`] : []),
     ...(bends ? [`${count(bends, 'cable')} ${bends === 1 ? 'has' : 'have'} a tight bend (${bends === 1 ? '' : 'the worst '}${worst.id}, ${worst.short} mm short)`] : []),
-    ...(covers ? [`${count(covers, 'cable')} cross${covers === 1 ? 'es' : ''} in front of other ports (${covers === 1 ? '' : 'the most '}${most.id}, ${count(most.n, 'port')})`] : [])];
+    ...(covers ? [`${count(covers, 'cable')} cross${covers === 1 ? 'es' : ''} in front of other ports (${covers === 1 ? '' : 'the most '}${most.id}, ${count(most.n, 'port')}${cabled ? '; only ports that hold a cable were judged' : ''})`] : [])];
   return parts.length ? `Findings: ${parts.join('; ')}.` : null;
 }
 
@@ -284,14 +287,16 @@ async function cableInfo(rack, cable, ctx) {
       // each corner with less room than its bend radius (#973, #1007): where,
       // the turn, the room and what the cable needs, with the sentence
       // bendFindings gives; and the ports a span of it passes in front of
-      // (#1013), with coverFindings' sentence. Both follow the path, so a
+      // (#1013), with coverFindings' sentence, how many, and whether every
+      // port was there to judge or only the cabled ones (`judged`). Both follow the path, so a
       // cable is told them wherever it is given a routed length, a loose end
       // or not; a cable whose port is not found has no path and neither.
       const tight = bendFindingsOf(rack, cable, ctx.route, label, path);
       if (tight.length) bends = tight.map(f => ({point: f.point, between: f.between, at: f.at, angle_deg: f.angle_deg, legs_mm: f.legs_mm,
         room_mm: f.room_mm, need_mm: f.need_mm, short_mm: f.short_mm, text: f.text}));
       const over = coverFindingsOf(rack, cable, ctx.route, label, path)[0];
-      if (over) covers = {ports: over.ports, between: over.between, text: over.text};
+      if (over) covers = {count: over.count, ports: over.ports, between: over.between, judged: over.judged,
+        ...(over.estimated ? {estimated: true} : {}), text: over.text};
     } catch { routed = null; rings = null; crosses = null; rests = null; bends = null; covers = null; }
   }
   // slack: the cable's own length less the routed one, in metres

@@ -226,34 +226,3 @@ export function cornersOf(pts, {share = 'half'} = {}) {
     return {k: P[c.i].k, angle_deg: round1(c.theta), legs_mm: [round1(inMm), round1(outMm)], room_mm: round1(room)};
   });
 }
-
-// CORNERS AT ONE POINT ARE ONE CORNER (#1007). Two points of a path can stand
-// a fraction of a millimetre apart (a lead point almost on an approach point,
-// a rest point almost on the point it hangs from), and cornersOf, which skips
-// only a point within a micron of the one before, gives a corner at each: two
-// findings at one place, with two angles, where a reader sees one turn. This
-// merges the corners of `corners` (cornersOf's, or some of them, in order)
-// whose points are the same to a tenth of a millimetre, the precision a
-// finding gives its `at` to: `k` is the first's, `angle_deg` the turn from the
-// leg into the first to the leg out of the last, `legs_mm` the first's leg in
-// and the last's leg out, and `room_mm` the least of theirs. A corner alone at
-// its point is returned as it is.
-export function mergeCorners(pts, corners) {
-  const key = p => `${round1(p.x)},${round1(p.y)},${round1(p.z)}`;
-  const groups = [];
-  for (const c of corners) {
-    const g = groups.at(-1);
-    if (g && key(pts[g.at(-1).k]) === key(pts[c.k])) g.push(c); else groups.push([c]);
-  }
-  return groups.map(g => {
-    if (g.length === 1) return g[0];
-    const first = g[0], last = g.at(-1), here = key(pts[first.k]);
-    // the legs in and out: to the nearest point either side that is not this one
-    let i = first.k - 1, j = last.k + 1;
-    while (i > 0 && key(pts[i]) === here) i--;
-    while (j < pts.length - 1 && key(pts[j]) === here) j++;
-    const u = sub(pts[first.k], pts[i]), v = sub(pts[j], pts[last.k]);
-    const angle = norm(u) > 1e-6 && norm(v) > 1e-6 ? round1(turnDeg(u, v)) : Math.max(...g.map(c => c.angle_deg));
-    return {k: first.k, angle_deg: angle, legs_mm: [first.legs_mm[0], last.legs_mm[1]], room_mm: Math.min(...g.map(c => c.room_mm))};
-  });
-}

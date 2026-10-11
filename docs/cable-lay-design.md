@@ -461,15 +461,17 @@ rack of twelve switches and no manager, with eleven cords bundled down one
 lane, every cord crossed a face diagonally and nothing was reported.
 
 **The finding.** A path's `covers` lists each port a span passes in front of,
-as `{kind: 'covers-port', cable, item, path, view, between: [from, to], at:
-[x, y, z]}`; `coverFindings(rack, ctx, nameOf)`, beside `bodyFindings` and
-`bendFindings`, gives one finding a cable, `{kind: 'covers-ports', cable,
-ports: [{item, path, view}], between, text}`, with a sentence: "c11 crosses
-in front of port-8, port-9 and port-10 on MGMT-SW1 between left-front U42 and
-its port on MGMT-SW1: add a horizontal cable manager above or below MGMT-SW1
-to carry it." A device with more than six ports covered has its first five
-named and the rest counted. It **warns and never refuses**: on a rack with no
-manager it is the truth about the rack.
+as `{kind: 'port-behind-span', cable, item, path, view, between: [from, to],
+at: [x, y, z], judged, estimated?}`; `coverFindings(rack, ctx, nameOf)`,
+beside `bodyFindings` and `bendFindings`, gives one finding a cable, `{kind:
+'span-over-ports', cable, count, ports: [{item, path, view}], between,
+judged, estimated?, text}`, with a sentence: "c10 crosses in front of port-2
+and port-4 on MGMT-SW1 between left-front U42 and its port on MGMT-SW1: add a
+horizontal cable manager above or below MGMT-SW1 to carry it to the gutter."
+A device with more than six ports covered has its first five named and the
+rest counted. It **warns and never refuses**: on a rack with no manager it
+is the truth about the rack. The two codes are a port (on the path) and a
+span (the finding), and share no word but `port`.
 
 **Which spans.** Only a span with no pathway at either end is judged: from a
 port to a lane, or from port to port (a short jumper that hangs). That is the
@@ -481,24 +483,75 @@ never listed.
 
 **Which ports.** A span covers a port when, seen square to the panel, it
 passes through the port's box grown by the cable's radius, while it stands in
-front of that panel and no further out than `COVER_DEPTH`, 100 mm. That
-figure is an estimate: the longest plug the kit knows stands 64.8 mm out of
-its cage, and the rest is room to hold it; no source states one. The spans
-judged stand within a plug and a bend radius of the panel, well inside it. A
-port on a neighbouring device counts as one on the cable's own: a span that
-sags into the face below covers the ports there.
+front of that panel and no further out than 100 mm. That figure is an
+estimate: the longest plug the kit knows stands 64.8 mm out of its cage, and
+the rest is room to hold it; no source states one. The spans judged stand
+within a plug and a bend radius of the panel, well inside it. A port on a
+neighbouring device counts as one on the cable's own: a span that sags into
+the face below covers the ports there.
+
+**Beside its own port is not in front of another.** A cable leaves its plug
+straight and turns within its bend radius, so whichever way it goes it passes
+over the ports that stand within that radius of its own. The stacked partner
+of its port is always one: the same column, the other row, 11 to 14 mm away
+on the faces modelled so far. A neighbour or two along the row are the
+others. No manager moves a cord off them, so reporting them is noise: on two
+48-port switches patched port for port, one above the other, every one of the
+48 jumpers was reported for the other-row port of its own column and told to
+add a manager. The rule:
+
+> a port on the same panel of the same device as one of the cable's own two
+> ports, whose box comes within the cable's installed bend radius of that own
+> port's centre, is not listed.
+
+The distance is from the centre of the cable's own port to the nearest point
+of the other port's box, in the plane of the panel. The radius is the one the
+lay turns the cable in (`ctx.bendOf(cable)`, else its media's): 24 mm for a
+Cat 6 cord, which takes in the stacked partner and one column either side at
+a 14.6 mm pitch; a stiffer cable turns wider and is beside more. A span that
+passes only such ports is not reported at all. What is left is a span that
+runs on across a face to reach its port, which is what a manager cures.
+
+Counted, before the rule and with it (cables reported, of those routed):
+
+| rack | before | with the rule |
+|---|---|---|
+| the reference rack of #949 (a lacer between its leaves) | 0 of 16 | 0 of 16 |
+| the 60 generated racks of 3.4 | 69 of 1,803 | 67 of 1,803 |
+| eleven cords down one lane, no manager, cabled ports only | 9 of 11 | 6 of 11 |
+| the same, every port listed (`portBoxesOf`) | 11 of 11 | 11 of 11, ten of them over 13 to 15 ports |
+| two 48-port switches port for port, one above the other | 48 of 48 | 0 of 48 |
+
+The same 48 patched one column along are not reported either (each is still
+beside its own ports); four columns along, 20 of the 40 are, for the columns
+the hop crosses; and with the switches three units apart, so that every cord
+goes to the gutter, 20 of the 48 are.
+
+**The advice fits the span.** One that runs between a lane and a port is told
+to "add a horizontal cable manager above or below" that port's device "to
+carry it to the gutter". One that hangs from port to port has no gutter to go
+to, and is told to "route its hop from A to B through a horizontal cable
+manager beside either".
+
+**What was judged.** A finding says which ports were there to judge: `judged`
+is `all` when the page listed every port of every device (below), and
+`cabled` when only the ports that hold a cable were known. With `cabled` the
+sentence ends "Only ports that hold a cable were judged.", and the findings
+line of `describe` says the same in its bracket, so a reader does not take a
+short list for a clear face. `estimated: true` marks a finding that rests on
+a port taken at the estimated box; it is a field and not a clause, since the
+sentence is long enough.
 
 **What the context carries.** The routing context places a port only when it
 is asked for one (`portX`, `portY`, by a cable end), so the kit knows where
 the cabled ports are and nothing of the others. Two sources, then:
 
-- every port that holds a cable, from `portX` and `portY`, with a box of
-  `PORT_BOX`, 12 by 10 mm (an estimate, about the opening of an RJ45 jack or
-  an SFP cage);
+- every port that holds a cable, from `portX` and `portY`, with a box of 12
+  by 10 mm (an estimate, about the opening of an RJ45 jack or an SFP cage);
 - **`ctx.portBoxesOf(itemId)`**, a new reader, optional and additive:
   `[{path, view, x, y, w?, h?}]`, every port of the device, cabled or not,
   `x` and `y` the centre of its box where `portX` and `portY` put a port, `w`
-  and `h` its size in mm (`PORT_BOX` when left out). A page that reads the
+  and `h` its size in mm (the estimated box when left out). A page that reads the
   compiled faces has these boxes already. A reader that throws, and an entry
   it cannot place, are left out.
 
@@ -1014,8 +1067,7 @@ mm, 10.8 mm short."). It warns and never refuses. A page that draws the kit's po
 have one and names the cable shortest of its radius, and
 `cableScheduleRows(..., {bends})` writes one sentence into the notes of each
 such cable: the finding, or how many corners and the tightest of them
-(#1007). Corners at one point, to a tenth of a millimetre, are one finding
-(`mergeCorners`). A cable is told them wherever it has a path, a loose end
+(#1007). Corners at one point, to a tenth of a millimetre, are one finding. A cable is told them wherever it has a path, a loose end
 or not; one whose port is not found has no path and is told nothing.
 
 **What is left.** On the reference rack, nothing. On one sample of 60
@@ -1785,12 +1837,14 @@ And the reads:
   sees fault 1, as the session behind #949 did not.
 - **Bends** (3.4) and **spans in front of other ports** (1.7) are in all
   three reads (#1007). `inspect` of a cable gains `route.bends`, each tight
-  corner with its sentence, and `route.covers`, `{ports, between, text}`;
+  corner with its sentence, and `route.covers`, `{count, ports, between,
+  judged, estimated?, text}`;
   each key is there only when there is something to say. `describe` puts
   them on the findings line with the bodies, each part only when it counts
   something: "Findings: 2 cables cross a body; 3 cables have a tight bend
   (the worst c9, 10.8 mm short); 9 cables cross in front of other ports (the
-  most c7, 5 ports)." The exports take the two lists as they take `bodies`:
+  most c7, 5 ports; only ports that hold a cable were judged)." The last
+  clause is there when the page listed no ports. The exports take the two lists as they take `bodies`:
   `cableScheduleRows(..., {bends, covers})` adds a sentence for each to a
   cable's notes, and `layNotes(rack, {bends, covers})` gives one line a
   cable for a file with no row for one (a BOM, a drawing). The columns are
@@ -1960,7 +2014,7 @@ published file or a saved rack file uses it.
 | a ring's part, and a zero-U part, met by the cable's tube in `legCrossings` and `detour`, the approach point (`at: 'approach'`) clear of the band by at least the radius and `CLEAR` (#968; the installed bend radius where the route turns there, #973) | kit API | a page checking its tubes and the routed lengths of saved racks follow it |
 | room for the bends (3.4, #973): the measure a path is judged by (`cornersOf` with `share: 'need'`, the plug's reach a leg), the approach point at the bend radius, the lead point (`at: 'lead'`, with a ring's `item` and `via` or a plug's `end`), a detour's `room` of two bend radii, the evenly sampled hang that leaves no corner short, and `ROOM_MAX` | kit API, routed lengths | a page reads the points by these names, and every routed length and stock size of a saved rack follows the rules; changing one moves them again |
 | `tight-bend` in a path's `bends` (`point`, `between`, `at`, `angle_deg`, `legs_mm`, `room_mm`, `need_mm`, `short_mm`), `bendFindings`, and its sentence ("turns N degrees between A and B with room for an R mm bend; the cable (type) needs M mm, S mm short.") | kit API, agent output | a page and an agent read the kind and the fields, and match the sentence |
-| `covers-port` in a path's `covers` (`item`, `path`, `view`, `between`, `at`), `coverFindings` with `covers-ports` (`ports`, `between`) and its sentence ("crosses in front of P on D between A and B: add a horizontal cable manager above or below D to carry it."), `PORT_BOX`, `COVER_DEPTH`, and the optional reader `ctx.portBoxesOf(itemId)` giving `[{path, view, x, y, w?, h?}]` (1.7, #1013) | kit API, the routing context, agent output | a page supplies the reader and reads the findings by these names; agents match the sentence |
+| `port-behind-span` in a path's `covers` (`item`, `path`, `view`, `between`, `at`, `judged`, `estimated`), `coverFindings` with `span-over-ports` (`count`, `ports`, `between`, `judged`, `estimated`) and its sentences ("crosses in front of P on D between A and B: add a horizontal cable manager above or below D to carry it to the gutter.", "Only ports that hold a cable were judged."), the rule that a port within the bend radius of the cable's own is not listed, and the optional reader `ctx.portBoxesOf(itemId)` giving `[{path, view, x, y, w?, h?}]` (1.7, #1013) | kit API, the routing context, agent output | a page supplies the reader and reads the findings by these names; agents match the sentence |
 | one lay whichever end is written first (3.4, #986): a cable laid from both ends and one kept by crossings, room, length, then the first-sorted end; `ctx` readers handed the twin | kit API, saved racks | routed lengths and paths on saved racks follow the lay kept; a page whose reader tells the ends apart by `cable.a` sees them exchanged on a twin |
 | `cornersOf` and `STRAIGHT_DEG` in `rack/route-path.js` (still exported from `rack/bundles.js`), and `cornersOf`'s `share` option with `half` (the default, the bundle check's) and `need` | kit API | a consumer imports them by these names from either path |
 | a doubled-back ring's path `face` point at its approach point, apart from the ring's own `rings[].face` on the band (#968) | kit API | a page that draws the face point, or compares the two, reads them by these names |

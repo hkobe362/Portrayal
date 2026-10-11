@@ -16,5 +16,5 @@
 ### Fixed
 - **One bend finding a corner** (#1007). Two points of a path a fraction of a
   millimetre apart gave two findings at one place, with two angles; they are
-  merged (`mergeCorners` in `rack/route-path.js`), so a page draws one ring
+  merged, so a page draws one ring
   and says one sentence.

@@ -14,7 +14,7 @@
 import {uLabel, zeroUOf, bundlesOf} from './model.js';
 import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
-import {throughRings, cornersOf, mergeCorners, STRAIGHT_DEG} from './route-path.js';
+import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
 import {isZeroUPart, zeroUSpan} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
@@ -297,6 +297,9 @@ export function resolveRoute(rack, cable, ctx) {
 // of end 'a' or 'b', or null when the port is not found. Two elements as near
 // go to the one whose key sorts first, so the answer does not depend on which
 // way the trunk was written.
+// Exported because two callers need the one measure: bundles.js layoutOf,
+// which must join a member where resolveRoute does, and a page that calls
+// followTrunk itself.
 export function trunkMeasures(rack, cable, trunk, ctx) {
   const aNearStart = () => {
     const p = portPoint(rack, cable.a, ctx), s = trunk.length && pointOf(rack, trunk[0], ctx), e = trunk.length && pointOf(rack, trunk.at(-1), ctx);
@@ -427,10 +430,15 @@ function panelZ(rack, it, pane, ctx) {
 //   added where the reader did not list it. So with no reader a span is still
 //   judged against the ports that hold a cable, and against no others: what
 //   is reported is true, and a port with no cable in it can be missed.
+// The list says what it holds: `judged` is 'all' when the reader was given
+// and answered for every device, else 'cabled' (no reader, or one that threw
+// for a device): a finding carries it, so a reader of one knows whether a
+// port with no cable in it could have been seen.
 // PORT_BOX is the box of a port whose size is not given: ESTIMATED, about
-// the opening of an RJ45 jack or an SFP cage (no one figure fits every port).
+// the opening of an RJ45 jack or an SFP cage (no one figure fits every port);
+// such a box is `estimated`, and a finding that rests on one says so.
 // Read once per rack and context, as solidsOf reads its bodies.
-export const PORT_BOX = {w: 12, h: 10};
+const PORT_BOX = {w: 12, h: 10};
 const portMemo = new WeakMap();
 function portBoxesOn(rack, ctx) {
   const keyed = ctx !== null && typeof ctx === 'object';
@@ -445,12 +453,13 @@ function portBoxesOn(rack, ctx) {
     if (!pane || seen.has(key) || !Number.isFinite(x) || !Number.isFinite(y)) return;
     seen.add(key);
     const hw = (size(w) ?? PORT_BOX.w) / 2, hh = (size(h) ?? PORT_BOX.h) / 2;
-    out.push({item: it.id, path, view, x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh,
-      z: panelZ(rack, it, pane, ctx), out: pane === 'rear' ? -1 : 1});
+    out.push({item: it.id, path, view, x: x, y: y, x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh,
+      z: panelZ(rack, it, pane, ctx), out: pane === 'rear' ? -1 : 1, ...(size(w) && size(h) ? {} : {estimated: true})});
   };
+  let all = typeof ctx?.portBoxesOf === 'function';
   if (typeof ctx?.portBoxesOf === 'function') for (const it of rack.items) {
     let list = null;
-    try { list = ctx.portBoxesOf(it.id); } catch { list = null; }
+    try { list = ctx.portBoxesOf(it.id); } catch { list = null; all = false; }
     for (const b of Array.isArray(list) ? list : [])
       if (b && typeof b.path === 'string') add(it, b.path, b.view === 'rear' ? 'rear' : 'front', b.x, b.y, b.w, b.h);
   }
@@ -460,6 +469,7 @@ function portBoxesOn(rack, ctx) {
     try { p = it ? portPoint(rack, e, ctx) : null; } catch { p = null; }
     if (p) add(it, e.path, e.view === 'rear' ? 'rear' : 'front', p.x, p.y);
   }
+  out.judged = all ? 'all' : 'cabled';
   if (keyed) per.set(ctx, out);
   return out;
 }
@@ -469,7 +479,7 @@ function portBoxesOn(rack, ctx) {
 // knows stands 64.8 out of its cage (PLUG_REACH, a DAC), and the figure is
 // that and room to hold it; no source states one. The spans it is for stand
 // within a plug and a bend radius of the panel, well inside it.
-export const COVER_DEPTH = 100;
+const COVER_DEPTH = 100;
 // Where the leg p -> q first passes in front of a port's box, the box grown by
 // the cable's radius `r`, no further out of the panel than COVER_DEPTH; null
 // when it does not. A leg that only touches the box's edge does not cover it.
@@ -646,19 +656,23 @@ export const stockLength = m => STOCK_M.find(s => s >= m - 1e-9) ?? Math.ceil(m 
 //   largest bend its legs leave it (route-path.js cornersOf, a leg between
 //   two corners shared by what each needs of it), `need_mm` the cable's
 //   radius (`ctx.bendOf(cable)`, else its media's) and `short_mm` the miss.
-//   Corners at one point are one finding (#1007, route-path.js mergeCorners).
+//   Corners at one point are one finding (#1007, mergeCorners below).
 //   The path is laid to leave none (the approach points, lead points and
 //   detours below, and no hang that would make one), so what is here is a
 //   bend the kit's rules found no room for: often the parts leave none, but
 //   a finding does not prove that no other lay would have it;
 // - `covers`: each port a span of the path passes in front of (#1013,
-//   section 1.7), as {kind: 'covers-port', cable, item, path, view, between:
-//   [from, to], at: [x, y, z]}: the port's device, path and view, the
-//   waypoints the span lies between (as for a crossing) and where it comes
-//   over the port, in mm. Only a span with no pathway at either end is
-//   judged, from a port to a lane or to the other port: that is the span no
-//   manager carries. The cable's own two ports are never listed, and a port
-//   is listed once. Which ports can be seen is portBoxesOn's (above);
+//   section 1.7), as {kind: 'port-behind-span', cable, item, path, view,
+//   between: [from, to], at: [x, y, z], judged, estimated?}: the port's
+//   device, path and view, the waypoints the span lies between (as for a
+//   crossing) and where it comes over the port, in mm; `judged` is 'all' or
+//   'cabled', which ports were there to judge, and `estimated: true` marks a
+//   port taken at the estimated box (portBoxesOn, above). Only a span with
+//   no pathway at either end is judged, from a port to a lane or to the
+//   other port: that is the span no manager carries. The cable's own two
+//   ports are never listed, nor is a port beside one of them (within the
+//   cable's bend radius, on the same panel: `beside`, below), and a port is
+//   listed once;
 // - `rests`: what the cable lies on (docs/cable-lay-design.md section 3):
 //   {kind: 'ring', item, via} for a ring on a tray whose sill holds it;
 //   {kind: 'tray', item, via, face, role, ties?} for a tray it runs along or
@@ -1234,7 +1248,7 @@ function layPath(rack, cable, ctx, given) {
   // less room than the cable's installed bend radius, by the measure the
   // bundle check uses (cornersOf).
   // One finding a corner (#1007): corners at one point, to the tenth of a
-  // millimetre a finding gives its place to, are one (route-path.js mergeCorners).
+  // millimetre a finding gives its place to, are one (mergeCorners).
   const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
     between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
     angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
@@ -1246,24 +1260,73 @@ function layPath(rack, cable, ctx, given) {
   // a tray is where the cord is meant to run, and the advice a finding gives
   // (add a manager) would not apply. Nor is a plug, which stands out of its
   // own port.
+  // BESIDE ITS OWN PORT is not in front of another. A cable leaves its plug
+  // straight and turns within its bend radius, so whatever way it goes it
+  // passes over the ports that stand within that radius of its own: the
+  // stacked partner of its port (the same column, the other row, some 11 to
+  // 14 mm away) always, and a neighbour or two along the row. No manager
+  // moves it off them. So a port on the same panel of the same device as one
+  // of the cable's own, whose box comes within the cable's installed bend
+  // radius of that own port's centre, is not listed (`beside`). What is left
+  // is a span that runs on across a face.
   const covers = [];
   const ports = portBoxesOn(rack, ctx);
   if (ports.length) {
     const same = (e, p) => p.item === e.item && p.path === e.path && p.view === (e.view === 'rear' ? 'rear' : 'front');
     const plug = p => p.at === 'a' || p.at === 'b';
+    const own = [cable.a, cable.b].map(e => ports.find(p => same(e, p))).filter(Boolean);
+    const beside = port => own.some(o => o.item === port.item && o.view === port.view
+      && Math.hypot(Math.max(port.x0 - o.x, 0, o.x - port.x1), Math.max(port.y0 - o.y, 0, o.y - port.y1)) <= need + 1e-9);
     for (let k = 1; k < final.length; k++) {
       const p = final[k - 1], q = final[k], between = legs[k - 1];
       if (between.some(w => w.item) || plug(p) || plug(q) || (p.end && p.end === q.end)) continue;
       for (const port of ports) {
-        if (same(cable.a, port) || same(cable.b, port)) continue;
+        if (same(cable.a, port) || same(cable.b, port) || beside(port)) continue;
         if (covers.some(c => c.item === port.item && c.path === port.path && c.view === port.view)) continue;
         const at = legOver(p, q, port, r);
-        if (at) covers.push({kind: 'covers-port', cable: cable.id, item: port.item, path: port.path, view: port.view,
-          between, at: [r1(at.x), r1(at.y), r1(at.z)]});
+        if (at) covers.push({kind: 'port-behind-span', cable: cable.id, item: port.item, path: port.path, view: port.view,
+          between, at: [r1(at.x), r1(at.y), r1(at.z)], judged: ports.judged, ...(port.estimated ? {estimated: true} : {})});
       }
     }
   }
   return {points: final, rings, findings, marks, crossings, detours, rests, bends, covers, allowance: endAllowance(cable)};
+}
+
+// CORNERS AT ONE POINT ARE ONE CORNER (#1007). Two points of a path can stand
+// a fraction of a millimetre apart (a ring of almost no depth, a lead point
+// almost on an approach point), and cornersOf, which skips only a point
+// within a micron of the one before, gives a corner at each: two findings at
+// one place, with two angles, where a reader sees one turn. This merges the
+// corners of `corners` (cornersOf's, or some of them, in order) whose points
+// are the same to a tenth of a millimetre, the precision a finding gives its
+// `at` to: `k` is the first's, `angle_deg` the turn from the leg into the
+// first to the leg out of the last, `legs_mm` the first's leg in and the
+// last's leg out, and `room_mm` the least of theirs. A corner alone at its
+// point is returned as it is. Not part of the kit's API: a path's `bends`
+// are what a reader takes.
+function mergeCorners(pts, corners) {
+  const t1 = v => Math.round(v * 10) / 10;
+  const key = p => `${t1(p.x)},${t1(p.y)},${t1(p.z)}`;
+  const groups = [];
+  for (const c of corners) {
+    const g = groups.at(-1);
+    if (g && key(pts[g.at(-1).k]) === key(pts[c.k])) g.push(c); else groups.push([c]);
+  }
+  return groups.map(g => {
+    if (g.length === 1) return g[0];
+    const first = g[0], last = g.at(-1), here = key(pts[first.k]);
+    // the legs in and out: to the nearest point either side that is not this one
+    let i = first.k - 1, j = last.k + 1;
+    while (i > 0 && key(pts[i]) === here) i--;
+    while (j < pts.length - 1 && key(pts[j]) === here) j++;
+    const u = {x: pts[first.k].x - pts[i].x, y: pts[first.k].y - pts[i].y, z: pts[first.k].z - pts[i].z};
+    const v = {x: pts[j].x - pts[last.k].x, y: pts[j].y - pts[last.k].y, z: pts[j].z - pts[last.k].z};
+    const nu = Math.hypot(u.x, u.y, u.z), nv = Math.hypot(v.x, v.y, v.z);
+    const angle = nu > 1e-6 && nv > 1e-6
+      ? t1(Math.acos(Math.max(-1, Math.min(1, (u.x * v.x + u.y * v.y + u.z * v.z) / (nu * nv)))) * 180 / Math.PI)
+      : Math.max(...g.map(c => c.angle_deg));
+    return {k: first.k, angle_deg: angle, legs_mm: [first.legs_mm[0], last.legs_mm[1]], room_mm: Math.min(...g.map(c => c.room_mm))};
+  });
 }
 
 // The rail plane an item is fixed to, as a z: the front rail's 0, or the
@@ -1423,34 +1486,55 @@ export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath
 
 // EVERY CABLE WHOSE SPAN PASSES IN FRONT OF OTHER PORTS (#1013,
 // docs/cable-lay-design.md section 1.7), rack-wide: routePath's `covers`, one
-// finding a cable, as {kind: 'covers-ports', cable, ports: [{item, path,
-// view}], between: [[from, to]], text}, with a sentence that names the ports
-// by device and says where a horizontal manager would carry the cord. It
-// warns and never refuses: on a rack with no manager it is the truth about
-// the rack. A cable whose port is not found is not judged. `nameOf(itemId)`
-// names an item. A device's ports are named up to six; past that, the first
-// five and how many more.
+// finding a cable, as {kind: 'span-over-ports', cable, count, ports: [{item,
+// path, view}], between: [[from, to]], judged, estimated?, text}: `count` the
+// ports covered; `judged` 'all' when every port of every device was there to
+// judge (`ctx.portBoxesOf`), 'cabled' when only the ports that hold a cable
+// were, and then the sentence says so; `estimated: true` when a port listed
+// was taken at the estimated box. The sentence names the ports by device and
+// says where a horizontal manager would carry the cord. It warns and never
+// refuses: on a rack with no manager it is the truth about the rack. A
+// cable whose port is not found is not judged. `nameOf(itemId)` names an
+// item. A device's ports are named up to six; past that, the first five and
+// how many more.
 export function coverFindings(rack, ctx, nameOf = id => id) {
   return (rack.cables || []).flatMap(c => coverFindingsOf(rack, c, ctx, nameOf));
 }
 // The same for one cable (#1007): none, or the one finding. `path` is the
 // cable's routePath, for a caller that already has it.
 export function coverFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath(rack, c, ctx)) {
-  const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}` : `${w.lane} U${uLabel(rack.frame, w.ru)}`);
-  const and = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
   const covers = path?.covers || [];
   if (!covers.length) return [];
+  const lab = w => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}` : `${w.lane} U${uLabel(rack.frame, w.ru)}`);
+  const and = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
   const by = new Map();
   for (const f of covers) (by.get(f.item) || by.set(f.item, []).get(f.item)).push(f.view === 'rear' ? `${f.path} (rear)` : f.path);
   for (const paths of by.values()) paths.sort((p, q) => p.localeCompare(q, 'en', {numeric: true}));
   const said = [...by].map(([item, paths]) => `${paths.length > 6 ? `${paths.slice(0, 5).join(', ')} and ${paths.length - 5} more` : and(paths)} on ${nameOf(item)}`);
   const between = [...new Map(covers.map(f => [JSON.stringify(f.between), f.between])).values()];
-  const where = between.map(bt => { const [a, b] = bt.map(w => lab(w, c)); return `between ${a} and ${b}`; });
-  // the devices its uncarried spans end at: a manager on one would carry it
-  const ends = [...new Set(between.flat().filter(w => w.end).map(w => (w.end === 'a' ? c.a : c.b).item))];
-  const at = (ends.length ? ends : [...by.keys()]).map(nameOf);
-  return [{kind: 'covers-ports', cable: c.id, ports: covers.map(f => ({item: f.item, path: f.path, view: f.view})), between,
-    text: `${c.id} crosses in front of ${and(said)} ${and(where)}: add a horizontal cable manager above or below ${at.join(' or ')} to carry it.`}];
+  const where = between.map(bt => `between ${lab(bt[0])} and ${lab(bt[1])}`);
+  // THE ADVICE FITS THE SPAN. One that runs between a lane and a port wants
+  // a manager at that port's device, to carry it along the face to the
+  // gutter. One that hangs from port to port has no gutter to go to: a
+  // manager between or beside the two devices carries it along and across,
+  // and where the two ports are on one device, beside that device.
+  const toLane = [...new Set(between.filter(bt => bt.some(w => w.lane)).flat().filter(w => w.end).map(w => (w.end === 'a' ? c.a : c.b).item))].map(nameOf);
+  const direct = between.some(bt => bt.every(w => w.end));
+  const ends = [...new Set([c.a.item, c.b.item])].map(nameOf);
+  const advice = [
+    ...(toLane.length ? [`add a horizontal cable manager above or below ${toLane.join(' or ')} to carry it to the gutter`] : []),
+    ...(direct ? [ends.length > 1 ? `${toLane.length ? 'and ' : ''}route its hop from ${ends[0]} to ${ends[1]} through a horizontal cable manager beside either`
+      : `${toLane.length ? 'and ' : ''}route it through a horizontal cable manager above or below ${ends[0]}`] : [])];
+  const judged = covers.every(f => f.judged === 'all') ? 'all' : 'cabled';
+  const estimated = covers.some(f => f.estimated);
+  // the ports in the rack's order of devices, then by name, whichever end the path was laid from
+  const order = new Map(rack.items.map((it, k) => [it.id, k]));
+  const ports = covers.map(f => ({item: f.item, path: f.path, view: f.view}))
+    .sort((p, q) => (order.get(p.item) ?? 0) - (order.get(q.item) ?? 0) || p.path.localeCompare(q.path, 'en', {numeric: true}) || p.view.localeCompare(q.view));
+  return [{kind: 'span-over-ports', cable: c.id, count: covers.length, ports, between,
+    judged, ...(estimated ? {estimated: true} : {}),
+    text: `${c.id} crosses in front of ${and(said)} ${and(where)}: ${advice.join(', ') || `add a horizontal cable manager beside ${ends.join(' or ')}`}.${
+      judged === 'cabled' ? ' Only ports that hold a cable were judged.' : ''}`}];
 }
 
 // A word for a part of a body, as a finding names it.
