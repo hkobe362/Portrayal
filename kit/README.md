@@ -661,6 +661,50 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.22.0: rack file version 4.** One version for everything that had
+waited for one ([`docs/rack-file-v4-design.md`](../docs/rack-file-v4-design.md));
+[Heights, spans and half units](#heights-spans-and-half-units) has the names
+a page calls. A version-3 file opens as it was and is saved as version 4,
+**which a page or kit older than 0.22.0 refuses whole.**
+
+What a page gains:
+
+- A position in steps of 0.5 (`ru: 12.5`), with `unitsOf`, `spanOf`,
+  `itemBox`, `spanText` and `uText`; a frame `startU`, `setback` and round
+  holes; an item `setback`, `roll` and `heldBy`.
+- `states` and `readings` on an item and on a part beside the rack
+  (`rack/states`, `state.set`, `readings.set`), and a PDU hung on brackets
+  (`zerou.hang`, `fitsHang`, `bracketPositions`).
+- The lengths of a cable by name (`needOf`, `spareOf`, `END_PLAY_M`), where
+  its spare is stored (`cable.slack`, `rack/slack`), and the face of a tray
+  it is pinned to (`cable.lay`, which the routes act on).
+- Straps of three kinds, each with a width, and the tie slots they are at
+  (`straps().kinds`, `anchorsOf`, `strapTotals`, `strapTexts`).
+- Exports: `spare`, `stored` and `straps` on the cable schedule, a spare
+  line in the BOM notes, the spare in a draw.io edge label, and device
+  comments for a rolled item, a PDU on brackets and what is set off.
+
+What changed meaning, for a page that calls the kit:
+
+- `span` is removed: use `spanOf`, which is half-open, `[ru, ru + units)`.
+- `heightOf` and the `u` of `itemsWithU` are 0.5 for a half-unit device,
+  `positionOf` answers in halves, and `freeUs` may answer a half position.
+- A body is centred in its span in the solids, where it stood on the bottom.
+- `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port
+  alone; the 0.1 m of dressing an end is `END_PLAY_M`. `stockLength` takes
+  the need. A routed length holds `need`, not `measured`, and a cord up to
+  10 mm short of full end play keeps its stock size.
+- `straps().count` is every kind together; the spacing straps alone are
+  `straps().kinds.spacing`. `strapBomRows` counts the straps of single
+  cables only when handed `{ anchors: anchorsOf(rack, ctx) }`.
+- The cable schedule has 20 columns where it had 17.
+- The Nautobot device file is written at whole units, and leaves the later
+  of two devices that share a unit with no position: on one face always,
+  and front and rear while either type is full depth. **That last is a
+  fix:** Nautobot refuses such a pair, and earlier kits wrote it.
+- `rackImportRows` answers no row, and `left`, for a rack name over 100
+  characters.
+
 **New in 0.21.0, in `rack/`.** Four changes to where a cable runs and what is
 said about it; nothing is removed or renamed, and the rack file and the
 export columns are as they were.
@@ -888,7 +932,7 @@ repairs `parseDoc` makes to bundles come back through
 `parseDoc(input, { notes })`; hand the same array to `editor.loadDoc(doc, { notes })`
 and they are its first `findings`.
 
-**The rack file is version 4 from the release that carries it.** A version-3
+**The rack file is version 4 from 0.22.0.** A version-3
 file opens as it was and is saved as version 4, which a page or kit that
 reads version 3 refuses whole. What the version holds is in
 [`docs/format-stability.md`](../docs/format-stability.md) and

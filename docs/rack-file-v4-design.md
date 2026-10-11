@@ -5,8 +5,7 @@ one held branch. The exports were tried on NetBox 4.7.2 and Nautobot 3.2.6
 (section 13, item 47). What
 the build read more narrowly than this note says, or had to choose where it
 was silent, is in section 13, and waits for a person to confirm. The kit
-release that carries it is a minor one, 0.22.0 after 0.21.0; the branch
-does not bump the version. Issues #935 (the scope, decided 2026-10-10), #970,
+release that carries it is a minor one, kit 0.22.0 after 0.21.0. Issues #935 (the scope, decided 2026-10-10), #970,
 #949 (step 4), #934, #939, #972, with #983, #986, #1007, #966 and #908 read
 beside them. The thirteen questions it raised were each decided as it
 recommended and are recorded in section 10, with the options not taken.
