@@ -514,6 +514,32 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point are one finding
 (`mergeCorners` in `rack/route-path`).
 
+**New in 0.21.0, in `rack/`.** Four changes to where a cable runs and what is
+said about it; nothing is removed or renamed, and the rack file and the
+export columns are as they were.
+
+- A bundle member with no route of its own joins and leaves the trunk at the
+  elements nearest its two ports, and a member's own route is the gutter
+  route even for a jumper within two units ([Bundles](#bundles), #1012):
+  `ownRoute` and `autoRoute` take `{ gutter: true }`, `followTrunk` takes
+  `nearest`, and `trunkMeasures(rack, cable, trunk, ctx)` measures it.
+  **Measured lengths change** for a member whose own route never met its
+  trunk: it no longer rides to the far end and back.
+- A span that crosses in front of other ports is reported (below, #1013):
+  `routePath().covers`, `coverFindings`, `coverFindingsOf`, `PORT_BOX`,
+  `COVER_DEPTH`, and the optional reader `portBoxesOf(itemId)` on the routing
+  context.
+- `inspect`, `describe` and the export notes carry the bend and span
+  findings (#1007): `route.bends` and `route.covers` on a cable, a fuller
+  `Findings:` line, `bends` and `covers` options on `cableScheduleRows`,
+  `layNotes` and `layNotesOf` in `rack/export-data`, `bendFindingsOf`, and
+  one finding a corner (`mergeCorners` in `rack/route-path`).
+- The same cable written end for end gets the same lay and the same findings
+  (#986): `routePath` lays it from both ends and keeps one. **Routed lengths
+  change** on the few cables whose other lay is the better one (seven of a
+  sample of 1,803), and a reader on the routing context can be handed a twin
+  of the cable, `a` and `b` exchanged.
+
 **A span in front of other ports.** With no horizontal manager a cable runs
 from its lane to its port across the faces between, over their ports, and
 crosses no body. The path's `covers` lists each port such a span passes in
