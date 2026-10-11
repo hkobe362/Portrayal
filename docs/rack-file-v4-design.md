@@ -337,7 +337,7 @@ For two XCU10 panels at `ru: 12` and `ru: 12.5` on a bottom-up frame:
 | NetBox device rows | `position: 12` | `position: 12.5` |
 | NetBox device type | `u_height: 0.5` (already so) | the same |
 | Nautobot device type | `u_height: 1.0` with its comment (already so) | the same |
-| Nautobot device rows | `position: 12`, comment "Occupies the lower half of U12 (0.5U). Nautobot stores whole rack units." | no position and no face, comment "In the upper half of U12, above ODF A. Nautobot stores whole rack units, and U12 is held by ODF A, so it has no position there." |
+| Nautobot device rows | `position: 12`, comment "Occupies the lower half of U12 (0.5U). Nautobot stores whole rack units." | no position and no face, comment "In the upper half of U12, above ODF A; no position, since Nautobot stores whole rack units." |
 | cable schedule `a_u`, `b_u` | `12` | `12.5` |
 | draw.io | a cell from `itemBox`, half a unit high | the same, in the upper half |
 | BOM mounting hardware | 2 screws and 2 cage nuts | the same |
