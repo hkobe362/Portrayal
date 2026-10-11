@@ -1001,7 +1001,8 @@ what it built, what the first devices met, and what is left.
    so the part goes back to where the drawing was built: the default, or the
    position the configuration on screen sets.
 5. **A refused value is said under the group**, in the sentence `setFields`
-   answers, in an element with `role="status"`. Only the number box can be
+   answers, in an element with `role="status"` that is in the page before it
+   has anything to say. Only the number box can be
    refused: the slider and the buttons cannot send a value outside the
    adjustment.
 6. **The slider applies each value as it moves in 2D, and when it is let go in
@@ -1011,7 +1012,8 @@ what it built, what the first devices met, and what is left.
    value is a scene to rebuild.
 7. **The line that names the views** is read from the faces: a face shows the
    motion when a member on it has a `dx` or a `dy`. The control asks the
-   shell for the other faces once for each device and configuration. In 3D
+   shell for the other faces once for each set of faces the shell holds, so
+   it asks again when a device is come back to. In 3D
    the line is not shown. The page says which stage is showing with a `mode`
    event on the shell.
 8. **The slider is a native range input.** It takes the arrow keys, Page Up
