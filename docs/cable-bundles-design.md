@@ -263,18 +263,21 @@ Every command that takes a bundle `id` refuses a missing one with
 
 ### 3.3 `bundle.create`
 
-Description: *"Bundle two or more cables sharing part of their route. It runs
-where they run together, unless given a route. A cable whose own route does
-not meet a given route joins and leaves it at the points nearest its two
-ports. Refused for a bundled cable."* (The third sentence is #1012.)
+The description an assistant reads is the `description` of `bundle.create`
+in the command table (`COMMANDS` in `kit/rack/commands.js`), and the table
+holds its words. It says four things, in this order: the command bundles two
+or more cables that share part of their route; the bundle runs where they run
+together unless it is given a route; a cable whose own route does not meet a
+given route joins and leaves it at the points nearest its two ports (#1012);
+and a cable already in a bundle is refused.
 
-The summary is "Bundled 11 cables as MGMT.", and says what bundling costs a
-jumper that hung (#1012): a cable on its automatic route with no waypoint of
-its own hangs from port to port, and in the bundle runs to the trunk and
-back, so it is longer. "c1 and c2 hung on their own and now run with the
-bundle: c1 0.60 m to 0.81 m, c2 0.61 m to 0.86 m." Each cable whose measured
-length grows by a centimetre or more is named; nothing is added when the
-routes are not known.
+The summary is "Bundled 11 cables as MGMT.", and then says what bundling
+costs a jumper that hung (#1012, `hungLonger` in `commands.js`). A cable on
+its automatic route with no waypoint of its own hangs from port to port, and
+in the bundle runs to the trunk and back, so it is longer. Each such cable
+whose measured length grows by a centimetre or more is named with both
+lengths: on the fixture c1 goes from 0.60 m to 0.81 m and c2 from 0.61 m to
+0.86 m. Nothing is added when the routes are not known.
 
 - `route` left out: the trunk is worked out from the members' own routes, with
   the refusals section 4.1 lists (a fork, leaving and rejoining, groups that
@@ -319,10 +322,11 @@ that waypoint, then runs on its own to one end."*
 
 ### 3.6 `bundle.update`
 
-Description: *"Change a bundle's label, number or strap spacing, or route it by
-hand. A cable whose own route does not meet a route given by hand joins and
-leaves it at the points nearest its two ports. A route of null works the route
-out again from its cables."* (The second sentence is #1012.)
+The description is the `description` of `bundle.update` in the same table.
+It says the command changes the label, the number or the strap spacing of a
+bundle, or routes it by hand; that a cable whose own route does not meet a
+route given by hand joins and leaves it at the points nearest its two ports
+(#1012); and that a route of null works the route out again from the cables.
 
 - `straps: {every: {value, unit}}`, or `{every: null}` for none. The value is
   above 0. A spacing under 50 mm or over 1 m is accepted with a note, since
@@ -434,10 +438,11 @@ Working it out needs `ctx.route` (section 3.1):
    bundles, and the refusal says so. A given `route` remains the way to make
    one bundle of them on purpose.
 7. **A member sharing nothing** with any other is refused: "c7 runs with none
-   of the others. Leave it out; or give the bundle a route, which c7 then
-   joins and leaves at the points nearest its two ports." The second half
-   says what a given route does with such a member (section 4.2), so the
-   advice is not taken blind.
+   of the others." The refusal (the last one `deriveTrunk` makes, in
+   `kit/rack/bundle-route.js`) then gives the two ways out: leave the cable
+   out, or give the bundle a route, and it says what a given route does with
+   such a member, which is to join and leave it at the points nearest the two
+   ports of the cable (section 4.2). So the advice is not taken blind.
 8. **The trunk** is the path, as waypoints in order. Lane intervals are
    written back as `{lane, ru}` waypoints at their ends, merged where they
    meet.
@@ -476,10 +481,11 @@ bundle with no change of their own. A member's route is:
   port, and runs from each port straight to that element. An element here is
   a pathway or a lane at a U (section 4.1), so on a lane it joins at the U
   level with its port. It rides the trunk between the two and no further:
-  both ports nearest one element, it joins and leaves there. A note says so,
-  naming the two points: "c7 does not meet Bundle 2's route, so it runs
-  straight to it: it joins at left-front U41 and leaves at left-front U42, the
-  points nearest its ports." This is accepted as a sketch, even when a port
+  both ports nearest one element, it joins and leaves there. A note says so
+  (`bundleCheck` in `kit/rack/bundles.js` writes it): that the cable "does
+  not meet" the route of the bundle and runs straight to it, and then the two
+  points by name, such as left-front U41 and left-front U42, as the points
+  nearest its ports. This is accepted as a sketch, even when a port
   is on the other face and the straight run goes through the rack's depth:
   the length is measured along that run, and the note names the member so it
   can be routed by hand.

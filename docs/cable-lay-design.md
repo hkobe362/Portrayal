@@ -465,9 +465,11 @@ as `{kind: 'port-behind-span', cable, item, path, view, between: [from, to],
 at: [x, y, z], judged, estimated?}`; `coverFindings(rack, ctx, nameOf)`,
 beside `bodyFindings` and `bendFindings`, gives one finding a cable, `{kind:
 'span-over-ports', cable, count, ports: [{item, path, view}], between,
-judged, estimated?, text}`, with a sentence: "c10 crosses in front of port-2
-and port-4 on MGMT-SW1 between left-front U42 and its port on MGMT-SW1: add a
-horizontal cable manager above or below MGMT-SW1 to carry it to the gutter."
+judged, estimated?, text}`, with a sentence (`coverFindingsOf` in
+`kit/rack/route.js` writes it). It has three parts: the ports by device ("c10
+crosses in front of port-2 and port-4 on MGMT-SW1"), the stretch of the route
+the span is ("between left-front U42 and its port on MGMT-SW1"), and the
+advice (below).
 A device with more than six ports covered has its first five named and the
 rest counted. It **warns and never refuses**: on a rack with no manager it
 is the truth about the rack. The two codes are a port (on the path) and a
@@ -1841,10 +1843,12 @@ And the reads:
   judged, estimated?, text}`;
   each key is there only when there is something to say. `describe` puts
   them on the findings line with the bodies, each part only when it counts
-  something: "Findings: 2 cables cross a body; 3 cables have a tight bend
-  (the worst c9, 10.8 mm short); 9 cables cross in front of other ports (the
-  most c7, 5 ports; only ports that hold a cable were judged)." The last
-  clause is there when the page listed no ports. The exports take the two lists as they take `bodies`:
+  something (`findingsText` in `kit/rack/queries.js`). After "Findings:"
+  come up to three parts, joined by semicolons: "2 cables cross a body";
+  "3 cables have a tight bend (the worst c9, 10.8 mm short)"; and "9 cables
+  cross in front of other ports", with the cable that covers most and its
+  count in a bracket. That bracket also says that only ports that hold a
+  cable were judged, when the page listed no ports. The exports take the two lists as they take `bodies`:
   `cableScheduleRows(..., {bends, covers})` adds a sentence for each to a
   cable's notes, and `layNotes(rack, {bends, covers})` gives one line a
   cable for a file with no row for one (a BOM, a drawing). The columns are
@@ -2014,7 +2018,7 @@ published file or a saved rack file uses it.
 | a ring's part, and a zero-U part, met by the cable's tube in `legCrossings` and `detour`, the approach point (`at: 'approach'`) clear of the band by at least the radius and `CLEAR` (#968; the installed bend radius where the route turns there, #973) | kit API | a page checking its tubes and the routed lengths of saved racks follow it |
 | room for the bends (3.4, #973): the measure a path is judged by (`cornersOf` with `share: 'need'`, the plug's reach a leg), the approach point at the bend radius, the lead point (`at: 'lead'`, with a ring's `item` and `via` or a plug's `end`), a detour's `room` of two bend radii, the evenly sampled hang that leaves no corner short, and `ROOM_MAX` | kit API, routed lengths | a page reads the points by these names, and every routed length and stock size of a saved rack follows the rules; changing one moves them again |
 | `tight-bend` in a path's `bends` (`point`, `between`, `at`, `angle_deg`, `legs_mm`, `room_mm`, `need_mm`, `short_mm`), `bendFindings`, and its sentence ("turns N degrees between A and B with room for an R mm bend; the cable (type) needs M mm, S mm short.") | kit API, agent output | a page and an agent read the kind and the fields, and match the sentence |
-| `port-behind-span` in a path's `covers` (`item`, `path`, `view`, `between`, `at`, `judged`, `estimated`), `coverFindings` with `span-over-ports` (`count`, `ports`, `between`, `judged`, `estimated`) and its sentences ("crosses in front of P on D between A and B: add a horizontal cable manager above or below D to carry it to the gutter.", "Only ports that hold a cable were judged."), the rule that a port within the bend radius of the cable's own is not listed, and the optional reader `ctx.portBoxesOf(itemId)` giving `[{path, view, x, y, w?, h?}]` (1.7, #1013) | kit API, the routing context, agent output | a page supplies the reader and reads the findings by these names; agents match the sentence |
+| `port-behind-span` in a path's `covers` (`item`, `path`, `view`, `between`, `at`, `judged`, `estimated`), `coverFindings` with `span-over-ports` (`count`, `ports`, `between`, `judged`, `estimated`) and its sentence (`coverFindingsOf`: "crosses in front of P on D", the stretch, the advice, and "Only ports that hold a cable were judged."), the rule that a port within the bend radius of the cable's own is not listed, and the optional reader `ctx.portBoxesOf(itemId)` giving `[{path, view, x, y, w?, h?}]` (1.7, #1013) | kit API, the routing context, agent output | a page supplies the reader and reads the findings by these names; agents match the sentence |
 | one lay whichever end is written first (3.4, #986): a cable laid from both ends and one kept by crossings, room, length, then the first-sorted end; `ctx` readers handed the twin | kit API, saved racks | routed lengths and paths on saved racks follow the lay kept; a page whose reader tells the ends apart by `cable.a` sees them exchanged on a twin |
 | `cornersOf` and `STRAIGHT_DEG` in `rack/route-path.js` (still exported from `rack/bundles.js`), and `cornersOf`'s `share` option with `half` (the default, the bundle check's) and `need` | kit API | a consumer imports them by these names from either path |
 | a doubled-back ring's path `face` point at its approach point, apart from the ring's own `rings[].face` on the band (#968) | kit API | a page that draws the face point, or compares the two, reads them by these names |
