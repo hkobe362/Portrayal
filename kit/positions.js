@@ -217,33 +217,35 @@ export function positionControl(shell, opts = {}) {
   }
 
   // THE OTHER FACES are what the line above names, and a face the shell
-  // holds is moved with the rest. THEY ARE ASKED FOR WHENEVER THE SHELL LACKS
-  // ONE: the question is put to the map of faces at every refresh, and
-  // nothing is remembered once a request has ended. A note of what was asked
-  // goes stale, by name after a visit to a device with no adjustment, and by
-  // map when the shell drops what it fetched because a module was opened
-  // while the faces were on their way. `asking` is the map a request is out
-  // for, so one is not sent twice. A request that ends with a face still
-  // missing is sent once more at once, which is what a module opened and
-  // left needs; after that it waits for the next thing the reader does, so a
-  // face that cannot be had is not asked for in a loop.
+  // holds is moved with the rest. THEY ARE ASKED FOR WHEN THE SHELL LACKS
+  // ONE, AT MOST TWICE FOR ONE MAP OF FACES AND ONE LOAD. Each refresh puts
+  // the question to the map itself, so no note of an old answer goes stale.
+  //   - `asking` is the map a request is out for: one is not sent twice.
+  //   - A request that ends with a face of this map still missing is counted
+  //     in `tries`. The first is followed at once by a second, which is what
+  //     a module opened while the faces were on their way needs once it is
+  //     left. After the second nothing is asked: the shell keeps no note of
+  //     a face it could not fetch, so asking at every `fields` event would
+  //     fetch it at every step of a dragged slider.
+  //   - The count starts again when the answer could be another one: the
+  //     shell starts a new map, or a `load` arrives (a device, a
+  //     configuration, a view, or the way back out of a module).
   let asking = null;              // the map a request is out for
-  let tried = null, tries = 0;    // the map of the requests that ended short
-  let resting = false;            // a refresh that must not ask
+  let tried = null, tries = 0;    // the map counted, and its requests that ended short
   const lacking = () => (state.meta?.views || []).some(v => !state.faces?.[v]);
   function wantFaces() {
-    if (resting || typeof shell.loadFaces !== 'function') return;
+    if (typeof shell.loadFaces !== 'function') return;
     const map = state.faces;
     if (tried !== map) { tried = map; tries = 0; }
-    if (!lacking()) { tries = 0; return; }
-    if (asking === map) return;
+    if (!lacking() || asking === map || tries >= 2) return;
     asking = map;
-    Promise.resolve().then(() => shell.loadFaces())
+    // asked now, not a moment later; what it throws is a request that failed
+    new Promise(done => done(shell.loadFaces()))
       .catch(err => console.warn('[portrayal] faces for the position control', err))
       .then(() => {
         if (asking === map) asking = null;
-        resting = state.faces === map && lacking() && ++tries > 1;
-        try { refresh(); } finally { resting = false; }
+        if (state.faces === map && lacking()) tries++;
+        refresh();
       });
   }
 
@@ -261,7 +263,8 @@ export function positionControl(shell, opts = {}) {
     wantFaces();
   }
 
-  shell.on('load', refresh);
+  // a load is when the faces that could not be had may be there to have
+  shell.on('load', () => { tries = 0; refresh(); });
   shell.on('fields', refresh);
   shell.on('mode', m => { mode = m === '3d' ? '3d' : '2d'; refresh(); });
   refresh();

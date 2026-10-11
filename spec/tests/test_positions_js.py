@@ -29,7 +29,7 @@ def test_the_control_on_a_real_shell():
                        cwd=str(SCRIPT.parent), timeout=120)
     assert p.returncode == 0, p.stdout[-4000:] + p.stderr[-2000:]
     # node --test passes a file whose tests never registered; it must have run them
-    assert "# pass 21" in p.stdout and "# fail 0" in p.stdout, p.stdout[-2000:]
+    assert "# pass 26" in p.stdout and "# fail 0" in p.stdout, p.stdout[-2000:]
 
 
 def test_the_explorer_mounts_it_once_and_tells_it_the_stage():

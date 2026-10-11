@@ -51,12 +51,15 @@ const cfg = (name, views) => JSON.stringify({
 const VIEWS = ['front', 'rear', 'top', 'right'];
 const routes = {
   'devices.json': () => JSON.stringify({devices: [
-    {name: 'slider', ns: 'fixture', model: 'SLIDER'}, {name: 'plain', ns: 'fixture', model: 'PLAIN'}]}),
+    {name: 'slider', ns: 'fixture', model: 'SLIDER'}, {name: 'plain', ns: 'fixture', model: 'PLAIN'},
+    {name: 'holed', ns: 'fixture', model: 'HOLED'}]}),
   'components.json': () => JSON.stringify({components: [
     {ns: 'fixture', name: 'slide-well', major: 'v1', skins: ['default']},
     {ns: 'fixture', name: 'slide-stud', major: 'v1', skins: ['default']}]}),
   'slider.configs.json': () => cfg('slider', VIEWS),
   'plain.configs.json': () => cfg('plain', ['front']),
+  // a device whose right face is not there to fetch: no route answers it
+  'holed.configs.json': () => cfg('holed', VIEWS),
   // a device that declares no adjustment
   'plain.base.front.svg': () => JSON.stringify({src: 'plain', parts: [chassis]}),
   // the face of a component, which a reader opens as a module
@@ -64,9 +67,15 @@ const routes = {
 };
 for (const v of VIEWS) {
   routes[`slider.base.${v}.svg`] = () => faces(60)[v];
+  if (v !== 'right') routes[`holed.base.${v}.svg`] = () => faces(60)[v];
   routes[`slider.back.${v}.svg`] = () => faces(180)[v];   // a configuration built moved
 }
 install(routes);
+// every fetch is counted, by the address asked for
+const fetched = [];
+const plainFetch = globalThis.fetch;
+globalThis.fetch = url => { fetched.push(String(url)); return plainFetch(url); };
+const fetchesOf = name => fetched.filter(u => u.endsWith(name)).length;
 globalThis.location.search = '?device=slider&view=front';
 const warned = [];
 console.warn = (...a) => warned.push(a);
@@ -369,23 +378,116 @@ test('a module opened while the faces are on their way does not cost the line it
                'The front view does not show this. See the top or right view, or 3D.');
 });
 
-test('a face that cannot be had is asked for twice and then left until the reader does something', async () => {
+// `loadFaces` as the shell has it, counted, or a stand-in for it
+async function withFaces(standIn, body) {
   const real = shell.loadFaces;
-  let calls = 0;
-  await shell.loadDevice('plain');
-  shell.loadFaces = () => { calls++; return Promise.resolve(0); };   // nothing ever arrives
-  try {
-    await shell.loadDevice('slider');
-    for (let i = 0; i < 8; i++) await settle();
-    assert.equal(calls, 2);
+  const n = {calls: 0};
+  shell.loadFaces = (...a) => { n.calls++; return (standIn || real)(...a); };
+  try { await body(n); } finally { shell.loadFaces = real; }
+}
+const tasks = async k => { for (let i = 0; i < k; i++) await settle(); };
+
+test('a face that cannot be fetched is asked for twice, and not again at every step of a slider', async () => {
+  await withFaces(null, async n => {
+    const before = fetchesOf('holed.base.right.svg');
+    await shell.loadDevice('holed');
+    await tasks(8);
+    assert.deepEqual(Object.keys(shell.state.faces).sort(), ['front', 'rear', 'top']);
+    assert.equal(n.calls, 2);
+    assert.equal(fetchesOf('holed.base.right.svg') - before, 2);
+    // the line says what the faces held can say
     assert.equal(part('panel-setback', 'note').textContent,
-                 'The front view does not show this. See it in 3D.');
-    control.refresh();                    // the next thing that happens asks once more
-    for (let i = 0; i < 8; i++) await settle();
-    assert.equal(calls, 3);
-  } finally { shell.loadFaces = real; }
-  control.refresh();
-  for (let i = 0; i < 6; i++) await settle();
+                 'The front view does not show this. See the top view, or 3D.');
+    // 200 steps of a dragged slider, each a `fields` event in a task of its own
+    const s = part('panel-setback', 'slider');
+    const events = [];
+    shell.on('fields', e => events.push(e));
+    for (let i = 0; i < 200; i++) { s.value = String(20 + i / 2); s.oninput(); await settle(); }
+    assert.equal(events.length, 200);
+    shell.emit('mode', '3d'); shell.emit('mode', '2d');
+    await tasks(4);
+    assert.equal(n.calls, 2);
+    assert.equal(fetchesOf('holed.base.right.svg') - before, 2);
+    // A LOAD IS WHEN IT MAY BE THERE: the same device, the same map of faces
+    const map = shell.state.faces;
+    await shell.loadStage();
+    await tasks(8);
+    assert.equal(shell.state.faces, map);
+    assert.equal(n.calls, 4);
+    assert.equal(fetchesOf('holed.base.right.svg') - before, 4);
+    part('panel-setback', 'reset').onclick();
+    await tasks(4);
+    assert.equal(n.calls, 4);
+  });
+});
+
+test('a new map of faces is asked about afresh, with no load', async () => {
+  await withFaces(() => Promise.resolve(0), async n => {      // nothing ever arrives
+    await shell.loadDevice('slider');
+    await tasks(8);
+    assert.equal(n.calls, 2);
+    control.refresh(); await tasks(4);
+    assert.equal(n.calls, 2);
+    shell.state.faces = {front: shell.state.svg};              // the shell let the faces go
+    control.refresh();
+    assert.equal(n.calls, 3);                                   // asked at once, not a moment later
+    await tasks(8);
+    assert.equal(n.calls, 4);
+    control.refresh(); await tasks(4);
+    assert.equal(n.calls, 4);
+  });
+});
+
+test('one request is out for a map at a time, and a late answer for an old map counts for nothing', async () => {
+  const gates = [];
+  const held = () => { const g = {}; g.p = new Promise(r => { g.open = r; }); gates.push(g); return g.p; };
+  await shell.loadDevice('plain');
+  await withFaces(held, async n => {
+    await shell.loadDevice('slider');
+    const first = shell.state.faces;
+    assert.equal(n.calls, 1);
+    for (let i = 0; i < 5; i++) { control.refresh(); await settle(); }
+    assert.equal(n.calls, 1);                                   // still out: not sent again
+    shell.state.faces = {front: shell.state.svg};              // a new map while it is out
+    control.refresh();
+    assert.equal(n.calls, 2);
+    gates[0].open(0);                                           // the old map is answered, short
+    await tasks(4);
+    assert.notEqual(shell.state.faces, first);
+    control.refresh(); await tasks(2);
+    assert.equal(n.calls, 2);                                   // the new one is still out
+    gates[1].open(0);                                           // its first try ends short
+    await tasks(4);
+    assert.equal(n.calls, 3);                                   // so it gets its second
+    gates[2].open(0);
+    await tasks(4);
+    control.refresh(); await tasks(2);
+    assert.equal(n.calls, 3);
+  });
+});
+
+for (const [how, standIn] of [
+  ['is refused', () => Promise.reject(new Error('no faces'))],
+  ['throws', () => { throw new Error('no faces'); }],
+]) test(`a request that ${how} is a try like any other: warned of, counted, and not left out`, async () => {
+  await shell.loadDevice('plain');
+  const before = warned.length;
+  await withFaces(standIn, async n => {
+    await shell.loadDevice('slider');
+    await tasks(8);
+    assert.equal(n.calls, 2);
+    assert.equal(warned.length - before, 2);
+    assert.match(String(warned.at(-1)[0]), /faces for the position control/);
+    for (let i = 0; i < 20; i++) { control.refresh(); await settle(); }
+    assert.equal(n.calls, 2);
+    assert.equal(warned.length - before, 2);
+  });
+});
+
+test('and the faces are there again once they can be had', async () => {
+  await shell.loadStage();
+  await tasks(6);
+  assert.deepEqual(Object.keys(shell.state.faces).sort(), [...VIEWS].sort());
   assert.equal(part('panel-setback', 'note').textContent,
                'The front view does not show this. See the top or right view, or 3D.');
 });

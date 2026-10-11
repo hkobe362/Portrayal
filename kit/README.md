@@ -181,9 +181,11 @@ declares no adjustment, or inside a module.
   does not show this. See the top, bottom, left or right view, or 3D." A face
   shows the motion when a member on it has a `dx` or a `dy` in its
   `data-moves-by`. The control asks the shell for the other faces
-  (`loadFaces`) whenever an adjustment is declared and the shell does not
-  hold every face of the device. A request that ends with a face still
-  missing is sent once more, and after that on the next change.
+  (`loadFaces`) when an adjustment is declared and the shell does not hold
+  every face of the device. A request that ends with a face still missing
+  is sent once more. After that the control does not ask again until the
+  shell emits `load` or starts a new set of faces, so a face that cannot be
+  fetched is not fetched at every step of a slider.
   In 3D the line is not shown.
 
 `positionControl(shell, opts)` answers `{el, refresh}`. `opts.before` is the

@@ -1012,9 +1012,13 @@ what it built, what the first devices met, and what is left.
    value is a scene to rebuild.
 7. **The line that names the views** is read from the faces: a face shows the
    motion when a member on it has a `dx` or a `dy`. The control asks the
-   shell for the other faces whenever it does not hold every face of the
-   device. A request that ends with a face still missing is sent once more,
-   and after that on the next change. In 3D
+   shell for the other faces when it does not hold every face of the
+   device. A request that ends with a face still missing is sent once more.
+   After that the control does not ask again until the shell emits `load`
+   (a device, a configuration, a view, or the way back out of a module) or
+   starts a new set of faces. The shell keeps no note of a face it could not
+   fetch, so asking at every `fields` event would fetch it at every step of
+   a slider. In 3D
    the line is not shown. The page says which stage is showing with a `mode`
    event on the shell.
 8. **The slider is a native range input.** It takes the arrow keys, Page Up
