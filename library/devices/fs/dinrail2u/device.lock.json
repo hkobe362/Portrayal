@@ -47,12 +47,12 @@
   }
  },
  "bay-accepts": {},
- "composed": "d0fb76dd23088aeb",
+ "composed": "6adbe3acc64f5b51",
  "composed-refs": {
   "common/pan-screw-m5@1": "1.0.0+e3af94de13c20a50",
   "fs/din-rail-ts35-400@1": "1.0.0+5d1b53d78b07151a",
   "fs/dinrail2u-ear@1": "1.0.0+fae4c099aeda9e90",
-  "fs/dinrail2u-panel@2": "2.0.0+c4ad4a5355892af0",
+  "fs/dinrail2u-panel@2": "2.0.1+b16cfe3070184c1f",
   "fs/dinrail2u-side@1": "1.0.1+0059ece92fb5bf04"
  },
  "configs": [

@@ -23,6 +23,8 @@
   carry `fields=rail-panel~rail-setback~<mm>`. `provenance.setback` is renamed
   `provenance.rail-setback`, and the `gaps` entry that asked for a way to
   state the range is removed. The three `physical.din-rail-setback` attrs
-  stay, and a test now requires them. The DCIM exports of the two devices
+  stay, and a test now requires them. The two panel components,
+  `fs/dinrail2u-panel@2` and `fs/dinrail4u-panel@2`, are 2.0.1: their depth
+  sentence points at the adjustment, wording only. The DCIM exports of the two devices
   change in one comment line each, the drawing version; no configuration is
   added and no field of a DCIM schema moves.
