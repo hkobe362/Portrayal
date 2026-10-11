@@ -463,7 +463,7 @@ test('straps: ceil(L / every), evenly, none on a run\'s end; one in a ring moves
   assert.equal(s.count, 5);
   // evenly at 41, 123, 205, 287, 369; ring 2 at 307.5, 3 at 205, 4 at 102.5, each taking +/-30 mm with a strap's half width
   assert.deepEqual(s.straps.map(x => x.along_mm), [41, 132.5, 175, 277.5, 369]);
-  assert.deepEqual(s.straps[1], {kind: 'spacing', segment: 1, t: 0.2927, along_mm: 132.5});
+  assert.deepEqual(s.straps[1], {kind: 'spacing', segment: 1, t: 0.2927, along_mm: 132.5, width_mm: 19});
   assert.deepEqual(s.runs, [[0, 410]]);
   // (rack file version 4) the two ends of the trunk are peel points, and the
   // spacing straps at 41 and 369 are within 50 mm of where a breakout strap

@@ -11,7 +11,7 @@
 // Pure; `ctx` is the routing context route.js takes, and `rack.bundles` are
 // read through bundles.js with it.
 
-import {routePath, spareOf, toMetres, UNPLACED_WARN_M} from './route.js';
+import {routePath, spareOf, toMetres, UNPLACED_WARN_M, BREAK_TOL_M} from './route.js';
 import {traysOf} from './solids.js';
 import {bendOf} from './resting.js';
 import {bundleOfCable, layoutOf} from './bundles.js';
@@ -115,21 +115,23 @@ export function storedText(rack, cable, s) {
 // - `spare-unplaced`: more than UNPLACED_WARN_M to store and no `slack` key
 //   (an empty list is a choice, and gives none);
 // - `spare-short`: a pinned length under the need;
-// - `spare-over`: values that add up to more than there is to store;
+// - `spare-over`: values that add up to more than there is to store, by more
+//   than the stock break tolerance (BREAK_TOL_M);
 // - `spare-off-route`: an entry on a tray the cable cannot store in, kept.
 export function slackFindings(rack, ctx, nameOf = id => id) {
   const out = [];
   for (const c of rack.cables || []) {
     let s = null;
+    if (!c.length) continue;                     // nothing is bought yet, so nothing is spare
     try { s = slackOf(rack, c, ctx); } catch { s = null; }
     if (!s) continue;
     if (s.short) { out.push({kind: 'spare-short', cable: c.id, text: `${c.id} is ${mText(s.spare.stock_m)} and needs ${mText(s.spare.need_m)}.`}); continue; }
     if (!s.said && s.spare.to_store_m > UNPLACED_WARN_M)
       out.push({kind: 'spare-unplaced', cable: c.id, text: `${c.id} has ${mText(s.spare.to_store_m)} to store and no place for it.`});
-    if (s.over_m > 0.005) {
+    if (s.over_m > BREAK_TOL_M) {
       const where = s.entries.filter(e => e.item && e.metres != null);
       const stated = s.entries.reduce((n, e) => n + (e.metres ?? 0), 0);
-      out.push({kind: 'spare-over', cable: c.id, text: `${c.id} stores ${mText(stated)}${where.length === 1 && s.entries.length === 1 ? ` in ${nameOf(where[0].item)} ${where[0].via}` : ''} and has ${mText(s.spare.spare_m)} to spare.`});
+      out.push({kind: 'spare-over', cable: c.id, text: `${c.id} stores ${mText(stated)}${where.length === 1 && s.entries.length === 1 ? ` in ${nameOf(where[0].item)} ${where[0].via}` : ''} and has ${mText(s.spare.to_store_m)} to store.`});
     }
     for (const e of s.entries) if (e.item && !e.ok) out.push({kind: 'spare-off-route', cable: c.id, text: e.why});
   }
@@ -142,7 +144,7 @@ export function spareLine(rack, ctx) {
   for (const c of rack.cables || []) {
     let s = null;
     try { s = slackOf(rack, c, ctx); } catch { s = null; }
-    if (!s || s.short) continue;
+    if (!s || s.short || !c.length) continue;    // a cable with no length has no spare to count
     n++; total += s.spare.spare_m;
     if (!s.said && s.unplaced_m > 0.005) unplaced++;
   }

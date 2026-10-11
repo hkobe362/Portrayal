@@ -290,7 +290,7 @@ function fit(rack, {id, path, ref}, ctx) {
       if (!conn?.family || ![c.a, c.b].some(e => e.item === id && portPathOf(e.path) === path && (view == null || e.view === view))) continue;
       const m = mediaKind(c.media);
       if ((m.family && m.family !== conn.family) || (m.family === 'fiber' && m.mode && conn.mode && m.mode !== conn.mode))
-        findings.push(note(`${c.id} now runs ${MEDIA_LABELS[c.media] ?? c.media} into ${name}.`));
+        findings.push(note(`${c.id} now runs ${Object.hasOwn(MEDIA_LABELS, c.media) ? MEDIA_LABELS[c.media] : c.media} into ${name}.`));
     }
   }
   const summary = holds === undefined ? `Put ${path} on ${it.label} back as its configuration builds it.`
@@ -755,7 +755,8 @@ function strapsSaid(b) {
   const e = strapSpacing(b), k = strapKinds(b), on = e !== null;
   const extra = [k.breakout !== on ? (k.breakout ? 'breakout straps' : 'no breakout straps') : null,
                  k.anchors !== on ? (k.anchors ? 'anchor straps' : 'no anchor straps') : null].filter(Boolean);
-  return [spacingText(e), ...extra].join(', ');
+  // with no spacing straps and another kind on, "no straps" would not be true
+  return [e === null && extra.length ? 'no spacing straps' : spacingText(e), ...extra].join(', ');
 }
 function spacingNote(straps) {
   const e = straps?.every;

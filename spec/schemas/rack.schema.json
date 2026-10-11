@@ -508,7 +508,7 @@
       "measured": {
        "type": "number",
        "exclusiveMinimum": 0,
-       "description": "Metres along the route, before rounding up to a stock length. Present when the source is routed."
+       "description": "Written before version 4: metres along the route with the allowances of then. A version-4 kit writes need in its place and drops this at the next measure."
       },
       "need": {
        "type": "number",

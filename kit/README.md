@@ -308,8 +308,10 @@ is what `cableScheduleRows` takes as `spare` to fill its `spare` and `stored`
 columns. It returns no geometry: spare is listed, not drawn.
 
 `straps(rack, bundle, ctx)` in `rack/bundles.js` gives each strap its `kind`
-(`spacing`, `breakout` or `anchor`) and `kinds`, the count of each; an anchor
-names its tray and the index of its tie slot. `anchorsOf(rack, ctx)` lists
+(`spacing`, `breakout` or `anchor`) and its `width_mm`, with `kinds` and
+`widths`, the count of each; `count` is all of them, and the spacing straps
+alone are `kinds.spacing`. An anchor names its tray and the index of its tie
+slot. `anchorsOf(rack, ctx)` lists
 every tie slot a strap is at, rack-wide, with the bundles and cables tied
 there, and `strapTotals(rack, ctx)` is what the rack buys. A page draws a
 band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
@@ -328,8 +330,8 @@ Of the names these modules export, a page draws and calls with: `unitsOf`,
 `shortTolerance`, `spareOf`, `stockLength`, `END_PLAY_M`, `BREAK_TOL_M`,
 `UNPLACED_WARN_M` (`rack/route.js`); `slackOf`, `storedText`,
 `slackFindings`, `spareLine`, `spareExports` (`rack/slack.js`); `strapKinds`,
-`anchorsOf`, `strapTotals`, `BREAKOUT_MM`, `BREAKOUT_MERGE_MM`,
-`BREAKOUT_GROUP_MM` (`rack/bundles.js`); `configFacts`,
+`anchorsOf`, `strapTotals`, `STRAP_WIDTHS_MM`, `BREAKOUT_MM`,
+`BREAKOUT_MERGE_MM`, `BREAKOUT_GROUP_MM`, `BREAKOUT_TWO_MM` (`rack/bundles.js`); `configFacts`,
 `meteringOf` (`rack/catalog.js`); `statesFor`, `readingsFor`, `stateNotices`
 (`rack/states.js`); `bracketPositions`, `hangNotices` (`rack/zero-u.js`).
 `facePoint` is the one a drawing calls for a point of a face; `rollPoint`,

@@ -1460,9 +1460,13 @@ function alongTray(rack, t, prev, next, cable, ctx, r) {
 // A cable's outside diameter in mm, for what it must fit and keep clear by:
 // the page's `ctx.diameterOf(cable)` (the cable types table, #919: its
 // diameterLookup), else its media's typical one.
+// A TABLE KEYED BY MEDIA IS READ BY ITS OWN KEYS ONLY: a cable whose media is
+// named like something every object has (`constructor`) is a media the table
+// does not know, never the function of that name.
+const ownMedia = (table, media) => (typeof media === 'string' && Object.hasOwn(table, media) ? table[media] : undefined);
 const cableDiameter = (cable, ctx) => {
   const d = typeof ctx?.diameterOf === 'function' ? ctx.diameterOf(cable) : null;
-  return typeof d === 'number' && d > 0 ? d : DIAMETERS[cable?.media] ?? UNSET_D;
+  return typeof d === 'number' && d > 0 ? d : ownMedia(DIAMETERS, cable?.media) ?? UNSET_D;
 };
 
 // The marks of a path drawn from its other end, for its points reversed: the
@@ -1669,7 +1673,7 @@ export function bodyFindings(rack, ctx, nameOf = id => id) {
 export const DIAMETERS = {cat6: 6.0, cat6a: 7.5, os2: 3.0, om3: 3.0, om4: 3.0, om5: 3.0, dac: 5.0, aoc: 3.0};
 const UNSET_D = 6.0;
 export const FILL_LIMIT = 0.4;
-const areaOf = media => Math.PI * ((DIAMETERS[media] ?? UNSET_D) / 2) ** 2;
+const areaOf = media => Math.PI * ((ownMedia(DIAMETERS, media) ?? UNSET_D) / 2) ** 2;
 
 // Every pathway with an aperture that a cable passes through, filled against
 // FILL_LIMIT of its opening. Lanes have no limit and are not listed.

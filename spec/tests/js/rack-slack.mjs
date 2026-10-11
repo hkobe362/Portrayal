@@ -191,7 +191,10 @@ test('a member riding a bundle trunk through the tray reads in its bundle', () =
 // ── the findings ─────────────────────────────────────────────────────────
 
 test('the findings: spare with no place, a pinned length too short, more stored than there is, and an entry off the route', () => {
-  const r = F.rack(), ctx = F.ctxOf(r);
+  const bare = F.rack(), ctx = F.ctxOf(bare);
+  // a cable with no length has nothing bought, so nothing spare: no finding and no line
+  assert.deepEqual([SL.slackFindings(bare, ctx), SL.spareLine(bare, ctx)], [[], '']);
+  const r = R.withRoutedLengths(bare, ctx);
   const f = SL.slackFindings(r, ctx);
   // every cord of the rack with more than 0.3 m to store and no slack key
   assert.deepEqual(f.map(x => x.kind), Array(12).fill('spare-unplaced'));
@@ -209,7 +212,11 @@ test('the findings: spare with no place, a pinned length too short, more stored 
   // values past what there is to store, on a pinned cord
   const {r: tr, c} = trayRack({}, {length: {value: 1, unit: 'm', source: 'entered'}, slack: [{...TRAY, value: 1.5}]});
   assert.deepEqual(SL.slackFindings({...tr, cables: [c]}, F.ctxOf(tr), id => tr.items.find(i => i.id === id).label),
-    [{kind: 'spare-over', cable: 'c1', text: 'c1 stores 1.5 m in CM-01 tray and has 0.64 m to spare.'}]);
+    [{kind: 'spare-over', cable: 'c1', text: 'c1 stores 1.5 m in CM-01 tray and has 0.44 m to store.'}]);
+  // within the stock break tolerance, 10 mm, it is no finding: 0.44 m to store and 0.445 stated
+  const close = {...c, slack: [{...TRAY, value: 0.445}]};
+  assert.deepEqual(SL.slackFindings({...tr, cables: [close]}, F.ctxOf(tr)), []);
+  assert.equal(SL.slackFindings({...tr, cables: [{...c, slack: [{...TRAY, value: 0.46}]}]}, F.ctxOf(tr)).length, 1);
   // an entry kept on a tray the cable does not rest on
   const off = {...r, cables: [{...r.cables[11], slack: [TRAY]}]};
   assert.deepEqual(SL.slackFindings(off, ctx), [{kind: 'spare-off-route', cable: 'c12', text: 'CM-01 tray is not on the route of c12.'}]);
@@ -318,7 +325,7 @@ test('inspect tells no slack key from an empty list, and shows what is stored', 
   assert.deepEqual(none.spare_findings, [{kind: 'spare-unplaced', text: 'c1 has 0.44 m to store and no place for it.'}]);
   assert.equal('spare_findings' in empty, false);
   // describe carries one line for the rack, and none without the routes
-  const r = F.rack();
+  const r = R.withRoutedLengths(F.rack(), F.ctxOf(F.rack()));
   const lines = Q.describe(r, {chassisOf: F.chassisOf, route: F.ctxOf(r)}).split('\n');
   assert.ok(lines.includes('Spare: 8.08 m; 13 cords not placed.'), lines.slice(0, 4).join(' | '));
   assert.ok(!Q.describe(r, {chassisOf: F.chassisOf}).includes('Spare:'));
@@ -342,3 +349,20 @@ test('the cable schedule ends with spare and stored, and one note line for the r
   const plain = X.cableScheduleRows(r, ends, r.items);
   assert.deepEqual([plain.columns, plain.rows[0].spare, plain.rows[0].stored], [X.CABLE_COLUMNS, '', '']);
 });
+
+test('a media named like something every object has is a media the tables do not know', async () => {
+  const {mediaKind} = await import('../../../kit/rack/cable-rules.js');
+  const r = F.rack(), ctx = F.ctxOf(r);
+  for (const media of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) {
+    const c = {...r.cables[0], media};
+    const p = R.routePath(r, c, ctx);
+    assert.ok(p.points.every(q => [q.x, q.y, q.z].every(Number.isFinite)), `${media}: every point is a number`);
+    const l = R.routedLength(r, c, ctx), plain = R.routedLength(r, {...c, media: ''}, ctx);
+    // it routes and measures as a cable with no media does, and its length is never null in a saved file
+    assert.deepEqual([l.value, Math.round(l.measured * 1e6)], [plain.value, Math.round(plain.measured * 1e6)], media);
+    const kept = R.withRoutedLengths({...r, cables: [c]}, ctx).cables[0].length;
+    assert.ok(kept.value > 0 && kept.need > 0, JSON.stringify(kept));
+    assert.deepEqual(mediaKind(media), {family: null, mode: null});
+  }
+});
+

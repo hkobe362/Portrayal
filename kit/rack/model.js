@@ -482,7 +482,7 @@ export function parseDoc(input, {notes} = {}) {
           ? {dcim: {...structuredClone(r.dcim), ...Object.fromEntries(Object.entries(dcimOf(r)).filter(([k]) => k in r.dcim))}} : {}),
         // Optional too (#921), and only when the file has it: a rack that was
         // never given a bundle saves as it was.
-        ...(bundles ? {bundles: readBundles(bundles, [...items, ...cables, ...zeroU.filter(plainObj)])} : {}),
+        ...(bundles ? {bundles: readBundles(bundles, [...items, ...cables, ...zeroU.filter(plainObj)], said)} : {}),
       };
       // The references are checked here, so a reader that only parses gets
       // the same consistent rack as the editor.
@@ -530,7 +530,7 @@ function readStraps(straps) {
   return ['every', ...STRAP_KINDS].some(k => k in out) ? out : null;
 }
 
-function readBundles(list, others) {
+function readBundles(list, others, said) {
   const objs = list.filter(plainObj);
   const declared = objs.filter(b => typeof b.id === 'string' && b.id).map(b => ({id: b.id}));
   const whole = n => Number.isInteger(n) && n >= 1;
@@ -553,6 +553,11 @@ function readBundles(list, others) {
     const asWritten = r.routeAsWritten
       ?? (Array.isArray(incoming) && routesEqual(readableFromRouteAsWritten(incoming), r.route) ? incoming : null);
     const kept = readStraps(straps);
+    // what of its straps said nothing usable is dropped, and said
+    if (straps !== undefined) {
+      const lost = !plainObj(straps) ? ['straps'] : ['every', ...STRAP_KINDS].filter(k => k in straps && !(kept && k in kept));
+      if (lost.length) said?.(`${b.label ? b.label : `Bundle ${whole(b.number) ? b.number : id}`} had ${lost.join(', ')} that could not be read, so ${lost.length === 1 ? 'it was' : 'they were'} dropped.`);
+    }
     out.push({...b, id, number: whole(b.number) ? b.number : ++top, label: String(b.label ?? ''), members, route: r.route,
               ...(asWritten ? {routeAsWritten: asWritten} : {}), ...(kept ? {straps: kept} : {})});
   }

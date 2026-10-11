@@ -54,15 +54,40 @@ export function strapKinds(b) {
   const none = 'every' in s && s.every === null;
   return {breakout: typeof s.breakout === 'boolean' ? s.breakout : !none, anchors: typeof s.anchors === 'boolean' ? s.anchors : !none};
 }
-// A breakout strap stands this far from the peel point, which clears the
-// strap's width; a spacing strap already within BREAKOUT_MERGE_MM of where one
-// would go, on the same side, serves as it; peel points less than
-// BREAKOUT_GROUP_MM from the one before are one group, strapped on its two
-// outer sides and not between; a side with less than BREAKOUT_MERGE_MM of
-// riding gets none.
+// THE STRAP WIDTHS A RACK MAY USE, mm: hook-and-loop strap is sold in narrower
+// and wider rolls, and which one a strap is cut from is a choice. ESTIMATED:
+// the three are the common inch sizes (1/2, 3/4 and 1 in) rounded to a whole
+// millimetre; no maker's sheet is held for them. Each strap straps() returns
+// carries its `width_mm`: STRAP_WIDE_MM for a pack WIDE_PACK_MM across or
+// more, STRAP_BASE_MM otherwise, and the narrowest that fits where two peel
+// points leave less room than that between them.
+export const STRAP_WIDTHS_MM = [12, 19, 25];
+export const STRAP_BASE_MM = 19;
+export const STRAP_WIDE_MM = 25;
+export const WIDE_PACK_MM = 25;
+// The gap a strap keeps from a peel point each side of it. ESTIMATED.
+export const STRAP_CLEAR_MM = 5;
+// BREAKOUT STRAPS (decided 2026-10-11, docs/rack-file-v4-design.md section
+// 10, decision 14). A strap goes before each point where a cable leaves:
+// - peel points are grouped only where no strap fits between them, which is
+//   closer than BREAKOUT_GROUP_MM, the narrowest strap and its clearance each
+//   side; the grouping chains;
+// - between two groups, where two or more ride, a gap of BREAKOUT_TWO_MM or
+//   more takes a strap BREAKOUT_MM in from each end of it; a shorter gap takes
+//   ONE, BREAKOUT_MM from the end a riding member peels at (the middle of the
+//   gap when members peel at both ends, or when that would leave the strap
+//   less than its clearance), of the widest width that fits;
+// - a spacing strap already in a short gap serves, and one within
+//   BREAKOUT_MERGE_MM of where a breakout strap would go in a long gap, on
+//   the same side, serves as it;
+// - the gap at either end of the trunk, where the members fan out, gets none
+//   when it has less than BREAKOUT_MERGE_MM of riding.
+// At a pitch of one unit (44.45 mm) every cable so gets a strap before it
+// leaves; at two units and over, one each side of each peel point.
 export const BREAKOUT_MM = 25;
 export const BREAKOUT_MERGE_MM = 50;
-export const BREAKOUT_GROUP_MM = 75;
+export const BREAKOUT_GROUP_MM = STRAP_WIDTHS_MM[0] + 2 * STRAP_CLEAR_MM;
+export const BREAKOUT_TWO_MM = 75;
 
 // "c1-c12", "c1, c3 and c7-c9": the members' ids, runs of numbers joined.
 export function membersText(ids) {
@@ -179,7 +204,7 @@ function diameter(cable, ctx) {
   let d = null;
   try { d = typeof ctx.diameterOf === 'function' ? ctx.diameterOf(cable) : null; } catch { d = null; }
   if (typeof d === 'number' && d > 0) return [d, true];
-  const m = DIAMETERS[cable?.media];
+  const m = typeof cable?.media === 'string' && Object.hasOwn(DIAMETERS, cable.media) ? DIAMETERS[cable.media] : null;
   return m ? [m, true] : [UNSET_D, false];
 }
 export const bundleDiameter = ds => Math.sqrt(ds.reduce((a, d) => a + d * d, 0) / BUNDLE_PACK);
@@ -385,7 +410,7 @@ export function straps(rack, b, ctx = {}) {
   const every = strapSpacing(b), mm = strapEveryMm(b), want = strapKinds(b);
   const L = layoutOf(rack, b, ctx);
   if (!L) return null;
-  const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, straps: [], runs: []};
+  const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: []};
   if (b.members.length < 2 || L.trunk.length < 2) return empty;
   const pts = L.trunk.map(w => pointOf(rack, w, ctx.route));
   if (pts.some(p => !p)) return empty;
@@ -430,25 +455,44 @@ export function straps(rack, b, ctx = {}) {
     const len = e - s, n = Math.ceil(len / mm - 1e-9);
     for (let k = 0; k < n; k++) spacing.push(clear(s + ((k + 0.5) * len) / n, s, e));
   }
-  // breakout straps: the peel points, grouped by chaining, each group's outer sides
+  // the pack at a place along the trunk: the members riding there, and how wide a strap it takes
+  const riders = L.members.filter(m => m.ji != null && m.li != null).map(m => {
+    const c = (rack.cables || []).find(x => x.id === m.cable);
+    return {lo: along(L.T[Math.min(m.ji, m.li)]), hi: along(L.T[Math.max(m.ji, m.li)]), d: diameter(c, ctx.route)[0]};
+  });
+  const packAt = a => bundleDiameter(riders.filter(x => x.lo <= a + 1e-9 && x.hi >= a - 1e-9).map(x => x.d));
+  const baseWidth = a => (packAt(a) >= WIDE_PACK_MM ? STRAP_WIDE_MM : STRAP_BASE_MM);
+  // breakout straps: the peel points, grouped where no strap fits between, and the gaps between groups
   const breakout = [];
   if (want.breakout) {
     const groups = [];
-    for (const p of cuts) { const g = groups.at(-1); if (g && p - g[1] < BREAKOUT_GROUP_MM) g[1] = p; else groups.push([p, p]); }
-    const riding = (lo, hi) => spans.filter(([x, y]) => x <= lo + 1e-9 && y >= hi - 1e-9).length;
-    const side = (edge, dir) => {
-      // the run of riding on that side of the group, from its edge outward
-      const run = runs.find(([s, e]) => (dir < 0 ? s < edge - 1e-9 && e >= edge - 1e-9 : s <= edge + 1e-9 && e > edge + 1e-9));
-      if (!run) return;
-      const room = dir < 0 ? edge - run[0] : run[1] - edge;
-      const near = dir < 0 ? riding(edge - Math.min(room, 1e-6), edge) : riding(edge, edge + Math.min(room, 1e-6));
-      if (near < 2 || room < BREAKOUT_MERGE_MM - 1e-9) return;
-      const at = edge + dir * BREAKOUT_MM;
-      const [lo, hi] = dir < 0 ? [run[0], edge] : [edge, run[1]];
-      if (spacing.some(a => a >= lo - 1e-9 && a <= hi + 1e-9 && Math.abs(a - at) <= BREAKOUT_MERGE_MM + 1e-9)) return;
-      breakout.push(clear(at, lo, hi));
-    };
-    for (const [g0, g1] of groups) { side(g0, -1); side(g1, 1); }
+    for (const p of cuts) { const g = groups.at(-1); if (g && p - g[1] < BREAKOUT_GROUP_MM - 1e-9) g[1] = p; else groups.push([p, p]); }
+    const inGroup = (v, g) => v >= g[0] - 1e-9 && v <= g[1] + 1e-9;
+    for (let k = 1; k < groups.length; k++) {
+      const A = groups[k - 1], B = groups[k], lo = A[1], hi = B[0], gap = hi - lo;
+      const ride = spans.filter(([x, y]) => x <= lo + 1e-9 && y >= hi - 1e-9);
+      if (ride.length < 2) continue;
+      // the gap at either end of the trunk, where the members fan out to their
+      // ports: with less than BREAKOUT_MERGE_MM of riding it gets none
+      if ((k === 1 || k === groups.length - 1) && gap < BREAKOUT_MERGE_MM - 1e-9) continue;
+      const here = spacing.filter(a => a >= lo - 1e-9 && a <= hi + 1e-9);
+      if (gap >= BREAKOUT_TWO_MM - 1e-9) {
+        // room for one at each end, each unless a spacing strap is near it
+        for (const at of [lo + BREAKOUT_MM, hi - BREAKOUT_MM])
+          if (!here.some(a => Math.abs(a - at) <= BREAKOUT_MERGE_MM + 1e-9)) breakout.push({a: clear(at, lo, hi), w: baseWidth(at)});
+        continue;
+      }
+      if (here.length) continue;                       // a spacing strap already in the gap serves
+      // one strap: before the end a riding member peels at, or in the middle
+      const atA = ride.some(([x, y]) => inGroup(x, A) || inGroup(y, A)), atB = ride.some(([x, y]) => inGroup(x, B) || inGroup(y, B));
+      const mid = (lo + hi) / 2;
+      let at = atA === atB ? mid : atB ? hi - BREAKOUT_MM : lo + BREAKOUT_MM;
+      const fits = (w, where) => Math.min(where - lo, hi - where) >= w / 2 + STRAP_CLEAR_MM - 1e-9;
+      const want_w = baseWidth(at);
+      let w = [...STRAP_WIDTHS_MM].reverse().find(x => x <= want_w && fits(x, at));
+      if (w == null) { at = mid; w = [...STRAP_WIDTHS_MM].reverse().find(x => x <= want_w && fits(x, at)); }
+      if (w != null) breakout.push({a: clear(at, lo, hi), w});
+    }
   }
   // anchor straps: each tray with tie slots the trunk lies on
   const anchors = [];
@@ -457,7 +501,7 @@ export function straps(rack, b, ctx = {}) {
     L.trunk.forEach((w, k) => {
       const t = w.lane ? null : trays.find(x => x.item === w.item && x.via === w.via);
       const tie = t ? nearestTie(t, stretchMiddle(t, pts[k - 1], pts[k], pts[k + 1])) : null;
-      if (tie != null) anchors.push({a: cum[k], item: w.item, via: w.via, tie});
+      if (tie != null) anchors.push({a: cum[k], item: w.item, via: w.via, tie, w: baseWidth(cum[k])});
     });
   }
   const place = a => {
@@ -466,12 +510,16 @@ export function straps(rack, b, ctx = {}) {
     const len = cum[k + 1] - cum[k];
     return {segment: k, t: len > 0 ? Math.round(((a - cum[k]) / len) * 1e4) / 1e4 : 0, along_mm: round1(a)};
   };
-  const list = [...spacing.map(a => ({kind: 'spacing', ...place(a)})), ...breakout.map(a => ({kind: 'breakout', ...place(a)})),
-                ...anchors.map(x => ({kind: 'anchor', ...place(x.a), item: x.item, via: x.via, tie: x.tie}))]
+  const list = [...spacing.map(a => ({kind: 'spacing', ...place(a), width_mm: baseWidth(a)})),
+                ...breakout.map(x => ({kind: 'breakout', ...place(x.a), width_mm: x.w})),
+                ...anchors.map(x => ({kind: 'anchor', ...place(x.a), width_mm: x.w, item: x.item, via: x.via, tie: x.tie}))]
     .sort((p, q) => p.along_mm - q.along_mm);
   return {every, count: list.length, kinds: {spacing: spacing.length, breakout: breakout.length, anchor: anchors.length},
-          straps: list, runs: runs.map(([s, e]) => [round1(s), round1(e)])};
+          widths: widthCounts(list.map(x => x.width_mm)), straps: list, runs: runs.map(([s, e]) => [round1(s), round1(e)])};
 }
+
+// How many straps of each width: {19: 6, 12: 2}.
+export const widthCounts = ws => ws.reduce((m, w) => { m[w] = (m[w] || 0) + 1; return m; }, {});
 
 // WHERE ALONG A TRAY A STRETCH HAS ITS MIDDLE: the stretch is what lies over
 // the tray's floors of the way from `prev` through `at` to `next` (rack
@@ -511,14 +559,18 @@ export function anchorsOf(rack, ctx = {}) {
   const out = new Map();
   const at = (item, via, tie) => {
     const key = `${item}|${via}|${tie}`;
-    if (!out.has(key)) out.set(key, {item, via, tie, bundles: [], cables: []});
+    if (!out.has(key)) out.set(key, {item, via, tie, width_mm: STRAP_BASE_MM, bundles: [], cables: []});
     return out.get(key);
   };
   const trunkTrays = new Map();
   for (const b of bundlesOf(rack)) {
     let st = null;
     try { st = straps(rack, b, ctx); } catch { st = null; }
-    for (const s of st?.straps || []) if (s.kind === 'anchor') at(s.item, s.via, s.tie).bundles.push(b.id);
+    for (const s of st?.straps || []) if (s.kind === 'anchor') {
+      const slot = at(s.item, s.via, s.tie);
+      slot.bundles.push(b.id);
+      slot.width_mm = Math.max(slot.width_mm, s.width_mm);
+    }
     if (b.members.length >= 2 && strapKinds(b).anchors)
       for (const m of b.members) trunkTrays.set(m.cable, (b.route || []).filter(w => w.item).map(w => `${w.item}|${w.via}`));
   }
@@ -545,17 +597,21 @@ export function anchorsOf(rack, ctx = {}) {
   }
   return [...out.values()];
 }
-// THE STRAPS A RACK BUYS: {spacing, breakout, anchor, total}. Spacing and
-// breakout straps are each bundle's own; anchors are counted by slot.
+// THE STRAPS A RACK BUYS: {spacing, breakout, anchor, total, widths}. Spacing
+// and breakout straps are each bundle's own; anchors are counted by slot.
+// `widths` is how many of each width, {19: 12, 12: 2}.
 export function strapTotals(rack, ctx = {}) {
   let spacing = 0, breakout = 0;
+  const ws = [];
   for (const b of bundlesOf(rack)) {
     let st = null;
     try { st = straps(rack, b, ctx); } catch { st = null; }
     spacing += st?.kinds.spacing ?? 0; breakout += st?.kinds.breakout ?? 0;
+    for (const x of st?.straps || []) if (x.kind !== 'anchor') ws.push(x.width_mm);
   }
-  const anchor = anchorsOf(rack, ctx).length;
-  return {spacing, breakout, anchor, total: spacing + breakout + anchor};
+  const slots = anchorsOf(rack, ctx);
+  for (const x of slots) ws.push(x.width_mm);
+  return {spacing, breakout, anchor: slots.length, total: spacing + breakout + slots.length, widths: widthCounts(ws)};
 }
 
 // The trunk's length along the rack's own measure, in metres; null when it

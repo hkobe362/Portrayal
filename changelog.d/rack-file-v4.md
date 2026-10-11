@@ -80,7 +80,9 @@
   A bundle `straps` takes `breakout` and `anchors` beside `every`, and a
   cable takes `straps: {anchors}`; `bundle.update` merges the keys given and
   `cable.update` takes the cable key. `rack/bundles` gains `strapKinds`,
-  `anchorsOf`, `strapTotals` and the three breakout distances.
+  `anchorsOf`, `strapTotals` and the breakout distances. Each strap also
+  carries `width_mm`, one of `STRAP_WIDTHS_MM` (12, 19 and 25): 19, 25 for
+  a pack 25 mm across or more, and the narrowest that fits in a tight gap.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file
@@ -113,13 +115,23 @@
   `stockLength` takes the need, with `{values}`. `pathLength` still answers
   `measured`, now the need and the end play, and adds `need`.
 - **The BOM strap count rises.** A bundle with spacing straps gains its
-  breakout straps (two on most, one in from each end of its trunk, unless a
-  spacing strap is already within 50 mm) and an anchor at each tray with tie
-  slots its trunk lies on. A single cable lying on such a tray is tied at
+  breakout straps (a strap before each point where a cable leaves: one in
+  each gap between cables that leave a unit apart, and one each side of a
+  peel point at two units and over, unless a spacing strap already serves)
+  and an anchor at each tray with tie slots its trunk lies on. A single cable lying on such a tray is tied at
   one slot, shared by every cable there: about three or four straps a lacer
   tray on a full rack, where there were none. A bundle saved with
   `every: null` still has no strap of any kind. The strap line of the BOM
-  says how many of each, and a bundle's note gives the kinds.
+  is reworded on every rack that has one: it says how many of each kind and
+  of each width, and ends "length to suit". A bundle's note gives the kinds.
+- **For a page that calls the kit.** `straps().count` is every kind
+  together; the spacing straps alone are `straps().kinds.spacing`.
+  `strapBomRows(bundles)` counts the straps of single cables only when it
+  is handed `{anchors: anchorsOf(rack, ctx)}`. `END_ALLOWANCE_BY_MEDIA` and
+  `endAllowance` no longer carry the 0.1 m of dressing: a page that took
+  the dressing as `endAllowance` less the table now gets 0. The end play is
+  `END_PLAY_M`, and `spareOf(rack, cable, ctx)` gives every length of a
+  cable. `pathLength().measured` is unchanged in value.
 - **The cable schedule gains two columns, a download-format change:**
   `spare` and `stored`, appended after `notes`, so no column read by
   position moves. A reader that checks the column count has to take 19

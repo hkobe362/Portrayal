@@ -9,7 +9,7 @@ import {positionOf, uLabel, zeroUOf, bundlesOf, bundleName, firstU, railWidth, R
 import {routeText, trunkRoute} from './route.js';
 import {isRackMount, isZeroUPart, railOf, unitsOf, itemUnits, unitsText, spansMeet} from './fit.js';
 import {zeroUEntries, whereText} from './zero-u.js';
-import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable} from './bundles.js';
+import {bundleCheck, straps as strapsOf, trunkLength, strapSpacing, membersText, bundleOfCable, widthCounts} from './bundles.js';
 export {positionOf};
 import {endKey, endName, cableName, paneOf, mismatch, lengthText, lengthParts, MEDIA_LABELS} from './cable-rules.js';
 import {storedText} from './slack.js';
@@ -317,6 +317,9 @@ export function bundleExports(rack, ctx = {}) {
             straps: !check.checked ? null : drawn ? (st ? st.count : null) : 0,
             // the three kinds, which `straps` is the sum of (bundles.js straps)
             strap_kinds: check.checked && drawn && st ? {...st.kinds} : null,
+            // how many of each strap width, {19: 6, 12: 2}, and of those the anchors
+            strap_widths: check.checked && drawn && st ? {...st.widths} : null,
+            anchor_widths: check.checked && drawn && st ? widthCounts(st.straps.filter(x => x.kind === 'anchor').map(x => x.width_mm)) : null,
             size_mm: size && size.max_mm > 0 ? size.max_mm : null, limit_mm: size ? size.limit_mm : null,
             limit_at: size?.limitBy?.text ?? null, limit_estimated: !!size?.limitBy?.estimated,
             bend_mm: bend?.radius_mm ?? null, bend_by: bend?.by ?? null,
@@ -359,7 +362,14 @@ export const bundleNotes = (bundles = []) => bundles.flatMap(e => [bundleNote(e)
 // and not by what passes it. `anchors`, when given, is bundles.js anchorsOf
 // for the rack: every slot a bundle or a single cable is tied at. Without it
 // the anchors are each bundle's own, and no single cable's.
+// A STRAP IS CUT FROM ONE OF A FEW WIDTHS (bundles.js STRAP_WIDTHS_MM), so the
+// line says how many of each, widest first: "9 of 19 mm, 2 of 12 mm".
 export function strapBomRows(bundles = [], {anchors = null} = {}) {
+  const widths = {};
+  const addW = (m, sign = 1) => { for (const [w, n] of Object.entries(m || {})) widths[w] = (widths[w] || 0) + sign * n; };
+  for (const e of bundles) { addW(e.strap_widths); if (anchors) addW(e.anchor_widths, -1); }
+  if (anchors) addW(widthCounts(anchors.map(x => x.width_mm)));
+  const byWidth = Object.entries(widths).filter(([, n]) => n > 0).sort((p, q) => q[0] - p[0]).map(([w, n]) => `${n} of ${w} mm`).join(', ');
   const kind = k => bundles.reduce((a, e) => a + (e.strap_kinds?.[k] || 0), 0);
   const spacing = kind('spacing'), breakout = kind('breakout'), anchor = anchors ? anchors.length : kind('anchor');
   const qty = spacing + breakout + anchor;
@@ -370,7 +380,7 @@ export function strapBomRows(bundles = [], {anchors = null} = {}) {
                 breakout ? `${breakout} where a cable joins or leaves a bundle` : null,
                 anchor ? `${anchor} at tray tie slots` : null].filter(Boolean);
   return [{section: 'Cables', qty, manufacturer: '', model: 'Hook-and-loop cable strap',
-           description: `${what.join('; ')}; length and width to suit`, ref: ''}];
+           description: `${what.join('; ')}; ${byWidth ? `${byWidth} wide; ` : ''}length to suit`, ref: ''}];
 }
 const andWords = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} or ${xs.at(-1)}`);
 // What the strap line cannot count: a drawn bundle whose route could not be

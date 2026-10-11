@@ -719,7 +719,7 @@ length gets one of these:
 | an entry naming a tray | "mgr-1 tray, coil, 0.38 m; 0.2 m at the ends" |
 | an `{end}` entry | "0.38 m at the A end; 0.2 m at the ends" |
 | entries with values that add up to less than what is to store | the entries, then "0.1 m not placed" |
-| entries with values that add up to more | the entries, and the finding "c7 stores 1.5 m in mgr-1 tray and has 0.6 m to spare." |
+| entries with values that add up to more | the entries, and the finding "c7 stores 1.5 m in mgr-1 tray and has 0.6 m to store.", past the stock break tolerance of 10 mm |
 | no `slack` key | "0.38 m not placed; 0.2 m at the ends" |
 | `"slack": []` | "0.38 m not placed, by choice; 0.2 m at the ends" |
 | nothing to store (the spare is all end play) | "0.15 m at the ends" |
@@ -801,15 +801,25 @@ neither (its decision 3, 2026-10-09).
   side. The rule names sides by who rides, not by direction, so it is the
   same when the bundle is written end for end.
 - **How far.** The strap centre is 25 mm from the peel point
-  (`BREAKOUT_MM`), which clears the 20 mm strap width.
-- **Within reason.** A spacing strap that already lies within 50 mm of where
-  a breakout strap would go, on the same side, serves as it and none is
-  added (`BREAKOUT_MERGE_MM`). Peel points are grouped by chaining: sorted
-  along the trunk, each one less than 75 mm from the one before it joins
-  the group of that one (`BREAKOUT_GROUP_MM`), however long the chain grows,
-  so peels at 0, 60 and 130 mm are one group read from either end. A group
-  is strapped once on each outer side and not between. A side shorter than 50 mm of riding gets none.
+  (`BREAKOUT_MM`).
+- **Where one fits** (decision 14). Peel points are grouped only where no
+  strap fits between them: closer than 22 mm (`BREAKOUT_GROUP_MM`), the
+  narrowest strap and its clearance of 5 mm each side. The grouping chains.
+  Between two groups, where two or more ride: a gap of 75 mm or more
+  (`BREAKOUT_TWO_MM`) takes a strap 25 mm in from each end; a shorter gap
+  takes one, 25 mm from the end at which a riding member peels, or in the
+  middle of the gap when members peel at both ends or when that would leave
+  the strap less than its clearance. A spacing strap already in a short gap
+  serves, and in a long gap one within 50 mm of where a breakout strap would
+  go serves as it (`BREAKOUT_MERGE_MM`). The gap at either end of the trunk,
+  where the members fan out to their ports, gets none when it is under
+  50 mm. So at a pitch of one unit every cable has a strap before it leaves,
+  and at two units and over there is one each side of each peel point.
   A strap that would fall on a ring moves to its nearer edge, as now.
+- **How wide** (decision 15). A strap is cut from one of a few stock widths,
+  `STRAP_WIDTHS_MM`: 12, 19 and 25 mm. Each strap carries `width_mm`: 19,
+  or 25 where the pack it goes round is 25 mm across or more, and the
+  narrowest that fits where a gap is too tight for that.
 - Each strap that `straps()` returns gains `kind`: `spacing`, `breakout` or
   `anchor`. The count is the three together.
 
@@ -1403,6 +1413,27 @@ one-way.
     FHD-CMP5DR, about 2.2 to 3 m); turns stacked to the whole ring opening
     (thirty-six, about 6.6 to 9 m). Two-way.
 
+14. **Breakout straps at close pitch (decided 2026-10-11): a strap before
+    each leaving point.** The first build grouped every peel point within
+    75 mm of the one before, so a trunk whose cables join a unit apart was
+    one group and had no breakout strap at all. Peel points are grouped
+    only where no strap fits between them with its clearance (3.10). On
+    eleven cables down one lane a unit apart that is nine straps where
+    there were none; at two units and three it is what it was. Considered:
+    the chained 75 mm of the first build. One-way: the strap count, and
+    where a drawn strap is.
+
+15. **A strap has a width, from a short list (decided 2026-10-11).**
+    Narrower and wider hook-and-loop strap exists and may be used: each
+    strap carries `width_mm`, one of 12, 19 and 25, and the BOM line counts
+    each width. The list and the rule that picks one are provisional
+    (section 13, item 43). Considered: the one 20 mm figure of before.
+    One-way: the shape of a strap entry, and the text of the BOM line.
+
+16. **Single-cable tie straps are kept as built (decided 2026-10-11):** one
+    strap at each tray tie slot a lone cord rests at, shared by every cord
+    at that slot (section 13, item 38, for how the slot is found).
+
 ## 11. One-way items
 
 **That follow from a decision of section 10:**
@@ -1419,6 +1450,17 @@ one-way.
 | breakout and anchor straps, their distances, `kind`, the strap count | 10 |
 | the hardware row and its text | 11 |
 | zero-U spans in millimetres | 12 |
+
+**That the build added, and the note had not decided:**
+
+| item | where | what moves |
+|---|---|---|
+| the BOM strap line counts each kind of strap and each width, and ends "length to suit" | BOM | every rack with a bundle or a cord on a tray; before, it gave one count and one spacing |
+| `kinds` and `widths` in what `straps()` returns, `strap_kinds`, `strap_widths` and `anchor_widths` on a bundle in `bundleExports`, `kinds` in `inspect` of a bundle | kit output | `count` is all kinds together; the spacing straps alone are `kinds.spacing` |
+| `width_mm` on each strap, and on each slot of `anchorsOf` | kit output | decision 15 |
+| `spare-unplaced`, `spare-short`, `spare-over`, `spare-off-route` as finding kinds of one cable, and `spareLine` as the one line for a rack | kit output | agents match the kinds |
+| `END_ALLOWANCE_BY_MEDIA` and `endAllowance` are what is inside the port alone | kit API | a page that took the dressing as `endAllowance` less the table gets 0: the end play is `END_PLAY_M`, and the lengths of a cable are `spareOf` |
+| `strapBomRows(bundles)` counts single cables only when handed `{anchors: anchorsOf(rack, ctx)}` | kit API | a page that does not pass them leaves their straps out |
 
 **That the scope fixed before any of those decisions:**
 
@@ -1635,9 +1677,14 @@ numbers are kept: a later reading takes the next one.
   spool ("CM-01 tray states no spool."), a turn that cannot lie on the
   floor ("A turn of c1 is 67.5 mm across, and the floor of CM-01 tray is
   61.2 mm deep."), a second entry for the rest, and spare left at an end
-  given a form. In the finding of values past what there is to store, "to
-  spare" is the spare, the stock less the need. An entry kept on a tray the
-  cable cannot store in is a finding of its own kind, `spare-off-route`.
+  given a form. The finding of values past what there is to store compares
+  them with what is to store and names it ("has 0.44 m to store"), and is
+  raised only past the stock break tolerance, 10 mm. An entry kept on a
+  tray the cable cannot store in is a finding of its own kind,
+  `spare-off-route`. `spare-unplaced` is a finding of one cable, which
+  `inspect` of that cable carries; the rack has one summary line
+  (`spareLine`) and never a line a cable. A cable with no length has no
+  spare, no finding and no part in that line.
 32. **No command writes an empty list.** `cable.slack.clear` with a place
   takes that entry off, and the key with the last; with none it takes the
   key off, so nothing is said again. "Stored nowhere, by choice" can be
@@ -1652,9 +1699,10 @@ numbers are kept: a later reading takes the next one.
   section 9 lists them. The key is kept on a cable as written.
 36. **`inspect` of a cable** gains `spare_findings` where it has any, and
   `describe` gives the spare a line of its own after the findings.
-37. **Found, not fixed:** a cable whose media is named like something every
-  object has (`constructor`) gets a path with a point that is no number,
-  and so no length. It is so on main, and is outside this version.
+37. **Found on main and fixed here:** a cable whose media is named like
+  something every object has (`constructor`) got a path with a point that
+  is no number, no length, and `value: null` in a saved file. Every table
+  the kit reads by a media name is now read by its own keys only.
 38. **Where a cable lies on a tray, for its anchor** (3.10). A single cable is
   tied at a tray its path rests on. Its stretch there is the part of its
   path within 12 mm over a floor of the tray (on the floor, or on the sill
@@ -1674,8 +1722,22 @@ numbers are kept: a later reading takes the next one.
   cables only when it is handed `anchorsOf` for the rack.
 41. **The kit draws no strap.** An anchor is an entry with its tray and slot;
   the band at the slot is the page's to draw.
-42. **Measured on the generated sample** (78 racks, 364 lacer trays, 2,320
+42. **Measured.** On the generated sample (78 racks, 364 lacer trays, 2,320
   cables, no bundle): 1,220 anchor straps where there were none, 3.4 a
-  tray; 1,699 cables rest on a tray. Of eight fixture bundles five gain two
-  breakout straps each and three gain none.
+  tray; 1,699 cables rest on a tray. On the eight bundles the tests hold:
+  the trunk along five rings (5 straps, unchanged: a spacing strap serves
+  each end), the trunk of 30 in through ducts (3 to 5), the fan-out up the
+  lane (2 to 4), the three-member bundle of the exports test (4 to 6), the
+  two drawn bundles of its three (4 to 6 each), the eleven cables down one
+  lane a unit apart (2 to 8 under decision 14; 2 before it) and the two
+  jumpers of that rack (1, unchanged).
+43. **The strap widths and the rule that picks one** (decision 15). The
+  list is 12, 19 and 25 mm: the common inch sizes of hook-and-loop strap
+  (1/2, 3/4 and 1 in) to a whole millimetre, an estimate with no maker's
+  sheet held. A strap is 19 mm; 25 mm where the pack at it is 25 mm across
+  or more (`WIDE_PACK_MM`, a figure of this build); and in a gap too tight
+  for that, the widest of the list that leaves 5 mm clear each side
+  (`STRAP_CLEAR_MM`, an estimate). The 20 mm that keeps a strap off a ring
+  (`STRAP_W`) is unchanged, so no strap of before moves.
+
 
