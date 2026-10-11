@@ -1,18 +1,65 @@
 {
+ "adjustments": {
+  "rail-setback": {
+   "axis": "z",
+   "carrier": "rail-panel",
+   "default": 159.9,
+   "members": [
+    "bottom/decor/rail",
+    "bottom/decor/rail-panel",
+    "bottom/decor/tab-left",
+    "bottom/decor/tab-right",
+    "front/placements/rail",
+    "front/placements/rail-panel",
+    "left/decor/flange",
+    "left/decor/tab-bottom",
+    "left/decor/tab-top",
+    "left/placements/screw-lower",
+    "left/placements/screw-upper",
+    "rear/decor/cutout-1",
+    "rear/decor/cutout-2",
+    "rear/decor/cutout-3",
+    "rear/decor/cutout-4",
+    "rear/decor/cutout-5",
+    "rear/decor/cutout-6",
+    "rear/decor/cutout-7",
+    "rear/decor/cutout-8",
+    "rear/decor/panel-back",
+    "right/decor/flange",
+    "right/decor/tab-bottom",
+    "right/decor/tab-top",
+    "right/placements/screw-lower",
+    "right/placements/screw-upper",
+    "top/decor/rail",
+    "top/decor/rail-panel",
+    "top/decor/tab-left",
+    "top/decor/tab-right"
+   ],
+   "range": [
+    50.5,
+    269.4
+   ],
+   "stops": {
+    "front": 50.5,
+    "middle": 159.9,
+    "rear": 269.4
+   }
+  }
+ },
  "bay-accepts": {},
- "composed": "fe759a08d253abb5",
+ "composed": "28faae5cb4b59454",
  "composed-refs": {
   "common/pan-screw-m5@1": "1.0.0+e3af94de13c20a50",
   "fs/din-rail-ts35-400@1": "1.0.0+5d1b53d78b07151a",
   "fs/dinrail4u-ear@1": "1.0.0+3a0ff7cea4e2eee4",
-  "fs/dinrail4u-panel@2": "2.0.0+017cf4b30ae01842",
+  "fs/dinrail4u-panel@2": "2.0.1+85ce25bfdc763368",
   "fs/dinrail4u-side@1": "1.0.1+6f564ca84c8fc5cb"
  },
  "configs": [
   "base"
  ],
  "format": 1,
- "gaps": "4f248062f27e9165",
+ "gaps": "e50c3e60fa120dd6",
  "groups": [
   "ears",
   "frame",
@@ -62,6 +109,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "7e3f8b82318ca270",
- "surface": "47db1d8b671ddc11",
- "version": "1.0.0"
+ "surface": "474f41039ced0e7b",
+ "version": "1.1.0"
 }

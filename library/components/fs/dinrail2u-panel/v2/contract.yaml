@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: dinrail2u-panel
-version: 2.0.0
+version: 2.0.1
 class: bracket
 description: >-
   The rail panel of the FS DINRAIL2U bracket, seen from the front: a steel plate 421.2 mm wide
@@ -22,7 +22,8 @@ provenance:
     in, where the rail's ends stand from the panel's (the view's vertical scale differs from its horizontal by
     several per cent).
   depth: >-
-    drawing - 161.2: the panel face's default setback behind the ears (the device's provenance.setback).
+    drawing - 161.2: the panel face's default setback behind the ears (the default of the
+    `rail-setback` adjustment of the device).
     In a sheet body a well builds its floor and nothing round it, so the plate stands at that
     depth with its cut-outs open, and the rail placed in the well stands on it.
 size: {w: 421.2, h: 87.5, d: 161.2}
