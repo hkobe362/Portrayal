@@ -73,6 +73,14 @@
   and the kit places none itself. `inspect` of a cable gives `slack` as
   `{metres, at_ends_m, said, stored, unplaced_m}` and `need` beside its
   length; `describe` gains one line for the rack.
+- Straps have three kinds, and each entry `straps()` returns carries its
+  `kind`: `spacing`, as before; `breakout`, one 25 mm from each point where a
+  cable joins or leaves a bundle, on each side two or more still ride; and
+  `anchor`, one at each tray tie slot a bundle or a single cable is tied at.
+  A bundle `straps` takes `breakout` and `anchors` beside `every`, and a
+  cable takes `straps: {anchors}`; `bundle.update` merges the keys given and
+  `cable.update` takes the cable key. `rack/bundles` gains `strapKinds`,
+  `anchorsOf`, `strapTotals` and the three breakout distances.
 
 ### Changed
 - **One-way: an older page refuses a version-4 rack file.** A version-3 file
@@ -104,6 +112,14 @@
   `allowance` of a path are that figure without the 0.1 m of dressing, and
   `stockLength` takes the need, with `{values}`. `pathLength` still answers
   `measured`, now the need and the end play, and adds `need`.
+- **The BOM strap count rises.** A bundle with spacing straps gains its
+  breakout straps (two on most, one in from each end of its trunk, unless a
+  spacing strap is already within 50 mm) and an anchor at each tray with tie
+  slots its trunk lies on. A single cable lying on such a tray is tied at
+  one slot, shared by every cable there: about three or four straps a lacer
+  tray on a full rack, where there were none. A bundle saved with
+  `every: null` still has no strap of any kind. The strap line of the BOM
+  says how many of each, and a bundle's note gives the kinds.
 - **The cable schedule gains two columns, a download-format change:**
   `spare` and `stored`, appended after `notes`, so no column read by
   position moves. A reader that checks the column count has to take 19

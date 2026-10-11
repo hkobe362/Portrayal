@@ -463,15 +463,22 @@ test('straps: ceil(L / every), evenly, none on a run\'s end; one in a ring moves
   assert.equal(s.count, 5);
   // evenly at 41, 123, 205, 287, 369; ring 2 at 307.5, 3 at 205, 4 at 102.5, each taking +/-30 mm with a strap's half width
   assert.deepEqual(s.straps.map(x => x.along_mm), [41, 132.5, 175, 277.5, 369]);
-  assert.deepEqual(s.straps[1], {segment: 1, t: 0.2927, along_mm: 132.5});
+  assert.deepEqual(s.straps[1], {kind: 'spacing', segment: 1, t: 0.2927, along_mm: 132.5});
   assert.deepEqual(s.runs, [[0, 410]]);
+  // (rack file version 4) the two ends of the trunk are peel points, and the
+  // spacing straps at 41 and 369 are within 50 mm of where a breakout strap
+  // would go, 25 mm in: each serves, and none is added
+  assert.deepEqual(s.kinds, {spacing: 5, breakout: 0, anchor: 0});
   // 30 in at 12 in: 3 straps, 10 in apart, through ducts (straps in a duct stay)
   const ducts = {'guide-1': 0, 'guide-2': 762};
   let d = rackWith([RT('i2:guide-1', 'i2:guide-2'), RT('i2:guide-1', 'i2:guide-2')]);
   d = run(d, {op: 'bundle.create', cables: ['c1', 'c2'], route: RT('i2:guide-1', 'i2:guide-2')}).rack;
   const dc = {...routeCtx(d), guidesOf: id => (id === 'i2' ? Object.entries(ducts).map(([via, x]) => ({via, kind: 'duct', face: 'front', x, box: {w: 40, h: 30}})) : [])};
   const ds = B.straps(d, d.bundles[0], {route: dc});
-  assert.deepEqual(ds.straps.map(x => x.along_mm), [127, 381, 635]);
+  assert.deepEqual(ds.straps.filter(x => x.kind === 'spacing').map(x => x.along_mm), [127, 381, 635]);
+  // and a breakout strap 25 mm in from each end, where the two fan out: the nearest spacing strap is 102 mm away
+  assert.deepEqual(ds.straps.map(x => [x.kind, x.along_mm]), [['breakout', 25], ['spacing', 127], ['spacing', 381], ['spacing', 635], ['breakout', 737]]);
+  assert.equal(ds.count, 5);
   assert.deepEqual(ds.every, {value: 12, unit: 'in'});
   // {every: null}: no straps, still runs
   const none = run(d, {op: 'bundle.update', id: 'b1', straps: {every: null}}).rack;
@@ -487,7 +494,11 @@ test('straps: fan-out leaves fewer than two riding, which ends a run', () => {
               {op: 'bundle.peel', id: 'b1', cable: 'c3', at: {lane: 'left-front', ru: 20}, end: 'b'}]).rack;
   const s = B.straps(r, r.bundles[0], {route: routeCtx(r)});
   assert.deepEqual(s.runs, [[0, Math.round(10 * RU * 10) / 10]]);
-  assert.equal(s.count, Math.ceil((10 * RU) / 304.8));
+  assert.equal(s.kinds.spacing, Math.ceil((10 * RU) / 304.8));
+  // the breakout straps of version 4: one in from the start, where the three fan in, and one before U20, where
+  // three still ride; none after it, where one cable is alone
+  assert.deepEqual(s.straps.filter(x => x.kind === 'breakout').map(x => x.along_mm), [25, Math.round((10 * RU - 25) * 10) / 10]);
+  assert.equal(s.count, 4);
 });
 
 // ── what an agent reads ──────────────────────────────────────────────────

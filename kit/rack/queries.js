@@ -394,7 +394,7 @@ function bundleFacts(rack, b, ctx) {
     route: {waypoints: b.route || [], text: routeText(b.route || [], label, rack.frame)},
     length: r.checked ? trunkLength(rack, b, ctx) : null,
     size: r.size, bend: r.bend,
-    straps: {every: strapSpacing(b), count: s ? s.count : null},
+    straps: {every: strapSpacing(b), count: s ? s.count : null, kinds: s ? s.kinds : null},
     gone: r.gone, warnings: r.warnings, notes: r.notes, checked: r.checked};
 }
 

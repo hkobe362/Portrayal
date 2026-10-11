@@ -11,7 +11,8 @@
 // route.js takes (`{chassisOf, guidesOf, portX, portY?, zeroUAperture?}`).
 
 import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers} from './model.js';
-import {ownRoute, trunkRoute, trunkMeasures, pointOf, routeText, DIAMETERS} from './route.js';
+import {ownRoute, trunkRoute, trunkMeasures, pointOf, routePath, routeText, DIAMETERS} from './route.js';
+import {traysOf} from './solids.js';
 import {elementsOf, elementText, waypointKey, followTrunk, andList} from './bundle-route.js';
 import {zeroUOnLane, carriesLane} from './zero-u.js';
 import {cornersOf, STRAIGHT_DEG} from './route-path.js';
@@ -41,6 +42,27 @@ export const bundleOfCable = (rack, cableId) => bundlesOf(rack).find(b => b.memb
 export const strapSpacing = b => (b.straps && 'every' in b.straps ? b.straps.every : DEFAULT_STRAPS);
 export const strapEveryMm = b => { const e = strapSpacing(b); return e ? e.value * MM[e.unit] : null; };
 export const spacingText = e => (e ? `straps every ${e.value} ${e.unit}` : 'no straps');
+// WHICH KINDS OF STRAP A BUNDLE HAS (rack file version 4,
+// docs/rack-file-v4-design.md section 3.10): beside the spacing straps,
+// BREAKOUT straps, one beside each point where a cable joins or leaves, and
+// ANCHOR straps, one at each tray tie slot the bundle is tied to. `breakout`
+// and `anchors` on `straps` turn each on or off; left out, each is on where
+// `every` is left out or a spacing, and off where `every` is null, so a
+// bundle saved with no straps has none of any kind.
+export function strapKinds(b) {
+  const s = b?.straps && typeof b.straps === 'object' ? b.straps : {};
+  const none = 'every' in s && s.every === null;
+  return {breakout: typeof s.breakout === 'boolean' ? s.breakout : !none, anchors: typeof s.anchors === 'boolean' ? s.anchors : !none};
+}
+// A breakout strap stands this far from the peel point, which clears the
+// strap's width; a spacing strap already within BREAKOUT_MERGE_MM of where one
+// would go, on the same side, serves as it; peel points less than
+// BREAKOUT_GROUP_MM from the one before are one group, strapped on its two
+// outer sides and not between; a side with less than BREAKOUT_MERGE_MM of
+// riding gets none.
+export const BREAKOUT_MM = 25;
+export const BREAKOUT_MERGE_MM = 50;
+export const BREAKOUT_GROUP_MM = 75;
 
 // "c1-c12", "c1, c3 and c7-c9": the members' ids, runs of numbers joined.
 export function membersText(ids) {
@@ -331,23 +353,39 @@ export function bundleChecks(rack, ctx = {}) {
   });
 }
 
-// ── straps (section 6) ───────────────────────────────────────────────────
-// Along each RUN of the trunk (a longest stretch with two or more members
-// riding together), n = ceil(L / every) straps, evenly at (k + 0.5) L / n, so
-// none is more than the spacing apart and none sits on a run's end. A strap
-// that falls on a ring or a pass-through (its extent along the run, widened by
-// half a strap each side) moves to the stretch's nearer edge; one in a duct
-// stays. The count is what the BOM buys and is never raised for a move.
-// Returns {every, count, straps: [{segment, t, along_mm}], runs: [[from, to]]}
-// (mm from the trunk's start), or null without `ctx.route`. A straps entry
-// names its trunk segment (between resolved waypoints `segment` and
-// `segment + 1`) and how far along it, since each view draws the waypoints at
-// its own positions.
+// ── straps (section 6; docs/rack-file-v4-design.md section 3.10) ─────────
+// Three kinds, each entry with its `kind`:
+// SPACING. Along each RUN of the trunk (a longest stretch with two or more
+// members riding together), n = ceil(L / every) straps, evenly at
+// (k + 0.5) L / n, so none is more than the spacing apart and none sits on a
+// run's end.
+// BREAKOUT. A PEEL POINT is a place along the trunk where at least one member
+// joins or leaves it; the two ends of the trunk are peel points where members
+// fan out. A strap goes BREAKOUT_MM from a peel point on each side on which
+// two or more members ride, counting a member that peels there on the side it
+// rides: so both sides where a cable leaves a bundle of four, and the one side
+// where the last two part. The rule names sides by who rides, not by
+// direction, so a bundle written end for end has the same straps. Peel points
+// are grouped by chaining and a group is strapped on its outer sides only; a
+// spacing strap near enough serves; a short side gets none (the constants
+// above).
+// ANCHOR. One at each tray with tie slots that the trunk lies on, at the slot
+// nearest the middle of its stretch there (the lower index on a tie).
+// A spacing or breakout strap that falls on a ring or a pass-through (its
+// extent along the run, widened by half a strap each side) moves to the
+// stretch's nearer edge; one in a duct stays. The count is what the BOM buys:
+// the three kinds together, never raised for a move.
+// Returns {every, count, kinds: {spacing, breakout, anchor}, straps: [{kind,
+// segment, t, along_mm, item?, via?, tie?}], runs: [[from, to]]} (mm from the
+// trunk's start), or null without `ctx.route`. A straps entry names its trunk
+// segment (between resolved waypoints `segment` and `segment + 1`) and how far
+// along it, since each view draws the waypoints at its own positions; an
+// anchor also names its tray and the index of its tie slot.
 export function straps(rack, b, ctx = {}) {
-  const every = strapSpacing(b), mm = strapEveryMm(b);
+  const every = strapSpacing(b), mm = strapEveryMm(b), want = strapKinds(b);
   const L = layoutOf(rack, b, ctx);
   if (!L) return null;
-  const empty = {every, count: 0, straps: [], runs: []};
+  const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, straps: [], runs: []};
   if (b.members.length < 2 || L.trunk.length < 2) return empty;
   const pts = L.trunk.map(w => pointOf(rack, w, ctx.route));
   if (pts.some(p => !p)) return empty;
@@ -365,7 +403,6 @@ export function straps(rack, b, ctx = {}) {
     if (n < 2 || e - s < 1e-9) continue;
     if (runs.length && Math.abs(runs.at(-1)[1] - s) < 1e-9) runs.at(-1)[1] = e; else runs.push([s, e]);
   }
-  if (!mm) return {every, count: 0, straps: [], runs};
   // the stretches a ring or a pass-through takes
   const axis = (p, q) => { const d = [Math.abs(q.x - p.x), Math.abs(q.y - p.y), Math.abs(q.z - p.z)];
     const m = Math.max(...d); return m === 0 ? null : ['x', 'y', 'z'][d.indexOf(m)]; };
@@ -383,15 +420,45 @@ export function straps(rack, b, ctx = {}) {
   stretches.sort((x, y) => x[0] - y[0]);
   stretches = stretches.reduce((acc, s) => { const l = acc.at(-1);
     if (l && s[0] <= l[1]) l[1] = Math.max(l[1], s[1]); else acc.push([...s]); return acc; }, []);
-  const out = [];
-  for (const [s, e] of runs) {
+  // off a ring, to the nearer edge of its stretch, and never out of [lo, hi]
+  const clear = (a, lo, hi) => {
+    const hit = stretches.find(([x, y]) => a > x && a < y);
+    return hit ? Math.min(hi, Math.max(lo, a - hit[0] <= hit[1] - a ? hit[0] : hit[1])) : a;
+  };
+  const spacing = [];
+  if (mm) for (const [s, e] of runs) {
     const len = e - s, n = Math.ceil(len / mm - 1e-9);
-    for (let k = 0; k < n; k++) {
-      let a = s + ((k + 0.5) * len) / n;
-      const hit = stretches.find(([x, y]) => a > x && a < y);
-      if (hit) a = Math.min(e, Math.max(s, a - hit[0] <= hit[1] - a ? hit[0] : hit[1]));
-      out.push(a);
-    }
+    for (let k = 0; k < n; k++) spacing.push(clear(s + ((k + 0.5) * len) / n, s, e));
+  }
+  // breakout straps: the peel points, grouped by chaining, each group's outer sides
+  const breakout = [];
+  if (want.breakout) {
+    const groups = [];
+    for (const p of cuts) { const g = groups.at(-1); if (g && p - g[1] < BREAKOUT_GROUP_MM) g[1] = p; else groups.push([p, p]); }
+    const riding = (lo, hi) => spans.filter(([x, y]) => x <= lo + 1e-9 && y >= hi - 1e-9).length;
+    const side = (edge, dir) => {
+      // the run of riding on that side of the group, from its edge outward
+      const run = runs.find(([s, e]) => (dir < 0 ? s < edge - 1e-9 && e >= edge - 1e-9 : s <= edge + 1e-9 && e > edge + 1e-9));
+      if (!run) return;
+      const room = dir < 0 ? edge - run[0] : run[1] - edge;
+      const near = dir < 0 ? riding(edge - Math.min(room, 1e-6), edge) : riding(edge, edge + Math.min(room, 1e-6));
+      if (near < 2 || room < BREAKOUT_MERGE_MM - 1e-9) return;
+      const at = edge + dir * BREAKOUT_MM;
+      const [lo, hi] = dir < 0 ? [run[0], edge] : [edge, run[1]];
+      if (spacing.some(a => a >= lo - 1e-9 && a <= hi + 1e-9 && Math.abs(a - at) <= BREAKOUT_MERGE_MM + 1e-9)) return;
+      breakout.push(clear(at, lo, hi));
+    };
+    for (const [g0, g1] of groups) { side(g0, -1); side(g1, 1); }
+  }
+  // anchor straps: each tray with tie slots the trunk lies on
+  const anchors = [];
+  if (want.anchors) {
+    const trays = traysOf(rack, ctx.route);
+    L.trunk.forEach((w, k) => {
+      const t = w.lane ? null : trays.find(x => x.item === w.item && x.via === w.via);
+      const tie = t ? nearestTie(t, stretchMiddle(t, pts[k - 1], pts[k], pts[k + 1])) : null;
+      if (tie != null) anchors.push({a: cum[k], item: w.item, via: w.via, tie});
+    });
   }
   const place = a => {
     let k = 0;
@@ -399,7 +466,96 @@ export function straps(rack, b, ctx = {}) {
     const len = cum[k + 1] - cum[k];
     return {segment: k, t: len > 0 ? Math.round(((a - cum[k]) / len) * 1e4) / 1e4 : 0, along_mm: round1(a)};
   };
-  return {every, count: out.length, straps: out.map(place), runs: runs.map(([s, e]) => [round1(s), round1(e)])};
+  const list = [...spacing.map(a => ({kind: 'spacing', ...place(a)})), ...breakout.map(a => ({kind: 'breakout', ...place(a)})),
+                ...anchors.map(x => ({kind: 'anchor', ...place(x.a), item: x.item, via: x.via, tie: x.tie}))]
+    .sort((p, q) => p.along_mm - q.along_mm);
+  return {every, count: list.length, kinds: {spacing: spacing.length, breakout: breakout.length, anchor: anchors.length},
+          straps: list, runs: runs.map(([s, e]) => [round1(s), round1(e)])};
+}
+
+// WHERE ALONG A TRAY A STRETCH HAS ITS MIDDLE: the stretch is what lies over
+// the tray's floors of the way from `prev` through `at` to `next` (rack
+// points; either may be missing), measured along the axis cables lie on it.
+function stretchMiddle(t, prev, at, next) {
+  const ax = t.run === 'z' ? 'z' : 'x', [lo, hi] = t.run === 'z' ? ['z0', 'z1'] : ['x0', 'x1'];
+  const from = Math.min(...t.floors.map(f => f[lo])), to = Math.max(...t.floors.map(f => f[hi]));
+  const clamp = v => Math.min(to, Math.max(from, v));
+  return (clamp((prev ?? at)[ax]) + clamp((next ?? at)[ax])) / 2;
+}
+// The tie slot of a tray nearest a place along it: its index in `ties`, the
+// lower index where two are as near; null for a tray with none.
+function nearestTie(t, where) {
+  const [lo, hi] = t.run === 'z' ? ['z0', 'z1'] : ['x0', 'x1'];
+  let best = null, gap = Infinity;
+  t.ties.forEach((s, i) => { const d = Math.abs((s[lo] + s[hi]) / 2 - where); if (d < gap - 1e-9) { gap = d; best = i; } });
+  return best;
+}
+
+// EVERY TIE SLOT A STRAP ANCHORS AT, rack-wide: [{item, via, tie, bundles:
+// [ids], cables: [ids]}], one entry a slot however many pass it, since one
+// strap at a slot serves every cable and bundle there. The count is by slot,
+// never by cable.
+// - a bundle (drawn, with anchors on): the slot straps() gives it at each tray
+//   its trunk lies on, on either face;
+// - a single cable on the HELD face of a tray: each tie slot it uses there;
+// - a single cable on the RESTING face of a tray that states tie slots: the
+//   slot nearest the middle of its stretch there. `straps: {anchors: false}`
+//   on a cable turns its own off; a member of a drawn bundle is not counted
+//   again at a tray its bundle's trunk lies on.
+// Nothing anchors to a ring or to a part beside the rack: none states a tie
+// point. [] without `ctx.route`.
+const ON_TRAY_MM = 12;   // a cable this close over a tray floor lies on it, or on a ring sill of it
+export function anchorsOf(rack, ctx = {}) {
+  const rc = ctx?.route;
+  if (!rc) return [];
+  const out = new Map();
+  const at = (item, via, tie) => {
+    const key = `${item}|${via}|${tie}`;
+    if (!out.has(key)) out.set(key, {item, via, tie, bundles: [], cables: []});
+    return out.get(key);
+  };
+  const trunkTrays = new Map();
+  for (const b of bundlesOf(rack)) {
+    let st = null;
+    try { st = straps(rack, b, ctx); } catch { st = null; }
+    for (const s of st?.straps || []) if (s.kind === 'anchor') at(s.item, s.via, s.tie).bundles.push(b.id);
+    if (b.members.length >= 2 && strapKinds(b).anchors)
+      for (const m of b.members) trunkTrays.set(m.cable, (b.route || []).filter(w => w.item).map(w => `${w.item}|${w.via}`));
+  }
+  let trays = [];
+  try { trays = traysOf(rack, rc); } catch { trays = []; }
+  for (const c of rack.cables || []) {
+    if (c.straps && c.straps.anchors === false) continue;
+    let path = null;
+    try { path = routePath(rack, c, rc); } catch { path = null; }
+    for (const r of path?.rests || []) {
+      if (r.kind !== 'tray' || (trunkTrays.get(c.id) || []).includes(`${r.item}|${r.via}`)) continue;
+      const t = trays.find(x => x.item === r.item && x.via === r.via);
+      if (!t?.ties.length) continue;
+      if (r.role === 'held') { for (const i of r.ties || []) at(r.item, r.via, i).cables.push(c.id); continue; }
+      // its stretch there: the points of its path over a floor of the tray, on
+      // it or on the sill of a ring that stands on it
+      const ax = t.run === 'z' ? 'z' : 'x';
+      const on = path.points.filter(q => q.y > t.top - 1e-6 && q.y < t.top + ON_TRAY_MM
+        && t.floors.some(f => q.x >= f.x0 - 1e-6 && q.x <= f.x1 + 1e-6 && q.z >= f.z0 - 1e-6 && q.z <= f.z1 + 1e-6)).map(q => q[ax]);
+      if (!on.length) continue;
+      const tie = nearestTie(t, (Math.min(...on) + Math.max(...on)) / 2);
+      if (tie != null) at(r.item, r.via, tie).cables.push(c.id);
+    }
+  }
+  return [...out.values()];
+}
+// THE STRAPS A RACK BUYS: {spacing, breakout, anchor, total}. Spacing and
+// breakout straps are each bundle's own; anchors are counted by slot.
+export function strapTotals(rack, ctx = {}) {
+  let spacing = 0, breakout = 0;
+  for (const b of bundlesOf(rack)) {
+    let st = null;
+    try { st = straps(rack, b, ctx); } catch { st = null; }
+    spacing += st?.kinds.spacing ?? 0; breakout += st?.kinds.breakout ?? 0;
+  }
+  const anchor = anchorsOf(rack, ctx).length;
+  return {spacing, breakout, anchor, total: spacing + breakout + anchor};
 }
 
 // The trunk's length along the rack's own measure, in metres; null when it

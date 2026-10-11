@@ -8,7 +8,7 @@
 import {withItem, updateItem, withoutItem, withFrame, renamed, withDcim, detached, positionOf, isWaypoint, holderOf, firstU, rollOf,
         nextId, zeroUById, zeroUOffset, zeroUBottom, bundlesOf, bundleName, bundleIdFor, holdersOf, usableReadings} from './model.js';
 import {withoutCables, bundleOfCable, bundleCheck, layoutOf, onTrunk, trunkText, waypointText, strapEveryMm,
-        spacingText, DEFAULT_STRAPS} from './bundles.js';
+        spacingText, strapSpacing, strapKinds} from './bundles.js';
 import {deriveTrunk, andList} from './bundle-route.js';
 import {ownRoute, autoRoute, routedLength, pointOf, portPoint, routePath} from './route.js';
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
@@ -624,11 +624,16 @@ function cableUpdate(rack, {id, a, b, ...p}, {chassisOf}) {
     const can = canCable(rack, ends.a, ends.b, {ignoreId: id, uOf});
     if (!can.ok) return {error: can.reason};
   }
-  const want = 'length' in p ? {...p, length: lengthOf(p.length)} : p;
+  const {straps: tie, ...fields} = p;
+  const want = 'length' in fields ? {...fields, length: lengthOf(fields.length)} : {...fields};
+  // the straps of this cable alone: null takes the key off, which is the default
+  const untie = tie === null && 'straps' in c;
+  if (tie != null) want.straps = {...(c.straps && typeof c.straps === 'object' ? c.straps : {}), ...tie};
   // A length named at all replaces one the loader kept as written.
   const changed = Object.keys(want).filter(k => !same(want[k], c[k] ?? null) || (k === 'length' && 'lengthAsWritten' in c));
-  if (!changed.length && !moved.length) return unchanged(rack);
-  const next = updateCable(rack, id, {...want, ...Object.fromEntries(moved.map(k => [k, ends[k]]))});
+  if (!changed.length && !moved.length && !untie) return unchanged(rack);
+  let next = updateCable(rack, id, {...want, ...Object.fromEntries(moved.map(k => [k, ends[k]]))});
+  if (untie) next = {...next, cables: next.cables.map(x => { if (x.id !== id) return x; const {straps: _s, ...rest} = x; return rest; })};
   const name = cableName(cableOf(next, id));
   const said = moved.map(k => `Moved end ${k.toUpperCase()} of cable ${name} to ${endName(next, ends[k], uOf)}.`);
   // A bundled cable stays in its bundle; an end now on another device is said.
@@ -744,6 +749,14 @@ const putBundle = (rack, b) => ({...rack, bundles: bundlesOf(rack).map(x => (x.i
 const labelOf = rack => id => rack.items.find(i => i.id === id)?.label ?? id;
 // A spacing under 50 mm or over 1 m is taken, and said: either is more likely
 // a unit slip than intent.
+// A bundle's straps in words: its spacing, and each kind that is not as the
+// spacing alone would have it.
+function strapsSaid(b) {
+  const e = strapSpacing(b), k = strapKinds(b), on = e !== null;
+  const extra = [k.breakout !== on ? (k.breakout ? 'breakout straps' : 'no breakout straps') : null,
+                 k.anchors !== on ? (k.anchors ? 'anchor straps' : 'no anchor straps') : null].filter(Boolean);
+  return [spacingText(e), ...extra].join(', ');
+}
 function spacingNote(straps) {
   const e = straps?.every;
   if (!e) return [];
@@ -911,9 +924,17 @@ function bundleUpdate(rack, {id, label, number, straps, summary, ...rest}, ctx) 
     if (taken) return {error: `Bundle ${number} is already ${taken.id}'s number.`};
     patch.number = number;
   }
-  if (straps !== undefined && !same(straps, b.straps ?? {every: DEFAULT_STRAPS})) {
-    patch.straps = structuredClone(straps);
-    findings.push(...spacingNote(straps));
+  // STRAPS MERGE BY KEY (version 4): a key given replaces that key, a key
+  // left out stays as it was, and `straps: null` takes the object off, which
+  // is the defaults: every 12 in, with breakout and anchor straps.
+  let unstrap = false;
+  if (straps === null) unstrap = 'straps' in b;
+  else if (straps !== undefined) {
+    const merged = {...(b.straps || {}), ...structuredClone(straps)};
+    if (!same(merged, b.straps ?? {})) {
+      patch.straps = merged;
+      findings.push(...spacingNote(straps));
+    }
   }
   let cleared = [];
   if ('route' in rest) {
@@ -943,11 +964,13 @@ function bundleUpdate(rack, {id, label, number, straps, summary, ...rest}, ctx) 
       if (cleared.length) patch.members = members;
     }
   }
-  if (!Object.keys(patch).length) return unchanged(rack);
+  if (!Object.keys(patch).length && !unstrap) return unchanged(rack);
   const {routeAsWritten: _w, ...kept} = b;
-  const nb = {...('route' in patch ? kept : b), ...patch}, next = putBundle(rack, nb);
+  const nb = {...('route' in patch ? kept : b), ...patch};
+  if (unstrap) delete nb.straps;
+  const next = putBundle(rack, nb);
   if ('label' in patch || 'number' in patch) said.push(`Renamed ${name} to ${bundleName(nb)}.`);
-  if ('straps' in patch) said.push(`${bundleName(nb)} now has ${spacingText(nb.straps.every)}.`);
+  if ('straps' in patch || unstrap) said.push(`${bundleName(nb)} now has ${strapsSaid(nb)}.`);
   if ('route' in patch) said.push(`Rerouted ${bundleName(nb)}.`);
   if (cleared.length) findings.push(note(`Cleared the peel points of ${andList(cleared)}: they are not on the new route.`));
   return {rack: next, summary: summary ?? said.join(' '), findings: [...findings, ...checksOf(next, nb, ctx)]};
@@ -1043,12 +1066,17 @@ const BOTTOM = {type: 'integer', minimum: 1, description: 'The U its bottom is l
 const BETWEEN = {type: 'boolean', description: 'true when it stands between this rack and the next one, serving both.'};
 const BUNDLE_CABLES = (min, description) => ({type: 'array', minItems: min, description,
   items: {type: 'string', minLength: 1, description: 'A cable id, or "@name" from earlier in this batch.'}});
-const STRAPS = {type: 'object', required: ['every'], additionalProperties: false,
-  description: 'Its hook-and-loop straps: {every: {value, unit}}, or {every: null} for none. Every 12 in when left out.',
+const STRAPS = {type: ['object', 'null'], additionalProperties: false,
+  description: 'Its hook-and-loop straps: any of every, breakout and anchors; a key left out stays as it is. null for the defaults.',
   properties: {every: {type: ['object', 'null'], required: ['value', 'unit'], additionalProperties: false,
-    description: 'The spacing, {value, unit}, or null for no straps.',
+    description: 'The spacing, {value, unit}, or null for no spacing straps. Every 12 in when never set.',
     properties: {value: {type: 'number', exclusiveMinimum: 0, description: 'How far apart, above 0.'},
-                 unit: {enum: ['in', 'mm'], description: 'Inches (in) or millimetres (mm).'}}}}};
+                 unit: {enum: ['in', 'mm'], description: 'Inches (in) or millimetres (mm).'}}},
+    breakout: {type: 'boolean', description: 'A strap beside each point where a cable joins or leaves. On when never set, unless every is null.'},
+    anchors: {type: 'boolean', description: 'A strap at each tray tie slot the bundle lies on. On when never set, unless every is null.'}}};
+const CABLE_STRAPS = {type: ['object', 'null'], additionalProperties: false,
+  description: 'The straps of this cable alone: {anchors: false} for none tying it to a tray it passes; null for the default.',
+  properties: {anchors: {type: 'boolean', description: 'false for no strap tying it to a tray it lies on.'}}};
 const args = (required, properties) => ({type: 'object', required, additionalProperties: false,
                                          properties: {...properties, rack: RACK}});
 
@@ -1130,7 +1158,7 @@ export const COMMANDS = {
     args: args(['a', 'b'], {a: END, b: END, ...CABLE_FIELDS, as: AS})},
   'cable.update': {run: cableUpdate, description: "Change a cable's type, purpose, label or length, or move either end to another port. A moved end keeps the cable's id and everything else about it; refused when the new port already has a cable.",
     args: args(['id'], {id: ID('cable'), a: {...END, description: 'Move end A to this port; left where it is when left out.'},
-      b: {...END, description: 'Move end B to this port; left where it is when left out.'}, ...CABLE_FIELDS})},
+      b: {...END, description: 'Move end B to this port; left where it is when left out.'}, ...CABLE_FIELDS, straps: CABLE_STRAPS})},
   'cable.remove': {run: cableRemove, description: 'Delete a cable.', args: args(['id'], {id: ID('cable')})},
   'cable.route': {run: cableRoute, description: 'Route a cable by hand through the waypoints given, in order. Its routed length follows. Refused for a pathway or gutter the rack lacks; the refusal lists what exists.',
     args: args(['id', 'route'], {id: ID('cable'),

@@ -1655,4 +1655,27 @@ numbers are kept: a later reading takes the next one.
 37. **Found, not fixed:** a cable whose media is named like something every
   object has (`constructor`) gets a path with a point that is no number,
   and so no length. It is so on main, and is outside this version.
+38. **Where a cable lies on a tray, for its anchor** (3.10). A single cable is
+  tied at a tray its path rests on. Its stretch there is the part of its
+  path within 12 mm over a floor of the tray (on the floor, or on the sill
+  of a ring that stands on it), and the slot is the one whose middle is
+  nearest the middle of that stretch along the run, the lower index where
+  two are as near. A member of a drawn bundle is not counted again at a
+  tray its trunk lies on. For a trunk the stretch is what lies over the
+  floors of the way from the waypoint before to the one after.
+39. **A side of a peel point** is measured to the end of the run of two or
+  more riding, and a spacing strap serves only from its own side of the
+  peel.
+40. **The words of the strap count.** The BOM line says how many of each kind
+  ("3 along 1 bundle, one every 12 in; 4 where a cable joins or leaves a
+  bundle", then the slots and its closing words as before), and a bundle
+  note gives its kinds where it has more than spacing straps ("7 straps (3
+  every 12 in, 4 where a cable leaves)"). `strapBomRows` counts single
+  cables only when it is handed `anchorsOf` for the rack.
+41. **The kit draws no strap.** An anchor is an entry with its tray and slot;
+  the band at the slot is the page's to draw.
+42. **Measured on the generated sample** (78 racks, 364 lacer trays, 2,320
+  cables, no bundle): 1,220 anchor straps where there were none, 3.4 a
+  tray; 1,699 cables rest on a tray. Of eight fixture bundles five gain two
+  breakout straps each and three gain none.
 

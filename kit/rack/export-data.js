@@ -315,6 +315,8 @@ export function bundleExports(rack, ctx = {}) {
             members: b.members.map(m => m.cable), drawn, checked: !!check.checked,
             length_m: len ? len.metres : null, every: strapSpacing(b),
             straps: !check.checked ? null : drawn ? (st ? st.count : null) : 0,
+            // the three kinds, which `straps` is the sum of (bundles.js straps)
+            strap_kinds: check.checked && drawn && st ? {...st.kinds} : null,
             size_mm: size && size.max_mm > 0 ? size.max_mm : null, limit_mm: size ? size.limit_mm : null,
             limit_at: size?.limitBy?.text ?? null, limit_estimated: !!size?.limitBy?.estimated,
             bend_mm: bend?.radius_mm ?? null, bend_by: bend?.by ?? null,
@@ -323,7 +325,14 @@ export function bundleExports(rack, ctx = {}) {
   });
 }
 
-const strapsText = (n, e) => (e ? `${count(n, 'strap', 'straps')} every ${e.value} ${e.unit}` : 'no straps');
+// "8 straps every 12 in", "8 straps (6 every 12 in, 2 where a cable leaves)", "no straps"
+const strapsText = (n, e, k) => {
+  if (!n) return 'no straps';
+  const kinds = k ? [k.spacing && e ? `${k.spacing} every ${e.value} ${e.unit}` : null, k.breakout ? `${k.breakout} where a cable leaves` : null,
+                     k.anchor ? `${k.anchor} at a tray` : null].filter(Boolean) : [];
+  if (k && (k.breakout || k.anchor)) return `${count(n, 'strap', 'straps')} (${kinds.join(', ')})`;
+  return e ? `${count(n, 'strap', 'straps')} every ${e.value} ${e.unit}` : count(n, 'strap', 'straps');
+};
 // ONE LINE PER BUNDLE, then its warnings and its notes, for the cable
 // schedule and any other export that lists the bundles: "Bundle 2 (b1): 12
 // cables (c1-c12), 2.4 m, 8 straps every 12 in; 23 mm across, limit 29.5 mm
@@ -334,7 +343,7 @@ export function bundleNote(e) {
   if (!e.drawn) return `${head}, no straps.`;
   if (!e.checked) return `${head}; its route could not be read, so its length, straps, size and bend are not given.`;
   const run = [e.length_m != null ? `${e.length_m} m` : null,
-               e.straps != null ? strapsText(e.straps, e.every) : 'straps not counted'].filter(Boolean).join(', ');
+               e.straps != null ? strapsText(e.straps, e.every, e.strap_kinds) : 'straps not counted'].filter(Boolean).join(', ');
   const size = e.size_mm != null ? `${Math.round(e.size_mm)} mm across, limit ${e.limit_mm} mm${e.limit_at ? ` at ${e.limit_at}${e.limit_estimated ? ' (estimated)' : ''}` : ''}` : null;
   const bend = e.bend_mm != null ? `bend radius ${e.bend_mm} mm (${e.bend_by})` : 'bend not checked';
   return `${head}, ${[run, size, bend].filter(Boolean).join('; ')}.`;
@@ -345,14 +354,23 @@ export const bundleNotes = (bundles = []) => bundles.flatMap(e => [bundleNote(e)
 // its quantity every bundle's straps added up; no manufacturer, and length and
 // width left to the buyer. No line when no bundle has a strap. `bundles` is
 // bundleExports'.
-export function strapBomRows(bundles = []) {
-  const qty = bundles.reduce((a, e) => a + (e.straps || 0), 0);
+// THE THREE KINDS ARE SUMMED (rack file version 4): the spacing and breakout
+// straps of each bundle, and the anchor straps, which are counted by tie slot
+// and not by what passes it. `anchors`, when given, is bundles.js anchorsOf
+// for the rack: every slot a bundle or a single cable is tied at. Without it
+// the anchors are each bundle's own, and no single cable's.
+export function strapBomRows(bundles = [], {anchors = null} = {}) {
+  const kind = k => bundles.reduce((a, e) => a + (e.strap_kinds?.[k] || 0), 0);
+  const spacing = kind('spacing'), breakout = kind('breakout'), anchor = anchors ? anchors.length : kind('anchor');
+  const qty = spacing + breakout + anchor;
   if (!qty) return [];
   const used = bundles.filter(e => e.straps > 0);
-  const every = uniq(used.map(e => `${e.every.value} ${e.every.unit}`));
+  const every = uniq(used.filter(e => e.every && e.strap_kinds?.spacing).map(e => `${e.every.value} ${e.every.unit}`));
+  const what = [spacing ? `${spacing} along ${count(used.filter(e => e.strap_kinds?.spacing).length, 'bundle', 'bundles')}, one every ${andWords(every)}` : null,
+                breakout ? `${breakout} where a cable joins or leaves a bundle` : null,
+                anchor ? `${anchor} at tray tie slots` : null].filter(Boolean);
   return [{section: 'Cables', qty, manufacturer: '', model: 'Hook-and-loop cable strap',
-           description: `For ${count(used.length, 'bundle', 'bundles')}, one strap every ${andWords(every)} along each; length and width to suit`,
-           ref: ''}];
+           description: `${what.join('; ')}; length and width to suit`, ref: ''}];
 }
 const andWords = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} or ${xs.at(-1)}`);
 // What the strap line cannot count: a drawn bundle whose route could not be
@@ -362,7 +380,7 @@ export function strapBomNotes(bundles = []) {
   for (const e of bundles) {
     if (!e.drawn) continue;
     if (e.straps == null) out.push(`${e.name}: its route could not be read, so its straps are not counted.`);
-    else if (!e.every) out.push(`${e.name} is set to no straps, so none are counted for it.`);
+    else if (!e.every && !e.straps) out.push(`${e.name} is set to no straps, so none are counted for it.`);
   }
   return out;
 }
