@@ -662,6 +662,33 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.24.0: the DCIM cables files hold the cables on a panel or a
+cassette.** A cable on a fibre port of a module seated in a bay was left out
+of both files, because a module type does not name such a port by its part.
+**This changes what the export holds.** No column, type file or rack file
+changes, and a rack with no cable on such a port exports the files it did.
+
+- The build publishes `optical.ports` in `components.json`: for each fibre
+  part of a module, the front or rear ports of its module type that the part
+  is, one name a position. `fibrePorts(item, end, ctx)` in `rack/ports.js`
+  reads it for a cable end. The kit derives no name.
+- `resolveEnd` takes that answer as `ports`, checks every name against the
+  type file of the target, and answers `names` beside `name`: a duplex
+  adapter on a front is two front ports (`bay-1/1`, `bay-1/2`), an adapter
+  on a back one rear port (`bay-1/B01-1`), a trunk connector one rear port
+  (`bay-2/MTP-1`). `endResolver({ rack, ctx, deviceOf, moduleAt, consolesOf })`
+  returns the `resolve` that `cableImportRows` is handed; `ctx` is the parts
+  lists that function takes as `parts`. **A page gets the new rows by
+  calling it**: `resolveEnd` called as before answers as before, and those
+  cables stay out, with the reason.
+- NetBox: one row a cord, both names in the name cell, separated by a comma.
+  Nautobot: where both ends have two ports, one row a fibre, first port to
+  first port, the label followed by ` (1/2)` and ` (2/2)`; where the other
+  end is a single port (an interface, a rear connector), one row to the
+  first of the two, and a note names each port left without a cable.
+  [`docs/optical-paths-design.md`](../docs/optical-paths-design.md) has the
+  table, and what NetBox 4.7.2 and Nautobot 3.2.6 accepted.
+
 **New in 0.23.0: a port on the back of a seated part.** The rear adapters of
 a patch panel and the trunk connector of a cassette take a cable. Nothing is
 removed, and the rack file and the export columns are as they were.
