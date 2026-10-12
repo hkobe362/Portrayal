@@ -14,18 +14,18 @@ size-notes: >-
   `body.depth`.
 attrs: {media: fiber}
 parts:
-  - {id: b01, ref: common/sc-simplex-adapter@1, at: [84.975, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b02, ref: common/sc-simplex-adapter@1, at: [69.105, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b03, ref: common/sc-simplex-adapter@1, at: [53.235, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b04, ref: common/sc-simplex-adapter@1, at: [37.365, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b05, ref: common/sc-simplex-adapter@1, at: [21.495, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b06, ref: common/sc-simplex-adapter@1, at: [5.625, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b07, ref: common/sc-simplex-adapter@1, at: [84.975, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b08, ref: common/sc-simplex-adapter@1, at: [69.105, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b09, ref: common/sc-simplex-adapter@1, at: [53.235, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b10, ref: common/sc-simplex-adapter@1, at: [37.365, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b11, ref: common/sc-simplex-adapter@1, at: [21.495, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
-  - {id: b12, ref: common/sc-simplex-adapter@1, at: [5.625, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b01, ref: common/sc-simplex-adapter@1, at: [85.550, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b02, ref: common/sc-simplex-adapter@1, at: [69.450, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b03, ref: common/sc-simplex-adapter@1, at: [53.350, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b04, ref: common/sc-simplex-adapter@1, at: [37.250, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b05, ref: common/sc-simplex-adapter@1, at: [21.150, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b06, ref: common/sc-simplex-adapter@1, at: [5.050, -0.600], rotate: 90, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b07, ref: common/sc-simplex-adapter@1, at: [85.550, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b08, ref: common/sc-simplex-adapter@1, at: [69.450, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b09, ref: common/sc-simplex-adapter@1, at: [53.350, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b10, ref: common/sc-simplex-adapter@1, at: [37.250, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b11, ref: common/sc-simplex-adapter@1, at: [21.150, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
+  - {id: b12, ref: common/sc-simplex-adapter@1, at: [5.050, 8.800], rotate: 270, attrs: {housing-finish: '#a0ae61'}}
 provenance:
   size: >-
     datasheet - see size-notes.

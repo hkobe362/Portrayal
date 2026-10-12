@@ -22,43 +22,43 @@ body:
   boxes:
     - {id: moulding, at: [0.5, 0.7], size: [99.0, 19.6], from: 1.0, depth: 30.0, color: '#17191b', shows: [rear],
        confidence: estimated, source: 'the moulding of the 100 x 21 x 37 holder of DSH_XMx rev 1.1, drawn 0.5 to 0.7 inside its face on each side; the 37 is taken as the overall depth with the adapters, and the moulding as 6 short of it, by eye off the renders'}
-    - {id: sc01-back, at: [4.225, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc01-back, at: [3.650, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc02-back, at: [20.095, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc02-back, at: [19.750, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc03-back, at: [35.965, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc03-back, at: [35.850, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc04-back, at: [51.835, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc04-back, at: [51.950, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc05-back, at: [67.705, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc05-back, at: [68.050, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc06-back, at: [83.575, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc06-back, at: [84.150, 1.400], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc07-back, at: [4.225, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc07-back, at: [3.650, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc08-back, at: [20.095, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc08-back, at: [19.750, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc09-back, at: [35.965, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc09-back, at: [35.850, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc10-back, at: [51.835, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc10-back, at: [51.950, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc11-back, at: [67.705, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc11-back, at: [68.050, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
-    - {id: sc12-back, at: [83.575, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
+    - {id: sc12-back, at: [84.150, 10.800], size: [12.2, 8.8], from: 31.0, depth: 6.0, color: '#44a72a', shows: [rear],
        confidence: estimated, source: 'the adapter body standing out of the back of the holder, as the vendor renders show it; 6 is read by eye'}
 parts:
-  - {id: sc01, ref: common/sc-simplex-adapter@1, at: [5.625, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc02, ref: common/sc-simplex-adapter@1, at: [21.495, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc03, ref: common/sc-simplex-adapter@1, at: [37.365, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc04, ref: common/sc-simplex-adapter@1, at: [53.235, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc05, ref: common/sc-simplex-adapter@1, at: [69.105, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc06, ref: common/sc-simplex-adapter@1, at: [84.975, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc07, ref: common/sc-simplex-adapter@1, at: [5.625, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc08, ref: common/sc-simplex-adapter@1, at: [21.495, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc09, ref: common/sc-simplex-adapter@1, at: [37.365, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc10, ref: common/sc-simplex-adapter@1, at: [53.235, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc11, ref: common/sc-simplex-adapter@1, at: [69.105, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
-  - {id: sc12, ref: common/sc-simplex-adapter@1, at: [84.975, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc01, ref: common/sc-simplex-adapter@1, at: [5.050, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc02, ref: common/sc-simplex-adapter@1, at: [21.150, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc03, ref: common/sc-simplex-adapter@1, at: [37.250, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc04, ref: common/sc-simplex-adapter@1, at: [53.350, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc05, ref: common/sc-simplex-adapter@1, at: [69.450, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc06, ref: common/sc-simplex-adapter@1, at: [85.550, -0.600], rotate: 90, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc07, ref: common/sc-simplex-adapter@1, at: [5.050, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc08, ref: common/sc-simplex-adapter@1, at: [21.150, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc09, ref: common/sc-simplex-adapter@1, at: [37.250, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc10, ref: common/sc-simplex-adapter@1, at: [53.350, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc11, ref: common/sc-simplex-adapter@1, at: [69.450, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
+  - {id: sc12, ref: common/sc-simplex-adapter@1, at: [85.550, 8.800], rotate: 270, attrs: {housing-finish: '#44a72a'}}
 faces:
   rear: {ref: fibrain/xmn1051gb-rear@1}
 optical:
@@ -82,30 +82,55 @@ optical:
 provenance:
   size: >-
     datasheet - DSH_XMx_EN rev 1.1 (03.06.2024), technical specification: height
-    21, width 100, depth 37 mm, plastic. One holder fills one HD slot.
+    21, width 100, depth 37 mm, plastic. One holder fills one HD slot. THE
+    100 x 21 IS THE NOMINAL ENVELOPE, kept because it is the slot: the maker's
+    front elevation draws the moulding 99.70 x 20.95, in a frame opening drawn
+    99.99 x 21.00, and 103.50 over the two latch tabs that reach into the
+    posts.
   parts: >-
-    ESTIMATED, MEASURED OFF ONE RENDER. No drawing of the holder is published
-    and every image of it is a three-quarter render. The columns come from the
-    one image with the camera on the centre line, the vendor's front render of
-    the 1U extendable panel XHU00 (XHU00_6.jpg, 4000 px), scaled on its 482.6
-    rack face at 7.94 px/mm: across all four holders the green adapter bodies
-    stand on a constant 15.87 pitch and read 12.6 to 13.35 wide, and the group
-    of six is centred between the red release latches either side (offsets
-    7.99, 7.37, 6.68 and 5.66 from the latch on its left, drifting with the
-    perspective of parts that stand proud; the mean, 6.93, is the centred
-    value 6.96). So six cells on 15.87, the first 3.925 from the holder's edge.
-    The rows are fractions of the 21 height on the same image, whose vertical
-    scale is foreshortened to 0.85 of the horizontal: the two rows of one
-    holder abut and span 19.9 on the render, a little over two 9.4 bodies
-    because the camera sits above and sees their top faces; they are drawn
-    abutting, 18.8, centred on the 21. The adapter is
-    common/sc-simplex-adapter@1 turned a quarter turn, landing 12.8 x 9.4.
+    drawing - measured on the entities of the maker's front elevations of
+    this slot front, `cassette-12-SCsx.dxf` and `cassette-6-SCsx.dxf` in
+    the maker's CAD libraries archive (hd.fibrain.com/dxf/cad-libraries.zip, files
+    dated 2020-07-30; AutoCAD 2007 DXF, units millimetres, drawn 1:1).
+    Six windows 12.95 wide stand on a 16.10 pitch between ribs 3.15 wide, the
+    first window 3.125 from the moulding's edge, the row centred on the
+    moulding; with the moulding centred in the 100 x 21, the adapter centres
+    are 9.75, 25.85, 41.95, 58.05, 74.15 and 90.25. THE DRAWING SEATS ITS OWN
+    ADAPTERS UP TO 0.05 OFF THOSE CENTRES, slack in a 12.95 window; the
+    window centres are what is modelled.
+    ROWS: the 12 draws two adapter bodies 9.35 tall, abutting, their ferrules
+    9.35 apart about mid height; the 6 draws one row at mid height. The
+    adapter is common/sc-simplex-adapter@1 turned a quarter turn, landing
+    12.8 x 9.4 where the drawing's body is 12.90 x 9.35. It is placed at its
+    own size and not squeezed: two rows abut at 9.4, centred on the 21, so
+    each ferrule is 0.025 further from mid height than drawn, which is inside
+    the 9.4 -0.2 that adapter's own source allows.
+    BEFORE THIS the columns stood on a 15.87 pitch read off a render of the 1U
+    extendable panel XHU00, and a 6 carried its row in the lower of the two
+    positions, 4.7 below where the drawing and the vendor's render of the
+    6-port holder (XM-Uchwyt-adapterow_3.jpg) both put it.
+  moulding: >-
+    drawing for the outline, windows, ribs, latch fingers and label holes
+    (the same archive); photo for what a 6 has above and below its one row.
+    The drawing leaves the whole 18.85 window open round the single row of a
+    6; the vendor's render of the 6-port holder shows solid black moulding
+    above and below the adapters, so the skin draws a window only the
+    adapter's height and 0.3 over, which is estimated. The base plate the
+    drawing shows 1.0 under the moulding (its layer is named for a base,
+    1.00 to 102.50 across) is not drawn: the datasheet gives the holder as 21
+    high and the 1U frame's slot rows stand 21.00 apart, which leaves no room
+    for it under an upper holder. Which body the drawn front belongs to, the
+    37 deep holder or the 169 deep cassette, the file does not say. THE LATCH
+    TAB at each end, 1.90 out and 1.80 tall at mid height, is outside the 100
+    envelope and is not drawn; seated, it is inside the post.
   orientation: >-
     photo - the 12-port holder's render (XM-Uchwyt-adapterow_2.jpg) and the
     XHU00 front render both show the upper row's key slot cut through the top
     wall and the lower row's through the bottom wall, the two rows mounted
-    belly to belly. The 6-port render (XM-Uchwyt-adapterow_3.jpg) shows one
-    row in the lower position with the key up.
+    belly to belly. The 6-port render (XM-Uchwyt-adapterow_3.jpg) shows its
+    one row with the key up. The maker's front elevations draw the key notch
+    the same way: up on the 6 and on the upper row of the 12, down on its
+    lower row.
   numbering: >-
     ASSUMED. Fibrain prints nothing on the holder; port numbers go on a separate
     label field (XL00), whose 12-port insert is two rows of six blank cells.

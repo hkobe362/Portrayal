@@ -14,12 +14,12 @@ size-notes: >-
   `body.depth`.
 attrs: {media: fiber}
 parts:
-  - {id: b01, ref: common/lc-duplex-v-adapter@6, at: [85.035, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
-  - {id: b02, ref: common/lc-duplex-v-adapter@6, at: [69.165, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
-  - {id: b03, ref: common/lc-duplex-v-adapter@6, at: [53.295, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
-  - {id: b04, ref: common/lc-duplex-v-adapter@6, at: [37.425, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
-  - {id: b05, ref: common/lc-duplex-v-adapter@6, at: [21.555, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
-  - {id: b06, ref: common/lc-duplex-v-adapter@6, at: [5.685, 8.265], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b01, ref: common/lc-duplex-v-adapter@6, at: [85.610, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b02, ref: common/lc-duplex-v-adapter@6, at: [69.510, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b03, ref: common/lc-duplex-v-adapter@6, at: [53.410, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b04, ref: common/lc-duplex-v-adapter@6, at: [37.310, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b05, ref: common/lc-duplex-v-adapter@6, at: [21.210, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
+  - {id: b06, ref: common/lc-duplex-v-adapter@6, at: [5.110, 3.625], rotate: 270, attrs: {housing-finish: '#1c9dbe'}}
 provenance:
   size: >-
     datasheet - see size-notes.
