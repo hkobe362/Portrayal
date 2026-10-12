@@ -77,8 +77,9 @@ def test_the_snap_in_ring_places_its_opening():
 
 
 def test_the_cmp5dr_takes_a_minor_for_its_tray():
-    # 1.1.0 took the tray; 1.1.1 is the patch for its ring's 1.3.0 (#968)
-    assert _load(CMP5DR)["version"] == "1.1.1"
+    # 1.1.0 took the tray; 1.1.1 is the patch for its ring's 1.3.0 (#968);
+    # 1.1.2 the patch for the kind of cable its count is of (#1032)
+    assert _load(CMP5DR)["version"] == "1.1.2"
 
 
 # --- the schema -------------------------------------------------------------------
