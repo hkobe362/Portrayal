@@ -17,8 +17,9 @@
 - **A page passes the catalogue to get this.** `resolveEnd` takes `ports`
   (`fibrePorts(item, end, ctx)` from `rack/ports.js`), and `endResolver({
   rack, ctx, deviceOf, moduleAt, consolesOf })` builds the `resolve` that
-  `cableImportRows` is handed, with it. A page that calls `resolveEnd` as
-  before gets the answers it got.
+  `cableImportRows` is handed, with it; `ctx` is the parts lists that
+  function takes as `parts`. A page that calls `resolveEnd` as before gets
+  the answers it got.
 
 ### Added
 - **`optical.ports` in `components.json`**: for each fibre part of a module
