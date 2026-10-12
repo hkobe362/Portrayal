@@ -389,7 +389,10 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # host and are still seats. The Eaton EVMI2130X's M6 bonding screw, the first
 # common/ground-screw-m6@1 placed on a face of its own, adds one more (down), and the
 # EVMA8365X's, the same screw at the same place on its sibling's face, one more (down).
-WANT = {"down": 107, "left": 27, "up": 8, "right": 21}
+# The Eaton PDU12IEC's grounding stud (#1044), a common/ground-stud@1 on its rear
+# face between the inlet and the breakers, adds one more seat (down) and one
+# more device.
+WANT = {"down": 108, "left": 27, "up": 8, "right": 21}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -459,7 +462,7 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 65   # 63, and the Eaton EVMI2130X and EVMA8365X
+    assert len({k[0] for k in ring}) == 66   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
     assert len({k[0] for k in pairs}) == 33
     # a pair is turned only along itself
