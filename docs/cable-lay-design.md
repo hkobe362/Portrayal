@@ -1033,8 +1033,9 @@ offers is taken each round, whichever end of the cable it is nearer, for at
 most six rounds; a path still short after six keeps what it has, and its
 corners are findings. The result is kept per rack, context and cable, as
 the side of a route is, so a page builds a new context when what the
-context reads changes: one changed in place can give a path placed for what
-it read before.
+context reads changes: one changed in place gives the path laid for what it
+read before (since kit 0.25.0 the whole lay is kept, and by what it read, so
+a new context that answers as the last one did lays nothing again).
 
 **A radius no lay is opened out for.** Points are placed for a bend radius
 up to 100 mm (`ROOM_MAX`, internal: twice a power cord's 42.6). A cable that
@@ -1147,9 +1148,11 @@ kinds:
   not: a ring that only holds a cord reaching just into it (3.3) is passed
   the way the lay from the first-sorted end passes it.
 
-  What it costs: a cable is laid twice the first time it is read, and which
-  lay was kept is then remembered per rack, context and cable, as the room
-  is. The page's readers are handed the twin when the twin is laid (the same
+  What it costs: a cable is laid twice the first time it is read. Since kit
+  0.25.0 both lays are kept, by what they read of the rack and the context,
+  and so is which of them was kept: neither is made again for a context made
+  anew or after an edit to another cable (the kit README, "New in 0.25.0",
+  says what lays a cable again). The page's readers are handed the twin when the twin is laid (the same
   id, media and type, `a` and `b` exchanged). `cornersOf` still reads a
   polyline from its start, so the bundle check's corners are as they were;
   the automatic route's own ties (a manager's rings in order from end a,
@@ -1201,7 +1204,7 @@ time a page measures them; an entered length is never touched.
 
 ### 3.5 Room to turn into a ring (#1026)
 
-Built in kit 0.25.0. Until then the automatic route sent every lead through
+Built in kit 0.26.0. Until then the automatic route sent every lead through
 the ring of its manager nearest its port, whatever stood between. A lead is
 the stretch of a cable from the far end of its plug to the first thing that
 holds it. Where a lacer is hosted on the unit its ports are in, the nearest

@@ -416,14 +416,14 @@ test('no span hangs down into the space in front of a zero-U part that it passes
   assert.equal(inFrontOfZeroU([p.points[k], p.points[lane]], solids, 1.5), 0);
 });
 
-test('a route context is read once: changed in place it may give the old path, and a new context gives the new one', () => {
-  // what the kit decides for a cable it keeps per rack, context and cable
-  // (as it keeps the side of a route), so a page builds a new context when
-  // what the context reads changes. Here the plugs grow from the default
-  // 27.6 mm to 47.6 on ONE context object: the paths asked for again are a
-  // mixture, the points placed for the short plug kept and the new reach
-  // used; a new context with the same answers gives the path for the long
-  // plug, and it differs from the stale one
+test('a route context is read once: changed in place it gives the old path, and a new context gives the new one', () => {
+  // what the kit lays for a cable it keeps per rack, context and cable, so a
+  // page builds a new context when what the context reads changes. Here the
+  // plugs grow from the default 27.6 mm to 47.6 on ONE context object: the
+  // paths asked for again are the ones laid for the short plug, whole (kit
+  // 0.25.0 keeps the lay itself; before it kept only where the points were
+  // placed, and gave a mixture of the two); a new context with the same
+  // answers gives the path for the long plug, and it differs from the stale one
   const r = F.rack();
   let reach = null;
   const base = F.ctxOf(r), live = {...base, plugReachOf: () => reach};
@@ -435,8 +435,8 @@ test('a route context is read once: changed in place it may give the old path, a
   assert.deepEqual(fresh, lengths({...base, plugReachOf: () => 47.6}));
   const differ = stale.filter((v, k) => Math.abs(v - fresh[k]) > 0.05).length;
   assert.ok(differ >= 5, `${differ} of 16 differ: stale ${stale}, fresh ${fresh}`);
-  // and the stale answer is not the short plug's either: nothing to rely on
-  assert.notDeepEqual(stale, short);
+  // and the stale answer is the short plug's: nothing of the new reach is read
+  assert.deepEqual(stale, short);
 });
 
 test('the measure reads a path from its start: the same points the other way round can give other corners', () => {
