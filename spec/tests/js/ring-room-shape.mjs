@@ -124,25 +124,28 @@ export function shape({lacer = 'top', setback = 0, count = 275} = {}) {
   return {rack, ctx, nameOf: id => rack.items.find(i => i.id === id)?.label ?? id};
 }
 
-// What a tree's kit finds on one of these racks: {corners, cables, close,
-// crossings, lengths}: the tight-bend findings and the cables that have one,
-// how many of the findings say the manager is too close, the legs through a
-// body, and each cable's routed length as [metres measured, stock size].
+// What a tree's kit finds on one of these racks: {findings, corners, cables,
+// close, crossings, lengths}: the tight-bend findings, the corners they are
+// of (a finding of two turns is two; before #1026 every corner was a
+// finding), the cables that have one, how many of the findings say the
+// manager is too close, the legs through a body, and each cable's routed
+// length as [metres measured, stock size].
 export function measure(R, {rack, ctx, nameOf}) {
-  let corners = 0, close = 0, crossings = 0;
+  let findings = 0, corners = 0, close = 0, crossings = 0;
   const cables = new Set(), lengths = {};
   for (const c of rack.cables) {
     const path = R.routePath(rack, c, ctx);
     if (!path) continue;
     const found = R.bendFindingsOf(rack, c, ctx, nameOf, path);
-    corners += found.length;
+    findings += found.length;
+    corners += found.reduce((n, f) => n + (f.turns?.length ?? 1), 0);
     close += found.filter(f => f.tooClose).length;
     if (found.length) cables.add(c.id);
     crossings += path.crossings.length;
     const l = R.pathLength(path);
     lengths[c.id] = [l.measured, l.value];
   }
-  return {corners, cables: cables.size, close, crossings, lengths};
+  return {findings, corners, cables: cables.size, close, crossings, lengths};
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
@@ -151,13 +154,13 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const count = Number(arg('--cables') ?? 275);
   const load = async root => import(pathToFileURL(`${root}/kit/rack/route.js`));
   const This = await load(here), Base = baseDir ? await load(baseDir) : null;
-  console.log(`${count} cables; tight bends / cables that have one${Base ? ', base then this tree' : ''}`);
+  console.log(`${count} cables; corners short of room / cables that have one${Base ? ', base then this tree' : ''}`);
   const moved = [];
   let up = 0, down = 0, same = 0;
   for (const lacer of ['top', 'bottom', 'none']) for (const setback of [0, 25, 50, 100]) {
     const t = measure(This, shape({lacer, setback, count})), b = Base && measure(Base, shape({lacer, setback, count}));
     console.log(`  lacer ${lacer.padEnd(6)} setback ${String(setback).padStart(3)}: ${b ? `${b.corners}/${b.cables} -> ` : ''}${t.corners}/${t.cables}`
-      + ` (${t.close} say the manager is too close); legs through a body ${b ? `${b.crossings} -> ` : ''}${t.crossings}`);
+      + ` (${t.findings} findings, ${t.close} of them saying the manager is too close); legs through a body ${b ? `${b.crossings} -> ` : ''}${t.crossings}`);
     if (!b) continue;
     for (const [id, [m, v]] of Object.entries(t.lengths)) {
       const [m0, v0] = b.lengths[id], d = (m - m0) * 1000;

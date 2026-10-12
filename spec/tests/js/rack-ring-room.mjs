@@ -308,4 +308,22 @@ test('two turns that share a leg too short for both are one finding, and it says
   assert.deepEqual(X.layNotesOf('c1', {bends: found}), [found.find(x => x.cable === 'c1').text]);
 });
 
-export {measure};
+// ── the rack, counted ────────────────────────────────────────────────────
+
+test('the first 43 cables of the shape, lacer on the top unit: 37 corners short at no setback (69 before), none at 50 and 100 mm', () => {
+  // EDGE-0's forty fabric links and its three to the control switches. With
+  // the nearest ring taken every time, and a detour pulled taut, the same
+  // racks had 69 corners short on 32 cables, 21 on 10 at 25 mm (not counted
+  // here) and 2 on 1 at 50 mm
+  const count = o => { const m = measure(R, shape({count: 43, ...o})); return [m.corners, m.cables, m.findings, m.close, m.crossings]; };
+  // every finding left at no setback is a lead with no ring it has room to
+  // turn into, and says so; nothing is bought with a body
+  assert.deepEqual(count({setback: 0}), [37, 18, 19, 19, 0]);
+  assert.deepEqual(count({setback: 50}), [0, 0, 0, 0, 0]);
+  assert.deepEqual(count({setback: 100}), [0, 0, 0, 0, 0]);
+  // on the bottom unit the tray is a unit below the ports it serves: 2
+  // corners on 1 cable (16 on 7 before)
+  assert.deepEqual(count({lacer: 'bottom'}), [2, 1, 1, 1, 0]);
+  // and with no lacer nothing is short, before or after
+  assert.deepEqual(count({lacer: 'none'}), [0, 0, 0, 0, 0]);
+});

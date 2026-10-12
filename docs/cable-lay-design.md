@@ -1378,6 +1378,44 @@ bends ("c7 has 2 bends with less room than the cable needs"). Nothing is
 laid differently for it: where two lays of a cable are compared (3.4), a
 finding of two turns still counts as two corners short.
 
+**What is left.** Counted on racks of the shape the issue was measured on
+(`spec/tests/js/ring-room-shape.mjs`, which builds them and prints these
+figures beside another tree's): thirteen 2U switches, each with an
+FHD-CMP5DR hosted on it, a vertical manager at each front upright, 275
+cables of which 264 are AOC. Corners short of room, and the cables that
+have one, before and after; a corner is counted as before, so a finding of
+two turns is two:
+
+| lacer on | setback 0 | 25 mm | 50 mm | 100 mm |
+|---|---|---|---|---|
+| the top unit, before | 518 on 193 | 249 on 101 | 58 on 27 | 12 on 5 |
+| the top unit, after | 254 on 108 | 92 on 41 | none | none |
+| the bottom unit, before | 152 on 70 | none | none | none |
+| the bottom unit, after | 22 on 10 | none | none | none |
+| no lacer | none, before and after | none | none | none |
+
+With the lacer on the top unit and no setback the 254 corners are 131
+findings, and 129 of them say the manager is too close: the three kinds of
+lead above. No leg crosses a body, before or after. Across the twelve racks
+648 of the 3,300 routed lengths move, by -575 to +327 mm, median -3; 426 are
+shorter; 18 cables go up a stock size and 78 down. With no lacer nothing
+moves.
+
+On the sample of 60 generated racks of 3.4 (1,803 cables) the corners short
+of room fall from 955 to 422, on 171 cables where it was 359: 14 of 883
+fibre cords, 7 of 242 Cat 6, 29 of 204 Cat 6A, 45 of 248 DACs and 76 of 226
+AOCs. 340 of the 1,803 lengths move, 194 shorter and 146 longer, by -340 to
++125 mm; 5 cables go up a stock size and 31 down. None measures differently
+written the other way round, and none reports a different number of bends.
+No path crosses a body, and no cable has a point in front of a zero-U
+part's outward face that had none before. On the reference rack one cord
+moves: c8, to 547 mm from 619.2, still a 1 m cord.
+
+**Lengths change on saved racks.** A routed length and its stock size move
+the next time a page measures them, for a cable whose automatic route takes
+another ring or whose detour is laid another way; an entered length and a
+route made by hand are never touched.
+
 ## 4. Lay order
 
 **Recommendation: cables that share a tray, ring or duct each get a position
