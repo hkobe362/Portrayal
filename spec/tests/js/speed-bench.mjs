@@ -17,7 +17,8 @@
 //                 one for every draw and every tool call;
 //   each rack-wide call, after those, in the same context;
 //   one cable moved, one switch moved: routePath over every cable of the
-//                 edited rack, with a context made anew.
+//                 edited rack, with a context made anew, and then every
+//                 rack-wide call above on it, as one figure.
 import {pathToFileURL} from 'node:url';
 import {resolve} from 'node:path';
 import {performance} from 'node:perf_hooks';
@@ -66,10 +67,16 @@ export async function bench(cables) {
   await row('inspect, one cable', () => Q.inspect(rack, 'c1', {chassisOf: made.chassisOf, route: ctx}));
   await row('freePorts', () => Q.freePorts(rack, made.switches[0], {portsOf: (it, view) => (view === 'front'
     ? Array.from({length: 76}, (_, n) => ({cls: 'port', path: `port-${n}`})) : []), slotsOf: () => null, compByRef: () => null}));
-  const cabled = moveCable(rack, 'c1');
-  await row('one cable moved', () => all(cabled, made.ctxOf(cabled)));
-  const moved = moveDevice(rack, made.switches[6]);
-  await row('one switch moved', () => all(moved, made.ctxOf(moved)));
+  // after one edit: every path, then every rack-wide call above, in a context made anew
+  const after = async (name, r) => {
+    const c = made.ctxOf(r), bc = {route: c};
+    await row(`${name}: every path`, () => all(r, c));
+    await row(`${name}: every call`, () => [R.bendFindings(r, c, label), R.coverFindings(r, c, label), R.ringFindings(r, c, label),
+      R.bodyFindings(r, c, label), R.fill(r, c), R.capacityOver(r, c), M.bundlesOf(r).map(b => B.straps(r, b, bc)), B.anchorsOf(r, bc),
+      r.cables.map(x => R.spareOf(r, x, c)), S.spareExports(r, c), Q.describe(r, {chassisOf: made.chassisOf, route: c})]);
+  };
+  await after('one cable moved', moveCable(rack, 'c1'));
+  await after('one switch moved', moveDevice(rack, made.switches[6]));
   return rows;
 }
 
