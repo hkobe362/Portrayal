@@ -479,9 +479,8 @@ fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
   the diameter a cable of no stated kind is given, and the note says "of 6 mm or
   more" and names no kind. A kit read against an older catalogue therefore still
   warns of copper over a count, and no longer of fibre cords.
-- **The words of the note are true of a mix.** "LACER (U20 front): 40 cables at least
-  as thick as Cat 6 copper through it, more than the 30 Cat 6 copper cables its maker
-  states."
+- **The words of the note are true of a mix.** "40 cables at least as thick as Cat 6
+  copper through it, more than the 30 Cat 6 copper cables its maker states."
 - **A warning says which manager.** Two managers of one model carry one label, so a
   note names the manager with its U and its face: "LACER (U20 front)". The U is the
   one `managerNotes` and the device import give it. A part beside the rack is named
