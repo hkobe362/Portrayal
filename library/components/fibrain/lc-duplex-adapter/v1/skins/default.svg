@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="12.7mm" height="9.3mm" viewBox="0 0 12.7 9.3">
+  <!-- Fibrain LC duplex adapter, 12.70 x 9.30, off the maker's front
+       elevations of the HD LC slot fronts.
+
+       THE BEZEL IS RAISED, and a raised part carries this art on its front
+       face, so the two bore openings are HOLES in it. Each hole is
+       std/lc-bulkhead-bore@1's keyed outline turned 180, tongue up: the
+       tongue from y 0.39, the shoulder from 1.81, the neck from 3.00 and the
+       4.7 square from 3.75 to 8.45, ferrules at (3.2249999999999996, 6.1) and (9.475, 6.1),
+       6.25 apart. ONLY THE OUTLINE IS STROKED, as common/lc-duplex-adapter@6
+       draws its own. No dust cap: the cap is an occupant. -->
+  <g id="bezel" fill-rule="evenodd">
+    <path fill="#1c9dbe" data-fill-from="housing-finish"
+          d="M 0.4 0 H 12.299999999999999 Q 12.7 0 12.7 0.4 V 8.9 Q 12.7 9.3 12.299999999999999 9.3 H 0.4 Q 0 9.3 0 8.9 V 0.4 Q 0 0 0.4 0 Z
+             M 1.905 0.390 h 2.64 v 1.42 h 1.03 v 1.19 h -0.62 v 0.75 h 0.62 v 4.7 h -4.7 v -4.7 h 0.62 v -0.75 h -0.62 v -1.19 h 1.03 z
+             M 8.155 0.390 h 2.64 v 1.42 h 1.03 v 1.19 h -0.62 v 0.75 h 0.62 v 4.7 h -4.7 v -4.7 h 0.62 v -0.75 h -0.62 v -1.19 h 1.03 z"/>
+    <rect x="0" y="0" width="12.7" height="9.3" rx="0.4" fill="none" stroke="#116074" stroke-width="0.15"
+          data-stroke-derive="housing-finish"/>
+  </g>
+</svg>

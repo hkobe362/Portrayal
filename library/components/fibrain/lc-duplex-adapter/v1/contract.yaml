@@ -1,0 +1,110 @@
+format: 1
+kind: component
+name: lc-duplex-adapter
+version: 1.0.0
+class: port
+# THE ADAPTER IS ITSELF A SLOT (docs/pluggables-caps-design.md, "The duplex
+# host"): a duplex connector - a duplex dust cap, a duplex plug - mates the
+# pair of bores as one part, at their midpoint. That slot and the two bore
+# slots below are mutually exclusive; the build and lint hold it.
+interface: lc-duplex
+# WHAT THAT SLOT SHIPS HOLDING (provenance.shipped-cap).
+default: common/lc-duplex-dust-cap@2
+profile: networking
+description: >-
+  Fibrain's LC duplex adapter as its HD slot fronts carry it - a flangeless
+  body 12.70 x 9.30 with two LC bores side by side, their latch slots along
+  one long edge. Drawn latch slots up. Not common/lc-duplex-adapter@6, which
+  is 13.2 x 11.0, nor common/lc-duplex-v-adapter@6, which stacks its bores.
+size: {w: 12.7, h: 9.3}
+size-confidence: {w: drawing, h: drawing}
+size-notes: >-
+  12.70 x 9.30 is the adapter's outer outline on the maker's 1:1 front
+  elevations of the 6 and 12 way LC slot fronts (provenance.size). NO DEPTH IS
+  RECORDED in `size`: a part with `size.d` and no behaviour is compiled as an
+  aperture, a pit behind its whole box; how far the body stands out of the
+  holder is `relief`.
+attrs: {media: fiber, connector: lc}
+fields:
+  housing-finish:
+    label: Housing colour
+    type: text
+    default: '#1c9dbe'
+optical:
+  positions: 2
+relief:
+  features:
+    - node: bezel
+      out: 1.0
+      confidence: estimated
+      source: >-
+        the vendor's three-quarter renders of the LC holders
+        (XM-Uchwyt-adapterow_4 and _5) show the adapter fronts standing just
+        proud of the black moulding; about a millimetre, by eye. No side
+        view is published.
+parts:
+  # THE BULKHEAD APERTURE, TURNED 180: std/lc-bulkhead-bore@1 draws its latch
+  # tongue DOWN, and half a turn puts it UP, where the drawing has the latch
+  # slots. `at` is the unrotated box's corner and the turn is about its centre,
+  # so a bore at [x, y] has its ferrule at (x + 2.35, y + 5.71): (3.2249999999999996, 6.1)
+  # and (9.475, 6.1). Lifted onto the raised body so each bore recesses from
+  # the proud face.
+  - {id: '1', ref: std/lc-bulkhead-bore@1, at: [0.875, 0.39], rotate: 180, lift: 1.0}
+  - {id: '2', ref: std/lc-bulkhead-bore@1, at: [7.125, 0.39], rotate: 180, lift: 1.0}
+connection-points:
+  # WHERE A DUPLEX CONNECTOR SEATS: the midpoint of the two bores' own mate
+  # points, on the ferrule line. The quoted `'on'` is the depth - YAML 1.1
+  # reads a bare `on` as true - and each bore is lifted onto the raised face,
+  # so a cap spanning both stands on that face.
+  mate: {at: [6.35, 6.1], direction: front, 'on': bezel}
+  optical:
+    at: [6.35, 4.65]
+    direction: front
+provenance:
+  size: >-
+    drawing - measured on the entities of the maker's front elevations
+    `cassette-6-LCdx.dxf` and `cassette-12-LCdx.dxf` in
+    the maker's CAD libraries archive (hd.fibrain.com/dxf/cad-libraries.zip, files
+    dated 2020-07-30; AutoCAD 2007 DXF, units millimetres, drawn 1:1).
+    The adapter's layer draws each body 12.70 across (5.16 to 17.86 on the 6)
+    and 9.30 high (5.825 to 15.125), the same on all six of the 6 and all
+    twelve of the 12. 9.3 is also the face standards.yaml records for a
+    bulkhead LC adapter.
+  parts: >-
+    drawing for where the ferrules are, registry for the opening. The same
+    two files draw each ferrule as a circle 1.246 across: the pair 6.25 apart
+    (8.389 and 14.639), centred on the body's width, and 6.10 from the latch
+    side edge (y 11.925 in a body from 5.825), which is 1.45 off the centre
+    line. 6.25 is the duplex pitch `lc-duplex-receptacle` records. THE
+    OPENING IS NOT THE DRAWING's: each bore is std/lc-bulkhead-bore@1, whose
+    keyway ends 5.71 from the ferrule axis, so it ends 0.39 inside this
+    body's latch side edge and its 4.7 square 0.85 inside the other. The
+    drawing's own latch slot outline is a little different in its steps and
+    is not copied.
+  position-order: >-
+    ASSUMED. Bore `1` is the left one with the latch slots up. Fibrain numbers
+    nothing; the holders count their bores left to right, and a fibre
+    position's number is the port number every reader of the optical model
+    shows.
+  shipped-cap: >-
+    ASSUMED, AND THE VENDOR's RENDERS SHOW THE PORTS OPEN. One duplex cap
+    across both ports, declared as this adapter's own top-level `default:`
+    (docs/pluggables-caps-design.md, "The shipped default"): a cap is what an
+    idle adapter holds, and a duplex adapter of this size takes the duplex
+    cap, which is 12.25 x 5.85 and sits inside the 12.70 x 9.30 body on the
+    ferrule line. No Fibrain document says what a new holder ships with, and
+    the renders of the LC holders draw every bore empty. The cap is
+    common/lc-duplex-dust-cap@2, read off another maker's adapter; whether
+    Fibrain's own cap is one moulding or two is not known.
+  colour: >-
+    a field, `housing-finish`, defaulting to the blue of the vendor's render
+    of the 12-port LC single-mode holder (#1c9dbe, the median of 380,610 blue
+    pixels on XM-Uchwyt-adapterow_5.jpg). The outline follows the fill as its
+    derived shade.
+  bore-ids: >-
+    the bores are fibre positions 1 and 2; an adapter has no direction until
+    something is plugged into it.
+  face-detail-gap: >-
+    the drawing gives the outline and the ferrules; how far the body stands
+    proud and what its back looks like are read off three-quarter renders.
+skins: [default]
