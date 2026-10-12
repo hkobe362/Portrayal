@@ -394,7 +394,8 @@ and `schemas/v3/rack.schema.json`.
 
 `rack.json` is written by the build beside `devices.json`. For every device it
 holds the rack units, the depth and height, how it mounts, whether its body is
-sheet, the cable capacity its vendor states, the ids a route can pass
+sheet, the cable capacity its vendor states (with the kind of cable counted,
+`capacity.media`, where a source names it), the ids a route can pass
 through, and its `kind`: a plain word for what it is (`switch`, `patch panel`,
 `cable manager`, ...) that `catalog(devices, { kind })` filters by. `kind` is
 advisory and its words may be refined. `loadCatalog(dist)` takes what the other loaders take: a base URL, or
@@ -661,6 +662,38 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.26.0: a manager's stated count is a count of one kind of cable.**
+`capacityOver(rack, ctx)` compared a manager's stated count with every cable
+through it. A maker counts with one cable (thirty Cat6 is the section of about
+a hundred and twenty 3 mm cords), so it now counts only the cables whose
+`media` is the catalogue's `capacity.media`, and reports nothing for a
+capacity that states none. **This changes what a page warns of, and the notes
+of the sheets, the cable schedule and the BOM.** No rack file changes.
+
+- An entry is `{ item, count, through, capacity, media }`: `count` of the
+  stated kind, `through` of every kind. A page that reads `item` alone reads
+  what it did.
+- `fillNotes(rack, facts, nameOf)` names a manager with where it is, after
+  the name `nameOf` gives: `LACER (U20 front)`, or `(at left-front)` for a
+  part beside the rack. Two managers of one model no longer give one line.
+  With `facts.ctx` the U is right for a manager taller than one unit on a
+  frame numbered from the top.
+- The note of a pathway over its fill says both shares: `ring 1 on LACER
+  (U20 front): 60 cables, 112% of its fill limit; the limit is 40% of the
+  opening.` It said `guide-1 on LACER: 60 cables, 112% of a 40% fill.`
+- The note of a manager over its count says the kind: `LACER (U20 front): 31
+  Cat 6 copper cables through it, more than the 30 of that kind its maker
+  states.` With other kinds beside them: `31 of the 36 cables through it are
+  Cat 6 copper, ...`.
+- `inspect` of a manager, on the rails or beside the rack, gives `capacity:
+  { count, basis, media }`, `media` null where no source names the cable.
+- `portLabel(path)` (`rack/cable-rules.js`) is a port in words: `bay 1 b09`
+  for `bay-1/module/b09`. `tagText` uses it, and `freePorts` gives it as a
+  port's `label`, which read `bay 1/module/b09` for a port on a seated part.
+
+The whole rule, with what happens for a mix of kinds, is
+[cable-managers-design.md](../docs/cable-managers-design.md) section 14.
 
 **New in 0.24.0: the DCIM cables files hold the cables on a panel or a
 cassette.** A cable on a fibre port of a module seated in a bay was left out

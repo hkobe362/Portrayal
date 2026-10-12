@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-hd-sfdabs3u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-HD-SFDABS3U
@@ -120,6 +120,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, a theoretical value - FS CMH-HD-SFDABS3U datasheet specification table, which
       states no fill basis
+    cable-capacity-media: cat6
   environmental:
     operating-temp: -10 to 60°C (14 to 140°F)
     operating-humidity: 95% Relative Humidity (max.), Non-condensing

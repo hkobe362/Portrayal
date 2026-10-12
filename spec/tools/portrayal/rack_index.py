@@ -125,6 +125,10 @@ def build(dist):
         perf = (idx.get("attrs") or {}).get("performance") or {}
         if perf.get("cable-capacity") is not None:
             entry["capacity"] = {"count": perf["cable-capacity"], "basis": perf.get("cable-capacity-basis", "")}
+            # the kind of cable the count is of, where the source names it:
+            # what a rack tool compares the count with, and nothing else
+            if perf.get("cable-capacity-media"):
+                entry["capacity"]["media"] = perf["cable-capacity-media"]
         for view in ("top", "front", "rear"):
             g, ps = marked(dist / face_file(idx, d["name"], idx.get("default"), view))
             if g:

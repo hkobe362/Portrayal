@@ -83,7 +83,7 @@ test('free ports: a port on the face and a port on the back are both offered by 
   const free = await Q.freePorts(RACK, 'i1', {...ctx, portsOf});
   assert.deepEqual(free.map(p => [p.path, p.view]), [['bay-1/module/lc01', 'front'], ['bay-1/module/lc02', 'front'],
     ['ground', 'rear'], ['bay-1/module/b01', 'rear'], ['bay-1/module/b02', 'rear'], ['bay-2/module/mtp', 'rear']]);
-  assert.deepEqual(free[3], {path: 'bay-1/module/b01', view: 'rear', label: 'bay 1/module/b01', media: 'fiber', speed: null});
+  assert.deepEqual(free[3], {path: 'bay-1/module/b01', view: 'rear', label: 'bay 1 b01', media: 'fiber', speed: null});
   // every offered port is one cable.add takes
   for (const p of free) assert.equal(run(RACK, [{op: 'cable.add', a: {item: 'i1', path: p.path, view: p.view}, b: end('i2', 'port-1')}]).error, undefined, p.path);
   // a cabled rear port is no longer free; the front port of the same adapter still is

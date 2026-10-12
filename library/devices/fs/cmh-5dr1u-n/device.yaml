@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-5dr1u-n
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: CMH-5DR1U-N
@@ -105,6 +105,7 @@ attrs:
       Cat6 24AWG (6.1 mm) cables at 100 % fill, theoretical; 25 at the recommended 30 %
       - FS Horizontal Cable Managers with D-rings datasheet, Cable Capacity Reference
       Guide
+    cable-capacity-media: cat6
 chassis:
   width: 430.0
   height: 44.0

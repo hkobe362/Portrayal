@@ -47,6 +47,15 @@ def test_a_rack_face_sheet_with_a_capacity(tmp_path):
     assert e["passes"] == {"front": ["window-1"]}
 
 
+def test_a_capacity_carries_the_kind_of_cable_it_counts_only_where_the_device_states_it(tmp_path):
+    """#1032: `cable-capacity-media` is what a rack tool compares the count
+    with. The test above is the other half: a device that states none gets a
+    capacity of exactly a count and a basis, so its count is never compared."""
+    d = _dist(tmp_path, {"w": 483, "h": 44, "d": 110, "ru": 1, "mount": "rack-face"},
+              {"performance": {"cable-capacity": 30, "cable-capacity-basis": "Cat6 24AWG", "cable-capacity-media": "cat6"}})
+    assert rack_index.build(d)["devices"]["mgr"]["capacity"] == {"count": 30, "basis": "Cat6 24AWG", "media": "cat6"}
+
+
 def test_a_rack_device_states_no_mount_and_derives_its_units(tmp_path):
     e = rack_index.build(_dist(tmp_path, {"w": 440, "h": 88.9, "d": 300, "mount": "rack"}))["devices"]["mgr"]
     assert "mount" not in e and "shell" not in e and "capacity" not in e and e["ru"] == 2

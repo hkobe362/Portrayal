@@ -162,7 +162,9 @@ the same way.
   spans, so a cable runs beside it and not through it
   ([cable-lay-design.md](cable-lay-design.md) section 1.3, #949). `fill`
   and `capacityOver` count the cables through it, `fill` against the channel
-  a caller measures from the drawing (`ctx.zeroUAperture`).
+  a caller measures from the drawing (`ctx.zeroUAperture`), `capacityOver`
+  only the cables of the kind its count is stated for
+  ([cable-managers-design.md](cable-managers-design.md) section 14, #1032).
 - **What each says.** `describe`, `inspect`, the export notes and the DCIM
   device rows (no position and no face, where it stands in the comment) know
   zero-U parts and a part's rail.

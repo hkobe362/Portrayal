@@ -1739,24 +1739,37 @@ function zeroUThrough(rack, ctx) {
     .filter(x => x.cables.length);
 }
 
-// Managers whose stated capacity the cables through them exceed. As in fill,
+// MANAGERS WITH MORE CABLES THROUGH THEM THAN THEIR MAKER STATES (#1032).
+// A maker counts with one kind of cable: thirty Cat6 is the section of about
+// a hundred and twenty 3 mm cords. So the count is compared only with the
+// cables of that kind, `capacity.media` (rack.json, from the device's
+// `cable-capacity-media`): a cable of another kind, or of no stated kind, is
+// not counted against it, and how full a ring is stays fill's to say. A
+// capacity that states no `media` is a fact for a reader and is never
+// compared. Each entry: the manager, `count` of the cables of that kind,
+// `through` of every kind, the stated `capacity` and its `media`. As in fill,
 // a ring a cable only doubles back from does not carry it.
 export function capacityOver(rack, ctx) {
   const by = new Map();
   for (const c of rack.cables || []) {
     const notThrough = new Set((routePath(rack, c, ctx)?.findings || []).map(f => `${f.item}|${f.via}`));
     for (const w of resolveRoute(rack, c, ctx).waypoints)
-      if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Set()).get(w.item)).add(c.id);
+      if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Map()).get(w.item)).set(c.id, c);
   }
+  const over = (cap, cables) => {
+    if (!(cap?.count > 0) || typeof cap.media !== 'string' || !cap.media) return null;
+    const count = cables.filter(c => c.media === cap.media).length;
+    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: cap.media} : null;
+  };
   const out = [];
-  for (const [item, set] of by) {
-    const cap = ctx.chassisOf(itemOf(rack, item)?.ref)?.capacity?.count;
-    if (cap && set.size > cap) out.push({item, count: set.size, capacity: cap});
+  for (const [item, cables] of by) {
+    const o = over(ctx.chassisOf(itemOf(rack, item)?.ref)?.capacity, [...cables.values()]);
+    if (o) out.push({item, ...o});
   }
   // a zero-U part that carries a lane, against its own stated capacity (#926)
   for (const {z, c, cables} of zeroUThrough(rack, ctx)) {
-    const cap = c.capacity?.count;
-    if (cap && cables.length > cap) out.push({item: z.id, count: cables.length, capacity: cap, zeroU: true});
+    const o = over(c.capacity, cables);
+    if (o) out.push({item: z.id, ...o, zeroU: true});
   }
   return out;
 }

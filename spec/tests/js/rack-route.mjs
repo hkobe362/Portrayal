@@ -268,14 +268,15 @@ test('fill: Cat6 through one ring, against 40% of its opening', () => {
 });
 
 test('capacity: a manager over its stated count', () => {
-  SIZES['fhd-cmp5dr'].capacity = {count: 2, basis: 'test'};
+  SIZES['fhd-cmp5dr'].capacity = {count: 2, basis: 'test', media: 'cat6'};
   let r = add(M.newRack(), 'sw', 20);
   r = add(r, 'fhd-cmp5dr', 20, {on: 'i1', unit: 1});
   r = add(r, 'pp', 30);
   r = {...r, cables: [0, 1, 2].map(k => ({id: `c${k}`, media: 'cat6', route: [],
     a: {item: 'i1', path: 'p', view: 'front'}, b: {item: 'i3', path: 'q', view: 'front'}}))};
   try {
-    assert.deepEqual(R.capacityOver(r, ctxFor(r, {'i1|p': -100})), [{item: 'i2', count: 3, capacity: 2}]);
+    assert.deepEqual(R.capacityOver(r, ctxFor(r, {'i1|p': -100})), 
+      [{item: 'i2', count: 3, through: 3, capacity: 2, media: 'cat6'}]);
   } finally { delete SIZES['fhd-cmp5dr'].capacity; }
 });
 

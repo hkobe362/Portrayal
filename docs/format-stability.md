@@ -660,6 +660,11 @@ device has them:
 - `mount`: the device's `chassis.mount`, present only when it is not `rack`.
 - `shell`: `chassis.shell`, `sheet` for a body that is a sheet and not a box.
 - `capacity`: `{"count", "basis"}`, the cable capacity the vendor states.
+  `media` joins them where the device states
+  `attrs.performance.cable-capacity-media`: the kind of cable the count is of,
+  in a rack file's `media` words. A count is compared only with cables of that
+  kind, and one with no `media` is never compared
+  ([cable-managers-design.md](cable-managers-design.md) section 14).
 - `guides` and `passes`: per view (`top`, `front`, `rear`), the sorted ids a
   cable route can pass through on the default configuration's drawing.
 - `solids`: what a cable may not pass through, where that is not the

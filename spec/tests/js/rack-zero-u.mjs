@@ -19,7 +19,7 @@ import {OPENING, RAIL_W} from '../../../kit/rack/rails.js';
 // rack.json as the build writes these (library/dist, 2026-10-08), trimmed.
 const SIZES = {
   'cmv-sfd45u5w': {manufacturer: 'FS.com', model: 'CMV-SFD45U5W', mount: 'rack-side', ru: 45, h: 2108, w: 138.8, d: 165.1,
-                   default: 'base', configs: ['base'], guides: {front: ['duct']}, capacity: {count: 2745}},
+                   default: 'base', configs: ['base'], guides: {front: ['duct']}, capacity: {count: 2745, media: 'cat6'}},
   'cmv-sfd42u9w': {manufacturer: 'FS.com', model: 'CMV-SFD42U9W', mount: 'rack-side', ru: 42, h: 1866.9, w: 88.9, d: 152.6,
                    default: 'base', configs: ['base'], guides: {front: ['duct']}},
   'cmv-5u3w': {manufacturer: 'FS.com', model: 'CMV-5U3W', mount: 'rack-face', ru: 5, h: 222, w: 26, d: 84,
@@ -242,7 +242,9 @@ test('fill: every cable whose lane run passes through the duct, once, against 40
   // No aperture: no fill entry, but the count still meets the stated capacity.
   const many = {...r, cables: Array.from({length: 2746}, (_, k) => lane(`c${k}`, 'cat6', [{lane: 'left', ru: 3}]))};
   assert.deepEqual(R.fill(many, {...rc, zeroUAperture: () => null}), []);
-  assert.deepEqual(R.capacityOver(many, rc), [{item: 'z1', count: 2746, capacity: 2745, zeroU: true}]);
+  assert.deepEqual(R.capacityOver(many, rc), [{item: 'z1', count: 2746, through: 2746, capacity: 2745, media: 'cat6', zeroU: true}]);
+  // and only against cables of the kind it is stated for (#1032): the same run of fibre cords is not over it
+  assert.deepEqual(R.capacityOver({...many, cables: many.cables.map(c => ({...c, media: 'os2'}))}, rc), []);
   // A run on the lane that only passes the duct's span still counts (its ends are outside it).
   const r48 = run(rackOf('two-post', 48), {op: 'zerou.place', ref: DUCT, at: 'left', ru: 2}).rack;
   const pass = R.fill({...r48, cables: [lane('c1', 'cat6', [{lane: 'left', ru: 1}, {lane: 'left', ru: 48}])]},
@@ -250,7 +252,8 @@ test('fill: every cable whose lane run passes through the duct, once, against 40
   assert.equal(pass[0].count, 1);
   // over its fill, it is named in the notes as any pathway is
   const nameOf = id => M.zeroUById(r, id)?.label ?? id;
-  assert.deepEqual(X.fillNotes(r, {fill, over: [], routes: new Map()}, nameOf), [`duct on CMV-SFD45U5W: 2 cables, ${fill[0].percent}% of a 40% fill.`]);
+  assert.deepEqual(X.fillNotes(r, {fill, over: [], routes: new Map()}, nameOf), 
+    [`duct on CMV-SFD45U5W (at left): 2 cables, ${fill[0].percent}% of its fill limit; the limit is 40% of the opening.`]);
 });
 
 test('a rack file with zero-U parts and sided items reads back whole and validates', () => {
@@ -349,7 +352,7 @@ test('describe and inspect know the parts beside the rack and the rail a part is
   assert.match(describe(rackOf(), ctx), /^Rack 1 \(r1\): 0 items, 0 cables\./);
   assert.deepEqual(await inspect(r, 'z1', ctx), {kind: 'zeroU', id: 'z1', ref: DUCT, model: 'CMV-SFD45U5W', manufacturer: 'FS.com',
     label: 'vcm-1', cfg: 'base', at: 'left', ru: 1, u: 45, between: true, mount: 'rack-side', lane: 'left',
-    where: 'between racks at left, U1-U45'});
+    where: 'between racks at left, U1-U45', capacity: {count: 2745, basis: '', media: 'cat6'}});
   assert.equal((await inspect(r, 'i1', ctx)).side, 'right');
   assert.deepEqual(await inspect(r, 'z7', ctx), {error: ZERO_GONE});
 });

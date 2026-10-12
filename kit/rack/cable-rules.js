@@ -38,10 +38,16 @@ export function endName(rack, end, uOf = carriedU) {
 }
 export const cableName = c => c.label || c.id;
 const clip = (s, n) => { const cs = Array.from(s); return cs.length > n ? `${cs.slice(0, n - 1).join('')}…` : s; };
+// A PORT AS A PERSON READS IT (#1032): its address without the spelling a
+// reader of the file needs. A port on a seated part is `<bay>/module/<part>`,
+// and `bay-1/module/b09` says no more to a person than "bay 1 b09"; a click on
+// a seated optic or its plug is a click on the port. queries.js freePorts
+// gives the same text as a port's `label`.
+export const portLabel = path => portPathOf(path).split('/module/').join(' ').replace(/[-/]/g, ' ');
 // The text of a cross-face tag: the far end, short enough for the side column.
 export function tagText(rack, end) {
   const it = itemOf(rack, end);
-  return clip(`→ ${it ? it.label : 'removed'} ${end.path}`, 32);
+  return clip(`→ ${it ? it.label : 'removed'} ${portLabel(end.path)}`, 32);
 }
 
 // ── one cable per port ──────────────────────────────────────────────────

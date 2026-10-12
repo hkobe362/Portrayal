@@ -527,11 +527,11 @@ test('fillNotes says an over-filled pathway, an over-capacity manager and a skip
   const nameOf = id => ({m1: 'mgr-1'}[id] ?? id);
   const facts = {
     fill: [{item: 'm1', via: 'guide-3', count: 9, percent: 130, over: true}, {item: 'm1', via: 'guide-4', count: 1, percent: 10, over: false}],
-    over: [{item: 'm1', count: 12, capacity: 8}],
+    over: [{item: 'm1', count: 12, through: 12, capacity: 8, media: 'cat6'}],
     routes: new Map([['c1', {waypoints: [], gone: [{item: 'm1', via: 'guide-9'}, {lane: 'left-front', ru: 5}]}], ['c2', {waypoints: [], gone: []}]])};
   assert.deepEqual(X.fillNotes(RACK, facts, nameOf), [
-    'guide-3 on mgr-1: 9 cables, 130% of a 40% fill.',
-    'mgr-1: 12 cables through it, more than its stated 8.',
+    'ring 3 on mgr-1: 9 cables, 130% of its fill limit; the limit is 40% of the opening.',
+    'mgr-1: 12 Cat 6 copper cables through it, more than the 8 of that kind its maker states.',
     'Cable A1: waypoint guide-9 on mgr-1 is gone, so the route skips it.',
     'Cable A1: waypoint left-front U5 is gone, so the route skips it.']);
   assert.deepEqual(X.fillNotes(RACK, null, nameOf), []);
