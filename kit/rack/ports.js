@@ -3,7 +3,7 @@
 // ports on its face, and a panel or a cassette has more on its back, which the
 // host shows through its rear panel. Whether a cable end names one of them is
 // answered here from `<ref>.configs.json` and `components.json` alone (what
-// `loadSlots` in catalog.js returns), through the item's own swaps, so a page
+// `loadSlots` in `catalog.js` returns), through the item's own swaps, so a page
 // needs no lookup in a drawing for it.
 //
 // THE ADDRESS of a port on a seated part is `<bay>/module/<part>`, on the
