@@ -14,6 +14,7 @@ import * as B from '../../../kit/rack/bundles.js';
 import * as X from '../../../kit/rack/export-data.js';
 import * as Q from '../../../kit/rack/queries.js';
 import * as F from './cable-solids-fixture.mjs';
+import * as HOPS from './bundle-hops-fixture.mjs';
 import {rearToFront} from './strap-path-fixture.mjs';
 import {loadTree, racksOf} from './speed-goldens.mjs';
 
@@ -169,9 +170,30 @@ test('a strap carries its own point, the way the trunk runs there and the cable 
     const along = leg.from + dist(leg.p, x.point);
     assert.ok(Math.abs(along - x.t * whole) < 0.2, `${along} mm along, t ${x.t}`);
   }
+  // the trunk starts at the middle of its first ring, between where the cord enters and leaves it: the
+  // breakout strap 25 mm along is 25 mm from there, on the cord's way out of the ring
+  const [entry, exit] = [P.find(p => p.at === 'entry'), P.find(p => p.at === 'exit')];
+  const middle = {x: (entry.x + exit.x) / 2, y: (entry.y + exit.y) / 2, z: (entry.z + exit.z) / 2};
+  assert.equal(s.straps[0].along_mm, 25);
+  assert.ok(Math.abs(dist(s.straps[0].point, middle) - 25) < 0.02, `${dist(s.straps[0].point, middle)} mm from the ring's middle`);
+  assert.deepEqual(s.straps[0].dir, {x: -1, y: 0, z: 0});
   // none of them is on the straight line a reader of segment and t alone would draw
   assert.ok(between.every(x => offLine(x.point, [way[0], way.at(-1)]) > 20));
   assert.ok(b.members.some(m => m.cable === s.straps[0].on));
+});
+
+test('the way a strap runs is the trunk\'s, also where its cable is written from the other end', () => {
+  // eleven cords up one lane, the trunk written from U31 up to U42; flipped, every cord is written from its top end
+  for (const flip of [false, true]) {
+    const r = HOPS.bundled({flip}), ctx = HOPS.ctxFor(r), s = B.straps(r, r.bundles[0], {route: ctx});
+    assert.equal(s.count, 10);
+    const c = r.cables.find(x => x.id === s.straps[0].on), P = R.routePath(r, c, ctx).points;
+    const lanes = P.filter(p => p.at === 'lane');
+    // the cable runs down the lane where it is written from its top end, and the trunk still runs up
+    assert.equal(Math.sign(lanes.at(-1).y - lanes[0].y), flip ? -1 : 1, 'which way the cable is written');
+    for (const x of s.straps) assert.deepEqual(x.dir, {x: 0, y: 1, z: 0});
+    assert.ok(s.straps.every((x, k) => k === 0 || x.point.y > s.straps[k - 1].point.y), 'further along is further up');
+  }
 });
 
 test('the same straps whatever order the cables and the members are written in', () => {
