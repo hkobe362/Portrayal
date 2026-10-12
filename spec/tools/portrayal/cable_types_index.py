@@ -19,6 +19,9 @@ SCHEMAS = Path(__file__).resolve().parents[2] / "schemas"
 FORMAT = 1
 FAMILIES = ("fiber", "copper", "dac", "aoc", "power")
 BASES = ("standard", "convention")
+# A jacket colour can also be counted on the maker's photograph (#1028).
+JACKET_BASES = BASES + ("photo",)
+COLOR = re.compile(r"^#[0-9a-f]{6}$")
 ID = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 
@@ -54,6 +57,26 @@ def radius_problems(where, r, sources, nullable):
         out.append(f"{where}: unverified must be true or false")
     extra = set(r) - {"mm", "xOD", "basis", "sources", "note", "unverified"}
     out += [f"{where}: unknown key {k!r}" for k in sorted(extra)]
+    return out
+
+
+def jacket_problems(where, j, sources):
+    """What is wrong with one jacket: a colour, a basis, sources."""
+    if not isinstance(j, dict):
+        return [f"{where}: not a mapping"]
+    out = []
+    if not isinstance(j.get("color"), str) or not COLOR.match(j["color"]):
+        out.append(f"{where}: color is # and six lower case hex digits")
+    if j.get("basis") not in JACKET_BASES:
+        out.append(f"{where}: basis must be one of {', '.join(JACKET_BASES)}")
+    src = j.get("sources")
+    if not isinstance(src, list) or not src:
+        out.append(f"{where}: no sources")
+    else:
+        out += [f"{where}: unknown source {s!r}" for s in src if not _known(s, sources)]
+    if j.get("basis") == "photo" and not (isinstance(j.get("note"), str) and j["note"].strip()):
+        out.append(f"{where}: a colour read off a photograph says what was counted, in its note")
+    out += [f"{where}: unknown key {k!r}" for k in sorted(set(j) - {"color", "basis", "sources", "note"})]
     return out
 
 
@@ -115,6 +138,11 @@ def problems(doc):
             out.append(f"{w}: a power type names its cord's `conductor`")
         if (fib is not None) != (t.get("family") == "fiber"):
             out.append(f"{w}: a fiber type, and only a fiber type, states `fiber`")
+        if "jacket" in t:
+            out += jacket_problems(f"{w} jacket", t["jacket"], sources)
+            # One table holds the colour a media is drawn in: the kit's.
+            if t.get("media") == tid:
+                out.append(f"{w}: a bare media type states no jacket; a media's colour is the kit's COLORS")
     # Every bare Rack Builder media has to be a type of its own, so a cable's
     # media resolves with no mapping (kit/rack/cable-types.js).
     named = {t.get("media") for t in types.values() if isinstance(t, dict) and isinstance(t.get("media"), str)}

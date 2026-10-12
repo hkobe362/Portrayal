@@ -40,11 +40,22 @@
 # bend-insensitive G.657 class, for a consumer that knows the cord's maker
 # allows the tighter figure.
 #
+# JACKET (#1028). `jacket` is the colour of a type's outer sheath:
+# `{color, basis, sources, note}`. `color` is `#` and six lower case hex
+# digits. `basis` is `standard` or `convention` as for a radius, or `photo`:
+# counted on the maker's own photograph of the product, and the `note` gives
+# the count. A named type states one only where a source states or shows it.
+# A BARE MEDIA TYPE STATES NONE, and the build refuses one that does: the
+# colour a media is drawn in is the kit's (kit/rack/cable-geometry.js
+# COLORS), and a second table of them could only disagree with the first. A
+# rack cable is drawn in a type's jacket colour when its own `type` names
+# that type (kit/rack/cable-types.js jacketLookup).
+#
 # VERSION. `version` is the table's own: a corrected value or a new type is a
 # minor, a removed type or a changed id is a major. `format` is the shape of
 # the published file, and only a removed or renamed key raises it.
 format: 1
-version: 1.0.0
+version: 1.1.0
 
 sources:
   foa-tia568:
@@ -74,6 +85,9 @@ sources:
   oznur-h05vv-f:
     title: Oznur Kablo, H05VV-F 300/500 V flexible cord, technical data (outer diameters and bending radius)
     url: https://www.oznurkablo.com.tr/en/products/300-500-V-PVC-Insulated-Multi-Core-Cables-With-Flexible-Copper-Conductors
+  siemon-qsfp28-aoc:
+    title: Siemon spec sheet, Active Optical Cables QSFP28 100G (Q1Q28F), SS_QSFP28 100G Rev. E 09/19, marked preliminary
+    url: https://files.siemon.com/en/specsheet/sis-active-optical-cables-qsfp28-100g_specsheet.pdf
   portrayal-estimate:
     title: Portrayal's own estimate of a typical diameter, a sketch and not a measurement; for a bare media type it is the fill figure in kit/rack/route.js DIAMETERS
     url: https://github.com/roc-ops/Portrayal/blob/main/kit/rack/route.js
@@ -245,6 +259,31 @@ types:
                   note: "TIA-568's rule for other premises fibre cables, applied by analogy; vendor figures run 30 to 60 mm"}
       loaded: {xOD: 15, basis: convention, sources: [foa-tia568], unverified: true,
                note: "TIA-568's rule under the maximum rated pulling tension, applied by analogy"}
+
+  # ONE MAKER'S AOC, the first type with a jacket colour (#1028). Its sheet
+  # gives the diameter (3.0 mm +/- 0.15) and a Minimum Bend Radius of 30 mm in
+  # its Mechanical Specifications, and shows the jacket on page 1. The sheet
+  # states no colour in words and no radius under load. The bare `aoc` above
+  # is not given this colour: one maker's 100G cable is not every AOC.
+  aoc-siemon-q1q28f:
+    label: Siemon Q1Q28F 100G QSFP28 AOC
+    media: aoc
+    family: aoc
+    od_mm: 3.0
+    od_sources: [siemon-qsfp28-aoc]
+    jacket:
+      color: '#49eaf8'
+      basis: photo
+      sources: [siemon-qsfp28-aoc]
+      note: >-
+        the page 1 product photograph, the embedded 1535 x 738 image: the
+        per-channel median of the 164,214 pixels (14.5 % of the image) of hue
+        0.45 to 0.55, saturation over 0.35 and value over 0.4, the same
+        reading as library/components/siemon/qsfp28-aoc. A studio photograph
+        lit bright, so a real jacket may read darker.
+    min_bend_radius:
+      installed: {mm: 30, basis: convention, sources: [siemon-qsfp28-aoc], note: "the maker's stated minimum bend radius"}
+      loaded: null
 
   # ── power ──────────────────────────────────────────────────────────────
   # No Rack Builder media names power yet; `power` is the media these share.
