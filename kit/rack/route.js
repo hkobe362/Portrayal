@@ -903,10 +903,43 @@ function copyOf(v) {
 // THE PORTS A SPAN COVERS (`coversOf`) are read per rack, context and cable,
 // after the lay and for the lay kept: they depend on every port of the rack
 // and on no choice of the lay.
+// THE RULE ALL OF IT RESTS ON: a rack, an item, a cable and an end are never
+// changed in place (an edit makes new ones, as every command does), and a
+// context is made anew whenever an answer of it could change. What is kept
+// per rack, context and cable is found by the three objects alone; a lay is
+// found again by what it read, but a cable's twin and which end sorts first
+// are kept by the cable and its ends, so an end put on the same cable object
+// is not seen. `ctx.checkKept` (below) finds a page that breaks the rule.
 const pathMemo = new WeakMap(), pickMemo = new WeakMap();
 // The path as it is kept: read by this file, never handed out (routePath
 // hands out a copy), so that no caller can change what the next one reads.
 function pathOf(rack, cable, ctx) {
+  const out = keptPath(rack, cable, ctx);
+  if (ctx?.checkKept === true && !checking) checkKept(rack, cable, ctx, out);
+  return out;
+}
+// THE CHECK OF WHAT IS KEPT (`ctx.checkKept: true`, for a page's tests and
+// for development; it costs a normal read one look at the context and
+// nothing more). Everything kept rests on one rule: a rack, an item, a cable
+// and an end are never changed in place, and a context is made anew whenever
+// an answer of it could change. A page that breaks it is given the path that
+// was right before, with nothing to say so. With `checkKept` on its context,
+// every path read is laid again from nothing (a copy of the rack, the cable,
+// its ends and the context, so that nothing kept applies) and compared, and
+// a difference throws. It lays every cable on every read, so it is not for
+// a page in use.
+let checking = false;
+function checkKept(rack, cable, ctx, out) {
+  const isObj = v => v !== null && typeof v === 'object';
+  const {checkKept: _on, ...plain} = ctx;
+  let cold;
+  checking = true;
+  try { cold = keptPath({...rack}, {...cable, a: isObj(cable.a) ? {...cable.a} : cable.a, b: isObj(cable.b) ? {...cable.b} : cable.b}, plain); }
+  finally { checking = false; }
+  if (JSON.stringify(cold) !== JSON.stringify(out))
+    throw new Error(`The path kept for ${String(cable.id)} is not the path its rack and context give now: a rack, an item, a cable or an end was changed in place, or the context answers otherwise than it did. Make a new rack and a new context for every change (ctx.checkKept).`);
+}
+function keptPath(rack, cable, ctx) {
   const memo = perOf(pathMemo, rack, ctx, cable);
   const known = memo?.get(cable);
   if (known !== undefined) return known;
@@ -944,11 +977,13 @@ function pickOf(rack, cable, ctx, {name = true} = {}) {
     }
     const first = order.first;
     // The two lays are judged once: which was kept is kept with the first
-    // (`picks`), for the same second lay and the same end first, so a
-    // context made anew does not turn and measure them again; and its path
-    // named for a cable is kept for the cable last named.
+    // (`picks`), for the same second lay, so a context made anew does not
+    // turn and measure them again; and its path named for a cable is kept
+    // for the cable last named. The same two lays are the lays of the same
+    // two ends (each is kept at its end), so which end sorts first is the
+    // same too, and is not asked again.
     let kept = picks.get(laidP);
-    if (!kept || kept.laidQ !== laidQ || kept.first !== first) {
+    if (!kept || kept.laidQ !== laidQ) {
       const p = laidP.path, q = laidQ && turnPath(laidQ.path);
       const score = x => [x.crossings.length, x.bends.reduce((m, f) => m + f.short_mm, 0), pathLength(x).measured];
       const sp = score(p), sq = score(q);
@@ -956,7 +991,7 @@ function pickOf(rack, cable, ctx, {name = true} = {}) {
       const tol = [0, 0.05, 1e-6];
       let pick = first ? 'written' : 'twin';
       for (let i = 0; i < 3; i++) if (Math.abs(sp[i] - sq[i]) > tol[i]) { pick = sp[i] < sq[i] ? 'written' : 'twin'; break; }
-      picks.set(laidP, kept = {laidQ, first, turned: pick === 'twin', raw: pick === 'twin' ? q : p, named: null});
+      picks.set(laidP, kept = {laidQ, turned: pick === 'twin', raw: pick === 'twin' ? q : p, named: null});
     }
     if (name && (!kept.named || kept.named.id !== cable.id)) kept.named = {id: cable.id, path: named(kept.raw, cable.id)};
     const path = name ? kept.named.path : kept.raw;
@@ -1118,8 +1153,8 @@ function turnPath(path) {
 // WHAT THE LAY OF A CABLE READS of its rack and its context, from the
 // cable's end a; `given` is the route to lay it on (a twin's: its cable's
 // route reversed), else the cable's own. Everything layFrom needs that is
-// the cable's own is here, as plain data: {media, allowance, a, b, diameter,
-// need, drape, wps, stops, rests}. null when a port is not found. Its id is
+// the cable's own is here, as plain data: {media, a, b, diameter, need,
+// drape, wps, stops, rests}. null when a port is not found. Its id is
 // not: a lay names no cable (layFrom).
 function layInputs(rack, cable, ctx, given) {
   const a = portPoint(rack, cable.a, ctx), b = portPoint(rack, cable.b, ctx);
@@ -1176,7 +1211,7 @@ function layInputs(rack, cable, ctx, given) {
     rested({kind: 'tray', item: s.w.item, via: s.w.via, face: laid.face, role: laid.role, ...(laid.ties ? {ties: laid.ties} : {})});
     stops.splice(k, 1, ...laid.points.map((p, j) => ({p, w: s.w, i: s.i, trayAt: true, hold: j > 0 && laid.hold[j]})));
   }
-  return {media: cable.media, allowance: endAllowance(cable), a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
+  return {media: cable.media, a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
     wps, stops, rests};
 }
 // One more thing a cable rests on, unless it is listed.
@@ -1615,7 +1650,7 @@ function layFrom(inp, world) {
   const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: null, point: final[c.k].at,
     between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
     angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
-  return {path: {points: final, rings, findings, marks, crossings, detours, rests, bends, covers: [], allowance: inp.allowance, media: inp.media},
+  return {path: {points: final, rings, findings, marks, crossings, detours, rests, bends, covers: [], allowance: endAllowance({media: inp.media}), media: inp.media},
     legs, need, r};
 }
 

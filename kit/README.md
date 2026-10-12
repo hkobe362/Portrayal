@@ -209,6 +209,16 @@ no DOM and fetch nothing but the catalogue and the cable types, so the same rack
 same way in a browser, in node and in an agent. Each is imported on its own,
 as `@portrayal/kit/rack/<module>`:
 
+**Never change a rack, an item, a cable or an end in place, and make a new
+route context whenever any answer of it could change.** The kit keeps what
+it works out for a cable and finds it again by those objects, so one changed
+in place is given the answer that was right before, with nothing to say so.
+Every command and `apply` return a new rack that shares what it did not
+touch, which is the way to edit one; an end is never put on the same cable
+object. To find a page that breaks this, put `checkKept: true` on the route
+context in its tests: every path read is then laid again from nothing and
+compared, and a difference throws ("New in 0.25.0" below).
+
 | module | what it does |
 |---|---|
 | `rack/catalog.js` | `loadCatalog(dist)`: the rack catalogue, and the `chassisOf(ref)` lookup everything else takes; `loadSlots(dist, refs)`: the bays, cages and parts the commands check against |
@@ -696,6 +706,15 @@ rack-wide call after that (`bendFindings`, `coverFindings`, `ringFindings`,
   the cables it does not touch (as `apply` and every command do) carries
   them over; a rack read again from its file is read for the first time.
   They are held weakly, and go when the rack's cables do.
+- **`ctx.checkKept: true`, for a page's tests.** With it on the route
+  context, `routePath` and every reader of a path lay the cable again from
+  a copy of the rack, the cable, its ends and the context, compare the two,
+  and throw an error that names the cable and `ctx.checkKept` where they
+  differ: a rack, item, cable or end changed in place, or a context that
+  answers otherwise than it did. It lays every cable on every read, so it is
+  for tests and development, not for a page in use; without it the kit pays
+  one look at the context a read. It does not see an end put on the same
+  cable object under a new context where both lays come out alike.
 - **`routePath` hands out a copy** of the path kept, and `resolveRoute` its
   own lists, so nothing a caller does to one reaches the next reader. The
   findings do the same.

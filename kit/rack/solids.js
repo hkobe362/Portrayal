@@ -288,14 +288,21 @@ const met = (s, diameter) => {
 // would not decide: a leg wholly to one side of a box on an axis has no
 // stretch inside it. The order of the list is kept, so the answer is the
 // same list in the same order. A short list is read as it is.
+// THE LIST IS NOT CHANGED IN PLACE: the boxes are laid out for the list as it
+// was when first read, and found again by the list itself. A list of another
+// length, or whose first or last solid or their boxes are other objects, is
+// laid out again; a solid swapped or moved in the middle of a list is not
+// seen (to look at every solid on every leg would cost what this saves), so
+// a caller with other solids hands in another list, as solidsOf does.
 const INDEX_FROM = 12;
 const indexOf = new WeakMap();
 function indexed(solids, diameter) {
   let per = indexOf.get(solids);
   if (!per) indexOf.set(solids, per = new Map());
   let ix = per.get(diameter);
-  if (ix && ix.n === solids.length) return ix;
-  const n = solids.length, boxes = new Float64Array(6 * n), groups = [];
+  const n = solids.length, s0 = solids[0], s1 = solids[n - 1];
+  if (ix && ix.n === n && ix.s0 === s0 && ix.s1 === s1 && ix.b0 === s0?.box && ix.b1 === s1?.box) return ix;
+  const boxes = new Float64Array(6 * n), groups = [];
   let g = null;
   solids.forEach((s, i) => {
     const b = met(s, diameter);
@@ -307,7 +314,7 @@ function indexed(solids, diameter) {
     g.x0 = Math.min(g.x0, b.x0); g.x1 = Math.max(g.x1, b.x1); g.y0 = Math.min(g.y0, b.y0); g.y1 = Math.max(g.y1, b.y1);
     g.z0 = Math.min(g.z0, b.z0); g.z1 = Math.max(g.z1, b.z1);
   });
-  per.set(diameter, ix = {n, boxes, groups});
+  per.set(diameter, ix = {n, boxes, groups, s0, s1, b0: s0?.box, b1: s1?.box});
   return ix;
 }
 
