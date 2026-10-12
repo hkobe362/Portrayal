@@ -795,12 +795,82 @@ reading `ctx.route`:
   buys, and it stays `ceil(L / every)` whatever the rings do.
 - `L` uses the same rack measure as routed length, so the count agrees in
   every view and the BOM.
+- **`L` is measured on the cables (#1034).** A trunk is a list of waypoints,
+  and its members do not run straight from one to the next: a cord passes a
+  ring by its opening, lies along a tray, hangs between a ring and a lane,
+  and goes round a body by a detour point. Until #1034 the trunk was
+  measured, and its straps placed, on the straight line between two
+  waypoints, which is shorter than the cords and elsewhere: on the trunk of
+  `spec/tests/js/strap-path-fixture.mjs` that goes from a rear lane to a
+  front one round a duct, the line between the two lane points is 0.75 m
+  where the cords run 1.15 m, and a strap placed on it stood off the cords.
+  Now:
+  - the trunk is cut at every place on it (a pathway, and a lane at each
+    unit), and each piece between two neighbours is one member's routed path
+    between them (`routePath`). On that path a lane point is the point; a
+    ring, a duct and a tray are the middle, by length, of the points the path
+    has there (a ring's entry and exit, a tray's stretch); a lane unit
+    between two lane waypoints is that share of the way along the path
+    between them;
+  - where several members ride a piece it is the one in the middle by
+    length (the earlier of two middles). A strap goes round the whole pack,
+    so it belongs where most of the pack lies. The longest was tried first
+    and was wrong: one AOC among three DACs between two ducts 762 mm apart
+    hangs lower and longer, and it set a 947 mm trunk with four straps, each
+    57 to 147 mm from the three DACs, where the four as DACs are 789 mm and
+    take three. With the middle one, a cord that is outnumbered sets neither
+    the length, nor the count, nor the place;
+  - members as long (to a micron) are put in order of id, by number and
+    then by the plain text, so `c2` is before `c10` and `c02` before `c2`.
+    The order the cables or the members are written in plays no part.
+    Renumbering cables can change which of several like members is named;
+  - a piece no member's path can be read for is the straight line, as
+    before. Where members ride it (a port not found on its drawing) that is
+    said: `straight` on the result and a sentence in the bundle's notes,
+    since the length and the count are then an estimate. Where nobody rides
+    it, no strap goes there and nothing is said.
+  - **an even split of two kinds goes to the kind that hangs less**, since
+    the earlier of two middles is the shorter: two DACs and two AOCs are
+    measured as DACs, and half the pack is then 50 mm and more off every
+    strap. Nothing better is known of such a pack without laying it as one
+    body;
+  - where the member named changes kind from one piece to the next (at a
+    ring, where the riders change), the line steps sideways there by the
+    difference of where the two kinds stand in the ring, up to about 3 mm
+    (OS2 against Cat 6A; 2.12 mm for Cat 6, 1.41 mm for DAC, none for AOC
+    or OM4);
+  - **a readable minority sets the trunk.** Where fewer than half of a
+    piece's riders have a path, the middle one of those is not the middle
+    of the pack (one AOC with a path among three DACs with none gives the
+    AOC's line). That is said as the straight line is: `few` on the result
+    and a sentence in the notes. The two are kept apart, on the export
+    record too: a straight line is the shortest the trunk could be, and a
+    minority's figure can be over. Exactly half readable says nothing: two
+    DACs with no path and two AOCs with one are measured on the AOCs,
+    946.8 mm and 4 spacing straps, with no note.
+  **A bundle that cannot be read is not counted.** An error from a reader
+  of the context is let out of `straps()`, and the rack-wide readers
+  (`bundleExports`, `anchorsOf`, `strapTotals`) leave such a bundle out,
+  where before #1034 it was counted along its straight lines. `strapTotals`
+  says how many it left out (`unread`, `unreadBundles`).
+  **What `on` means.** Each cable is laid on its own, so members of unlike
+  kinds hang a little apart between the same two places, where a real pack
+  hangs as one. A strap's point is exactly on the path of the member it
+  names; members that lie like it are there too; one that hangs otherwise is
+  off it by the difference of the two hangs. Laying a pack as one body is
+  not done here.
+  The bend check (section 5.2) still reads the straight lines.
 
-Each strap comes back as `{segment, t, along_mm}`: which trunk segment it is
-on and how far along (0 to 1), plus its distance from the trunk's start. It is
-not a coordinate, because 2D and 3D draw the same waypoints at their own
-positions (2D at ring ends and gutter centres, 3D at guide anchors and
-40 mm-offset lane points). Each view puts the strap on its own segment at `t`.
+Each strap comes back as `{segment, t, along_mm, point, dir, on}`. `point` is
+where it is, in rack coordinates, `dir` the way the trunk runs there (a unit
+vector, null where it has no length), and `on` the id of the cable whose path
+the point is on (null on a straight piece). `segment` and `t` say which trunk
+segment it is on and what share of that segment's routed length it is along
+(0 to 1), and `along_mm` its distance from the trunk's start along the cords.
+A view that draws the rack's own coordinates puts the strap at `point`. One
+that draws the same waypoints at positions of its own (2D at ring ends and
+gutter centres) can still put it on its own segment at `t`, and is then as far
+off the cable as that view's straight segment is.
 
 - **2D** (portrayal-site#142): the bundle's members are drawn combed side by
   side in member order, through each pane's waypoints, with corners drawn at
@@ -956,7 +1026,8 @@ What the bend check settled that section 5.2 leaves to it:
   it is worked out from the rack's own sketch of where rings and lanes are,
   not from a measured bend.
 - **The polyline is the trunk's waypoints at `pointOf`**, a ring at its
-  centre, as `trunkLength` and `straps` measure the trunk. It is not #930's
+  centre (as `trunkLength` and `straps` measured the trunk until #1034;
+  they now read the members' paths, section 6). It is not #930's
   `routePath`, which splits a ring into the faces a cable enters and leaves
   by: that path runs from port to port, and a trunk has no ports. Treating a
   ring's inside as straight cable would also turn the stand-off of a lacer
@@ -1008,7 +1079,7 @@ What the exports settled that section 7 leaves to them:
 - **One record per bundle.** `bundleExports(rack, ctx)` in `export-data.js`
   measures each bundle once (`bundleCheck`, `straps`, `trunkLength`) and every
   export reads that record: `{id, number, label, name, members, drawn,
-  checked, length_m, every, straps, size_mm, limit_mm, limit_at,
+  checked, length_m, straight, few, every, straps, size_mm, limit_mm, limit_at,
   limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes}`. `name`
   is what a tag prints, `bundleName` with control characters as spaces; the
   bundle's own `number` and `label` sit beside it, so label software can be
