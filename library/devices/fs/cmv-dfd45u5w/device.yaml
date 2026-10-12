@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmv-dfd45u5w
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: CMV-DFD45U5W
@@ -186,6 +186,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, 6.1 mm - a theoretical value for reference (FS Vertical Cable Managers
       with Finger Ducts datasheet), both channels together, which states no fill
+    cable-capacity-media: cat6
   compliance:
     rohs: RoHS Compliant
     iso: ISO9001 Certificate

@@ -1290,7 +1290,7 @@ const KEPT = 6;
 // The lay of `cable` from its end a, on `given` (a twin's route) or its own:
 // {path, legs, need, r}, the one kept where its inputs and its world are
 // those of a lay already made. null when a port is not found.
-// PLAIN (#1026): `plain` asks for the lay as it was made before kit 0.26.0,
+// PLAIN (#1026): `plain` asks for the lay as it was made before kit 0.27.0,
 // with none of the offers that came with it (a detour not pulled taut, the
 // way behind a tray, the stretch through a ring lengthened on this side, an
 // approach point taken back in, a span's point at the edge of what it lies
@@ -1887,7 +1887,7 @@ function layFrom(inp, world) {
     // both ends and keeps one (#986).
     for (let round = 0; round < 6 && short > 0; round++) {
       let best = null;
-      // (a plain lay is offered nothing that came with kit 0.26.0: PLAIN, at layOf)
+      // (a plain lay is offered nothing that came with kit 0.27.0: PLAIN, at layOf)
       for (const c of offers()) if (!(plain && c.novel)) best = better(c, best);
       if (!best) break;
       const o = new Map(best.o), l = new Map(best.l);
@@ -2511,24 +2511,51 @@ function zeroUThrough(rack, ctx) {
     .filter(x => x.cables.length);
 }
 
-// Managers whose stated capacity the cables through them exceed. As in fill,
-// a ring a cable only doubles back from does not carry it.
+// MANAGERS WITH MORE CABLES THROUGH THEM THAN THEIR MAKER STATES (#1032).
+// A maker counts with one kind of cable: thirty Cat6 is the section of about
+// a hundred and twenty 3 mm cords. So the count is compared with the cables
+// AT LEAST AS THICK as that kind, `capacity.media` (rack.json, from the
+// device's `cable-capacity-media`), by DIAMETERS above: Cat6A through a
+// manager counted in Cat6 counts, since it takes at least the room the maker
+// counted (the makers' own tables give Cat6A within a few per cent of Cat6),
+// and so does a cable of no stated kind, which fill already takes as 6 mm
+// copper. A thinner kind (a fibre cord, an AOC) is not counted, and how full
+// a ring is with those stays fill's to say.
+// THREE SHAPES OF A CAPACITY. `media` a kind: compared as above. `media:
+// null`: the device states a count and no source names the cable, so it is a
+// fact for a reader and is never compared. ANYTHING ELSE: no `media` key (a
+// catalogue built before the key existed, which cannot say which of the two
+// it is), a kind this kit has no diameter for (a catalogue newer than the
+// kit), or a value that is no kind at all. Its count is compared with the
+// cables of 6 mm or more (the diameter a cable of no stated kind is given)
+// and the entry names no kind, so that neither an older catalogue nor a newer
+// one goes silent. Only `null` says "never compare".
+// Each entry: the manager, `count` of the cables counted, `through` of every
+// kind, the stated `capacity`, its `media` (null where the kit knows no kind) and
+// `diameter`, the least diameter counted, in mm. As in fill, a ring a cable
+// only doubles back from does not carry it.
 export function capacityOver(rack, ctx) {
   const by = new Map();
   for (const c of rack.cables || []) {
     const notThrough = new Set((pathOf(rack, c, ctx)?.findings || []).map(f => `${f.item}|${f.via}`));
     for (const w of routeOf(rack, c, ctx).waypoints)
-      if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Set()).get(w.item)).add(c.id);
+      if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Map()).get(w.item)).set(c.id, c);
   }
+  const over = (cap, cables) => {
+    if (!(cap?.count > 0) || cap.media === null) return null;
+    const known = ownMedia(DIAMETERS, cap.media) > 0, diameter = known ? DIAMETERS[cap.media] : UNSET_D;
+    const count = cables.filter(c => (ownMedia(DIAMETERS, c.media) ?? UNSET_D) >= diameter).length;
+    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: known ? cap.media : null, diameter} : null;
+  };
   const out = [];
-  for (const [item, set] of by) {
-    const cap = ctx.chassisOf(itemOf(rack, item)?.ref)?.capacity?.count;
-    if (cap && set.size > cap) out.push({item, count: set.size, capacity: cap});
+  for (const [item, cables] of by) {
+    const o = over(ctx.chassisOf(itemOf(rack, item)?.ref)?.capacity, [...cables.values()]);
+    if (o) out.push({item, ...o});
   }
   // a zero-U part that carries a lane, against its own stated capacity (#926)
   for (const {z, c, cables} of zeroUThrough(rack, ctx)) {
-    const cap = c.capacity?.count;
-    if (cap && cables.length > cap) out.push({item: z.id, count: cables.length, capacity: cap, zeroU: true});
+    const o = over(c.capacity, cables);
+    if (o) out.push({item: z.id, ...o, zeroU: true});
   }
   return out;
 }

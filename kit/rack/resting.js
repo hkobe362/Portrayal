@@ -264,7 +264,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
   // (the edges a span passes are those of the same surfaces, less the ones
   // above both its ends, which nothing of it lies on: overEdges)
   let over = null;
-  // `edges: false` leaves them out, as a span was hung before kit 0.26.0
+  // `edges: false` leaves them out, as a span was hung before kit 0.27.0
   // (route.js layOf, PLAIN); a hang for which one was found says so (`edged`)
   let added = false;
   const edged = pts => {

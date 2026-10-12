@@ -58,7 +58,9 @@ Four things a cable manager needs are missing:
    this round.
 9. **Cable capacity is one stated fact per device**: the count and the vendor's basis for
    it. It is not divided among rings, because the vendor states it per manager and calls it
-   theoretical.
+   theoretical. The basis is also recorded as the kind of cable counted, where a source
+   names it, and the count is compared with the cables at least as thick as that kind
+   ([the count and the kind of cable](#the-count-and-the-kind-of-cable), #1032).
 10. **A lab placement gains `face`, `on` and `unit`.** `face` is `front` or `rear`. `on`
     names a host placement; `unit` is which rack unit of that host, counted the way the
     rack counts, default 1. A rack-face part always sits on a whole rack unit, also in
@@ -432,6 +434,63 @@ larger than the cable, so a cable crossing it at an angle is held, and an entry 
 1.5 mm apart change no length. Neither has the ring's fault. A duct's point is its
 centre, though, so a route into a long duct is measured to its middle; where a cable
 enters and leaves a duct is a separate question.
+
+## 14. The count and the kind of cable
+
+(#1032, kit 0.26.0.) Decision 9 records a manager's capacity as one count and its basis
+in words. The kit compared that count with every cable through the manager, of any
+kind. A rack of 48 fibre cords of 3 mm through an FHD-CMP5DR, which states 30 Cat6
+24AWG, was warned of as over its capacity while its fullest ring stood at 45% of its
+fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
+
+- **The warning about how full a manager is comes from its rings.** `fill` already
+  works out each ring's share of its fill limit from the section of every cable
+  through it, whatever its kind. That is the check that holds for any mix.
+- **The count is a fact about one kind of cable.** A device records that kind beside
+  the words, as `attrs.performance.cable-capacity-media`, in the words a rack file
+  gives a cable's `media` (`cat6`, `os2`, ...). `rack.json` carries it as
+  `capacity.media`. It is set only where a source names the cable. It is left out of
+  the device (and is `null` in `rack.json`)
+  where the count is an estimate (the USCMH-SFDABS and SFDABSB managers) and where two
+  sources disagree on the cable (the CMH-4DRB1U: one says 28AWG, one Cat6 24AWG).
+- **The count is compared with the cables at least as thick as that kind.**
+  `capacityOver` counts the cables through the manager whose typical diameter (the
+  kit's `DIAMETERS`, the table `fill` uses) is the stated kind's or more, and reports
+  the manager when there are more of them than the count. Through a manager counted
+  in Cat6 that is Cat6 and Cat6A. A cable with no `media`, or of a kind the table does
+  not have, counts too: `fill` takes it as 6 mm copper, and so does this.
+- **Why a thicker cable counts.** A thicker cable takes at least the room the maker
+  counted with, so a count of them over the stated one is over it. The makers' own
+  tables bear this out: where FS states a count for Cat6A or Cat7 beside the one for
+  Cat6, it is 1.6 to 6.3 per cent under it (45 beside 48, 80 beside 83, 53 beside 55,
+  2700 beside 2745). Counting only the stated kind left a manager silent with about
+  twice the section its maker counted: 40 Cat6A spread eight a ring stand at 94% of
+  each ring's fill limit, under it, and are 1767 mm2 where 30 Cat6 are 848.
+- **A thinner cable does not count,** in either direction: a fibre cord, an AOC, a DAC
+  through a manager counted in Cat6. No conversion by section is made, because the
+  maker states none. Thirty Cat6 and twenty fibre cords are not over a count of
+  thirty; thirty-one Cat6 and five fibre cords are, and the note says "31 of the 36
+  cables through it". For the thinner kinds the rings' fill is the check.
+- **Three shapes of a capacity in `rack.json`.** `media` a kind: compared as above.
+  `media: null`: no source names the cable, so the count is shown where a manager is
+  inspected (`inspect` gives `capacity: {count, basis, media: null}`) and is never
+  compared. Anything else is compared with the cables of 6 mm or more, the diameter a
+  cable of no stated kind is given, and the note says "of 6 mm or more" and names no
+  kind. That covers no `media` key (a catalogue built before the key existed, which
+  cannot say which of the two it is) and a kind the kit has no diameter for (a
+  catalogue newer than the kit, or a value that is no kind). A kit read against an
+  older catalogue therefore still warns of copper over a count, and no longer of
+  fibre cords; an older kit read against a catalogue with a new kind does not go
+  silent either. Only `null` means "never compare".
+- **The words of the note are true of a mix.** "40 cables at least as thick as Cat 6
+  copper through it, more than the 30 Cat 6 copper cables its maker states."
+- **A warning says which manager.** Two managers of one model carry one label, so a
+  note names the manager with its U and its face: "LACER (U20 front)". The U is the
+  one `managerNotes` and the device import give it. A part beside the rack is named
+  with its attachment point.
+- **The fill note states both shares.** "ring 1 on LACER (U20 front): 60 cables, 112%
+  of its fill limit; the limit is 40% of the opening." The earlier wording, "112% of a
+  40% fill", could be read as a share of the opening.
 
 ## Decisions taken
 

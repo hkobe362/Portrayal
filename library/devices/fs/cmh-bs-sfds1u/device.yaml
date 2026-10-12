@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-bs-sfds1u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-BS-SFDS1U
@@ -118,6 +118,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, theoretical value, no fill basis stated (FS CMH-BS-SFDS1U datasheet,
       specification table)
+    cable-capacity-media: cat6
   environmental:
     operating-temp: -10 to 60°C (14 to 140°F)
     operating-humidity: 95% Relative Humidity (max.), Non-condensing

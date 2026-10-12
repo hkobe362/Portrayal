@@ -23,7 +23,7 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // holds on any machine; the two kits were compared by every digit on one
 // (speed-goldens.mjs, `--exact`). A change that is meant to move a number
 // records them again (speed-goldens.mjs says how).
-// RECORDED AGAIN FOR KIT 0.26.0 (#1026, #987), which is meant to move
+// RECORDED AGAIN FOR KIT 0.27.0 (#1026, #987), which is meant to move
 // numbers: a lead's ring is chosen by room, a detour round a tray is laid
 // another way, a patch's ring is chosen by its lay, a span has a point at
 // the edge of what it lies on, and two turns on one leg are one finding. Of

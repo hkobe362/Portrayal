@@ -8,7 +8,7 @@ import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, itemUnits, 
 import {placement, managersOf} from './managers.js';
 import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf, uText} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
-import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText, isElementId, addressFor} from './cable-rules.js';
+import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText, isElementId, addressFor, portLabel} from './cable-rules.js';
 import {seatedPort, settleEnds} from './ports.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
@@ -224,7 +224,7 @@ export async function freePorts(rack, itemId, {portsOf, slotsOf, compByRef}) {
       if (seen.has(`${view}|${path}`)) continue;
       seen.add(`${view}|${path}`);
       if (!portFree(rack, {item: itemId, path, view}).ok) continue;
-      out.push({path, view, label: path.replace(/-/g, ' '), media: p.media ?? null, speed: p.speed ?? null});
+      out.push({path, view, label: portLabel(path), media: p.media ?? null, speed: p.speed ?? null});
     }
   }
   return out;
@@ -260,6 +260,14 @@ export async function looseEnds(rack, ctx) {
 // them; everything else is answered from the rack and what ctx hands in.
 const offers = (ctx, refs) => refs.map(ref => ({ref, name: partName(ctx.compByRef, ref), kind: partOf(ctx.compByRef, ref)?.class ?? null}));
 
+// THE CABLE COUNT A MAKER STATES FOR A MANAGER (#1032), as the catalogue
+// holds it: the count, the basis in the words of the device file, and
+// `media`, the kind of cable it counts (route.js capacityOver compares it
+// with the cables at least that thick), or null where the catalogue names
+// none.
+const capacityFact = c => (c?.capacity?.count != null
+  ? {capacity: {count: c.capacity.count, basis: c.capacity.basis ?? '', media: c.capacity.media ?? null}} : {});
+
 function itemFacts(rack, item, ctx) {
   const c = ctx.chassisOf?.(item.ref) || null;
   const slots = typeof ctx.slotsOf === 'function' ? ctx.slotsOf(item.ref) : null;
@@ -270,7 +278,7 @@ function itemFacts(rack, item, ctx) {
     label: item.label, cfg: item.cfg, configs, ru: item.ru, u: ctx.chassisOf ? itemUnits(item, ctx.chassisOf) : 1, face: item.face, turned: !!item.turned,
     ...(rollOf(item) ? {roll: rollOf(item)} : {}),
     on: item.on ?? null, unit: item.unit ?? null, side: railOf(item, ctx.chassisOf ?? (() => null)),
-    managers: managersOf(rack, item.id).map(m => m.id)};
+    managers: managersOf(rack, item.id).map(m => m.id), ...capacityFact(c)};
   // A DEVICE OF A HEIGHT THAT IS NO WHOLE NUMBER OF UNITS may start on a
   // whole unit or on a half, and whether its ears meet the rail holes there
   // is checked only when the catalogue states its ear slot heights. None
@@ -401,7 +409,7 @@ function zeroUFacts(rack, z, ctx) {
   return {kind: 'zeroU', id: z.id, ref: z.ref, model: c?.model ?? null, manufacturer: c?.manufacturer ?? null,
     label: z.label ?? null, cfg: z.cfg ?? '', at: z.at, ru: zeroUBottom(z), u: isZeroUPart(c) ? zeroUUnits(c) : null,
     between: z.between === true, mount: c?.mount ?? null, lane: carriesLane(c) ? z.at : null,
-    where: c ? whereText(rack, z, ctx.chassisOf) : null};
+    where: c ? whereText(rack, z, ctx.chassisOf) : null, ...capacityFact(c)};
 }
 
 // A BUNDLE (#921), `kind: 'bundle'`: its members with where each joins and

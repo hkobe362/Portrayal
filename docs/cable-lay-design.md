@@ -1204,7 +1204,7 @@ time a page measures them; an entered length is never touched.
 
 ### 3.5 Room to turn into a ring (#1026)
 
-Built in kit 0.26.0. Until then the automatic route sent every lead through
+Built in kit 0.27.0. Until then the automatic route sent every lead through
 the ring of its manager nearest its port, whatever stood between. A lead is
 the stretch of a cable from the far end of its plug to the first thing that
 holds it. Where a lacer is hosted on the unit its ports are in, the nearest
