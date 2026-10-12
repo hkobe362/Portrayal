@@ -340,13 +340,18 @@ test('a readable minority sets the trunk, and that is said', async () => {
   assert.deepEqual(m.straps.notes, [said]);
   assert.deepEqual(B.trunkLength(x.rack, x.rack.bundles[0], {route: x.ctx}), {metres: 0.95, few: true});
   const [e] = X.bundleExports(x.rack, {route: x.ctx});
-  assert.equal(e.straight, true, 'the export record marks the estimate');
+  // the export record keeps the two estimates apart: a minority's figure can be over, a straight line is the shortest
+  assert.deepEqual([e.few, e.straight], [true, false]);
   assert.ok(e.notes.includes(said));
   const f = await Q.inspect(x.rack, 'b1', {chassisOf: x.ctx.chassisOf, route: x.ctx});
   assert.ok(f.notes.includes(said) && f.straps.few === true && f.length.few === true);
   // half of them readable is no minority: two DACs with a path and two without are measured as DACs, and nothing is said
   const half = ducts(['dac', 'dac', 'dac', 'dac'], {portX: e => (/[34]$/.test(e.path) ? -150 : null)}), h = measured(half.rack, half.ctx);
   assert.deepEqual([h.run, h.straps.few, h.straps.notes], [788.8, false, []]);
+  // also where the readable half is the other kind: two DACs unread and two AOCs read are measured on the AOCs, with no note
+  const other = ducts(['dac', 'dac', 'aoc', 'aoc'], {portX: e => (/[34]$/.test(e.path) ? -150 : null)}), o = measured(other.rack, other.ctx);
+  assert.deepEqual([o.run, o.kinds.spacing, o.straps.few, o.straps.straight, o.straps.notes], [946.8, 4, false, false, []]);
+  assert.deepEqual([X.bundleExports(other.rack, {route: other.ctx})[0].few, X.bundleExports(other.rack, {route: other.ctx})[0].straight], [false, false]);
 });
 
 test('a member is counted only on the stretch it rides, though its own path passes more of the trunk', () => {
@@ -467,7 +472,7 @@ test('where no member has a path, a trunk is the straight lines between its wayp
   assert.equal(s.straight, true);
   assert.deepEqual(s.notes, [said]);
   const ex = X.bundleExports(RACK, {route: ctx});
-  assert.equal(ex[5].straight, true);
+  assert.deepEqual([ex[5].straight, ex[5].few], [true, false]);
   assert.ok(ex[5].notes.includes(said));
   const notes = X.bundleNotes(ex), at = notes.indexOf(X.bundleNote(ex[5]));
   assert.ok(at >= 0 && notes.slice(at + 1, at + 4).includes(said), 'under the bundle\'s own line');
@@ -477,7 +482,7 @@ test('where no member has a path, a trunk is the straight lines between its wayp
   assert.ok(f.notes.includes(said));
   // and not said of a bundle measured on its cables: a stretch nobody rides is no estimate
   const fine = X.bundleExports(RACK, {route: ctxOf()});
-  assert.ok(fine.every(e => e.straight === false && !e.notes.some(n => /straight line/.test(n))));
+  assert.ok(fine.every(e => e.straight === false && e.few === false && !e.notes.some(n => /straight line|fewer than half/.test(n))));
   // nor of a trunk that runs on past where its members leave it: b1 with one more ring that no member rides to
   const longer = {...RACK, bundles: RACK.bundles.map(x => (x.id === 'b1' ? {...x, route: [...x.route, {item: x.route.at(-1).item, via: 'guide-3'}]} : x))};
   const s1 = got('b1', longer);

@@ -80,7 +80,7 @@ test('bundleExports: each bundle measured as the kit measures it, with its tag f
   const st = B.straps(r, r.bundles[0], ctx), check = B.bundleCheck(r, r.bundles[0], ctx);
   assert.ok(st.count > 0, 'the fixture must place straps');
   assert.deepEqual(e, {id: 'b1', number: 1, label: '', name: 'Bundle 1', members: ['c1', 'c2', 'c3'], drawn: true, checked: true,
-    length_m: B.trunkLength(r, r.bundles[0], ctx).metres, straight: false, every: {value: 12, unit: 'in'}, straps: st.count, strap_kinds: st.kinds,
+    length_m: B.trunkLength(r, r.bundles[0], ctx).metres, straight: false, few: false, every: {value: 12, unit: 'in'}, straps: st.count, strap_kinds: st.kinds,
     strap_widths: st.widths, anchor_widths: {},
     size_mm: check.size.max_mm, limit_mm: 63.5, limit_at: null, limit_estimated: false,
     bend_mm: 25, bend_by: 'c2', bend_checked: true, warnings: check.warnings, notes: []});

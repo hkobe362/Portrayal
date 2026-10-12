@@ -34,10 +34,10 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // now, and holds the next change to them.
 // RECORDED AGAIN FOR KIT 0.28.0 (#1034), which moves `straps` and
 // `bundle-exports` on the racks that have a bundle and no other answer: each
-// strap gained its `point`, `dir` and `on`, the straps gained `straight` and
-// `few`, each export record `straight`, a trunk is measured along its
-// members' paths, and a place half way between two tenths of a millimetre
-// always rounds up (bundles.js mm1).
+// strap gained its `point`, `dir` and `on`, the straps and each export
+// record gained `straight` and `few`, a trunk is measured along its members'
+// paths, and a place half way between two tenths of a millimetre always
+// rounds up (bundles.js mm1).
 test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);

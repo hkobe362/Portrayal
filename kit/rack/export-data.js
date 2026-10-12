@@ -304,7 +304,7 @@ function spareCells(rack, c, s) {
 // of the render (`ctx`: {route, diameterOf?, bendOf?}, as bundleCheck takes
 // it). One record per bundle, in the rack's order:
 //   {id, number, label, name, members: [cable ids], drawn, checked,
-//    length_m, straight, every: {value, unit} | null, straps, size_mm, limit_mm,
+//    length_m, straight, few, every: {value, unit} | null, straps, size_mm, limit_mm,
 //    limit_at, limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes}
 // `name` is what a tag prints (the label, else "Bundle N"), with control
 // characters as spaces; `number` and `label` are the bundle's own, for label
@@ -324,10 +324,10 @@ export function bundleExports(rack, ctx = {}) {
     return {id: b.id, number: b.number, label: b.label || '', name: flat(bundleName(b)),
             members: b.members.map(m => m.cable), drawn, checked: !!check.checked,
             length_m: len ? len.metres : null,
-            // true where the length and the straps are an estimate for want of a cable's path: measured
-            // along the straight line between waypoints, or on fewer than half of the riders
-            // (bundles.js); the notes then say which
-            straight: !!(len?.straight || len?.few || (drawn && (st?.straight || st?.few))), every: strapSpacing(b),
+            // where the length and the straps are an estimate for want of a cable's path (bundles.js):
+            // `straight`, measured along the straight line between waypoints, the shortest it could be;
+            // `few`, measured on fewer than half of the riders, which can be over. The notes say it too.
+            straight: !!(len?.straight || (drawn && st?.straight)), few: !!(len?.few || (drawn && st?.few)), every: strapSpacing(b),
             straps: !check.checked ? null : drawn ? (st ? st.count : null) : 0,
             // the three kinds, which `straps` is the sum of (bundles.js straps)
             strap_kinds: check.checked && drawn && st ? {...st.kinds} : null,

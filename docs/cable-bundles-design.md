@@ -836,12 +836,18 @@ reading `ctx.route`:
     body;
   - where the member named changes kind from one piece to the next (at a
     ring, where the riders change), the line steps sideways there by the
-    difference of where the two kinds stand in the ring, about 3 mm;
+    difference of where the two kinds stand in the ring, up to about 3 mm
+    (OS2 against Cat 6A; 2.12 mm for Cat 6, 1.41 mm for DAC, none for AOC
+    or OM4);
   - **a readable minority sets the trunk.** Where fewer than half of a
     piece's riders have a path, the middle one of those is not the middle
     of the pack (one AOC with a path among three DACs with none gives the
     AOC's line). That is said as the straight line is: `few` on the result
-    and a sentence in the notes.
+    and a sentence in the notes. The two are kept apart, on the export
+    record too: a straight line is the shortest the trunk could be, and a
+    minority's figure can be over. Exactly half readable says nothing: two
+    DACs with no path and two AOCs with one are measured on the AOCs,
+    946.8 mm and 4 spacing straps, with no note.
   **A bundle that cannot be read is not counted.** An error from a reader
   of the context is let out of `straps()`, and the rack-wide readers
   (`bundleExports`, `anchorsOf`, `strapTotals`) leave such a bundle out,
@@ -1073,7 +1079,7 @@ What the exports settled that section 7 leaves to them:
 - **One record per bundle.** `bundleExports(rack, ctx)` in `export-data.js`
   measures each bundle once (`bundleCheck`, `straps`, `trunkLength`) and every
   export reads that record: `{id, number, label, name, members, drawn,
-  checked, length_m, straight, every, straps, size_mm, limit_mm, limit_at,
+  checked, length_m, straight, few, every, straps, size_mm, limit_mm, limit_at,
   limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes}`. `name`
   is what a tag prints, `bundleName` with control characters as spaces; the
   bundle's own `number` and `label` sit beside it, so label software can be

@@ -705,9 +705,10 @@ routed paths (`routePath`).
   AOCs are measured as DACs, and the two AOCs are then 50 mm and more off
   every strap. Where the member named changes kind from one piece to the
   next, at a ring where the riders change, the line steps sideways there by
-  the difference of where the two kinds stand in the ring, about 3 mm. The
-  order the cables or the members are written in plays no part; renumbering cables can change which of several like members is
-  named, and with it a place by a few millimetres where they do not lie
+  the difference of where the two kinds stand in the ring, up to about 3 mm
+  (OS2 against Cat 6A; 2.12 mm for Cat 6, 1.41 mm for DAC, none for AOC or
+  OM4). The order the cables or the members are written in plays no part;
+  renumbering cables can change which of several like members is named, and with it a place by a few millimetres where they do not lie
   quite alike.
 - **What `on` means.** The kit lays each cable on its own, so members of
   unlike kinds hang a little apart where a real pack hangs as one. A strap's
@@ -726,9 +727,12 @@ routed paths (`routePath`).
   sets the trunk**: where fewer than half of a stretch's riders have a
   path, the middle one of those is taken (one AOC with a path among three
   DACs with none gives the AOC's 946.8 mm and four straps), and that is
-  said in the same places with `few: true` and its own sentence;
-  `bundleExports` marks it `straight: true` as well, its one flag for an
-  estimate.
+  said in the same places with `few: true` and its own sentence. The two
+  are kept apart, on a `bundleExports` record too (`straight` and `few`,
+  each always there, false otherwise): a straight line is the shortest the
+  trunk could be, and a minority's figure can be over. **Exactly half
+  readable says nothing**: two DACs with no path and two AOCs with one are
+  measured on the AOCs, 946.8 mm and 4 spacing straps, with no note.
 - **An error is let out.** A context reader that throws, or a path found
   changed under `ctx.checkKept`, throws from `straps()` and `trunkLength`
   as it does from `routePath`. `bundleExports`, `anchorsOf` and
@@ -1271,7 +1275,7 @@ its port, are not checked here: each cable's own path is, since 0.17.0, by
 **Bundles in the exports (0.9.0).** `bundleExports(rack, ctx)` in
 `@portrayal/kit/rack/export-data` measures each bundle once, with the same
 `ctx` as `bundleCheck`, and gives one record per bundle: `{ id, number, label,
-name, members, drawn, checked, length_m, straight, every, straps, size_mm, limit_mm,
+name, members, drawn, checked, length_m, straight, few, every, straps, size_mm, limit_mm,
 limit_at, limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes }`.
 `name` is what a tag prints (the label, else "Bundle N"), and `number` and
 `label` are there on their own for label software. `straps` is the count the
