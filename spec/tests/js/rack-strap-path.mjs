@@ -130,13 +130,13 @@ test('a trunk is as long as the path of it, and its straps are counted along tha
   assert.deepEqual(got('b5').runs, [[0, 1284.2]]);
   assert.deepEqual(got('b5').kinds, {spacing: 5, breakout: 4, anchor: 0});
   // the rack: what it buys, the BOM's strap line, and a bundle's line on the sheet and the schedule
-  assert.deepEqual(B.strapTotals(RACK, bc), {spacing: 32, breakout: 24, anchor: 16, total: 72, widths: {19: 72}});
+  assert.deepEqual(B.strapTotals(RACK, bc), {spacing: 32, breakout: 24, anchor: 20, total: 76, widths: {19: 76}});
   const ex = X.bundleExports(RACK, bc);
   assert.deepEqual(ex.map(e => [e.id, e.length_m, e.straps, e.straight]),
     [['b1', 0.5, 4, false], ['b2', 0.73, 5, false], ['b3', 0.74, 5, false], ['b4', 0.51, 4, false],
      ['b5', 1.28, 9, false], ['b6', 1.74, 10, false], ['b7', 1.74, 10, false], ['b8', 1.28, 9, false]]);
   assert.equal(X.strapBomRows(ex, {anchors: B.anchorsOf(RACK, bc)})[0].description,
-    '32 along 8 bundles, one every 12 in; 24 where a cable joins or leaves a bundle; 16 at tray tie slots; 72 of 19 mm wide; length to suit');
+    '32 along 8 bundles, one every 12 in; 24 where a cable joins or leaves a bundle; 20 at tray tie slots; 76 of 19 mm wide; length to suit');
   assert.equal(X.bundleNote(ex[5]),
     'rear 2 (b6): 12 cables (c61-c72), 1.74 m, 10 straps (6 every 12 in, 4 where a cable leaves); 12 mm across, limit 29.5 mm at LACER-REAR ring 4; bend not checked.');
 });
@@ -372,7 +372,7 @@ test('a member is counted only on the stretch it rides, though its own path pass
 test('a bundle whose straps cannot be read is left out of the rack\'s totals, and the totals say so', () => {
   const ctx = ctxOf(), bc = {route: ctx};
   const whole = B.strapTotals(RACK, bc);
-  assert.equal(whole.total, 72);
+  assert.equal(whole.total, 76);
   assert.equal('unread' in whole || 'unreadBundles' in whole, false, 'nothing is said where every bundle was read');
   // one port of one cord of b6 cannot be placed: its reader throws
   const c61 = RACK.cables[60];

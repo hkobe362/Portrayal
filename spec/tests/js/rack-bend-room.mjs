@@ -79,17 +79,19 @@ test('the owner\'s rack: no corner of any cord is short of its 25 mm (86 were, b
   assert.deepEqual(tightCorners(r, ctx, 'need'), []);
   assert.deepEqual(r.cables.flatMap(c => R.routePath(r, c, ctx).bends), []);
   assert.deepEqual(R.bendFindings(r, ctx), []);
-  // it looked: the sixteen paths have 97 corners between them, and the
-  // tightest has 25 mm
+  // it looked: the sixteen paths have 98 corners between them (97 until c8
+  // took ring 4, #987), and the tightest has 25 mm
   const all = r.cables.flatMap(c => cornersOf(R.routePath(r, c, ctx).points, {share: 'need'}));
-  assert.equal(all.length, 97);
+  assert.equal(all.length, 98);
   assert.equal(Math.min(...all.map(c => c.room_mm)), 25);
   // by halves, the only measure there was before, 86 corners were short: 22
   // at a rest sample, 32 at a ring's approach, 13 at a detour and 19 at a
   // plug's end beside a rest sample. 23 are still short by halves, none at
-  // a rest sample or a detour: each is a turn that shares a leg with a
-  // slighter one, which takes half of it and needs a fraction
-  assert.deepEqual(byCause(tightCorners(r, ctx, 'half')), {rest: 0, approach: 16, detour: 0, other: 7});
+  // a detour: each is a turn that shares a leg with a slighter one, which
+  // takes half of it and needs a fraction. (One is at a rest sample since
+  // #987, where c8, through ring 4, lands on the tray: sixteen were at an
+  // approach point until then.)
+  assert.deepEqual(byCause(tightCorners(r, ctx, 'half')), {rest: 1, approach: 15, detour: 0, other: 7});
   // and nothing was bought with a body: no path crosses one
   assert.deepEqual(R.bodyFindings(r, ctx), []);
   assert.deepEqual(R.ringFindings(r, ctx), []);
@@ -272,30 +274,44 @@ test('a bend the kit\'s rules find no room for is found, and the route still exi
   // c9 as an AOC from the leaf below: its head ends 64.8 mm out of the port,
   // and to reach ring 3 it goes out past the tray's front edge and back in
   // to the approach point, 60 mm (two radii of 30) in front of the ring's
-  // line. Pulled taut it turns 129.7 degrees at the edge, and that turn and
-  // the right angle at the approach point need 30 (tan 64.85 + tan 45) = 94
-  // mm of the 60 between them: each has room for 19.2 mm. The kit's rules
-  // found no more room; that is what a finding says, not that none exists
+  // line. Pulled taut it turned 129.7 degrees at the edge, and that turn and
+  // the right angle at the approach point needed 30 (tan 64.85 + tan 45) = 94
+  // mm of the 60 between them: each had room for 19.2 mm, and both were
+  // findings. Since #1026 the way round a tray's edge keeps the point where
+  // it turns back in (three right angles, each with its leg), and the cord
+  // has its room, 45.9 mm longer
   const aoc = {...r.cables.find(c => c.id === 'c9'), media: 'aoc'};
   const rack = {...r, cables: [aoc]};
-  const p = R.routePath(rack, aoc, ctx);
+  const roomy = R.routePath(rack, aoc, ctx);
+  assert.deepEqual(roomy.bends, []);
+  assert.deepEqual(roomy.detours.map(d => d.points.length), [2]);
+  assert.equal(Math.round(R.pathLength(roomy).measured * 10000) / 10, 723);
+  // held to 35 mm, it is short again: the same way round, pulled taut or not,
+  // has 70 mm between its turns and needs more. The kit's rules found no
+  // more room; that is what a finding says, not that none exists
+  const c35 = {...ctx, bendOf: () => 35};
+  const p = R.routePath(rack, aoc, c35);
   assert.ok(p.points.length > 8);
   assert.deepEqual(p.crossings, []);
   assert.ok(R.pathLength(p).measured > 0.5);
+  // the turn at the edge and the right angle at the approach point share
+  // that 70 mm and are one finding, of two turns (#1026)
   assert.deepEqual(p.bends.map(b => [b.point, b.angle_deg, b.legs_mm[1], b.room_mm, b.short_mm]),
-    [['detour', 129.7, 60, 19.2, 10.8], ['approach', 90, 43.3, 19.2, 10.8]]);
+    [['reach', 35.9, 97.3, 28.5, 6.5], ['detour', 144.1, 48.3, 17.1, 17.9]]);
+  assert.deepEqual(p.bends.map(b => [b.apart_mm, b.turns?.map(t => [t.point, t.angle_deg])]),
+    [[undefined, undefined], [70, [['detour', 144.1], ['approach', 90]]]]);
   for (const b of p.bends) {
-    assert.deepEqual([b.kind, b.cable, b.need_mm, b.between], ['tight-bend', 'c9', 30, [{end: 'a'}, {item: 'i4', via: 'guide-3'}]]);
+    assert.deepEqual([b.kind, b.cable, b.need_mm, b.between], ['tight-bend', 'c9', 35, [{end: 'a'}, {item: 'i4', via: 'guide-3'}]]);
     assert.equal(b.at.length, 3);
   }
   // each is a corner of the path, with the room the kit's measure gives it
   const corners = cornersOf(p.points, {share: 'need'});
   assert.ok(corners.length > 4);
-  assert.deepEqual(p.bends.map(b => [b.angle_deg, b.room_mm]), corners.filter(c => c.room_mm < 30).map(c => [c.angle_deg, c.room_mm]));
-  const f = R.bendFindings(rack, ctx, id => ({i2: 'PP-01', i3: 'LEAF-B', i4: 'CM-01'}[id] ?? id));
+  assert.deepEqual(p.bends.flatMap(b => (b.turns ?? [b]).map(t => [t.angle_deg, b.room_mm])), corners.filter(c => c.room_mm < 35).map(c => [c.angle_deg, c.room_mm]));
+  const f = R.bendFindings(rack, c35, id => ({i2: 'PP-01', i3: 'LEAF-B', i4: 'CM-01'}[id] ?? id));
   assert.deepEqual(f.map(x => x.text), [
-    'c9 turns 129.7 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 19.2 mm bend; the cable (aoc) needs 30 mm, 10.8 mm short.',
-    'c9 turns 90 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 19.2 mm bend; the cable (aoc) needs 30 mm, 10.8 mm short.']);
+    'c9 turns 35.9 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 28.5 mm bend; the cable (aoc) needs 35 mm, 6.5 mm short.',
+    'c9 turns twice within 70 mm between its port on LEAF-B and CM-01 ring 3 (144.1 and 90 degrees), with room for a 17.1 mm bend; the cable (aoc) needs 35 mm, 17.9 mm short.']);
   // the same cord as OM4 has room everywhere; and held to a radius no lacer
   // gives, 80 mm, the turns it makes are found, each against that radius
   assert.deepEqual(R.bendFindings(r, ctx).filter(x => x.cable === 'c9'), []);
@@ -304,7 +320,8 @@ test('a bend the kit\'s rules find no room for is found, and the route still exi
   // 165 mm in all; laid from end a alone it was five, [13.9, 10.1, 10.1, 67,
   // 60.8], 238 mm in all. Each is 0.1 mm more than on a lacer stood on the
   // bottom of its unit ([12.9, 12.9, 68.4, 60.8]): it is centred, 0.225 mm up
-  assert.deepEqual(stiff.map(x => x.room_mm), [13, 13, 68.5, 60.9]);
+  assert.deepEqual(stiff.map(x => x.room_mm), [13, 68.5, 60.9]);
+  assert.deepEqual(stiff.map(x => x.turns?.length ?? 1), [2, 1, 1]);
   assert.ok(stiff.every(x => x.need_mm === 80 && x.short_mm === r1(80 - x.room_mm)));
 });
 

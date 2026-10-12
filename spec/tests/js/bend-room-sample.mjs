@@ -177,6 +177,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   console.log(`  written the other way round, of ${tested}: ${reversed} measure differently${Base ? ` (base: ${reversedBase})` : ''}, ${reversedShort} report a different number of bends`);
   if (Base) {
     deltas.sort((x, y) => x - y);
-    console.log(`  length against the base, mm: ${deltas[0].toFixed(1)} to ${deltas.at(-1).toFixed(1)}, median ${deltas[Math.floor(deltas.length / 2)].toFixed(1)}; ${shorter} shorter; stock sizes ${up} up, ${down} down`);
+    const longer = deltas.filter(d => d > 0.05).length;
+    console.log(`  length against the base, mm: ${deltas[0].toFixed(1)} to ${deltas.at(-1).toFixed(1)}, median ${deltas[Math.floor(deltas.length / 2)].toFixed(1)}; ${shorter + longer} of ${deltas.length} move, ${shorter} shorter and ${longer} longer; stock sizes ${up} up, ${down} down`);
   }
 }
