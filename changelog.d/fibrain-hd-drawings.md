@@ -38,7 +38,12 @@
   module types name their ports `{module}/...` where they named them
   `{module.parent}/{module}/...`. A holder now also seats directly in a bay
   of a device, the 1U frame, and a module seated at more than one depth is
-  written at depth one. NetBox's names are unchanged.
+  written at depth one. For the same reason the Nautobot module type of the
+  XCU10 drawer, `XCU10`, is no longer given its four module bays `slot-1` to
+  `slot-4`: each accepts a module that also seats directly in a chassis bay,
+  and Nautobot copies a bay's position as written (nautobot/nautobot#5823),
+  so on Nautobot a holder can be installed in the 1U frame and not in the
+  XCU10's drawer. NetBox's names and bays are unchanged.
 
 ### Removed
 - `fibrain/xm*@1`, the forty retired majors above; each is replaced by its
