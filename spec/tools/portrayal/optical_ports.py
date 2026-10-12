@@ -266,9 +266,39 @@ def ports(entry, load_ref):
     projection lossless for a cassette whose front and rear do not correspond
     one to one.
     """
+    front, rear, _by_part = _projection(entry, load_ref)
+    return {"front": front, "rear": rear}
+
+
+def part_ports(entry, load_ref):
+    """`{part key: {"front-ports" | "rear-ports": [name per position]}}`.
+
+    WHICH PORT A CONNECTOR'S POSITIONS ARE, for a reader that knows the part and
+    not the port: a cable in a rack lands on `lc01` or on the rear face's
+    `b01`, and its DCIM row has to name the ports `ports` wrote for it. The key
+    is the part's own id, or `rear:<id>` for a part of the rear face, as an
+    endpoint spells it; each list has one entry per position of the part,
+    position 1 first, and holds None where that position is not in that list
+    (a part whose positions are split between the trunk and the front).
+
+    ONE WALK WRITES BOTH. `ports` and this are two views of `_projection`, so
+    a name here is a name there by construction, and the numbering rules stay
+    in one place (roc-ops/Portrayal#1020). Names are the built document's own:
+    the `{module}/` token is added where a type file is written.
+    """
+    return _projection(entry, load_ref)[2]
+
+
+def _projection(entry, load_ref):
+    """`(front rows, rear rows, part_ports' map)` for one module entry."""
     caps = optical.capacities(entry, load_ref)
     polish = (entry.get("optical") or {}).get("polish")
     rear_kind = (entry.get("optical") or {}).get("rear-kind")
+    by_part = {}
+
+    def land(key, section, width, position, name):
+        row = by_part.setdefault(key, {}).setdefault(section, [None] * width)
+        row[position - 1] = name
 
     # A TRUNK POSITION LEAVES THE FRONT LIST AND THE NUMBERING DOES NOT SKIP
     # IT. Front ports are named as `front_label` counts, every position along
@@ -285,11 +315,14 @@ def ports(entry, load_ref):
             n += 1
             if kept:
                 front.append({"name": str(n), "type": t, "positions": len(kept)})
+                for i in kept:
+                    land(pid, "front-ports", width, i, str(n))
             continue
         for i in range(1, width + 1):
             n += 1
             if i in kept:
                 front.append({"name": str(n), "type": t, "positions": 1})
+                land(pid, "front-ports", width, i, str(n))
 
     rear = []
     names = rear_port_names(entry, load_ref)
@@ -298,13 +331,17 @@ def ports(entry, load_ref):
         ref = _face_part_ref(entry, face, pid, load_ref)
         t = port_type(family_of(ref), polish) or rear_kind
         rear.append({"name": names[pid], "type": t, "positions": caps[key]})
+        for i in range(1, caps[key] + 1):
+            land(key, "rear-ports", caps[key], i, names[pid])
     refs = {str(p["id"]): p.get("ref") for p in (entry.get("parts") or [])
             if isinstance(p, dict) and p.get("id")}
     for pid, positions in trunk.items():
         rear.append({"name": names[pid],
                      "type": port_type(family_of(refs.get(pid) or ""), polish),
                      "positions": len(positions)})
-    return {"front": front, "rear": rear}
+        for i in positions:
+            land(pid, "rear-ports", caps.get(pid) or max(positions), i, names[pid])
+    return front, rear, by_part
 
 
 def rear_port_names(entry, load_ref):

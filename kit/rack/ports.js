@@ -101,6 +101,40 @@ export function seatedPort(item, end, ctx) {
           info: connectorOf({portMedia: drawn.attrs?.media || '', iface: slot?.interface || drawn.attrs?.connector || ''})};
 }
 
+// ── what a DCIM calls the port ─────────────────────────────────────────────
+// THE DCIM PORTS A CABLE END ON A SEATED PART LANDS ON, as the part's module
+// type lists them, or null when the catalogue has none for it. A module type
+// does not name a fibre port by its part: a duplex adapter `lc01` on a panel's
+// face is the front ports `1` and `2`, one per fibre; its back `b01` is the
+// rear port `B01-1`, one connector with two positions; a cassette's `mtp` is
+// `MTP-1`. Those names are the exporter's own numbering, so the build writes
+// them beside the fibre graph (`optical.ports` in components.json, from the
+// walk that writes the type file) and nothing here derives one.
+//   part      the part's id on the module
+//   back      it is on the back of the module
+//   sections  [[section, names]]: the type file's list ('front-ports',
+//             'rear-ports') and the names in it, in position order, each once
+//             and without the {module}/ a type file writes before them. More
+//             than one list: the part's positions are split between two kinds
+//             of port (a stated trunk position beside a front one).
+// Only a port one step under a module in one of the device's own bays: a
+// module inside a card has no module bay to be imported into (dcim-rules.js).
+export function fibrePorts(item, end, ctx) {
+  const at = seatedPort(item, end, ctx);
+  if (!at?.port || !at.holder?.ref) return null;
+  const p = portPathOf(end.path), cut = p.indexOf(MODULE);
+  const part = p.slice(cut + MODULE.length);
+  if (part.includes('/')) return null;
+  const key = `${at.back ? 'rear:' : ''}${part}`;
+  const published = partOf(ctx.compByRef, at.holder.ref)?.optical?.ports;
+  const lists = published && Object.hasOwn(published, key) ? published[key] : null;
+  if (!lists || typeof lists !== 'object') return null;
+  const sections = Object.entries(lists)
+    .map(([section, names]) => [section, [...new Set(list(names).filter(n => n != null).map(String))]])
+    .filter(([, names]) => names.length);
+  return sections.length ? {part, back: at.back, sections} : null;
+}
+
 // The ids one step under a part that a cable can be on: its cages, the parts
 // it composes and its own bays, and the cages and parts of its back.
 export function portIdsOf(comp, compByRef) {

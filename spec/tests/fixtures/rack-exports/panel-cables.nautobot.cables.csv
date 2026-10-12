@@ -1,0 +1,9 @@
+a_device,a_type,a_name,b_device,b_type,b_name,type,status,label,color,length,length_unit
+sw-1,dcim.interface,port-1,pp-1,dcim.frontport,bay-1/1,smf-os2,Planned,C1,,3,m
+pp-1,dcim.rearport,bay-1/B01-1,sw-2,dcim.interface,port-1,smf-os2,Planned,C2,,3,m
+pp-1,dcim.frontport,bay-2/1,sw-1,dcim.interface,port-2,smf-os2,Planned,C3,,3,m
+pp-1,dcim.rearport,bay-2/MTP-1,pp-2,dcim.rearport,bay-2/MTP-1,smf-os2,Planned,TRUNK-1,,13,m
+pp-1,dcim.frontport,bay-1/3,pp-2,dcim.frontport,bay-1/3,smf-os2,Planned,C5 (1/2),,3,m
+pp-1,dcim.frontport,bay-1/4,pp-2,dcim.frontport,bay-1/4,smf-os2,Planned,C5 (2/2),,3,m
+pp-2,dcim.rearport,bay-1/B03-1,pp-1,dcim.frontport,bay-1/5,smf-os2,Planned,C6,,3,m
+sw-1,dcim.interface,port-3,sw-2,dcim.interface,port-3,dac-passive,Planned,C7,,3,m
