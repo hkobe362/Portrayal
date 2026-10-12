@@ -1145,6 +1145,8 @@ export function layNotesOf(cableId, {bends = null, covers = null} = {}) {
     const rest = worst.text.startsWith(`${cableId} `) ? worst.text.slice(cableId.length + 1) : worst.text;
     out.push(`${cableId} has ${tight.length} bends with less room than the cable needs; the tightest ${rest}`);
   }
+  // what would give a lead its room (route.js bendFindingsOf `advice`, #1026), each said once
+  for (const said of new Set(tight.map(f => f.advice).filter(Boolean))) out.push(said);
   for (const f of covers || []) if (f.cable === cableId && f.text) out.push(f.text);
   return out;
 }

@@ -92,10 +92,12 @@ test('where no ring leaves room the nearest stands, and the finding says the man
   assert.equal(found.length, 1);
   const [f] = found;
   assert.deepEqual(f.tooClose, {manager: 'm3', device: 'i3'});
+  // the sentence is the bend and no more; what would help is a field of its own
   assert.equal(f.text, 'c1 turns twice within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and 63.2 degrees), '
-    + 'with room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short. '
-    + 'Lacer EDGE-0 stands too close to this port for the cable to turn into any ring on its way: '
+    + 'with room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short.');
+  assert.equal(f.advice, 'Lacer EDGE-0 stands too close to the port of c1 on EDGE-0 for the cable to turn into any ring on its way: '
     + 'set EDGE-0 back from the rail, mount the manager on another unit of EDGE-0, or leave EDGE-0 without a manager.');
+  assert.ok(f.text.length < 200 && !/too close/.test(f.text));
   // rack-wide the findings are the same ones
   assert.deepEqual(R.bendFindings(rack, ctx, nameOf).filter(f => f.cable === 'c1').map(f => f.text), R.bendFindingsOf(rack, c1, ctx, nameOf).map(f => f.text));
   // the path's own `bends` are as they were: the sentence is the finding's
@@ -115,7 +117,7 @@ test('the advice fits the device: one of a single unit has no other unit to moun
   const flat = {...rack, items: rack.items.map(i => (i.id === 'm3' ? {...i, ru: 35, unit: 1} : i))};
   const f1 = R.bendFindingsOf(flat, c1, one, nameOf).find(f => f.tooClose);
   assert.ok(f1, 'the lead is still too close');
-  assert.ok(f1.text.endsWith('set EDGE-0 back from the rail or leave EDGE-0 without a manager.'), f1.text);
+  assert.ok(f1.advice.endsWith('set EDGE-0 back from the rail or leave EDGE-0 without a manager.'), f1.advice);
 });
 
 test('set back 50 mm, the same leads have room: the rule reads where the device and the manager stand', () => {
@@ -136,7 +138,7 @@ test('a hand route is never overridden: a ring it names is gone through, room or
   assert.deepEqual(path.rings.slice(0, 2).map(g => [g.via, g.passed]), [['guide-2', true], ['guide-1', true]]);
   const found = R.bendFindingsOf(r, hand, ctx, nameOf);
   assert.ok(found.length >= 1);
-  assert.ok(found.every(f => !f.tooClose && !/too close/.test(f.text)));
+  assert.ok(found.every(f => !f.tooClose && !('advice' in f)));
 });
 
 test('what cannot be measured is not passed over: a port not found, and a cable no lay is opened out for', () => {
@@ -301,11 +303,14 @@ test('two turns that share a leg too short for both are one finding, and it says
   const seen = (await Q.inspect(rack, 'c1', qctx)).route.bends;
   assert.equal(seen.length, 1);
   assert.deepEqual([seen[0].apart_mm, seen[0].turns.length, seen[0].tooClose], [22.8, 2, {manager: 'm3', device: 'i3'}]);
+  assert.match(seen[0].advice, /^Lacer EDGE-0 stands too close to the port of c1 on EDGE-0 /);
   assert.match(seen[0].text, /^c1 turns twice within 22\.8 mm between its port on EDGE-0 and .* ring 1 \(67\.1 and 63\.2 degrees\), with room for a 17\.9 mm bend/);
   const withBend = rack.cables.filter(c => R.routePath(rack, c, ctx).bends.length).length;
   assert.match(Q.describe(rack, qctx), new RegExp(`Findings: ${withBend} cables have a tight bend \\(the worst `));
   const found = R.bendFindings(rack, ctx, nameOf);
-  assert.deepEqual(X.layNotesOf('c1', {bends: found}), [found.find(x => x.cable === 'c1').text]);
+  // (and the advice after it, once)
+  const mine = found.filter(x => x.cable === 'c1');
+  assert.deepEqual(X.layNotesOf('c1', {bends: found}), [mine[0].text, mine[0].advice]);
 });
 
 // ── what is kept ─────────────────────────────────────────────────────────
@@ -334,6 +339,88 @@ test('the ring chosen reads nothing that what is kept leaves out: every path lai
     assert.deepEqual(ringsOn(R.autoRoute(moved, cableOf(moved, 'c1'), cx), 'm3'), o.setback || o.lacer ? [2, 1] : [1], JSON.stringify(o));
   }
   assert.equal(reads, 3 * 4 * 43);
+});
+
+// ── the gutter, and what is chosen by laying ─────────────────────────────
+
+test('no cable is moved to another gutter: each side is measured through its nearest rings, laid as it was before', () => {
+  // c131 (lacer on the bottom unit) has its ports on opposite sides of the
+  // centre line, so its gutter is chosen by measuring both. Measured through
+  // the rings chosen by room, the right came out 127 mm shorter and was
+  // taken, into a bend 6.8 mm short that the left never had. The gutter is
+  // chosen first, by the way through the ring nearest each port and with
+  // none of this kit's new offers, as it was: the left
+  const {rack, ctx} = shape({lacer: 'bottom'});
+  const c = cableOf(rack, 'c131'), route = R.autoRoute(rack, c, ctx);
+  assert.deepEqual([...new Set(route.filter(w => w.lane).map(w => w.lane))], ['left-front']);
+  assert.deepEqual(ringsOn(route, 'm11'), [1]);
+  assert.deepEqual(ringsOn(route, 'm6'), [1, 2, 3, 4]);
+  const path = R.routePath(rack, c, ctx);
+  assert.deepEqual([path.bends, path.crossings], [[], []]);
+  assert.equal(Math.round(R.pathLength(path).measured * 10000) / 10, 1675);
+  // the same cable written the other way round takes the same gutter
+  assert.deepEqual(R.autoRoute(rack, {...c, a: c.b, b: c.a}, ctx), route.toReversed());
+});
+
+test('a ring between a plug and the ring its lead takes is cleared run out, through its opening, not gone round', () => {
+  // c168's far end is FAB-0's port-36, beside ring 2 of the lacer on the unit
+  // below and 21 mm above its line; ring 2 is passed over for ring 1. The
+  // straight way from ring 1 meets ring 2, and the way round it that has all
+  // its room is a loop out, under the tray and back, 320 mm long. Run 15 mm
+  // on out of its plug, the cable clears ring 2 through its opening
+  const {rack, ctx} = shape({lacer: 'bottom'});
+  const c = cableOf(rack, 'c168'), path = R.routePath(rack, c, ctx);
+  assert.deepEqual(ringsOn(R.autoRoute(rack, c, ctx), 'm6'), [1]);
+  assert.deepEqual(path.detours, []);
+  assert.deepEqual(path.points.filter(q => q.at === 'lead').map(q => [q.end, r1(q.z)]), [['b', 79.8]]);
+  assert.deepEqual([path.bends, path.crossings], [[], []]);
+  // 5.8 mm shorter than through ring 2, where it turned twice on 22.8 mm
+  assert.equal(Math.round(R.pathLength(path).measured * 10000) / 10, 1459.7);
+});
+
+test('the answer kept for a lead is kept with the world it was judged in: a wall put between is seen', () => {
+  // the same rack, cable and ends, and a context whose lacer has a wall
+  // standing between ring 2 and ring 1: what the test reads of the cable and
+  // the ring is the same text, and only the world differs
+  const {rack, ctx} = shape({count: 43});
+  const c9 = cableOf(rack, 'c9');
+  assert.deepEqual(ringsOn(R.autoRoute(rack, c9, ctx), 'm3'), [1]);
+  const lacer = ctx.chassisOf('fhd-cmp5dr');
+  const walled = {...lacer, solids: [...lacer.solids, {part: 'wall/plate', box: {x: 80, y: -100, z: 0, w: 2, h: 400, d: 400}}]};
+  const cx = {...ctx, chassisOf: ref => (ref === 'fhd-cmp5dr' ? walled : ctx.chassisOf(ref))};
+  // no way to ring 1 with room now: no ring leaves any, and the nearest stands
+  assert.deepEqual(ringsOn(R.autoRoute(rack, c9, cx), 'm3'), [2, 1]);
+  // and back in the first world, the first answer
+  assert.deepEqual(ringsOn(R.autoRoute(rack, c9, {...ctx}), 'm3'), [1]);
+});
+
+test('where the lay from each end differs, the one kept is by corners counted singly: a finding of two turns is two', async () => {
+  // speed-fixture's rack of 150 cords: c96 laid from one end has three
+  // findings, 6.1 and 13.5 mm short and a pair 14 mm short (47.6 in all, the
+  // pair counted twice), and from the other end two that come to less only
+  // if the pair is counted once. The lay kept is the first, as before a
+  // pair was one finding
+  const M = await import('../../../kit/rack/model.js'), F = await import('./cable-solids-fixture.mjs');
+  const {speedRack} = await import('./speed-fixture.mjs');
+  const m = speedRack(M, F, {cables: 150, bundles: 4}), ctx = m.ctxOf(m.rack);
+  const c = m.rack.cables.find(x => x.id === 'c96'), path = R.routePath(m.rack, c, ctx);
+  assert.deepEqual(path.bends.map(f => [f.point, f.short_mm, f.turns?.length ?? 1]), [['reach', 6.1, 1], ['approach', 13.5, 1], ['approach', 14, 2]]);
+  assert.equal(Math.round(R.pathLength(path).measured * 10000) / 10, 659.2);
+});
+
+test('a patch keeps the ring it took unless another lays better, and the tightest corner is weighed before the sum', async () => {
+  const M = await import('../../../kit/rack/model.js'), F = await import('./cable-solids-fixture.mjs');
+  const {speedRack} = await import('./speed-fixture.mjs');
+  const m = speedRack(M, F, {cables: 300}), ctx = m.ctxOf(m.rack);
+  // c268 joins two ports of one switch 22 mm apart, with no ring between.
+  // Through ring 2, as before, it has three corners 23.3 to 26 mm short;
+  // through ring 3 one, which doubles back with no room, 30 mm short and
+  // 142 mm longer. Fewer millimetres short in all, and the worse cable
+  const c = m.rack.cables.find(x => x.id === 'c268'), item = R.autoRoute(m.rack, c, ctx)[0].item;
+  const lay = n => { const hand = {...c, route: [ring(item, n)], routeEdited: true}, p = R.routePath({...m.rack, cables: [hand]}, hand, ctx);
+    return [Math.round(R.pathLength(p).measured * 10000) / 10, Math.max(...p.bends.map(f => f.short_mm)), r1(p.bends.reduce((n2, f) => n2 + f.short_mm * (f.turns?.length ?? 1), 0)), p.findings.length]; };
+  assert.deepEqual([lay(2), lay(3)], [[700.6, 26, 75.3, 1], [842.2, 30, 30, 1]]);
+  assert.deepEqual(R.autoRoute(m.rack, c, ctx), [ring(item, 2)]);
 });
 
 // ── the rack, counted ────────────────────────────────────────────────────

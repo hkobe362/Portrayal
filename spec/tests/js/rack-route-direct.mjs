@@ -178,7 +178,9 @@ test('c8: no ring between its ports; of the ring each side, the one it lays bett
   assert.deepEqual(R.ringFindings({...r, cables: [c8]}, ctx), []);
   const lay = n => { const hand = {...c8, route: [ring(n)], routeEdited: true}, p = R.routePath({...r, cables: [hand]}, hand, ctx);
     return [mm(R.pathLength(p)), p.bends.length, p.crossings.length, p.findings.length, p.detours.length]; };
-  assert.deepEqual([lay(4), lay(5)], [[547, 0, 0, 0, 0], [619.2, 0, 0, 0, 1]]);
+  // (through ring 5 by hand it is 617.4 mm now: the way back round the
+  // tray's front is in its plug's own leg, and a run-out shortens it)
+  assert.deepEqual([lay(4), lay(5)], [[547, 0, 0, 0, 0], [617.4, 0, 0, 0, 1]]);
   const [g] = R.routePath(r, c8, ctx).rings;
   assert.deepEqual([g.via, g.passed, g.held], ['guide-4', true, undefined]);
   // the same cable written the other way round takes the same ring

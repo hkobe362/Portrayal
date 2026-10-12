@@ -174,9 +174,13 @@ function along(m, pane, ax, bx, ctx, passes = null, room = null, pick = null) {
     // crossed: only longer, and drawn. So the nearest ring on EACH side of
     // the stretch is laid (`pick`, autoRoute), and the one that lays better
     // is taken; `pick` gives null when it cannot lay them, and then the
-    // nearest that passes stands, as before.
-    const sides = [order.find(g => g.x < lo), order.find(g => g.x > hi)].filter(Boolean);
-    const near = (sides.length > 1 ? pick?.(sides) : null) ?? order.find(g => passes?.(g)) ?? order[0];
+    // ring taken before stands.
+    // The ring taken before is laid with them, first, so that a tie keeps
+    // it and no patch lays worse than it did: the nearest that passes (or
+    // the nearest, when none does) can be the second ring out on its side.
+    const was = order.find(g => passes?.(g)) ?? order[0];
+    const tried = [was, order.find(g => g.x < lo), order.find(g => g.x > hi)].filter((g, k, all) => g && all.indexOf(g) === k);
+    const near = (tried.length > 1 ? pick?.(tried) : null) ?? was;
     return [{item: m.id, via: near.via}];
   }
   const duct = gs.find(g => g.kind === 'duct');
@@ -208,6 +212,15 @@ function byGutter(rack, A, B, mA, mB, side, ctx, roomOf = null) {
 // when they stand on opposite sides, the side whose path (routePath, with its
 // detours) is the shorter, end a's side on a tie or when either port is not
 // found and so cannot be measured.
+// THE GUTTER IS CHOSEN BEFORE THE RINGS ARE (#1026): each side is measured
+// by the way through the ring nearest each port, as it was before a lead's
+// ring was chosen by room and by the lay as it was then (PLAIN, at layOf),
+// and the rings are then chosen on the side taken.
+// Which rings a lead has room for is a matter of a few centimetres at its
+// own device; measured with them, the two sides' lengths moved and a cable
+// was sent down the other gutter into a bend it did not have, and a member
+// of a bundle away from its trunk. So this change moves no cable to another
+// gutter.
 // A jumper within SHORT units, on one face, with no manager at either end,
 // takes no gutter: it just hangs, and the route is empty. `{gutter: true}`
 // asks for the gutter route all the same: what a member of a bundle takes
@@ -246,7 +259,6 @@ export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
   // way out to `side` (#1026, leadRoom)
   const roomOf = (E, m, side) => g => leadRoom(rack, cable, E.e, m, g, side === 'left' ? -1 : 1, ctx);
   if (sA === sB) return byGutter(rack, A, B, mA, mB, sA, ctx, roomOf);
-  const routes = {[sA]: byGutter(rack, A, B, mA, mB, sA, ctx, roomOf), [sB]: byGutter(rack, A, B, mA, mB, sB, ctx, roomOf)};
   // The detours are part of the path (a gutter beside a zero-U PDU can cost
   // the one side 25 cm round it), and measuring them is the dear part, so the
   // side is decided once per rack, context and cable, as solidsOf reads its
@@ -259,20 +271,35 @@ export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
     // Measured as a route edited by hand, so the measure does not come back
     // here; and under an id no bundle holds, so it is the cable's own path.
     // The lay kept (pickOf) is measured: a length needs no ports covered.
-    const measure = route => pathLength(pickOf(rack, {...cable, id: Symbol('side'), route, routeEdited: true}, ctx, {name: false})?.path)?.measured;
-    const la = measure(routes[sA]), lb = measure(routes[sB]);
+    // Each side by its nearest rings (above).
+    const measure = side => pathLength(pickOf(rack, {...cable, id: Symbol('side'), route: byGutter(rack, A, B, mA, mB, side, ctx), routeEdited: true}, ctx, {name: false, plain: true})?.path)?.measured;
+    const la = measure(sA), lb = measure(sB);
     // within a micron is a tie: a mirrored pair of paths that sag (#949 step
     // 3) can measure apart in the last bits of a float
     byCable.set(cable, la == null || lb == null || la <= lb + 1e-6 ? sA : sB);
   }
-  return routes[byCable.get(cable)];
+  return byGutter(rack, A, B, mA, mB, byCable.get(cable), ctx, roomOf);
 }
 const sideMemo = new WeakMap();
+// HOW TWO LAYS OF ONE CABLE ARE WEIGHED where a route is chosen by laying it
+// (the ring of a patch along one manager, #987): fewer rings entered and
+// left by one face, then fewer bodies crossed, then the tightest corner less
+// short of room, then corners less short in all (a finding of two turns is
+// two corners), then the shorter. THE TIGHTEST CORNER BEFORE THE SUM: three
+// corners 23 to 26 mm short add up to more than one that doubles back with
+// no room at all, and the one is the worse cable. A tenth of a millimetre of
+// room and a micron of length are a tie.
+const layScore = path => [path.findings.length, path.crossings.length, path.bends.reduce((m, f) => Math.max(m, f.short_mm), 0),
+  path.bends.reduce((n, f) => n + f.short_mm * (f.turns?.length ?? 1), 0), pathLength(path).measured * 1000];
+const LAY_TIE = [0, 0, 0.05, 0.05, 1e-3];
+// whether a lay of score `s` is better than one of score `t` (a tie is not)
+function layBetter(s, t) {
+  for (let i = 0; i < s.length; i++) if (Math.abs(s[i] - t[i]) > LAY_TIE[i]) return s[i] < t[i];
+  return false;
+}
 // WHICH OF TWO RINGS A PATCH LAYS BETTER THROUGH (#987, `along`): each is
 // laid as a route made by hand through that one ring, and they are compared
-// as two lays of one cable are (routePath): fewer rings entered and left by
-// one face, then fewer bodies crossed, then corners less short of room in
-// all, then the shorter; on a tie the first given, the one nearer the middle
+// by `layScore`, above; on a tie the first given, the one nearer the middle
 // of the two ports. null when a lay cannot be made (a port not found). Kept
 // per rack, context and cable, as the side is: the lays are the dear part.
 function patchRing(rack, cable, m, rings, ctx) {
@@ -291,12 +318,8 @@ function patchRing(rack, cable, m, rings, ctx) {
     // is measured: no port covered need be read for it.
     const path = pickOf(rack, {...cable, route: [{item: m.id, via: g.via}], routeEdited: true}, ctx, {name: false})?.path;
     if (!path) return null;
-    const score = [path.findings.length, path.crossings.length, path.bends.reduce((n, f) => n + f.short_mm * (f.turns?.length ?? 1), 0), pathLength(path).measured * 1000];
-    // a tenth of a millimetre of room, a micron of length: under that is a tie
-    const tol = [0, 0, 0.05, 1e-3];
-    let better = !best;
-    for (let i = 0; best && i < 4; i++) if (Math.abs(score[i] - best.score[i]) > tol[i]) { better = score[i] < best.score[i]; break; }
-    if (better) best = {g, score};
+    const score = layScore(path);
+    if (!best || layBetter(score, best.score)) best = {g, score};
   }
   byCable?.set(cable, {key, via: best.g.via});
   return best.g;
@@ -417,15 +440,16 @@ function leadFrom(inp, world) {
     if (run > 0 && legCrossings(p, from, solids, {diameter}).length) return null;
     const stops = [from, ...mid, entry], out = mm > 0 ? [port, from] : [from], round = [];
     for (let k = 1; k < stops.length; k++) {
-      // A LEAD GOES ROUND A TRAY, NEVER UP OVER A RING. The detour rules
-      // will take a leg over the top of a ring that stands in its way, and
-      // such a hump can have all its room: 60 mm up in front of the device
-      // above and down again. No lead is dressed so; a ring whose legs
-      // stand between the plug and the next ring leaves that next ring no
-      // room. (A leg that clears a ring, through its opening or beside it,
-      // meets nothing and is not stopped.)
+      // A LEAD GOES ROUND A TRAY'S FLOOR AND ROUND NOTHING ELSE. The detour
+      // rules will take a leg over the top of a ring that stands in its
+      // way, or round a wall, and such a way can have all its room: 60 mm up
+      // in front of the device above and down again. No lead is dressed
+      // so. So a leg that meets anything but a plate from above or below
+      // (a ring's own legs, seat and bar among them) leaves the ring it is
+      // for no room. (A leg that clears a ring, through its opening or
+      // beside it, meets nothing and is not stopped.)
       const met = solids.length ? legCrossings(stops[k - 1], stops[k], solids, {diameter})[0] : null;
-      if (met && /^ring\//.test(String(met.solid.part ?? ''))) return null;
+      if (met && (/^ring\//.test(String(met.solid.part ?? '')) || !isFloor(met.solid.box))) return null;
       const extra = solids.length ? detour(stops[k - 1], stops[k], solids, {diameter, lanes, room: 2 * bend, ...how}) : [];
       if (extra === null) return null;
       for (const q of extra) { round.push(out.length); out.push(q); }
@@ -1209,16 +1233,17 @@ function keptPath(rack, cable, ctx) {
 // cable or its twin), `turned` when that is the twin's. null when a port is
 // not found. `{name: false}` leaves the path's findings naming no cable, as
 // a lay has them: what autoRoute asks for, which only measures.
-function pickOf(rack, cable, ctx, {name = true} = {}) {
-  const memo = perOf(pickMemo, rack, ctx, cable);
+function pickOf(rack, cable, ctx, {name = true, plain = false} = {}) {
+  // (a plain pick is asked for a cable made for the asking, and is not kept by it)
+  const memo = plain ? null : perOf(pickMemo, rack, ctx, cable);
   const known = memo?.get(cable);
   if (known !== undefined) return known;
   let twin = twins.get(cable);
   if (!twin) twins.set(cable, twin = {...cable, a: cable.b, b: cable.a});
-  const laidP = layOf(rack, cable, ctx, null);
+  const laidP = layOf(rack, cable, ctx, null, plain);
   let out = null;
   if (laidP) {
-    const laidQ = layOf(rack, twin, ctx, [...routeOf(rack, cable, ctx).waypoints].reverse());
+    const laidQ = layOf(rack, twin, ctx, [...routeOf(rack, cable, ctx).waypoints].reverse(), plain);
     const isObj = v => v !== null && typeof v === 'object';
     let order = isObj(cable.a) ? orders.get(cable.a) : null;
     if (!order || order.b !== cable.b) {
@@ -1265,8 +1290,17 @@ const KEPT = 6;
 // The lay of `cable` from its end a, on `given` (a twin's route) or its own:
 // {path, legs, need, r}, the one kept where its inputs and its world are
 // those of a lay already made. null when a port is not found.
-function layOf(rack, cable, ctx, given) {
-  const inp = layInputs(rack, cable, ctx, given);
+// PLAIN (#1026): `plain` asks for the lay as it was made before kit 0.26.0,
+// with none of the offers that came with it (a detour not pulled taut, the
+// way behind a tray, the stretch through a ring lengthened on this side, an
+// approach point taken back in, a span's point at the edge of what it lies
+// on). It is what the gutter of a cable is chosen
+// by (autoRoute), so that those offers move no cable to another gutter. A
+// lay that took none of them (`novel` false) IS the plain lay, and is not
+// made twice.
+function layOf(rack, cable, ctx, given, plain = false) {
+  if (plain) { const full = layOf(rack, cable, ctx, given); if (!full || !full.novel) return full; }
+  const inp = layInputs(rack, cable, ctx, given, plain);
   if (!inp) return null;
   const world = worldOf(rack, ctx);
   const at = cable.a !== null && typeof cable.a === 'object' ? cable.a : null;
@@ -1408,7 +1442,7 @@ function turnPath(path) {
 // the cable's own is here, as plain data: {media, a, b, diameter, need,
 // drape, wps, stops, rests}. null when a port is not found. Its id is
 // not: a lay names no cable (layFrom).
-function layInputs(rack, cable, ctx, given) {
+function layInputs(rack, cable, ctx, given, plain = false) {
   const a = portPoint(rack, cable.a, ctx), b = portPoint(rack, cable.b, ctx);
   if (!a || !b) return null;
   const diameter = cableDiameter(cable, ctx), r = diameter / 2;
@@ -1463,7 +1497,7 @@ function layInputs(rack, cable, ctx, given) {
     rested({kind: 'tray', item: s.w.item, via: s.w.via, face: laid.face, role: laid.role, ...(laid.ties ? {ties: laid.ties} : {})});
     stops.splice(k, 1, ...laid.points.map((p, j) => ({p, w: s.w, i: s.i, trayAt: true, hold: j > 0 && laid.hold[j]})));
   }
-  return {media: cable.media, a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
+  return {...(plain ? {plain: true} : {}), media: cable.media, a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
     wps, stops, rests};
 }
 // One more thing a cable rests on, unless it is listed.
@@ -1480,6 +1514,8 @@ const restedIn = rests => o => { if (!rests.some(x => x.kind === o.kind && x.ite
 // the gutter its side was chosen for (autoRoute measures both, under an id
 // of their own) is the lay of the cable itself, and is made once.
 function layFrom(inp, world) {
+  const plain = inp.plain === true;
+  let usedNovel = false;
   const {a, b, diameter, wps, stops, rests} = inp, r = diameter / 2;
   const rested = restedIn(rests);
   const marks = wps.map(() => null);
@@ -1535,7 +1571,8 @@ function layFrom(inp, world) {
   const rounds = new Map();
   // `how` is which way round is asked for (#1026): 1 `rear`, 2 `loose`, 3 both.
   const roundOf = (p, q, room, how = 0) => {
-    const sum = p.x + 3 * p.y + 7 * p.z + 13 * q.x + 29 * q.y + 61 * q.z + 127 * room + 251 * how;
+    // (`how` is compared and is not in the sum: the ways round one leg, asked each way, are found in one list)
+    const sum = p.x + 3 * p.y + 7 * p.z + 13 * q.x + 29 * q.y + 61 * q.z + 127 * room;
     let list = rounds.get(sum);
     if (!list) rounds.set(sum, list = []);
     for (const e of list)
@@ -1720,10 +1757,10 @@ function layFrom(inp, world) {
     // a body or in front of a zero-U part, and either leaves no corner of
     // `region` (the stretch it is for) short or makes the path no longer: a
     // cable is not sent a longer way round to make a short corner less short.
-    const better = ({o = offs, l = leads, r = runs, region}, best) => {
+    const better = ({o = offs, l = leads, r = runs, region, novel = false}, best) => {
       const L2 = lay(o, l, r), s2 = shortOf(L2.taut), len = lengthOf(L2.taut);
       if (L2.stuck > L.stuck || L2.ahead.length > L.ahead.length || !(s2 < short - 1e-9) || (region(L2) && len > lengthOf(L.taut) + 1e-9)) return best;
-      return !best || s2 < best.s - 1e-9 || (s2 < best.s + 1e-9 && len < best.len - 1e-9) ? {L: L2, s: s2, len, o, l, r} : best;
+      return !best || s2 < best.s - 1e-9 || (s2 < best.s + 1e-9 && len < best.len - 1e-9) ? {L: L2, s: s2, len, o, l, r, novel} : best;
     };
     const put = (map, k, side, v) => { const m = new Map(map); const o = [...(m.get(k) ?? [false, false])]; o[side] = v; m.set(k, o); return m; };
     // Every change on offer for the path as it stands (the rules above and
@@ -1747,7 +1784,7 @@ function layFrom(inp, world) {
         const region = T => { const w = within(T); return !!w && tightOf(T.taut).some(c => c.k >= w[0] && c.k <= w[1]); };
         const w = within(L);
         if (!w || !tight.some(c => c.k >= w[0] && c.k <= w[1])) continue;
-        if (moved) { list.push({o: put(offs, k, side, base), region}); continue; }
+        if (moved) { list.push({o: put(offs, k, side, base), region, novel: true}); continue; }
         const [lo, hi] = w;
         // how far out of the band, along the run, that stop stands
         const nb = L.taut[side ? hi : lo], d = f.out[side] * (nb[f.a] - f.face[side]);
@@ -1780,7 +1817,7 @@ function layFrom(inp, world) {
         const cs = cornersIn(L.taut), tanAt = i => { const c = cs.find(x => x.k === i); return c ? Math.tan(c.angle_deg * Math.PI / 360) : 0; };
         const other = offs.get(k)[1 - side], lack = bend * (tanAt(apOf(L, 0)) + tanAt(apOf(L, 1))) - (cur + other + Math.abs(f.face[1] - f.face[0]));
         if (lack > 1e-6 && Number.isFinite(lack) && other + lack + 0.5 <= Math.min(2 * bend, f.free[1 - side])) list.push({o: put(offs, k, 1 - side, other + lack + 0.5), region});
-        if (lack > 1e-6 && Number.isFinite(lack) && cur + lack + 0.5 <= Math.min(2 * bend, f.free[side])) list.push({o: put(offs, k, side, cur + lack + 0.5), region});
+        if (lack > 1e-6 && Number.isFinite(lack) && cur + lack + 0.5 <= Math.min(2 * bend, f.free[side])) list.push({o: put(offs, k, side, cur + lack + 0.5), region, novel: true});
       }
       // ROOM AT A PLUG (#973, section 3.4). A cable leaves its plug straight
       // (1.5), and the plug's reach is the leg its first turn has on that
@@ -1805,14 +1842,40 @@ function layFrom(inp, world) {
         // behind a floor's back edge (its device is set back) is offered
         // the way up behind the plate, one slight turn in place of the
         // three right angles round the front edge
-        if (runs.rear !== true) list.push({r: {...runs, rear: true}, region: atDetour});
+        if (runs.rear !== true) list.push({r: {...runs, rear: true}, region: atDetour, novel: true});
         // NOT PULLED TAUT (#1026, solids.js detour): a way round an edge
         // keeps the point where it turns back in, where the straight run
         // past it would take the room of the turn before
-        if (runs.loose !== true) list.push({r: {...runs, loose: true}, region: atDetour});
+        if (runs.loose !== true) list.push({r: {...runs, loose: true}, region: atDetour, novel: true});
       }
       return list;
     };
+    // RUN OUT PAST A BODY IN A PLUG'S OWN LEAD (#1026). A ring that stands
+    // between a plug and the ring its lead takes is gone round, and the way
+    // round can have all its room and be a loop a quarter of a metre long;
+    // nothing above then offers anything, since no corner is short. Run out
+    // of its plug the cable can clear that ring through its opening and
+    // need no way round at all. So where a detour stands in a plug's own
+    // leg, the run-outs are tried before any offer, and the shortest is
+    // taken that leaves that leg no detour, no corner shorter of room in
+    // all, and nothing newly crossed. Not in a plain lay (layOf).
+    const leadDetour = (T, end) => {
+      const i = T.taut.findIndex(p => p.end === end && p.at === 'reach');
+      if (i < 0) return false;
+      const step = end === 'a' ? 1 : -1;
+      for (let j = i + step; j > 0 && j < T.taut.length - 1 && (T.own[j] === -1 || T.taut[j].end === end); j += step) if (T.taut[j].at === 'detour') return true;
+      return false;
+    };
+    if (!plain) for (const end of ['a', 'b']) {
+      if (!leadDetour(L, end)) continue;
+      let out = null;
+      for (const m of [0.5, 1, 1.5]) {
+        const r2 = {...runs, [end]: m * bend}, L2 = lay(offs, leads, r2), s2 = shortOf(L2.taut), len = lengthOf(L2.taut);
+        if (L2.stuck > L.stuck || L2.ahead.length > L.ahead.length || s2 > short + 1e-9 || leadDetour(L2, end) || len > lengthOf(L.taut) - 1e-9) continue;
+        if (!out || len < out.len - 1e-9) out = {L: L2, s: s2, len, r: r2};
+      }
+      if (out) { Object.assign(runs, out.r); L = out.L; short = out.s; usedNovel = true; }
+    }
     // The best change on offer is made, and the offers are drawn up again,
     // until none helps or six have been made: the best of all of them each
     // time, whichever end of the cable they are nearer. That takes the order
@@ -1824,13 +1887,15 @@ function layFrom(inp, world) {
     // both ends and keeps one (#986).
     for (let round = 0; round < 6 && short > 0; round++) {
       let best = null;
-      for (const c of offers()) best = better(c, best);
+      // (a plain lay is offered nothing that came with kit 0.26.0: PLAIN, at layOf)
+      for (const c of offers()) if (!(plain && c.novel)) best = better(c, best);
       if (!best) break;
       const o = new Map(best.o), l = new Map(best.l);
       offs.clear(); for (const [k, v] of o) offs.set(k, v);
       leads.clear(); for (const [k, v] of l) leads.set(k, v);
       Object.assign(runs, best.r);
       L = best.L; short = best.s;
+      if (best.novel) usedNovel = true;
     }
   }
   const {rings, findings, taut, tautLegs, detours} = L;
@@ -1872,7 +1937,8 @@ function layFrom(inp, world) {
       return cornersOf([...head, ...pts, ...tail], {share: 'need'}).every(c => (c.k >= i0 && c.k < i1 ? c.room_mm >= need - 1e-9
         : c.room_mm >= kept(c.k < i0 ? c.k : c.k - pts.length) - 1e-9));
     };
-    const h = hang(p, q, {r, drape, bend: need, surfaces, fits});
+    const h = hang(p, q, {r, drape, bend: need, surfaces, fits, edges: !plain});
+    if (h.edged) usedNovel = true;
     if (h.points.length) hung[k] = h;
   }
   const strung = () => {
@@ -1930,7 +1996,7 @@ function layFrom(inp, world) {
     room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm),
     ...(d ? {apart_mm: c.legs_mm[1], turns: [c, d].map(x => ({point: final[x.k].at, at: spot(x.k), angle_deg: x.angle_deg}))} : {})}));
   return {path: {points: final, rings, findings, marks, crossings, detours, rests, bends, covers: [], allowance: endAllowance({media: inp.media}), media: inp.media},
-    legs, need, r};
+    legs, need, r, novel: usedNovel};
 }
 
 // WHAT A LAY COVERS (#1013, section 1.7): with no manager a leg is a free span
@@ -2251,17 +2317,20 @@ export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = pathOf(ra
     const needs = `${kind ? `the cable (${kind})` : 'the cable'} needs ${f.need_mm} mm`;
     // A LEAD LEFT IN A RING IT HAS NO ROOM TO TURN INTO (#1026): no ring on
     // its way left room, so the nearest stands and the finding says what
-    // would give it room (closeRing, below)
+    // would give it room (closeRing, below). IN A FIELD OF ITS OWN, `advice`:
+    // `text` is the bend and no more, as it was, so a page that reads, clips
+    // or joins the sentences is not handed a longer one; and a cable with a
+    // bend at each end of one manager is told once (layNotesOf)
     const close = closeRing(rack, c, f, ctx);
-    const help = !close ? '' : ` ${nameOf(close.manager)} stands too close to this port for the cable to turn into any ring on its way: ${
+    const help = !close ? '' : `${nameOf(close.manager)} stands too close to the port of ${c.id} on ${nameOf(close.device)} for the cable to turn into any ring on its way: ${
       [`set ${nameOf(close.device)} back from the rail`,
         ...(close.hosted && close.units >= 2 ? [`mount the manager on another unit of ${nameOf(close.device)}`] : []),
         close.hosted ? `leave ${nameOf(close.device)} without a manager` : `move ${nameOf(close.manager)} away from ${nameOf(close.device)}`]
         .reduce((m, t, k, all) => (k ? `${m}${all.length > 2 ? ',' : ''}${k === all.length - 1 ? ' or' : ''} ${t}` : t))}.`;
-    return {...f, ...(close ? {tooClose: {manager: close.manager, device: close.device}} : {}),
+    return {...f, ...(close ? {tooClose: {manager: close.manager, device: close.device}, advice: help} : {}),
       text: `${f.room_mm === 0 ? `${c.id} doubles back ${where}, with no room for a bend; ${needs}.`
         : f.turns ? `${c.id} turns twice within ${f.apart_mm} mm ${where} (${f.turns.map(t => t.angle_deg).join(' and ')} degrees), with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`
-        : `${c.id} turns ${f.angle_deg} degrees ${where} with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`}${help}`};
+        : `${c.id} turns ${f.angle_deg} degrees ${where} with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`}`};
   });
 }
 // THE MANAGER A TIGHT LEAD IS TOO CLOSE TO (#1026). A finding between a port

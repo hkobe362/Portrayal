@@ -113,28 +113,30 @@ test('the same face, different sides: the shorter side is taken, whichever end i
   // the same cable written the other way round takes the same side
   const back = cable({item: 'i3', path: 'q'}, {item: 'i1', path: 'p'});
   assert.deepEqual(R.autoRoute(r, back, ctx), right.toReversed());
-  // ports at -100 and 100 are as far from either gutter, each 5 mm short of
-  // the near face of the ring beside it (2 and 4). Until #1026 each went
-  // through that ring, and since #973 the two sides, the same legs, measured
-  // 0.8 mm apart (1393.52 by the left, 1392.74 by the right: a span hangs
-  // only as deep as the corners beside it have room for, and the two sides
-  // met their short legs at different heights), so the right was taken
-  // whichever end was a. Neither lead has room to turn into the ring beside
-  // it, so each passes it: by the left a takes ring 1 and b rings 3, 2 and 1,
-  // by the right a takes 3, 4 and 5 and b ring 5, mirror images that measure
-  // the same to a micron. A tie keeps end a's side, as it did before #973
+  // ports at -100 and 100 are as far from either gutter, and until #973 the
+  // two sides measured the same to a micron, a tie, which keeps end a's side.
+  // They are the same legs still, but a span now hangs only as deep as the
+  // corners beside it have room for, and the two sides meet their short legs
+  // at different heights: the right measures 0.8 mm shorter, and is taken
+  // whichever end is a
   const near = ctxFor(r, {'i1|p': -100, 'i3|q': 100});
   const sides = [R.autoRoute(r, c, near), R.autoRoute(r, back, near)].map(rt => rt.find(w => w.lane).lane);
-  assert.deepEqual(sides, ['left-front', 'right-front']);
+  assert.deepEqual(sides, ['right-front', 'right-front']);
+  // THE GUTTER IS CHOSEN BY THE NEAREST RINGS, the rings then by room
+  // (#1026): each port is 5 mm short of the near face of the ring beside it
+  // (2 and 4), which its lead has no room to turn into. The two sides are
+  // still measured through those rings, as they were (1393.52 by the left,
+  // 1392.74 by the right), so the cable keeps its gutter; and on the side
+  // taken b's lead passes ring 4 and enters ring 5
   const by = side => {
     const pick = (a, b) => (side === 'left' ? a : b);
-    return [...pick([1], [3, 4, 5]).map(n => ({item: 'i2', via: `guide-${n}`})), {lane: `${side}-front`, ru: 20}, {lane: `${side}-front`, ru: 30},
-      ...pick([1, 2, 3], [5]).map(n => ({item: 'i4', via: `guide-${n}`}))];
+    return [...pick([2, 1], [3, 4, 5]).map(n => ({item: 'i2', via: `guide-${n}`})), {lane: `${side}-front`, ru: 20}, {lane: `${side}-front`, ru: 30},
+      ...pick([1, 2, 3], [5, 4]).map(n => ({item: 'i4', via: `guide-${n}`}))];
   };
   const len = side => Math.round(R.routedLength(r, {...c, route: by(side), routeEdited: true}, near).measured * 1e5) / 100;
-  assert.deepEqual(R.autoRoute(r, c, near), by('left'));
-  assert.deepEqual(R.autoRoute(r, back, near), by('right').toReversed());
-  assert.deepEqual([len('left'), len('right')], [1379.87, 1379.87]);
+  assert.deepEqual([len('left'), len('right')], [1393.52, 1392.74]);
+  assert.deepEqual(R.autoRoute(r, c, near), by('right').slice(0, -1));
+  assert.deepEqual(R.autoRoute(r, back, near), by('right').slice(0, -1).toReversed());
 });
 
 test('opposite faces: front lane to rear lane on the A side, joined at the higher U', () => {
@@ -232,6 +234,25 @@ test('two ends on one ring manager run through the rings between them, in order 
   assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': 20, 'i3|q': 60})), [{item: 'i2', via: 'guide-3'}]);
   // the middle, not end a: a at 15 is nearer ring 3, but the middle (60) is nearer ring 4
   assert.deepEqual(R.autoRoute(r, swapped, ctxFor(r, {'i1|p': 15, 'i3|q': 105})), [{item: 'i2', via: 'guide-4'}]);
+});
+
+test('a patch whose two rings lay the same keeps the one it took: on a true tie, the ring on end a\'s side (#987)', () => {
+  let r = add(M.newRack(), 'sw', 20);
+  r = add(r, 'fhd-cmp5dr', 20, {on: 'i1', unit: 1});
+  r = add(r, 'pp', 21);
+  // two ports of the switch, 40 and 70: no ring between, the middle 55, and
+  // rings 3 and 4 as near it. The two lays are mirror images (452.965 mm
+  // each, the same two corners short, the same finding), so neither is the
+  // better, and the ring taken before stands: of two as near the middle,
+  // the one on end a's side
+  const ports = {'i1|p': 40, 'i1|q': 70}, ctx = ctxFor(r, ports);
+  const c = cable({item: 'i1', path: 'p'}, {item: 'i1', path: 'q'});
+  const lay = n => { const p = R.routePath(r, {...c, route: [{item: 'i2', via: `guide-${n}`}], routeEdited: true}, ctx);
+    return [Math.round(R.pathLength(p).measured * 1e6) / 1000, p.bends.length, p.findings.length]; };
+  assert.deepEqual(lay(3), lay(4));
+  assert.deepEqual(lay(3), [452.965, 2, 1]);
+  assert.deepEqual(R.autoRoute(r, c, ctx), [{item: 'i2', via: 'guide-3'}]);
+  assert.deepEqual(R.autoRoute(r, cable({item: 'i1', path: 'q'}, {item: 'i1', path: 'p'}), ctx), [{item: 'i2', via: 'guide-4'}]);
 });
 
 test('endPane: face, turned, and the end view', () => {

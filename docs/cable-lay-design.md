@@ -1246,12 +1246,15 @@ having room, so nothing is passed over for what cannot be measured.
 
 **Where no ring leaves room** the lead takes the nearest, as before, and its
 bend is a finding (3.4). The finding then also says why ("Lacer EDGE-0
-stands too close to this port for the cable to turn into any ring on its
-way") and what would help ("set EDGE-0 back from the rail, mount the manager
-on another unit of EDGE-0, or leave EDGE-0 without a manager"). The second remedy is
+stands too close to the port of c1 on EDGE-0 for the cable to turn into any
+ring on its way") and what would help ("set EDGE-0 back from the rail, mount
+the manager on another unit of EDGE-0, or leave EDGE-0 without a manager").
+That is a field of its own, `advice`; the finding's `text` is the bend and
+no more, as it was, so a page that reads, clips or joins the sentences is
+handed nothing longer, and a schedule's note says it once a cable. The second remedy is
 offered only for a manager hosted on a device of two units or more, and a
 manager that is a rack item of its own is to be moved away, not left out.
-`bendFindingsOf` and `bendFindings` carry it in `text` and mark the finding
+`bendFindingsOf` and `bendFindings` carry `advice` and mark the finding
 `tooClose: {manager, device}`; the path's `bends` are unchanged. The lead is
 not sent straight to the gutter instead: with the plug ending 0.1 mm behind
 a ring's leg, the straight run clears the ring only on paper, and a lead
@@ -1260,15 +1263,38 @@ with advice to add the manager it skipped.
 
 **A route made by hand is never overridden.** The rule is the automatic
 route's. A ring a hand route names is gone through, room or none, and its
-finding carries no advice about the manager: the ring was chosen.
+finding carries no advice about the manager: the ring was chosen. Its
+waypoints are kept; the lay between them is the kit's, and can move as any
+lay does (a detour round a tray, a span's point at an edge).
 
-**A lead goes round a tray, never up over a ring.** The detour rules of 1.3
-will take a leg over the top of a ring that stands in its way, and such a
-hump can have all its room: 60 mm up in front of the device above, across,
-and down again. No lead is dressed so. The test stops at a ring's leg: a
+**A lead goes round a tray's floor, and round nothing else.** The detour
+rules of 1.3 will take a leg over the top of a ring that stands in its way,
+or round a wall, and such a way can have all its room: 60 mm up in front of
+the device above, across, and down again. No lead is dressed so. The test
+stops at anything a leg meets that is not a plate met from above or below: a
 ring whose legs stand between the plug and the next ring leaves that next
 ring no room. A leg that clears a ring, through its opening or beside it,
 meets nothing and is not stopped.
+
+**Run out past a ring in the way.** Where a ring stands between a plug and
+the ring its lead takes, the path's own way round it can be a loop with all
+its room (out, under the tray and back, 320 mm, in the fixture), and since
+no corner of it is short nothing of 3.4 offers anything else. Run on 15 mm
+out of its plug, the same cable clears that ring through its opening. So
+where a detour stands in a plug's own leg, the run-outs of 3.4 are tried
+before any offer, and the shortest is taken that leaves the leg no detour,
+no corner shorter of room in all and nothing newly crossed.
+
+**The gutter is chosen before the rings are.** A cable whose ports stand on
+opposite sides of the centre line takes the gutter that measures the
+shorter (4.1). Measured through the rings chosen by room, and with the
+detours of this section, the two sides' lengths moved, and cables changed
+gutter: one into a bend it did not have, and a member of a bundle away from
+its trunk, where it hung free. So each side is measured as it was before
+this kit: through the ring nearest each port, by a lay with none of the
+offers of this section (a **plain** lay; one that took none of them is the
+plain lay, and is not made twice). The rings are then chosen by room on the
+side taken. This change moves no cable to another gutter.
 
 **Which leads are left without room** on that rack, at no setback: a port
 within some 35 mm inboard of the end ring, which has no ring after it; a
@@ -1336,10 +1362,12 @@ and the test of 4.1 for whether a cord passes a ring reads the ports and the
 ring's centre, not the sill the cord lies on, and calls ring 4 a hook where
 the lay passes it. So here, and only here, the choice is made by laying:
 **the nearest ring on each side of the stretch is laid as a route through
-that one ring, and the better lay is taken**, by the order two lays of one
-cable are compared in (3.4): fewer rings entered and left by one face, fewer
-bodies crossed, corners less short of room, then the shorter; on a tie the
-one nearer the middle. c8 takes ring 4: led square from the leaf above,
+that one ring, with the ring taken before, and the best lay is taken**:
+fewer rings entered and left by one face, fewer bodies crossed, the
+tightest corner less short of room, corners less short in all, then the
+shorter; on a tie the ring taken before. The tightest corner is weighed
+before the sum because three corners 23 to 26 mm short add up to more than
+one that doubles back with no room at all, and the one is the worse cable. c8 takes ring 4: led square from the leaf above,
 straight on to the panel, 547 mm. The other fifteen cords keep their ring.
 The choice is the same whichever end is written first, which the tie on end
 a's side was not. It costs two more lays for such a cable, kept as the

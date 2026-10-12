@@ -250,7 +250,7 @@ function evenly(fine, n) {
 //     is held does not also sag.
 // Near-duplicate points are dropped (NEAR). Without `fits` the first of each
 // is laid, as before #973.
-export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = null} = {}) {
+export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = null, edges = true} = {}) {
   const L = Math.hypot(q.x - p.x, q.z - p.z);
   if (L < MIN_SPAN) return {points: [], lands: []};
   const ok = pts => typeof fits !== 'function' || fits(pts);
@@ -264,7 +264,16 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
   // (the edges a span passes are those of the same surfaces, less the ones
   // above both its ends, which nothing of it lies on: overEdges)
   let over = null;
-  const edged = pts => overEdges(p, q, pts, over ??= ground.near().filter(s => s.y + r <= top + EPS), r);
+  // `edges: false` leaves them out, as a span was hung before kit 0.26.0
+  // (route.js layOf, PLAIN); a hang for which one was found says so (`edged`)
+  let added = false;
+  const edged = pts => {
+    if (!edges) return pts;
+    const out = overEdges(p, q, pts, over ??= ground.near().filter(s => s.y + r <= top + EPS), r);
+    // (of any hang tried: one refused for its edge point leaves another laid)
+    if (out.length > pts.length) added = true;
+    return out;
+  };
   const chords = Array.from({length: FINE + 1}, (_, k) => {
     const t = k / FINE, chord = lerp(p, q, t);
     return {t, chord, g: ground(chord.x, chord.z, Math.max(chord.y, top) - r)};
@@ -301,7 +310,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
           if (g && pt.y < g.y + r) pt.y = g.y + r;
         }
         const out = edged(apart(p, q, pts));
-        if (out.length && ok(out)) return {points: out, lands: [land]};
+        if (out.length && ok(out)) return {points: out, lands: [land], ...(added ? {edged: true} : {})};
         if (typeof fits !== 'function') break;
       }
     }
@@ -326,12 +335,12 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
       if (n < 2 || n === last) continue;
       last = n;
       const out = edged(apart(p, q, evenly(raised, n)));
-      if (out.length && ok(out)) return {points: out, lands: landsOf(out)};
+      if (out.length && ok(out)) return {points: out, lands: landsOf(out), ...(added ? {edged: true} : {})};
       if (typeof fits !== 'function') break;
     }
     if (typeof fits !== 'function') break;
   }
-  return {points: [], lands: []};
+  return {points: [], lands: [], ...(added ? {edged: true} : {})};
 }
 
 // THE HELD FACE OF A TRAY (section 2.3): a cable strapped up against the

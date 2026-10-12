@@ -507,7 +507,8 @@ export function detour(a, b, solids, {diameter = 0, lanes = [], room = 0, rear =
   // and down again is no dressing, and stays taut and short of room.
   const all = [a, ...pts, b];
   const met0 = legCrossings(a, b, solids, {diameter})[0]?.solid;
-  const plate = !!met0 && crossAxis(a, b, met(met0, diameter)) === 'y';
+  // (a ring's seat and bar are thin and level too, and are no plate: RING_PART)
+  const plate = !!met0 && !RING_PART.test(String(met0.part ?? '')) && crossAxis(a, b, met(met0, diameter)) === 'y';
   const keeps = i => loose && plate && room > 0
     && leastRoom([...all.slice(0, i), ...all.slice(i + 1)]) < Math.min(leastRoom(all), room / 2) - 1e-6;
   for (let i = 1; i < all.length - 1;) {
