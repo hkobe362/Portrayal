@@ -7,8 +7,8 @@ mates: [nema-5-15r, nema-5-20r]
 conforms: nema-5-15p-cord
 profile: networking
 description: >-
-  A moulded straight NEMA 5-15P plug on its cord (15 A 125 V), the wall end
-  of a North American power cord, seen from the cable end as a front
+  A moulded straight NEMA 5-15P plug on its cord (15 A 125 V). It is the wall
+  end of a North American power cord, seen from the cable end as a front
   elevation sees it seated. It shows the moulding, the strain relief and a
   short straight stub of cord whose diameter is the cable-od field. It seats
   in a `nema-5-15r` or a `nema-5-20r` receptacle at its own mate point. A
