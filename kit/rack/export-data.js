@@ -1208,10 +1208,11 @@ export function fillNotes(rack, facts, nameOf = id => id) {
     if (f.over) out.push(`${viaText(f.via)} on ${named(f.item)}: ${f.count} cables, ${f.percent}% of its fill limit; the limit is ${limit}% of the opening.`);
   for (const o of facts.over || []) {
     // the kind the count is stated for, and every cable at least as thick;
-    // an older catalogue names no kind, and the note gives the diameter
+    // where the entry names no kind (an older catalogue, or a kind this kit
+    // does not know), the note gives the diameter
     const kind = o.media ? mediaLabel(o.media) : '', thick = kind ? `at least as thick as ${kind}` : `of ${o.diameter} mm or more`;
     out.push(`${named(o.item)}: ${o.through > o.count ? `${o.count} of the ${o.through} cables through it are ${thick}` : `${o.count} cables ${thick} through it`}, ` +
-             `more than the ${o.capacity}${kind ? ` ${kind} cables` : ''} its maker states.`);
+             `more than the ${o.capacity}${kind ? ` ${kind} ${o.capacity === 1 ? 'cable' : 'cables'}` : ''} its maker states.`);
   }
   for (const c of rack.cables || [])
     for (const w of facts.routes?.get(c.id)?.gone || [])

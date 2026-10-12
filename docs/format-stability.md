@@ -665,7 +665,8 @@ device has them:
   `null` where no source names the cable. A count is compared with the cables
   at least as thick as that kind; one whose `media` is `null` is never
   compared. A catalogue built before `media` was written has no such key, and
-  a reader takes that as a cable of 6 mm
+  a reader takes that as a cable of 6 mm. A reader takes a kind it does not
+  know the same way, and never as `null`: a kind may be added
   ([cable-managers-design.md](cable-managers-design.md) section 14).
 - `guides` and `passes`: per view (`top`, `front`, `rear`), the sorted ids a
   cable route can pass through on the default configuration's drawing.

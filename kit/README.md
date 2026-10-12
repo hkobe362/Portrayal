@@ -689,9 +689,10 @@ No rack file changes.
   diameter counted, in mm. A page that reads `item` alone reads what it did.
 - `capacity.media` in `rack.json` has three shapes. A kind: compared as
   above. `null`: no source names the cable, and the count is never compared.
-  No key: a catalogue built before 0.27.0; its count is compared with the
-  cables of 6 mm or more, so an older catalogue still warns of copper over a
-  count (and no longer of fibre cords), with `media: null` in the entry.
+  Anything else, which is no key (a catalogue built before 0.27.0) or a
+  kind this kit has no diameter for (a catalogue newer than the kit): its
+  count is compared with the cables of 6 mm or more, so neither goes silent,
+  with `media: null` in the entry. Only `null` means "never compare".
   **Take the library build and the kit together** to get the stated kinds.
 - `fillNotes(rack, facts, nameOf)` names a manager with where it is, after
   the name `nameOf` gives: `LACER (U20 front)`, or `(at left-front)` for a
@@ -706,8 +707,10 @@ No rack file changes.
   31 cables at least as thick as Cat 6 copper through it, more than the 30
   Cat 6 copper cables its maker states.` With thinner kinds beside them: `31
   of the 36 cables through it are at least as thick as Cat 6 copper, ...`.
-  From an older catalogue: `31 cables of 6 mm or more through it, more than
-  the 30 its maker states.`
+  Where the entry names no kind: `31 cables of 6 mm or more through it, more
+  than the 30 its maker states.`, and with thinner kinds beside them `31 of
+  the 36 cables through it are of 6 mm or more, more than the 30 its maker
+  states.` A count of one reads `the 1 Cat 6 copper cable`.
 - `inspect` of a manager, on the rails or beside the rack, gives `capacity:
   { count, basis, media }`, `media` null where the catalogue names no cable.
 - `portLabel(path)` (`rack/cable-rules.js`) is a port in words: `bay 1 b09`

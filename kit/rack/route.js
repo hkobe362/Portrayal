@@ -2114,12 +2114,15 @@ function zeroUThrough(rack, ctx) {
 // a ring is with those stays fill's to say.
 // THREE SHAPES OF A CAPACITY. `media` a kind: compared as above. `media:
 // null`: the device states a count and no source names the cable, so it is a
-// fact for a reader and is never compared. NO `media` KEY: a catalogue built
-// before the key existed, which cannot say which of the two it is; its count
-// is compared with the cables of 6 mm or more (the diameter a cable of no
-// stated kind is given), so that an older catalogue does not go silent.
+// fact for a reader and is never compared. ANYTHING ELSE: no `media` key (a
+// catalogue built before the key existed, which cannot say which of the two
+// it is), a kind this kit has no diameter for (a catalogue newer than the
+// kit), or a value that is no kind at all. Its count is compared with the
+// cables of 6 mm or more (the diameter a cable of no stated kind is given)
+// and the entry names no kind, so that neither an older catalogue nor a newer
+// one goes silent. Only `null` says "never compare".
 // Each entry: the manager, `count` of the cables counted, `through` of every
-// kind, the stated `capacity`, its `media` (null for an older catalogue) and
+// kind, the stated `capacity`, its `media` (null where the kit knows no kind) and
 // `diameter`, the least diameter counted, in mm. As in fill, a ring a cable
 // only doubles back from does not carry it.
 export function capacityOver(rack, ctx) {
@@ -2130,12 +2133,10 @@ export function capacityOver(rack, ctx) {
       if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Map()).get(w.item)).set(c.id, c);
   }
   const over = (cap, cables) => {
-    if (!(cap?.count > 0)) return null;
-    const old = !Object.hasOwn(cap, 'media');
-    const diameter = old ? UNSET_D : ownMedia(DIAMETERS, cap.media);
-    if (!(diameter > 0)) return null;
+    if (!(cap?.count > 0) || cap.media === null) return null;
+    const known = ownMedia(DIAMETERS, cap.media) > 0, diameter = known ? DIAMETERS[cap.media] : UNSET_D;
     const count = cables.filter(c => (ownMedia(DIAMETERS, c.media) ?? UNSET_D) >= diameter).length;
-    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: old ? null : cap.media, diameter} : null;
+    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: known ? cap.media : null, diameter} : null;
   };
   const out = [];
   for (const [item, cables] of by) {

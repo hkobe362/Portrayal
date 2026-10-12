@@ -16,7 +16,11 @@
 - **A catalogue built before this change does not go silent.** `rack.json`
   now writes `capacity.media` on every capacity, `null` where the device
   states no kind. A capacity with no `media` key is one from an older
-  build, and the kit compares its count with the cables of 6 mm or more.
+  build, and the kit compares its count with the cables of 6 mm or more:
+  `FHD-CMP5DR (U42 front): 48 cables of 6 mm or more through it, more than
+  the 30 its maker states.`, or `31 of the 36 cables through it are of 6 mm
+  or more, ...` beside thinner ones. A kind the kit has no diameter for is
+  compared the same way. Only `null` is never compared.
 - **The notes name the manager and say what the percentage is of**
   (`kit/rack/export-data.js` `fillNotes`). A manager is named with its U and
   its face, so two managers of one model give two lines: `FHD-CMP5DR (U42

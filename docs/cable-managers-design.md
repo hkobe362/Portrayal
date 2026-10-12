@@ -462,7 +462,7 @@ fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
 - **Why a thicker cable counts.** A thicker cable takes at least the room the maker
   counted with, so a count of them over the stated one is over it. The makers' own
   tables bear this out: where FS states a count for Cat6A or Cat7 beside the one for
-  Cat6, it is within 3 to 6 per cent of it (45 beside 48, 80 beside 83, 53 beside 55,
+  Cat6, it is 1.6 to 6.3 per cent under it (45 beside 48, 80 beside 83, 53 beside 55,
   2700 beside 2745). Counting only the stated kind left a manager silent with about
   twice the section its maker counted: 40 Cat6A spread eight a ring stand at 94% of
   each ring's fill limit, under it, and are 1767 mm2 where 30 Cat6 are 848.
@@ -474,11 +474,14 @@ fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
 - **Three shapes of a capacity in `rack.json`.** `media` a kind: compared as above.
   `media: null`: no source names the cable, so the count is shown where a manager is
   inspected (`inspect` gives `capacity: {count, basis, media: null}`) and is never
-  compared. No `media` key: a catalogue built before the key existed. It cannot say
-  which of the two it is, so its count is compared with the cables of 6 mm or more,
-  the diameter a cable of no stated kind is given, and the note says "of 6 mm or
-  more" and names no kind. A kit read against an older catalogue therefore still
-  warns of copper over a count, and no longer of fibre cords.
+  compared. Anything else is compared with the cables of 6 mm or more, the diameter a
+  cable of no stated kind is given, and the note says "of 6 mm or more" and names no
+  kind. That covers no `media` key (a catalogue built before the key existed, which
+  cannot say which of the two it is) and a kind the kit has no diameter for (a
+  catalogue newer than the kit, or a value that is no kind). A kit read against an
+  older catalogue therefore still warns of copper over a count, and no longer of
+  fibre cords; an older kit read against a catalogue with a new kind does not go
+  silent either. Only `null` means "never compare".
 - **The words of the note are true of a mix.** "40 cables at least as thick as Cat 6
   copper through it, more than the 30 Cat 6 copper cables its maker states."
 - **A warning says which manager.** Two managers of one model carry one label, so a

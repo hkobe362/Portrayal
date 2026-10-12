@@ -40,7 +40,7 @@ const ctxOf = rack => ({chassisOf, checkKept: true,
   },
   // a port stands under the ring its cable passes: `r1-...` under ring 1, to `r5-...` under ring 5
   portX: end => XS[Number(end.path[1]) - 1]});
-const LACERS = {lacer: 1, plain: 1, early: 1};
+const LACERS = {lacer: 1, plain: 1, early: 1, odd: 1};
 // A switch at U20 with a manager on it, and a panel at U30.
 const rackOf = (manager = 'lacer') => {
   let r = add(M.newRack(), 'sw', 20, {label: 'switch'});
@@ -147,6 +147,30 @@ test('a catalogue built before the kind was recorded does not go silent', () => 
   // and the fibre cords of the issue are not counted there either
   const fibre = {...rackOf('early'), cables: [...cables(24, 'os2', 1), ...cables(24, 'os2', 5)]};
   assert.deepEqual(notes(fibre), []);
+  // with thinner cables beside the copper, the note says how many of how many
+  const mixed = {...rackOf('early'), cables: [...cables(16, 'cat6', 1), ...cables(15, 'cat6', 5), ...cables(5, 'os2', 3)]};
+  assert.equal(notes(mixed).at(-1),
+    'LACER-5 (U20 front): 31 of the 36 cables through it are of 6 mm or more, more than the 30 its maker states.');
+});
+
+test('a kind this kit has no diameter for is compared as an older catalogue is, never dropped', () => {
+  // a catalogue newer than the kit may state a kind the kit does not know; a
+  // value that is no kind at all is taken the same way. Only null is "never".
+  for (const media of ['cat8', '', undefined, 7]) {
+    SIZES.odd = {...LACER, capacity: {count: 30, basis: 'eighty of something', media}};
+    try {
+      // 80 Cat6, sixteen a ring: 452.4 mm2, 120% of each ring's limit
+      const r = {...rackOf('odd'), cables: spread(16, 'cat6')};
+      assert.deepEqual(R.capacityOver(r, ctxOf(r)), [{item: 'i2', count: 80, through: 80, capacity: 30, media: null, diameter: 6}], String(media));
+      assert.equal(notes(r).at(-1), 'LACER-5 (U20 front): 80 cables of 6 mm or more through it, more than the 30 its maker states.');
+    } finally { delete SIZES.odd; }
+  }
+});
+
+test('a count of one is one cable', () => {
+  const facts = {fill: [], over: [{item: 'i2', count: 2, through: 2, capacity: 1, media: 'cat6', diameter: 6}], routes: new Map()};
+  assert.deepEqual(X.fillNotes(rackOf(), facts, () => 'LACER-5'),
+    ['LACER-5 (U20 front): 2 cables at least as thick as Cat 6 copper through it, more than the 1 Cat 6 copper cable its maker states.']);
 });
 
 test('a ring over its fill is named, with its share of the limit and what the limit is', () => {
