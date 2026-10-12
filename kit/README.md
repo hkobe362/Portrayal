@@ -673,6 +673,57 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.27.0: a lead enters a ring it has room to turn into.** The
+automatic route sent every lead through the ring of its manager nearest its
+port. **Routed lengths on saved racks move:** a cable whose automatic route
+takes another ring, or whose detour is laid another way, measures
+differently the next time a page measures it, and its stock size can change.
+An entered length is never touched, and a route made by hand keeps its
+waypoints (the lay between them is the kit's, and can move). Nothing is
+removed or renamed; the rack file and the export columns are as they were.
+[`docs/cable-lay-design.md`](../docs/cable-lay-design.md) section 3.5 has the
+rules and what was counted.
+
+- **The ring is chosen by room, not by distance.** Of the rings on a lead's
+  way to its gutter, the first that the lead can turn into within its
+  cable's installed bend radius is taken, and one too close is passed over.
+  A patch along one manager takes the rings between its ports the same way.
+  Where no ring leaves room the nearest stands, and its finding says so and
+  what would help, in a field of its own: `bendFindings` and
+  `bendFindingsOf` give such a finding `advice` (one sentence) and
+  `tooClose: { manager, device }`. Its `text` is the bend and no more: the
+  advice adds nothing to it. `routePath`'s `bends` carry neither. **The gutter a cable takes does
+  not change:** it is chosen first, measured as before.
+- **A patch with no ring between its ports** takes, of the ring it took
+  before and the nearest ring on each side, the one it lays best through
+  (the tightest corner weighed first); on a tie, the ring it took before.
+- **Two turns on one short leg are one finding.** A `tight-bend` that was
+  two (an S-bend, or the two turns of a way out and back) is one, with
+  `apart_mm`, the leg between the turns, and `turns: [{ point, at,
+  angle_deg }, { point, at, angle_deg }]`. Its `at` is the middle of that
+  leg, its `point` the first turn's, its `angle_deg` the wider of the two,
+  and its `legs_mm` the leg into the first and out of the second; its
+  sentence reads "turns twice within 22.8 mm ... (67.1 and 63.2 degrees)".
+  **A page that counts `bends` counts fewer**, and one that rings each
+  finding at `at` rings such a bend once; `turns[].at` are the two corners.
+  `inspect` carries `turns`, `apart_mm`, `tooClose` and `advice`; a
+  schedule's note says "bends" where it said "corners", and ends with the
+  advice, once for each end's device. **A pair's sentence is longer than any
+  bend's was** (up to 182 characters where the longest was 150), and most
+  findings on a rack with lacers are pairs: a page that clips a label at a
+  fixed length cuts more of them.
+- **Round a tray.** `detour` in `rack/solids.js` takes two options, both
+  off unless asked for: `loose`, which keeps the point where a way round a
+  plate turns back in where pulled taut it would take a turn's room, and
+  `rear`, which takes a floor's back edge first for an end that stands
+  behind it (a device set back from its rails). `routePath` offers both
+  where a corner at a detour point is short. A free span that leaves a
+  surface over its edge has a point at the edge (`hang`'s `edges`, on
+  unless asked off).
+- A page's `plugReachOf`, `bendOf` and `diameterOf` are asked more often for
+  a patch along one manager with no ring between its ports: the two rings
+  are each laid once to choose.
+
 **New in 0.26.0: a manager's stated count is a count of one kind of cable.**
 `capacityOver(rack, ctx)` compared a manager's stated count with every cable
 through it. A maker counts with one cable (thirty Cat6 is the section of about

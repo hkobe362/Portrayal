@@ -249,7 +249,9 @@ radii (3.4). The plane only moves away from the body, so what it cleared it
 still clears; and in each tier the ways with room are tried first and the
 ways as they were only when none resolves, so a body that leaves no room is
 still gone round by the same preferred way, and the short leg is a finding
-(3.4), not a different route.
+(3.4), not a different route. Two further offers came with #1026 (3.5): a
+detour round a plate that is not pulled taut, and the way up behind a tray
+for a plug that ends behind its back edge.
 
 A hand route keeps its waypoints; the detours are added between them in the
 same way, and a leg the three rules cannot clear is left as drawn and reported.
@@ -957,8 +959,9 @@ is a point of:
 | a plug's end (beside a rest sample) | 19 | 7 | 0 | follows from the three above |
 | all | 86 | 87 | 0 | |
 
-By halves 23 corners of the new paths are still short (16 at an approach
-point, 2 at a lead point, 5 at a plug's end): each is a turn that shares a
+By halves 23 corners of the new paths are still short (15 at an approach
+point, 1 at a rest sample, 2 at a lead point, 5 at a plug's end; 16 at an
+approach point and none at a rest sample until #987, 3.5): each is a turn that shares a
 leg with a slighter one. That is the difference between the two ways of
 sharing, and why a path is judged by need.
 
@@ -1069,8 +1072,8 @@ mm, 10.8 mm short."). It warns and never refuses. A page that draws the kit's po
 `kind` and `cable`, with its sentence), `describe` counts the cables that
 have one and names the cable shortest of its radius, and
 `cableScheduleRows(..., {bends})` writes one sentence into the notes of each
-such cable: the finding, or how many corners and the tightest of them
-(#1007). Corners at one point, to a tenth of a millimetre, are one finding. A cable is told them wherever it has a path, a loose end
+such cable: the finding, or how many bends and the tightest of them
+(#1007). Corners at one point, to a tenth of a millimetre, are one finding, and so are two turns on one short leg (3.5). A cable is told them wherever it has a path, a loose end
 or not; one whose port is not found has no path and is told nothing.
 
 **What is left.** On the reference rack, nothing. On one sample of 60
@@ -1158,6 +1161,7 @@ kinds:
   lead point that its detour then reaches in line, so the path passes
   straight through it. It is left in: the path is the kit's stops and its
   detours between them, and a drawing rebuilds the detour from that point.
+  (c8 no longer does so: since #987 it takes ring 4, 3.5.)
 
 **Lengths change on saved racks.** On the reference rack every cord is longer,
 by 10.9 to 179.2 mm, none shorter, and seven of the sixteen change stock
@@ -1186,7 +1190,8 @@ leaf's eight are still 1 m cords.
 
 c8 grows most: it leaves ring 5 and comes straight back to a panel port 13.4
 mm short of the ring, with the lacer's web between, so it goes round the
-front of the tray and straight in to its plug. On the generated racks a
+front of the tray and straight in to its plug (until #987 gave it ring 4,
+3.5: 547 mm). On the generated racks a
 length moves by -113 to +297 mm, median +14; 93 cables move up a stock size
 and 34 down. 668 of the 1,803 are shorter: a span that hung to its full
 depth whatever held its ends now hangs only as deep as the corners beside
@@ -1196,6 +1201,297 @@ outward face that had none before: eight do, the same eight before and
 after, each where a lane's own run comes to the end of a short PDU and is
 taken over its face, the last way round of 1.3. A stored routed length and stock size move the next
 time a page measures them; an entered length is never touched.
+
+### 3.5 Room to turn into a ring (#1026)
+
+Built in kit 0.27.0. Until then the automatic route sent every lead through
+the ring of its manager nearest its port, whatever stood between. A lead is
+the stretch of a cable from the far end of its plug to the first thing that
+holds it. Where a lacer is hosted on the unit its ports are in, the nearest
+ring is so close that the lead has nowhere to turn. On a rack of thirteen 2U
+switches, each with an FHD-CMP5DR on its top unit, the rings stand 73.7 mm
+out of the rail and their sill 7 and 20 mm under the two rows of ports above
+it; an AOC's plug ends 64.8 mm out, 8.9 mm short of the line it has to turn
+onto, and needs 30 mm to turn. A port 6 mm to one side of a ring's face had
+two turns to make on 20 mm.
+
+**The rule: a lead enters the first ring along its way that it has room to
+turn into.** The rings on its way are the ones the route already listed,
+from the port out toward the gutter it takes. One that is too close to turn
+into is passed over, and the lead runs on to the next: over the tray, or
+through the opening of the ring it passed without lying in it. The choice is
+by room, not by distance.
+
+**What room is.** The lead is laid on its own, taut, by the rules of 3.4:
+from the plug's reach point to the ring's approach point, round whatever
+body stands between (1.3), and on through the ring. It has room when no
+corner of that has less than the cable's installed bend radius, a leg
+between two corners shared by need (3.4). The approach point is tried where
+3.4 may put it (at the bend radius from the band, at the radius and
+`CLEAR`, two radii past the plug with the lead led square or not, and to
+either side of a detour that comes back beside itself), and the plug's
+run-outs are tried where its own turn is what is short. One of these with
+room is room. So what decides is what stands in the rack: how far the plug
+reaches (1.5), how far out and how high the ring's sill is, the ring's own
+legs and the tray under it, which unit the manager is mounted on, and how
+far back the device is set. No distance is written into the rule; the 30 to
+40 mm at which a ring starts to leave an AOC room on this lacer comes out of
+those.
+
+It is a test of one lead, not the whole path: it lays no hang and none of
+the rest of the route, so it can call room where the path then reports a
+bend, or the reverse. The path's own `bends` are what is reported. A port
+the drawings do not place, and a ring they do not place, are taken as
+having room, so nothing is passed over for what cannot be measured.
+
+**Where no ring leaves room** the lead takes the nearest, as before, and its
+bend is a finding (3.4). The finding then also says why ("Lacer EDGE-0
+stands too close to the port of c1 on EDGE-0 for the cable to turn into any
+ring on its way") and what would help ("set EDGE-0 back from the rail, mount
+the manager on another unit of EDGE-0, or leave EDGE-0 without a manager").
+That is a field of its own, `advice`; the finding's `text` is the bend and
+no more, so the advice lengthens no sentence a page reads, clips or joins,
+and a schedule's note says it once for each end's device (a cable short of
+room at both ends has two). The second remedy is
+offered only for a manager hosted on a device of two units or more, and a
+manager that is a rack item of its own is to be moved away, not left out.
+`bendFindingsOf` and `bendFindings` carry `advice` and mark the finding
+`tooClose: {manager, device}`; the path's `bends` are unchanged. The lead is
+not sent straight to the gutter instead: with the plug ending 0.1 mm behind
+a ring's leg, the straight run clears the ring only on paper, and a lead
+that skips its device's manager is a span in front of other ports (1.7)
+with advice to add the manager it skipped.
+
+**A route made by hand is never overridden.** The rule is the automatic
+route's. A ring a hand route names is gone through, room or none, and its
+finding carries no advice about the manager: the ring was chosen. Its
+waypoints are kept; the lay between them is the kit's, and can move as any
+lay does (a detour round a tray, a span's point at an edge).
+
+**A lead goes round a tray's floor, and round nothing else.** The detour
+rules of 1.3 will take a leg over the top of a ring that stands in its way,
+or round a wall, and such a way can have all its room: 60 mm up in front of
+the device above, across, and down again. No lead is dressed so. The test
+stops at anything a leg meets that is not a plate met from above or below: a
+ring whose legs stand between the plug and the next ring leaves that next
+ring no room. A leg that clears a ring, through its opening or beside it,
+meets nothing and is not stopped.
+
+**Run out past a ring in the way.** Where a ring stands between a plug and
+the ring its lead takes, the path's own way round it can be a loop with all
+its room (out, under the tray and back, 320 mm, in the fixture), and since
+no corner of it is short nothing of 3.4 offers anything else. Run on 15 mm
+out of its plug, the same cable clears that ring through its opening. So
+where a detour stands in a plug's own leg, the run-outs of 3.4 are tried
+before any offer, and the shortest is taken that leaves the leg no detour,
+no corner shorter of room in all and nothing newly crossed.
+
+**The gutter is chosen before the rings are.** A cable whose ports stand on
+opposite sides of the centre line takes the gutter that measures the
+shorter (4.1). Measured through the rings chosen by room, and with the
+detours of this section, the two sides' lengths moved, and cables changed
+gutter: one into a bend it did not have, and a member of a bundle away from
+its trunk, where it hung free. So each side is measured as it was before
+this kit: through the ring nearest each port, by a lay with none of the
+offers of this section (a **plain** lay; one that took none of them is the
+plain lay, and is not made twice). The rings are then chosen by room on the
+side taken. This change moves no cable to another gutter.
+
+**Which leads are left without room** on that rack, at no setback: a port
+within some 35 mm inboard of the end ring, which has no ring after it; a
+port under a ring, or just past one, whose plug ends 1.6 mm behind that
+ring's rear leg; and a port in the lower row beside a ring, level with the
+ring's seat, whose way to the next ring is through that seat. All three are
+the manager standing where the ports are.
+
+**Round a tray's front edge, with room.** A port under a tray reaches its
+ring by rule 1 of 1.3: out past the front edge, across, and back in to the
+approach point. That is three right angles, and 3.4 gives each its leg. But
+a detour is pulled taut (1.3), and taut the point where the cable turns
+back in toward its plug is not needed: the cable runs straight from the
+point in front of the ring to the plug's end, and that one turn is then
+wider than a right angle on the same 60 mm it shares with the turn before
+it (139 degrees and 16 mm of room for a 30 mm cable, in the fixture). So a
+detour round a plate met from above or below is offered **not pulled taut**:
+a point stays where the way without it would leave a turn less than the
+bend radius and less than the way with it does, each end of the way taken
+as a right angle (`detour`'s `loose`). It is an offer of 3.4, tried only
+where a corner at a detour point is short, so a path with room is as it
+was. A way over a ring's leg is never kept loose: that is the hump above.
+
+**Behind a tray's back edge.** Rule 1 takes the front edge first because a
+port at the rail plane ends its plug under the floor. A device set back
+from its rails ends its plug behind the floor's back edge instead (the
+FHD-CMP5DR's floor starts 48.8 mm out of the rail; an AOC's plug on a
+switch set back 50 mm ends 14.8 mm out), and the near edge is then that
+one. So the same offer of 3.4 also gives a detour its way **up behind the
+plate**: one point on the floor's back plane (the back edge less the
+cable's radius and `CLEAR`), as far clear of the plate on the far end's
+side, and along the run where a taut line from end to end crosses that
+edge (`detour`'s `rear`). It is offered only to a floor one of whose ends
+stands at or behind the back plane, and taken only where it leaves the
+path's corners less short than the front edge does: at 25 mm of setback the
+plug ends 2.5 mm behind the plane and the cable would have to stand almost
+upright there, so the front edge is kept. In the fixture a bottom-unit
+port 54 mm along from its ring's face, which turned twice on 53.3 mm round
+the front edge with room for a 26.6 mm bend, comes up behind the tray with
+room and is 247 mm shorter.
+
+**The stretch through a ring** (3.4) could be lengthened only by moving the
+other side's approach point out. Where that point stands beside a port and
+has no room to move, this side's now moves out instead; and an approach
+point already moved in beside a detour may go back to the radius and
+`CLEAR`. Both are offers, judged as every offer is.
+
+What is chosen is still the cable's whole path, laid from both ends
+(3.4), so no cable written the other way round lays differently.
+
+**A patch along one manager (#987).** Two ends that leave through one
+manager run along it through the rings between their ports (4.1). The rule
+above is applied there too: of the rings between, the first from end a that
+a's lead has room to turn into and the last that b's has are the ends of
+what is taken; where an end has room at none its nearest stands, and where
+the two ends would pass each other's ring all are kept.
+
+With no ring between, the ring nearest the middle of the two ports was
+taken, of those the cord passes through. On the reference rack that sent c8
+through ring 5, which stands 6.6 mm past its panel port: the cord left the
+ring and came back to the port round the front of the tray, 619.2 mm, with
+every corner its room and nothing crossed. Nothing in the lay was wrong; the
+ring was. Room cannot tell the two rings apart (the loop has all its room),
+and the test of 4.1 for whether a cord passes a ring reads the ports and the
+ring's centre, not the sill the cord lies on, and calls ring 4 a hook where
+the lay passes it. So here, and only here, the choice is made by laying:
+**the nearest ring on each side of the stretch is laid as a route through
+that one ring, with the ring taken before, and the best lay is taken**:
+fewer rings entered and left by one face, fewer bodies crossed, the
+tightest corner less short of room, corners less short in all, then the
+shorter; on a tie the ring taken before. The tightest corner is weighed
+before the sum because three corners 23 to 26 mm short add up to more than
+one that doubles back with no room at all, and the one is the worse cable. c8 takes ring 4: led square from the leaf above,
+straight on to the panel, 547 mm. The other fifteen cords keep their ring.
+The choice is the same whichever end is written first, which the tie on end
+a's side was not. It costs two more lays for such a cable, kept as the
+path's are; a manager with a ring on only one side of the stretch is as it
+was. A route made by hand through ring 5 is laid as before, with no finding.
+
+A first attempt at this was withdrawn because c8, through ring 4, failed
+the check that no point of a cord lies below a support it is over. That was
+a fault of the hang, not of the choice, and c8 was the first cord to show
+it: a span that lands on a surface and leaves it over its edge had one
+sample on the surface and the next past the edge and lower, and the straight
+leg between them was inside the plate for the rest of the way to the edge
+(0.2 mm into the tray's floor, over 8 mm). **A span now has a point where
+it passes the edge of a surface it lies on, at the height a cable lies on
+it:** level to the edge, and down from there (`resting.js`).
+
+**Two turns on one short leg are one finding.** A lead that jogs from its
+plug's end to a ring's line turns one way and then the other on the leg
+between (an S-bend); a way out past an edge and back turns twice the same
+way on the leg across. The measure gives each turn the same room, what
+that leg leaves the two, and until now each was a finding: one fault read
+as two, with the same room and the same shortfall, and a rack's count of
+tight corners was near twice what a person would find. A person fitting the
+cable makes such a bend with one movement of the hand, calls it one bend,
+and puts it right in one place, the leg between the turns. So it is one
+finding, and the finding says plainly that it is two turns: "c1 turns twice
+within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and
+63.2 degrees)", and then the room and the shortfall as for any bend ("with
+room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short."). Two tight corners are paired when they are next to each
+other on the path, have the same room, and that room is what the leg
+between them leaves the two. A corner that is short for its other leg stays
+a finding of its own, as does one that doubles back. A pair's sentence is
+longer than any bend's was (182 characters at the longest, where it was
+150), and on a rack with lacers most findings are pairs. The finding has
+`turns`, the two of them (`point`, `at`, `angle_deg`), and `apart_mm`; its
+`at` is the middle of the leg, so a page that rings a finding rings the
+bend once; `point` is the first turn's, `angle_deg` the wider of the two,
+`legs_mm` the leg into the first and out of the second. `inspect` carries
+the same; `describe` counts cables, as before, and a schedule's note counts
+bends ("c7 has 2 bends with less room than the cable needs"). Nothing is
+laid differently for it: where two lays of a cable are compared (3.4), a
+finding of two turns still counts as two corners short.
+
+**What is left.** Counted on racks of the shape the issue was measured on
+(`spec/tests/js/ring-room-shape.mjs`, which builds them and prints these
+figures beside another tree's): thirteen 2U switches, each with an
+FHD-CMP5DR hosted on it, a vertical manager at each front upright, 275
+cables of which 264 are AOC. Corners short of room, and the cables that
+have one, before and after; a corner is counted as before, so a finding of
+two turns is two:
+
+| lacer on | setback 0 | 25 mm | 50 mm | 100 mm |
+|---|---|---|---|---|
+| the top unit, before | 518 on 193 | 249 on 101 | 58 on 27 | 12 on 5 |
+| the top unit, after | 252 on 107 | 90 on 40 | none | none |
+| the bottom unit, before | 152 on 70 | none | none | none |
+| the bottom unit, after | 20 on 9 | none | none | none |
+| no lacer | none, before and after | none | none | none |
+
+With the lacer on the top unit and no setback the 252 corners are 130
+findings, and 128 of them say the manager is too close: the three kinds of
+lead above. No leg crosses a body, before or after, and no cable changes
+gutter. Across the twelve racks 639 of the 3,300 routed lengths move, by
+-575 to +61 mm, median -3; 423 are shorter; 10 cables go up a stock size
+and 77 down. With no lacer nothing moves.
+
+On the sample of 60 generated racks of 3.4 (1,803 cables) the corners short
+of room fall from 955 to 422 (every corner of every path, by `cornersOf`;
+counted from the findings, where corners at one point are one, 953 to
+420), on 171 cables where it was 359: 14 of 883
+fibre cords, 7 of 242 Cat 6, 29 of 204 Cat 6A, 45 of 248 DACs and 76 of 226
+AOCs. 332 of the 1,803 lengths move, 187 shorter and 145 longer, by -340 to
++121 mm; 4 cables go up a stock size and 30 down. None measures differently
+written the other way round, and none reports a different number of bends.
+No path crosses a body, and no cable has a point in front of a zero-U
+part's outward face that had none before. On the reference rack one cord
+moves: c8, to 547 mm from 619.2, still a 1 m cord.
+
+**Lengths change on saved racks.** A routed length and its stock size move
+the next time a page measures them, for a cable whose automatic route takes
+another ring or whose detour is laid another way. An entered length is
+never touched, and a route made by hand keeps its waypoints (5 of the
+hand-routed cables on the kit's test racks measure differently, by their
+lay). Everything read off a routed length
+moves with it: the cable schedule, the BOM's cord sizes, the spare and what
+is to store, a sheet, and the length a DCIM cables file gives a cable (and
+a note of that file that depends on it: Nautobot's, that 1.5 m is written
+as 2 m). A cord already bought at the size the kit chose before can read as
+too short where its path grew (the longest growth measured is 121 mm);
+none does of the 7,210 cables on the racks above, the sample and the kit's
+other test racks.
+
+**What is kept.** The choice is part of a cable's route, and a lay is kept
+under its route written out (3.4), so a lead that takes another ring is
+another lay. The test of a lead is itself made in two steps, as a lay is:
+what it reads of the rack and the context, and the answer from that and the
+world; the answer is kept under the text of what was read, so a context made
+anew judges nothing again. `spec/tests/js/speed-goldens.json` is recorded
+again from this kit, since this change is meant to move numbers: 75 of its
+91 racks have an answer that moves. A first read of 300 cables takes half
+as long again as it did (0.68 s for 0.44 s on one quiet machine, where the
+kit before 0.25.0 took 35 s). Most of that is the run-outs tried first
+where a detour stands in a plug's own leg: they are tried at 1,202 lead
+ends, three trial lays each, and taken at 34, and the trial lays inside
+the lays rise from 9,199 to 15,554. The room tests cost about 40 ms. The
+plain measure of the gutter is cheap, about 30 ms: of 500 asks 450 are
+answered by the lay already made, and 50 plain lays are made. A read after
+one device is moved lays every cable again and is slower by the same
+ratio (873 ms for 559 ms at 300 cables); a read after one cable is moved,
+and one in a context made anew (21 ms for 18 ms), are about as before.
+Trying the run-outs at fewer lead ends is the known saving, and is left
+for a later change.
+
+**Worse than before, and left so.** Every cable of those racks was compared
+with the kit before on bends, bodies crossed, rings entered and left by one
+face, ports covered and its gutter. One is worse: on a generated rack with
+no vertical managers, a 445 mm span from a port to its gutter hangs to its
+full depth and comes to rest on the tray of the lacer below, across the
+front of 11 ports, where before it was laid at half its sag because the
+full one cut the tray's edge. That is the hang being laid as the model
+says, now that a span can lie to an edge; it is 85 mm longer and a new
+finding. One has three corners short where it had two, each less short
+than before (8.7 and 8.7 mm, to 0.4, 4 and 4).
 
 ## 4. Lay order
 
