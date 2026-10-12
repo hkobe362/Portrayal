@@ -76,7 +76,10 @@ provenance:
     are 9.75, 25.85, 41.95, 58.05, 74.15 and 90.25. UNTIL THIS MAJOR the
     columns stood on a 15.87 pitch read off a render of the 1U extendable
     panel XHU00.
-    The drawing seats its own adapters on the window centres.
+    THE DRAWING SEATS ITS OWN ADAPTERS 0.014 RIGHT OF THOSE CENTRES, all six
+    alike (ferrule-pair centre 9.614 of the moulding against 9.60), slack in
+    a 12.95 window round a 12.70 body; the window centres are what is
+    modelled.
     THE ADAPTER IS FIBRAIN's OWN, fibrain/lc-duplex-adapter@1, drawn from the
     same file: 12.70 x 9.30 with its ferrules 6.25 apart and 1.45 off the
     body's centre line. @1 composed common/lc-duplex-v-adapter@6, another

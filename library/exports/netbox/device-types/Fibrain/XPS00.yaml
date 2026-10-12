@@ -56,8 +56,8 @@ comments: 'HD patch panel frame, 1U, 19 in, 250 mm deep. An open steel frame wit
   or a blind cover. Sold empty, as XPU00 without grounding and XPS00 with grounding.
 
 
-  Configuration `xps00`: XPS00 - the frame with grounding, as it ships: empty, all eight slots open. The
-  cross-member behind the posts is copper-coloured; see provenance.grounding.
+  Configuration `xps00`: XPS00 - the frame with grounding, as it ships: empty, all eight slots open. A
+  copper-coloured grounding bar runs behind the posts; see provenance.grounding.
 
 
   Facts carried in the model that this schema has no field for:
@@ -65,6 +65,8 @@ comments: 'HD patch panel frame, 1U, 19 in, 250 mm deep. An open steel frame wit
   - environmental.ingress-protection: IP 20 (EN 60529)
 
   - environmental.operating-temp: -40 to 70 C
+
+  - lifecycle.eol: none-announced
 
   - physical.color: Black RAL 9005
 

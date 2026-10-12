@@ -10,7 +10,7 @@ description: >-
   behind the floor, open at the rear. It is drawn as the well its floor sheet
   lies at the bottom of. The floor is the strip across the front under the
   slot parts.
-size: {w: 435.0, h: 250.0, d: 41.9}
+size: {w: 435.0, h: 250.0, d: 43.15}
 size-confidence: {w: drawing, h: datasheet, d: drawing}
 relief: {wall: '#1b1e21'}
 elements:
@@ -27,9 +27,10 @@ provenance:
     in from each side. Read to a pixel, 0.7 mm, on a drawing that coarse.
   depth: >-
     drawing - the front elevation has the floor sheet 0.80 thick at 43.15 to
-    43.95 of a 43.955 envelope, so its top is 43.15 down. IT IS DRAWN AT 41.9:
-    a well is built no nearer the far side than 2 mm, so the floor stands 1.25
-    high.
+    43.95 of a 43.955 envelope, so its top is 43.15 down, and that is the
+    depth stated. A 3D view builds a well no nearer the far side than 2 mm, so
+    it shows the floor 1.2 high; what a cable cannot pass through is derived
+    from the stated depth.
   color: >-
     photo - black, as the frame is on every vendor render.
 skins: [default]

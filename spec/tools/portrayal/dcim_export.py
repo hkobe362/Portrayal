@@ -2660,7 +2660,9 @@ def nested_bays_for(doc, target, withheld=(), through=(), anchored=None):
                        f"{', '.join(held)}. Each accepts a module that also seats directly "
                        "in a chassis bay, and this module only ever sits in a bay named "
                        f"{seat}, so its bays carry that position as written and a module "
-                       f"in one is named {seat}/<bay>/x, as NetBox names it.")
+                       f"in one is named {seat}/<bay>/x, as NetBox names it. Import this "
+                       "type and the types of what seats in those bays together: one "
+                       "written before this rule does not name ports to match.")
         if passed:
             _note(out, f"Given to Nautobot with a blank position: module bay(s) "
                        f"{', '.join(passed)}. It accepts modules that also seat directly "

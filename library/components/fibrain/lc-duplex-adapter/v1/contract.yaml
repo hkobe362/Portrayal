@@ -46,7 +46,7 @@ parts:
   # THE BULKHEAD APERTURE, TURNED 180: std/lc-bulkhead-bore@1 draws its latch
   # tongue DOWN, and half a turn puts it UP, where the drawing has the latch
   # slots. `at` is the unrotated box's corner and the turn is about its centre,
-  # so a bore at [x, y] has its ferrule at (x + 2.35, y + 5.71): (3.2249999999999996, 6.1)
+  # so a bore at [x, y] has its ferrule at (x + 2.35, y + 5.71): (3.225, 6.1)
   # and (9.475, 6.1). Lifted onto the raised body so each bore recesses from
   # the proud face.
   - {id: '1', ref: std/lc-bulkhead-bore@1, at: [0.875, 0.39], rotate: 180, lift: 1.0}

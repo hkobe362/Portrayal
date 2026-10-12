@@ -15,8 +15,8 @@ elements:
 relief:
   features:
     - node: bar
-      lift: 20.0
-      out: 20.8
+      lift: 21.15
+      out: 21.95
       color: '#1b1e21'
       confidence: estimated
       source: 'a flat plate about level with the middle of the frame on the vendor renders; no view is square to it'

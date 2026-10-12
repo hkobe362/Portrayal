@@ -48,8 +48,8 @@ provenance:
       across the front, two sides, a bar across the rear and air between
       them, so the six views are elevations and the solid is built of the
       parts: the ears and posts on the front; the floor, the top sheet, the
-      sides, the rear cable bar and the cross-member in the top view, where
-      the floor is the well the others stand in. Cables pass through from the
+      sides and the rear cable bar in the top view, where the floor is the
+      well the others stand in. Cables pass through from the
       rear to the backs of the slot parts. 0.8 is the sheet the front
       elevation draws for the top sheet and for the floor.
   ears:
@@ -76,11 +76,24 @@ provenance:
     confidence: drawing
     note: >-
       a top sheet 0.80 thick at 0.05 to 0.85 and a floor 0.80 thick at 43.15
-      to 43.95, both 24.90 to 459.70; the front draws their edges. Behind the
-      posts the drawing shows a slotted cross-member 19.0 high from 33.40 to
-      451.20; it is fibrain/xpu-cross-member@1 in the top view and is not
-      drawn on the front, where an open slot is a dark mouth and a seated
-      holder hides it.
+      to 43.95, both 24.90 to 459.70; the front draws their edges.
+  cross-member:
+    confidence: estimated
+    note: >-
+      DRAWN BY THE MAKER, NOT BUILT HERE. Through the open slots the front
+      elevation shows a slotted band 19.0 high, 12.5 to 31.5 from the top and
+      so centred on the height, from 33.40 to 451.20, with a lip 1.2 thick top
+      and bottom and twelve slots 20 x 4 on a 34.4 pitch at mid height, the
+      first at 43.10. The datasheet front drawing shows the same band. A front
+      elevation says nothing of how far behind the face it stands, and no
+      other view is published. IT CANNOT STAND JUST BEHIND THE POSTS: the six
+      renders of XPU00, which look down through the slots, show nothing
+      between the posts as far back as they see, about 65 at that height, and
+      a cassette 169 deep fills each slot. The reading taken is that it is the
+      upright edge of the rear cable bar, seen through the frame, which is
+      centred on the height as the bar is; that is a reading and not a
+      measurement. So it is in no view as a part, it is not a body in 3D, and
+      nothing here stops a cable where it would be.
   grounding:
     confidence: estimated
     note: >-
@@ -91,10 +104,11 @@ provenance:
       The product picture on the XPS00 datasheet shows a copper-coloured bar
       across the frame behind the posts and a round yellow label on the right
       side wall near the rear; the picture on the XPU00 datasheet, from the
-      same viewpoint, shows a dark member there and no label. So the XPS00
-      configuration sets the cross-member's finish to copper and XPU00 leaves
-      it dark. The label is not drawn. Which of the drawn fasteners XPU00
-      lacks, no document says.
+      same viewpoint, shows no such bar and no label. So the XPS00
+      configuration alone carries fibrain/xpu-grounding-bar@1, a mark on the
+      plan in a copper finish; it is not built, because nothing gives its
+      section or where it stands. The label is not drawn. Which of the drawn
+      fasteners XPU00 lacks, no document says.
   numbering:
     confidence: estimated
     note: >-
@@ -118,9 +132,8 @@ provenance:
       millimetre at best. Rear at y = 0. Each part of the top view records
       its own reading: the rear cable bar 29 deep with forty-eight tie slots
       counted, a side on each flank, the top sheet 90 deep across the middle
-      and 115.6 at each end, the floor 30.5 and 52, the cross-member 45
-      behind the face. The top sheet lies over the floor, the sides and the
-      cross-member, and lifts off in a viewer to show them.
+      and 115.6 at each end, the floor 30.5 and 52. The top sheet lies over
+      the floor and the sides, and lifts off in a viewer to show them.
   depth:
     confidence: estimated
     note: >-
@@ -128,6 +141,13 @@ provenance:
       CAD is published. The side views draw a side wall as deep as the top
       sheet, an arm and the end of the rear bar, all estimated off the
       renders.
+  lifecycle:
+    confidence: estimated
+    note: >-
+      searched 2026-10-12: a web search for XPU00 and XPS00 with the words end
+      of sale, discontinued and end of life returned no notice from Fibrain,
+      and both datasheets are on the HD panel page of the maker. Fibrain's own
+      site was not searched page by page.
   not-drawn:
     confidence: estimated
     note: >-
@@ -144,6 +164,8 @@ attrs:
   environmental:
     operating-temp: -40 to 70 C
     ingress-protection: IP 20 (EN 60529)
+  lifecycle:
+    eol: none-announced
 chassis:
   width: 484.6
   height: 43.96
@@ -160,8 +182,9 @@ gaps:
     reason: needs-drawing
     note: >-
       the one drawing is named XPS00 and nothing separates what the grounded
-      frame adds. The copper finish of the cross-member is read off one
-      picture; the yellow label and the fasteners are not drawn.
+      frame adds. The copper-coloured bar is read off one picture and is a
+      mark on the plan only; the yellow label and the fasteners are not
+      drawn.
     wanted: >-
       a drawing or a square-on photograph of each of XPU00 and XPS00, or the
       parts list that says what XPS00 adds.
@@ -174,6 +197,27 @@ gaps:
     wanted: >-
       side and top views of XPS00 from the maker, whose CAD archive shows
       they exist.
+  - what: cross-member
+    scope: [front, rear, top]
+    reason: needs-drawing
+    note: >-
+      the front elevation shows a slotted band 19 high at mid height behind
+      the posts and nothing says how far back it stands or what it is. It is
+      read as the upright of the rear cable bar and is not built; see
+      provenance.cross-member.
+    wanted: >-
+      a side or top view of the frame, or a photograph from behind.
+  - what: floor
+    scope: [front, top, bottom]
+    reason: sources-disagree
+    note: >-
+      the front elevation and the datasheet front drawing both draw a floor
+      sheet under the slot parts, 0.80 thick, and the datasheet plan an edge
+      30.5 to 52 behind the face that is read as its rear edge; the six
+      renders of XPU00 show the posts hanging from the top sheet with no
+      sheet under them. The drawings are followed and the floor is built.
+    wanted: >-
+      a photograph of the underside of either frame.
   - what: slot-numbering
     scope: [front]
     reason: vendor-silent
@@ -197,8 +241,8 @@ groups:
     index-origin: 1
     description: >-
       the metal and plastic of the frame itself: two ears, five guide posts,
-      the floor, the top sheet, the rear cable bar, two sides and the
-      cross-member.
+      the floor, the top sheet, the rear cable bar and two sides; on XPS00
+      the grounding bar.
 views:
   front:
     size: {w: 484.6, h: 43.96}
@@ -488,7 +532,7 @@ views:
         - {ref: fibrain/xpu-cable-bar@1, id: cable-bar, at: [24.8, 0.0], group: frame, rel-pos: 10, in: interior}
         - {ref: fibrain/xpu-side@1, id: side-left, at: [24.8, 29.0], group: frame, rel-pos: 11, in: interior, under: [top-sheet]}
         - {ref: fibrain/xpu-side@1, id: side-right, at: [459, 29.0], group: frame, rel-pos: 12, in: interior, under: [top-sheet]}
-        - {ref: fibrain/xpu-cross-member@1, id: cross-member, at: [33.4, 199], group: frame, rel-pos: 13, in: interior, under: [top-sheet]}
+        - {ref: fibrain/xpu-grounding-bar@1, id: grounding-bar, at: [33.4, 198], group: frame, rel-pos: 13, in: interior, under: [top-sheet], only-in: [xps00]}
 
   bottom:
     size: {w: 484.6, h: 250}
@@ -537,10 +581,10 @@ configurations:
     part-numbers:
       XPS00: {part: XPS00}
     component-attrs:
-      cross-member: {finish: '#b87333'}
+      grounding-bar: {finish: '#b87333'}
     description: >-
       XPS00 - the frame with grounding, as it ships: empty, all eight slots
-      open. The cross-member behind the posts is copper-coloured; see
+      open. A copper-coloured grounding bar runs behind the posts; see
       provenance.grounding.
   mixed:
     kind: example

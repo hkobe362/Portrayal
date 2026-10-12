@@ -16,13 +16,13 @@ elements:
 relief:
   features:
     - node: wall
-      out: 41.8
+      out: 43.05
       color: '#1b1e21'
       confidence: estimated
       source: 'the side wall stands the height of the frame beside the slot parts on the vendor renders; it is drawn as deep as the top sheet reaches at its ends, 115.6, and a tenth short of the top so that it is built at all'
     - node: arm
-      lift: 13.0
-      out: 29.0
+      lift: 13.6
+      out: 29.6
       color: '#1b1e21'
       confidence: estimated
       source: 'the arm is a strip about 16 high at mid height on the vendor renders, joining the side wall to the rear cable bar'
