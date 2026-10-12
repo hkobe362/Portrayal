@@ -424,6 +424,16 @@ export function bundleChecks(rack, ctx = {}) {
 // drawing). The second is said: `straight` is true, and straps() and
 // trunkLength pass it on, since the length and the count there are an
 // estimate. An error a reader of the context throws is not caught here.
+// A PIECE FEWER THAN HALF OF WHOSE RIDERS HAVE A PATH is taken from the
+// middle one of those that have, which is then not the middle of the pack:
+// one AOC with a path among three DACs with none sets the trunk. That is
+// said too (`few`), in the same way.
+// WHERE TWO KINDS RIDE IN EQUAL NUMBERS the earlier of the two middles is of
+// the shorter kind, so the trunk follows the kind that hangs less and the
+// other half of the pack is off every strap by the difference of the hangs.
+// And where the member named changes kind from one piece to the next (at a
+// ring, where the riders change), the line steps sideways there by the
+// difference of where the two kinds stand in the ring, a few millimetres.
 // Returns {pts, cum, wcum, length, straight, pointAt}, or null when a trunk
 // waypoint has no point: `pts` is pointOf at each resolved waypoint; `cum[i]` is how
 // far along the trunk element `i` of `L.T` is, mm; `wcum[k]` the same for
@@ -509,14 +519,14 @@ function trunkLine(rack, b, L, rc) {
   const lineOf = id => { if (!lines.has(id)) lines.set(id, memberLine(rack, b, id, rc)); return lines.get(id); };
   const nodes = T.map((e, i) => (e.kind === 's' ? -1 : i)).filter(i => i >= 0);
   const cum = new Array(T.length).fill(0), pieces = [];
-  let straight = false;
+  let straight = false, few = false;
   for (let n = 1; n < nodes.length; n++) {
     const i = nodes[n - 1], j = nodes[n];
     const read = [];
-    let ridden = false;
+    let ridden = 0;
     for (const m of riding) {
       if (m.lo > i || m.hi < j) continue;
-      ridden = true;
+      ridden++;
       const line = lineOf(m.id), s0 = line?.pos.get(T[i].key), s1 = line?.pos.get(T[j].key);
       if (s0 != null && s1 != null) read.push({line, s0, s1, len: Math.abs(s1 - s0)});
     }
@@ -524,6 +534,8 @@ function trunkLine(rack, b, L, rc) {
     read.sort((x, y) => Math.round(x.len * 1e3) - Math.round(y.len * 1e3));
     const best = read.length ? read[Math.floor((read.length - 1) / 2)] : null;
     if (ridden && !best) straight = true;
+    // the middle of a minority is not the middle of the pack
+    if (best && 2 * read.length < ridden) few = true;
     const p = chordAt(T[i]), q = chordAt(T[j]);
     const len = best ? best.len : dist(p, q);
     pieces.push({from: cum[i], to: cum[i] + len, ...(best ?? {}), p, q});
@@ -543,7 +555,7 @@ function trunkLine(rack, b, L, rc) {
     return {point: {x: c.p.x + f * (c.q.x - c.p.x), y: c.p.y + f * (c.q.y - c.p.y), z: c.p.z + f * (c.q.z - c.p.z)},
             dir: d > 1e-9 ? {x: (c.q.x - c.p.x) / d, y: (c.q.y - c.p.y) / d, z: (c.q.z - c.p.z) / d} : null, on: null};
   };
-  return {pts, cum, wcum, length, straight, pointAt};
+  return {pts, cum, wcum, length, straight, few, pointAt};
 }
 
 // ── straps (section 6; docs/rack-file-v4-design.md section 3.10) ─────────
@@ -583,13 +595,14 @@ function trunkLine(rack, b, L, rc) {
 // whose path the point is on (null where no member's path could be read and
 // the straight line stands in; WHAT `on` THEN MEANS, above). An anchor also
 // names its tray and the index of its tie slot. `straight` is true where a
-// stretch that members ride was measured along the straight line, and `notes`
-// then says so.
+// stretch that members ride was measured along the straight line, and `few`
+// where one was measured on fewer than half of its riders; `notes` then says
+// so.
 export function straps(rack, b, ctx = {}) {
   const every = strapSpacing(b), mm = strapEveryMm(b), want = strapKinds(b);
   const L = layoutOf(rack, b, ctx);
   if (!L) return null;
-  const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false};
+  const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false, few: false};
   if (b.members.length < 2 || L.trunk.length < 2) return empty;
   const line = trunkLine(rack, b, L, ctx.route);
   if (!line) return empty;
@@ -700,11 +713,13 @@ export function straps(rack, b, ctx = {}) {
           widths: widthCounts(list.map(x => x.width_mm)), straps: list, runs: runs.map(([s, e]) => [mm1(s), mm1(e)]),
           // a tie slot too short for any strap: said, and no strap is counted there
           // where riders have no path the trunk is the straight line there: said, since the count is then an estimate
-          straight: line.straight, notes: [...misfits, ...(line.straight ? [straightText(bundleName(b))] : [])]};
+          straight: line.straight, few: line.few,
+          notes: [...misfits, ...(line.straight ? [straightText(bundleName(b))] : []), ...(line.few ? [fewText(bundleName(b))] : [])]};
 }
 
 // What is said of a bundle measured, in part or whole, along the straight
 // lines between its waypoints (the trunk's own line, above).
+export const fewText = name => `${name} is measured in part on fewer than half of the cables that ride there, since no path could be read for the others (a port not found on its drawing), so its length and its straps are an estimate.`;
 export const straightText = name => `${name} is measured along the straight line between its waypoints where no path could be read for its cables (a port not found on its drawing), so its length and its straps are an estimate.`;
 
 // How many straps of each width: {19: 6, 12: 2}.
@@ -842,28 +857,36 @@ export function strapTexts(rack, ctx = {}, nameOf = null) {
 // THE STRAPS A RACK BUYS: {spacing, breakout, anchor, total, widths}. Spacing
 // and breakout straps are each bundle's own; anchors are counted by slot.
 // `widths` is how many of each width, {19: 12, 12: 2}.
+// A DRAWN BUNDLE WHOSE STRAPS COULD NOT BE READ (a reader of the context
+// threw, or there are no routes) is left out, never guessed, here and in
+// anchorsOf; so the totals can be short of what the rack needs. Then, and only
+// then, the result also has `unread`, how many such bundles there are, and
+// `unreadBundles`, their ids: a caller that shows the total can say so.
 export function strapTotals(rack, ctx = {}) {
   let spacing = 0, breakout = 0;
-  const ws = [];
+  const ws = [], unread = [];
   for (const b of bundlesOf(rack)) {
     let st = null;
     try { st = straps(rack, b, ctx); } catch { st = null; }
+    if (!st && b.members.length >= 2) unread.push(b.id);
     spacing += st?.kinds.spacing ?? 0; breakout += st?.kinds.breakout ?? 0;
     for (const x of st?.straps || []) if (x.kind !== 'anchor') ws.push(x.width_mm);
   }
   const slots = anchorsOf(rack, ctx);
   for (const x of slots) ws.push(x.width_mm);
-  return {spacing, breakout, anchor: slots.length, total: spacing + breakout + slots.length, widths: widthCounts(ws)};
+  return {spacing, breakout, anchor: slots.length, total: spacing + breakout + slots.length, widths: widthCounts(ws),
+          ...(unread.length ? {unread: unread.length, unreadBundles: unread} : {})};
 }
 
 // The trunk's length along the rack's own measure, in metres; null when it
 // cannot be measured. It is the length of the trunk's own line (trunkLine,
 // #1034): the members' routed paths from its first waypoint to its last, as
 // the straps are counted along. `straight: true` is added where riders had no
-// path and the straight line stood in: the figure is then an estimate.
+// path and the straight line stood in, and `few: true` where fewer than half
+// of a stretch's riders had one: the figure is then an estimate.
 export function trunkLength(rack, b, ctx = {}) {
   const L = layoutOf(rack, b, ctx);
   if (!L || L.trunk.length < 2) return null;
   const line = trunkLine(rack, b, L, ctx.route);
-  return line ? {metres: Math.round(line.length / 10) / 100, ...(line.straight ? {straight: true} : {})} : null;
+  return line ? {metres: Math.round(line.length / 10) / 100, ...(line.straight ? {straight: true} : {}), ...(line.few ? {few: true} : {})} : null;
 }

@@ -228,11 +228,12 @@ test('the same straps whatever order the cables and the members are written in',
 // the middle by length on each piece: one cord that hangs otherwise than the
 // rest sets neither the length, nor the count, nor the place.
 const DUCT_SIZES = {sw: {ru: 1, d: 515, model: 'SW'}, pp: {ru: 1, d: 100, model: 'PP'},
-  mgr: {ru: 1, d: 110, mount: 'rack-face', model: 'MGR', guides: {front: ['guide-1', 'guide-2']}, default: 'x'}};
-// Two ducts 762 mm apart on one manager, a cord of each media given between them, all in one bundle.
-function ducts(media) {
+  mgr: {ru: 1, d: 110, mount: 'rack-face', model: 'MGR', guides: {front: ['guide-1', 'guide-2', 'guide-3']}, default: 'x'}};
+// Two ducts 762 mm apart on one manager (or the ducts of `at`, by x), a cord of each media given
+// through them, all in one bundle. `portX` places the ports; -150 for every one without it.
+function ducts(media, {at = {'guide-1': 0, 'guide-2': 762}, portX = () => -150} = {}) {
   const chassisOf = ref => DUCT_SIZES[ref] || null;
-  const way = [{item: 'i2', via: 'guide-1'}, {item: 'i2', via: 'guide-2'}];
+  const way = Object.keys(at).map(via => ({item: 'i2', via}));
   let r = M.newRack({name: 'Rack 1'});
   r = M.withItem(r, {ref: 'sw', cfg: 'x', ru: 10, label: 'sw-1'}).rack;
   r = M.withItem(r, {ref: 'mgr', cfg: 'x', ru: 10, label: 'mgr-1', on: 'i1', unit: 1}).rack;
@@ -242,8 +243,7 @@ function ducts(media) {
     r = {...r, cables: r.cables.map(c => (c.id === `c${k + 1}` ? {...c, route: way, routeEdited: true} : c))};
   });
   r = apply(r, {op: 'bundle.create', cables: media.map((m, k) => `c${k + 1}`), route: way}, {chassisOf}).rack;
-  const at = {'guide-1': 0, 'guide-2': 762};
-  const ctx = {chassisOf, portX: () => -150,
+  const ctx = {chassisOf, portX,
     guidesOf: id => (id === 'i2' ? Object.entries(at).map(([via, x]) => ({via, kind: 'duct', face: 'front', x, box: {w: 40, h: 30}})) : [])};
   return {rack: r, ctx};
 }
@@ -251,10 +251,10 @@ function ducts(media) {
 function measured(rack, ctx, b = rack.bundles[0]) {
   const s = B.straps(rack, b, {route: ctx});
   const off = Object.fromEntries(b.members.map(m => {
-    const P = R.routePath(rack, rack.cables.find(c => c.id === m.cable), ctx).points;
-    return [m.cable, Math.max(...s.straps.map(x => offLine(x.point, P)))];
+    const P = R.routePath(rack, rack.cables.find(c => c.id === m.cable), ctx)?.points;
+    return [m.cable, P ? Math.max(...s.straps.map(x => offLine(x.point, P))) : null];
   }));
-  return {run: s.runs[0][1], kinds: s.kinds, on: [...new Set(s.straps.map(x => x.on))], off, length: B.trunkLength(rack, b, {route: ctx}).metres};
+  return {run: s.runs[0][1], kinds: s.kinds, on: [...new Set(s.straps.map(x => x.on))], off, length: B.trunkLength(rack, b, {route: ctx}).metres, straps: s};
 }
 
 test('one limp cord among stiff ones sets neither the length, nor the count, nor the place of a strap', () => {
@@ -310,6 +310,89 @@ test('a strap names a member that rides there, the middle one of them, and the n
   for (const x of s.straps) { const r = riders(x); assert.ok(r.includes(x.on)); assert.equal(x.on, r[Math.floor((r.length - 1) / 2)]); }
   // where they leave: three places, the last riders four, then eight, then twelve
   assert.deepEqual(L.members.map(m => Math.max(m.ji, m.li) - Math.min(m.ji, m.li)).filter((v, k, a) => a.indexOf(v) === k).length, 3);
+});
+
+test('an even split of two kinds goes to the kind that hangs less, and half the pack is then off every strap', () => {
+  // two DACs and two AOCs: the earlier of the two middles by length is a DAC, so it is measured as four DACs are
+  const four = ducts(['dac', 'dac', 'dac', 'dac']), all = measured(four.rack, four.ctx);
+  for (const media of [['dac', 'dac', 'aoc', 'aoc'], ['aoc', 'aoc', 'dac', 'dac'], ['aoc', 'dac', 'aoc', 'dac']]) {
+    const x = ducts(media), m = measured(x.rack, x.ctx);
+    assert.deepEqual([m.run, m.kinds], [all.run, all.kinds], media.join());
+    media.forEach((kind, k) => {
+      const off = m.off[`c${k + 1}`];
+      assert.ok(kind === 'dac' ? off < 0.02 : off > 50, `${media.join()}: c${k + 1} (${kind}) is ${off.toFixed(1)} mm off at the farthest strap`);
+    });
+    assert.equal(m.straps.few, false);
+  }
+  // one of each: the DAC
+  const two = ducts(['aoc', 'dac']), m = measured(two.rack, two.ctx);
+  assert.deepEqual([m.run, m.on], [all.run, ['c2']]);
+  assert.ok(m.off.c1 > 50);
+});
+
+test('a readable minority sets the trunk, and that is said', async () => {
+  // three DACs whose ports are not found and one AOC whose are: the AOC is all there is to measure
+  const x = ducts(['dac', 'dac', 'dac', 'aoc'], {portX: e => (/4$/.test(e.path) ? -150 : null)}), m = measured(x.rack, x.ctx);
+  assert.deepEqual([m.run, m.kinds.spacing, m.on, m.off.c1], [946.8, 4, ['c4'], null]);
+  const said = 'Bundle 1 is measured in part on fewer than half of the cables that ride there, since no path could be read for the others (a port not found on its drawing), so its length and its straps are an estimate.';
+  assert.equal(m.straps.few, true);
+  assert.equal(m.straps.straight, false);
+  assert.deepEqual(m.straps.notes, [said]);
+  assert.deepEqual(B.trunkLength(x.rack, x.rack.bundles[0], {route: x.ctx}), {metres: 0.95, few: true});
+  const [e] = X.bundleExports(x.rack, {route: x.ctx});
+  assert.equal(e.straight, true, 'the export record marks the estimate');
+  assert.ok(e.notes.includes(said));
+  const f = await Q.inspect(x.rack, 'b1', {chassisOf: x.ctx.chassisOf, route: x.ctx});
+  assert.ok(f.notes.includes(said) && f.straps.few === true && f.length.few === true);
+  // half of them readable is no minority: two DACs with a path and two without are measured as DACs, and nothing is said
+  const half = ducts(['dac', 'dac', 'dac', 'dac'], {portX: e => (/[34]$/.test(e.path) ? -150 : null)}), h = measured(half.rack, half.ctx);
+  assert.deepEqual([h.run, h.straps.few, h.straps.notes], [788.8, false, []]);
+});
+
+test('a member is counted only on the stretch it rides, though its own path passes more of the trunk', () => {
+  // three ducts, four cords through all of them; c1 is made to join at the second duct, so it rides the second stretch only
+  const x = ducts(['om4', 'om4', 'om4', 'om4'], {at: {'guide-1': 0, 'guide-2': 400, 'guide-3': 800}});
+  const {rack: r0, ctx} = x;
+  const peeled = apply(r0, {op: 'bundle.peel', id: 'b1', cable: 'c1', at: {item: 'i2', via: 'guide-2'}, end: 'a'}, {chassisOf: ctx.chassisOf, route: ctx}).rack;
+  const b = peeled.bundles[0], L = B.layoutOf(peeled, b, {route: ctx});
+  assert.deepEqual(L.members.map(m => [m.cable, m.ji, m.li]), [['c1', 1, 2], ['c2', 0, 2], ['c3', 0, 2], ['c4', 0, 2]]);
+  // its own path still passes the first duct: it comes from its port through it
+  const P = R.routePath(peeled, peeled.cables[0], ctx).points;
+  assert.ok(P.some(p => p.via === 'guide-1') && P.some(p => p.via === 'guide-2'));
+  // on the first stretch three ride (c2, c3, c4) and the middle one is c3; were c1 counted there it would be c2
+  const s = B.straps(peeled, b, {route: ctx});
+  // (a strap exactly at the second duct is of the stretch that starts there)
+  const first = s.straps.filter(q => q.segment === 0 && q.t < 1), second = s.straps.filter(q => q.segment === 1 || q.t === 1);
+  assert.ok(first.length >= 2 && second.length >= 2);
+  assert.deepEqual([...new Set(first.map(q => q.on))], ['c3']);
+  // on the second all four ride, and the earlier of the two middles is c2
+  assert.deepEqual([...new Set(second.map(q => q.on))], ['c2']);
+});
+
+test('a bundle whose straps cannot be read is left out of the rack\'s totals, and the totals say so', () => {
+  const ctx = ctxOf(), bc = {route: ctx};
+  const whole = B.strapTotals(RACK, bc);
+  assert.equal(whole.total, 72);
+  assert.equal('unread' in whole || 'unreadBundles' in whole, false, 'nothing is said where every bundle was read');
+  // one port of one cord of b6 cannot be placed: its reader throws
+  const c61 = RACK.cables[60];
+  const bad = ctxOf(RACK, {portX: e => { if (e.item === c61.a.item && e.path === c61.a.path) throw new Error('no drawing'); return ctx.portX(e); }});
+  assert.throws(() => B.straps(RACK, bundle('b6'), {route: bad}), /no drawing/);
+  const short = B.strapTotals(RACK, {route: bad});
+  // b6's ten straps are not counted, nor is any tie slot its cords would be tied at: fewer, and said
+  assert.ok(short.total < whole.total - 9, `${short.total} of ${whole.total}`);
+  assert.equal(short.spacing, whole.spacing - 6);
+  assert.equal(short.breakout, whole.breakout - 4);
+  assert.equal(short.unread, 1);
+  assert.deepEqual(short.unreadBundles, ['b6']);
+  // the exports say it in words: no length, no count, a note, and the BOM line counts the rest
+  const ex = X.bundleExports(RACK, {route: bad});
+  assert.deepEqual([ex[5].length_m, ex[5].straps], [null, null]);
+  assert.deepEqual(X.strapBomNotes(ex), ['rear 2: its route could not be read, so its straps are not counted.']);
+  assert.equal(X.strapBomRows(ex, {anchors: B.anchorsOf(RACK, {route: bad})})[0].qty, short.total);
+  // with no routes at all, every drawn bundle is unread
+  const none = B.strapTotals(RACK, {});
+  assert.deepEqual([none.total, none.unread, none.unreadBundles], [0, 8, RACK.bundles.map(b => b.id)]);
 });
 
 // A bundle of the cords named, renamed: the rack with `ids[k]` for the k-th of them.

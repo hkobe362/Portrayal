@@ -25,9 +25,9 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // records them again (speed-goldens.mjs says how).
 // Recorded again for kit 0.28.0 (#1034), which moved `straps` and
 // `bundle-exports` on the twelve racks that have a bundle and no other
-// answer: each strap gained its `point`, `dir` and `on`, the straps and each
-// export record gained `straight`, and a place half way between two tenths
-// of a millimetre now always rounds up (bundles.js mm1).
+// answer: each strap gained its `point`, `dir` and `on`, the straps gained
+// `straight` and `few`, each export record `straight`, and a place half way
+// between two tenths of a millimetre now always rounds up (bundles.js mm1).
 test('every answer for every rack is the one recorded before the kit was made faster', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);

@@ -829,6 +829,24 @@ reading `ctx.route`:
     said: `straight` on the result and a sentence in the bundle's notes,
     since the length and the count are then an estimate. Where nobody rides
     it, no strap goes there and nothing is said.
+  - **an even split of two kinds goes to the kind that hangs less**, since
+    the earlier of two middles is the shorter: two DACs and two AOCs are
+    measured as DACs, and half the pack is then 50 mm and more off every
+    strap. Nothing better is known of such a pack without laying it as one
+    body;
+  - where the member named changes kind from one piece to the next (at a
+    ring, where the riders change), the line steps sideways there by the
+    difference of where the two kinds stand in the ring, about 3 mm;
+  - **a readable minority sets the trunk.** Where fewer than half of a
+    piece's riders have a path, the middle one of those is not the middle
+    of the pack (one AOC with a path among three DACs with none gives the
+    AOC's line). That is said as the straight line is: `few` on the result
+    and a sentence in the notes.
+  **A bundle that cannot be read is not counted.** An error from a reader
+  of the context is let out of `straps()`, and the rack-wide readers
+  (`bundleExports`, `anchorsOf`, `strapTotals`) leave such a bundle out,
+  where before #1034 it was counted along its straight lines. `strapTotals`
+  says how many it left out (`unread`, `unreadBundles`).
   **What `on` means.** Each cable is laid on its own, so members of unlike
   kinds hang a little apart between the same two places, where a real pack
   hangs as one. A strap's point is exactly on the path of the member it

@@ -700,8 +700,13 @@ routed paths (`routePath`).
   most of the pack lies: one limp cord among stiff ones hangs lower and
   longer, and it sets neither the length, nor the count, nor the place.
   Three DACs and an AOC between two ducts 762 mm apart are measured as four
-  DACs are. The order the cables or the members are written in plays no
-  part; renumbering cables can change which of several like members is
+  DACs are. **An even split of two kinds goes to the kind that hangs
+  less** (the earlier of the two middles is the shorter): two DACs and two
+  AOCs are measured as DACs, and the two AOCs are then 50 mm and more off
+  every strap. Where the member named changes kind from one piece to the
+  next, at a ring where the riders change, the line steps sideways there by
+  the difference of where the two kinds stand in the ring, about 3 mm. The
+  order the cables or the members are written in plays no part; renumbering cables can change which of several like members is
   named, and with it a place by a few millimetres where they do not lie
   quite alike.
 - **What `on` means.** The kit lays each cable on its own, so members of
@@ -717,12 +722,25 @@ routed paths (`routePath`).
   has `straight` on each record and the sentence in its `notes` (so on the
   sheet and in the schedule), and `inspect` carries both. The length and the
   count are then an estimate. A stretch of trunk that no member rides is
-  straight too, and is not said: no strap goes there.
+  straight too, and is not said: no strap goes there. **A readable minority
+  sets the trunk**: where fewer than half of a stretch's riders have a
+  path, the middle one of those is taken (one AOC with a path among three
+  DACs with none gives the AOC's 946.8 mm and four straps), and that is
+  said in the same places with `few: true` and its own sentence;
+  `bundleExports` marks it `straight: true` as well, its one flag for an
+  estimate.
 - **An error is let out.** A context reader that throws, or a path found
   changed under `ctx.checkKept`, throws from `straps()` and `trunkLength`
   as it does from `routePath`. `bundleExports`, `anchorsOf` and
   `strapTotals` keep their rule: a bundle that cannot be read is not
-  counted.
+  counted. Before, such a bundle was counted along its straight lines, so
+  **a total can now be lower than it was, and lower than the rack needs**:
+  `bundleExports` gives `length_m: null` and `straps: null` for it, the
+  BOM's strap line counts the rest, and `strapBomNotes` says "its route
+  could not be read, so its straps are not counted". `strapTotals` returns
+  `unread` (how many drawn bundles were left out) and `unreadBundles`
+  (their ids), only when there are any; show them beside the total.
+  `anchorsOf` returns a list and has nowhere to say it.
 - **What the length now depends on.** A bundle's length and strap count
   move with whatever the lay of its members reads: their media and type,
   the cable types a page loads (diameter, bend radius, drape), where the

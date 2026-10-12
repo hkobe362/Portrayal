@@ -15,7 +15,7 @@ import {catalogEntries} from './catalog.js';
 import {slackOf, spareLine, slackFindings} from './slack.js';
 import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
-import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText,
+import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText, fewText,
         layoutOf} from './bundles.js';
 import {slotEnv, slotTree, partName, partOf} from './slots.js';
 import {fieldRows} from '../fields.js';
@@ -434,9 +434,9 @@ function bundleFacts(rack, b, ctx) {
     route: {waypoints: b.route || [], text: routeText(b.route || [], label, rack.frame)},
     length: r.checked ? trunkLength(rack, b, ctx) : null,
     size: r.size, bend: r.bend,
-    straps: {every: strapSpacing(b), count: s ? s.count : null, kinds: s ? s.kinds : null, ...(s?.straight ? {straight: true} : {})},
+    straps: {every: strapSpacing(b), count: s ? s.count : null, kinds: s ? s.kinds : null, ...(s?.straight ? {straight: true} : {}), ...(s?.few ? {few: true} : {})},
     // measured along the straight line where its cables have no path (bundles.js): said, since it is then an estimate
-    gone: r.gone, warnings: r.warnings, notes: s?.straight ? [...r.notes, straightText(bundleName(b))] : r.notes, checked: r.checked};
+    gone: r.gone, warnings: r.warnings, notes: [...r.notes, ...(s?.straight ? [straightText(bundleName(b))] : []), ...(s?.few ? [fewText(bundleName(b))] : [])], checked: r.checked};
 }
 
 // inspect looks an id up as an item, a cable, a part beside the rack, then a

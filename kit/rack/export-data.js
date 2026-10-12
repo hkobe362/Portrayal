@@ -324,9 +324,10 @@ export function bundleExports(rack, ctx = {}) {
     return {id: b.id, number: b.number, label: b.label || '', name: flat(bundleName(b)),
             members: b.members.map(m => m.cable), drawn, checked: !!check.checked,
             length_m: len ? len.metres : null,
-            // true where the length and the straps were measured along the straight line between
-            // waypoints, for want of a cable's path (bundles.js); the notes then say so too
-            straight: !!(len?.straight || (drawn && st?.straight)), every: strapSpacing(b),
+            // true where the length and the straps are an estimate for want of a cable's path: measured
+            // along the straight line between waypoints, or on fewer than half of the riders
+            // (bundles.js); the notes then say which
+            straight: !!(len?.straight || len?.few || (drawn && (st?.straight || st?.few))), every: strapSpacing(b),
             straps: !check.checked ? null : drawn ? (st ? st.count : null) : 0,
             // the three kinds, which `straps` is the sum of (bundles.js straps)
             strap_kinds: check.checked && drawn && st ? {...st.kinds} : null,
