@@ -37,8 +37,8 @@
 - **BREAKING for Nautobot data already imported.** The twenty holders' Nautobot
   module types name their ports `{module}/...` where they named them
   `{module.parent}/{module}/...`. A holder now also seats directly in a bay
-  of a device, the 1U frame, and a module seated at more than one depth is
-  written at depth one. So that the names a holder installs under do not
+  of a device, the 1U frame, and one module type has to serve both seats. So
+  that the names a holder installs under do not
   change, the Nautobot module type of the XCU10 drawer, `XCU10`, gives its
   four module bays the positions `drawer/slot-1` to `drawer/slot-4` where
   they were `slot-1` to `slot-4`: a holder in the drawer still installs as
