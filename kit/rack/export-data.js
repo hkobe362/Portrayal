@@ -1133,7 +1133,7 @@ const FAMILY = {fiber: 'fiber', copper: 'copper', dac: 'DAC', aoc: 'AOC'};
 const familyOf = info => (info && Object.hasOwn(FAMILY, info.family ?? '') ? FAMILY[info.family] : null);
 // WHAT THE LAY FINDS FOR ONE CABLE, as sentences for a notes cell (#1007):
 // its tight bends in one sentence (route.js bendFindings: the one finding's
-// own, or how many corners and the tightest of them), then the ports its
+// own, or how many bends and the tightest of them), then the ports its
 // spans cross in front of (coverFindings, #1013). `bends` and `covers` are
 // those lists for the whole rack, or null.
 export function layNotesOf(cableId, {bends = null, covers = null} = {}) {
@@ -1143,8 +1143,10 @@ export function layNotesOf(cableId, {bends = null, covers = null} = {}) {
   else if (tight.length) {
     const worst = tight.reduce((m, f) => (f.short_mm > m.short_mm ? f : m));
     const rest = worst.text.startsWith(`${cableId} `) ? worst.text.slice(cableId.length + 1) : worst.text;
-    out.push(`${cableId} has ${tight.length} corners with less room than the cable needs; the tightest ${rest}`);
+    out.push(`${cableId} has ${tight.length} bends with less room than the cable needs; the tightest ${rest}`);
   }
+  // what would give a lead its room (route.js bendFindingsOf `advice`, #1026), each said once
+  for (const said of new Set(tight.map(f => f.advice).filter(Boolean))) out.push(said);
   for (const f of covers || []) if (f.cable === cableId && f.text) out.push(f.text);
   return out;
 }

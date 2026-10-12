@@ -204,8 +204,9 @@ test('the findings: spare with no place, a pinned length too short, more stored 
   const chosen = {...r, cables: r.cables.map(c => ({...c, slack: c.id === 'c12' ? [{end: 'a'}] : []}))};
   assert.deepEqual(SL.slackFindings(chosen, ctx), []);
   // the line for the rack counts every cord with spare and no place said, c4 with its 9 mm too
-  assert.equal(SL.spareLine(r, ctx), 'Spare: 8.08 m; 13 cords not placed.');
-  assert.equal(SL.spareLine(chosen, ctx), 'Spare: 8.08 m; 0 cords not placed.');
+  // (8.08 m until #987: c8, through ring 4, needs 72 mm less of its 1 m cord)
+  assert.equal(SL.spareLine(r, ctx), 'Spare: 8.15 m; 13 cords not placed.');
+  assert.equal(SL.spareLine(chosen, ctx), 'Spare: 8.15 m; 0 cords not placed.');
   // a pinned length under the need
   const short = {...r, cables: [{...r.cables[11], length: {value: 0.3, unit: 'm', source: 'entered'}}]};
   assert.deepEqual(SL.slackFindings(short, ctx), [{kind: 'spare-short', cable: 'c12', text: 'c12 is 0.3 m and needs 0.42 m.'}]);
@@ -327,7 +328,7 @@ test('inspect tells no slack key from an empty list, and shows what is stored', 
   // describe carries one line for the rack, and none without the routes
   const r = R.withRoutedLengths(F.rack(), F.ctxOf(F.rack()));
   const lines = Q.describe(r, {chassisOf: F.chassisOf, route: F.ctxOf(r)}).split('\n');
-  assert.ok(lines.includes('Spare: 8.08 m; 13 cords not placed.'), lines.slice(0, 4).join(' | '));
+  assert.ok(lines.includes('Spare: 8.15 m; 13 cords not placed.'), lines.slice(0, 4).join(' | '));
   assert.ok(!Q.describe(r, {chassisOf: F.chassisOf}).includes('Spare:'));
 });
 

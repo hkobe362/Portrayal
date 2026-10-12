@@ -23,7 +23,16 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // holds on any machine; the two kits were compared by every digit on one
 // (speed-goldens.mjs, `--exact`). A change that is meant to move a number
 // records them again (speed-goldens.mjs says how).
-test('every answer for every rack is the one recorded before the kit was made faster', async () => {
+// RECORDED AGAIN FOR KIT 0.27.0 (#1026, #987), which is meant to move
+// numbers: a lead's ring is chosen by room, a detour round a tray is laid
+// another way, a patch's ring is chosen by its lay, a span has a point at
+// the edge of what it lies on, and two turns on one leg are one finding. Of
+// the 91 racks 75 have an answer that moves (1,580 of the 3,094 answers:
+// paths, lengths and what is read off them, the schedule, the BOM, the
+// spare and the DCIM cables files among them); the other 16 are as they
+// were. So the file is this kit's own answers
+// now, and holds the next change to them.
+test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);
   // and it is not a comparison of nothing with nothing

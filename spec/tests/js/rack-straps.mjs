@@ -250,10 +250,11 @@ test('a single cable is anchored too: each tie slot it uses on the held face, an
   // straps: {anchors: false} on the cable turns its own off
   assert.deepEqual(B.anchorsOf({...r, cables: [{...r.cables[0], straps: {anchors: false}}]}, ctx), []);
   // ONE STRAP AT A SLOT SERVES EVERY CABLE THERE: the count is by slot, never by cable.
-  // On the reference rack two cords come to rest on the tray, at one slot.
+  // On the reference rack three cords come to rest on the tray, at one slot
+  // (two until c8 took ring 4, #987).
   const owner = F.rack();
   const all = B.anchorsOf(owner, {route: F.ctxOf(owner)});
-  assert.deepEqual(all, [{item: 'i4', via: 'tray', tie: 14, width_mm: 19, bundles: [], cables: ['c7', 'c14']}]);
+  assert.deepEqual(all, [{item: 'i4', via: 'tray', tie: 14, width_mm: 19, bundles: [], cables: ['c7', 'c8', 'c14']}]);
   assert.deepEqual(B.strapTotals(owner, {route: F.ctxOf(owner)}), {spacing: 0, breakout: 0, anchor: 1, total: 1, widths: {19: 1}});
   // a ring states no tie point, so a cord through a ring alone is tied to nothing; and without routes there is none
   assert.equal(all.some(x => x.cables.includes('c1')), false);

@@ -42,9 +42,12 @@ test('the defaults are the library\'s plug and boot, per media', () => {
   // it is asked per end, with the cable
   const asked = [];
   R.routePath(r, c1, {...base, plugReachOf: (end, cable) => { asked.push([end.item, cable.id]); return 1; }});
-  // (twice an end and no more: the cable is laid from both ends, #986)
+  // (twice an end for the path: the cable is laid from both ends, #986. And
+  // twice an end again for each of the two rings a patch along one manager
+  // is laid through to choose between them, #987: twelve in all here, the
+  // choice then kept as the path's is)
   assert.deepEqual([...new Set(asked.map(x => x.join(' ')))].sort(), ['i1 c1', 'i2 c1']);
-  assert.ok(asked.length <= 4, `${asked.length} calls`);
+  assert.ok(asked.length <= 12, `${asked.length} calls`);
   // the helpers that compute it are not part of the kit's API
   assert.equal(R.plugReach, undefined);
   assert.equal(R.reachPoint, undefined);
@@ -211,10 +214,11 @@ test('a cord that must clear its plug goes round the tray\'s front edge, and is 
   for (const id of ['c1', 'c2', 'c4', 'c5', 'c6']) assert.deepEqual(led(id), [['i4', 'guide-4']], id);
   assert.deepEqual([led('c3'), led('c7')], [[], []]);
   assert.deepEqual(got.c7.detours.map(d => d.between), [[{end: 'a'}, {item: 'i4', via: 'guide-4'}]]);
-  // c8 leaves ring 5 and comes straight back to a panel port 13.4 mm short
-  // of it: round the front of the tray, and straight in to its plug
-  assert.deepEqual(got.c8.detours.map(d => d.between), [[{item: 'i4', via: 'guide-5'}, {end: 'b'}]]);
-  assert.deepEqual(got.c8.points.filter(q => q.at === 'lead').map(q => q.end), ['b']);
+  // c8 left ring 5 and came straight back to a panel port 13.4 mm short of
+  // it, round the front of the tray, until #987: it takes ring 4 now, led
+  // square to it as c1 is, and has no detour
+  assert.deepEqual(got.c8.detours, []);
+  assert.deepEqual(led('c8'), [['i4', 'guide-4']]);
   assert.deepEqual(R.bodyFindings(r, ctx), []);
   assert.deepEqual(R.ringFindings(r, ctx), []);
   assert.deepEqual(R.bendFindings(r, ctx), []);
@@ -258,9 +262,9 @@ test('the drawn path is the measured one: nothing to go round again, and each de
       assert.deepEqual(xyz(built), xyz(taut), `${name} ${c.id}`);
       assert.equal(p.detours.reduce((n, d) => n + d.points.length, 0), taut.length - stops.length, `${name} ${c.id}`);
     }
-    // it looked: the lower leaf's eight go round the tray's front edge, c8
-    // round its front on the way back to its panel port, and c7 over ring 4
-    assert.equal(detoured, 8 + 2, name);
+    // it looked: the lower leaf's eight go round the tray's front edge, and
+    // c7 over ring 4 (c8 too, back to its panel port from ring 5, until #987)
+    assert.equal(detoured, 8 + 1, name);
     assert.ok(legs > 100, `${name}: ${legs} legs`);
   }
 });
