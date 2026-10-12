@@ -227,9 +227,9 @@ compared, and a difference throws ("New in 0.25.0" below).
 | `rack/fit.js` | whether a device fits at a unit, on a face and (a narrow part) on one rail; whether a zero-U part fits beside the rack (`fitsZeroU`); how a shrink trims a rack |
 | `rack/zero-u.js` | the parts beside the rack: where each stands, as words (`whereText`) and as x (`zeroUX`), whether the lane beside its upright runs through it, and each placeable entry (`zeroUEntries`) |
 | `rack/managers.js` | cable managers: `placement` of a manager onto the device behind it, and moving one |
-| `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths |
-| `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres |
-| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`) |
+| `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths; a cable's own colour (`parseColor`), what decides the colour it is drawn in (`colorFacts`, `cableColorOf`, `colorsKey`), and the plans a drawing reads (`cablePlan`, `cablePlan3d`) |
+| `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres; `jacketLookup(types)` and the loaded `typeColorOf` give the jacket colour of the type a cable names |
+| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`); and the colour a cable is drawn in: `COLORS`, `cableColor`, `colorOf`, `hexColor`, `agreedJacket`, `bundleColor` |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, what the lay finds as notes (`layNotes`, `layNotesOf`), and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
@@ -239,7 +239,7 @@ compared, and a difference throws ("New in 0.25.0" below).
 | `rack/history.js` | undo and redo as snapshots |
 | `rack/editor.js` | `createRackEditor`: a rack document you edit by commands, with undo, redo and change events |
 | `rack/queries.js` | reading a rack: `fitsAt`, `freeUs`, `catalog`, `describe`, `inspect`, `selectCables`, `freePorts`, `suggestMedia`, `looseEnds` |
-| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `fibrePorts` (the front or rear ports of its module type that a fibre adapter is, from `optical.ports` in `components.json`), and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
+| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `fibrePorts` (the front or rear ports of its module type that a fibre adapter is, from `optical.ports` in `components.json`), and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings; `seatedJacket`, `jacketAt` and `jacketsFor`, the jacket colour the part seated at a cable end states |
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
@@ -672,6 +672,86 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.29.0: a cable's colour.** A cable was drawn in the colour of its
+media and nothing could change it. It is now drawn, in this order, in:
+
+1. the colour stated on the cable itself, `color` in the rack file;
+2. else the jacket colour of its two seated ends, when both state one and
+   the two agree;
+3. else the colour of its named cable type, where the table gives the type a
+   `jacket`;
+4. else its media's, from `COLORS` in `rack/cable-geometry.js`, as before.
+
+**No default changed.** Every media is the colour it was (an AOC is still
+`#3a3f45`), so a rack that states nothing is drawn as it was. `COLORS` is
+the one table that holds those colours; `JACKETS`, the hero's table, now
+names entries of it and holds no colour of its own.
+
+- **A colour is hex**: `#` and three or six hex digits, in either case, as
+  `jacket-color` is written on the cable ends of the library. `hexColor(v)`
+  gives it as `#rrggbb` in lower case, or `null`. A name (`red`), a CSS
+  function or a number is not a colour, and is never drawn as one: the next
+  rule of the order decides.
+- **The cable's own.** `cable.add` and `cable.update` take `color`; `null`
+  or `""` clears it, and anything that is no colour is refused with
+  `COLOR_REFUSED`. `parseColor(text)` is the same rule for a form: `{ ok,
+  color }` or `{ ok: false, reason }`. A file's `color` that is no colour
+  moves, whole, to `colorAsWritten`, as a length does.
+- **The ends.** `seatedJacket(item, end, ctx)` in `rack/ports.js` reads what
+  the part seated in the port states, from the parts lists `loadSlots`
+  returns. **A default is not a statement.** Every generic cable end
+  declares `jacket-color` with a default (`#1c1c1c`), and if that counted
+  every cable between two of them would turn black. An end states a colour
+  when the rack sets the field on that part (`fields` of the item, at
+  `<port>-occupant`; the default's own colour, chosen, counts) or when the
+  part itself gives its jacket one (a maker's part that composes the generic
+  end). One stated end and one bare end, or two that differ, settle nothing.
+- **The type.** `loadCableTypes` returns `typeColorOf`, and
+  `jacketLookup(types)` builds it over a table in hand. It reads only the
+  type a cable names in its own `type`, never the bare type of its media.
+- **The answer.** `cableColor(link)` is `{ color, from }`, `from` being
+  `cable`, `ends`, `type` or `media`; `colorOf(link)` is the colour alone.
+  `cablePlan(rack, readers)` and `cablePlan3d(rack, readers)` put what
+  decides a colour on each link (`color`, `jackets`, `typeColor`, each only
+  when it says something), so `colorOf(link)` is the colour to draw.
+  `cableColorOf(cable, readers)` answers for one cable of a rack.
+  `readers` is `{ jacketOf, typeColorOf }`.
+
+**What a page does to show it:**
+
+```js
+import { cablePlan, cablePlan3d, colorsKey } from '@portrayal/kit/rack/cable-rules';
+import { colorOf, bundleColor } from '@portrayal/kit/rack/cable-geometry';
+import { jacketsFor } from '@portrayal/kit/rack/ports';
+
+// parts: what loadSlots returned; ends: the Map the page's cableFacts reads;
+// types: what loadCableTypes returned
+const readers = { jacketOf: jacketsFor(rack, { ends, parts }), typeColorOf: types.typeColorOf };
+for (const link of cablePlan(rack, readers).links) draw(link, colorOf(link));
+```
+
+- Pass the same `readers` to `cablePlan3d`. `sameCables3d` sees a cable's
+  own colour change; a jacket set on an end changes no cable, so a scene
+  that keeps its tubes also compares `colorsKey(rack, readers)`.
+- A page that reads an end's jacket off its drawing says so with a `jacket`
+  key on that end's entry of its cable facts: a colour, or `null` for an end
+  it found bare. Where the key is there it stands; where it is not, the
+  parts lists answer.
+- `bundleColor(colors)` is `{ color, mixed }` for one band drawn for a whole
+  bundle: the members' colour when they are all one, else `color: null` and
+  `mixed: true`. The kit picks no colour for a mixed bundle.
+- `drawioCables` gives a cable whose colour is said (rules 1 to 3) a
+  `color`, and the kit's draw.io writer draws it ahead of its media's entry.
+  A page's own `cableStyle` function is handed the row and reads `color`
+  there. Pass `typeColorOf` in its options for rule 3.
+- Both DCIM cables files fill their `color` column with the cable's own
+  colour (rule 1 only), six digits with no `#`. The Nautobot file is read by
+  the import script that goes with it (`import_cables.py`), which has to
+  pass the column on.
+
+A colour is no part of a lay: nothing in `rack/route.js` reads it, and
+giving a cable one lays nothing again.
 
 **New in 0.28.0: a bundle's straps are measured and placed on its cables.**
 `straps(rack, bundle, ctx)` and `trunkLength` measured a trunk along the
@@ -1123,7 +1203,8 @@ answers what a command would need to know first.
 
 `fit` seats, empties or restores one bay or cage, and `field` sets one setting
 of one seated part; neither touches the rest of the device. `cable.update`
-takes `a` or `b` to move an end and keep the cable, and `cable.route` checks
+takes `a` or `b` to move an end and keep the cable, `color` to give the cable
+a colour of its own (`null` takes it off), and `cable.route` checks
 each new waypoint against the rack. These check what they are given against
 the parts lists when the caller loads them: `loadSlots(dist, refs)` fetches
 each device's `<ref>.configs.json` and `components.json` once, and
@@ -1367,7 +1448,11 @@ const { text, notes: n } = toDrawio(shell.state.svg, doc, { cables });
   comment. `toDrawio` also returns them as `notes`.
 - **Style.** `cableStyle` is a map from `media` to a stroke colour, merged over
   `CABLE_COLOURS` (dac, aoc, cu, mm, sm, the OM and OS grades, and a grey
-  `default`), or a function from a cable to a whole draw.io edge style.
+  `default`), or a function from a cable to a whole draw.io edge style. A
+  cable that carries its own `color` (`#rgb` or `#rrggbb`) is drawn in it,
+  ahead of the map; a function is handed the cable and reads `color` itself.
+  `CABLE_COLOURS` is this writer's own palette, chosen to read on draw.io's
+  white page, and is not the Rack Builder's `COLORS`.
 - **Identity.** Edge ids are `cable-<id>`, slugged like the other cell ids (a
   stub is `cable-<id>-a` or `-b`, and its label `cable-<id>-a-far`). The edge's
   label is `label` and `length`. `id`, `media`, `purpose` and `length` are kept
