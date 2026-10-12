@@ -1,10 +1,12 @@
 // spec/tests/js/rack-speed.mjs
 // The rack kit made fast on a large rack (kit 0.25.0) WITHOUT A NUMBER
-// CHANGED: every answer it gives is the one it gave before, and a lay kept
-// is the lay that would be made.
+// CHANGED: every answer it gives is the one it gave before, a lay kept is
+// the lay that would be made, and a rack of a real one's size is read within
+// a budget.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {performance} from 'node:perf_hooks';
 import * as M from '../../../kit/rack/model.js';
 import * as R from '../../../kit/rack/route.js';
 import * as F from './cable-solids-fixture.mjs';
@@ -102,4 +104,38 @@ test('spareOf takes the path it is handed, and reads the one kept without', () =
   for (const c of rack.cables) assert.deepEqual(R.spareOf(rack, c, ctx, R.routePath(rack, c, ctx)), R.spareOf(rack, c, ctx));
   assert.equal(R.spareOf(rack, rack.cables[0], ctx, null), null);
   assert.ok(rack.cables.some(c => R.spareOf(rack, c, ctx)?.need_m > 0));
+});
+
+// ── the budgets ──────────────────────────────────────────────────────────
+// A rack of thirteen two-unit switches, a lacer on each, two ducts and 300
+// cords (speed-fixture.mjs), every path read (routePath over every cable).
+// THE FIGURES ARE CEILINGS WITH HEADROOM, not what it takes: on the machine
+// they were chosen on (twelve cores, node 22, other work running) a first
+// read took 0.6 s, where the kit before 0.25.0 took 35 s, a second read
+// 3 ms, a read in a context made anew 26 ms and a read after one cable
+// moved 26 ms. A first read may take FIRST_MS, some sixteen times what it
+// took; the others are held to a fraction of that budget (a second read a
+// twentieth, a new context and one cable moved a fifth each), and a read
+// after one cable moved also to half of what the first read took in this
+// run, which is what says the other 299 cables were not laid again.
+const FIRST_MS = 10000, SECOND = 0.05, ANEW = 0.2, EDITED = 0.2;
+test('at 300 cables: a first read within its budget, and a second, a new context and one cable moved within a fraction of it', () => {
+  const made = speedRack(M, F, {cables: 300, bundles: 4, seed: 11}), rack = made.rack;
+  assert.equal(rack.cables.length, 300);
+  const all = (r, c) => r.cables.map(x => R.routePath(r, x, c));
+  const ms = fn => { const t = performance.now(); const v = fn(); return [performance.now() - t, v]; };
+  const ctx = made.ctxOf(rack);
+  const [first, paths] = ms(() => all(rack, ctx));
+  assert.ok(paths.every(Boolean), 'every cable has a path');
+  const [second] = ms(() => all(rack, ctx));
+  const [anew] = ms(() => all(rack, made.ctxOf(rack)));
+  // the better of two, each a different cable moved, so that one pause does not fail it
+  const moved = ['c1', 'c2'].map(id => { const r = moveCable(rack, id); return ms(() => all(r, made.ctxOf(r)))[0]; });
+  const edited = Math.min(...moved);
+  const said = `first ${Math.round(first)} ms, second ${second.toFixed(1)} ms, new context ${Math.round(anew)} ms, one cable moved ${Math.round(edited)} ms`;
+  assert.ok(first < FIRST_MS, said);
+  assert.ok(second < SECOND * FIRST_MS, said);
+  assert.ok(anew < ANEW * FIRST_MS, said);
+  assert.ok(edited < EDITED * FIRST_MS, said);
+  assert.ok(edited < first / 2, said);
 });
