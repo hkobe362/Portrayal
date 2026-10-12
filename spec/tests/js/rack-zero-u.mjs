@@ -242,8 +242,8 @@ test('fill: every cable whose lane run passes through the duct, once, against 40
   // No aperture: no fill entry, but the count still meets the stated capacity.
   const many = {...r, cables: Array.from({length: 2746}, (_, k) => lane(`c${k}`, 'cat6', [{lane: 'left', ru: 3}]))};
   assert.deepEqual(R.fill(many, {...rc, zeroUAperture: () => null}), []);
-  assert.deepEqual(R.capacityOver(many, rc), [{item: 'z1', count: 2746, through: 2746, capacity: 2745, media: 'cat6', zeroU: true}]);
-  // and only against cables of the kind it is stated for (#1032): the same run of fibre cords is not over it
+  assert.deepEqual(R.capacityOver(many, rc), [{item: 'z1', count: 2746, through: 2746, capacity: 2745, media: 'cat6', diameter: 6, zeroU: true}]);
+  // and only against cables at least as thick as the kind it is stated for (#1032): the same run of fibre cords is not over it
   assert.deepEqual(R.capacityOver({...many, cables: many.cables.map(c => ({...c, media: 'os2'}))}, rc), []);
   // A run on the lane that only passes the duct's span still counts (its ends are outside it).
   const r48 = run(rackOf('two-post', 48), {op: 'zerou.place', ref: DUCT, at: 'left', ru: 2}).rack;

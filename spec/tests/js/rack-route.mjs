@@ -276,7 +276,7 @@ test('capacity: a manager over its stated count', () => {
     a: {item: 'i1', path: 'p', view: 'front'}, b: {item: 'i3', path: 'q', view: 'front'}}))};
   try {
     assert.deepEqual(R.capacityOver(r, ctxFor(r, {'i1|p': -100})), 
-      [{item: 'i2', count: 3, through: 3, capacity: 2, media: 'cat6'}]);
+      [{item: 'i2', count: 3, through: 3, capacity: 2, media: 'cat6', diameter: 6}]);
   } finally { delete SIZES['fhd-cmp5dr'].capacity; }
 });
 

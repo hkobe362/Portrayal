@@ -2104,14 +2104,24 @@ function zeroUThrough(rack, ctx) {
 
 // MANAGERS WITH MORE CABLES THROUGH THEM THAN THEIR MAKER STATES (#1032).
 // A maker counts with one kind of cable: thirty Cat6 is the section of about
-// a hundred and twenty 3 mm cords. So the count is compared only with the
-// cables of that kind, `capacity.media` (rack.json, from the device's
-// `cable-capacity-media`): a cable of another kind, or of no stated kind, is
-// not counted against it, and how full a ring is stays fill's to say. A
-// capacity that states no `media` is a fact for a reader and is never
-// compared. Each entry: the manager, `count` of the cables of that kind,
-// `through` of every kind, the stated `capacity` and its `media`. As in fill,
-// a ring a cable only doubles back from does not carry it.
+// a hundred and twenty 3 mm cords. So the count is compared with the cables
+// AT LEAST AS THICK as that kind, `capacity.media` (rack.json, from the
+// device's `cable-capacity-media`), by DIAMETERS above: Cat6A through a
+// manager counted in Cat6 counts, since it takes at least the room the maker
+// counted (the makers' own tables give Cat6A within a few per cent of Cat6),
+// and so does a cable of no stated kind, which fill already takes as 6 mm
+// copper. A thinner kind (a fibre cord, an AOC) is not counted, and how full
+// a ring is with those stays fill's to say.
+// THREE SHAPES OF A CAPACITY. `media` a kind: compared as above. `media:
+// null`: the device states a count and no source names the cable, so it is a
+// fact for a reader and is never compared. NO `media` KEY: a catalogue built
+// before the key existed, which cannot say which of the two it is; its count
+// is compared with the cables of 6 mm or more (the diameter a cable of no
+// stated kind is given), so that an older catalogue does not go silent.
+// Each entry: the manager, `count` of the cables counted, `through` of every
+// kind, the stated `capacity`, its `media` (null for an older catalogue) and
+// `diameter`, the least diameter counted, in mm. As in fill, a ring a cable
+// only doubles back from does not carry it.
 export function capacityOver(rack, ctx) {
   const by = new Map();
   for (const c of rack.cables || []) {
@@ -2120,9 +2130,12 @@ export function capacityOver(rack, ctx) {
       if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Map()).get(w.item)).set(c.id, c);
   }
   const over = (cap, cables) => {
-    if (!(cap?.count > 0) || typeof cap.media !== 'string' || !cap.media) return null;
-    const count = cables.filter(c => c.media === cap.media).length;
-    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: cap.media} : null;
+    if (!(cap?.count > 0)) return null;
+    const old = !Object.hasOwn(cap, 'media');
+    const diameter = old ? UNSET_D : ownMedia(DIAMETERS, cap.media);
+    if (!(diameter > 0)) return null;
+    const count = cables.filter(c => (ownMedia(DIAMETERS, c.media) ?? UNSET_D) >= diameter).length;
+    return count > cap.count ? {count, through: cables.length, capacity: cap.count, media: old ? null : cap.media, diameter} : null;
   };
   const out = [];
   for (const [item, cables] of by) {

@@ -126,9 +126,11 @@ def build(dist):
         if perf.get("cable-capacity") is not None:
             entry["capacity"] = {"count": perf["cable-capacity"], "basis": perf.get("cable-capacity-basis", "")}
             # the kind of cable the count is of, where the source names it:
-            # what a rack tool compares the count with, and nothing else
-            if perf.get("cable-capacity-media"):
-                entry["capacity"]["media"] = perf["cable-capacity-media"]
+            # what a rack tool compares the count with. ALWAYS WRITTEN, null
+            # where the device states none: a catalogue built before this key
+            # has no `media` at all, and a reader must be able to tell "no
+            # source names the cable" from "built too early to say".
+            entry["capacity"]["media"] = perf.get("cable-capacity-media") or None
         for view in ("top", "front", "rear"):
             g, ps = marked(dist / face_file(idx, d["name"], idx.get("default"), view))
             if g:

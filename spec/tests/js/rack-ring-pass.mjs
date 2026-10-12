@@ -400,7 +400,7 @@ test('capacity, like fill, does not count a cable at a manager it only doubles b
     // from the port at -40 to the ring at -150 and back to the right-hand lane: a double-back
     const back = {...cableOf([{item: 'i2', via: 'guide-1'}, {lane: 'right-front', ru: 20}, {lane: 'right-front', ru: 30}]), id: 'c2'};
     const two = {...rackOf(), cables: [through, {...through, id: 'c2'}]};
-    assert.deepEqual(R.capacityOver(two, ctx), [{item: 'i2', count: 2, through: 2, capacity: 1, media: 'cat6'}]);
+    assert.deepEqual(R.capacityOver(two, ctx), [{item: 'i2', count: 2, through: 2, capacity: 1, media: 'cat6', diameter: 6}]);
     const mixed = {...rackOf(), cables: [through, back]};
     assert.deepEqual(R.routePath(mixed, back, ctx).findings.map(f => f.via), ['guide-1']);
     assert.deepEqual(R.capacityOver(mixed, ctx), []);

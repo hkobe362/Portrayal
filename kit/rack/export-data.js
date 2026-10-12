@@ -1192,8 +1192,9 @@ function placeOf(rack, id, chassisOf = () => null) {
 // bodyFindings says it so); any other id, a duct's, as it is.
 const viaText = via => (/^guide-(\d+)$/.test(via) ? `ring ${via.slice(6)}` : via);
 // What the routes add to an export's notes: a pathway filled past its limit, a
-// manager with more cables of one kind through it than its maker states for
-// that kind, and a stored waypoint that no longer resolves. `facts` is
+// manager with more cables through it, of the kind its maker counted or
+// thicker, than its maker states (route.js capacityOver), and a stored
+// waypoint that no longer resolves. `facts` is
 // route-context.js routeFacts (or null); its `ctx`, where it carries one,
 // gives each manager's height for its U.
 // THE FILL IS A SHARE OF THE LIMIT, and the limit a share of the opening
@@ -1206,9 +1207,11 @@ export function fillNotes(rack, facts, nameOf = id => id) {
   for (const f of facts.fill || [])
     if (f.over) out.push(`${viaText(f.via)} on ${named(f.item)}: ${f.count} cables, ${f.percent}% of its fill limit; the limit is ${limit}% of the opening.`);
   for (const o of facts.over || []) {
-    const kind = mediaLabel(o.media);
-    out.push(`${named(o.item)}: ${o.through > o.count ? `${o.count} of the ${o.through} cables through it are ${kind}` : `${o.count} ${kind} cables through it`}, ` +
-             `more than the ${o.capacity} of that kind its maker states.`);
+    // the kind the count is stated for, and every cable at least as thick;
+    // an older catalogue names no kind, and the note gives the diameter
+    const kind = o.media ? mediaLabel(o.media) : '', thick = kind ? `at least as thick as ${kind}` : `of ${o.diameter} mm or more`;
+    out.push(`${named(o.item)}: ${o.through > o.count ? `${o.count} of the ${o.through} cables through it are ${thick}` : `${o.count} cables ${thick} through it`}, ` +
+             `more than the ${o.capacity}${kind ? ` ${kind} cables` : ''} its maker states.`);
   }
   for (const c of rack.cables || [])
     for (const w of facts.routes?.get(c.id)?.gone || [])

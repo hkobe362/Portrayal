@@ -659,11 +659,13 @@ device has them:
 
 - `mount`: the device's `chassis.mount`, present only when it is not `rack`.
 - `shell`: `chassis.shell`, `sheet` for a body that is a sheet and not a box.
-- `capacity`: `{"count", "basis"}`, the cable capacity the vendor states.
-  `media` joins them where the device states
-  `attrs.performance.cable-capacity-media`: the kind of cable the count is of,
-  in a rack file's `media` words. A count is compared only with cables of that
-  kind, and one with no `media` is never compared
+- `capacity`: `{"count", "basis", "media"}`, the cable capacity the vendor
+  states. `media` is the kind of cable the count is of, in a rack file's
+  `media` words (the device's `attrs.performance.cable-capacity-media`), or
+  `null` where no source names the cable. A count is compared with the cables
+  at least as thick as that kind; one whose `media` is `null` is never
+  compared. A catalogue built before `media` was written has no such key, and
+  a reader takes that as a cable of 6 mm
   ([cable-managers-design.md](cable-managers-design.md) section 14).
 - `guides` and `passes`: per view (`top`, `front`, `rear`), the sorted ids a
   cable route can pass through on the default configuration's drawing.

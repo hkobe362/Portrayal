@@ -263,8 +263,8 @@ const offers = (ctx, refs) => refs.map(ref => ({ref, name: partName(ctx.compByRe
 // THE CABLE COUNT A MAKER STATES FOR A MANAGER (#1032), as the catalogue
 // holds it: the count, the basis in the words of the device file, and
 // `media`, the kind of cable it counts (route.js capacityOver compares it
-// with those alone), or null where no source names one and the count is
-// never compared.
+// with the cables at least that thick), or null where the catalogue names
+// none.
 const capacityFact = c => (c?.capacity?.count != null
   ? {capacity: {count: c.capacity.count, basis: c.capacity.basis ?? '', media: c.capacity.media ?? null}} : {});
 
