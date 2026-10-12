@@ -1420,23 +1420,23 @@ two turns is two:
 | lacer on | setback 0 | 25 mm | 50 mm | 100 mm |
 |---|---|---|---|---|
 | the top unit, before | 518 on 193 | 249 on 101 | 58 on 27 | 12 on 5 |
-| the top unit, after | 254 on 108 | 92 on 41 | none | none |
+| the top unit, after | 252 on 107 | 90 on 40 | none | none |
 | the bottom unit, before | 152 on 70 | none | none | none |
-| the bottom unit, after | 22 on 10 | none | none | none |
+| the bottom unit, after | 20 on 9 | none | none | none |
 | no lacer | none, before and after | none | none | none |
 
-With the lacer on the top unit and no setback the 254 corners are 131
-findings, and 129 of them say the manager is too close: the three kinds of
-lead above. No leg crosses a body, before or after. Across the twelve racks
-648 of the 3,300 routed lengths move, by -575 to +327 mm, median -3; 426 are
-shorter; 18 cables go up a stock size and 78 down. With no lacer nothing
-moves.
+With the lacer on the top unit and no setback the 252 corners are 130
+findings, and 128 of them say the manager is too close: the three kinds of
+lead above. No leg crosses a body, before or after, and no cable changes
+gutter. Across the twelve racks 639 of the 3,300 routed lengths move, by
+-575 to +61 mm, median -3; 423 are shorter; 10 cables go up a stock size
+and 77 down. With no lacer nothing moves.
 
 On the sample of 60 generated racks of 3.4 (1,803 cables) the corners short
 of room fall from 955 to 422, on 171 cables where it was 359: 14 of 883
 fibre cords, 7 of 242 Cat 6, 29 of 204 Cat 6A, 45 of 248 DACs and 76 of 226
-AOCs. 340 of the 1,803 lengths move, 194 shorter and 146 longer, by -340 to
-+125 mm; 5 cables go up a stock size and 31 down. None measures differently
+AOCs. 332 of the 1,803 lengths move, 187 shorter and 145 longer, by -340 to
++121 mm; 4 cables go up a stock size and 30 down. None measures differently
 written the other way round, and none reports a different number of bends.
 No path crosses a body, and no cable has a point in front of a zero-U
 part's outward face that had none before. On the reference rack one cord
@@ -1444,13 +1444,17 @@ moves: c8, to 547 mm from 619.2, still a 1 m cord.
 
 **Lengths change on saved racks.** A routed length and its stock size move
 the next time a page measures them, for a cable whose automatic route takes
-another ring or whose detour is laid another way; an entered length and a
-route made by hand are never touched. Everything read off a routed length
+another ring or whose detour is laid another way. An entered length is
+never touched, and a route made by hand keeps its waypoints (5 of the
+hand-routed cables on the kit's test racks measure differently, by their
+lay). Everything read off a routed length
 moves with it: the cable schedule, the BOM's cord sizes, the spare and what
-is to store, a sheet, and the length a DCIM cables file gives a cable. A
-cord already bought at the size the kit chose before can now read as too
-short where its path grew: 4 of the 3,300 on the twelve racks above (1.5 m
-cords that need 1.58 to 1.61 m), none of the 1,803 on the sample.
+is to store, a sheet, and the length a DCIM cables file gives a cable (and
+a note of that file that depends on it: Nautobot's, that 1.5 m is written
+as 2 m). A cord already bought at the size the kit chose before can read as
+too short where its path grew (the longest growth measured is 121 mm);
+none does of the 7,210 cables on the racks above, the sample and the kit's
+other test racks.
 
 **What is kept.** The choice is part of a cable's route, and a lay is kept
 under its route written out (3.4), so a lead that takes another ring is
@@ -1459,9 +1463,22 @@ what it reads of the rack and the context, and the answer from that and the
 world; the answer is kept under the text of what was read, so a context made
 anew judges nothing again. `spec/tests/js/speed-goldens.json` is recorded
 again from this kit, since this change is meant to move numbers: 75 of its
-91 racks have an answer that moves. A first read of 300 cables takes about
-a fifth longer than it did in 0.25.0 (0.6 s for 0.5 s on one machine, the
-room tests), and a read in a context made anew the same as before.
+91 racks have an answer that moves. A first read of 300 cables takes half
+as long again as it did (0.68 s for 0.44 s on one quiet machine, where the
+kit before 0.25.0 took 35 s): the room tests, and the lays the gutter is
+measured by where the route then taken is another. A read in a context
+made anew takes 21 ms for 18 ms.
+
+**Worse than before, and left so.** Every cable of those racks was compared
+with the kit before on bends, bodies crossed, rings entered and left by one
+face, ports covered and its gutter. One is worse: on a generated rack with
+no vertical managers, a 445 mm span from a port to its gutter hangs to its
+full depth and comes to rest on the tray of the lacer below, across the
+front of 11 ports, where before it was laid at half its sag because the
+full one cut the tray's edge. That is the hang being laid as the model
+says, now that a span can lie to an edge; it is 85 mm longer and a new
+finding. One has three corners short where it had two, each less short
+than before (8.7 and 8.7 mm, to 0.4, 4 and 4).
 
 ## 4. Lay order
 

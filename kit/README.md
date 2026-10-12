@@ -678,7 +678,8 @@ automatic route sent every lead through the ring of its manager nearest its
 port. **Routed lengths on saved racks move:** a cable whose automatic route
 takes another ring, or whose detour is laid another way, measures
 differently the next time a page measures it, and its stock size can change.
-An entered length and a route made by hand are never touched. Nothing is
+An entered length is never touched, and a route made by hand keeps its
+waypoints (the lay between them is the kit's, and can move). Nothing is
 removed or renamed; the rack file and the export columns are as they were.
 [`docs/cable-lay-design.md`](../docs/cable-lay-design.md) section 3.5 has the
 rules and what was counted.

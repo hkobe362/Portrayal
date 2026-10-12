@@ -27,7 +27,7 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // numbers: a lead's ring is chosen by room, a detour round a tray is laid
 // another way, a patch's ring is chosen by its lay, a span has a point at
 // the edge of what it lies on, and two turns on one leg are one finding. Of
-// the 91 racks 75 have an answer that moves (1,590 of the 3,094 answers:
+// the 91 racks 75 have an answer that moves (1,580 of the 3,094 answers:
 // paths, lengths and what is read off them, the schedule, the BOM, the
 // spare and the DCIM cables files among them); the other 16 are as they
 // were. So the file is this kit's own answers
