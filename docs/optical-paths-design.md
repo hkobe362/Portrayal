@@ -321,6 +321,105 @@ therefore GENERATED ONLY and never hand-edited, so the contracts stay the single
 source and the file stays a projection; and it is deliberately boring - a flat
 row list, no nesting - so feeding it to a script or the API is a five-line job.
 
+### A cable in a rack names these ports (#1020)
+
+A cable in a rack file lands on a PART: `bay-1/module/lc01` on the front
+panel, `bay-1/module/b01` on the rear one. The module type does not name a
+fibre port by its part, so a row of the DCIM cables file has to be given the
+names above. The build publishes them per part, beside the fibre graph, as
+`optical.ports` in `components.json`:
+
+```json
+"lc01":     {"front-ports": ["1", "2"]},
+"rear:b01": {"rear-ports":  ["B01-1", "B01-1"]}
+```
+
+One entry for each position of the part, position 1 first, `null` where that
+position is not in that list. The key is the part id, or `rear:<id>` for a
+part of the rear face, as an endpoint spells it. `optical_ports.ports`, which
+writes the type file, and `optical_ports.part_ports`, which writes this, are
+two views of one walk, and the key is written only for a module whose glass is
+projected, so a name here is a name in the type file. The kit reads the key
+(`rack/ports.js` `fibrePorts`) and derives no name. It then looks each name up
+in the type file of the target, as it does every other port, so a type that
+Nautobot was given without its ports leaves the cable out with that reason.
+
+| the end is on | it lands on | example, in `bay-1` |
+|---|---|---|
+| a duplex adapter on a front | two front ports, one a fibre | FHD-FAP12LCDXSMF `lc01`: `bay-1/1` and `bay-1/2` |
+| a simplex adapter on a front | one front port | XMI1041CA `sc03`: its front port `3` |
+| an MPO adapter on a front | one front port, a position a fibre | FHD-FAP12MTPHA `mtp02`: `bay-1/2` |
+| an adapter on the back of a panel | one rear port; a duplex cord takes both positions of it | FHD-FAP12LCDXSMF `b01`: `bay-1/B01-1` |
+| the trunk connector of a cassette | one rear port, every position | FHD-1MTP6LCDOS2A `mtp`: `bay-1/MTP-1` |
+| a stated trunk part of a single-faced module | its rear port | a PPM coupler `common`: its rear port `COMMON-1` |
+| a part that is a front port and a rear port at once (a DCM adapter) | nothing: the cable is left out, with the reason | |
+| an optic in a cage, a jack, a port of a device | as before: the interface or port of that name | `port-1` |
+
+A cable terminates on a port, never on a position of one, in both platforms.
+So a duplex cord on a rear adapter and a twelve-fibre trunk on an MTP are each
+one name, and nothing is said about positions.
+
+**What each file writes for an end on two front ports.**
+
+- **NetBox: one row a cord.** The name column holds both names, separated by
+  a comma, under the one type `dcim.frontport`. The import form splits the
+  cell on commas, wants one kind of port a side and one device or one a name,
+  and asks no equal count of the two sides (NetBox v4.7.2, `251458b8`,
+  `dcim/forms/bulk_import.py` `CableImportForm._clean_side` and
+  `dcim/models/cables.py` `Cable.clean`). So an interface against two front
+  ports is one row, and so is a rear port against two front ports. No cable
+  profile is written.
+- **Nautobot: one termination a side, so one row a fibre.** Where both ends
+  have two ports the cord is two rows, first port to first port and second to
+  second. Each row has the type, status, length and unit of the cord, and its
+  label followed by ` (1/2)` or ` (2/2)`, which is what ties the rows: a
+  Nautobot cable has no description to say it in. A label is cut to leave
+  room for that.
+- **Nautobot, a single port against two.** An optic is one interface and a
+  rear adapter one rear port, and either can take one cable. The cord is
+  written as one row, to the FIRST of the two front ports, and the README
+  names each second port as having no cable in the file. The trace through
+  the panel then holds on that fibre.
+- Ends on two different counts of several ports have no such reading: NetBox
+  takes the row, and the Nautobot file leaves the cord out and says why.
+
+**First port to first port is an order, not a polarity.** The rack file does
+not say whether a cord is crossed, so the two Nautobot rows pair the ports in
+position order and claim nothing more.
+
+**Nautobot could hold the cord as one cable, and the kit does not write it
+so.** Nautobot 3.2.6 has cable types with several connectors a side
+(`dcim/models/cables.py` `CableType`, `3dc554b4`), and front ports, rear ports
+and interfaces may all end one. Such a type must exist before a cable names
+it, and the script the Nautobot file is read by makes one termination a
+side. The rows above need neither.
+
+**Tried on running instances**, NetBox 4.7.2 and Nautobot 3.2.6, with the
+type files of this repository, an enclosure holding an FHD-FAP12LCDXSMF panel
+and an FHD-1MTP6LCDOS2A cassette, a second enclosure the same, and two
+switches:
+
+| the cable | NetBox 4.7.2 | Nautobot 3.2.6 |
+|---|---|---|
+| an optic to a panel front, duplex | accepted; the interface, and front ports 1 and 2 | accepted; the interface and front port 1 |
+| a panel rear to an optic | accepted; rear port `B01-1` and the interface | accepted, the same |
+| a cassette front to an optic | accepted; front ports 1 and 2, and the interface | accepted; front port 1 and the interface |
+| an MTP trunk between two cassettes | accepted; `MTP-1` to `MTP-1` | accepted, the same |
+| a panel front to a panel front | accepted; two front ports a side | two rows accepted, 3 to 3 and 4 to 4 |
+| a panel rear to a panel front | accepted; one rear port and two front ports | accepted; the rear port and front port 5 |
+| a second cable on a fibre already used | refused: "is already connected" | refused: "already has a cable attached" |
+
+The NetBox file went through the cable import form, each row alone and then
+the file whole, and every row was accepted. Read back, each cable sat on the
+ports its row named. NetBox showed the far port of each cable and no path
+beyond the panel: its module types carry no front-to-rear binding (above).
+The Nautobot rows were made one termination a side through the cable model
+in the application shell, with its validation, since the script that reads
+the file needs an API token and none was used: so the script itself is NOT
+tried on these rows. Read back, each cable sat on its ports, and Nautobot
+traced the first switch through the panel to the second, and through both
+cassettes and the trunk, on the first fibre.
+
 ## D. What the model makes checkable
 
 A mapping table cannot be verified. A fibre graph can, and verification is the

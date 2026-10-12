@@ -223,13 +223,13 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, what the lay finds as notes (`layNotes`, `layNotesOf`), and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
-| `rack/dcim-rules.js` | what a NetBox or Nautobot import needs of a rack |
+| `rack/dcim-rules.js` | what a NetBox or Nautobot import needs of a rack: the names a type file gives its ports (`typeLists`, `resolveEnd`, and `endResolver`, which answers for every end of a rack), the modules file, the cables file (`cableImportRows`) and the README |
 | `rack/validate.js` | `validate(schema, value)`, a small JSON Schema validator, and `same` |
 | `rack/commands.js` | every edit as a named, validated command, and `apply` for a batch of them |
 | `rack/history.js` | undo and redo as snapshots |
 | `rack/editor.js` | `createRackEditor`: a rack document you edit by commands, with undo, redo and change events |
 | `rack/queries.js` | reading a rack: `fitsAt`, `freeUs`, `catalog`, `describe`, `inspect`, `selectCables`, `freePorts`, `suggestMedia`, `looseEnds` |
-| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `seatedPorts`, and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
+| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `seatedPorts`, `fibrePorts` (the front or rear ports of its module type that a fibre adapter is, from `optical.ports` in `components.json`), and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
