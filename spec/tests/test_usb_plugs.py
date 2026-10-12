@@ -30,7 +30,7 @@ import warmrender
 from portrayal import components_index
 from portrayal import render as render_mod
 from portrayal.artifacts import face_file
-from portrayal.manifest import presented_interface
+from portrayal.manifest import mates_of, presented_interface
 from test_coax_slots import _card_slot, _contract, _skin_path
 from test_head_3d import apply, box, lift_of
 from test_nested_occupants import (assert_same_turn, by_path, cage_mate, device_matrix,
@@ -573,7 +573,7 @@ def test_usb_a_offers_the_cable_plug_and_nothing_else(comps):
     """No storage stick and no console dongle: the one part in the library
     that mates `usb-a` is the cable plug."""
     mating = sorted(ref for ref, e in comps.items()
-                    if _contract(ref).get("mates") in PAIRS)
+                    if any(m in PAIRS for m in mates_of(_contract(ref))))
     assert mating == PLUGS
 
 
