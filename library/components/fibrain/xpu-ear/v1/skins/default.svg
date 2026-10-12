@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24.7mm" height="43.9mm" viewBox="0 0 24.7 43.9">
+  <!-- Fibrain HD 1U frame, left rack ear, off the maker's front elevation: the
+       outer corners rounded at 3.0, a 7.2 hole at (9.6, 21.95) and an obround
+       slot 10.5 x 6.5 at 15.9 either side of it. The holes are holes in the
+       path. -->
+  <path id="plate" fill="#1b1e21" fill-rule="evenodd" d="
+    M 3 0 H 24.7 V 43.9 H 3 Q 0 43.9 0 40.9 V 3 Q 0 0 3 0 Z
+    M 6 21.95 a 3.6 3.6 0 1 0 7.2 0 a 3.6 3.6 0 1 0 -7.2 0 Z
+    M 7.6 2.8 h 4 a 3.25 3.25 0 0 1 0 6.5 h -4 a 3.25 3.25 0 0 1 0 -6.5 Z
+    M 7.6 34.6 h 4 a 3.25 3.25 0 0 1 0 6.5 h -4 a 3.25 3.25 0 0 1 0 -6.5 Z"/>
+</svg>

@@ -1,0 +1,42 @@
+format: 1
+kind: component
+name: xpu-top-sheet
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: optical
+description: >-
+  The top sheet of the Fibrain HD 1U frame XPU00 / XPS00 - the steel plate
+  over the slot parts, across the front of the frame. Behind it the frame is
+  open from above.
+size: {w: 435.0, h: 115.6}
+size-confidence: {w: drawing, h: estimated}
+elements:
+  cover: {at: [0.0, 0.0], size: [435.0, 115.6], class: bezel}
+relief:
+  features:
+    - node: cover
+      lift: 41.0
+      out: 41.8
+      color: '#1b1e21'
+      confidence: drawing
+      source: 'the front elevation draws the top sheet 0.80 thick, 0.05 to 0.85 from the top of the frame; the heights here are those above the floor as it is drawn, which puts its top 0.1 down'
+provenance:
+  size: >-
+    drawing across - 435, the frame between its ears, off the front elevation
+    (the CAD libraries archive Fibrain publishes (hd.fibrain.com/dxf/cad-libraries.zip, files dated 2020-07-30), `XPS00.dxf`: AutoCAD 2007, units millimetres, one 1:1 front elevation);
+    the sheet itself is drawn 434.80 there. ESTIMATED DEEP -
+    the front and plan line drawing on page 2 of DSH-XPU00 rev 2 (15.05.2020) and DSH-XPS00 rev 1 (24.05.2020), one image in both, 782 px across at 1.376 px/mm:
+    the sheet reaches 90 back from the face across the middle and 115.6 at
+    each end, with a slope about 26 long between the two depths starting 21
+    in from each side.
+  size-holes: >-
+    estimated - the same plan: four pairs of slots about 22 x 3, 48 and 59
+    back from the face, and a screw over each of the five posts, 27 back. The
+    vendor renders show the same screws and more that the plan does not
+    resolve.
+  relief: >-
+    drawing - see the feature.
+  color: >-
+    photo - black, a fine texture on the vendor renders.
+skins: [default]

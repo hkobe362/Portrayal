@@ -1,0 +1,37 @@
+format: 1
+kind: component
+name: xpu-cable-bar
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  The rear cable bar of the Fibrain HD 1U frame XPU00 / XPS00 seen from above
+  - a flat plate across the back of the frame with rows of slots that cables
+  are tied down to.
+size: {w: 435.0, h: 29.0}
+size-confidence: {w: estimated, h: estimated}
+elements:
+  bar: {at: [0.0, 0.0], size: [435.0, 29.0], class: bezel}
+relief:
+  features:
+    - node: bar
+      lift: 20.0
+      out: 20.8
+      color: '#1b1e21'
+      confidence: estimated
+      source: 'a flat plate about level with the middle of the frame on the vendor renders; no view is square to it'
+provenance:
+  size: >-
+    estimated - the front and plan line drawing on page 2 of DSH-XPU00 rev 2 (15.05.2020) and DSH-XPS00 rev 1 (24.05.2020), one image in both, 782 px across at 1.376 px/mm:
+    the bar runs the width of the frame and is 29 deep.
+  size-slots: >-
+    estimated - the same plan shows forty-eight tie slots in twelve groups of
+    four, two nearer the rear and two nearer the front in each group. THE
+    COUNT IS READ; THE SIZE AND SPACING ARE NOT: each slot is drawn 4 x 10 and
+    the groups are spread evenly. The vendor renders show each as a tab cut
+    out of the plate on three sides, which is not drawn.
+  relief: >-
+    estimated - see the feature.
+  color: >-
+    photo - black on the vendor renders.
+skins: [default]

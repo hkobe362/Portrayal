@@ -1,0 +1,39 @@
+format: 1
+kind: component
+name: xpu-side
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  One side of the Fibrain HD 1U frame XPU00 / XPS00 seen from above - the
+  full-height side wall beside the slot parts and the lower arm that runs
+  back from it to the rear cable bar. A sheet on edge, so a line in plan.
+size: {w: 0.8, h: 221.0}
+size-confidence: {w: estimated, h: estimated}
+elements:
+  wall: {at: [0.0, 105.4], size: [0.8, 115.6], class: bezel}
+  arm: {at: [0.0, 0.0], size: [0.8, 105.4], class: bezel}
+relief:
+  features:
+    - node: wall
+      out: 41.8
+      color: '#1b1e21'
+      confidence: estimated
+      source: 'the side wall stands the height of the frame beside the slot parts on the vendor renders; it is drawn as deep as the top sheet reaches at its ends, 115.6, and a tenth short of the top so that it is built at all'
+    - node: arm
+      lift: 13.0
+      out: 29.0
+      color: '#1b1e21'
+      confidence: estimated
+      source: 'the arm is a strip about 16 high at mid height on the vendor renders, joining the side wall to the rear cable bar'
+provenance:
+  size: >-
+    estimated - the front and plan line drawing on page 2 of DSH-XPU00 rev 2 (15.05.2020) and DSH-XPS00 rev 1 (24.05.2020), one image in both, 782 px across at 1.376 px/mm:
+    a side wall and an arm run from the rear bar, 29 from the rear, to the
+    face. The 0.8 is the sheet of the top and floor on the front elevation,
+    carried over.
+  relief: >-
+    estimated - see the features. No side view is published.
+  color: >-
+    photo - black on the vendor renders.
+skins: [default]

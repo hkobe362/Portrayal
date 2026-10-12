@@ -41,25 +41,30 @@ provenance:
       part of its own fixed to the frame side with pan-head screws; it is
       drawn as part of the face all the same, because the frame is not sold
       or shown without it.
+  shell:
+    confidence: drawing
+    note: >-
+      AN OPEN SHEET BODY, NOT A BOX. The frame is a top sheet and a floor
+      across the front, two sides, a bar across the rear and air between
+      them, so the six views are elevations and the solid is built of the
+      parts: the ears and posts on the front; the floor, the top sheet, the
+      sides, the rear cable bar and the cross-member in the top view, where
+      the floor is the well the others stand in. Cables pass through from the
+      rear to the backs of the slot parts. 0.8 is the sheet the front
+      elevation draws for the top sheet and for the floor.
   ears:
     confidence: drawing
     note: >-
-      each ear 24.70 x 43.90 with its two outer corners rounded at 3.0 (the
-      drawn patch runs 3.0 under the end post so that only those two show); one
-      round hole 7.2 across, its centre 9.60 from the outer edge at mid
-      height (22.0), and an obround slot 10.5 x 6.5 above and below it,
-      centres 6.1 and 37.9, which is 31.8 apart. The two round holes are
-      465.4 apart across the rack.
+      fibrain/xpu-ear@1, one at each end, the right one turned half a turn;
+      that part records the reading. The two round holes are 465.4 apart
+      across the rack.
   posts:
     confidence: drawing
     note: >-
       five guide posts 7.01 wide on a 107.00 pitch, left edges 24.80, 131.80,
-      238.80, 345.80 and 452.80, each 1.00 to 43.00 with a small tab to 0.00,
-      in two tiers of 21.00. The drawing puts the third to fifth posts 0.005
-      to 0.01 off that pitch, which is rounding in the file. Each tier
-      carries a release latch 6.50 x 8.50, 3.20 below the top of the tier
-      (4.20 to 12.70 and 25.20 to 33.70), and a small block 4.0 x 2.5 near
-      its foot. The latches are red and the posts black on every render.
+      238.80, 345.80 and 452.80; fibrain/xpu-guide-post@1 records the post.
+      The drawing puts the third to fifth posts 0.005 to 0.01 off that pitch,
+      which is rounding in the file.
   slots:
     confidence: drawing
     note: >-
@@ -71,26 +76,25 @@ provenance:
     confidence: drawing
     note: >-
       a top sheet 0.80 thick at 0.05 to 0.85 and a floor 0.80 thick at 43.15
-      to 43.95, both 24.90 to 459.70. Behind the posts the drawing shows a
-      slotted cross-member 19.0 high (12.5 to 31.5, lips 1.2 thick top and
-      bottom) from 33.40 to 451.20, with twelve slots 20 x 4 on a 34.4 pitch
-      at mid height, the first at 43.10. IT IS NOT DRAWN: it stands behind
-      the face at a depth nothing states, an open slot is drawn as a dark
-      mouth and a seated holder hides it.
+      to 43.95, both 24.90 to 459.70; the front draws their edges. Behind the
+      posts the drawing shows a slotted cross-member 19.0 high from 33.40 to
+      451.20; it is fibrain/xpu-cross-member@1 in the top view and is not
+      drawn on the front, where an open slot is a dark mouth and a seated
+      holder hides it.
   grounding:
     confidence: estimated
     note: >-
-      WHAT GROUNDING CHANGES IS NOT DRAWN. One drawing exists and it is named
-      XPS00. Its layers name an M4 press-in stud at each ear junction, an M3
-      nut at the right one and pan-head screws at both, all edge-on slivers
-      under 0.2 wide in a front elevation. The product picture on the XPS00
-      datasheet shows a copper-coloured bar across the frame behind the
-      posts, at the height of the cross-member, and a round yellow label on
-      the right side wall near the rear; the picture on the XPU00 datasheet,
-      from the same viewpoint, shows a dark member there and no label. Which
-      of the drawn parts XPU00 lacks, and whether its cross-member is the
-      same part unplated, no document says. Both configurations draw the same
-      face, with the cross-member dark.
+      WHAT GROUNDING CHANGES IS READ OFF TWO PICTURES. One drawing exists and
+      it is named XPS00. Its layers name an M4 press-in stud at each ear
+      junction, an M3 nut at the right one and pan-head screws at both, all
+      edge-on slivers under 0.2 wide in a front elevation, and none is drawn.
+      The product picture on the XPS00 datasheet shows a copper-coloured bar
+      across the frame behind the posts and a round yellow label on the right
+      side wall near the rear; the picture on the XPU00 datasheet, from the
+      same viewpoint, shows a dark member there and no label. So the XPS00
+      configuration sets the cross-member's finish to copper and XPU00 leaves
+      it dark. The label is not drawn. Which of the drawn fasteners XPU00
+      lacks, no document says.
   numbering:
     confidence: estimated
     note: >-
@@ -103,32 +107,25 @@ provenance:
     confidence: estimated
     note: >-
       NO REAR VIEW IS HELD. The rear is the front mirrored: the ears, the
-      backs of the five posts, the edges of the top sheet and floor, and one
-      open passage behind each slot through which a seated holder shows its
-      back. The rear cable bar is drawn edge-on as a strip a millimetre thick
-      at mid height, and the two side arms that carry it 16 high; both are
-      read off the renders, which show the bar as a flat plate level with
-      the middle of the frame.
+      backs of the five posts, the edges of the top sheet and floor, the rear
+      cable bar edge-on at mid height and the ends of the two arms that carry
+      it, and one open passage behind each slot through which a seated holder
+      shows its back.
   plan:
     confidence: estimated
     note: >-
       READ OFF THE DATASHEET PLAN AT 1.376 px/mm, so good to about a
-      millimetre at best, and drawn in rectangles. Rear at y = 0. The rear
-      bar is 29 deep across the 435 body and carries forty-eight tie slots in
-      twelve groups of four, two nearer the rear and two nearer the front
-      (counted on the plan; their size and spacing are schematic). A side arm
-      7 wide joins each end of it to the front. The top sheet reaches 90 back
-      from the face across the middle and 115.6 at each end; the slope
-      between the two depths, about 40 long on the plan, is not drawn, and
-      each end is drawn as a square wing 21 wide. The floor reaches 30.5 back
-      across the middle and 52 at each end, the same way. Four pairs of slots
-      22 x 3 in the top sheet, and a screw over each post, are placed from
-      the plan.
+      millimetre at best. Rear at y = 0. Each part of the top view records
+      its own reading: the rear cable bar 29 deep with forty-eight tie slots
+      counted, a side on each flank, the top sheet 90 deep across the middle
+      and 115.6 at each end, the floor 30.5 and 52, the cross-member 45
+      behind the face. The top sheet lies over the floor, the sides and the
+      cross-member, and lifts off in a viewer to show them.
   depth:
     confidence: estimated
     note: >-
       everything behind the face other than the 250 overall: no side or top
-      CAD is published. The side views draw a side plate as deep as the top
+      CAD is published. The side views draw a side wall as deep as the top
       sheet, an arm and the end of the rear bar, all estimated off the
       renders.
   not-drawn:
@@ -138,7 +135,8 @@ provenance:
       plain black frame with nothing printed on its front, so no logo zone is
       reserved. The optional front cable manager (ORG-HD-1U-0) and the label
       fields (XL00) are separate parts and are not modelled here. The side
-      labels the vendor animation shows on the ears are not drawn.
+      labels the vendor animation shows on the ears are not drawn. A guide
+      post is built only as its face, three millimetres proud.
 attrs:
   physical:
     material: powder paint coated steel frame, plastic guides
@@ -151,6 +149,8 @@ chassis:
   height: 43.96
   depth: 250.0
   ru: 1
+  shell: sheet
+  thickness: 0.8
   weight-kg: 1.2
   color: '#1b1e21'
   airflow: passive
@@ -160,8 +160,8 @@ gaps:
     reason: needs-drawing
     note: >-
       the one drawing is named XPS00 and nothing separates what the grounded
-      frame adds; the copper-coloured bar and the yellow label of the XPS00
-      picture are not drawn, and the two configurations draw one face.
+      frame adds. The copper finish of the cross-member is read off one
+      picture; the yellow label and the fasteners are not drawn.
     wanted: >-
       a drawing or a square-on photograph of each of XPU00 and XPS00, or the
       parts list that says what XPS00 adds.
@@ -191,53 +191,22 @@ groups:
       eight slots, four across and two high, each taking one HD slot part.
       Numbered left to right, the upper row first; the order is proposed, the
       frame prints none.
+  frame:
+    term: Item
+    role: furniture
+    index-origin: 1
+    description: >-
+      the metal and plastic of the frame itself: two ears, five guide posts,
+      the floor, the top sheet, the rear cable bar, two sides and the
+      cross-member.
 views:
   front:
     size: {w: 484.6, h: 43.96}
-    open-frame: true
     panel:
       decor:
         - {id: interior, at: [24.7, 0.05], size: [435.2, 43.9], fill: '#0b0c0d', kind: opening}
-        - {id: ear-left, at: [0, 0.05], size: [27.7, 43.9], fill: '#1b1e21', kind: rack-ear, rx: 3.0}
-        - {id: ear-right, at: [456.9, 0.05], size: [27.7, 43.9], fill: '#1b1e21', kind: rack-ear, rx: 3.0}
-        - {id: ear-left-hole, at: [6, 18.4], size: [7.2, 7.2], fill: '#050506', kind: mounting-hole, rx: 3.6}
-        - {id: ear-left-slot-1, at: [4.35, 2.85], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
-        - {id: ear-left-slot-2, at: [4.35, 34.65], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
-        - {id: ear-right-hole, at: [471.4, 18.4], size: [7.2, 7.2], fill: '#050506', kind: mounting-hole, rx: 3.6}
-        - {id: ear-right-slot-1, at: [469.75, 2.85], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
-        - {id: ear-right-slot-2, at: [469.75, 34.65], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
-        - {id: top-rail, at: [24.9, 0.05], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
-        - {id: floor, at: [24.9, 43.15], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
-        - {id: post-1, at: [24.8, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: post-1-tab, at: [27.8, 0], size: [1, 1], fill: '#101214', kind: guide-post}
-        - {id: latch-1-1, at: [25.06, 4.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: latch-1-2, at: [25.06, 25.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: post-1-key-1, at: [26.31, 18], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-1-key-2, at: [26.31, 39], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-2, at: [131.8, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: post-2-tab, at: [134.8, 0], size: [1, 1], fill: '#101214', kind: guide-post}
-        - {id: latch-2-1, at: [132.06, 4.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: latch-2-2, at: [132.06, 25.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: post-2-key-1, at: [133.31, 18], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-2-key-2, at: [133.31, 39], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-3, at: [238.8, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: post-3-tab, at: [241.8, 0], size: [1, 1], fill: '#101214', kind: guide-post}
-        - {id: latch-3-1, at: [239.06, 4.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: latch-3-2, at: [239.06, 25.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: post-3-key-1, at: [240.31, 18], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-3-key-2, at: [240.31, 39], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-4, at: [345.8, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: post-4-tab, at: [348.8, 0], size: [1, 1], fill: '#101214', kind: guide-post}
-        - {id: latch-4-1, at: [346.06, 4.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: latch-4-2, at: [346.06, 25.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: post-4-key-1, at: [347.31, 18], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-4-key-2, at: [347.31, 39], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-5, at: [452.8, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: post-5-tab, at: [455.8, 0], size: [1, 1], fill: '#101214', kind: guide-post}
-        - {id: latch-5-1, at: [453.06, 4.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: latch-5-2, at: [453.06, 25.2], size: [6.5, 8.5], fill: '#d92c1b', kind: latch, rx: 0.5}
-        - {id: post-5-key-1, at: [454.31, 18], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
-        - {id: post-5-key-2, at: [454.31, 39], size: [4, 2.5], fill: '#1d2023', kind: guide-post}
+        - {id: top-sheet-edge, at: [24.9, 0.05], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
+        - {id: floor-edge, at: [24.9, 43.15], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
     components:
       bays:
         - id: slot-1
@@ -245,26 +214,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 1
           rear: {view: rear, cutout: back-1}
@@ -273,26 +242,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 2
           rear: {view: rear, cutout: back-2}
@@ -301,26 +270,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 3
           rear: {view: rear, cutout: back-3}
@@ -329,26 +298,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 4
           rear: {view: rear, cutout: back-4}
@@ -357,26 +326,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 5
           rear: {view: rear, cutout: back-5}
@@ -385,26 +354,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 6
           rear: {view: rear, cutout: back-6}
@@ -413,26 +382,26 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 7
           rear: {view: rear, cutout: back-7}
@@ -441,33 +410,40 @@ views:
           size: {w: 100.0, h: 21.0}
           accepts:
             - fibrain/xbcs0@1
-            - fibrain/xmn1051gb@1
-            - fibrain/xmn1041gb@1
-            - fibrain/xmi1051ga@1
-            - fibrain/xmi1041ga@1
-            - fibrain/xmi1021ca@1
-            - fibrain/xmi1021da@1
-            - fibrain/xmi1021ha@1
-            - fibrain/xmi1021ga@1
-            - fibrain/xmi1031ga@1
-            - fibrain/xmi1041ca@1
-            - fibrain/xmi1041da@1
-            - fibrain/xmi1041ha@1
-            - fibrain/xmn1021cb@1
-            - fibrain/xmn1021db@1
-            - fibrain/xmn1021hb@1
-            - fibrain/xmn1021gb@1
-            - fibrain/xmn1031gb@1
-            - fibrain/xmn1041cb@1
-            - fibrain/xmn1041db@1
-            - fibrain/xmn1041hb@1
+            - fibrain/xmn1051gb@2
+            - fibrain/xmn1041gb@2
+            - fibrain/xmi1051ga@2
+            - fibrain/xmi1041ga@2
+            - fibrain/xmi1021ca@2
+            - fibrain/xmi1021da@2
+            - fibrain/xmi1021ha@2
+            - fibrain/xmi1021ga@2
+            - fibrain/xmi1031ga@2
+            - fibrain/xmi1041ca@2
+            - fibrain/xmi1041da@2
+            - fibrain/xmi1041ha@2
+            - fibrain/xmn1021cb@2
+            - fibrain/xmn1021db@2
+            - fibrain/xmn1021hb@2
+            - fibrain/xmn1021gb@2
+            - fibrain/xmn1031gb@2
+            - fibrain/xmn1041cb@2
+            - fibrain/xmn1041db@2
+            - fibrain/xmn1041hb@2
           group: slots
           rel-pos: 8
           rear: {view: rear, cutout: back-8}
+      placements:
+        - {ref: fibrain/xpu-ear@1, id: ear-left, at: [0.0, 0.05], group: frame, rel-pos: 1}
+        - {ref: fibrain/xpu-ear@1, id: ear-right, at: [459.9, 0.05], rotate: 180, group: frame, rel-pos: 2}
+        - {ref: fibrain/xpu-guide-post@1, id: post-1, at: [24.8, 0.0], group: frame, rel-pos: 3}
+        - {ref: fibrain/xpu-guide-post@1, id: post-2, at: [131.8, 0.0], group: frame, rel-pos: 4}
+        - {ref: fibrain/xpu-guide-post@1, id: post-3, at: [238.8, 0.0], group: frame, rel-pos: 5}
+        - {ref: fibrain/xpu-guide-post@1, id: post-4, at: [345.8, 0.0], group: frame, rel-pos: 6}
+        - {ref: fibrain/xpu-guide-post@1, id: post-5, at: [452.8, 0.0], group: frame, rel-pos: 7}
 
   rear:
     size: {w: 484.6, h: 43.96}
-    open-frame: true
     panel:
       decor:
         - {id: interior, at: [24.7, 0.05], size: [435.2, 43.9], fill: '#0b0c0d', kind: opening}
@@ -479,16 +455,16 @@ views:
         - {id: ear-right-hole, at: [471.4, 18.4], size: [7.2, 7.2], fill: '#050506', kind: mounting-hole, rx: 3.6}
         - {id: ear-right-slot-1, at: [469.75, 2.85], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
         - {id: ear-right-slot-2, at: [469.75, 34.65], size: [10.5, 6.5], fill: '#050506', kind: mounting-hole, shape: slot}
-        - {id: top-plate-edge, at: [24.9, 0.05], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
+        - {id: top-sheet-edge, at: [24.9, 0.05], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
         - {id: floor-edge, at: [24.9, 43.15], size: [434.8, 0.8], fill: '#1b1e21', kind: frame}
         - {id: post-1-back, at: [452.79, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
         - {id: post-2-back, at: [345.79, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
         - {id: post-3-back, at: [238.79, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
         - {id: post-4-back, at: [131.79, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
         - {id: post-5-back, at: [24.79, 1], size: [7.01, 42], fill: '#101214', kind: guide-post}
-        - {id: arm-left, at: [24.8, 14], size: [1.2, 16], fill: '#1b1e21', kind: frame}
-        - {id: arm-right, at: [458.6, 14], size: [1.2, 16], fill: '#1b1e21', kind: frame}
-        - {id: rear-bar, at: [24.8, 21.5], size: [435, 1], fill: '#2a2e32', kind: cable-bar}
+        - {id: arm-left, at: [24.8, 14], size: [0.8, 16], fill: '#1b1e21', kind: frame}
+        - {id: arm-right, at: [459, 14], size: [0.8, 16], fill: '#1b1e21', kind: frame}
+        - {id: rear-bar, at: [24.8, 21.1], size: [435, 0.8], fill: '#2a2e32', kind: cable-bar}
       cutouts:
         - {id: back-1, at: [352.795, 1], size: [100.0, 21.0], depth: 249.0}
         - {id: back-2, at: [245.795, 1], size: [100.0, 21.0], depth: 249.0}
@@ -503,85 +479,24 @@ views:
     size: {w: 484.6, h: 250}
     panel:
       decor:
-        - {id: open, at: [0, 0], size: [484.6, 250], fill: '#0b0c0d', kind: opening}
-        - {id: rear-bar, at: [24.8, 0], size: [435, 29], fill: '#1b1e21', kind: cable-bar}
-        - {id: tie-1-1, at: [31.8, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-1-2, at: [39.8, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-1-3, at: [47.8, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-1-4, at: [55.8, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-2-1, at: [67.217, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-2-2, at: [75.217, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-2-3, at: [83.217, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-2-4, at: [91.217, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-3-1, at: [102.633, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-3-2, at: [110.633, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-3-3, at: [118.633, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-3-4, at: [126.633, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-4-1, at: [138.05, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-4-2, at: [146.05, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-4-3, at: [154.05, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-4-4, at: [162.05, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-5-1, at: [173.467, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-5-2, at: [181.467, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-5-3, at: [189.467, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-5-4, at: [197.467, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-6-1, at: [208.883, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-6-2, at: [216.883, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-6-3, at: [224.883, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-6-4, at: [232.883, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-7-1, at: [244.3, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-7-2, at: [252.3, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-7-3, at: [260.3, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-7-4, at: [268.3, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-8-1, at: [279.717, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-8-2, at: [287.717, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-8-3, at: [295.717, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-8-4, at: [303.717, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-9-1, at: [315.133, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-9-2, at: [323.133, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-9-3, at: [331.133, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-9-4, at: [339.133, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-10-1, at: [350.55, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-10-2, at: [358.55, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-10-3, at: [366.55, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-10-4, at: [374.55, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-11-1, at: [385.967, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-11-2, at: [393.967, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-11-3, at: [401.967, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-11-4, at: [409.967, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-12-1, at: [421.383, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-12-2, at: [429.383, 3], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-12-3, at: [437.383, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: tie-12-4, at: [445.383, 13], size: [4, 10], fill: '#050506', kind: tie-slot}
-        - {id: arm-left, at: [24.8, 29], size: [7, 105.4], fill: '#1b1e21', kind: frame}
-        - {id: arm-right, at: [452.8, 29], size: [7, 105.4], fill: '#1b1e21', kind: frame}
-        - {id: top-plate, at: [24.8, 160], size: [435, 90], fill: '#1b1e21', kind: frame}
-        - {id: top-plate-wing-left, at: [24.8, 134.4], size: [21, 25.6], fill: '#1b1e21', kind: frame}
-        - {id: top-plate-wing-right, at: [438.8, 134.4], size: [21, 25.6], fill: '#1b1e21', kind: frame}
-        - {id: plate-slot-1-1, at: [99.5, 191], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-1-2, at: [99.5, 202], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-2-1, at: [182.6, 191], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-2-2, at: [182.6, 202], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-3-1, at: [280, 191], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-3-2, at: [280, 202], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-4-1, at: [363.1, 191], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: plate-slot-4-2, at: [363.1, 202], size: [22, 3], fill: '#050506', kind: slot}
-        - {id: post-screw-1, at: [26.705, 221.4], size: [3.2, 3.2], fill: '#b8bdc2', kind: screw, rx: 1.6}
-        - {id: post-screw-2, at: [133.705, 221.4], size: [3.2, 3.2], fill: '#b8bdc2', kind: screw, rx: 1.6}
-        - {id: post-screw-3, at: [240.705, 221.4], size: [3.2, 3.2], fill: '#b8bdc2', kind: screw, rx: 1.6}
-        - {id: post-screw-4, at: [347.705, 221.4], size: [3.2, 3.2], fill: '#b8bdc2', kind: screw, rx: 1.6}
-        - {id: post-screw-5, at: [454.705, 221.4], size: [3.2, 3.2], fill: '#b8bdc2', kind: screw, rx: 1.6}
-        - {id: ear-left, at: [0, 248.5], size: [24.7, 1.5], fill: '#1b1e21', kind: rack-ear}
-        - {id: ear-right, at: [459.9, 248.5], size: [24.7, 1.5], fill: '#1b1e21', kind: rack-ear}
+        - {id: ear-left-edge, at: [0, 248.5], size: [24.7, 1.5], fill: '#1b1e21', kind: rack-ear}
+        - {id: ear-right-edge, at: [459.9, 248.5], size: [24.7, 1.5], fill: '#1b1e21', kind: rack-ear}
+    components:
+      placements:
+        - {ref: fibrain/xpu-floor@1, id: interior, at: [24.8, 0.0], group: frame, rel-pos: 8}
+        - {ref: fibrain/xpu-top-sheet@1, id: top-sheet, at: [24.8, 134.4], group: frame, rel-pos: 9, in: interior}
+        - {ref: fibrain/xpu-cable-bar@1, id: cable-bar, at: [24.8, 0.0], group: frame, rel-pos: 10, in: interior}
+        - {ref: fibrain/xpu-side@1, id: side-left, at: [24.8, 29.0], group: frame, rel-pos: 11, in: interior, under: [top-sheet]}
+        - {ref: fibrain/xpu-side@1, id: side-right, at: [459, 29.0], group: frame, rel-pos: 12, in: interior, under: [top-sheet]}
+        - {ref: fibrain/xpu-cross-member@1, id: cross-member, at: [33.4, 199], group: frame, rel-pos: 13, in: interior, under: [top-sheet]}
 
   bottom:
     size: {w: 484.6, h: 250}
     panel:
       decor:
-        - {id: open, at: [0, 0], size: [484.6, 250], fill: '#0b0c0d', kind: opening}
         - {id: rear-bar, at: [24.8, 0], size: [435, 29], fill: '#1b1e21', kind: cable-bar}
-        - {id: arm-left, at: [24.8, 29], size: [7, 169], fill: '#1b1e21', kind: frame}
-        - {id: arm-right, at: [452.8, 29], size: [7, 169], fill: '#1b1e21', kind: frame}
+        - {id: arm-left, at: [24.8, 29], size: [0.8, 169], fill: '#1b1e21', kind: frame}
+        - {id: arm-right, at: [459, 29], size: [0.8, 169], fill: '#1b1e21', kind: frame}
         - {id: floor, at: [24.8, 219.5], size: [435, 30.5], fill: '#1b1e21', kind: frame}
         - {id: floor-wing-left, at: [24.8, 198], size: [21, 21.5], fill: '#1b1e21', kind: frame}
         - {id: floor-wing-right, at: [438.8, 198], size: [21, 21.5], fill: '#1b1e21', kind: frame}
@@ -592,26 +507,24 @@ views:
     size: {w: 250, h: 43.96}
     panel:
       decor:
-        - {id: open, at: [0, 0], size: [250, 43.96], fill: '#0b0c0d', kind: opening}
-        - {id: side-plate, at: [134.4, 0.05], size: [115.6, 43.9], fill: '#1b1e21', kind: frame}
+        - {id: side-wall, at: [134.4, 0.05], size: [115.6, 43.9], fill: '#1b1e21', kind: frame}
         - {id: arm, at: [29, 14], size: [105.4, 16], fill: '#1b1e21', kind: frame}
-        - {id: rear-bar, at: [0, 14], size: [29, 16], fill: '#1b1e21', kind: cable-bar}
+        - {id: rear-bar, at: [0, 21.1], size: [29, 0.8], fill: '#1b1e21', kind: cable-bar}
 
   right:
     size: {w: 250, h: 43.96}
     panel:
       decor:
-        - {id: open, at: [0, 0], size: [250, 43.96], fill: '#0b0c0d', kind: opening}
-        - {id: side-plate, at: [0, 0.05], size: [115.6, 43.9], fill: '#1b1e21', kind: frame}
+        - {id: side-wall, at: [0, 0.05], size: [115.6, 43.9], fill: '#1b1e21', kind: frame}
         - {id: arm, at: [115.6, 14], size: [105.4, 16], fill: '#1b1e21', kind: frame}
-        - {id: rear-bar, at: [221, 14], size: [29, 16], fill: '#1b1e21', kind: cable-bar}
+        - {id: rear-bar, at: [221, 21.1], size: [29, 0.8], fill: '#1b1e21', kind: cable-bar}
 configurations:
   base:
     kind: base
     default: true
     description: >-
-      The frame as both part numbers ship: empty, all eight slots open, the
-      five guide posts in place.
+      The frame as XPU00 ships: empty, all eight slots open, the five guide
+      posts in place.
   xpu00:
     kind: orderable
     part-numbers:
@@ -623,9 +536,12 @@ configurations:
     kind: orderable
     part-numbers:
       XPS00: {part: XPS00}
+    component-attrs:
+      cross-member: {finish: '#b87333'}
     description: >-
       XPS00 - the frame with grounding, as it ships: empty, all eight slots
-      open. Drawn as XPU00 is; see provenance.grounding.
+      open. The cross-member behind the posts is copper-coloured; see
+      provenance.grounding.
   mixed:
     kind: example
     description: >-
@@ -633,28 +549,28 @@ configurations:
       duplex and 6 SC/APC - to show the four slot fronts seated. Illustrative:
       holders are ordered separately from the frame.
     bays:
-      slot-1: fibrain/xmn1021gb@1
-      slot-2: fibrain/xmn1051gb@1
-      slot-3: fibrain/xmi1021ga@1
-      slot-4: fibrain/xmi1051ga@1
-      slot-5: fibrain/xmn1051gb@1
-      slot-6: fibrain/xmn1021gb@1
-      slot-7: fibrain/xmi1051ga@1
-      slot-8: fibrain/xmi1021ga@1
+      slot-1: fibrain/xmn1021gb@2
+      slot-2: fibrain/xmn1051gb@2
+      slot-3: fibrain/xmi1021ga@2
+      slot-4: fibrain/xmi1051ga@2
+      slot-5: fibrain/xmn1051gb@2
+      slot-6: fibrain/xmn1021gb@2
+      slot-7: fibrain/xmi1051ga@2
+      slot-8: fibrain/xmi1021ga@2
   lc-duplex-192:
     kind: example
     description: >-
       Eight 12-port LC duplex holders, the 192 fibres the datasheet gives as
       the most the frame holds. Illustrative.
     bays:
-      slot-1: fibrain/xmn1021gb@1
-      slot-2: fibrain/xmn1021gb@1
-      slot-3: fibrain/xmn1021gb@1
-      slot-4: fibrain/xmn1021gb@1
-      slot-5: fibrain/xmn1021gb@1
-      slot-6: fibrain/xmn1021gb@1
-      slot-7: fibrain/xmn1021gb@1
-      slot-8: fibrain/xmn1021gb@1
+      slot-1: fibrain/xmn1021gb@2
+      slot-2: fibrain/xmn1021gb@2
+      slot-3: fibrain/xmn1021gb@2
+      slot-4: fibrain/xmn1021gb@2
+      slot-5: fibrain/xmn1021gb@2
+      slot-6: fibrain/xmn1021gb@2
+      slot-7: fibrain/xmn1021gb@2
+      slot-8: fibrain/xmn1021gb@2
 datasheet:
   title: 'Fibrain patch panel HD without grounding, empty, datasheet XPU00 rev 2'
   sha256: 17f2a34bcb3ee1cf1ed7f16d52abb78d4c12e28bb629e0d0e6bf069913bd2bb6
