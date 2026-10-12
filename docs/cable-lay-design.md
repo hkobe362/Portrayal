@@ -249,7 +249,9 @@ radii (3.4). The plane only moves away from the body, so what it cleared it
 still clears; and in each tier the ways with room are tried first and the
 ways as they were only when none resolves, so a body that leaves no room is
 still gone round by the same preferred way, and the short leg is a finding
-(3.4), not a different route.
+(3.4), not a different route. Two further offers came with #1026 (3.5): a
+detour round a plate that is not pulled taut, and the way up behind a tray
+for a plug that ends behind its back edge.
 
 A hand route keeps its waypoints; the detours are added between them in the
 same way, and a leg the three rules cannot clear is left as drawn and reported.
@@ -1254,11 +1256,62 @@ with advice to add the manager it skipped.
 route's. A ring a hand route names is gone through, room or none, and its
 finding carries no advice about the manager: the ring was chosen.
 
+**A lead goes round a tray, never up over a ring.** The detour rules of 1.3
+will take a leg over the top of a ring that stands in its way, and such a
+hump can have all its room: 60 mm up in front of the device above, across,
+and down again. No lead is dressed so. The test stops at a ring's leg: a
+ring whose legs stand between the plug and the next ring leaves that next
+ring no room. A leg that clears a ring, through its opening or beside it,
+meets nothing and is not stopped.
+
 **Which leads are left without room** on that rack, at no setback: a port
-within some 35 mm inboard of the end ring, which has no ring after it; and
-a port in the lower row beside a ring, level with the ring's seat, whose way
-to the next ring is through that seat. Both are the manager standing where
-the ports are.
+within some 35 mm inboard of the end ring, which has no ring after it; a
+port under a ring, or just past one, whose plug ends 1.6 mm behind that
+ring's rear leg; and a port in the lower row beside a ring, level with the
+ring's seat, whose way to the next ring is through that seat. All three are
+the manager standing where the ports are.
+
+**Round a tray's front edge, with room.** A port under a tray reaches its
+ring by rule 1 of 1.3: out past the front edge, across, and back in to the
+approach point. That is three right angles, and 3.4 gives each its leg. But
+a detour is pulled taut (1.3), and taut the point where the cable turns
+back in toward its plug is not needed: the cable runs straight from the
+point in front of the ring to the plug's end, and that one turn is then
+wider than a right angle on the same 60 mm it shares with the turn before
+it (139 degrees and 16 mm of room for a 30 mm cable, in the fixture). So a
+detour round a plate met from above or below is offered **not pulled taut**:
+a point stays where the way without it would leave a turn less than the
+bend radius and less than the way with it does, each end of the way taken
+as a right angle (`detour`'s `loose`). It is an offer of 3.4, tried only
+where a corner at a detour point is short, so a path with room is as it
+was. A way over a ring's leg is never kept loose: that is the hump above.
+
+**Behind a tray's back edge.** Rule 1 takes the front edge first because a
+port at the rail plane ends its plug under the floor. A device set back
+from its rails ends its plug behind the floor's back edge instead (the
+FHD-CMP5DR's floor starts 48.8 mm out of the rail; an AOC's plug on a
+switch set back 50 mm ends 14.8 mm out), and the near edge is then that
+one. So the same offer of 3.4 also gives a detour its way **up behind the
+plate**: one point on the floor's back plane (the back edge less the
+cable's radius and `CLEAR`), as far clear of the plate on the far end's
+side, and along the run where a taut line from end to end crosses that
+edge (`detour`'s `rear`). It is offered only to a floor one of whose ends
+stands at or behind the back plane, and taken only where it leaves the
+path's corners less short than the front edge does: at 25 mm of setback the
+plug ends 2.5 mm behind the plane and the cable would have to stand almost
+upright there, so the front edge is kept. In the fixture a bottom-unit
+port 54 mm along from its ring's face, which turned twice on 53.3 mm round
+the front edge with room for a 26.6 mm bend, comes up behind the tray with
+room and is 247 mm shorter.
+
+**The stretch through a ring** (3.4) could be lengthened only by moving the
+other side's approach point out. Where that point stands beside a port and
+has no room to move, this side's now moves out instead; and an approach
+point already moved in beside a detour may go back to the radius and
+`CLEAR`. Both are offers, judged as every offer is.
+
+What is chosen is still the cable's whole path, laid from both ends
+(3.4), so no cable written the other way round lays differently.
 
 ## 4. Lay order
 

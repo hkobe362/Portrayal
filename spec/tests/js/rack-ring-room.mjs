@@ -79,7 +79,7 @@ test('a ring with room is taken though it is the nearest: the rule passes over n
   }
   // of EDGE-0's fabric leads that take a ring on the side their port is on,
   // most take the nearest
-  assert.deepEqual([taken, passed], [22, 5]);
+  assert.deepEqual([taken, passed], [24, 4]);
 });
 
 test('where no ring leaves room the nearest stands, and the finding says the manager is too close and what would help', () => {
@@ -173,6 +173,98 @@ test('the measure the rule uses is the path\'s own: a lead it gives a ring has n
     assert.ok(cornersOf(R.routePath(rack, c, ctx).points, {share: 'need'}).length > 0, c.id);
   }
   assert.ok(leads > 10, `${leads} findings at a lead`);
+});
+
+// ── round a tray ─────────────────────────────────────────────────────────
+// The fabric switches have ports in their bottom unit, under a lacer hosted
+// on the top unit: c164 to c203 and c204 to c243 are the fabric links of
+// EDGE-4 and EDGE-5, whose far ends are those ports.
+
+test('a plug that ends behind a tray\'s back edge comes up behind the plate, by one point on its back plane', () => {
+  const far = shape({setback: 50});
+  const c = cableOf(far.rack, 'c164'), path = R.routePath(far.rack, c, far.ctx);
+  // FAB-0's port-32, 23.6 mm under the tray of its lacer (m6); set back 50
+  // mm, its plug ends 14.8 mm out of the rail, 34 mm behind the floor's back edge
+  const [t] = S.traysOf(far.rack, far.ctx).filter(x => x.item === 'm6');
+  const floor = t.floors.reduce((m, f) => ((f.x1 - f.x0) > (m.x1 - m.x0) ? f : m));
+  const reach = path.points.find(q => q.at === 'reach' && q.end === 'b'), ap = path.points.findLast(q => q.at === 'approach');
+  assert.deepEqual([r1(floor.z0), r1(reach.z), r1(t.top - reach.y)], [48.8, 14.8, 16.5]);
+  // one detour, of one point: the back edge less the cable's radius and
+  // CLEAR, as far above the plate, and between the two along the run
+  const clear = 1.5 + S.CLEAR;
+  assert.deepEqual(path.detours.map(d => d.between), [[ring('m6', 1), {end: 'b'}]]);
+  const [q] = path.detours[0].points;
+  assert.equal(path.detours[0].points.length, 1);
+  assert.deepEqual([r1(q.z), r1(q.y)], [r1(floor.z0 - clear), r1(t.top + clear)]);
+  assert.ok(q.x > ap.x && q.x < reach.x, `${q.x} between ${ap.x} and ${reach.x}`);
+  // and it has its room: round the front edge the same cord turned twice on
+  // 53.3 mm, with room for a 26.6 mm bend
+  assert.deepEqual(path.bends, []);
+  assert.deepEqual(path.crossings, []);
+  // with no setback the plug ends under the floor, in front of its back
+  // edge, and the way round is the front edge as before
+  const near = shape({});
+  const front = R.routePath(near.rack, cableOf(near.rack, 'c164'), near.ctx).detours.at(-1);
+  assert.ok(front.points.length && front.points.every(o => o.z > floor.z1), JSON.stringify(front.points));
+});
+
+test('the back edge is offered only to an end that stands behind it, and only where it is asked for', () => {
+  const {rack, ctx} = shape({});
+  const solids = S.solidsOf(rack, ctx).filter(x => x.item === 'm6');
+  const above = {x: -170, y: 1299.4, z: 73.7}, opts = {diameter: 3, room: 60};
+  // under the floor, in front of its back edge: `rear` changes nothing
+  const under = {x: -148, y: 1275, z: 64.8};
+  assert.deepEqual(S.detour(above, under, solids, {...opts, rear: true}), S.detour(above, under, solids, opts));
+  // behind the back edge: round the front edge as it stands, and by one point with `rear`
+  const behind = {x: -148, y: 1275, z: 14.8};
+  const front = S.detour(above, behind, solids, opts), back = S.detour(above, behind, solids, {...opts, rear: true});
+  assert.ok(front.length >= 2 && front.every(q => q.z > 110), JSON.stringify(front));
+  assert.equal(back.length, 1);
+  assert.deepEqual([r1(back[0].z), back[0].x > -170 && back[0].x < -148], [42.3, true]);
+  // either way round, nothing is crossed
+  for (const way of [front, back]) {
+    const chain = [above, ...way, behind];
+    for (let k = 1; k < chain.length; k++) assert.deepEqual(S.legCrossings(chain[k - 1], chain[k], solids, {diameter: 3}), []);
+  }
+});
+
+test('a way round a tray\'s front edge keeps the point where it turns back in, where pulled taut it would take a turn\'s room', () => {
+  const {rack, ctx} = shape({});
+  // c167's far end is FAB-0's port-35, 31 mm under the tray and 77 mm along
+  // from ring 1's face: out past the front edge, across and back in
+  const c = cableOf(rack, 'c167'), path = R.routePath(rack, c, ctx);
+  const d = path.detours.at(-1), ap = path.points.findLast(q => q.at === 'approach'), reach = path.points.find(q => q.at === 'reach' && q.end === 'b');
+  assert.deepEqual(d.between, [ring('m6', 1), {end: 'b'}]);
+  // two points, both two bend radii in front of the rings' line: straight
+  // out from the approach point, and straight out from the plug
+  assert.deepEqual(d.points.map(q => [r1(q.x), r1(q.y), r1(q.z)]), [[r1(ap.x), r1(ap.y), 133.7], [r1(reach.x), r1(reach.y), 133.7]]);
+  assert.deepEqual(path.bends.filter(f => f.between.some(w => w.end === 'b')), []);
+  // pulled taut, as it was, the second point goes and the first turns 139
+  // degrees on the 60 mm it shares with the right angle before it
+  const solids = S.solidsOf(rack, ctx), opts = {diameter: 3, room: 60};
+  const taut = S.detour(ap, reach, solids, opts), loose = S.detour(ap, reach, solids, {...opts, loose: true});
+  assert.deepEqual([taut.length, loose.length], [1, 2]);
+  const turns = pts => cornersOf([{...ap, x: ap.x - 60}, ap, ...pts, reach, {...reach, z: 0}], {share: 'need'}).map(k => [k.angle_deg, k.room_mm]);
+  assert.deepEqual(turns(taut), [[90, 16.4], [138.6, 16.4], [41.4, 30.4]]);
+  assert.ok(turns(loose).every(([, room]) => room >= 30), JSON.stringify(turns(loose)));
+  // and only a way round a plate is kept so: over a ring's leg, `loose` or
+  // not, a way is pulled taut (c182's, below)
+  const lead = cableOf(rack, 'c182'), lp = R.routePath(rack, lead, ctx);
+  const from = lp.points.find(q => q.at === 'reach' && q.end === 'a'), to = lp.points.find(q => q.at === 'approach');
+  assert.equal(S.detour(from, to, solids, opts).length, 1);
+  assert.deepEqual(S.detour(from, to, solids, {...opts, loose: true}), S.detour(from, to, solids, opts));
+});
+
+test('a lead is not taken up over a ring that stands in its way: the nearest stands, and says the manager is too close', () => {
+  const {rack, ctx, nameOf} = shape({});
+  // c182 leaves EDGE-4's fab-18, 3.5 mm left of the centre line and so just
+  // past ring 3 on its way left; ring 3's rear leg stands 1.6 mm in front of
+  // its plug's end. The detour rules take a leg over the ring, and that hump
+  // can have all its room; no lead is dressed so
+  const c = cableOf(rack, 'c182');
+  assert.deepEqual(ringsOn(R.autoRoute(rack, c, ctx), 'm12'), [2, 1]);
+  const found = R.bendFindingsOf(rack, c, ctx, nameOf).filter(f => f.between.some(w => w.end === 'a'));
+  assert.ok(found.length >= 1 && found.every(f => f.tooClose?.manager === 'm12'), JSON.stringify(found.map(f => f.text)));
 });
 
 export {measure};

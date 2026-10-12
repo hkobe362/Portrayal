@@ -312,13 +312,22 @@ function leadHasRoom(rack, cable, end, m, g, s, ctx) {
   // the ring's near face), with its detours; null when a leg cannot be
   // cleared. `run` is a run-out: the cable goes on straight out of its plug
   // that far past the reach point before it turns (ROOM AT A PLUG, layPath)
-  const laid = (mid, run = 0) => {
+  const laid = (mid, run = 0, how = {}) => {
     const from = run > 0 ? {...p, z: p.z + Math.sign(p.z - port.z) * run} : p;
     // a run-out goes through nothing: a ring's leg just past the plug's end stops it
     if (run > 0 && legCrossings(p, from, solids, {diameter}).length) return null;
     const stops = [from, ...mid, entry], out = mm > 0 ? [port, from] : [from], round = [];
     for (let k = 1; k < stops.length; k++) {
-      const extra = solids.length ? detour(stops[k - 1], stops[k], solids, {diameter, lanes, room: 2 * bend}) : [];
+      // A LEAD GOES ROUND A TRAY, NEVER UP OVER A RING. The detour rules
+      // will take a leg over the top of a ring that stands in its way, and
+      // such a hump can have all its room: 60 mm up in front of the device
+      // above and down again. No lead is dressed so; a ring whose legs
+      // stand between the plug and the next ring leaves that next ring no
+      // room. (A leg that clears a ring, through its opening or beside it,
+      // meets nothing and is not stopped.)
+      const met = solids.length ? legCrossings(stops[k - 1], stops[k], solids, {diameter})[0] : null;
+      if (met && /^ring\//.test(String(met.solid.part ?? ''))) return null;
+      const extra = solids.length ? detour(stops[k - 1], stops[k], solids, {diameter, lanes, room: 2 * bend, ...how}) : [];
       if (extra === null) return null;
       for (const q of extra) { round.push(out.length); out.push(q); }
       out.push(stops[k]);
@@ -330,13 +339,20 @@ function leadHasRoom(rack, cable, end, m, g, s, ctx) {
   };
   const tight = L => cornersOf(L.pts, {share: 'need'}).filter(k => k.room_mm < need - 1e-9);
   const ok = L => !!L && !tight(L).length;
-  // `mid` as it stands, and, where the turn at the plug's end is what is
-  // short, with the run-outs a path is offered there
+  // `mid` as it stands; where the turn at the plug's end is what is short,
+  // with the run-outs a path is offered there; and where it goes round a
+  // body, by the ways a path is offered there: not pulled taut, and up
+  // behind a tray (solids.js detour `loose`, waysRound `rear`)
   const fits = mid => {
     const L = laid(mid);
     if (ok(L)) return true;
+    // (a lead a ring's leg stops at the plug's end may clear it run out: through the ring's opening)
+    if (mm > 0 && mid.length < 2 && (!L || tight(L).some(k => k.k === 1)) && [0.5, 1, 1.5].some(n => ok(laid(mid, n * bend)))) return true;
     if (!L) return false;
-    return mm > 0 && mid.length < 2 && tight(L).some(k => k.k === 1) && [0.5, 1, 1.5].some(n => ok(laid(mid, n * bend)));
+    // only toward a ring that stands ahead: a lead is not taken up over a
+    // ring it stands under and back down behind it, however much room that has
+    const ahead = s * ((mid.at(-1) ?? entry).x - p.x) >= 0;
+    return ahead && L.round.length > 0 && [{loose: true}, {rear: true}, {rear: true, loose: true}].some(how => ok(laid(mid, 0, how)));
   };
   // a ring whose opening is not placed has no approach point: the lead comes
   // to its face
@@ -1144,7 +1160,7 @@ function layPath(rack, cable, ctx, given) {
     let stuck = 0;
     for (let k = 1; k < out.length; k++) {
       const between = [ref(from[k - 1]), ref(from[k])];
-      const extra = solids.length ? detour(out[k - 1], out[k], solids, {diameter, lanes: lanesAt, room: runs.room ?? 2 * bend}) : [];
+      const extra = solids.length ? detour(out[k - 1], out[k], solids, {diameter, lanes: lanesAt, room: runs.room ?? 2 * bend, rear: runs.rear === true, loose: runs.loose === true}) : [];
       if (extra === null) stuck++;
       if (extra?.length) {
         detours.push({between, points: extra.map(p => ({x: p.x, y: p.y, z: p.z}))});
@@ -1270,7 +1286,10 @@ function layPath(rack, cable, ctx, given) {
       const list = [], tight = tightOf(L.taut);
       for (const k of offs.keys()) for (const side of [0, 1]) {
         const cur = offs.get(k)[side], f = faces.get(k);
-        if (cur < bend - 1e-9) continue;
+        // a point that already stands nearer than the bend radius is offered
+        // nothing but the way back to the radius and CLEAR (below, #1026)
+        const moved = cur < bend - 1e-9;
+        if (moved && !(cur > base + 1e-9)) continue;
         // the stretch this approach point's leg is part of: from the stop
         // before the ring to the ring, or from the ring to the stop after it
         // (the approach point itself: the one before the ring's entry, or after its exit)
@@ -1282,6 +1301,7 @@ function layPath(rack, cable, ctx, given) {
         const region = T => { const w = within(T); return !!w && tightOf(T.taut).some(c => c.k >= w[0] && c.k <= w[1]); };
         const w = within(L);
         if (!w || !tight.some(c => c.k >= w[0] && c.k <= w[1])) continue;
+        if (moved) { list.push({o: put(offs, k, side, base), region}); continue; }
         const [lo, hi] = w;
         // how far out of the band, along the run, that stop stands
         const nb = L.taut[side ? hi : lo], d = f.out[side] * (nb[f.a] - f.face[side]);
@@ -1308,10 +1328,13 @@ function layPath(rack, cable, ctx, given) {
         // point moved out past it would make the cable come back for it
         if (cur > base + 1e-9) list.push({o: put(offs, k, side, base), region});
         // the two turns' share of the stretch through the ring: what they
-        // need of it over what it is, given to the other side
+        // need of it over what it is, given to the other side; or to this
+        // one (#1026), where the other side's point stands beside a port it
+        // has no room to move away from
         const cs = cornersOf(L.taut, {share: 'need'}), tanAt = i => { const c = cs.find(x => x.k === i); return c ? Math.tan(c.angle_deg * Math.PI / 360) : 0; };
         const other = offs.get(k)[1 - side], lack = bend * (tanAt(apOf(L, 0)) + tanAt(apOf(L, 1))) - (cur + other + Math.abs(f.face[1] - f.face[0]));
         if (lack > 1e-6 && Number.isFinite(lack) && other + lack + 0.5 <= Math.min(2 * bend, f.free[1 - side])) list.push({o: put(offs, k, 1 - side, other + lack + 0.5), region});
+        if (lack > 1e-6 && Number.isFinite(lack) && cur + lack + 0.5 <= Math.min(2 * bend, f.free[side])) list.push({o: put(offs, k, side, cur + lack + 0.5), region});
       }
       // ROOM AT A PLUG (#973, section 3.4). A cable leaves its plug straight
       // (1.5), and the plug's reach is the leg its first turn has on that
@@ -1330,8 +1353,18 @@ function layPath(rack, cable, ctx, given) {
       // turn can be wider than a right angle, and a corner at a detour point
       // still short of room is offered two and a half and three radii
       const atDetour = T => tightOf(T.taut).some(c => T.taut[c.k].at === 'detour');
-      if (tight.some(c => L.taut[c.k].at === 'detour'))
+      if (tight.some(c => L.taut[c.k].at === 'detour')) {
         for (const m of [2.5, 3]) if (m * bend > (runs.room ?? 2 * bend) + 1e-9) list.push({r: {...runs, room: m * bend}, region: atDetour});
+        // BEHIND A TRAY (#1026, solids.js waysRound): a plug that ends
+        // behind a floor's back edge (its device is set back) is offered
+        // the way up behind the plate, one slight turn in place of the
+        // three right angles round the front edge
+        if (runs.rear !== true) list.push({r: {...runs, rear: true}, region: atDetour});
+        // NOT PULLED TAUT (#1026, solids.js detour): a way round an edge
+        // keeps the point where it turns back in, where the straight run
+        // past it would take the room of the turn before
+        if (runs.loose !== true) list.push({r: {...runs, loose: true}, region: atDetour});
+      }
       return list;
     };
     // The best change on offer is made, and the offers are drawn up again,

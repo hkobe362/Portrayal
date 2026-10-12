@@ -272,30 +272,41 @@ test('a bend the kit\'s rules find no room for is found, and the route still exi
   // c9 as an AOC from the leaf below: its head ends 64.8 mm out of the port,
   // and to reach ring 3 it goes out past the tray's front edge and back in
   // to the approach point, 60 mm (two radii of 30) in front of the ring's
-  // line. Pulled taut it turns 129.7 degrees at the edge, and that turn and
-  // the right angle at the approach point need 30 (tan 64.85 + tan 45) = 94
-  // mm of the 60 between them: each has room for 19.2 mm. The kit's rules
-  // found no more room; that is what a finding says, not that none exists
+  // line. Pulled taut it turned 129.7 degrees at the edge, and that turn and
+  // the right angle at the approach point needed 30 (tan 64.85 + tan 45) = 94
+  // mm of the 60 between them: each had room for 19.2 mm, and both were
+  // findings. Since #1026 the way round a tray's edge keeps the point where
+  // it turns back in (three right angles, each with its leg), and the cord
+  // has its room, 45.9 mm longer
   const aoc = {...r.cables.find(c => c.id === 'c9'), media: 'aoc'};
   const rack = {...r, cables: [aoc]};
-  const p = R.routePath(rack, aoc, ctx);
+  const roomy = R.routePath(rack, aoc, ctx);
+  assert.deepEqual(roomy.bends, []);
+  assert.deepEqual(roomy.detours.map(d => d.points.length), [2]);
+  assert.equal(Math.round(R.pathLength(roomy).measured * 10000) / 10, 723);
+  // held to 35 mm, it is short again: the same way round, pulled taut or not,
+  // has 70 mm between its turns and needs more. The kit's rules found no
+  // more room; that is what a finding says, not that none exists
+  const c35 = {...ctx, bendOf: () => 35};
+  const p = R.routePath(rack, aoc, c35);
   assert.ok(p.points.length > 8);
   assert.deepEqual(p.crossings, []);
   assert.ok(R.pathLength(p).measured > 0.5);
   assert.deepEqual(p.bends.map(b => [b.point, b.angle_deg, b.legs_mm[1], b.room_mm, b.short_mm]),
-    [['detour', 129.7, 60, 19.2, 10.8], ['approach', 90, 43.3, 19.2, 10.8]]);
+    [['reach', 35.9, 97.3, 28.5, 6.5], ['detour', 144.1, 70, 17.1, 17.9], ['approach', 90, 48.3, 17.1, 17.9]]);
   for (const b of p.bends) {
-    assert.deepEqual([b.kind, b.cable, b.need_mm, b.between], ['tight-bend', 'c9', 30, [{end: 'a'}, {item: 'i4', via: 'guide-3'}]]);
+    assert.deepEqual([b.kind, b.cable, b.need_mm, b.between], ['tight-bend', 'c9', 35, [{end: 'a'}, {item: 'i4', via: 'guide-3'}]]);
     assert.equal(b.at.length, 3);
   }
   // each is a corner of the path, with the room the kit's measure gives it
   const corners = cornersOf(p.points, {share: 'need'});
   assert.ok(corners.length > 4);
-  assert.deepEqual(p.bends.map(b => [b.angle_deg, b.room_mm]), corners.filter(c => c.room_mm < 30).map(c => [c.angle_deg, c.room_mm]));
-  const f = R.bendFindings(rack, ctx, id => ({i2: 'PP-01', i3: 'LEAF-B', i4: 'CM-01'}[id] ?? id));
+  assert.deepEqual(p.bends.map(b => [b.angle_deg, b.room_mm]), corners.filter(c => c.room_mm < 35).map(c => [c.angle_deg, c.room_mm]));
+  const f = R.bendFindings(rack, c35, id => ({i2: 'PP-01', i3: 'LEAF-B', i4: 'CM-01'}[id] ?? id));
   assert.deepEqual(f.map(x => x.text), [
-    'c9 turns 129.7 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 19.2 mm bend; the cable (aoc) needs 30 mm, 10.8 mm short.',
-    'c9 turns 90 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 19.2 mm bend; the cable (aoc) needs 30 mm, 10.8 mm short.']);
+    'c9 turns 35.9 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 28.5 mm bend; the cable (aoc) needs 35 mm, 6.5 mm short.',
+    'c9 turns 144.1 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 17.1 mm bend; the cable (aoc) needs 35 mm, 17.9 mm short.',
+    'c9 turns 90 degrees between its port on LEAF-B and CM-01 ring 3 with room for a 17.1 mm bend; the cable (aoc) needs 35 mm, 17.9 mm short.']);
   // the same cord as OM4 has room everywhere; and held to a radius no lacer
   // gives, 80 mm, the turns it makes are found, each against that radius
   assert.deepEqual(R.bendFindings(r, ctx).filter(x => x.cable === 'c9'), []);

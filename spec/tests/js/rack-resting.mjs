@@ -227,10 +227,16 @@ test('a leg from above straight onto the held face crosses the plate: lying agai
   // the straight leg from the plug above to the held face passes through the floor
   const straight = S.legCrossings(reach, first, solids, {diameter: 3});
   assert.deepEqual(straight.map(x => `${x.solid.item}:${x.solid.part}`), ['i4:tray/floor']);
-  // the kit does not lay it so: it goes round the front edge first (section
-  // 1.3, rule 1), and what it lays crosses nothing
-  assert.ok(p.detours.length >= 1);
-  assert.ok(p.detours[0].points.some(q => q.z > 110 + r15), 'round the front edge');
+  // the kit does not lay it so: it goes round an edge (section 1.3, rule 1),
+  // and what it lays crosses nothing. Until #1026 that was the front edge,
+  // out to 141.2 mm and back under the plate: 766.1 mm, seven corners short
+  // of room. An LC plug ends 27.6 mm out of the rail, behind the floor's back
+  // edge (48.8), so the near edge is that one (section 3.5): down behind the
+  // plate by one point on its back plane, 623.3 mm, four corners short
+  assert.equal(p.detours.length, 2);
+  for (const d of p.detours) assert.deepEqual(d.points.map(q => Math.round(q.z * 10) / 10), [48.8 - r15 - S.CLEAR], 'behind the back edge');
+  assert.equal(Math.round(R.pathLength(p).measured * 10000) / 10, 623.3);
+  assert.equal(p.bends.length, 4);
   assert.deepEqual(p.crossings, []);
   // a cable lying on the held face itself is no crossing: along the plate, a radius below it
   assert.deepEqual(S.legCrossings({x: -150, y: UNDER - r15, z: 91.2}, {x: 150, y: UNDER - r15, z: 91.2}, solids, {diameter: 3}), []);
