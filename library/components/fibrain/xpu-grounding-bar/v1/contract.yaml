@@ -1,0 +1,41 @@
+format: 1
+kind: component
+name: xpu-grounding-bar
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  The grounding bar of the Fibrain HD 1U frame XPS00, seen from above. A
+  copper-coloured bar across the frame behind the guide posts, which the frame
+  without grounding, XPU00, does not show. A mark on the plan and nothing
+  more: it is not built, because where it stands is not known.
+size: {w: 417.8, h: 12.0}
+size-confidence: {w: estimated, h: estimated}
+fields:
+  finish:
+    label: Finish
+    type: text
+    default: '#15171a'
+elements:
+  bar: {at: [0.0, 0.0], size: [417.8, 12.0], class: bezel}
+provenance:
+  size: >-
+    estimated - the product picture on the XPS00 datasheet (DSH-XPS00 rev 1,
+    24.05.2020), a three-quarter render from above, shows a copper-coloured
+    bar running across the frame behind the posts, level with the middle of
+    a post and passing behind every post. It reads as a strip lying flat,
+    about 12 from front to back, by eye. It is drawn the length of the member
+    the front elevation shows behind the posts, 417.8, because nothing gives
+    its own; whether it is that member is not known (see the device,
+    provenance.cross-member).
+  finish: >-
+    photo - copper-coloured on that picture (#b87333 here, a nominal copper
+    and not a sampled one). The picture on the XPU00 datasheet, from the same
+    viewpoint, and the six renders of XPU00 show no such bar. The field
+    defaults to a dark steel and the XPS00 configuration sets the copper.
+  relief: >-
+    NONE, ON PURPOSE. No source gives the bar's section, its height in the
+    frame or how far behind the face it stands, and the slot parts pass
+    through the space it would be built in. So it is a mark on the plan and
+    is not a body in 3D or something a cable is routed round.
+skins: [default]

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100.0mm" height="21.0mm" viewBox="0 0 100.0 21.0">
+  <!-- Fibrain XMN1021GB rear - the holder from behind
+       The adapters are composed by the contract; this skin is the black
+       moulding as the maker's front elevation draws it: the 99.70 x 20.95
+       face, six windows 12.95 wide on a 16.10 pitch, the five ribs 3.15 wide
+       between them, the two end cheeks with their latch fingers and the four
+       1.5 mm label holes. The latch tab that stands 1.90 out of each end is
+       not drawn: it is outside the 100 envelope and inside the post when the
+       holder is seated. Nothing is printed on the holder. See the contract's
+       provenance. -->
+  <rect id="bezel" x="0.15" y="0.025" width="99.7" height="20.95" rx="0.4"
+        fill="#17191b" stroke="#0c0d0e" stroke-width="0.2"/>
+  <rect x="0.25" y="0.125" width="3.025" height="20.75" fill="#222528"/>
+  <rect x="96.725" y="0.125" width="3.025" height="20.75" fill="#222528"/>
+  <rect x="3.275" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="19.375" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="35.475" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="51.575" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="67.675" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="83.775" y="1.050" width="12.95" height="18.85" fill="#0b0c0d"/>
+  <rect x="16.225" y="0.025" width="3.15" height="20.95" fill="#2a2d30"/>
+  <rect x="32.325" y="0.025" width="3.15" height="20.95" fill="#2a2d30"/>
+  <rect x="48.425" y="0.025" width="3.15" height="20.95" fill="#2a2d30"/>
+  <rect x="64.525" y="0.025" width="3.15" height="20.95" fill="#2a2d30"/>
+  <rect x="80.625" y="0.025" width="3.15" height="20.95" fill="#2a2d30"/>
+  <path d="M 0.15 3.625 L 2.65 3.625 L 2.65 17.325 L 0.15 17.325 M 1.65 6.575 L 1.65 14.375" fill="none" stroke="#0c0d0e" stroke-width="0.15"/>
+  <path d="M 99.85 3.625 L 97.35 3.625 L 97.35 17.325 L 99.85 17.325 M 98.35 6.575 L 98.35 14.375" fill="none" stroke="#0c0d0e" stroke-width="0.15"/>
+  <circle cx="1.65" cy="1.4" r="0.75" fill="#050506"/>
+  <circle cx="1.65" cy="19.6" r="0.75" fill="#050506"/>
+  <circle cx="98.35" cy="1.4" r="0.75" fill="#050506"/>
+  <circle cx="98.35" cy="19.6" r="0.75" fill="#050506"/>
+</svg>
