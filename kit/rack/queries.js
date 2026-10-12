@@ -15,7 +15,7 @@ import {catalogEntries} from './catalog.js';
 import {slackOf, spareLine, slackFindings} from './slack.js';
 import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
-import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength,
+import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText, fewText,
         layoutOf} from './bundles.js';
 import {slotEnv, slotTree, partName, partOf} from './slots.js';
 import {fieldRows} from '../fields.js';
@@ -419,7 +419,9 @@ function zeroUFacts(rack, z, ctx) {
 // never a pass. `bend` is the bend check's (#922, bundles.js bendCheck): the
 // bundle's radius and the cable that sets it, the members with no radius, and
 // each corner and stated-radius pathway with the room there and what it needs;
-// null when the routes are not known or there is no bundle to bend.
+// null when the routes are not known or there is no bundle to bend. `length`
+// and `straps` carry `straight: true`, and `notes` a sentence, where the trunk
+// was measured along the straight line for want of a cable's path (#1034).
 function bundleFacts(rack, b, ctx) {
   const label = id => rack.items.find(i => i.id === id)?.label ?? id;
   const r = bundleCheck(rack, b, ctx);
@@ -433,8 +435,9 @@ function bundleFacts(rack, b, ctx) {
     route: {waypoints: b.route || [], text: routeText(b.route || [], label, rack.frame)},
     length: r.checked ? trunkLength(rack, b, ctx) : null,
     size: r.size, bend: r.bend,
-    straps: {every: strapSpacing(b), count: s ? s.count : null, kinds: s ? s.kinds : null},
-    gone: r.gone, warnings: r.warnings, notes: r.notes, checked: r.checked};
+    straps: {every: strapSpacing(b), count: s ? s.count : null, kinds: s ? s.kinds : null, ...(s?.straight ? {straight: true} : {}), ...(s?.few ? {few: true} : {})},
+    // measured along the straight line where its cables have no path (bundles.js): said, since it is then an estimate
+    gone: r.gone, warnings: r.warnings, notes: [...r.notes, ...(s?.straight ? [straightText(bundleName(b))] : []), ...(s?.few ? [fewText(bundleName(b))] : [])], checked: r.checked};
 }
 
 // inspect looks an id up as an item, a cable, a part beside the rack, then a
