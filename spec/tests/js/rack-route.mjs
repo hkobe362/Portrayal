@@ -212,13 +212,22 @@ test('two ends on one ring manager run through the rings between them, in order 
   // a at 150 on the panel above, b at -150 on the switch: rings 4, 3 and 2, leftward
   assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': -150, 'i3|q': 150})),
     [{item: 'i2', via: 'guide-4'}, {item: 'i2', via: 'guide-3'}, {item: 'i2', via: 'guide-2'}]);
-  // a ring at a port's own x is between
-  assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': 0, 'i3|q': 110})), [{item: 'i2', via: 'guide-4'}, {item: 'i2', via: 'guide-3'}]);
-  // no ring between (1 to 109): never direct, but the ring nearest the middle
-  // (55), rings 3 and 4 being as near, the one on end a's side
+  // a ring at a port's own x is between. The panel's port comes down into
+  // ring 4 from the unit above, with room; the switch's port stands under
+  // ring 3 in its own unit, its plug ending 15.6 mm short of the ring, with
+  // no room to turn into it (#1026), and passes it: ring 4 alone (rings 4
+  // and 3 until then)
+  assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': 0, 'i3|q': 110})), [{item: 'i2', via: 'guide-4'}]);
+  // no ring between (1 to 109): never direct. Rings 3 and 4 are as near the
+  // middle (55), and until #987 the one on end a's side was taken, so the
+  // same cable written the other way round took the other ring. Now the
+  // ring each side is laid and the better lay taken: ring 4, which the
+  // panel's port comes down into from the unit above, where the switch's
+  // port has ring 3 beside it in its own unit and no room to turn into it.
+  // Whichever end is a
   assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': 1, 'i3|q': 109})), [{item: 'i2', via: 'guide-4'}]);
   const swapped = cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'});
-  assert.deepEqual(R.autoRoute(r, swapped, ctxFor(r, {'i1|p': 1, 'i3|q': 109})), [{item: 'i2', via: 'guide-3'}]);
+  assert.deepEqual(R.autoRoute(r, swapped, ctxFor(r, {'i1|p': 1, 'i3|q': 109})), [{item: 'i2', via: 'guide-4'}]);
   // and not a tie: 20 to 60, the middle 40, ring 3
   assert.deepEqual(R.autoRoute(r, c, ctxFor(r, {'i1|p': 20, 'i3|q': 60})), [{item: 'i2', via: 'guide-3'}]);
   // the middle, not end a: a at 15 is nearer ring 3, but the middle (60) is nearer ring 4

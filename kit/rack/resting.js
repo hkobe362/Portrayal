@@ -141,6 +141,45 @@ function apart(p, q, pts) {
   while (out.length && gap3(out[out.length - 1], q) < NEAR) out.pop();
   return out;
 }
+// OFF A SURFACE AT ITS EDGE (#987). A span's points are samples, and a
+// sample that lies on a surface can be followed by one past the surface's
+// edge and lower: the straight leg between them then starts down while it
+// is still over the surface, and for the rest of the way to the edge the
+// cable is drawn in the plate it lies on (a fifth of a millimetre into a
+// tray's floor, over 8 mm, where it was found). So wherever a leg of p,
+// `pts`, q has one end over a surface, at or above where a cable lies on
+// it, and the other end beyond its edge and below that, the point where the
+// leg passes the edge is added, at the height a cable lies on the surface:
+// level to the edge, and down from there. Returns `pts` with those points.
+function overEdges(p, q, pts, surfaces, r) {
+  if (!pts.length || !surfaces.length) return pts;
+  const chain = [p, ...pts, q], out = [];
+  const inside = (s, o) => o.x >= s.x0 - EPS && o.x <= s.x1 + EPS && o.z >= s.z0 - EPS && o.z <= s.z1 + EPS;
+  for (let k = 1; k < chain.length; k++) {
+    const u = chain[k - 1], v = chain[k], add = [];
+    for (const s of surfaces) {
+      const lie = s.y + r;
+      for (const [a, b] of [[u, v], [v, u]]) {
+        if (!inside(s, a) || inside(s, b) || a.y < lie - EPS || b.y >= lie - EPS) continue;
+        // where a-b leaves the footprint: the last t at which it is inside
+        let t = 1;
+        for (const [k0, k1, ax] of [['x0', 'x1', 'x'], ['z0', 'z1', 'z']]) {
+          const d = b[ax] - a[ax];
+          if (Math.abs(d) < 1e-12) continue;
+          t = Math.min(t, Math.max((s[k0] - a[ax]) / d, (s[k1] - a[ax]) / d));
+        }
+        const e = lerp(a, b, Math.max(0, Math.min(1, t)));
+        // only where the leg is below the lie there: a leg that is still
+        // above it at the edge has not dipped
+        if (e.y < lie - EPS && gap3(e, a) > 1e-3 && gap3(e, b) > 1e-3) add.push({pt: {...e, y: lie}, t: a === u ? t : 1 - t});
+      }
+    }
+    // one point an edge: a tray's floor is a surface twice, as a tray and as a body
+    for (const x of add.sort((m, n) => m.t - n.t)) if (!out.length || gap3(out[out.length - 1], x.pt) > 1e-3) out.push(x.pt);
+    if (k < chain.length - 1) out.push(v);
+  }
+  return out;
+}
 // How finely the curve is worked before it is sampled evenly along its arc.
 const FINE = 48;
 // A curve given as fine points from p to q, as n - 1 points evenly spaced
@@ -231,7 +270,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
           const g = groundAt(surfaces, pt.x, pt.z, pt.y - r);
           if (g && pt.y < g.y + r) pt.y = g.y + r;
         }
-        const out = apart(p, q, pts);
+        const out = overEdges(p, q, apart(p, q, pts), surfaces, r);
         if (out.length && ok(out)) return {points: out, lands: [land]};
         if (typeof fits !== 'function') break;
       }
@@ -256,7 +295,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
       const n = Math.min(24, Math.round(len / step));
       if (n < 2 || n === last) continue;
       last = n;
-      const out = apart(p, q, evenly(raised, n));
+      const out = overEdges(p, q, apart(p, q, evenly(raised, n)), surfaces, r);
       if (out.length && ok(out)) return {points: out, lands: landsOf(out)};
       if (typeof fits !== 'function') break;
     }

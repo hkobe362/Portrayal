@@ -137,14 +137,24 @@ function through(m, pane, portX, side, crossing, ctx, room = null) {
 // ring nearest the middle of its two ports (below), so a manager with a ring
 // along x never gives an empty route. A manager with no ring that runs along
 // x, but a duct, runs in the duct.
-function along(m, pane, ax, bx, ctx, passes = null) {
+function along(m, pane, ax, bx, ctx, passes = null, room = null, pick = null) {
   const gs = mountedGuides(m, ctx).filter(g => g.face === pane);
   const rings = gs.filter(g => g.kind === 'ring' && ringOf(g).run === 'x');
   if (rings.length) {
     const lo = Math.min(ax, bx), hi = Math.max(ax, bx);
     const between = rings.filter(g => g.x >= lo && g.x <= hi)
       .sort((p, q) => (ax <= bx ? p.x - q.x : q.x - p.x));
-    if (between.length) return between.map(g => ({item: m.id, via: g.via}));
+    if (between.length) {
+      // BY ROOM (#1026), as on the way to a gutter (`through`): of the rings
+      // between, the first from end a that a's lead has room to turn into,
+      // and the last that b's has; a ring too close to its end is passed
+      // over. `room(end, g)` says whether that end's lead has room at ring g
+      // (leadRoom). Where an end has room at none, its nearest stands; and
+      // where the two ends would pass each other's ring, all are kept.
+      const i = room ? between.findIndex(g => room('a', g)) : 0, j = room ? between.findLastIndex(g => room('b', g)) : between.length - 1;
+      const lo = Math.max(0, i), hi = j < 0 ? between.length - 1 : j;
+      return (lo <= hi ? between.slice(lo, hi + 1) : between).map(g => ({item: m.id, via: g.via}));
+    }
     // NO RING BETWEEN (owner's decision, 2026-10-09): a ring holds the cord
     // even where it does not turn it, so the route is never direct: the ring
     // nearest the middle of the two ports, of two as near the one on end a's
@@ -156,7 +166,17 @@ function along(m, pane, ax, bx, ctx, passes = null) {
     const mid = (ax + bx) / 2, aSide = Math.sign(ax - mid);
     const order = [...rings].sort((p, q) => Math.abs(p.x - mid) - Math.abs(q.x - mid)
       || aSide * (q.x - p.x));
-    const near = order.find(g => passes?.(g)) ?? order[0];
+    // NOT A RING THAT STANDS PAST ITS PORT WHEN ANOTHER LAYS BETTER (#987).
+    // The ring nearest the middle can stand just past one port: it passes
+    // (it holds the cord, or the cord comes down into it), and the cord then
+    // has to come back to that port beside the ring, a loop out in front of
+    // the tray that the lay gives all its room. Nothing short, nothing
+    // crossed: only longer, and drawn. So the nearest ring on EACH side of
+    // the stretch is laid (`pick`, autoRoute), and the one that lays better
+    // is taken; `pick` gives null when it cannot lay them, and then the
+    // nearest that passes stands, as before.
+    const sides = [order.find(g => g.x < lo), order.find(g => g.x > hi)].filter(Boolean);
+    const near = (sides.length > 1 ? pick?.(sides) : null) ?? order.find(g => passes?.(g)) ?? order[0];
     return [{item: m.id, via: near.via}];
   }
   const duct = gs.find(g => g.kind === 'duct');
@@ -215,7 +235,10 @@ export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
       return !(pa && pb && p) || !throughRings([pa, p, pb],
         [null, {...ringOf(g), diameter: cableDiameter(cable, ctx), portBefore: true, portAfter: true}, null]).back.length;
     };
-    return along(mA, A.pane, A.x, B.x, ctx, passes);
+    // each end's lead passes a ring toward the other port
+    const way = B.x >= A.x ? 1 : -1;
+    const room = (end, g) => leadRoom(rack, cable, end === 'a' ? cable.a : cable.b, mA, g, end === 'a' ? way : -way, ctx);
+    return along(mA, A.pane, A.x, B.x, ctx, passes, room, rings => patchRing(rack, cable, mA, rings, ctx));
   }
   const sideOf = x => (x <= 0 ? 'left' : 'right');
   const sA = sideOf(A.x), sB = sideOf(B.x);
@@ -244,6 +267,39 @@ export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
   return routes[byCable.get(cable)];
 }
 const sideMemo = new WeakMap();
+// WHICH OF TWO RINGS A PATCH LAYS BETTER THROUGH (#987, `along`): each is
+// laid as a route made by hand through that one ring, and they are compared
+// as two lays of one cable are (routePath): fewer rings entered and left by
+// one face, then fewer bodies crossed, then corners less short of room in
+// all, then the shorter; on a tie the first given, the one nearer the middle
+// of the two ports. null when a lay cannot be made (a port not found). Kept
+// per rack, context and cable, as the side is: the lays are the dear part.
+function patchRing(rack, cable, m, rings, ctx) {
+  const keyed = ctx !== null && typeof ctx === 'object';
+  let per = patchMemo.get(rack);
+  if (!per) patchMemo.set(rack, per = new WeakMap());
+  let byCable = keyed ? per.get(ctx) : null;
+  if (keyed && !byCable) per.set(ctx, byCable = new WeakMap());
+  const key = rings.map(g => g.via).join('|');
+  const known = byCable?.get(cable);
+  if (known?.key === key) return rings.find(g => g.via === known.via) ?? null;
+  let best = null;
+  for (const g of rings) {
+    // under the cable's own id: the page's readers are asked about this
+    // cable, and must know it
+    const path = routePath(rack, {...cable, route: [{item: m.id, via: g.via}], routeEdited: true}, ctx);
+    if (!path) return null;
+    const score = [path.findings.length, path.crossings.length, path.bends.reduce((n, f) => n + f.short_mm, 0), pathLength(path).measured * 1000];
+    // a tenth of a millimetre of room, a micron of length: under that is a tie
+    const tol = [0, 0, 0.05, 1e-3];
+    let better = !best;
+    for (let i = 0; best && i < 4; i++) if (Math.abs(score[i] - best.score[i]) > tol[i]) { better = score[i] < best.score[i]; break; }
+    if (better) best = {g, score};
+  }
+  byCable?.set(cable, {key, via: best.g.via});
+  return best.g;
+}
+const patchMemo = new WeakMap();
 // where each cable's turns were given room (routePath), per rack and context
 const roomMemo = new WeakMap();
 

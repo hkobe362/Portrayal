@@ -130,10 +130,12 @@ test('the owner\'s rack: no point of any cord lies below a support it is over', 
     // and no leg enters a body
     for (let k = 1; k < p.points.length; k++) assert.deepEqual(S.legCrossings(p.points[k - 1], p.points[k], solids, {diameter: 3}), [], c.id);
   }
-  // it looked: the cords pass over the floor, two come to rest on it (below),
+  // it looked: the cords pass over the floor, three come to rest on it
+  // (below; two, at one sampled point each, until c8 took ring 4, #987: its
+  // span on to the panel lands and lies along the floor to its back edge),
   // and every one is inside a ring's band
   assert.ok(overFloor > 500, `over the floor: ${overFloor}`);
-  assert.equal(onFloor, 2, `on the floor: ${onFloor}`);
+  assert.equal(onFloor, 9, `on the floor: ${onFloor}`);
   assert.ok(inRing >= 16, `in a ring: ${inRing}`);
 });
 
@@ -147,15 +149,40 @@ test('a free span that would sag below the floor lands on it and is supported th
   // the floor and rise the 17.7 to the plug in bends of 25 mm takes 61 mm
   // along and the turn at each end besides: only c7 and c14, whose panel
   // ports stand furthest from their ring (44.1 and 47.1 mm along the run),
-  // have a span that touches the floor, and no hang is laid that leaves a
-  // corner less room than the bend radius. The rest span straight.
+  // had a span that touches the floor, and no hang is laid that leaves a
+  // corner less room than the bend radius. Since #987 c8 is a third: from
+  // ring 4 on to lc6, 57 mm along the run. The rest span straight.
   const lands = r.cables.map(c => [c.id, R.routePath(r, c, ctx)])
     .filter(([, p]) => p.rests.some(x => x.kind === 'tray'));
-  assert.deepEqual(lands.map(x => x[0]), ['c7', 'c14']);
+  assert.deepEqual(lands.map(x => x[0]), ['c7', 'c8', 'c14']);
   for (const [id, p] of lands) {
     assert.deepEqual(p.rests.find(x => x.kind === 'tray'), {kind: 'tray', item: 'i4', via: 'tray', face: 'top', role: 'resting'}, id);
     assert.ok(p.points.some(q => q.at === 'rest' && Math.abs(q.y - (TOP + r15)) < 1e-6), `${id} lies on the floor`);
   }
+});
+
+test('a span that leaves a surface over its edge lies level to the edge, and goes down from there (#987)', () => {
+  // c8, through ring 4, hangs on to its panel port and lands on the tray's
+  // floor; the port is behind the floor's back edge (48.8 mm out), so the
+  // span leaves the floor over that edge. Its samples stood on the floor at
+  // 56.9 mm out and past the edge, 0.4 mm lower, at 41.4: the straight leg
+  // between them was up to 0.2 mm inside the floor for the 8 mm to the edge
+  const r = F.rack(), ctx = F.ctxOf(r);
+  const [t] = S.traysOf(r, ctx), back = Math.max(...t.floors.map(f => f.z0).filter(z => z < 60));
+  const p = R.routePath(r, r.cables.find(c => c.id === 'c8'), ctx);
+  const rest = p.points.filter(q => q.at === 'rest');
+  const lie = TOP + r15;
+  // a point at the edge, at the height a cord lies on the floor
+  const edge = rest.filter(q => Math.abs(q.z - back) < 1e-6);
+  assert.equal(edge.length, 1);
+  near(edge[0].y, lie, 'level at the edge');
+  // before it the span is on the floor, after it below
+  const k = rest.indexOf(edge[0]);
+  assert.ok(k > 0 && k < rest.length - 1);
+  near(rest[k - 1].y, lie, 'on the floor before the edge');
+  assert.ok(rest[k + 1].y < lie && rest[k + 1].z < back, JSON.stringify(rest[k + 1]));
+  // and the leg from the floor to the edge is level, so nothing of it is in the plate
+  for (const q of along([rest[k - 1], edge[0]], 0.5)) near(q.y, lie, 'level to the edge');
 });
 
 // ── a route along the tray ─────────────────────────────────────────────

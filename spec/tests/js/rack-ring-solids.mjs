@@ -187,8 +187,9 @@ test('every ring is entered from an approach point, and no detour ends at the ri
   assert.deepEqual(offs.filter(v => v < 25 - 1e-6).map(v => Math.round(v * 10) / 10), [6.5, 12.5]);
   // ten detours (thirteen before #973, when five upper cords went over
   // their ring: four are led square to its approach point now, and c7
-  // still goes over it)
-  assert.equal(detoured, 10);
+  // still goes over it); nine since #987, c8 no longer coming back round
+  // the front of the tray from ring 5
+  assert.equal(detoured, 9);
 });
 
 test('a detour that ends at the ring\'s centre, or its face, is a fault', () => {

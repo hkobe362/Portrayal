@@ -79,17 +79,19 @@ test('the owner\'s rack: no corner of any cord is short of its 25 mm (86 were, b
   assert.deepEqual(tightCorners(r, ctx, 'need'), []);
   assert.deepEqual(r.cables.flatMap(c => R.routePath(r, c, ctx).bends), []);
   assert.deepEqual(R.bendFindings(r, ctx), []);
-  // it looked: the sixteen paths have 97 corners between them, and the
-  // tightest has 25 mm
+  // it looked: the sixteen paths have 98 corners between them (97 until c8
+  // took ring 4, #987), and the tightest has 25 mm
   const all = r.cables.flatMap(c => cornersOf(R.routePath(r, c, ctx).points, {share: 'need'}));
-  assert.equal(all.length, 97);
+  assert.equal(all.length, 98);
   assert.equal(Math.min(...all.map(c => c.room_mm)), 25);
   // by halves, the only measure there was before, 86 corners were short: 22
   // at a rest sample, 32 at a ring's approach, 13 at a detour and 19 at a
   // plug's end beside a rest sample. 23 are still short by halves, none at
-  // a rest sample or a detour: each is a turn that shares a leg with a
-  // slighter one, which takes half of it and needs a fraction
-  assert.deepEqual(byCause(tightCorners(r, ctx, 'half')), {rest: 0, approach: 16, detour: 0, other: 7});
+  // a detour: each is a turn that shares a leg with a slighter one, which
+  // takes half of it and needs a fraction. (One is at a rest sample since
+  // #987, where c8, through ring 4, lands on the tray: sixteen were at an
+  // approach point until then.)
+  assert.deepEqual(byCause(tightCorners(r, ctx, 'half')), {rest: 1, approach: 15, detour: 0, other: 7});
   // and nothing was bought with a body: no path crosses one
   assert.deepEqual(R.bodyFindings(r, ctx), []);
   assert.deepEqual(R.ringFindings(r, ctx), []);

@@ -79,9 +79,14 @@ const mm = l => Math.round(l.measured * 10000) / 10;
 // And since the stock break of version 4 (BREAK_TOL_M, 10 mm) c3 and c7, 2.7
 // and 5.8 mm over 0.5 m with full end play, are 0.5 m cords too. No length
 // moved for it: the figure here is the need and the end play, as before.
+// And since #987 c8 takes ring 4, not ring 5: 547 mm, 72.2 shorter. Ring 5
+// is the nearer to the middle of its two ports and stands 6.6 mm past its
+// panel port, so the cord left it and came back round the front of the
+// tray; through ring 4 it is led square from the leaf above and runs
+// straight on to the panel, landing on the tray on the way.
 const OWNER = {
   c1: [[4], 514.2, 1], c2: [[4], 499.8, 0.5], c3: [[4], 502.7, 0.5], c4: [[4], 491.4, 0.5],
-  c5: [[4], 522, 1], c6: [[4], 515, 1], c7: [[4], 505.8, 0.5], c8: [[5], 619.2, 1],
+  c5: [[4], 522, 1], c6: [[4], 515, 1], c7: [[4], 505.8, 0.5], c8: [[4], 547, 1],
   c9: [[3], 611.2, 1], c10: [[3], 613.2, 1], c11: [[3], 616.1, 1], c12: [[3], 623.4, 1],
   c13: [[4], 645.5, 1], c14: [[4], 616.9, 1], c15: [[4], 648, 1], c16: [[4], 576.3, 1],
 };
@@ -107,10 +112,7 @@ test('the owner\'s rack: each cord runs along the lacer through a ring, with no 
     r.cables.map(c => c.id).filter(id => !['c2', 'c3', 'c4', 'c7'].includes(id)));
   // and no corner of any is short of its 25 mm (#973)
   assert.deepEqual(r.cables.flatMap(c => R.routePath(r, c, ctx).bends), []);
-  // every ring taken is passed. None now holds a cord that does not turn in
-  // it: c8's panel port stands 12.1 mm above ring 5's sill and 10 mm short
-  // of its centre, steeper than 45 degrees, so the cord comes down into the
-  // ring rather than reaching along into it (route-path.js)
+  // every ring taken is passed, and none holds a cord that does not turn in it
   for (const c of r.cables) {
     const p = R.routePath(r, c, ctx);
     assert.equal(p.rings.length, OWNER[c.id][0].length, c.id);
@@ -135,13 +137,14 @@ test('the owner\'s rack: no ring is entered and left by one face, and no route c
     assert.ok(p.detours.length <= 1, c.id);
     if (!LOWER.includes(c.id)) {
       const lead = p.points.filter(q => q.at === 'lead' && q.via);
-      assert.equal(lead.length, ['c1', 'c2', 'c5', 'c6'].includes(c.id) ? 1 : 0, c.id);
+      assert.equal(lead.length, ['c1', 'c2', 'c5', 'c6', 'c8'].includes(c.id) ? 1 : 0, c.id);
       const reach = p.points[1];
       for (const q of lead) assert.deepEqual([q.x, q.y, q.z], [ap.x, reach.y, reach.z], c.id);
       // c7 goes over ring 4 to its approach point, 6.5 mm past the band on
-      // the far side, by one detour point 50 mm above it; c8 has a detour
-      // back from ring 5 to its panel port; no other upper cord has one
-      const want = {c7: [[{end: 'a'}, ring(4)]], c8: [[ring(5), {end: 'b'}]]}[c.id] ?? [];
+      // the far side, by one detour point 50 mm above it; no other upper
+      // cord has one (c8 had, back from ring 5 to its panel port, until
+      // #987: through ring 4 it is led square, as c1 is)
+      const want = {c7: [[{end: 'a'}, ring(4)]]}[c.id] ?? [];
       assert.deepEqual(p.detours.map(d => d.between), want, c.id);
       if (c.id === 'c7') assert.deepEqual(p.detours[0].points.map(q => [q.x, q.y, q.z]), [[ap.x, ap.y + 50, ap.z]]);
       continue;
@@ -159,23 +162,34 @@ test('the owner\'s rack: no ring is entered and left by one face, and no route c
   assert.deepEqual(s.filter(x => x.part === 'envelope').map(x => x.item), ['i1', 'i2', 'i3']);
 });
 
-test('c8: no ring between its ports; ring 5, just past its panel port, passes it with no finding; a hook still warns', () => {
+test('c8: no ring between its ports; of the ring each side, the one it lays better through; a hook still warns', () => {
   const r = F.rack(), ctx = F.ctxOf(r);
   const c8 = r.cables.find(c => c.id === 'c8');
   // ports at 147.3 (LEAF-A port 56, lower row) and 195.81 (bay 4 lc6), the
   // middle 171.6: ring 5 (205.8) is 34.2 from it, ring 4 (110.4) 61.2. Ring
   // 5's near face (202.4) is 6.59 past lc6, within its depth (6.8) and the
-  // OM4 cord's 3 mm: the cord reaches into it to be held, and passes
-  assert.deepEqual(R.autoRoute(r, c8, ctx), [ring(5)]);
+  // OM4 cord's 3 mm: the cord reaches into it to be held, and passes. It
+  // was taken for that until #987, and the cord then came back to lc6 round
+  // the front of the tray, 619.2 mm with nothing short and nothing crossed.
+  // Now the nearest ring on each side of the stretch is laid (ring 4 and
+  // ring 5), and the better lay is taken: through ring 4, 547 mm
+  assert.deepEqual(R.autoRoute(r, c8, ctx), [ring(4)]);
   assert.deepEqual(R.ringMarks(r, c8, ctx), [{run: 'x', depth: 6.8, sense: 1, back: false}]);
   assert.deepEqual(R.ringFindings({...r, cables: [c8]}, ctx), []);
-  // passed; not `held` since #949 step 3: the cord rests on ring 5's sill,
-  // 12.1 mm below lc6's reach point, which is then steeper than 45 degrees
-  // off the run and comes down into the ring (the bound below is level)
+  const lay = n => { const hand = {...c8, route: [ring(n)], routeEdited: true}, p = R.routePath({...r, cables: [hand]}, hand, ctx);
+    return [mm(R.pathLength(p)), p.bends.length, p.crossings.length, p.findings.length, p.detours.length]; };
+  assert.deepEqual([lay(4), lay(5)], [[547, 0, 0, 0, 0], [619.2, 0, 0, 0, 1]]);
   const [g] = R.routePath(r, c8, ctx).rings;
-  assert.deepEqual([g.via, g.passed, g.held], ['guide-5', true, undefined]);
-  // a hand route the same way gets the same answer
-  assert.deepEqual(R.ringFindings({...r, cables: [{...c8, route: [ring(5)], routeEdited: true}]}, ctx), []);
+  assert.deepEqual([g.via, g.passed, g.held], ['guide-4', true, undefined]);
+  // the same cable written the other way round takes the same ring
+  assert.deepEqual(R.autoRoute(r, {...c8, a: c8.b, b: c8.a}, ctx), [ring(4)]);
+  // a hand route through ring 5 is still the user's: passed (not `held`
+  // since #949 step 3: the cord rests on ring 5's sill, 12.1 mm below lc6's
+  // reach point, which is then steeper than 45 degrees off the run and
+  // comes down into the ring), with no finding
+  const by5 = {...c8, route: [ring(5)], routeEdited: true};
+  assert.deepEqual(R.ringFindings({...r, cables: [by5]}, ctx), []);
+  assert.deepEqual(R.routePath({...r, cables: [by5]}, by5, ctx).rings.map(x => [x.via, x.passed, x.held]), [['guide-5', true, undefined]]);
   // a real hook still warns: through ring 3, 144 mm behind LEAF-A port 56
   // past its near face, the cord goes well past and comes back. (Ring 4,
   // 33.5 mm behind, warned until the cord rested on its sill, 43.5 mm below

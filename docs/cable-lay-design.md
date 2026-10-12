@@ -959,8 +959,9 @@ is a point of:
 | a plug's end (beside a rest sample) | 19 | 7 | 0 | follows from the three above |
 | all | 86 | 87 | 0 | |
 
-By halves 23 corners of the new paths are still short (16 at an approach
-point, 2 at a lead point, 5 at a plug's end): each is a turn that shares a
+By halves 23 corners of the new paths are still short (15 at an approach
+point, 1 at a rest sample, 2 at a lead point, 5 at a plug's end; 16 at an
+approach point and none at a rest sample until #987, 3.5): each is a turn that shares a
 leg with a slighter one. That is the difference between the two ways of
 sharing, and why a path is judged by need.
 
@@ -1157,6 +1158,7 @@ kinds:
   lead point that its detour then reaches in line, so the path passes
   straight through it. It is left in: the path is the kit's stops and its
   detours between them, and a drawing rebuilds the detour from that point.
+  (c8 no longer does so: since #987 it takes ring 4, 3.5.)
 
 **Lengths change on saved racks.** On the reference rack every cord is longer,
 by 10.9 to 179.2 mm, none shorter, and seven of the sixteen change stock
@@ -1185,7 +1187,8 @@ leaf's eight are still 1 m cords.
 
 c8 grows most: it leaves ring 5 and comes straight back to a panel port 13.4
 mm short of the ring, with the lacer's web between, so it goes round the
-front of the tray and straight in to its plug. On the generated racks a
+front of the tray and straight in to its plug (until #987 gave it ring 4,
+3.5: 547 mm). On the generated racks a
 length moves by -113 to +297 mm, median +14; 93 cables move up a stock size
 and 34 down. 668 of the 1,803 are shorter: a span that hung to its full
 depth whatever held its ends now hangs only as deep as the corners beside
@@ -1312,6 +1315,43 @@ point already moved in beside a detour may go back to the radius and
 
 What is chosen is still the cable's whole path, laid from both ends
 (3.4), so no cable written the other way round lays differently.
+
+**A patch along one manager (#987).** Two ends that leave through one
+manager run along it through the rings between their ports (4.1). The rule
+above is applied there too: of the rings between, the first from end a that
+a's lead has room to turn into and the last that b's has are the ends of
+what is taken; where an end has room at none its nearest stands, and where
+the two ends would pass each other's ring all are kept.
+
+With no ring between, the ring nearest the middle of the two ports was
+taken, of those the cord passes through. On the reference rack that sent c8
+through ring 5, which stands 6.6 mm past its panel port: the cord left the
+ring and came back to the port round the front of the tray, 619.2 mm, with
+every corner its room and nothing crossed. Nothing in the lay was wrong; the
+ring was. Room cannot tell the two rings apart (the loop has all its room),
+and the test of 4.1 for whether a cord passes a ring reads the ports and the
+ring's centre, not the sill the cord lies on, and calls ring 4 a hook where
+the lay passes it. So here, and only here, the choice is made by laying:
+**the nearest ring on each side of the stretch is laid as a route through
+that one ring, and the better lay is taken**, by the order two lays of one
+cable are compared in (3.4): fewer rings entered and left by one face, fewer
+bodies crossed, corners less short of room, then the shorter; on a tie the
+one nearer the middle. c8 takes ring 4: led square from the leaf above,
+straight on to the panel, 547 mm. The other fifteen cords keep their ring.
+The choice is the same whichever end is written first, which the tie on end
+a's side was not. It costs two more lays for such a cable, kept as the
+path's are; a manager with a ring on only one side of the stretch is as it
+was. A route made by hand through ring 5 is laid as before, with no finding.
+
+A first attempt at this was withdrawn because c8, through ring 4, failed
+the check that no point of a cord lies below a support it is over. That was
+a fault of the hang, not of the choice, and c8 was the first cord to show
+it: a span that lands on a surface and leaves it over its edge had one
+sample on the surface and the next past the edge and lower, and the straight
+leg between them was inside the plate for the rest of the way to the edge
+(0.2 mm into the tray's floor, over 8 mm). **A span now has a point where
+it passes the edge of a surface it lies on, at the height a cable lies on
+it:** level to the edge, and down from there (`resting.js`).
 
 ## 4. Lay order
 
