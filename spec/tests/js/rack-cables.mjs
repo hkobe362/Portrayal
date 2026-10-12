@@ -100,8 +100,8 @@ test('endName and tagText say which device, and survive a removed one', () => {
   assert.equal(C.endName(r, end('i4', 'port-2-1')), 'demarc (U20) port-2-1');
   assert.equal(C.endName({...r, frame: {...r.frame, numbering: 'top-down'}}, end('i4', 'port-2-1')), 'demarc (U23) port-2-1');
   assert.equal(C.endName(r, end('i9', 'port-1')), "a removed device's port-1");
-  assert.equal(C.tagText(r, end('i3', 'port-2-1')), '→ demarc port-2-1');
-  assert.equal(C.tagText(r, end('i9', 'port-1')), '→ removed port-1');
+  assert.equal(C.tagText(r, end('i3', 'port-2-1')), '→ demarc port 2 1');
+  assert.equal(C.tagText(r, end('i9', 'port-1')), '→ removed port 1');
   const long = C.tagText(r, end('i1', 'slot-2/module/a-very-long-port-name-indeed'));
   assert.equal(long.length, 32);
   assert.ok(long.endsWith('…'));

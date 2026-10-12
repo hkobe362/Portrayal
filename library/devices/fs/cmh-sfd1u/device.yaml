@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-sfd1u
-version: 0.1.3
+version: 0.1.4
 maturity: modelled
 manufacturer: FS.com
 model: CMH-SFD1U
@@ -159,6 +159,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, 6.1 mm, at 100% (maximum) fill - a theoretical value for reference (FS
       finger duct datasheet), which recommends 30% fill, 14 cables
+    cable-capacity-media: cat6
   compliance:
     rohs: RoHS Compliant
     iso: ISO9001 Certificate

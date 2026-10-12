@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: uscmh-5dr1u
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: USCMH-5DR1U
@@ -116,6 +116,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG cables, theoretical - FS 0U/1U Horizontal Cable Manager datasheet,
       specification table, third column
+    cable-capacity-media: cat6
   compliance:
     environment: Indoor
 chassis:

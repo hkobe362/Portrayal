@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: fhd-cmp5dr
-version: 1.1.1
+version: 1.1.2
 maturity: modelled
 manufacturer: FS.com
 model: FHD-CMP5DR
@@ -126,6 +126,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG cables, theoretical - FS 0U/1U Horizontal Cable Manager datasheet,
       specification table
+    cable-capacity-media: cat6
   compliance:
     environment: Indoor
     rohs: RoHS

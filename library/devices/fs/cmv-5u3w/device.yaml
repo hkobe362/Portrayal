@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmv-5u3w
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: CMV-5U3W
@@ -142,6 +142,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, 6.1 mm - a theoretical value for reference (FS Vertical Cable Managers
       with Finger Ducts datasheet), which states no fill
+    cable-capacity-media: cat6
   compliance:
     flammability: UL 94V-0 (product page)
     rohs: RoHS Compliant
