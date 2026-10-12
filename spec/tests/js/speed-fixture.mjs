@@ -122,3 +122,30 @@ export function moveCable(rack, id) {
 export function moveDevice(rack, id, by = -1) {
   return {...rack, items: rack.items.map(i => (i.id === id || i.on === id ? {...i, ru: i.ru + by} : i))};
 }
+
+// SPANS PAST A TRAY'S EDGE, hung (resting.js hang): from over the middle of
+// the floor of the lacer's tray on the owner's rack (cable-solids-fixture)
+// out past its front edge, its two ends and a corner, 30, 120 and 400 mm
+// beyond, from 4, 20 and 60 mm above the floor, the 120 mm ones 15 mm
+// downhill: 45 spans, each [its points to a millionth of a millimetre, what
+// it lands on]. `F`, `S` and `Rest` are a tree's cable-solids-fixture,
+// solids.js and resting.js.
+export function edgeSpans(F, S, Rest) {
+  const rack = {...F.ownerRack(), cables: F.OWNER_CABLES}, ctx = F.ctxOf();
+  const surfaces = Rest.surfacesOf(rack, ctx), trays = S.traysOf(rack, ctx);
+  const floor = trays[0].floors.reduce((m, f) => ((f.x1 - f.x0) * (f.z1 - f.z0) > (m.x1 - m.x0) * (m.z1 - m.z0) ? f : m));
+  const top = trays[0].top, cx = (floor.x0 + floor.x1) / 2, cz = (floor.z0 + floor.z1) / 2;
+  const spans = [];
+  for (const up of [4, 20, 60])
+    for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [1, 1], [0.3, 1]])
+      for (const reach of [30, 120, 400]) {
+        const p = {x: cx, y: top + up, z: cz};
+        const edge = dz ? floor.z1 - cz : (dx > 0 ? floor.x1 - cx : cx - floor.x0);
+        spans.push([p, {x: cx + dx * (edge + reach), y: top + up + (reach === 120 ? -15 : 0), z: cz + dz * (edge + reach)}]);
+      }
+  const r6 = v => Math.round(v * 1e6) / 1e6;
+  return spans.map(([p, q]) => {
+    const h = Rest.hang(p, q, {r: 1.5, drape: 1, bend: 25, surfaces});
+    return [h.points.map(pt => [r6(pt.x), r6(pt.y), r6(pt.z)]), h.lands.map(g => g.via ?? g.part)];
+  });
+}
