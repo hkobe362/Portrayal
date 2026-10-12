@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="7.01mm" height="43.0mm" viewBox="0 0 7.01 43.0">
+  <!-- Fibrain HD 1U frame guide post, off the maker's front elevation: two
+       tiers of 21.00, a red release latch 6.50 x 8.50 in each, a small block
+       near each foot. -->
+  <rect x="3" y="0" width="1" height="1" fill="#101214"/>
+  <rect id="post" x="0" y="1" width="7.01" height="42" fill="#101214"/>
+  <rect x="1.51" y="18" width="4" height="2.5" fill="#1d2023"/>
+  <rect x="1.51" y="39" width="4" height="2.5" fill="#1d2023"/>
+  <rect id="latch-1" x="0.26" y="4.2" width="6.5" height="8.5" rx="0.5" fill="#d92c1b"/>
+  <rect id="latch-2" x="0.26" y="25.2" width="6.5" height="8.5" rx="0.5" fill="#d92c1b"/>
+</svg>

@@ -1,0 +1,71 @@
+format: 1
+kind: component
+name: xpu-cable-bar
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  The rear cable bar of the Fibrain HD 1U frame XPU00 / XPS00, seen from
+  above. A stepped bar across the back of the frame: an upper strip at the
+  rear, an upright, and a lower strip in front of it. Each strip carries a row
+  of slots that cables are tied down to.
+size: {w: 435.0, h: 29.0}
+size-confidence: {w: estimated, h: estimated}
+elements:
+  upper: {at: [0.0, 0.0], size: [435.0, 14.5], class: bezel}
+  lower: {at: [0.0, 14.5], size: [435.0, 14.5], class: bezel}
+  upright: {at: [8.6, 13.9], size: [417.8, 1.2], class: bezel}
+relief:
+  features:
+    - node: upper
+      lift: 29.45
+      out: 30.65
+      color: '#1b1e21'
+      confidence: drawing
+      source: 'the upper lip of the band on the front elevation, 12.5 to 13.7 from the top of the frame, read as the upper strip seen edge on; how far back it runs is estimated'
+    - node: upright
+      lift: 11.65
+      out: 30.65
+      color: '#1b1e21'
+      confidence: drawing
+      source: 'the band on the front elevation, 19.0 high from 12.5 to 31.5 and from 33.40 to 451.20, read as the upright of this bar; where it stands between the two strips is estimated'
+    - node: lower
+      lift: 11.65
+      out: 12.85
+      color: '#1b1e21'
+      confidence: drawing
+      source: 'the lower lip of the same band, 30.3 to 31.5, read as the lower strip seen edge on; how far forward it runs is estimated'
+provenance:
+  size: >-
+    estimated - the front and plan line drawing on page 2 of DSH-XPU00 rev 2 (15.05.2020) and DSH-XPS00 rev 1 (24.05.2020), one image in both, 782 px across at 1.376 px/mm:
+    the bar runs the width of the frame and is 29 deep.
+  size-section: >-
+    photo and drawing - the vendor renders of XPU00 (XPU00_1 and _2, 2000 px,
+    from above and behind the front) show the bar as a stepped section: an
+    upper strip at the rear with one row of tie tabs, an upright, and a lower
+    strip in front of it with the second row. Seen from the front that is a
+    band with a sheet edge top and bottom, which is what the front elevation
+    (the CAD libraries archive Fibrain publishes (hd.fibrain.com/dxf/cad-libraries.zip, files dated 2020-07-30), `XPS00.dxf`: AutoCAD 2007, units millimetres, one 1:1 front elevation)
+    draws on a part layer of its own behind the posts: 19.0 high, 12.5 to
+    31.5 from the top, with lips 1.2 thick at 12.5 to 13.7 and 30.3 to 31.5,
+    from 33.40 to 451.20, and twelve slots 20 x 4 on a 34.4 pitch at mid
+    height, the first at 43.10. SO THE HEIGHTS ARE DRAWN AND THE
+    DEPTHS ARE NOT: the upright is put half way, 14.5 from the rear, and each
+    strip runs from it to its edge of the 29. THAT THE BAND IS THIS BAR IS A
+    READING: a front elevation does not say how far back anything stands. It
+    is taken because the renders show nothing else at that height as far
+    back as they see, and a cassette 169 deep fills each slot in front of it.
+    The twelve slots of the upright are not cut: it is a line in plan.
+  size-slots: >-
+    estimated - the plan shows forty-eight tie slots in twelve groups of
+    four, two nearer the rear and two nearer the front in each group, which
+    the renders show as one row on each strip. THE COUNT IS READ; THE SIZE AND
+    SPACING ARE NOT: each slot is drawn 4 x 8 and the groups are spread
+    evenly. The renders show each as a tab cut out of the plate on three
+    sides, which is not drawn.
+  relief: >-
+    drawing for the heights, estimated for the depths - see the features and
+    `size-section`.
+  color: >-
+    photo - black on the vendor renders.
+skins: [default]
