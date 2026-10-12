@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-6dr1u
-version: 1.0.0
+version: 1.0.1
 maturity: modelled
 manufacturer: FS.com
 model: CMH-6DR1U
@@ -151,6 +151,7 @@ attrs:
       at the recommended 30 %. The two end rings are stated apart, 153 (46 at 30 %), for
       vertical runs - FS Horizontal Cable Managers with D-rings datasheet, Cable Capacity
       Reference Guide
+    cable-capacity-media: cat6
 chassis:
   width: 430.0
   height: 44.0

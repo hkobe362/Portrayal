@@ -404,7 +404,8 @@ and `schemas/v3/rack.schema.json`.
 
 `rack.json` is written by the build beside `devices.json`. For every device it
 holds the rack units, the depth and height, how it mounts, whether its body is
-sheet, the cable capacity its vendor states, the ids a route can pass
+sheet, the cable capacity its vendor states (with the kind of cable counted,
+`capacity.media`, where a source names it), the ids a route can pass
 through, and its `kind`: a plain word for what it is (`switch`, `patch panel`,
 `cable manager`, ...) that `catalog(devices, { kind })` filters by. `kind` is
 advisory and its words may be refined. `loadCatalog(dist)` takes what the other loaders take: a base URL, or
@@ -747,6 +748,60 @@ routed paths (`routePath`).
   bend check of a bundle (its corners are still the straight lines between
   waypoints), a single cable's path and length, and a saved rack: nothing
   here is stored.
+
+**New in 0.26.0: a manager's stated count is a count of one kind of cable.**
+`capacityOver(rack, ctx)` compared a manager's stated count with every cable
+through it. A maker counts with one cable (thirty Cat6 is the section of about
+a hundred and twenty 3 mm cords), so it now counts only the cables at least
+as thick as the catalogue's `capacity.media`, by `DIAMETERS`: Cat6 and Cat6A
+through a manager counted in Cat6, and a cable with no `media`, which `fill`
+already takes as 6 mm copper. A fibre cord, an AOC or a DAC is not counted
+there; the fill of the rings is the check for those. **This changes what a
+page warns of, and the notes of the sheets, the cable schedule and the BOM.**
+No rack file changes.
+
+- An entry is `{ item, count, through, capacity, media, diameter }`: `count`
+  of the cables counted, `through` of every kind, `diameter` the least
+  diameter counted, in mm. A page that reads `item` alone reads what it did.
+- `capacity.media` in `rack.json` has three shapes. A kind: compared as
+  above. `null`: no source names the cable, and the count is never compared.
+  Anything else, which is no key (a catalogue built before 0.26.0) or a
+  kind this kit has no diameter for (a catalogue newer than the kit): its
+  count is compared with the cables of 6 mm or more, so neither goes silent,
+  with `media: null` in the entry. Only `null` means "never compare".
+  **Take the library build and the kit together** to get the stated kinds.
+- `fillNotes(rack, facts, nameOf)` names a manager with where it is, after
+  the name `nameOf` gives: `LACER (U20 front)`, or `(at left-front)` for a
+  part beside the rack. Two managers of one model no longer give one line.
+  It reads `facts.ctx.chassisOf` where the facts carry a context: with it
+  the U is right for a manager taller than one unit on a frame numbered from
+  the top, and without it such a manager is named one unit off.
+- The note of a pathway over its fill says both shares: `ring 1 on LACER
+  (U20 front): 60 cables, 112% of its fill limit; the limit is 40% of the
+  opening.` It said `guide-1 on LACER: 60 cables, 112% of a 40% fill.`
+- The note of a manager over its count names the kind: `LACER (U20 front):
+  31 cables at least as thick as Cat 6 copper through it, more than the 30
+  Cat 6 copper cables its maker states.` With thinner kinds beside them: `31
+  of the 36 cables through it are at least as thick as Cat 6 copper, ...`.
+  Where the entry names no kind: `31 cables of 6 mm or more through it, more
+  than the 30 its maker states.`, and with thinner kinds beside them `31 of
+  the 36 cables through it are of 6 mm or more, more than the 30 its maker
+  states.` A count of one reads `the 1 Cat 6 copper cable`.
+- `inspect` of a manager, on the rails or beside the rack, gives `capacity:
+  { count, basis, media }`, `media` null where the catalogue names no cable.
+- `portLabel(path)` (`rack/cable-rules.js`) is a port in words: `bay 1 b09`
+  for `bay-1/module/b09`. `tagText` uses it, so the tags a page draws, on
+  the screen and on a sheet, change their words. `freePorts` gives it as a
+  port's `label`, which read `bay 1/module/b09` for a port on a seated part.
+
+**What a page must change.** A test that pins `% of a 40% fill.` or `more
+than its stated` no longer matches. A page that shows the `label` of a
+`freePorts` entry (an agent's tool, a picker) shows the new words. Nothing
+else is asked of a page: `capacityOver`, `fillNotes` and `tagText` take what
+they took.
+
+The whole rule, with what happens for a mix of kinds, is
+[cable-managers-design.md](../docs/cable-managers-design.md) section 14.
 
 **New in 0.25.0: a large rack is read in a fraction of the time, and every
 answer is the one it was.** No path, length, need, stock size, finding,

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-bs-dfdabs2u
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: CMH-BS-DFDABS2U
@@ -131,6 +131,7 @@ attrs:
     cable-capacity-basis: >-
       Cat6 24AWG, a theoretical value - FS CMH-BS-DFDABS2U datasheet specification table,
       which states no fill basis and does not divide it between the two sides
+    cable-capacity-media: cat6
   environmental:
     operating-temp: -10 to 60°C (14 to 140°F)
     operating-humidity: 95% Relative Humidity (max.), Non-condensing
