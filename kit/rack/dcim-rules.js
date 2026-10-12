@@ -172,7 +172,7 @@ export function resolveEnd({path, device, moduleAt = () => null, consoles = [], 
 
 // resolveEnd FOR EVERY END OF ONE RACK, with the catalogue asked for each
 // end's fibre ports: what a page hands cableImportRows as `resolve`.
-//   ctx        {slotsOf, compByRef}, what catalog.js loadSlots returns
+//   ctx        {slotsOf, compByRef}, what `catalog.js` loadSlots returns
 //   deviceOf   item id -> typeLists of its device type, or null
 //   moduleAt   (item id, bay id) -> typeLists of the module type seated there
 //   consolesOf item id -> the paths of the console ports its drawing has
