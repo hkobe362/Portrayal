@@ -24,7 +24,9 @@ const add = (rack, ref, ru, extra = {}) => M.withItem(rack, {ref, cfg: 'x', ru, 
 // The rings at their x in the rack, each 32 mm by 29.5 mm: 944 mm2, of which
 // the fill limit (40%) is 377.6 mm2.
 const RINGS = [-205, -110, 0, 110, 205].map((x, i) => ({via: `guide-${i + 1}`, kind: 'ring', x, aperture: {w: 32, h: 29.5}}));
-const ctxOf = rack => ({chassisOf,
+// `checkKept` lays each cable again beside the path the kit kept for it and
+// throws where they differ: nothing here may be read by a kept answer.
+const ctxOf = rack => ({chassisOf, checkKept: true,
   guidesOf: id => {
     const it = rack.items.find(i => i.id === id);
     return it && (it.ref === 'lacer' || it.ref === 'plain') ? RINGS.map(r => ({...r, face: it.face})) : [];

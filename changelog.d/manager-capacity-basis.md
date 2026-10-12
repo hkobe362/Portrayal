@@ -36,8 +36,8 @@
   compared: the CMH-4DRB1U, whose two sources disagree on the cable, and the
   USCMH-SFDABS1U, USCMH-SFDABS2U and USCMH-SFDABSB1U, whose counts are
   estimates.
-- **`@portrayal/kit` is 0.26.0.** The kit README lists what a page calls
-  under "New in 0.26.0".
+- **`@portrayal/kit` is 0.27.0.** The kit README lists what a page calls
+  under "New in 0.27.0".
 
 ### Added
 - **`attrs.performance.cable-capacity-media`** in the device schema: the kind

@@ -673,7 +673,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.26.0: a manager's stated count is a count of one kind of cable.**
+**New in 0.27.0: a manager's stated count is a count of one kind of cable.**
 `capacityOver(rack, ctx)` compared a manager's stated count with every cable
 through it. A maker counts with one cable (thirty Cat6 is the section of about
 a hundred and twenty 3 mm cords), so it now counts only the cables whose
