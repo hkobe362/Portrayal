@@ -812,12 +812,29 @@ reading `ctx.route`:
     has there (a ring's entry and exit, a tray's stretch); a lane unit
     between two lane waypoints is that share of the way along the path
     between them;
-  - where several members ride a piece it is the longest of them, so no
-    member is strapped short, and two as long go to the one whose id sorts
-    first by number. The order the cables or the members are written in
-    plays no part;
-  - a piece no member's path can be read for (nobody rides it, or a port is
-    not found on its drawing) is the straight line, as before.
+  - where several members ride a piece it is the one in the middle by
+    length (the earlier of two middles). A strap goes round the whole pack,
+    so it belongs where most of the pack lies. The longest was tried first
+    and was wrong: one AOC among three DACs between two ducts 762 mm apart
+    hangs lower and longer, and it set a 947 mm trunk with four straps, each
+    57 to 147 mm from the three DACs, where the four as DACs are 789 mm and
+    take three. With the middle one, a cord that is outnumbered sets neither
+    the length, nor the count, nor the place;
+  - members as long (to a micron) are put in order of id, by number and
+    then by the plain text, so `c2` is before `c10` and `c02` before `c2`.
+    The order the cables or the members are written in plays no part.
+    Renumbering cables can change which of several like members is named;
+  - a piece no member's path can be read for is the straight line, as
+    before. Where members ride it (a port not found on its drawing) that is
+    said: `straight` on the result and a sentence in the bundle's notes,
+    since the length and the count are then an estimate. Where nobody rides
+    it, no strap goes there and nothing is said.
+  **What `on` means.** Each cable is laid on its own, so members of unlike
+  kinds hang a little apart between the same two places, where a real pack
+  hangs as one. A strap's point is exactly on the path of the member it
+  names; members that lie like it are there too; one that hangs otherwise is
+  off it by the difference of the two hangs. Laying a pack as one body is
+  not done here.
   The bend check (section 5.2) still reads the straight lines.
 
 Each strap comes back as `{segment, t, along_mm, point, dir, on}`. `point` is
@@ -1038,7 +1055,7 @@ What the exports settled that section 7 leaves to them:
 - **One record per bundle.** `bundleExports(rack, ctx)` in `export-data.js`
   measures each bundle once (`bundleCheck`, `straps`, `trunkLength`) and every
   export reads that record: `{id, number, label, name, members, drawn,
-  checked, length_m, every, straps, size_mm, limit_mm, limit_at,
+  checked, length_m, straight, every, straps, size_mm, limit_mm, limit_at,
   limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes}`. `name`
   is what a tag prints, `bundleName` with control characters as spaces; the
   bundle's own `number` and `label` sit beside it, so label software can be

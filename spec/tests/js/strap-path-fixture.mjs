@@ -7,7 +7,9 @@
 // the panel's. Four run from the rear lacer down a REAR lane and then a
 // FRONT lane to a lacer under a switch: between the two lanes a cord goes
 // round the duct by a detour point, so its path is well off the straight
-// line from one lane point to the other, and longer.
+// line from one lane point to the other, and longer. Of each rear bundle
+// four cords leave at the first ring of that lacer, four at the second and
+// four at the third, so the trunk is ridden by twelve, then eight, then four.
 // The devices are cable-solids-fixture's (the catalogue's lacer and duct);
 // the ports are placed by their number, as speed-fixture places them.
 const RU = 44.45;
@@ -37,7 +39,7 @@ export function rearToFront(M, F) {
     const members = [];
     for (let k = 0; k < 12; k++) {
       const id = `c${cables.length + 1}`, [a, b] = ends(k);
-      cables.push({id, a, b, media: 'os2', purpose: '', label: '', route: own, routeEdited: true});
+      cables.push({id, a, b, media: 'os2', purpose: '', label: '', route: typeof own === 'function' ? own(k) : own, routeEdited: true});
       members.push({cable: id});
     }
     bundles.push({id: `b${bundles.length + 1}`, number: bundles.length + 1, label, members, route: trunk});
@@ -53,7 +55,12 @@ export function rearToFront(M, F) {
   // the rear: the panel's back, the rear lacer, down a rear lane, on down a front lane, to the lacer under a switch
   [[1, 'left', 5, 1, 2, 0], [0, 'left', 4, 1, 2, 12], [0, 'right', 2, 5, 4, 24], [1, 'right', 1, 5, 4, 36]].forEach(([k, side, from, outer, inner, first]) => {
     const down = [ring(rear, from), lane(`${side}-rear`, TOP), lane(`${side}-front`, TOP - 3 - 3 * k), ring(under[k], outer)];
-    bundle(`rear ${bundles.length - 3}`, i => [ppPort('rear', first + i), swPort(k, (side === 'left' ? 16 : 56) + i)], down, [...down, ring(under[k], inner)]);
+    // NOT EVERY MEMBER RIDES ALL OF IT: the first four leave at the outer ring, the next four at the
+    // inner one, and the last four ride on to ring 3, so 12, then 8, then 4 ride, and the trunk has three
+    // places where cords leave
+    const on = [ring(under[k], inner), ring(under[k], 3)];
+    bundle(`rear ${bundles.length - 3}`, i => [ppPort('rear', first + i), swPort(k, (side === 'left' ? 16 : 56) + i)],
+      i => [...down, ...on.slice(0, Math.floor(i / 4))], [...down, ...on]);
   });
   rack = {...rack, cables, bundles};
   const chassisOf = ref => (Object.hasOwn(sizes, ref) ? sizes[ref] : null);

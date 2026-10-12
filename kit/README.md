@@ -692,11 +692,44 @@ routed paths (`routePath`).
   place worked out from `segment` and `t` alone is still off the cable, as
   it was.
 - **Which member.** The trunk is cut at every pathway and at every unit of a
-  lane, and each piece is taken from the member that rides it whose path is
-  longest there; two as long go to the one whose id sorts first (`c2` before
-  `c10`). The order the cables or the members are written in plays no part.
-  Where no member's path can be read (a port not found on its drawing), a
-  piece is the straight line it was, and a strap there has `on: null`.
+  lane, and each piece is taken from the member in the middle by length of
+  those that ride it (the earlier of two middles); members as long are put in
+  order of id, by number (`c2` before `c10`) and then by the plain text
+  (`c02` before `c2`). A strap goes round the whole pack, so it goes where
+  most of the pack lies: one limp cord among stiff ones hangs lower and
+  longer, and it sets neither the length, nor the count, nor the place.
+  Three DACs and an AOC between two ducts 762 mm apart are measured as four
+  DACs are. The order the cables or the members are written in plays no
+  part; renumbering cables can change which of several like members is
+  named, and with it a place by a few millimetres where they do not lie
+  quite alike.
+- **What `on` means.** The kit lays each cable on its own, so members of
+  unlike kinds hang a little apart where a real pack hangs as one. A strap's
+  `point` is exactly on the path of the member `on` names; members that lie
+  like it are there too, and one that hangs otherwise is off it by the
+  difference of the two hangs. Draw the strap at `point` only if the bundle
+  is drawn on its members' routed paths.
+- **Where no path can be read** (a port not found on its drawing), a piece
+  is the straight line it was, a strap there has `on: null`, and it is said:
+  `straps()` returns `straight: true` and a sentence in `notes`,
+  `trunkLength` returns `straight: true` beside `metres`, `bundleExports`
+  has `straight` on each record and the sentence in its `notes` (so on the
+  sheet and in the schedule), and `inspect` carries both. The length and the
+  count are then an estimate. A stretch of trunk that no member rides is
+  straight too, and is not said: no strap goes there.
+- **An error is let out.** A context reader that throws, or a path found
+  changed under `ctx.checkKept`, throws from `straps()` and `trunkLength`
+  as it does from `routePath`. `bundleExports`, `anchorsOf` and
+  `strapTotals` keep their rule: a bundle that cannot be read is not
+  counted.
+- **What the length now depends on.** A bundle's length and strap count
+  move with whatever the lay of its members reads: their media and type,
+  the cable types a page loads (diameter, bend radius, drape), where the
+  ports are, and the solid bodies of the rack. The same trunk in Cat 6 is
+  1.72 m on the rack below where in fibre it is 1.74 m. And `straps()` now
+  lays every member when it is the first reader of a rack (about 0.1 s for
+  that rack, where it took a few milliseconds); after any reader has read
+  the paths it costs a few milliseconds.
 - **The counts follow.** `straps().runs`, `along_mm`, `kinds`, `count` and
   `widths`, `strapTotals`, `trunkLength`, a bundle's `length` and `straps`
   in `inspect`, `length_m`, `straps`, `strap_kinds` and `strap_widths` in
@@ -706,8 +739,10 @@ routed paths (`routePath`).
   one lane to another, is as long as its cords, and takes a strap more where
   that crosses a multiple of the spacing. On the rack of
   `spec/tests/js/strap-path-fixture.mjs` (96 cords in eight bundles, four of
-  them from a rear lane to a front one) the BOM's strap line goes from 54 to
-  58, and the two bundles that go round a duct from 1.15 m to 1.63 m.
+  them from a rear lane to a front one) the BOM's strap line goes from 70 to
+  72 (4 more along the bundles, 2 fewer where a cable leaves, since a
+  spacing strap now serves there), and the two bundles that go round a duct
+  from 1.26 m to 1.74 m.
 - **Not changed:** which tie slot an anchor strap is at, the widths, the
   bend check of a bundle (its corners are still the straight lines between
   waypoints), a single cable's path and length, and a saved rack: nothing
@@ -1112,7 +1147,7 @@ its port, are not checked here: each cable's own path is, since 0.17.0, by
 **Bundles in the exports (0.9.0).** `bundleExports(rack, ctx)` in
 `@portrayal/kit/rack/export-data` measures each bundle once, with the same
 `ctx` as `bundleCheck`, and gives one record per bundle: `{ id, number, label,
-name, members, drawn, checked, length_m, every, straps, size_mm, limit_mm,
+name, members, drawn, checked, length_m, straight, every, straps, size_mm, limit_mm,
 limit_at, limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes }`.
 `name` is what a tag prints (the label, else "Bundle N"), and `number` and
 `label` are there on their own for label software. `straps` is the count the
