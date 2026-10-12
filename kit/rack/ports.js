@@ -179,15 +179,22 @@ function partJacket(comp, compByRef, seen = new Set()) {
 // The jacket colour the part seated at a cable end states, as `#rrggbb`, or
 // null: nothing is seated in the port, the catalogue was not loaded or does
 // not know the part, or nothing states a colour of it. `ctx` is
-// {slotsOf, compByRef}, what `loadSlots` returns.
-export function seatedJacket(item, end, ctx) {
+// {slotsOf, compByRef}, what `loadSlots` returns. `kept`, a Map, holds what
+// each item seats from one end to the next (jacketsFor passes one): a device
+// of sixty cabled ports is then read once and not sixty times.
+function seatsOf(item, ctx, kept) {
+  if (kept?.has(item)) return kept.get(item);
+  const slots = ctx.slotsOf(item.ref);
+  const seats = !slots || slots.error ? null : resolverFor(slotEnv(item, slots, ctx.compByRef), item.swaps || {});
+  kept?.set(item, seats);
+  return seats;
+}
+export function seatedJacket(item, end, ctx, kept = null) {
   if (!item || !loaded(ctx)) return null;
   const port = portPathOf(end?.path ?? '');
   if (!port || isElementId(port)) return null;
-  const slots = ctx.slotsOf(item.ref);
-  if (!slots || slots.error) return null;
   const path = `${port}-occupant`;
-  const ref = resolverFor(slotEnv(item, slots, ctx.compByRef), item.swaps || {}).refAt(path);
+  const ref = seatsOf(item, ctx, kept)?.refAt(path);
   if (!ref) return null;
   const set = item.fields?.[path];
   if (set && typeof set === 'object' && Object.hasOwn(set, JACKET_FIELD) && set[JACKET_FIELD] != null && set[JACKET_FIELD] !== '')
@@ -201,14 +208,15 @@ export function seatedJacket(item, end, ctx) {
 // there, it stands, since a page can see a part the rack file does not name
 // (a plug it seats for the cable). Where it is not, the catalogue answers
 // (seatedJacket). `parts` is {slotsOf, compByRef}.
-export function jacketAt(rack, end, {ends = null, parts = null} = {}) {
+export function jacketAt(rack, end, {ends = null, parts = null} = {}, kept = null) {
   const got = ends?.get?.(endKey(end));
   if (got && Object.hasOwn(got, 'jacket')) return hexColor(got.jacket);
-  return seatedJacket((rack.items || []).find(i => i.id === end?.item) || null, end, parts);
+  return seatedJacket((rack.items || []).find(i => i.id === end?.item) || null, end, parts, kept);
 }
 // The `jacketOf` reader the plans and the exports take (cable-rules.js
-// colorFacts): end -> the jacket colour it states, or null.
-export const jacketsFor = (rack, facts = {}) => end => jacketAt(rack, end, facts);
+// colorFacts): end -> the jacket colour it states, or null. Made for one
+// rack as it is, and made anew for the next: it keeps what each item seats.
+export const jacketsFor = (rack, facts = {}) => { const kept = new Map(); return end => jacketAt(rack, end, facts, kept); };
 
 // ── what the page read, with what the catalogue knows laid over it ──────
 // One end: `got` is the page's {facts, info, reason} for it, or nothing. An

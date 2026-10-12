@@ -165,6 +165,21 @@ test('what the configuration builds in a cage states its jacket as what a swap s
   assert.equal(P.seatedJacket(r.items[0], end('i1', 'port-1-occupant/body'), parts), AQUA);
 });
 
+test('a reader made for a rack reads what each device seats once, however many of its ports are cabled', () => {
+  let rack = pair({a: 'maker/aoc@1', b: 'maker/aoc@1'});
+  for (const n of [2, 3, 4]) rack = C.withCable(M.updateItem(M.updateItem(rack, 'i1', {swaps: {...rack.items[0].swaps, [`port-${n}`]: 'maker/aoc@1'}}),
+    'i2', {swaps: {...rack.items[1].swaps, [`port-${n}`]: n === 4 ? 'maker/aec@1' : 'maker/aoc@1'}}), {a: end('i1', `port-${n}`), b: end('i2', `port-${n}`), media: 'aoc'}).rack;
+  let asked = 0;
+  const counted = {slotsOf: ref => { asked++; return parts.slotsOf(ref); }, compByRef};
+  const jacketOf = P.jacketsFor(rack, {parts: counted});
+  const colours = C.cablePlan(rack, {jacketOf}).links.map(l => G.cableColor(l));
+  assert.deepEqual(colours.map(c => c.from), ['ends', 'ends', 'ends', 'media']);
+  assert.equal(asked, 2, 'eight ends on two devices');
+  // and the answers are those of reading each end on its own
+  for (const c of rack.cables) for (const e of [c.a, c.b])
+    assert.equal(jacketOf(e), P.seatedJacket(rack.items.find(i => i.id === e.item), e, parts));
+});
+
 test('an end is not read without the catalogue, on a removed device, an empty cage or an element id', () => {
   const rack = pair({a: 'maker/aoc@1', b: 'maker/aoc@1'});
   assert.equal(P.seatedJacket(rack.items[0], end('i1'), null), null);
