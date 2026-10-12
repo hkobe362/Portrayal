@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16.5mm" height="14.3mm" viewBox="0 0 16.5 14.3">
+  <!-- A push-to-reset thermal breaker seen end on: the hex panel nut, flats top and
+       bottom, the threaded bushing through it and the plunger in the bushing. -->
+  <g id="nut">
+    <path d="M 0.05 7.15 L 4.15 0.05 L 12.35 0.05 L 16.45 7.15 L 12.35 14.25 L 4.15 14.25 Z" fill="#989192" stroke="#5f5a5b" stroke-width="0.25"/>
+    <circle cx="8.25" cy="7.15" r="6.6" fill="none" stroke="#7c7677" stroke-width="0.2"/>
+  </g>
+  <g id="bushing">
+    <circle cx="8.25" cy="7.15" r="5.0" fill="#aaa3a4" stroke="#5f5a5b" stroke-width="0.25"/>
+    <circle cx="8.25" cy="7.15" r="4.45" fill="none" stroke="#7c7677" stroke-width="0.2"/>
+  </g>
+  <circle id="plunger" cx="8.25" cy="7.15" r="3.95" fill="#2a2e35" stroke="#0e0f11" stroke-width="0.25"/>
+</svg>
