@@ -1250,8 +1250,9 @@ stands too close to the port of c1 on EDGE-0 for the cable to turn into any
 ring on its way") and what would help ("set EDGE-0 back from the rail, mount
 the manager on another unit of EDGE-0, or leave EDGE-0 without a manager").
 That is a field of its own, `advice`; the finding's `text` is the bend and
-no more, as it was, so a page that reads, clips or joins the sentences is
-handed nothing longer, and a schedule's note says it once a cable. The second remedy is
+no more, so the advice lengthens no sentence a page reads, clips or joins,
+and a schedule's note says it once for each end's device (a cable short of
+room at both ends has two). The second remedy is
 offered only for a manager hosted on a device of two units or more, and a
 manager that is a rack item of its own is to be moved away, not left out.
 `bendFindingsOf` and `bendFindings` carry `advice` and mark the finding
@@ -1399,7 +1400,9 @@ within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and
 room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short."). Two tight corners are paired when they are next to each
 other on the path, have the same room, and that room is what the leg
 between them leaves the two. A corner that is short for its other leg stays
-a finding of its own, as does one that doubles back. The finding has
+a finding of its own, as does one that doubles back. A pair's sentence is
+longer than any bend's was (182 characters at the longest, where it was
+150), and on a rack with lacers most findings are pairs. The finding has
 `turns`, the two of them (`point`, `at`, `angle_deg`), and `apart_mm`; its
 `at` is the middle of the leg, so a page that rings a finding rings the
 bend once; `point` is the first turn's, `angle_deg` the wider of the two,
@@ -1433,7 +1436,9 @@ gutter. Across the twelve racks 639 of the 3,300 routed lengths move, by
 and 77 down. With no lacer nothing moves.
 
 On the sample of 60 generated racks of 3.4 (1,803 cables) the corners short
-of room fall from 955 to 422, on 171 cables where it was 359: 14 of 883
+of room fall from 955 to 422 (every corner of every path, by `cornersOf`;
+counted from the findings, where corners at one point are one, 953 to
+420), on 171 cables where it was 359: 14 of 883
 fibre cords, 7 of 242 Cat 6, 29 of 204 Cat 6A, 45 of 248 DACs and 76 of 226
 AOCs. 332 of the 1,803 lengths move, 187 shorter and 145 longer, by -340 to
 +121 mm; 4 cables go up a stock size and 30 down. None measures differently
@@ -1465,9 +1470,17 @@ anew judges nothing again. `spec/tests/js/speed-goldens.json` is recorded
 again from this kit, since this change is meant to move numbers: 75 of its
 91 racks have an answer that moves. A first read of 300 cables takes half
 as long again as it did (0.68 s for 0.44 s on one quiet machine, where the
-kit before 0.25.0 took 35 s): the room tests, and the lays the gutter is
-measured by where the route then taken is another. A read in a context
-made anew takes 21 ms for 18 ms.
+kit before 0.25.0 took 35 s). Most of that is the run-outs tried first
+where a detour stands in a plug's own leg: they are tried at 1,202 lead
+ends, three trial lays each, and taken at 34, and the trial lays inside
+the lays rise from 9,199 to 15,554. The room tests cost about 40 ms. The
+plain measure of the gutter is cheap, about 30 ms: of 500 asks 450 are
+answered by the lay already made, and 50 plain lays are made. A read after
+one device is moved lays every cable again and is slower by the same
+ratio (873 ms for 559 ms at 300 cables); a read after one cable is moved,
+and one in a context made anew (21 ms for 18 ms), are about as before.
+Trying the run-outs at fewer lead ends is the known saving, and is left
+for a later change.
 
 **Worse than before, and left so.** Every cable of those racks was compared
 with the kit before on bends, bodies crossed, rings entered and left by one

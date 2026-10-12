@@ -691,8 +691,8 @@ rules and what was counted.
   Where no ring leaves room the nearest stands, and its finding says so and
   what would help, in a field of its own: `bendFindings` and
   `bendFindingsOf` give such a finding `advice` (one sentence) and
-  `tooClose: { manager, device }`. Its `text` is the bend and no more, as it
-  was. `routePath`'s `bends` carry neither. **The gutter a cable takes does
+  `tooClose: { manager, device }`. Its `text` is the bend and no more: the
+  advice adds nothing to it. `routePath`'s `bends` carry neither. **The gutter a cable takes does
   not change:** it is chosen first, measured as before.
 - **A patch with no ring between its ports** takes, of the ring it took
   before and the nearest ring on each side, the one it lays best through
@@ -708,7 +708,10 @@ rules and what was counted.
   finding at `at` rings such a bend once; `turns[].at` are the two corners.
   `inspect` carries `turns`, `apart_mm`, `tooClose` and `advice`; a
   schedule's note says "bends" where it said "corners", and ends with the
-  advice, once a cable.
+  advice, once for each end's device. **A pair's sentence is longer than any
+  bend's was** (up to 182 characters where the longest was 150), and most
+  findings on a rack with lacers are pairs: a page that clips a label at a
+  fixed length cuts more of them.
 - **Round a tray.** `detour` in `rack/solids.js` takes two options, both
   off unless asked for: `loose`, which keeps the point where a way round a
   plate turns back in where pulled taut it would take a turn's room, and
