@@ -12,10 +12,10 @@ interface: lc-duplex
 default: common/lc-duplex-dust-cap@2
 profile: networking
 description: >-
-  Fibrain's LC duplex adapter as its HD slot fronts carry it - a flangeless
-  body 12.70 x 9.30 with two LC bores side by side, their latch slots along
-  one long edge. Drawn latch slots up. Not common/lc-duplex-adapter@6, which
-  is 13.2 x 11.0, nor common/lc-duplex-v-adapter@6, which stacks its bores.
+  Fibrain's LC duplex adapter, as its HD slot fronts carry it. A flangeless
+  body 12.70 x 9.30 with two LC bores side by side, drawn latch slots up. Not
+  common/lc-duplex-adapter@6, which is 13.2 x 11.0, nor
+  common/lc-duplex-v-adapter@6, which stacks its bores.
 size: {w: 12.7, h: 9.3}
 size-confidence: {w: drawing, h: drawing}
 size-notes: >-

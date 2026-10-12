@@ -7,8 +7,7 @@ is_full_depth: true
 part_number: XPU00
 weight: 1.2
 weight_unit: kg
-description: 'HD patch panel frame, 1U, 19 in, 250 mm deep: an open steel frame with five plastic guide
-  posts and eight slots, four across and two high, each taking one HD slot part - an adapter holder, a...'
+description: HD patch panel frame, 1U, 19 in, 250 mm deep
 front_image: true
 rear_image: true
 module-bays:
@@ -52,8 +51,8 @@ module-bays:
     description: 'Accepts: xbcs0, xmn1051gb, xmn1041gb, xmi1051ga, xmi1041ga, xmi1021ca, xmi1021da, xmi1021ha,
       xmi1021ga, xmi1031ga, xmi1041ca, xmi1041da, xmi1041ha, xmn1021cb, xmn1021db, xmn1021hb, xmn1021gb
       (+4 more)'
-comments: 'HD patch panel frame, 1U, 19 in, 250 mm deep: an open steel frame with five plastic guide posts
-  and eight slots, four across and two high, each taking one HD slot part - an adapter holder, a cassette
+comments: 'HD patch panel frame, 1U, 19 in, 250 mm deep. An open steel frame with five plastic guide posts
+  and eight slots, four across and two high. Each slot takes one HD slot part: an adapter holder, a cassette
   or a blind cover. Sold empty, as XPU00 without grounding and XPS00 with grounding.
 
 

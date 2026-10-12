@@ -941,8 +941,7 @@ def test_a_holder_names_its_ports_alike_in_the_frame_and_in_the_drawer():
     trees = {t: LIB / "exports" / t for t in ("netbox", "nautobot")}
     rels = ("device-types/Fibrain/XPU00.yaml", "module-types/Fibrain/XCU10.yaml",
             "module-types/Fibrain/XMN1021GB.yaml")
-    if any(not (t / r).exists() for t in trees.values() for r in rels):
-        pytest.skip("not published - run ./publish.sh --no-images")
+    # the committed exports: read as they are, never skipped
     got = {}
     for t, root in trees.items():
         frame, drawer, holder = (yaml.safe_load((root / r).read_text()) for r in rels)

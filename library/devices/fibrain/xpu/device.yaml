@@ -6,9 +6,9 @@ maturity: modelled
 manufacturer: Fibrain
 model: XPU00
 description: >-
-  HD patch panel frame, 1U, 19 in, 250 mm deep: an open steel frame with five
-  plastic guide posts and eight slots, four across and two high, each taking
-  one HD slot part - an adapter holder, a cassette or a blind cover. Sold
+  HD patch panel frame, 1U, 19 in, 250 mm deep. An open steel frame with five
+  plastic guide posts and eight slots, four across and two high. Each slot
+  takes one HD slot part: an adapter holder, a cassette or a blind cover. Sold
   empty, as XPU00 without grounding and XPS00 with grounding.
 profile: optical
 provenance:
@@ -545,8 +545,8 @@ configurations:
   mixed:
     kind: example
     description: >-
-      One of each holder kind in each row - 12 LC duplex, 12 SC/APC, 6 LC
-      duplex and 6 SC/APC - to show the four slot fronts seated. Illustrative:
+      One of each holder kind in each row: 12 LC duplex, 12 SC/APC, 6 LC
+      duplex and 6 SC/APC. It shows the four slot fronts seated. Illustrative:
       holders are ordered separately from the frame.
     bays:
       slot-1: fibrain/xmn1021gb@2

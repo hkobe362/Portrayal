@@ -5,9 +5,9 @@ version: 1.0.0
 class: mechanical
 profile: optical
 description: >-
-  One side of the Fibrain HD 1U frame XPU00 / XPS00 seen from above - the
-  full-height side wall beside the slot parts and the lower arm that runs
-  back from it to the rear cable bar. A sheet on edge, so a line in plan.
+  One side of the Fibrain HD 1U frame XPU00 / XPS00, seen from above. A
+  full-height side wall beside the slot parts, and a lower arm running back
+  from it to the rear cable bar. A sheet on edge, so a line in plan.
 size: {w: 0.8, h: 221.0}
 size-confidence: {w: estimated, h: estimated}
 elements:

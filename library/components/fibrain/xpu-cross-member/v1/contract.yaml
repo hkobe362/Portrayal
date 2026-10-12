@@ -6,9 +6,9 @@ class: mechanical
 profile: optical
 description: >-
   The cross-member behind the guide posts of the Fibrain HD 1U frame, seen
-  from above - a slotted bar across the frame between the first and last
-  post, at mid height. Dark on XPU00; copper-coloured on XPS00, where it is
-  what the datasheet picture shows of the grounding. The colour is a field.
+  from above. A slotted bar across the frame between the first and last post,
+  at mid height. Dark on XPU00; copper-coloured on XPS00, where it is what the
+  datasheet picture shows of the grounding. The colour is a field.
 size: {w: 417.8, h: 6.0}
 size-confidence: {w: drawing, h: estimated}
 fields:

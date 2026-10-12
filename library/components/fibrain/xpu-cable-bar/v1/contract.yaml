@@ -5,9 +5,9 @@ version: 1.0.0
 class: mechanical
 profile: optical
 description: >-
-  The rear cable bar of the Fibrain HD 1U frame XPU00 / XPS00 seen from above
-  - a flat plate across the back of the frame with rows of slots that cables
-  are tied down to.
+  The rear cable bar of the Fibrain HD 1U frame XPU00 / XPS00, seen from
+  above. A flat plate across the back of the frame, with rows of slots that
+  cables are tied down to.
 size: {w: 435.0, h: 29.0}
 size-confidence: {w: estimated, h: estimated}
 elements:

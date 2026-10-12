@@ -6,10 +6,10 @@ class: ear
 behaviour: mounts
 profile: optical
 description: >-
-  One rack ear of the Fibrain HD 1U frame XPU00 / XPS00 - a bracket fixed to
-  the side of the frame, its face in the plane of the rack rails, with a round
-  hole between two obround slots for the rack screws. Drawn as the left ear;
-  the right one is this part turned half a turn.
+  One rack ear of the Fibrain HD 1U frame XPU00 / XPS00. A bracket fixed to
+  the side of the frame, its face in the plane of the rack rails. It has a
+  round hole between two obround slots for the rack screws. Drawn as the left
+  ear; the right one is this part turned half a turn.
 size: {w: 24.7, h: 43.9}
 size-confidence: {w: drawing, h: drawing}
 elements:

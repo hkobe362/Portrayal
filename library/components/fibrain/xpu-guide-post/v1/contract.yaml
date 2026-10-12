@@ -5,9 +5,9 @@ version: 1.0.0
 class: mechanical
 profile: optical
 description: >-
-  One guide post of the Fibrain HD 1U frame XPU00 / XPS00 - the black plastic
-  upright between two slot columns, in two tiers, each tier carrying the red
-  release latch of the slot parts either side of it.
+  One guide post of the Fibrain HD 1U frame XPU00 / XPS00: the black plastic
+  upright between two slot columns. It has two tiers, and each carries the red
+  release latch of the slot parts either side.
 size: {w: 7.01, h: 43.0}
 size-confidence: {w: drawing, h: drawing}
 elements:

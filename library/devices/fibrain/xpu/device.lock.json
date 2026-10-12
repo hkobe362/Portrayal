@@ -185,11 +185,11 @@
    "fibrain/xmn1051gb@2"
   ]
  },
- "composed": "302efd9064d13be3",
+ "composed": "36ac16018910e481",
  "composed-refs": {
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/sc-simplex-adapter@1": "1.0.0+f02d950564696b84",
-  "fibrain/lc-duplex-adapter@1": "1.0.0+4c69042294e755af",
+  "fibrain/lc-duplex-adapter@1": "1.0.0+3d0d834660868faf",
   "fibrain/xbcs0@1": "1.0.0+529a53a4261472bb",
   "fibrain/xmi1021ca-rear@2": "2.0.0+e94930d8ded3ba83",
   "fibrain/xmi1021ca@2": "2.0.0+84b6487837afca52",
@@ -231,12 +231,12 @@
   "fibrain/xmn1041hb@2": "2.0.0+1769b1026776757f",
   "fibrain/xmn1051gb-rear@2": "2.0.0+b0cb2327ca507f0c",
   "fibrain/xmn1051gb@2": "2.0.0+82621adf46db6709",
-  "fibrain/xpu-cable-bar@1": "1.0.0+6d61a46e7047a160",
-  "fibrain/xpu-cross-member@1": "1.0.0+a92dee986311bac7",
-  "fibrain/xpu-ear@1": "1.0.0+89774e8e68aa39ec",
-  "fibrain/xpu-floor@1": "1.0.0+d8357d2d7981a3b3",
-  "fibrain/xpu-guide-post@1": "1.0.0+bc23b1373f0a9cc4",
-  "fibrain/xpu-side@1": "1.0.0+3a163ef59abb66f9",
+  "fibrain/xpu-cable-bar@1": "1.0.0+d5890422bc4f58fe",
+  "fibrain/xpu-cross-member@1": "1.0.0+9e728af1ecacd107",
+  "fibrain/xpu-ear@1": "1.0.0+a32e2c008d7d7c55",
+  "fibrain/xpu-floor@1": "1.0.0+af07817fce2db62c",
+  "fibrain/xpu-guide-post@1": "1.0.0+eb2506ba285d4db7",
+  "fibrain/xpu-side@1": "1.0.0+ef8b9810acb6af3c",
   "fibrain/xpu-top-sheet@1": "1.0.0+a8fd83fc926bdd7f",
   "std/lc-bulkhead-bore@1": "1.0.1+bec8fa23019b19ae",
   "std/sc-bore@1": "1.0.0+f9b52936418ba281"
@@ -338,6 +338,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "19299c9f2d64bb71",
- "surface": "c4f0253c6d3cf15c",
+ "surface": "3c154ae8fd64cd5a",
  "version": "0.1.0"
 }

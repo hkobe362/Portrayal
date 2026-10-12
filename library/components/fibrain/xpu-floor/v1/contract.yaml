@@ -5,9 +5,9 @@ version: 1.0.0
 class: mechanical
 profile: optical
 description: >-
-  The inside of the Fibrain HD 1U frame XPU00 / XPS00 seen from above - the
-  space between its two sides, open above behind the top sheet, open below
-  behind the floor and open at the rear - drawn as the well its floor sheet
+  The inside of the Fibrain HD 1U frame XPU00 / XPS00, seen from above. It is
+  the space between the two sides: open above behind the top sheet, open below
+  behind the floor, open at the rear. It is drawn as the well its floor sheet
   lies at the bottom of. The floor is the strip across the front under the
   slot parts.
 size: {w: 435.0, h: 250.0, d: 41.9}

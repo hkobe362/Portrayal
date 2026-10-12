@@ -4,11 +4,11 @@
    "fibrain/xcu-drawer@1"
   ]
  },
- "composed": "525ca51f862467a7",
+ "composed": "338c043d196aa18c",
  "composed-refs": {
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/sc-simplex-adapter@1": "1.0.0+f02d950564696b84",
-  "fibrain/lc-duplex-adapter@1": "1.0.0+4c69042294e755af",
+  "fibrain/lc-duplex-adapter@1": "1.0.0+3d0d834660868faf",
   "fibrain/xbcs0@1": "1.0.0+529a53a4261472bb",
   "fibrain/xcu-drawer-plan@1": "1.0.0+60eccff23f1d306d",
   "fibrain/xcu-drawer@1": "1.2.0+43f7af449c94b566",
