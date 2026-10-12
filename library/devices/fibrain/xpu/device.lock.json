@@ -185,7 +185,7 @@
    "fibrain/xmn1051gb@2"
   ]
  },
- "composed": "3bbee9f3ba8f04fb",
+ "composed": "abe80b4b6bb7780c",
  "composed-refs": {
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/sc-simplex-adapter@1": "1.0.0+f02d950564696b84",
@@ -231,13 +231,13 @@
   "fibrain/xmn1041hb@2": "2.0.0+1769b1026776757f",
   "fibrain/xmn1051gb-rear@2": "2.0.0+b0cb2327ca507f0c",
   "fibrain/xmn1051gb@2": "2.0.0+82621adf46db6709",
-  "fibrain/xpu-cable-bar@1": "1.0.0+3143c084165c5fa2",
+  "fibrain/xpu-cable-bar@1": "1.0.0+4bbcdab51529b7d5",
   "fibrain/xpu-ear@1": "1.0.0+a32e2c008d7d7c55",
   "fibrain/xpu-floor@1": "1.0.0+531a87a4b3ac8215",
   "fibrain/xpu-grounding-bar@1": "1.0.0+0ae60b66ae62cf73",
   "fibrain/xpu-guide-post@1": "1.0.0+eb2506ba285d4db7",
-  "fibrain/xpu-side@1": "1.0.0+2ea9a86c37bd842e",
-  "fibrain/xpu-top-sheet@1": "1.0.0+35ac707aecc9da98",
+  "fibrain/xpu-side@1": "1.0.0+7c631597f4ce70de",
+  "fibrain/xpu-top-sheet@1": "1.0.0+8bc4e8973daa544a",
   "std/lc-bulkhead-bore@1": "1.0.1+bec8fa23019b19ae",
   "std/sc-bore@1": "1.0.0+f9b52936418ba281"
  },
@@ -249,7 +249,7 @@
   "xpu00"
  ],
  "format": 1,
- "gaps": "462d924f0ac293fe",
+ "gaps": "80f33dfbae441050",
  "groups": [
   "frame",
   "slots"
@@ -338,6 +338,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "4f06594705d30884",
- "surface": "4a7f508159b24b83",
+ "surface": "ee8e107bb6183bbe",
  "version": "0.1.0"
 }

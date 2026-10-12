@@ -16,11 +16,11 @@ elements:
 relief:
   features:
     - node: cover
-      lift: 42.25
-      out: 43.05
+      lift: 42.30
+      out: 43.10
       color: '#1b1e21'
       confidence: drawing
-      source: 'the front elevation draws the top sheet 0.80 thick, 0.05 to 0.85 from the top of the frame; the heights here are those above the floor, which put it 0.1 to 0.9 from the top'
+      source: 'the front elevation draws the top sheet 0.80 thick, 0.05 to 0.85 from the top of the frame; the heights here are those above the floor, which put it there'
 provenance:
   size: >-
     drawing across - 435, the frame between its ears, off the front elevation
