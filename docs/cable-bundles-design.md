@@ -795,12 +795,41 @@ reading `ctx.route`:
   buys, and it stays `ceil(L / every)` whatever the rings do.
 - `L` uses the same rack measure as routed length, so the count agrees in
   every view and the BOM.
+- **`L` is measured on the cables (#1034).** A trunk is a list of waypoints,
+  and its members do not run straight from one to the next: a cord passes a
+  ring by its opening, lies along a tray, hangs between a ring and a lane,
+  and goes round a body by a detour point. Until #1034 the trunk was
+  measured, and its straps placed, on the straight line between two
+  waypoints, which is shorter than the cords and elsewhere: on the trunk of
+  `spec/tests/js/strap-path-fixture.mjs` that goes from a rear lane to a
+  front one round a duct, the line between the two lane points is 0.75 m
+  where the cords run 1.15 m, and a strap placed on it stood off the cords.
+  Now:
+  - the trunk is cut at every place on it (a pathway, and a lane at each
+    unit), and each piece between two neighbours is one member's routed path
+    between them (`routePath`). On that path a lane point is the point; a
+    ring, a duct and a tray are the middle, by length, of the points the path
+    has there (a ring's entry and exit, a tray's stretch); a lane unit
+    between two lane waypoints is that share of the way along the path
+    between them;
+  - where several members ride a piece it is the longest of them, so no
+    member is strapped short, and two as long go to the one whose id sorts
+    first by number. The order the cables or the members are written in
+    plays no part;
+  - a piece no member's path can be read for (nobody rides it, or a port is
+    not found on its drawing) is the straight line, as before.
+  The bend check (section 5.2) still reads the straight lines.
 
-Each strap comes back as `{segment, t, along_mm}`: which trunk segment it is
-on and how far along (0 to 1), plus its distance from the trunk's start. It is
-not a coordinate, because 2D and 3D draw the same waypoints at their own
-positions (2D at ring ends and gutter centres, 3D at guide anchors and
-40 mm-offset lane points). Each view puts the strap on its own segment at `t`.
+Each strap comes back as `{segment, t, along_mm, point, dir, on}`. `point` is
+where it is, in rack coordinates, `dir` the way the trunk runs there (a unit
+vector, null where it has no length), and `on` the id of the cable whose path
+the point is on (null on a straight piece). `segment` and `t` say which trunk
+segment it is on and what share of that segment's routed length it is along
+(0 to 1), and `along_mm` its distance from the trunk's start along the cords.
+A view that draws the rack's own coordinates puts the strap at `point`. One
+that draws the same waypoints at positions of its own (2D at ring ends and
+gutter centres) can still put it on its own segment at `t`, and is then as far
+off the cable as that view's straight segment is.
 
 - **2D** (portrayal-site#142): the bundle's members are drawn combed side by
   side in member order, through each pane's waypoints, with corners drawn at
@@ -956,7 +985,8 @@ What the bend check settled that section 5.2 leaves to it:
   it is worked out from the rack's own sketch of where rings and lanes are,
   not from a measured bend.
 - **The polyline is the trunk's waypoints at `pointOf`**, a ring at its
-  centre, as `trunkLength` and `straps` measure the trunk. It is not #930's
+  centre (as `trunkLength` and `straps` measured the trunk until #1034;
+  they now read the members' paths, section 6). It is not #930's
   `routePath`, which splits a ring into the faces a cable enters and leaves
   by: that path runs from port to port, and a trunk has no ports. Treating a
   ring's inside as straight cable would also turn the stand-off of a lacer

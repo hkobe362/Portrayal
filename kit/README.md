@@ -672,6 +672,47 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.28.0: a bundle's straps are measured and placed on its cables.**
+`straps(rack, bundle, ctx)` and `trunkLength` measured a trunk along the
+straight line from one waypoint to the next. The members do not run there: a
+cord passes a ring by its opening, hangs between a ring and a lane, and goes
+round a body by a detour point. So a trunk was measured short, and a strap's
+`{ segment, t }` named a place off the cables. Both now read the members'
+routed paths (`routePath`).
+
+- **Each strap carries its own place.** Beside `segment`, `t` and `along_mm`
+  a strap has `point` (`{ x, y, z }` in rack coordinates, mm, to a
+  hundredth), `dir` (the way the trunk runs there, a unit vector, or `null`
+  where it has no length) and `on` (the id of the cable whose path the point
+  is on). A page draws the strap at `point`, across `dir`, and needs no
+  correction of its own. `segment` and `t` keep their meaning for a reader
+  that has only those: the trunk segment between resolved waypoints
+  `segment` and `segment + 1`, and the share of that segment's **routed**
+  length the strap is along. On a segment whose cords do not run straight a
+  place worked out from `segment` and `t` alone is still off the cable, as
+  it was.
+- **Which member.** The trunk is cut at every pathway and at every unit of a
+  lane, and each piece is taken from the member that rides it whose path is
+  longest there; two as long go to the one whose id sorts first (`c2` before
+  `c10`). The order the cables or the members are written in plays no part.
+  Where no member's path can be read (a port not found on its drawing), a
+  piece is the straight line it was, and a strap there has `on: null`.
+- **The counts follow.** `straps().runs`, `along_mm`, `kinds`, `count` and
+  `widths`, `strapTotals`, `trunkLength`, a bundle's `length` and `straps`
+  in `inspect`, `length_m`, `straps`, `strap_kinds` and `strap_widths` in
+  `bundleExports`, and so the bundle's line on the sheet and in the cable
+  schedule and the BOM's strap line. A trunk that only runs along a lane is
+  measured as it was. One that passes a ring, a duct or a tray, or goes from
+  one lane to another, is as long as its cords, and takes a strap more where
+  that crosses a multiple of the spacing. On the rack of
+  `spec/tests/js/strap-path-fixture.mjs` (96 cords in eight bundles, four of
+  them from a rear lane to a front one) the BOM's strap line goes from 54 to
+  58, and the two bundles that go round a duct from 1.15 m to 1.63 m.
+- **Not changed:** which tie slot an anchor strap is at, the widths, the
+  bend check of a bundle (its corners are still the straight lines between
+  waypoints), a single cable's path and length, and a saved rack: nothing
+  here is stored.
+
 **New in 0.25.0: a large rack is read in a fraction of the time, and every
 answer is the one it was.** No path, length, need, stock size, finding,
 sentence, strap, spare figure or export row changes, and no name is removed
@@ -1042,8 +1083,8 @@ two units, which hangs when it is on its own (`ownRoute` and `autoRoute` take
 joins and leaves it at the trunk elements nearest its two ports
 (`trunkMeasures(rack, cable, trunk, ctx)` measures them for `followTrunk`), so
 it never rides to an end its ports are not at. `straps(rack, bundle, ctx)` places the straps, every 12 in unless
-the bundle says otherwise, as `{ segment, t, along_mm }` along the trunk, kept
-off rings. `inspect` reads a bundle (`kind: 'bundle'`) and a member's
+the bundle says otherwise, as `{ segment, t, along_mm, point, dir, on }` along
+the trunk as its members' paths run ("New in 0.28.0" above), kept off rings. `inspect` reads a bundle (`kind: 'bundle'`) and a member's
 `bundle`, `selectCables` takes `{ bundle }`, and `describe` lists them. A
 bundle of fewer than two cables is kept and listed, but not drawn.
 

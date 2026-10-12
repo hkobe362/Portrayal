@@ -23,6 +23,10 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // holds on any machine; the two kits were compared by every digit on one
 // (speed-goldens.mjs, `--exact`). A change that is meant to move a number
 // records them again (speed-goldens.mjs says how).
+// Recorded again for kit 0.28.0 (#1034), which moved `straps` on the twelve
+// racks that have a bundle and no other answer: each strap gained its
+// `point`, `dir` and `on`, and a place half way between two tenths of a
+// millimetre now always rounds up (bundles.js mm1).
 test('every answer for every rack is the one recorded before the kit was made faster', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);

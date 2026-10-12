@@ -1,0 +1,233 @@
+// spec/tests/js/rack-strap-path.mjs
+// STRAPS ARE MEASURED AND PLACED ON THE CABLES (#1034). A bundle's trunk is a
+// list of waypoints, and its members do not run straight from one to the
+// next: a cord goes through a ring by its opening, hangs between a ring and a
+// lane, and goes round a body by a detour point. The trunk's length, the
+// count of its straps and the place of each are read off the members' routed
+// paths (bundles.js, the trunk's own line), never off the straight line
+// between two waypoints.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as M from '../../../kit/rack/model.js';
+import * as R from '../../../kit/rack/route.js';
+import * as B from '../../../kit/rack/bundles.js';
+import * as X from '../../../kit/rack/export-data.js';
+import * as Q from '../../../kit/rack/queries.js';
+import * as F from './cable-solids-fixture.mjs';
+import {rearToFront} from './strap-path-fixture.mjs';
+import {loadTree, racksOf} from './speed-goldens.mjs';
+
+const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);
+// how far a point is from a line of points
+function offLine(p, P) {
+  let near = Infinity;
+  for (let k = 1; k < P.length; k++) {
+    const a = P[k - 1], b = P[k], d = {x: b.x - a.x, y: b.y - a.y, z: b.z - a.z}, L2 = d.x * d.x + d.y * d.y + d.z * d.z;
+    const t = L2 > 0 ? Math.max(0, Math.min(1, ((p.x - a.x) * d.x + (p.y - a.y) * d.y + (p.z - a.z) * d.z) / L2)) : 0;
+    near = Math.min(near, dist(p, {x: a.x + t * d.x, y: a.y + t * d.y, z: a.z + t * d.z}));
+  }
+  return near;
+}
+// Every strap of every bundle of a rack against its members' paths: how many
+// straps were read, and the farthest any is from the path of a member (of
+// the member it names, where it names one).
+function strapsOnPaths(rack, ctx) {
+  const pathOf = new Map(rack.cables.map(c => [c.id, R.routePath(rack, c, ctx)?.points ?? null]));
+  let read = 0, far = 0, named = 0;
+  for (const b of M.bundlesOf(rack)) {
+    const s = B.straps(rack, b, {route: ctx});
+    for (const x of s?.straps ?? []) {
+      assert.ok(x.point && [x.point.x, x.point.y, x.point.z].every(Number.isFinite), `${b.id}: a strap at ${x.along_mm} mm has no point of its own`);
+      const members = b.members.map(m => m.cable).filter(id => pathOf.get(id));
+      assert.ok(members.length >= 2, `${b.id}: its members have paths`);
+      if (x.on != null) { assert.ok(members.includes(x.on), `${b.id}: ${x.on} is a member`); named++; }
+      const off = Math.min(...(x.on != null ? [x.on] : members).map(id => offLine(x.point, pathOf.get(id))));
+      far = Math.max(far, off);
+      read++;
+    }
+  }
+  return {read, far, named};
+}
+
+const made = rearToFront(M, F), RACK = made.rack;
+const ctxOf = (r = RACK, extra) => made.ctxOf(r, extra);
+const bundle = id => RACK.bundles.find(b => b.id === id);
+const got = (id, r = RACK, ctx = ctxOf(r)) => B.straps(r, r.bundles.find(b => b.id === id), {route: ctx});
+
+test('the rack is the one meant: 96 cords in eight bundles, and the rear ones go round a duct between their two lanes', () => {
+  const ctx = ctxOf();
+  assert.equal(RACK.cables.length, 96);
+  assert.deepEqual(RACK.bundles.map(b => b.members.length), [12, 12, 12, 12, 12, 12, 12, 12]);
+  const paths = RACK.cables.map(c => R.routePath(RACK, c, ctx));
+  assert.ok(paths.every(Boolean), 'every cord has a path');
+  // c61, of the bundle to the lacer under switch 1: rear lane, two detour points over the duct, front lane
+  const P = paths[60].points, at = P.map(p => p.at);
+  const i = at.indexOf('lane'), j = at.lastIndexOf('lane');
+  assert.deepEqual(at.slice(i, j + 1), ['lane', 'detour', 'detour', 'lane']);
+  // by the detour it is 1151 mm from one lane point to the other, where the straight line is 754 mm
+  const routed = P.slice(i + 1, j + 1).reduce((m, p, k) => m + dist(P[i + k], p), 0), straight = dist(P[i], P[j]);
+  assert.ok(routed - straight > 350, `${Math.round(routed)} mm routed, ${Math.round(straight)} mm straight`);
+  // and the detour points are nowhere near that line
+  assert.ok(offLine(P[i + 1], [P[i], P[j]]) > 100 && offLine(P[i + 2], [P[i], P[j]]) > 100);
+});
+
+test('every strap of the 96-cord rack is on a member\'s routed path, to within a millimetre', () => {
+  const {read, far, named} = strapsOnPaths(RACK, ctxOf());
+  // 30 spacing and 16 breakout straps; the anchors are counted by slot, rack-wide, and are not of a bundle here
+  assert.equal(read, 46);
+  assert.equal(named, 46, 'each names the cable whose path it is on');
+  assert.ok(far < 1, `the farthest strap is ${far.toFixed(2)} mm off its cable`);
+});
+
+test('every fixture with a bundle: each strap is on a member\'s routed path, to within a millimetre', async () => {
+  const K = await loadTree();
+  let racks = 0, straps = 0, worst = 0;
+  for (const r of racksOf(K)) {
+    if (!K.M.bundlesOf(r.rack).some(b => b.members.length >= 2)) continue;
+    // with the check of what is kept on: every path the straps read is laid again from nothing and compared
+    const {read, far} = strapsOnPaths(r.rack, {...r.ctxOf(r.rack), checkKept: true});
+    assert.ok(far < 1, `${r.name}: the farthest strap is ${far.toFixed(2)} mm off a member's path`);
+    racks++; straps += read; worst = Math.max(worst, far);
+  }
+  // and it is not a comparison of nothing with nothing
+  assert.ok(racks >= 12 && straps >= 140, `${racks} racks, ${straps} straps, worst ${worst}`);
+});
+
+test('a place half way between two tenths of a millimetre rounds up, whatever rack it is on', async () => {
+  // eleven units of a lane are 488.95 mm. A sum of lengths comes out a hair
+  // under or over that, and it read 489 on one rack and 488.9 on another.
+  const K = await loadTree(), all = racksOf(K);
+  const ends = ['hops-bundled', 'speed-300'].map(name => {
+    const r = all.find(x => x.name === name), ctx = r.ctxOf(r.rack);
+    return K.M.bundlesOf(r.rack).map(b => B.straps(r.rack, b, {route: ctx}).runs.map(run => run[1] - run[0])).flat();
+  });
+  assert.ok(ends[0].includes(444.5) && ends[1].includes(489), JSON.stringify(ends));
+  assert.ok(!ends.flat().some(v => Math.abs(v - 488.9) < 1e-9 || Math.abs(v - 444.4) < 1e-9), JSON.stringify(ends));
+});
+
+test('a trunk is as long as the path of it, and its straps are counted along that', () => {
+  const ctx = ctxOf(), bc = {route: ctx};
+  // b6 goes round the duct between its lanes. The straight lines from waypoint
+  // to waypoint come to 1.15 m, and 1051 mm of that is ridden: four straps at
+  // one every 12 in. The cords run 1538 mm there, which takes six.
+  const pts = B.layoutOf(RACK, bundle('b6'), bc).trunk.map(w => R.pointOf(RACK, w, ctx));
+  const straight = pts.slice(1).reduce((m, p, k) => m + dist(pts[k], p), 0);
+  assert.equal(Math.round(straight) / 1000, 1.147);
+  const s = got('b6');
+  assert.deepEqual(s.runs, [[0, 1538]]);
+  assert.deepEqual(s.kinds, {spacing: 6, breakout: 2, anchor: 0});
+  assert.equal(s.kinds.spacing, Math.ceil(1538 / 304.8));
+  assert.deepEqual(s.straps.map(x => [x.kind, x.along_mm]),
+    [['breakout', 25], ['spacing', 128.2], ['spacing', 384.5], ['spacing', 640.8], ['spacing', 897.2], ['spacing', 1153.5], ['spacing', 1409.8], ['breakout', 1513]]);
+  assert.deepEqual(B.trunkLength(RACK, bundle('b6'), bc), {metres: 1.63});
+  // b5 has no body in its way: its cords still hang between a ring and a lane, so it is longer than its straight lines too
+  assert.deepEqual(got('b5').runs, [[0, 1085.5]]);
+  assert.deepEqual(got('b5').kinds, {spacing: 4, breakout: 2, anchor: 0});
+  // the rack: what it buys, the BOM's strap line, and a bundle's line on the sheet and the schedule
+  assert.deepEqual(B.strapTotals(RACK, bc), {spacing: 30, breakout: 16, anchor: 12, total: 58, widths: {19: 58}});
+  const ex = X.bundleExports(RACK, bc);
+  assert.deepEqual(ex.map(e => [e.id, e.length_m, e.straps]),
+    [['b1', 0.5, 4], ['b2', 0.73, 5], ['b3', 0.74, 5], ['b4', 0.51, 4], ['b5', 1.18, 6], ['b6', 1.63, 8], ['b7', 1.63, 8], ['b8', 1.18, 6]]);
+  assert.equal(X.strapBomRows(ex, {anchors: B.anchorsOf(RACK, bc)})[0].description,
+    '30 along 8 bundles, one every 12 in; 16 where a cable joins or leaves a bundle; 12 at tray tie slots; 58 of 19 mm wide; length to suit');
+  assert.equal(X.bundleNote(ex[5]),
+    'rear 2 (b6): 12 cables (c61-c72), 1.63 m, 8 straps (6 every 12 in, 2 where a cable leaves); 12 mm across, limit 29.5 mm at LACER-REAR ring 4; bend not checked.');
+});
+
+test('inspect of a bundle gives the routed length and the count along it', async () => {
+  const f = await Q.inspect(RACK, 'b6', {chassisOf: made.chassisOf, route: ctxOf()});
+  assert.deepEqual(f.length, {metres: 1.63});
+  assert.deepEqual(f.straps.kinds, {spacing: 6, breakout: 2, anchor: 0});
+});
+
+test('a strap carries its own point, the way the trunk runs there and the cable it is on; segment and t still say where on the trunk', () => {
+  const ctx = ctxOf(), s = got('b6', RACK, ctx), b = bundle('b6');
+  const P = R.routePath(RACK, RACK.cables.find(c => c.id === 'c61'), ctx).points;
+  const i = P.findIndex(p => p.at === 'lane'), j = P.findLastIndex(p => p.at === 'lane'), way = P.slice(i, j + 1);
+  assert.equal(way.length, 4);
+  for (const x of s.straps) {
+    assert.deepEqual(Object.keys(x), ['kind', 'segment', 't', 'along_mm', 'point', 'dir', 'on', 'width_mm']);
+    assert.ok(Math.abs(Math.hypot(x.dir.x, x.dir.y, x.dir.z) - 1) < 1e-3, 'a unit vector');
+    assert.ok(Number.isInteger(x.segment) && x.t >= 0 && x.t <= 1);
+  }
+  // the trunk's second segment is the rear lane to the front lane: its straps
+  // are on the legs of the detour, each running the way its leg runs
+  const between = s.straps.filter(x => x.segment === 1);
+  assert.equal(between.length, 4);
+  const legs = way.slice(1).map((q, k) => { const p = way[k], d = dist(p, q);
+    return {from: way.slice(1, k + 1).reduce((m, v, n) => m + dist(way[n], v), 0), p, d, dir: {x: (q.x - p.x) / d, y: (q.y - p.y) / d, z: (q.z - p.z) / d}}; });
+  const whole = legs.at(-1).from + legs.at(-1).d;
+  let at0 = null;
+  for (const x of between) {
+    const leg = legs.find(v => Math.abs(v.dir.x - x.dir.x) + Math.abs(v.dir.y - x.dir.y) + Math.abs(v.dir.z - x.dir.z) < 1e-3);
+    assert.ok(leg, `the strap at ${x.along_mm} mm runs along a leg of the detour`);
+    // `t` is the share of the segment's routed length: the same start of the segment for every strap of it
+    const from = x.along_mm - x.t * whole;
+    at0 ??= from;
+    assert.ok(Math.abs(from - at0) < 0.2, 'every strap of the segment gives the same start for it');
+    // and its point is that far along the cord from the rear lane point
+    const along = leg.from + dist(leg.p, x.point);
+    assert.ok(Math.abs(along - x.t * whole) < 0.2, `${along} mm along, t ${x.t}`);
+  }
+  // none of them is on the straight line a reader of segment and t alone would draw
+  assert.ok(between.every(x => offLine(x.point, [way[0], way.at(-1)]) > 20));
+  assert.ok(b.members.some(m => m.cable === s.straps[0].on));
+});
+
+test('the same straps whatever order the cables and the members are written in', () => {
+  // half of b6 in Cat 6, so that its members do not all lie alike: a thicker cord stands further off a ring's sill and hangs otherwise
+  const mixed = {...RACK, cables: RACK.cables.map((c, k) => (k >= 60 && k < 72 && k % 2 ? {...c, media: 'cat6'} : c))};
+  const turn = r => ({...r, cables: [...r.cables].reverse(),
+    bundles: r.bundles.map(b => ({...b, members: [...b.members].reverse()}))});
+  const shuffle = r => ({...r, cables: r.cables.map((c, k, all) => all[(k * 37 + 11) % all.length]),
+    bundles: r.bundles.map(b => ({...b, members: b.members.map((m, k, all) => all[(k * 5 + 3) % all.length])}))});
+  for (const rack of [RACK, mixed]) {
+    const want = rack.bundles.map(b => got(b.id, rack));
+    for (const other of [turn(rack), shuffle(rack)]) {
+      assert.equal(other.cables.length, 96);
+      assert.deepEqual(new Set(other.cables.map(c => c.id)).size, 96);
+      assert.deepEqual(other.bundles.map(b => got(b.id, other)), want);
+      assert.deepEqual(other.bundles.map(b => B.trunkLength(other, b, {route: ctxOf(other)})), rack.bundles.map(b => B.trunkLength(rack, b, {route: ctxOf(rack)})));
+    }
+  }
+  // the members of the mixed bundle do differ, and its run is the longest of them: never shorter than any one member's own
+  const ctx = ctxOf(mixed), s = got('b6', mixed, ctx);
+  const own = id => {
+    const P = R.routePath(mixed, mixed.cables.find(c => c.id === id), ctx).points;
+    const rings = P.map((p, k) => (p.at === 'entry' || p.at === 'exit' ? k : -1)).filter(k => k >= 0);
+    // from the middle of its first ring to the middle of its last
+    let mm = -dist(P[rings[0]], P[rings[1]]) / 2 - dist(P[rings.at(-2)], P[rings.at(-1)]) / 2;
+    for (let k = rings[0] + 1; k <= rings.at(-1); k++) mm += dist(P[k - 1], P[k]);
+    return mm;
+  };
+  const each = mixed.bundles[5].members.map(m => own(m.cable));
+  assert.ok(Math.max(...each) - Math.min(...each) > 1, 'the members are not all as long');
+  assert.ok(s.runs[0][1] >= Math.max(...each) - 0.1, `${s.runs[0][1]} mm, the longest member ${Math.max(...each)} mm`);
+  assert.ok(s.runs[0][1] < Math.max(...each) + 20);
+});
+
+test('with the check of what is kept on, the answers are the same and nothing is found changed', () => {
+  const plain = RACK.bundles.map(b => got(b.id));
+  const checked = ctxOf(RACK, {checkKept: true});
+  assert.deepEqual(RACK.bundles.map(b => B.straps(RACK, b, {route: checked})), plain);
+  assert.deepEqual(RACK.bundles.map(b => B.trunkLength(RACK, b, {route: checked})), RACK.bundles.map(b => B.trunkLength(RACK, b, {route: ctxOf()})));
+  // a second read in the same context, and one in a context made anew
+  assert.deepEqual(RACK.bundles.map(b => B.straps(RACK, b, {route: checked})), plain);
+  assert.deepEqual(RACK.bundles.map(b => got(b.id, RACK, ctxOf())), plain);
+});
+
+test('where no member has a path, a trunk is the straight lines between its waypoints, and a strap says it is on no cable', () => {
+  // no port is found on its drawing, so no cord has a path
+  const ctx = ctxOf(RACK, {portX: () => null});
+  assert.equal(R.routePath(RACK, RACK.cables[60], ctx), null);
+  const b = bundle('b6'), s = B.straps(RACK, b, {route: ctx});
+  const pts = B.layoutOf(RACK, b, {route: ctx}).trunk.map(w => R.pointOf(RACK, w, ctx));
+  const straight = pts.slice(1).reduce((m, p, k) => m + dist(pts[k], p), 0);
+  assert.deepEqual(B.trunkLength(RACK, b, {route: ctx}), {metres: Math.round(straight / 10) / 100});
+  assert.ok(s.count > 0);
+  for (const x of s.straps) {
+    assert.equal(x.on, null);
+    const p = pts[x.segment], q = pts[x.segment + 1];
+    assert.ok(dist(x.point, {x: p.x + x.t * (q.x - p.x), y: p.y + x.t * (q.y - p.y), z: p.z + x.t * (q.z - p.z)}) < 0.1, 'on the straight line, at t');
+  }
+});

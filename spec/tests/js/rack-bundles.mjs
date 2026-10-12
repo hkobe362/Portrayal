@@ -461,23 +461,35 @@ test('straps: ceil(L / every), evenly, none on a run\'s end; one in a ring moves
               straps: {every: {value: 100, unit: 'mm'}}}).rack;
   const s = B.straps(r, r.bundles[0], {route: routeCtx(r)});
   assert.equal(s.count, 5);
-  // evenly at 41, 123, 205, 287, 369; ring 2 at 307.5, 3 at 205, 4 at 102.5, each taking +/-30 mm with a strap's half width
-  assert.deepEqual(s.straps.map(x => x.along_mm), [41, 132.5, 175, 277.5, 369]);
-  assert.deepEqual(s.straps[1], {kind: 'spacing', segment: 1, t: 0.2927, along_mm: 132.5, width_mm: 19});
-  assert.deepEqual(s.runs, [[0, 410]]);
+  // MEASURED ON THE CABLE (#1034). From its port at x -150 a cord would enter
+  // ring 5 and leave it by one face, so it is taken to that face only, 5 mm
+  // short of the ring's centre, and the trunk it rides starts there: 405 mm
+  // to the centre of ring 1, where the straight line from centre to centre
+  // is 410. Evenly at 40.5, 121.5, 202.5, 283.5 and 364.5; ring 4 is 97.5 mm
+  // along, ring 3 200 and ring 2 302.5, each taking +/-30 mm with a strap's
+  // half width, so the three in a ring move to its nearer edge.
+  assert.deepEqual(s.straps.map(x => x.along_mm), [40.5, 127.5, 230, 272.5, 364.5]);
+  assert.deepEqual(s.straps[1], {kind: 'spacing', segment: 1, t: 0.2927, along_mm: 127.5,
+    point: {x: 72.5, y: 422.28, z: 55}, dir: {x: -1, y: 0, z: 0}, on: 'c1', width_mm: 19});
+  assert.deepEqual(s.runs, [[0, 405]]);
   // (rack file version 4) the two ends of the trunk are peel points, and the
-  // spacing straps at 41 and 369 are within 50 mm of where a breakout strap
+  // spacing straps at 40.5 and 364.5 are within 50 mm of where a breakout strap
   // would go, 25 mm in: each serves, and none is added
   assert.deepEqual(s.kinds, {spacing: 5, breakout: 0, anchor: 0});
-  // 30 in at 12 in: 3 straps, 10 in apart, through ducts (straps in a duct stay)
+  // two ducts 30 in apart, at 12 in: 3 straps, evenly, through ducts (straps in a duct stay)
   const ducts = {'guide-1': 0, 'guide-2': 762};
   let d = rackWith([RT('i2:guide-1', 'i2:guide-2'), RT('i2:guide-1', 'i2:guide-2')]);
   d = run(d, {op: 'bundle.create', cables: ['c1', 'c2'], route: RT('i2:guide-1', 'i2:guide-2')}).rack;
   const dc = {...routeCtx(d), guidesOf: id => (id === 'i2' ? Object.entries(ducts).map(([via, x]) => ({via, kind: 'duct', face: 'front', x, box: {w: 40, h: 30}})) : [])};
-  const ds = B.straps(d, d.bundles[0], {route: dc});
-  assert.deepEqual(ds.straps.filter(x => x.kind === 'spacing').map(x => x.along_mm), [127, 381, 635]);
-  // and a breakout strap 25 mm in from each end, where the two fan out: the nearest spacing strap is 102 mm away
-  assert.deepEqual(ds.straps.map(x => [x.kind, x.along_mm]), [['breakout', 25], ['spacing', 127], ['spacing', 381], ['spacing', 635], ['breakout', 737]]);
+  const ds = B.straps(d, d.bundles[0], {route: dc}), RUN = ds.runs[0][1];
+  assert.equal(RUN, 815);
+  // measured on the cable (#1034): between the two ducts the cords hang, 815 mm of cord over the 762 mm
+  // between them, so the three are a third of that apart and not 10 in
+  assert.deepEqual(ds.runs, [[0, RUN]]);
+  assert.deepEqual(ds.straps.filter(x => x.kind === 'spacing').map(x => x.along_mm), [RUN / 6, RUN / 2, (5 * RUN) / 6].map(v => Math.round(v * 10) / 10));
+  // and a breakout strap 25 mm in from each end, where the two fan out: the nearest spacing strap is over 100 mm away
+  assert.deepEqual(ds.straps.map(x => [x.kind, x.along_mm]),
+    [['breakout', 25], ['spacing', 135.8], ['spacing', 407.5], ['spacing', 679.2], ['breakout', Math.round((RUN - 25) * 10) / 10]]);
   assert.equal(ds.count, 5);
   assert.deepEqual(ds.every, {value: 12, unit: 'in'});
   // {every: null}: no straps, still runs
