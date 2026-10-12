@@ -226,7 +226,7 @@ export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
     // Measured as a route edited by hand, so the measure does not come back
     // here; and under an id no bundle holds, so it is the cable's own path.
     // The lay kept (pickOf) is measured: a length needs no ports covered.
-    const measure = route => pathLength(pickOf(rack, {...cable, id: Symbol('side'), route, routeEdited: true}, ctx)?.path)?.measured;
+    const measure = route => pathLength(pickOf(rack, {...cable, id: Symbol('side'), route, routeEdited: true}, ctx, {name: false})?.path)?.measured;
     const la = measure(routes[sA]), lb = measure(routes[sB]);
     // within a micron is a tie: a mirrored pair of paths that sag (#949 step
     // 3) can measure apart in the last bits of a float
@@ -877,8 +877,8 @@ function copyOf(v) {
 //    It is kept at the cable's end `a`, the object, which an edit to a
 //    cable's label, length or slack carries over to the new cable, and
 //    which goes when the cable does; a few lays are kept at each end
-//    (`KEPT`): the cable's own, those of the two gutters its side is
-//    chosen between, and the same for the rack an undo away.
+//    (`KEPT`): the cable's own and that of the other gutter its side was
+//    chosen against, and the same for a rack or two an undo away.
 // 3. THE WORLD (`worldOf`), per rack and context: what every lay reads that
 //    is not its own cable's: the solid bodies (solidsOf), the trays and the
 //    surfaces a span can land on (traysOf, surfacesOf) and where each lane
@@ -924,8 +924,9 @@ function pathOf(rack, cable, ctx) {
 // {path, laid, cable, turned}, `path` as the cable reads it from its end a
 // with no port covered yet, `laid` the lay as it was made, of `cable` (the
 // cable or its twin), `turned` when that is the twin's. null when a port is
-// not found.
-function pickOf(rack, cable, ctx) {
+// not found. `{name: false}` leaves the path's findings naming no cable, as
+// a lay has them: what autoRoute asks for, which only measures.
+function pickOf(rack, cable, ctx, {name = true} = {}) {
   const memo = perOf(pickMemo, rack, ctx, cable);
   const known = memo?.get(cable);
   if (known !== undefined) return known;
@@ -944,7 +945,8 @@ function pickOf(rack, cable, ctx) {
     const first = order.first;
     // The two lays are judged once: which was kept is kept with the first
     // (`picks`), for the same second lay and the same end first, so a
-    // context made anew does not turn and measure them again.
+    // context made anew does not turn and measure them again; and its path
+    // named for a cable is kept for the cable last named.
     let kept = picks.get(laidP);
     if (!kept || kept.laidQ !== laidQ || kept.first !== first) {
       const p = laidP.path, q = laidQ && turnPath(laidQ.path);
@@ -954,9 +956,11 @@ function pickOf(rack, cable, ctx) {
       const tol = [0, 0.05, 1e-6];
       let pick = first ? 'written' : 'twin';
       for (let i = 0; i < 3; i++) if (Math.abs(sp[i] - sq[i]) > tol[i]) { pick = sp[i] < sq[i] ? 'written' : 'twin'; break; }
-      picks.set(laidP, kept = {laidQ, first, turned: pick === 'twin', path: pick === 'twin' ? q : p});
+      picks.set(laidP, kept = {laidQ, first, turned: pick === 'twin', raw: pick === 'twin' ? q : p, named: null});
     }
-    out = kept.turned ? {path: kept.path, laid: laidQ, cable: twin, turned: true} : {path: kept.path, laid: laidP, cable, turned: false};
+    if (name && (!kept.named || kept.named.id !== cable.id)) kept.named = {id: cable.id, path: named(kept.raw, cable.id)};
+    const path = name ? kept.named.path : kept.raw;
+    out = kept.turned ? {path, laid: laidQ, cable: twin, turned: true} : {path, laid: laidP, cable, turned: false};
   }
   memo?.set(cable, out);
   return out;
@@ -964,6 +968,9 @@ function pickOf(rack, cable, ctx) {
 // which of two lays was kept, by the lay from the end written first; and
 // whether an end sorts before the end it is cabled to (endOrder), by end
 const picks = new WeakMap(), orders = new WeakMap();
+// A lay's path with its findings named for a cable (layFrom names none).
+const named = (path, id) => ({...path, findings: path.findings.map(f => ({...f, cable: id})),
+  crossings: path.crossings.map(f => ({...f, cable: id})), bends: path.bends.map(f => ({...f, cable: id}))});
 // a cable's twin, kept with it
 const twins = new WeakMap();
 // THE LAYS KEPT AT AN END, newest first: [{key, world, lay}].
@@ -1000,10 +1007,9 @@ function layOf(rack, cable, ctx, given) {
 // tray, are read off the trays, which are part of the world the key is kept
 // with, by the waypoint alone (ringOpening): that a stop has an opening is
 // written, the boxes are not. A cable with no media is one, and is told
-// from every media there is; an id that is no text (the one a side is
-// measured under, autoRoute) is one such id.
+// from every media there is.
 function keyed(inp) {
-  return {...inp, media: inp.media === undefined ? {unset: true} : inp.media, id: typeof inp.id === 'string' ? inp.id : {other: typeof inp.id},
+  return {...inp, media: inp.media === undefined ? {unset: true} : inp.media,
     stops: inp.stops.map(({w, open, others, ...rest}) => (open ? {...rest, open: true} : rest))};
 }
 // PLAIN DATA AS TEXT, exactly: two values give one text only when a lay
@@ -1112,8 +1118,9 @@ function turnPath(path) {
 // WHAT THE LAY OF A CABLE READS of its rack and its context, from the
 // cable's end a; `given` is the route to lay it on (a twin's: its cable's
 // route reversed), else the cable's own. Everything layFrom needs that is
-// the cable's own is here, as plain data: {id, media, allowance, a, b,
-// diameter, need, drape, wps, stops, rests}. null when a port is not found.
+// the cable's own is here, as plain data: {media, allowance, a, b, diameter,
+// need, drape, wps, stops, rests}. null when a port is not found. Its id is
+// not: a lay names no cable (layFrom).
 function layInputs(rack, cable, ctx, given) {
   const a = portPoint(rack, cable.a, ctx), b = portPoint(rack, cable.b, ctx);
   if (!a || !b) return null;
@@ -1169,7 +1176,7 @@ function layInputs(rack, cable, ctx, given) {
     rested({kind: 'tray', item: s.w.item, via: s.w.via, face: laid.face, role: laid.role, ...(laid.ties ? {ties: laid.ties} : {})});
     stops.splice(k, 1, ...laid.points.map((p, j) => ({p, w: s.w, i: s.i, trayAt: true, hold: j > 0 && laid.hold[j]})));
   }
-  return {id: cable.id, media: cable.media, allowance: endAllowance(cable), a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
+  return {media: cable.media, allowance: endAllowance(cable), a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
     wps, stops, rests};
 }
 // One more thing a cable rests on, unless it is listed.
@@ -1181,6 +1188,10 @@ const restedIn = rests => o => { if (!rests.some(x => x.kind === o.kind && x.ite
 // {path, legs, need, r}: the path with no port covered yet (`covers` empty),
 // and what coversOf needs to judge them: the waypoints each leg lies
 // between, the bend radius and the cable's radius.
+// A LAY NAMES NO CABLE: each finding of it has `cable: null`, and pickOf
+// gives the one kept its cable's id (`named`). So the lay of a cable down
+// the gutter its side was chosen for (autoRoute measures both, under an id
+// of their own) is the lay of the cable itself, and is made once.
 function layFrom(inp, world) {
   const {a, b, diameter, wps, stops, rests} = inp, r = diameter / 2;
   const rested = restedIn(rests);
@@ -1307,7 +1318,7 @@ function layFrom(inp, world) {
         out.push({...face, ...tag, at: 'face'});
         rings.push({...ring, passed: false, sense: no.sense, face: at});
         marks[s.i] = {run: s.ring.run, depth: s.ring.depth, sense: no.sense, back: true};
-        findings.push({kind: 'doubles-back', cable: inp.id, item: s.w.item, via: s.w.via});
+        findings.push({kind: 'doubles-back', cable: null, item: s.w.item, via: s.w.via});
       }
     });
     // the detours leave each end's move to a plane room for two bends (#973,
@@ -1592,7 +1603,7 @@ function layFrom(inp, world) {
     for (const x of legCrossings(final[k - 1], final[k], solids, {diameter})) {
       const dup = crossings.some(c => c.item === x.solid.item && c.part === x.solid.part
         && JSON.stringify(c.between) === JSON.stringify(legs[k - 1]));
-      if (!dup) crossings.push({kind: 'crosses-body', cable: inp.id, item: x.solid.item, part: x.solid.part,
+      if (!dup) crossings.push({kind: 'crosses-body', cable: null, item: x.solid.item, part: x.solid.part,
         between: legs[k - 1], at: [r1(x.at.x), r1(x.at.y), r1(x.at.z)]});
     }
   }
@@ -1601,7 +1612,7 @@ function layFrom(inp, world) {
   // bundle check uses (cornersOf).
   // One finding a corner (#1007): corners at one point, to the tenth of a
   // millimetre a finding gives its place to, are one (mergeCorners).
-  const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: inp.id, point: final[c.k].at,
+  const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: null, point: final[c.k].at,
     between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
     angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
   return {path: {points: final, rings, findings, marks, crossings, detours, rests, bends, covers: [], allowance: inp.allowance, media: inp.media},
