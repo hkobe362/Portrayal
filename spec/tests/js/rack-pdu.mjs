@@ -54,6 +54,20 @@ function hung(apart = 35) {
 
 // ── hung on brackets ─────────────────────────────────────────────────────
 
+test('a mount point that mates a list of interfaces hangs where one that mates one does', () => {
+  // `mates` on a component is one interface or a list (#1045), and a mount
+  // point publishes it as stated
+  const listed = POINTS.map(m => ({...m, mates: ['other-button', m.mates]}));
+  const c = {chassisOf, slotsOf: ref => (ref === 'pdu' ? {...SLOTS.pdu, configs: [{...SLOTS.pdu.configs[0], 'mount-points': listed}]} : slotsOf(ref))};
+  const res = run(hung(35), {op: 'zerou.hang', id: 'z3', on: ['z1', 'z2']}, c);
+  assert.equal(res.error, undefined);
+  const pdu = zById(res.rack, 'z3');
+  assert.deepEqual(Z.fitsHang(res.rack, pdu, c), {ok: true, place: {at: 'left-rear', offsetMm: 87.35}});
+  // a list that does not name what the brackets present still does not hang
+  const none = {chassisOf, slotsOf: ref => (ref === 'pdu' ? {...SLOTS.pdu, configs: [{...SLOTS.pdu.configs[0], 'mount-points': POINTS.map(m => ({...m, mates: ['other-button']}))}]} : slotsOf(ref))};
+  assert.equal(Z.fitsHang(res.rack, pdu, none).ok, false);
+});
+
 test('a PDU hung on two brackets 35U apart fits, and stands where they hold it', () => {
   const r = hung(35);
   const res = run(r, {op: 'zerou.hang', id: 'z3', on: ['z1', 'z2']});
