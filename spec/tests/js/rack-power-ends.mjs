@@ -215,9 +215,21 @@ test('an end saved to an -occupant path keeps working and is not rewritten', asy
 test('a DC feed lands on a screw of its terminal, and the terminal itself is named as no slot', async () => {
   const rack = cabled(RACK, {a: LUG1, b: OUT_R1, media: 'power'}, {a: end('i1', 'psu-2/module/terminal'), b: OUT_F1, media: 'power'});
   // the terminal is no slot and its screws are: the reason says which path to give
-  assert.deepEqual(await loose(rack), ['c2 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-1, lug-2, lug-10 and not on itself; give the path psu-2/module/terminal/lug-1']);
+  // (lug-1 has the feed c1 on it, so it is not among the screws to give)
+  assert.deepEqual(await loose(rack), ['c2 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-2, lug-10 and not on itself; give the path psu-2/module/terminal/lug-2']);
+  const none = cabled(RACK, {a: end('i1', 'psu-2/module/terminal'), b: OUT_F1, media: 'power'});
+  assert.deepEqual(await loose(none), ['c1 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-1, lug-2, lug-10 and not on itself; give the path psu-2/module/terminal/lug-1']);
   assert.deepEqual(P.seatedPort(rack.items[0], end('i1', 'psu-2/module/terminal'), ctx).under,
     ['psu-2/module/terminal/lug-1', 'psu-2/module/terminal/lug-2', 'psu-2/module/terminal/lug-10']);
+  // a screw that has a cable is not the one to give: the first FREE one is, in natural order
+  const T = end('i1', 'psu-2/module/terminal'), lug = n => end('i1', `psu-2/module/terminal/lug-${n}`);
+  const one = cabled(RACK, {a: lug(1), b: OUT_R1, media: 'power'}, {a: T, b: OUT_F1, media: 'power'});
+  assert.deepEqual(await loose(one), ['c2 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-2, lug-10 and not on itself; give the path psu-2/module/terminal/lug-2']);
+  const two = cabled(RACK, {a: lug(1), b: OUT_R1, media: 'power'}, {a: lug(2), b: PDU_IN, media: 'power'}, {a: T, b: OUT_F1, media: 'power'});
+  assert.deepEqual(await loose(two), ['c3 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-10 and not on itself; give the path psu-2/module/terminal/lug-10']);
+  const all = cabled(RACK, {a: lug(1), b: OUT_R1, media: 'power'}, {a: lug(2), b: PDU_IN, media: 'power'},
+    {a: lug(10), b: end('i2', 'outlet-front-2', 'front'), media: 'power'}, {a: T, b: OUT_F1, media: 'power'});
+  assert.deepEqual(await loose(all), ['c4 a: psu-2 holds PSU-DC, whose terminal takes a cable on its screws and not on itself, and every screw of its terminal has a cable']);
   const at = P.seatedPort(rack.items[0], LUG1, ctx);
   // the screw says nothing of itself: the terminal it is part of does
   assert.deepEqual(at.info, {family: 'power', mode: 'dc', role: 'inlet', plug: LUG, connector: 'terminal-stud inlet'});

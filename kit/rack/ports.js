@@ -302,10 +302,15 @@ export function settleEnd(rack, end, got, ctx) {
   // catalogue is asked again, and heard only where it finds a slot that takes
   // a cable end, or a part that takes none; a port is still the page's to say.
   // AND ONLY WHERE THE PAGE SAW WHAT THE BAY SHIPS WITH: the part it names is
-  // the one the catalogue holds there. A page whose drawing is of another
-  // configuration, or of a part swapped since, names another and is not heard.
-  // (A page names the part as modelOf does, as it always has: its model, else
-  // its ref's name in capitals.)
+  // the one the catalogue holds there, so a page whose drawing shows another
+  // part in the bay is not heard. (A page names the part as modelOf does, as
+  // it always has: its model, else its ref's name in capitals.)
+  // WHAT THIS DOES NOT CATCH: the catalogue does not say which configurations
+  // build a bay that only its default fills. A page that hands in the drawing
+  // of a configuration that builds the bay, for an item now in one that does
+  // not, names the very part the bay ships with and is heard. A page that
+  // reads the item's own configuration never does that
+  // (docs/cable-ends-design.md section 6).
   if (!own && got?.facts?.drawing === true && got.facts.port === false && got.facts.holder?.part) {
     const again = seatedPort(item, end, ctx, {seen: true});
     if ((again?.slot || again?.part) && again.holder?.part === got.facts.holder.part) own = again;
@@ -320,6 +325,9 @@ export function settleEnd(rack, end, got, ctx) {
   }
   if (!own || got?.facts?.drawing === false) return got ?? null;
   const {info, ...facts} = own;
+  // the screws to name for an end on a terminal: those no other cable is on
+  if (facts.under) facts.under = facts.under.filter(x => !(rack.cables || []).some(c => [c.a, c.b].some(e =>
+    e.item === end.item && e.view === end.view && portPathOf(e.path) === x)));
   // an end that lands by its slot is what its part says it is; a port, what the page read of it
   return {...got, facts: {...got?.facts, ...facts}, info: facts.slot ? info : got?.info?.family ? got.info : info ?? got?.info, reason: looseReason(end, facts)};
 }

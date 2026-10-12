@@ -43,7 +43,7 @@ device's `configs.json`, by the class of the part that presents it:
 | slots | presented by | accepts | lands |
 |---|---|---|---|
 | 7,240 pluggable cages (`kind: cage`) | class `port` | optics | on its optic, as before; the cage is a port and says it holds no optic |
-| 3,782 connector slots | class `port` (RJ45, LC, coax, USB, D-sub) | plugs, and caps on fibre | yes, as before |
+| 3,780 connector slots | class `port` (RJ45, LC, coax, USB, D-sub) | plugs, and caps on fibre | yes, as before |
 | 305 connector slots | class `inlet` (C13, C14, C19, C20, Saf-D-Grid, P40, DC barrel, terminal headers, a stud pair) | one cord end or lug | **yes, new** |
 | 127 connector slots | class `ground` | one lug | **yes, new** |
 | 8 connector slots | class `screw` (the screws of a DC terminal) | one ring lug | **yes, new** |
@@ -81,8 +81,8 @@ feeds a C14 inlet through a cord with a different plug at each end.
   the screws under their terminal (`of`) and mark that one (`first`). Every
   screw of a terminal is the same power port to a DCIM, so the row to come
   does not depend on which was taken. An end that names the terminal and no
-  screw does not land, and is not moved: its reason names the screws and the
-  path to give. The library can end the choice by making the terminal the
+  screw does not land, and is not moved: its reason names the screws with no
+  cable and the path of the first of them, or says every screw has one. The library can end the choice by making the terminal the
   slot (section 8).
 - A derived plug is drawn and is never a swap, never a bill-of-materials line and
   never an export row: both ends belong to the cord.
@@ -183,6 +183,17 @@ The kit answers from the catalogue wherever the catalogue can:
   guessed**: the end lands with no family and no direction, so no warning rests
   on a guess, and an outlet that is no slot reads "is not on this panel" as it
   always did.
+
+**A limit, stated plainly.** The catalogue does not say which configurations
+build a bay that only its default fills. So a page that hands the kit the
+drawing of one configuration for an item now in another can make an end land
+on a supply the item's own configuration does not build: it names the very
+part the bay ships with, and the comparison passes. Over the catalogue that
+is 14 of 9,171 such questions, all `rear-15-16/module/inlet` on `ch3000`,
+whose bay two configurations draw and none names. A page that reads the
+item's own configuration never asks it. What would close it is the catalogue
+saying which configurations build a default-filled bay; the kit does not
+guess at it from names.
 
 So a page that still knows class `port` alone gets true answers from this kit for
 every end it reads, with one exception it must close before it offers power
