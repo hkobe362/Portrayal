@@ -302,11 +302,18 @@ export const CABLE_IMPORT_COLUMNS = {
 // Nautobot's file is read by import_cables.py, which makes a cable of one
 // termination a side, so the cord is one row for each fibre: port k of one
 // end to port k of the other, each row with the cord's type, status and
-// length, and its label with " (k/n)" after it, which is what ties the rows.
+// length, and its label with " (k/n)" after it, which is what ties the rows
+// (and so is made unique among such cords, with the cable's id where needed).
 // Where one end is a single port (an optic's interface, a rear connector) and
 // the other is several, Nautobot gets one row, to the FIRST of them, and a
-// note names the ports left without a cable. Ends on two different counts of
-// several ports have no such reading, and Nautobot's file leaves the cord out.
+// note names the ports left without a cable. THAT ROW TRACES ONLY BETWEEN
+// LIKE ENDS: a Type A cassette binds front port 1 to trunk position 1 and a
+// Type AF one binds it to position 2 (FHD-1MTP6LCDOS2A and -AF, as committed),
+// so across an A to AF pair the fibre arrives on the far end's second port,
+// which has no cable. The note says so. Ends on two different counts of
+// several ports have no such reading, and Nautobot's file leaves the cord out;
+// no part of the library gives such an end today (a part is one port or two),
+// and a test reaches the rule with a resolver of its own.
 // (Nautobot v3.2.6 3dc554b4 can hold several connectors a side on a cable
 // that names a cable type made for it: dcim/models/cables.py CableType. Such
 // a type must exist before a cable names it, as a NetBox bundle must, so the
@@ -320,7 +327,7 @@ export const CABLE_IMPORT_COLUMNS = {
 export function cableImportRows({rack, target = 'netbox', names, kept, resolve, ends = new Map(), unchecked = false, uOf, parts = null}) {
   const T = TARGET_NAME[target] || 'NetBox', nautobot = target === 'nautobot';
   const rows = [], left = [], notes = [], used = new Map(), inBundle = new Map();
-  const several = [], perFibre = [], firstOnly = [];
+  const several = [], perFibre = [], firstOnly = [], tied = new Set();
   let dac = false;
   for (const f of cableFindings(rack, ends, parts)) {
     const c = f.cable;
@@ -391,13 +398,24 @@ export function cableImportRows({rack, target = 'netbox', names, kept, resolve, 
     const count = a.ports.length === b.ports.length ? a.ports.length : 1;
     if (count > 1) perFibre.push(f.name);
     else for (const s of sides) if (s.ports.length > 1) firstOnly.push(`${f.name} (${s.device} ${s.ports.slice(1).join(', ')})`);
+    // THE LABEL TIES THE ROWS OF ONE CORD, so no two cords may share it. A
+    // label that fits and no earlier cord took is written whole. One that is
+    // too long for " (k/n)" after it, or that another cord's rows already
+    // carry (labels repeat, and two long ones may share all that is kept), is
+    // cut to leave room for the cable's id, which no other cable has.
     const room = DCIM_LIMITS.cableLabel - charCount(` (${count}/${count})`);
-    if (count > 1 && charCount(label) > room)
-      notes.push(`Cable ${f.name}: its label is shortened to ${room} characters on each of its ${count} rows, to leave room for which fibre the row is.`);
+    let stem = label;
+    if (count > 1 && (charCount(stem) > room || tied.has(stem))) {
+      const id = ` ${flat(c.id)}`, mark = charCount(id) <= room ? id : ` #${tied.size + 1}`;
+      stem = cutTo(label, room - charCount(mark)) + mark;
+      notes.push(`Cable ${f.name}: its ${count} rows are labelled ${stem}, the label ${charCount(label) > room ? 'shortened' : 'another cable has too'} ` +
+                 'and the id of the cable after it, so that the rows of one cord are not taken for those of another.');
+    }
+    if (count > 1) tied.add(stem);
     for (let k = 0; k < count; k++) {
       const tail = count > 1 ? ` (${k + 1}/${count})` : '';
       rows.push({a_device: a.device, a_type: a.type, a_name: a.ports[k], b_device: b.device, b_type: b.type, b_name: b.ports[k], type,
-                 status: 'Planned', label: tail ? cutTo(label, room) + tail : label, color: '', length: len.value, length_unit: len.unit});
+                 status: 'Planned', label: stem + tail, color: '', length: len.value, length_unit: len.unit});
     }
   }
   if (dac) notes.push('A DAC is written as dac-passive. Change the type of one that is active.');
@@ -406,10 +424,13 @@ export function cableImportRows({rack, target = 'netbox', names, kept, resolve, 
     notes.push(`A cord on a duplex adapter is on two fibre ports of its panel or cassette. Its row names both, separated by a comma, which NetBox's cable import reads as the ports of one end: ${andList(several)}.`);
   if (perFibre.length)
     notes.push('Nautobot gives a cable one port at each end, so a cord with two fibre ports at both ends is written as one row for each fibre, ' +
-               `first port to first port, each with the cord's type and length and its label followed by which fibre it is, as (1/2): ${andList(perFibre)}.`);
+               `first port to first port, each with the cord's type and length and its label followed by which fibre it is, as (1/2). ` +
+               `First to first is an order, not a polarity: the rack file does not say whether a cord is crossed. The cords: ${andList(perFibre)}.`);
   if (firstOnly.length)
     notes.push('Nautobot gives a cable one port at each end, so a cord from a single port (an interface, a rear connector) to two fibre ports ' +
-               `is written to the first of the two. These ports have no cable in this file: ${firstOnly.join('; ')}.`);
+               'is written to the first of the two. Nautobot then traces a link whose two ends bind that first port to the same trunk position ' +
+               '(two cassettes of one type), and not one whose ends differ (a Type A cassette facing a Type AF one, which puts the fibre on the ' +
+               `second port at the far end): cable that second port by hand there. These ports have no cable in this file: ${firstOnly.join('; ')}.`);
   // THE BUNDLES (#923, decision 9). NetBox: each cable names its bundle first
   // in its description. NetBox 4.6 and later also has cable bundles of its own
   // (dcim.CableBundle, and the cable import's `bundle` column, by name: NetBox

@@ -10,6 +10,15 @@ Three things are held here. The published names are the committed type files'
 names, for every module whose glass is projected, on both targets. The
 projection's two views (`ports`, `part_ports`) are one walk. And the kit's own
 rows, by its node tests, against the committed files and two golden CSVs.
+
+WHAT A CABLES FILE REACHES is narrower than what agrees here, and the node
+sweep states it: of the 63 modules that publish ports, 3 FS panels have no
+`attrs.model` and the kit finds no type file for them (#1025); on NetBox the
+other 60 resolve, less the one adapter of each of 4 DCMs; on Nautobot 36 of
+the 63 are named `{module}/x`, and less the 4 DCMs 32 resolve whole, since 4
+types carry no glass there and 20 Fibrain panels are named by a bay chain,
+which the kit does not read (#1024). This file finds a type by its model OR
+its contract name, so it compares the names of all 63.
 """
 import json
 import os
@@ -36,8 +45,11 @@ def _index():
 
 
 def _type_file(target, entry):
-    """The committed module type a contract is written as, or None: found by
-    its model, as the kit finds it (export-data.js moduleTypePath)."""
+    """The committed module type a contract is written as, or None: by its
+    model, else by its contract name, which is how the exporter names the file
+    (`dcim_export.build_module`). NOT as the kit finds one: the kit looks for
+    the part number (export-data.js partNumber, then moduleTypePath) and
+    misses a module with no `attrs.model` (#1025)."""
     model = str((entry.get("attrs") or {}).get("model") or entry["name"]).replace("/", "-")
     hits = sorted((EXPORTS / target / "module-types").glob(f"*/{model}.yaml"))
     return yaml.safe_load(hits[0].read_text()) if hits else None
@@ -67,6 +79,7 @@ def test_every_module_with_a_fibre_graph_that_projects_publishes_its_ports():
 @pytest.mark.parametrize("target", ["netbox", "nautobot"])
 def test_the_published_names_are_the_committed_type_files_names(target):
     checked = names = 0
+    bare = []
     for e in _index():
         ports = (e.get("optical") or {}).get("ports")
         if not ports:
@@ -82,13 +95,17 @@ def test_the_published_names_are_the_committed_type_files_names(target):
             for section, row in lists.items():
                 published[section] |= {n for n in row if n is not None}
         if target == "nautobot" and not (listed["front-ports"] or listed["rear-ports"]):
-            continue        # Nautobot was given this type without its glass (for_target); the kit leaves such a cable out
+            bare.append(ref)   # Nautobot was given this type without its glass (for_target); the kit leaves such a cable out
+            continue
         for section in SECTIONS:
             assert published[section] == listed[section], \
                 f"{ref}: {section} published {sorted(published[section] ^ listed[section])} differently from the {target} file"
             names += len(listed[section])
         checked += 1
-    assert checked >= 55 and names >= 900, f"measured too little: {checked} types, {names} names"
+    # two couplers and two add/drop filters: a split has no Nautobot spelling
+    assert len(bare) == (4 if target == "nautobot" else 0), bare
+    assert checked >= (59 if target == "nautobot" else 63) and names >= 900, \
+        f"measured too little: {checked} types, {names} names"
 
 
 def test_the_panel_and_a_cassette_by_hand():

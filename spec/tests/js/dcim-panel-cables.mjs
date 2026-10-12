@@ -58,6 +58,22 @@ const resolverFor = (rack, ctx, target, held) => D.endResolver({rack, ctx,
   moduleAt: (id, bayId) => (rack.items.find(i => i.id === id).ref === 'fhd-1ufce' && held[bayId] ? moduleLists(target, held[bayId]) : null)});
 
 // ── the sweep: every module type whose glass the exporter projects ───────
+// WHAT IT REACHES, of the 63 modules that publish ports (2026-10-11):
+//   - 3 have no type file the kit can find, on either target: FS panels with
+//     no attrs.model, whose file is named for the contract while the kit looks
+//     for the part number (#1025). They are not measured here.
+//   - NetBox: the other 60 are measured. 4 are DCMs, whose one adapter is a
+//     front and a rear port at once and is left out by its reason; every port
+//     of the other 56 resolves.
+//   - Nautobot: of the 60, 4 types carry no glass (two couplers and two
+//     add/drop filters: a split has no Nautobot spelling), and 24 name their
+//     ports by a bay chain, {module.parent}/{module}/x (20 Fibrain panels,
+//     which seat in a drawer, and the 4 DCMs), which the kit does not read
+//     (#1024). Those 28 are left out by a reason, which is checked. The
+//     other 32 resolve whole.
+// The sweep seats each module straight in a device bay. A Fibrain panel is
+// never seated so in a rack (it sits in the XCU10 drawer), so its NetBox rows
+// here show the names agree, not that a rack reaches them.
 const FIBRE = COMPONENTS.filter(c => c.kind === 'module' && c.optical?.ports && !c['superseded-by']);
 
 test('the build publishes the ports of a part where it publishes the fibre graph of a projected module', () => {
@@ -70,11 +86,11 @@ test('the build publishes the ports of a part where it publishes the fibre graph
 for (const target of ['netbox', 'nautobot']) {
   test(`${target}: every port a cable can land on, on every module that carries glass, is named as its committed type file names it`, () => {
     let ends = 0, written = 0, modules = 0;
-    const odd = [];
+    const odd = [], unfound = [], whole = [];
     for (const comp of FIBRE) {
       const ref = refOf(comp), held = {'bay-1': ref}, ctx = ctxFor(held);
       const type = moduleLists(target, ref);
-      if (!type) continue;                               // a part with no manufacturer is written nowhere
+      if (!type) { unfound.push(`${comp.ns}/${comp.name}`); continue; }   // no file under its part number (#1025)
       modules++;
       const rack = {name: 'sweep', frame: M.normalizeFrame({heightRU: 12}), zeroU: [], cables: [],
                     items: [{id: 'i1', ref: 'fhd-1ufce', cfg: 'seated', label: 'pp', ru: 2, u: 1, face: 'front', turned: false}]};
@@ -89,7 +105,8 @@ for (const target of ['netbox', 'nautobot']) {
         const r = resolve({item: 'i1', path: port.path, view: port.view});
         const sections = Object.keys(comp.optical.ports[key]);
         if (!r.ok) {
-          // the only two ways out: a part that is two kinds of port, or a type file this target was given without the port
+          // the only two ways out: a part that is two kinds of port, or a type file of this target that does not list the
+          // name as {module}/<name> (Nautobot: a type with no glass, or one that names its ports by a bay chain)
           const want = sections.length > 1 ? /is .* and .*, and one end of a cable is one kind of port$/
             : new RegExp(`^the module type .* lists no (front|rear) port named \\{module\\}/`);
           assert.match(r.reason, want, `${ref} ${port.path}`);
@@ -112,14 +129,28 @@ for (const target of ['netbox', 'nautobot']) {
         }
       }
       // and nothing the type file lists is out of a cable's reach, on a module whose every port resolved
+      if (!odd.some(o => o.startsWith(`${ref} `))) whole.push(ref);
       if (!odd.some(o => o.startsWith(`${ref} `)))
         for (const section of ['front-ports', 'rear-ports'])
           for (const name of type.sections[section])
             assert.ok(named.has(`${section} ${name}`), `${ref}: no cable end reaches ${name} of the ${target} type ${type.model}`);
     }
-    // Nautobot was given three of these types without their glass (a front port there is one position of one rear port)
-    assert.ok(modules >= 55 && ends >= 800 && written >= (target === 'netbox' ? 900 : 750), `measured too little: ${modules} modules, ${ends} ends, ${written} names`);
-    if (target === 'netbox') assert.deepEqual([...new Set(odd.map(o => o.split(' ')[1]))], ['dcm'], 'only a DCM adapter is two kinds of port');
+    assert.deepEqual(unfound, ['fs/fhd-fap12lcd-om5', 'fs/fhd-fap12mtp-b', 'fs/fhd-fap12mtp16-a'], 'the modules with no type file under their part number (#1025)');
+    const partly = new Set(odd.map(o => o.split(' ')[0].split('@')[0]));
+    assert.equal(whole.length + partly.size, modules);
+    if (target === 'netbox') {
+      assert.deepEqual([...new Set(odd.map(o => o.split(' ')[1]))], ['dcm'], 'only a DCM adapter is two kinds of port');
+      assert.ok(modules >= 60 && whole.length >= 56 && written >= 900, `measured too little: ${modules} modules, ${whole.length} whole, ${written} names`);
+    } else {
+      // every module the Nautobot file cannot name is one of the two kinds the comment above gives
+      for (const name of partly) {
+        const l = moduleLists(target, latest(name)), listed = [...l.sections['front-ports'], ...l.sections['rear-ports']];
+        assert.ok(!listed.length || listed.every(n => n.startsWith('{module.parent}/')), `${name}: left out for neither reason`);
+      }
+      const bare = [...partly].filter(name => { const l = moduleLists(target, latest(name)); return !l.sections['front-ports'].length && !l.sections['rear-ports'].length; });
+      assert.deepEqual(bare.sort(), ['smartoptics/ppm-ad1-1510', 'smartoptics/ppm-ad1-1625', 'smartoptics/ppm-ocu-50-50', 'smartoptics/ppm-ocu-97-3']);
+      assert.ok(modules >= 60 && whole.length >= 32 && written >= 750, `measured too little: ${modules} modules, ${whole.length} whole, ${written} names`);
+    }
   });
 }
 
@@ -185,7 +216,8 @@ test('Nautobot: one port a side, so a row for each fibre, tied by the label; one
     ['C6', 'dcim.rearport', 'bay-1/B03-1', 'dcim.frontport', 'bay-1/5', 3, 'm'],
     ['C7', 'dcim.interface', 'port-3', 'dcim.interface', 'port-3', 3, 'm']]);
   const notes = got.notes.join('\n');
-  assert.match(notes, /one row for each fibre, first port to first port, .* as \(1\/2\): C5\./);
+  assert.match(notes, /one row for each fibre, first port to first port, .* as \(1\/2\)\. First to first is an order, not a polarity: .* The cords: C5\./);
+  assert.match(notes, /and not one whose ends differ \(a Type A cassette facing a Type AF one/);
   assert.match(notes, /These ports have no cable in this file: C1 \(pp-1 bay-1\/2\); C3 \(pp-1 bay-2\/2\); C6 \(pp-1 bay-1\/6\)\./);
 });
 
@@ -204,8 +236,43 @@ test('a long label keeps which fibre the row is', () => {
   const rack = {...RACK, cables: [cable('c5', CABLES[4].a, CABLES[4].b, {label: long})]};
   const ends = P.settleEnds(rack, new Map(rack.cables.flatMap(c => [c.a, c.b]).map(e => [CR.endKey(e), {info: null, reason: null}])), CTX);
   const got = D.cableImportRows({rack, target: 'nautobot', names: NAMES, kept: KEPT, ends, uOf: () => 1, resolve: resolverFor(rack, CTX, 'nautobot', HELD)});
-  assert.deepEqual(got.rows.map(r => [X.charCount(r.label), r.label.slice(-6)]), [[100, ' (1/2)'], [100, ' (2/2)']]);
-  assert.match(got.notes.join('\n'), /its label is shortened to 94 characters on each of its 2 rows/);
+  assert.deepEqual(got.rows.map(r => [X.charCount(r.label), r.label.slice(-9)]), [[100, ' c5 (1/2)'], [100, ' c5 (2/2)']]);
+  assert.match(got.notes.join('\n'), /its 2 rows are labelled L{91} c5, the label shortened and the id of the cable after it/);
+});
+
+test('no two cords share the label that ties their rows: long labels alike in all that is kept, and one label on two cords', () => {
+  const run = (l1, l2) => {
+    const rack = {...RACK, cables: [cable('c5', CABLES[4].a, CABLES[4].b, {label: l1}),
+                                    cable('c9', end('i2', 'bay-1/module/lc04'), end('i3', 'bay-1/module/lc04'), {label: l2})]};
+    const ends = P.settleEnds(rack, new Map(rack.cables.flatMap(c => [c.a, c.b]).map(e => [CR.endKey(e), {info: null, reason: null}])), CTX);
+    return D.cableImportRows({rack, target: 'nautobot', names: X.uniqueNames(ITEMS), kept: KEPT, ends, uOf: () => 1, resolve: resolverFor(rack, CTX, 'nautobot', HELD)});
+  };
+  const stems = got => got.rows.map(r => r.label.replace(/ \(\d\/2\)$/, ''));
+  // 97 characters in common, so the 94 a row could keep are the same
+  const long = run(`${'L'.repeat(97)}-A`, `${'L'.repeat(97)}-B`);
+  assert.equal(long.rows.length, 4);
+  assert.equal(new Set(long.rows.map(r => r.label)).size, 4);
+  assert.deepEqual(stems(long), [`${'L'.repeat(91)} c5`, `${'L'.repeat(91)} c5`, `${'L'.repeat(91)} c9`, `${'L'.repeat(91)} c9`]);
+  assert.ok(long.rows.every(r => X.charCount(r.label) <= 100));
+  // one short label on two cords: the first keeps it, the second carries its id
+  const twice = run('UPLINK', 'UPLINK');
+  assert.deepEqual(twice.rows.map(r => r.label), ['UPLINK (1/2)', 'UPLINK (2/2)', 'UPLINK c9 (1/2)', 'UPLINK c9 (2/2)']);
+  assert.match(twice.notes.join('\n'), /its 2 rows are labelled UPLINK c9, the label another cable has too and the id of the cable after it/);
+  // and a cord whose label no other has is written as it is
+  assert.deepEqual(run('A', 'B').rows.map(r => r.label), ['A (1/2)', 'A (2/2)', 'B (1/2)', 'B (2/2)']);
+});
+
+test('ends on two different counts of several ports: NetBox takes the row, Nautobot leaves the cord out, by its reason', () => {
+  // No part of the library is three ports, so the ends are a resolver's own: two ports at one end, three at the other.
+  const rack = {...RACK, cables: [cable('c5', CABLES[4].a, CABLES[4].b)]};
+  const ends = new Map(rack.cables.flatMap(c => [c.a, c.b]).map(e => [CR.endKey(e), {info: null, reason: null}]));
+  const resolve = e => ({ok: true, type: 'dcim.frontport', name: 'bay-1/1',
+                         names: e.item === 'i2' ? ['bay-1/1', 'bay-1/2'] : ['bay-1/1', 'bay-1/2', 'bay-1/3']});
+  const run = target => D.cableImportRows({rack, target, names: NAMES, kept: KEPT, ends, uOf: () => 1, resolve});
+  assert.deepEqual(run('nautobot').rows, []);
+  assert.deepEqual(run('nautobot').left, ['Cable C5 is not in the cables file: its ends are on 2 and 3 ports, and Nautobot gives a cable one port at each end.']);
+  assert.deepEqual(run('netbox').left, []);
+  assert.deepEqual(run('netbox').rows.map(r => [r.side_a_name, r.side_b_name]), [['bay-1/1,bay-1/2', 'bay-1/1,bay-1/2,bay-1/3']]);
 });
 
 test('with no catalogue the kit answers as it did: the part id is looked up, not guessed at', () => {

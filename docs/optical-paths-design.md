@@ -373,15 +373,27 @@ one name, and nothing is said about positions.
   have two ports the cord is two rows, first port to first port and second to
   second. Each row has the type, status, length and unit of the cord, and its
   label followed by ` (1/2)` or ` (2/2)`, which is what ties the rows: a
-  Nautobot cable has no description to say it in. A label is cut to leave
-  room for that.
+  Nautobot cable has no description to say it in. No two cords share that
+  label: one too long for the suffix, or one that another such cord already
+  has, is cut and given the id of its cable before the suffix, and a note
+  says so.
 - **Nautobot, a single port against two.** An optic is one interface and a
   rear adapter one rear port, and either can take one cable. The cord is
   written as one row, to the FIRST of the two front ports, and the README
-  names each second port as having no cable in the file. The trace through
-  the panel then holds on that fibre.
+  names each second port as having no cable in the file. **The trace then
+  holds between like ends and not across unlike ones.** Two panels, or two
+  cassettes of one type, bind the first front port to the same trunk
+  position, and Nautobot traces the link end to end. A Type A cassette binds
+  front port 1 to trunk position 1 and a Type AF one binds front port 1 to
+  position 2 (`FHD-1MTP6LCDOS2A.yaml` and `FHD-1MTP6LCDOS2AF.yaml`), which is
+  what a Method A link is made of. Across that pair the fibre arrives on
+  front port 2 of the far cassette, which has no cable, and the trace stops
+  there. The README says so beside the list of those ports; the second port
+  is cabled by hand on such a link.
 - Ends on two different counts of several ports have no such reading: NetBox
-  takes the row, and the Nautobot file leaves the cord out and says why.
+  takes the row, and the Nautobot file leaves the cord out and says why. No
+  part in the library gives such an end today, a fibre part being one port
+  or two; the rule is held by a test with a resolver of its own.
 
 **First port to first port is an order, not a polarity.** The rack file does
 not say whether a cord is crossed, so the two Nautobot rows pair the ports in
@@ -418,7 +430,8 @@ in the application shell, with its validation, since the script that reads
 the file needs an API token and none was used: so the script itself is NOT
 tried on these rows. Read back, each cable sat on its ports, and Nautobot
 traced the first switch through the panel to the second, and through both
-cassettes and the trunk, on the first fibre.
+cassettes and the trunk, on the first fibre. Both cassettes were Type A; an A
+to AF pair was not tried, and by the type files it does not trace (above).
 
 ## D. What the model makes checkable
 

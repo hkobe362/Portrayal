@@ -12,7 +12,10 @@
   cell, separated by a comma. Nautobot gets one row a fibre where both ends
   have two ports, labelled `<label> (1/2)` and `<label> (2/2)`, and one row,
   to the first port, where the other end is a single port (an interface, a
-  rear connector); the README names each port left without a cable. A rack
+  rear connector); the README names each port left without a cable, and
+  says that such a row traces between like ends and not across a Type A
+  to Type AF pair. Two cords never share the label that ties their rows:
+  the id of the cable is added where they would. A rack
   with no cable on such a port exports the files it did, byte for byte.
 - **A page passes the catalogue to get this.** `resolveEnd` takes `ports`
   (`fibrePorts(item, end, ctx)` from `rack/ports.js`), and `endResolver({
