@@ -1242,10 +1242,10 @@ the drawings do not place, and a ring they do not place, are taken as
 having room, so nothing is passed over for what cannot be measured.
 
 **Where no ring leaves room** the lead takes the nearest, as before, and its
-bend is a finding (3.4). The finding then also says why and what would help:
-"Lacer EDGE-0 stands too close to this port for the cable to turn into any
-ring on its way: set EDGE-0 back from the rail, mount the manager on another
-unit of EDGE-0, or leave EDGE-0 without a manager." The second remedy is
+bend is a finding (3.4). The finding then also says why ("Lacer EDGE-0
+stands too close to this port for the cable to turn into any ring on its
+way") and what would help ("set EDGE-0 back from the rail, mount the manager
+on another unit of EDGE-0, or leave EDGE-0 without a manager"). The second remedy is
 offered only for a manager hosted on a device of two units or more, and a
 manager that is a rack item of its own is to be moved away, not left out.
 `bendFindingsOf` and `bendFindings` carry it in `text` and mark the finding
@@ -1364,8 +1364,8 @@ cable makes such a bend with one movement of the hand, calls it one bend,
 and puts it right in one place, the leg between the turns. So it is one
 finding, and the finding says plainly that it is two turns: "c1 turns twice
 within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and
-63.2 degrees), with room for a 17.9 mm bend; the cable (aoc) needs 30 mm,
-12.1 mm short." Two tight corners are paired when they are next to each
+63.2 degrees)", and then the room and the shortfall as for any bend ("with
+room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short."). Two tight corners are paired when they are next to each
 other on the path, have the same room, and that room is what the leg
 between them leaves the two. A corner that is short for its other leg stays
 a finding of its own, as does one that doubles back. The finding has
