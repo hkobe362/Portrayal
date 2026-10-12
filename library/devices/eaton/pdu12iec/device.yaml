@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: pdu12iec
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Eaton
 model: PDU12IEC
@@ -184,8 +184,12 @@ provenance:
       receptacles) to connect your power strip to ground". PDU12IEC_BK shows a
       threaded stud with a zinc hex nut on a toothed lock washer and a flat
       washer. common/ground-stud@1 is the library's part of that kind; ITS
-      NUT IS SMALLER THAN THE ONE PHOTOGRAPHED, 8.1 across against about 9.4
-      read, a compromise of size and not of place. The pale round mark below
+      NUT IS SMALLER THAN THE ONE PHOTOGRAPHED. The part draws a nut 8.1
+      across the corners and 7.0 across the flats; the photographed nut reads
+      about 9.4 across the corners (9.0 to 9.9 over its three pairs, the nut
+      being seen a little from one side) and about 8.3 across the flats. So
+      the drawn nut is about 1.3 short either way, a compromise of size and
+      not of place. The pale round mark below
       it, 5.8 across and #afbac4, carries a faint figure the 3000 px master
       does not resolve; it is drawn as a plain disc and not as an earth symbol
       (gaps: round-mark).
@@ -220,8 +224,15 @@ provenance:
       16A max per C19 outlet, 12A (10A CE) max per C13 outlet; 50/60 Hz. The
       owner manual gives the range as 100V to 240V and the output as 15 amps
       for 100V to 120V or 16 amps for 208 to 240V; the low end, 100 or 120, is
-      the two documents differing (gaps: input-range). `input-voltage-v` is
-      the top of the range, the one the stated 3.84 kW belongs to.
+      the two documents differing, and so is the current at the low end, 15
+      or 16 (gaps: input-range). `input-voltage-v` is the top of the range,
+      the one the stated 3.84 kW belongs to, and at that end both documents
+      give 16 A, which is `input-current-a`. NO `plug-rating-a` IS STATED: the
+      unit has an inlet and no plug, it ships no cord, and no document held
+      rates a plug or a cord connector. The 20 of the spec sheet's "16/20A"
+      is the service it recommends, a branch circuit of which 16 A is the
+      continuous share, and not a rating of anything on the unit. So the
+      exported input says 16 A and names no plug.
   capability:
     confidence: datasheet
     note: >-
@@ -248,7 +259,6 @@ attrs:
     input-phase: single
     input-voltage-v: 240
     input-current-a: 16
-    plug-rating-a: 20
     capacity-kw: 3.84
     capacity-scope: >-
       the load the PDU can hand on, 3.84 kW at 240 V down to 1.92 kW at 120 V,
@@ -364,7 +374,11 @@ gaps:
   note: >-
     the owner manual gives the nominal voltage as 100V to 240V; the spec sheet
     lists input voltages from 120 to 240 and titles the unit 120-240V. Both
-    are carried in `input-ac`.
+    are carried in `input-ac`. THE CURRENT AT THE LOW END DIFFERS TOO: the
+    owner manual gives the output as 15 amps for 100V to 120V and 16 amps for
+    208 to 240V; the spec sheet gives 16A total at every voltage, with 1.92kW
+    at 120V, which is 16 A. `input-current-a` is 16, the figure both give at
+    240 V.
   wanted: the rating label of a unit.
 - what: top-bottom-sides
   scope: [top, bottom, left, right]

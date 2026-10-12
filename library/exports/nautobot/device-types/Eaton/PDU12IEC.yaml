@@ -14,7 +14,7 @@ rear_image: true
 power-ports:
   - name: input
     type: iec-60320-c20
-    description: 240 V single-phase, 16 A input (20 A plug)
+    description: 240 V single-phase, 16 A input
 power-outlets:
   - name: Front 1
     type: iec-60320-c13
@@ -68,8 +68,8 @@ comments: "Eaton Tripp Lite series basic PDU, 1U horizontal: a black metal box a
   \ a viewer asks for ears; the cable clamp and its screws are in the box and are not drawn.\n\nRack mounting\
   \ positions: flush (\"mounting ears flush with the four-outlet face (owner manual, 1U Rackmount Installation)\"\
   ; as shipped).\n\nPDU class: basic (metering-scope none, outlet-switching false).\n\nInput rating: 240\
-  \ V single-phase, 16 A input (20 A plug).\n\nDatasheet: Tripp Lite PDU12IEC spec sheet (1.9-3.8kW Single-Phase\
-  \ 120-240V Basic PDU, 14 Outlets, C20 16A Input, 1U Rack-Mount)\n  https://assets.tripplite.com/product-pdfs/en/pdu12iec.pdf\n\
+  \ V single-phase, 16 A input.\n\nDatasheet: Tripp Lite PDU12IEC spec sheet (1.9-3.8kW Single-Phase 120-240V\
+  \ Basic PDU, 14 Outlets, C20 16A Input, 1U Rack-Mount)\n  https://assets.tripplite.com/product-pdfs/en/pdu12iec.pdf\n\
   \nFacts carried in the model that this schema has no field for:\n- compliance.certifications: RETIE\
   \ (Colombia); CAN/CSA-C22.2 No. 60950-1 (Canada); NOM (Mexico); UL 60950-1\n- compliance.product-compliance:\
   \ RoHS; CE (Europe)\n- environmental.altitude: 0 to 3000 m (0 to 10000 ft)\n- environmental.humidity:\
@@ -82,7 +82,7 @@ comments: "Eaton Tripp Lite series basic PDU, 1U horizontal: a black metal box a
   \ 100/120 to 240 V single-phase, 16 A maximum (agency de-rated to 16 A continuous in North America),\
   \ 50/60 Hz\n- power.input-cord: detachable\n- power.input-current-a: 16\n- power.input-phase: single\n\
   - power.input-plug: iec-60320-c20\n- power.input-voltage-v: 240\n- power.output-rating: 16 A total;\
-  \ 16 A max per C19; 12 A (10 A CE) max per C13\n- power.output-voltage: 120-240 V\n- power.plug-rating-a:\
-  \ 20\n\nDrawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached\
-  \ from an earlier export may no longer line up.\nModel maturity: modelled. Every dimension in the source\
-  \ records where it came from."
+  \ 16 A max per C19; 12 A (10 A CE) max per C13\n- power.output-voltage: 120-240 V\n\nDrawing version\
+  \ 0.1.1. A major bump means a slot moved or an id was renamed, so anything cached from an earlier export\
+  \ may no longer line up.\nModel maturity: modelled. Every dimension in the source records where it came\
+  \ from."

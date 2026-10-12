@@ -1,8 +1,8 @@
 {
  "bay-accepts": {},
- "composed": "0e05bba638a29140",
+ "composed": "b707dd46ae9426b3",
  "composed-refs": {
-  "common/breaker-push-reset@1": "1.0.0+c17f1dfbbee1dd4a",
+  "common/breaker-push-reset@1": "1.0.0+6b43b91710c16bb9",
   "common/ground-stud@1": "1.0.1+8ee1c47866e993c9",
   "std/c13-outlet@1": "1.0.0+4c2ec0215cfdc077",
   "std/c19-outlet@1": "1.0.1+0e8370a77e7841c5",
@@ -12,7 +12,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "e7bb4b4231a15e31",
+ "gaps": "6df17eb6822fc9c1",
  "groups": [
   "breakers",
   "grounding",
@@ -119,6 +119,6 @@
  },
  "placement-surface": "d3dd3eba4ff1cf82",
  "shape": "a8396cb7d43e0dab",
- "surface": "b2e64bdab9005848",
- "version": "0.1.0"
+ "surface": "ea23e7b3b56da738",
+ "version": "0.1.1"
 }
