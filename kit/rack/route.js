@@ -494,8 +494,12 @@ function portBoxesOn(rack, ctx) {
   // an upright item would hold it, as portX and portY do, and the roll of the
   // item turns it (fit.js rollPoint), a quarter turn swapping its width and
   // height. `mounted` is a point that is already as mounted (portPoint's).
+  // (an item's pane and its panel's depth are the same for all its ports)
+  const panes = new Map(), depths = new Map();
+  const paneOf = (it, view) => { let per = panes.get(it); if (!per) panes.set(it, per = {}); if (!(view in per)) per[view] = endPane(rack, {item: it.id, view}); return per[view]; };
+  const depthOf = (it, pane) => { let per = depths.get(it); if (!per) depths.set(it, per = {}); if (!(pane in per)) per[pane] = panelZ(rack, it, pane, ctx); return per[pane]; };
   const add = (it, path, view, ux, uy, w0, h0, mounted = false) => {
-    const pane = endPane(rack, {item: it.id, view});
+    const pane = paneOf(it, view);
     const key = `${it.id}|${path}|${view}`;
     if (!pane || seen.has(key) || !Number.isFinite(ux) || !Number.isFinite(uy)) return;
     seen.add(key);
@@ -503,7 +507,7 @@ function portBoxesOn(rack, ctx) {
     const [w, h] = isQuarter(it) ? [h0, w0] : [w0, h0];
     const hw = (size(w) ?? PORT_BOX.w) / 2, hh = (size(h) ?? PORT_BOX.h) / 2;
     out.push({item: it.id, path, view, x: x, y: y, x0: x - hw, x1: x + hw, y0: y - hh, y1: y + hh,
-      z: panelZ(rack, it, pane, ctx), out: pane === 'rear' ? -1 : 1, ...(size(w) && size(h) ? {} : {estimated: true})});
+      z: depthOf(it, pane), out: pane === 'rear' ? -1 : 1, ...(size(w) && size(h) ? {} : {estimated: true})});
   };
   let all = typeof ctx?.portBoxesOf === 'function';
   if (typeof ctx?.portBoxesOf === 'function') for (const it of rack.items) {
@@ -514,11 +518,27 @@ function portBoxesOn(rack, ctx) {
   }
   for (const c of rack.cables || []) for (const e of [c.a, c.b]) {
     const it = e && itemOf(rack, e.item);
+    // a port already listed is not placed again (`add` would pass it over)
+    if (it && seen.has(`${it.id}|${e.path}|${e.view === 'rear' ? 'rear' : 'front'}`)) continue;
     let p = null;
     try { p = it ? portPoint(rack, e, ctx) : null; } catch { p = null; }
     if (p) add(it, e.path, e.view === 'rear' ? 'rear' : 'front', p.x, p.y, undefined, undefined, true);
   }
   out.judged = all ? 'all' : 'cabled';
+  // FOR coversOf, which asks of every span of every cable which of these it
+  // passes in front of: each port by its key (one port a key, `seen` above),
+  // and the ports of one device that follow each other in the list under
+  // the one box, across the face, that holds them all (`all` when a box has
+  // a number that is not one, and is then never passed over).
+  out.byKey = new Map(out.map(p => [`${p.item}|${p.path}|${p.view}`, p]));
+  out.groups = [];
+  let g = null;
+  out.forEach((p, i) => {
+    if (!g || g.item !== p.item) out.groups.push(g = {item: p.item, from: i, to: i, x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity, all: false});
+    g.to = i + 1;
+    if (![p.x0, p.x1, p.y0, p.y1].every(Number.isFinite)) g.all = true;
+    g.x0 = Math.min(g.x0, p.x0); g.x1 = Math.max(g.x1, p.x1); g.y0 = Math.min(g.y0, p.y0); g.y1 = Math.max(g.y1, p.y1);
+  });
   if (keyed) per.set(ctx, out);
   return out;
 }
@@ -1183,7 +1203,12 @@ function layFrom(inp, world) {
   const need = inp.need, bend = Math.min(need, ROOM_MAX), base = r + CLEAR;
   // the corners of a run of points short of the cable's installed bend
   // radius, a shared leg shared by need (route-path.js cornersOf)
-  const tightOf = pts => cornersOf(pts, {share: 'need'}).filter(c => c.room_mm < need - 1e-9);
+  // (kept for a list of points while this lay is made: the search below asks
+  // for the corners of one taut path many times, and no list is changed
+  // once it is built)
+  const cornersKept = new WeakMap(), tightKept = new WeakMap();
+  const cornersIn = pts => { let c = cornersKept.get(pts); if (!c) cornersKept.set(pts, c = cornersOf(pts, {share: 'need'})); return c; };
+  const tightOf = pts => { let t = tightKept.get(pts); if (!t) tightKept.set(pts, t = cornersIn(pts).filter(c => c.room_mm < need - 1e-9)); return t; };
   // Round the solid bodies (section 1.3), then what still crosses one (1.4).
   // A ring's parts are met by the cable's tube (solids.js legCrossings, #968).
   const solids = world.solids;
@@ -1204,6 +1229,23 @@ function layFrom(inp, world) {
     box: {x0: x.box.x0 - r, x1: x.box.x1 + r, y0: x.box.y0 - r, y1: x.box.y1 + r,
       z0: x.away === -1 ? -1e6 : x.box.z1, z1: x.away === -1 ? x.box.z0 : 1e6}}));
   const aheadOf = pts => { const at = []; for (let k = 1; fronts.length && k < pts.length; k++) if (legCrossings(pts[k - 1], pts[k], fronts).length) at.push(k); return at; };
+  // The way round between two points for a room (solids.js detour), kept
+  // while this lay is made: each change tried below lays the whole path
+  // again, and all but a leg or two of it are the legs of the last try.
+  // Found again by the seven numbers themselves, each the same number
+  // (Object.is): the sum only says which few to compare.
+  const rounds = new Map();
+  const roundOf = (p, q, room) => {
+    const sum = p.x + 3 * p.y + 7 * p.z + 13 * q.x + 29 * q.y + 61 * q.z + 127 * room;
+    let list = rounds.get(sum);
+    if (!list) rounds.set(sum, list = []);
+    for (const e of list)
+      if (Object.is(e.p.x, p.x) && Object.is(e.p.y, p.y) && Object.is(e.p.z, p.z) && Object.is(e.q.x, q.x) && Object.is(e.q.y, q.y)
+        && Object.is(e.q.z, q.z) && Object.is(e.room, room)) return e.got;
+    const got = detour(p, q, solids, {diameter, lanes: lanesAt, room});
+    list.push({p: {x: p.x, y: p.y, z: p.z}, q: {x: q.x, y: q.y, z: q.z}, room, got});
+    return got;
+  };
   // THE TAUT PATH for the approach offsets `offs` (stop index -> [before the
   // ring, after it], mm from its band along the run): every stop's points,
   // then the detours between them. `own[i]` is the stop a taut point is of
@@ -1275,7 +1317,7 @@ function layFrom(inp, world) {
     let stuck = 0;
     for (let k = 1; k < out.length; k++) {
       const between = [ref(from[k - 1]), ref(from[k])];
-      const extra = solids.length ? detour(out[k - 1], out[k], solids, {diameter, lanes: lanesAt, room: runs.room ?? 2 * bend}) : [];
+      const extra = solids.length ? roundOf(out[k - 1], out[k], runs.room ?? 2 * bend) : [];
       if (extra === null) stuck++;
       if (extra?.length) {
         detours.push({between, points: extra.map(p => ({x: p.x, y: p.y, z: p.z}))});
@@ -1430,7 +1472,7 @@ function layFrom(inp, world) {
         if (cur > base + 1e-9) list.push({o: put(offs, k, side, base), region});
         // the two turns' share of the stretch through the ring: what they
         // need of it over what it is, given to the other side
-        const cs = cornersOf(L.taut, {share: 'need'}), tanAt = i => { const c = cs.find(x => x.k === i); return c ? Math.tan(c.angle_deg * Math.PI / 360) : 0; };
+        const cs = cornersIn(L.taut), tanAt = i => { const c = cs.find(x => x.k === i); return c ? Math.tan(c.angle_deg * Math.PI / 360) : 0; };
         const other = offs.get(k)[1 - side], lack = bend * (tanAt(apOf(L, 0)) + tanAt(apOf(L, 1))) - (cur + other + Math.abs(f.face[1] - f.face[0]));
         if (lack > 1e-6 && Number.isFinite(lack) && other + lack + 0.5 <= Math.min(2 * bend, f.free[1 - side])) list.push({o: put(offs, k, 1 - side, other + lack + 0.5), region});
       }
@@ -1496,7 +1538,7 @@ function layFrom(inp, world) {
   const drape = inp.drape;
   const hung = taut.map(() => null);
   // the room each point of the taut path has as a corner (none: all it needs)
-  const roomAt = new Map(cornersOf(taut, {share: 'need'}).map(c => [c.k, c.room_mm]));
+  const roomAt = new Map(cornersIn(taut).map(c => [c.k, c.room_mm]));
   const kept = i => Math.min(roomAt.get(i) ?? Infinity, need);
   for (let k = 1; k < taut.length; k++) {
     const p = taut[k - 1], q = taut[k];
@@ -1583,7 +1625,10 @@ function layFrom(inp, world) {
 // of the cable's own, whose box comes within the cable's installed bend
 // radius of that own port's centre, is not listed (`beside`). What is left
 // is a span that runs on across a face.
-// `laid` is layFrom's answer for `cable`, as it was laid.
+// `laid` is layFrom's answer for `cable`, as it was laid. A span is judged
+// against the ports of one device at a time, and against a device's only
+// where it comes within their reach across the face (portBoxesOn's `groups`):
+// a leg that stays to one side of every box of a device covers none of them.
 function coversOf(rack, cable, ctx, laid) {
   const {path: {points: final}, legs, need, r} = laid;
   const r1 = v => Math.round(v * 10) / 10;
@@ -1592,18 +1637,29 @@ function coversOf(rack, cable, ctx, laid) {
   if (ports.length) {
     const same = (e, p) => p.item === e.item && p.path === e.path && p.view === (e.view === 'rear' ? 'rear' : 'front');
     const plug = p => p.at === 'a' || p.at === 'b';
-    const own = [cable.a, cable.b].map(e => ports.find(p => same(e, p))).filter(Boolean);
+    // the cable's own two ports, each found by its key and held to `same`
+    const own = [cable.a, cable.b].map(e => { const p = ports.byKey.get(`${e.item}|${e.path}|${e.view === 'rear' ? 'rear' : 'front'}`); return p && same(e, p) ? p : null; }).filter(Boolean);
     const beside = port => own.some(o => o.item === port.item && o.view === port.view
       && Math.hypot(Math.max(port.x0 - o.x, 0, o.x - port.x1), Math.max(port.y0 - o.y, 0, o.y - port.y1)) <= need + 1e-9);
+    const listed = new Set();
     for (let k = 1; k < final.length; k++) {
       const p = final[k - 1], q = final[k], between = legs[k - 1];
       if (between.some(w => w.item) || plug(p) || plug(q) || (p.end && p.end === q.end)) continue;
-      for (const port of ports) {
-        if (same(cable.a, port) || same(cable.b, port) || beside(port)) continue;
-        if (covers.some(c => c.item === port.item && c.path === port.path && c.view === port.view)) continue;
-        const at = legOver(p, q, port, r);
-        if (at) covers.push({kind: 'port-behind-span', cable: cable.id, item: port.item, path: port.path, view: port.view,
-          between, at: [r1(at.x), r1(at.y), r1(at.z)], judged: ports.judged, ...(port.estimated ? {estimated: true} : {})});
+      const lx = Math.min(p.x, q.x), hx = Math.max(p.x, q.x), ly = Math.min(p.y, q.y), hy = Math.max(p.y, q.y);
+      for (const g of ports.groups) {
+        if (!g.all && (hx < g.x0 - r || lx > g.x1 + r || hy < g.y0 - r || ly > g.y1 + r)) continue;
+        for (let i = g.from; i < g.to; i++) {
+          const port = ports[i];
+          if (hx < port.x0 - r || lx > port.x1 + r || hy < port.y0 - r || ly > port.y1 + r) continue;
+          if (same(cable.a, port) || same(cable.b, port) || beside(port)) continue;
+          if (listed.has(port)) continue;
+          const at = legOver(p, q, port, r);
+          if (at) {
+            listed.add(port);
+            covers.push({kind: 'port-behind-span', cable: cable.id, item: port.item, path: port.path, view: port.view,
+              between, at: [r1(at.x), r1(at.y), r1(at.z)], judged: ports.judged, ...(port.estimated ? {estimated: true} : {})});
+          }
+        }
       }
     }
   }
@@ -1752,9 +1808,9 @@ export const orientMarks = (marks, flip = {}) => marks.map(m => (m && (m.sense =
 // decision, and a ring's mark is {run, depth} alone: the drawing then decides
 // it from its own points.
 export function ringMarks(rack, cable, ctx) {
-  const path = routePath(rack, cable, ctx);
-  if (path) return path.marks;
-  return resolveRoute(rack, cable, ctx).waypoints.map(w => {
+  const path = pathOf(rack, cable, ctx);
+  if (path) return copyOf(path.marks);
+  return routeOf(rack, cable, ctx).waypoints.map(w => {
     const g = w.lane ? null : ringOf(ctx.guidesOf(w.item).find(x => x.via === w.via));
     return g ? {run: g.run, depth: g.depth} : null;
   });
@@ -1776,7 +1832,7 @@ export function pathLength(path, {values = 0} = {}) {
   const need = base + shortTolerance(cable, value);
   return {measured: need + 2 * END_PLAY_M, value, need};
 }
-export const routedLength = (rack, cable, ctx) => pathLength(routePath(rack, cable, ctx), {values: slackValues(cable)});
+export const routedLength = (rack, cable, ctx) => pathLength(pathOf(rack, cable, ctx), {values: slackValues(cable)});
 
 // A length in metres, or null: only metres and feet convert.
 const M_PER = {m: 1, ft: 0.3048};
@@ -1796,13 +1852,14 @@ export function layFaceOf(cable, {item, via}) {
 }
 
 // THE SPARE OF A CABLE: {need_m, stock_m, spare_m, end_play_m, to_store_m,
-// pinned}, or null without a path. It measures the path it is given and
+// pinned}, or null without a path. `path` is the cable's routePath, for a
+// caller that already has it (kit 0.25.0); without it the path kept for the
+// rack, the context and the cable is read. It measures the path it is given and
 // never reads a saved number but a length the user pinned (any source but
 // `routed`), which is the stock then; a pinned length in a unit that does
 // not convert, or one kept as written, gives null.
-export function spareOf(rack, cable, ctx) {
-  let path = null;
-  try { path = routePath(rack, cable, ctx); } catch { path = null; }
+export function spareOf(rack, cable, ctx, path = undefined) {
+  if (path === undefined) { try { path = pathOf(rack, cable, ctx); } catch { path = null; } }
   if (!path || cable.lengthAsWritten != null) return null;
   const pinned = !!cable.length && cable.length.source !== 'routed';
   const stock = pinned ? toMetres(cable.length.value, cable.length.unit) : pathLength(path, {values: slackValues(cable)})?.value;
@@ -1816,7 +1873,7 @@ export function spareOf(rack, cable, ctx) {
 // with a sentence for each: what the page and an agent report. A cable whose
 // port is not found is not judged.
 export function ringFindings(rack, ctx, nameOf = id => id) {
-  return (rack.cables || []).flatMap(c => (routePath(rack, c, ctx)?.findings || []).map(f => ({...f,
+  return (rack.cables || []).flatMap(c => (pathOf(rack, c, ctx)?.findings || []).map(f => ({...f,
     text: `${c.id} would enter and leave ${nameOf(f.item)} ${/^guide-(\d+)$/.test(f.via) ? `ring ${f.via.slice(6)}` : f.via} by the same face: route it through the ring, or past it.`})));
 }
 
@@ -1830,12 +1887,13 @@ export function bendFindings(rack, ctx, nameOf = id => id) {
 }
 // The same for one cable (#1007): what `inspect` carries. `path` is the
 // cable's routePath, for a caller that already has it.
-export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath(rack, c, ctx)) {
+export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = pathOf(rack, c, ctx)) {
   const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}`
     : w.lane ? `${w.lane} U${uLabel(rack.frame, w.ru)}`
     : `${nameOf(w.item)} ${/^guide-(\d+)$/.test(w.via) ? `ring ${w.via.slice(6)}` : w.via}`);
   const an = t => (/^(8|1[18](\.|$))/.test(t) ? 'an' : 'a');
-  return (path?.bends || []).map(f => {
+  // each finding a copy, so that none handed out is part of the path kept
+  return copyOf(path?.bends || []).map(f => {
     const [a, b] = f.between.map(w => lab(w, c));
     const where = a === b ? `at ${a}` : `between ${a} and ${b}`;
     const kind = c.type || c.media;
@@ -1863,8 +1921,9 @@ export function coverFindings(rack, ctx, nameOf = id => id) {
 }
 // The same for one cable (#1007): none, or the one finding. `path` is the
 // cable's routePath, for a caller that already has it.
-export function coverFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath(rack, c, ctx)) {
-  const covers = path?.covers || [];
+export function coverFindingsOf(rack, c, ctx, nameOf = id => id, path = pathOf(rack, c, ctx)) {
+  // a copy, so that nothing handed out is part of the path kept
+  const covers = copyOf(path?.covers || []);
   if (!covers.length) return [];
   const lab = w => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}` : `${w.lane} U${uLabel(rack.frame, w.ru)}`);
   const and = xs => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs.at(-1)}`);
@@ -1921,7 +1980,7 @@ export function bodyFindings(rack, ctx, nameOf = id => id) {
   const lab = (w, c) => (w.end ? `its port on ${nameOf((w.end === 'a' ? c.a : c.b).item)}`
     : w.lane ? `${w.lane} U${uLabel(rack.frame, w.ru)}`
     : `${nameOf(w.item)} ${/^guide-(\d+)$/.test(w.via) ? `ring ${w.via.slice(6)}` : w.via}`);
-  return (rack.cables || []).flatMap(c => (routePath(rack, c, ctx)?.crossings || []).map(f => {
+  return (rack.cables || []).flatMap(c => copyOf(pathOf(rack, c, ctx)?.crossings || []).map(f => {
     const s = solids.find(x => x.item === f.item && x.part === f.part);
     const body = [nameOf(f.item), partText(f.part)].filter(Boolean).join(' ');
     const [a, b] = f.between.map(w => lab(w, c));
@@ -1957,9 +2016,9 @@ const areaOf = media => Math.PI * ((ownMedia(DIAMETERS, media) ?? UNSET_D) / 2) 
 export function fill(rack, ctx) {
   const at = new Map();
   for (const c of rack.cables || []) {
-    const path = routePath(rack, c, ctx);
+    const path = pathOf(rack, c, ctx);
     const notThrough = new Set((path?.findings || []).map(f => `${f.item}|${f.via}`));
-    for (const w of resolveRoute(rack, c, ctx).waypoints) {
+    for (const w of routeOf(rack, c, ctx).waypoints) {
       if (w.lane || notThrough.has(`${w.item}|${w.via}`)) continue;
       const g = ctx.guidesOf(w.item).find(x => x.via === w.via);
       if (!g?.aperture) continue;
@@ -1991,7 +2050,7 @@ export function fill(rack, ctx) {
 function zeroUThrough(rack, ctx) {
   const parts = zeroUOf(rack).map(z => ({z, c: ctx.chassisOf(z.ref)})).filter(({c}) => carriesLane(c));
   if (!parts.length) return [];
-  const routes = (rack.cables || []).map(c => [c, resolveRoute(rack, c, ctx).waypoints]);
+  const routes = (rack.cables || []).map(c => [c, routeOf(rack, c, ctx).waypoints]);
   return parts
     .map(({z, c}) => ({z, c, cables: routes.filter(([, ws]) => runsThrough(ws, z, ctx.chassisOf)).map(([cable]) => cable)}))
     .filter(x => x.cables.length);
@@ -2002,8 +2061,8 @@ function zeroUThrough(rack, ctx) {
 export function capacityOver(rack, ctx) {
   const by = new Map();
   for (const c of rack.cables || []) {
-    const notThrough = new Set((routePath(rack, c, ctx)?.findings || []).map(f => `${f.item}|${f.via}`));
-    for (const w of resolveRoute(rack, c, ctx).waypoints)
+    const notThrough = new Set((pathOf(rack, c, ctx)?.findings || []).map(f => `${f.item}|${f.via}`));
+    for (const w of routeOf(rack, c, ctx).waypoints)
       if (w.item && !notThrough.has(`${w.item}|${w.via}`)) (by.get(w.item) || by.set(w.item, new Set()).get(w.item)).add(c.id);
   }
   const out = [];
