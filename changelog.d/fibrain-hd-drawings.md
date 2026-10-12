@@ -38,12 +38,20 @@
   module types name their ports `{module}/...` where they named them
   `{module.parent}/{module}/...`. A holder now also seats directly in a bay
   of a device, the 1U frame, and a module seated at more than one depth is
-  written at depth one. For the same reason the Nautobot module type of the
-  XCU10 drawer, `XCU10`, is no longer given its four module bays `slot-1` to
-  `slot-4`: each accepts a module that also seats directly in a chassis bay,
-  and Nautobot copies a bay's position as written (nautobot/nautobot#5823),
-  so on Nautobot a holder can be installed in the 1U frame and not in the
-  XCU10's drawer. NetBox's names and bays are unchanged.
+  written at depth one. So that the names a holder installs under do not
+  change, the Nautobot module type of the XCU10 drawer, `XCU10`, gives its
+  four module bays the positions `drawer/slot-1` to `drawer/slot-4` where
+  they were `slot-1` to `slot-4`: a holder in the drawer still installs as
+  `drawer/slot-1/B01-1`, and one in the 1U frame as `slot-1/B01-1`. A holder
+  type and a drawer type have to be re-imported together. NetBox's names and
+  bays are unchanged.
+- The Nautobot export gives a carrier's bays their carrier's own position in
+  front of theirs when the carrier only ever sits in one bay id (#1040), where
+  such a bay was withheld if it accepted a module that also seats directly in
+  a chassis bay. Besides the XCU10 drawer this reaches one part: the Dell
+  `riser-2s-16g` module type gains its bays `e3s-0` and `e3s-1`, at
+  `riser-2/e3s-0` and `riser-2/e3s-1`, so a drive carrier can be installed in
+  the R660's riser 2S on Nautobot under NetBox's names.
 
 ### Removed
 - `fibrain/xm*@1`, the forty retired majors above; each is replaced by its

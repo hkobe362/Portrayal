@@ -800,7 +800,6 @@ def _render_nautobot(name, positions):
 WITHHELD = {
     **{f"Cisco/A9K-MOD{n}-{v}": ["bay-0", "bay-1"]
        for n in (80, 160, 200, 400) for v in ("SE", "TR")},
-    "Dell/riser-2s-16g": ["e3s-0", "e3s-1"],      # its slot-1 is given
     "Juniper/MX-MPC1E-3D": ["mic0", "mic1"],
     # NOT the MX2000 adapter's `mpc` (#917): its only bay, given with a blank
     # position instead - PASS_THROUGH below.
@@ -809,6 +808,18 @@ WITHHELD = {
     "Nokia/IOM4-e": ["mda-1", "mda-2"],
     "Nokia/IOM4-e-HS": ["mda-1", "mda-2"],
     "Nokia/IOM5-e": ["mda-1", "mda-2"],
+}
+
+# THE BAYS NAUTOBOT IS GIVEN WITH THEIR CARRIER'S SEAT WRITTEN IN FRONT (#1040),
+# by carrier: (the one bay id the carrier ever sits in, its bays that accept a
+# model also seated directly in a chassis bay). Nautobot copies the position as
+# written, so a holder in the XCU10 drawer's `slot-1` names its port
+# `drawer/slot-1/x`, as NetBox does, and the same holder in a bay of the 1U
+# frame names it `slot-1/x`. The Dell riser's two drive bays were withheld
+# until this rule; its slot-1 was always given, plainly.
+ANCHORED = {
+    "Dell/riser-2s-16g": ("riser-2", ["e3s-0", "e3s-1"]),
+    "Fibrain/XCU10": ("drawer", ["slot-1", "slot-2", "slot-3", "slot-4"]),
 }
 
 # THE BAYS NAUTOBOT IS GIVEN WITH A BLANK POSITION (#917), by carrier: its only
@@ -825,7 +836,9 @@ PASS_THROUGH = {
 MULTI_DEPTH = sorted([
     "Cisco/A9K-MPA-1X40GE", "Cisco/A9K-MPA-20X1GE", "Cisco/A9K-MPA-2X10GE",
     "Cisco/A9K-MPA-4X10GE", "Cisco/MPA blank",
-    "Dell/e3s-carrier", "Dell/e3s-carrier-blank",
+    # NOT the Dell E3.S carriers the R660's riser 2S seats, nor the Fibrain HD
+    # holders the XCU10's drawer seats (#1040): each of those carriers has one
+    # seat, so its bays are anchored and what sits in one is at depth 1.
     "Juniper/MIC-3D-16CHE1-T1-CE", "Juniper/MIC-3D-1OC192-XFP",
     "Juniper/MIC-3D-20GE-SFP", "Juniper/MIC-3D-2XGE-XFP",
     "Juniper/MIC-3D-4OC3OC12-1OC48", "Juniper/MIC-3D-8DS3-E3",
@@ -862,7 +875,7 @@ def test_the_written_module_types_carry_their_nested_bays():
         if c.get("kind") == "module" and isinstance(c.get("bays"), dict) and c["bays"]:
             model = str((c.get("attrs") or {}).get("model") or c["name"]).replace("/", "-")
             declared.setdefault(model, set()).add(frozenset(c["bays"]))
-    seen, withheld, passed = 0, {}, {}
+    seen, withheld, passed, anchored = 0, {}, {}, {}
     for p in sorted(nb.glob("*/*.yaml")):
         bays = (yaml.safe_load(p.read_text()) or {}).get("module-bays") or []
         if not bays:
@@ -876,9 +889,15 @@ def test_the_written_module_types_carry_their_nested_bays():
         twin_p = LIB / "exports/nautobot/module-types" / p.parent.name / p.name
         twin = yaml.safe_load(twin_p.read_text()) or {}
         plain = twin.get("module-bays") or []
+        key = f"{p.parent.name}/{p.stem}"
+        seat = ANCHORED.get(key, (None, ()))[0]
         for b in plain:
             assert "{" not in b["position"] and "{" not in b["name"], (twin_p, b)
-            assert b["position"] in ("", b["name"]), (twin_p, b)
+            assert b["position"] in ("", b["name"], f"{seat}/{b['name']}"), (twin_p, b)
+        fixed = sorted(b["name"] for b in plain if b["position"] == f"{seat}/{b['name']}")
+        if fixed:
+            anchored[key] = (seat, fixed)
+            assert f"at the position {seat}/<bay>" in twin.get("comments", ""), twin_p
         held = got - {b["name"] for b in plain}
         assert {b["name"] for b in plain} <= got, twin_p
         if held:
@@ -891,6 +910,55 @@ def test_the_written_module_types_carry_their_nested_bays():
     assert seen, "no module type with a nested bay was read - run ./publish.sh --no-images"
     assert withheld == WITHHELD
     assert passed == PASS_THROUGH
+    assert anchored == ANCHORED
+
+
+def test_the_anchored_bays_are_the_pinned_ones():
+    """The function, beside the files: a carrier with one seat, and of its bays
+    those accepting a model that also seats directly in a chassis bay."""
+    got = {f"{man}/{model}": (seat, sorted(ids))
+           for (man, model), (seat, ids) in dx.anchored_bays(_dist()).items()}
+    assert got == ANCHORED
+
+
+def test_an_anchored_bay_is_written_with_its_carriers_seat():
+    doc = {"model": "T", "module-bays": [{"name": "slot-1", "position": "slot-1"},
+                                         {"name": "aux", "position": "aux"}]}
+    nt = dx.nested_bays_for(doc, "nautobot", anchored=("drawer", {"slot-1"}))
+    assert nt["module-bays"] == [{"name": "slot-1", "position": "drawer/slot-1"},
+                                 {"name": "aux", "position": "aux"}]
+    assert "at the position drawer/<bay>" in nt["comments"]
+    nb = dx.nested_bays_for(doc, "netbox", anchored=("drawer", {"slot-1"}))
+    assert nb["module-bays"][0] == {"name": "{module}/slot-1", "position": "{module}/slot-1"}
+    with pytest.raises(ValueError):
+        dx.nested_bays_for(doc, "nautobot", withheld={"slot-1"}, anchored=("drawer", {"slot-1"}))
+
+
+def test_a_holder_names_its_ports_alike_in_the_frame_and_in_the_drawer():
+    """#1040: one Fibrain holder type seats in a bay of the 1U frame and in a
+    slot of the XCU10's drawer. In both DCIMs it is `slot-1/x` in the frame and
+    `drawer/slot-1/x` in the drawer, from one module type each."""
+    trees = {t: LIB / "exports" / t for t in ("netbox", "nautobot")}
+    rels = ("device-types/Fibrain/XPU00.yaml", "module-types/Fibrain/XCU10.yaml",
+            "module-types/Fibrain/XMN1021GB.yaml")
+    if any(not (t / r).exists() for t in trees.values() for r in rels):
+        pytest.skip("not published - run ./publish.sh --no-images")
+    got = {}
+    for t, root in trees.items():
+        frame, drawer, holder = (yaml.safe_load((root / r).read_text()) for r in rels)
+        assert [b["position"] for b in frame["module-bays"]] == [f"slot-{n}" for n in range(1, 9)]
+        names = holder["front-ports"] + holder["rear-ports"]
+        assert all(n["name"].startswith("{module}/") for n in names), (t, names[0])
+        slot = drawer["module-bays"][0]["position"]
+        if t == "netbox":
+            got[t] = ([_resolve(n["name"], "slot-1") for n in names],
+                      [_resolve(n["name"], _resolve_bay(slot, "drawer")) for n in names])
+        else:
+            got[t] = ([_render_nautobot(n["name"], ["slot-1"]) for n in names],
+                      [_render_nautobot(n["name"], ["drawer", slot]) for n in names])
+    assert got["nautobot"] == got["netbox"]
+    assert got["netbox"][0][0] == "slot-1/1" and got["netbox"][1][0] == "drawer/slot-1/1"
+    assert len(set(got["netbox"][0])) == len(got["netbox"][0]) == 36
 
 
 def _resolve_bay(template, parent_position):
@@ -1022,12 +1090,16 @@ def _reach(tree, ref, chain, seen=()):
                     else _render_nautobot(row["name"], chain))
     contract = _dist().component_by_ref(ref) or {}
     for bid, b in (contract.get("bays") or {}).items():
-        mine = {b2["position"] for b2 in doc.get("module-bays") or []}
-        pos = dx.module_scoped(bid) if tree == "netbox" else bid
-        if pos not in mine:
-            continue                    # withheld - the sweep counts it
+        if tree == "netbox":
+            here = bid if dx.module_scoped(bid) in {b2["position"] for b2 in doc.get("module-bays") or []} else None
+        else:
+            # a plain bay is at its own id; an anchored one (#1040) at its
+            # carrier's seat and its id, which is what `{module}` is filled with
+            here = {b2["name"]: b2["position"] for b2 in doc.get("module-bays") or []}.get(bid)
+        if not here:
+            continue                    # withheld or passed through - the sweep counts it
         for sub in (b or {}).get("accepts") or []:
-            out |= _reach(tree, sub, chain + [bid], seen + (ref,))
+            out |= _reach(tree, sub, chain + [here], seen + (ref,))
     return out
 
 
@@ -1044,7 +1116,7 @@ def _withheld_paths(ref, chain, seen=()):
         for key in dx.MODULE_PORT_KEYS:
             for row in nb.get(key) or []:
                 out.add(_resolve(row["name"], "/".join(chain)))
-    plain = {b["position"] for b in (nt or {}).get("module-bays") or []}
+    plain = {b["name"] for b in (nt or {}).get("module-bays") or [] if b["position"]}
     contract = _dist().component_by_ref(ref) or {}
     for bid, b in (contract.get("bays") or {}).items():
         for sub in (b or {}).get("accepts") or []:
