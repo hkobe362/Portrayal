@@ -289,7 +289,7 @@ function patchRing(rack, cable, m, rings, ctx) {
     // cable, and must know it
     const path = routePath(rack, {...cable, route: [{item: m.id, via: g.via}], routeEdited: true}, ctx);
     if (!path) return null;
-    const score = [path.findings.length, path.crossings.length, path.bends.reduce((n, f) => n + f.short_mm, 0), pathLength(path).measured * 1000];
+    const score = [path.findings.length, path.crossings.length, path.bends.reduce((n, f) => n + f.short_mm * (f.turns?.length ?? 1), 0), pathLength(path).measured * 1000];
     // a tenth of a millimetre of room, a micron of length: under that is a tie
     const tol = [0, 0, 0.05, 1e-3];
     let better = !best;
@@ -918,7 +918,12 @@ export const stockLength = (need, {values = 0} = {}) => chooseStock(() => need, 
 //   largest bend its legs leave it (route-path.js cornersOf, a leg between
 //   two corners shared by what each needs of it), `need_mm` the cable's
 //   radius (`ctx.bendOf(cable)`, else its media's) and `short_mm` the miss.
-//   Corners at one point are one finding (#1007, mergeCorners below).
+//   Corners at one point are one finding (#1007, mergeCorners below), and
+//   so are two turns that share a leg too short for both (#1026, pairTurns
+//   below): that finding also has `apart_mm`, the leg between the two, and
+//   `turns: [{point, at, angle_deg}, {point, at, angle_deg}]`; its `at` is
+//   the middle of that leg, `point` the first turn's, `angle_deg` the wider
+//   of the two, and `legs_mm` the leg into the first and out of the second.
 //   The path is laid to leave none (the approach points, lead points and
 //   detours below, and no hang that would make one), so what is here is a
 //   bend the kit's rules found no room for: often the parts leave none, but
@@ -1003,7 +1008,8 @@ export function routePath(rack, cable, ctx) {
   const p = asWritten();
   if (!p) return null;
   const q = asTwin();
-  const score = x => [x.crossings.length, x.bends.reduce((m, f) => m + f.short_mm, 0), pathLength(x).measured];
+  // (a finding of two turns is two corners short, as it was counted before #1026)
+  const score = x => [x.crossings.length, x.bends.reduce((m, f) => m + f.short_mm * (f.turns?.length ?? 1), 0), pathLength(x).measured];
   const sp = score(p), sq = score(q);
   // a tenth of a millimetre of room, a micron of length: under that is a tie
   const tol = [0, 0.05, 1e-6];
@@ -1044,7 +1050,8 @@ function turnPath(path) {
     marks: reverseMarks(path.marks),
     crossings: rev(path.crossings).map(c => ({...c, between: between(c.between)})),
     detours: rev(path.detours).map(d => ({between: between(d.between), points: rev(d.points)})),
-    bends: rev(path.bends).map(f => ({...f, between: between(f.between), legs_mm: rev(f.legs_mm)})),
+    bends: rev(path.bends).map(f => ({...f, between: between(f.between), legs_mm: rev(f.legs_mm),
+      ...(f.turns ? {turns: rev(f.turns), point: f.turns.at(-1).point} : {})})),
     covers: path.covers.map(c => ({...c, between: between(c.between)})),
     rests: path.rests};
 }
@@ -1528,9 +1535,18 @@ function layPath(rack, cable, ctx, given) {
   // bundle check uses (cornersOf).
   // One finding a corner (#1007): corners at one point, to the tenth of a
   // millimetre a finding gives its place to, are one (mergeCorners).
-  const bends = mergeCorners(final, tightOf(final)).map(c => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
-    between: [legs[c.k - 1][0], (legs[c.k] ?? legs[c.k - 1])[1]], at: [r1(final[c.k].x), r1(final[c.k].y), r1(final[c.k].z)],
-    angle_deg: c.angle_deg, legs_mm: c.legs_mm, room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm)}));
+  // TWO TURNS ON ONE SHORT LEG ARE ONE FINDING (#1026, pairTurns below): an
+  // S-bend, or the two turns of a way out and back. It has `turns`, the two
+  // of them, and `apart_mm`, the leg between; its `at` is the middle of that
+  // leg, its `point` the first turn's, its `angle_deg` the wider of the two,
+  // and its `legs_mm` the leg into the first and the leg out of the second.
+  const spot = k => [r1(final[k].x), r1(final[k].y), r1(final[k].z)];
+  const bends = pairTurns(final, mergeCorners(final, tightOf(final))).map(([c, d]) => ({kind: 'tight-bend', cable: cable.id, point: final[c.k].at,
+    between: [legs[c.k - 1][0], (legs[(d ?? c).k] ?? legs[(d ?? c).k - 1])[1]],
+    at: d ? [0, 1, 2].map(i => r1((spot(c.k)[i] + spot(d.k)[i]) / 2)) : spot(c.k),
+    angle_deg: d ? Math.max(c.angle_deg, d.angle_deg) : c.angle_deg, legs_mm: d ? [c.legs_mm[0], d.legs_mm[1]] : c.legs_mm,
+    room_mm: c.room_mm, need_mm: need, short_mm: r1(need - c.room_mm),
+    ...(d ? {apart_mm: c.legs_mm[1], turns: [c, d].map(x => ({point: final[x.k].at, at: spot(x.k), angle_deg: x.angle_deg}))} : {})}));
   // WHAT IT COVERS (#1013, section 1.7): with no manager a leg is a free span
   // from a lane to a port, or from port to port, across the faces of the
   // devices between; it crosses no body (only envelopes are solid, 1.1), so
@@ -1606,6 +1622,32 @@ function mergeCorners(pts, corners) {
       : Math.max(...g.map(c => c.angle_deg));
     return {k: first.k, angle_deg: angle, legs_mm: [first.legs_mm[0], last.legs_mm[1]], room_mm: Math.min(...g.map(c => c.room_mm))};
   });
+}
+
+// TWO TURNS THAT SHARE A LEG TOO SHORT FOR BOTH ARE ONE BEND (#1026). A
+// cable that jogs sideways on a short leg (an S-bend), or goes out, across
+// and back on one (a dog-leg), is dressed with one movement of the hand and
+// is put right in one place: the leg between the two turns. Counted as two
+// corners it read as two faults, each with the same room and the same
+// shortfall, and a rack's count was twice what a person would find. So two
+// tight corners next to each other on the path (no corner between them)
+// whose room is the same, and is what the leg between them leaves the two
+// (that leg over the sum of their tangents, cornersOf by need), are one.
+// Returns the corners in pairs: [corner] alone, or [first, second]. A corner
+// that is short for another leg than the one it shares stays alone, and so
+// does one that doubles back. Not part of the kit's API.
+function pairTurns(pts, corners) {
+  const order = new Map(cornersOf(pts, {share: 'need'}).map((c, i) => [c.k, i]));
+  const tan = c => Math.tan(c.angle_deg * Math.PI / 360);
+  const out = [];
+  for (let i = 0; i < corners.length; i++) {
+    const a = corners[i], b = corners[i + 1];
+    const pair = !!b && a.room_mm > 0 && order.get(b.k) === order.get(a.k) + 1 && Math.abs(a.room_mm - b.room_mm) < 0.05
+      && Math.abs(a.room_mm - a.legs_mm[1] / (tan(a) + tan(b))) <= 0.15;
+    out.push(pair ? [a, b] : [a]);
+    if (pair) i++;
+  }
+  return out;
 }
 
 // The rail plane an item is fixed to, as a z: the front rail's 0, or the
@@ -1812,6 +1854,7 @@ export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = routePath
         .reduce((m, t, k, all) => (k ? `${m}${all.length > 2 ? ',' : ''}${k === all.length - 1 ? ' or' : ''} ${t}` : t))}.`;
     return {...f, ...(close ? {tooClose: {manager: close.manager, device: close.device}} : {}),
       text: `${f.room_mm === 0 ? `${c.id} doubles back ${where}, with no room for a bend; ${needs}.`
+        : f.turns ? `${c.id} turns twice within ${f.apart_mm} mm ${where} (${f.turns.map(t => t.angle_deg).join(' and ')} degrees), with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`
         : `${c.id} turns ${f.angle_deg} degrees ${where} with room for ${an(String(f.room_mm))} ${f.room_mm} mm bend; ${needs}, ${f.short_mm} mm short.`}${help}`};
   });
 }

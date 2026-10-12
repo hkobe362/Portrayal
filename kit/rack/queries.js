@@ -337,7 +337,8 @@ async function cableInfo(rack, cable, ctx) {
       // or not; a cable whose port is not found has no path and neither.
       const tight = bendFindingsOf(rack, cable, ctx.route, label, path);
       if (tight.length) bends = tight.map(f => ({point: f.point, between: f.between, at: f.at, angle_deg: f.angle_deg, legs_mm: f.legs_mm,
-        room_mm: f.room_mm, need_mm: f.need_mm, short_mm: f.short_mm, text: f.text}));
+        room_mm: f.room_mm, need_mm: f.need_mm, short_mm: f.short_mm,
+        ...(f.turns ? {apart_mm: f.apart_mm, turns: f.turns} : {}), ...(f.tooClose ? {tooClose: f.tooClose} : {}), text: f.text}));
       const over = coverFindingsOf(rack, cable, ctx.route, label, path)[0];
       if (over) covers = {count: over.count, ports: over.ports, between: over.between, judged: over.judged,
         ...(over.estimated ? {estimated: true} : {}), text: over.text};

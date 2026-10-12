@@ -51,10 +51,10 @@ test('a ring too close to turn into is passed over, and the next ring with room 
   assert.deepEqual(path.bends.filter(f => f.between.some(w => w.end === 'a')), []);
   assert.deepEqual(path.crossings, []);
   // through ring 2 by hand, as the route was before: the two turns share
-  // 20 mm and have room for an 11.2 mm bend
+  // 20.8 mm and have room for an 11.2 mm bend, one finding
   const hand = {...c9, route: [ring('m3', 2), ...route], routeEdited: true};
   const was = R.routePath({...rack, cables: [hand]}, hand, ctx).bends.filter(f => f.between.some(w => w.end === 'a'));
-  assert.deepEqual(was.map(f => [f.point, f.room_mm]), [['reach', 11.2], ['approach', 11.2]]);
+  assert.deepEqual(was.map(f => [f.point, f.room_mm, f.apart_mm, f.turns.map(t => t.point)]), [['reach', 11.2, 20.8, ['reach', 'approach']]]);
 });
 
 test('a ring with room is taken though it is the nearest: the rule passes over nothing it need not', () => {
@@ -89,13 +89,13 @@ test('where no ring leaves room the nearest stands, and the finding says the man
   const c1 = cableOf(rack, 'c1');
   assert.deepEqual(ringsOn(R.autoRoute(rack, c1, ctx), 'm3'), [1]);
   const found = R.bendFindingsOf(rack, c1, ctx, nameOf).filter(f => f.between.some(w => w.end === 'a'));
-  assert.equal(found.length, 2);
-  for (const f of found) {
-    assert.deepEqual(f.tooClose, {manager: 'm3', device: 'i3'});
-    assert.match(f.text, /^c1 turns [\d.]+ degrees between its port on EDGE-0 and Lacer EDGE-0 ring 1 with room for an? [\d.]+ mm bend; the cable \(aoc\) needs 30 mm, [\d.]+ mm short\. /);
-    assert.ok(f.text.endsWith('Lacer EDGE-0 stands too close to this port for the cable to turn into any ring on its way: '
-      + 'set EDGE-0 back from the rail, mount the manager on another unit of EDGE-0, or leave EDGE-0 without a manager.'), f.text);
-  }
+  assert.equal(found.length, 1);
+  const [f] = found;
+  assert.deepEqual(f.tooClose, {manager: 'm3', device: 'i3'});
+  assert.equal(f.text, 'c1 turns twice within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and 63.2 degrees), '
+    + 'with room for a 17.9 mm bend; the cable (aoc) needs 30 mm, 12.1 mm short. '
+    + 'Lacer EDGE-0 stands too close to this port for the cable to turn into any ring on its way: '
+    + 'set EDGE-0 back from the rail, mount the manager on another unit of EDGE-0, or leave EDGE-0 without a manager.');
   // rack-wide the findings are the same ones
   assert.deepEqual(R.bendFindings(rack, ctx, nameOf).filter(f => f.cable === 'c1').map(f => f.text), R.bendFindingsOf(rack, c1, ctx, nameOf).map(f => f.text));
   // the path's own `bends` are as they were: the sentence is the finding's
@@ -135,7 +135,7 @@ test('a hand route is never overridden: a ring it names is gone through, room or
   const path = R.routePath(r, hand, ctx);
   assert.deepEqual(path.rings.slice(0, 2).map(g => [g.via, g.passed]), [['guide-2', true], ['guide-1', true]]);
   const found = R.bendFindingsOf(r, hand, ctx, nameOf);
-  assert.ok(found.length >= 2);
+  assert.ok(found.length >= 1);
   assert.ok(found.every(f => !f.tooClose && !/too close/.test(f.text)));
 });
 
@@ -265,6 +265,47 @@ test('a lead is not taken up over a ring that stands in its way: the nearest sta
   assert.deepEqual(ringsOn(R.autoRoute(rack, c, ctx), 'm12'), [2, 1]);
   const found = R.bendFindingsOf(rack, c, ctx, nameOf).filter(f => f.between.some(w => w.end === 'a'));
   assert.ok(found.length >= 1 && found.every(f => f.tooClose?.manager === 'm12'), JSON.stringify(found.map(f => f.text)));
+});
+
+// ── two turns on one leg ─────────────────────────────────────────────────
+
+test('two turns that share a leg too short for both are one finding, and it says it is two turns', async () => {
+  const Q = await import('../../../kit/rack/queries.js');
+  const X = await import('../../../kit/rack/export-data.js');
+  const {rack, ctx, nameOf} = shape({count: 43});
+  const c1 = cableOf(rack, 'c1'), path = R.routePath(rack, c1, ctx);
+  // c1 jogs from its plug's end to ring 1's approach point: 67.1 degrees
+  // one way and 63.2 the other, 22.8 mm apart. It was two findings, each
+  // with room for 17.9 mm and 12.1 short
+  assert.equal(path.bends.length, 1);
+  const [f] = path.bends;
+  assert.deepEqual([f.point, f.angle_deg, f.apart_mm, f.room_mm, f.short_mm, f.legs_mm], ['reach', 67.1, 22.8, 17.9, 12.1, [64.8, 43.3]]);
+  assert.deepEqual(f.turns.map(t => [t.point, t.angle_deg]), [['reach', 67.1], ['approach', 63.2]]);
+  // it is where the leg between the two turns is: the middle of it
+  assert.deepEqual(f.at, [0, 1, 2].map(i => r1((f.turns[0].at[i] + f.turns[1].at[i]) / 2)));
+  // both turns are corners of the path, short by the same leg
+  const corners = cornersOf(path.points, {share: 'need'}).filter(k => k.room_mm < 30);
+  assert.deepEqual(corners.map(k => [k.angle_deg, k.room_mm]), [[67.1, 17.9], [63.2, 17.9]]);
+  assert.equal(corners[0].legs_mm[1], f.apart_mm);
+  // the same cable written the other way round: the same finding, read from its end
+  const back = R.routePath(rack, {...c1, a: c1.b, b: c1.a}, ctx).bends;
+  assert.deepEqual(back.map(b => [b.point, b.apart_mm, b.room_mm, b.turns.map(t => t.angle_deg), b.at]), [['approach', 22.8, 17.9, [63.2, 67.1], f.at]]);
+  // a turn that is short for another leg than the one it shares stays a finding of its own
+  const all = rack.cables.flatMap(c => R.routePath(rack, c, ctx).bends);
+  assert.ok(all.some(b => b.turns) && all.some(b => !b.turns), JSON.stringify(all.map(b => !!b.turns)));
+  for (const b of all) assert.ok(!b.turns || b.turns.length === 2);
+  // what a reader is told agrees: inspect lists the one finding with its
+  // two turns, describe counts the cable once, and a schedule's note is the
+  // finding's own sentence
+  const qctx = {chassisOf: ctx.chassisOf, route: ctx};
+  const seen = (await Q.inspect(rack, 'c1', qctx)).route.bends;
+  assert.equal(seen.length, 1);
+  assert.deepEqual([seen[0].apart_mm, seen[0].turns.length, seen[0].tooClose], [22.8, 2, {manager: 'm3', device: 'i3'}]);
+  assert.match(seen[0].text, /^c1 turns twice within 22\.8 mm between its port on EDGE-0 and .* ring 1 \(67\.1 and 63\.2 degrees\), with room for a 17\.9 mm bend/);
+  const withBend = rack.cables.filter(c => R.routePath(rack, c, ctx).bends.length).length;
+  assert.match(Q.describe(rack, qctx), new RegExp(`Findings: ${withBend} cables have a tight bend \\(the worst `));
+  const found = R.bendFindings(rack, ctx, nameOf);
+  assert.deepEqual(X.layNotesOf('c1', {bends: found}), [found.find(x => x.cable === 'c1').text]);
 });
 
 export {measure};

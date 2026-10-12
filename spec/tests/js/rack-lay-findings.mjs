@@ -70,7 +70,7 @@ test('the cable schedule and a file\'s notes carry one sentence a cable for its 
   const bends = R.bendFindings(r, route, nameOf(r)), covers = R.coverFindings(r, HOPS.ctxFor(r), nameOf(r));
   const {columns, rows} = X.cableScheduleRows(r, new Map(), r.items, null, {bends, covers});
   assert.deepEqual(columns, X.CABLE_COLUMNS);                    // the same columns: the sentences join `notes`
-  assert.equal(rows[6].notes, 'c7 has 2 corners with less room than the cable needs; the tightest turns 96.6 degrees between left-front U42 '
+  assert.equal(rows[6].notes, 'c7 has 2 bends with less room than the cable needs; the tightest turns 96.6 degrees between left-front U42 '
     + 'and its port on MGMT-SW1 with room for an 11.6 mm bend; the cable (cat6) needs 60 mm, 48.4 mm short. '
     + covers.find(f => f.cable === 'c7').text);
   assert.ok(rows[6].notes.endsWith('Only ports that hold a cable were judged.'));

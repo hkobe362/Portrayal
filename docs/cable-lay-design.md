@@ -1071,8 +1071,8 @@ mm, 10.8 mm short."). It warns and never refuses. A page that draws the kit's po
 `kind` and `cable`, with its sentence), `describe` counts the cables that
 have one and names the cable shortest of its radius, and
 `cableScheduleRows(..., {bends})` writes one sentence into the notes of each
-such cable: the finding, or how many corners and the tightest of them
-(#1007). Corners at one point, to a tenth of a millimetre, are one finding. A cable is told them wherever it has a path, a loose end
+such cable: the finding, or how many bends and the tightest of them
+(#1007). Corners at one point, to a tenth of a millimetre, are one finding, and so are two turns on one short leg (3.5). A cable is told them wherever it has a path, a loose end
 or not; one whose port is not found has no path and is told nothing.
 
 **What is left.** On the reference rack, nothing. On one sample of 60
@@ -1352,6 +1352,31 @@ leg between them was inside the plate for the rest of the way to the edge
 (0.2 mm into the tray's floor, over 8 mm). **A span now has a point where
 it passes the edge of a surface it lies on, at the height a cable lies on
 it:** level to the edge, and down from there (`resting.js`).
+
+**Two turns on one short leg are one finding.** A lead that jogs from its
+plug's end to a ring's line turns one way and then the other on the leg
+between (an S-bend); a way out past an edge and back turns twice the same
+way on the leg across. The measure gives each turn the same room, what
+that leg leaves the two, and until now each was a finding: one fault read
+as two, with the same room and the same shortfall, and a rack's count of
+tight corners was near twice what a person would find. A person fitting the
+cable makes such a bend with one movement of the hand, calls it one bend,
+and puts it right in one place, the leg between the turns. So it is one
+finding, and the finding says plainly that it is two turns: "c1 turns twice
+within 22.8 mm between its port on EDGE-0 and Lacer EDGE-0 ring 1 (67.1 and
+63.2 degrees), with room for a 17.9 mm bend; the cable (aoc) needs 30 mm,
+12.1 mm short." Two tight corners are paired when they are next to each
+other on the path, have the same room, and that room is what the leg
+between them leaves the two. A corner that is short for its other leg stays
+a finding of its own, as does one that doubles back. The finding has
+`turns`, the two of them (`point`, `at`, `angle_deg`), and `apart_mm`; its
+`at` is the middle of the leg, so a page that rings a finding rings the
+bend once; `point` is the first turn's, `angle_deg` the wider of the two,
+`legs_mm` the leg into the first and out of the second. `inspect` carries
+the same; `describe` counts cables, as before, and a schedule's note counts
+bends ("c7 has 2 bends with less room than the cable needs"). Nothing is
+laid differently for it: where two lays of a cable are compared (3.4), a
+finding of two turns still counts as two corners short.
 
 ## 4. Lay order
 
