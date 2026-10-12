@@ -1,0 +1,156 @@
+format: 1
+kind: component
+name: nema-5-15p-cord
+version: 1.0.0
+class: port
+mates: [nema-5-15r, nema-5-20r]
+conforms: nema-5-15p-cord
+profile: networking
+description: >-
+  A moulded straight NEMA 5-15P plug on its cord (15 A 125 V), the wall end
+  of a North American power cord, seen from the cable end as a front
+  elevation sees it seated. It shows the moulding, the strain relief and a
+  short straight stub of cord whose diameter is the cable-od field. It seats
+  in a `nema-5-15r` or a `nema-5-20r` receptacle at its own mate point. A
+  plain generic body: makers differ, and no mark is drawn.
+size: {w: 26.0, h: 24.7}
+size-confidence: {w: drawing, h: drawing}
+attrs: {media: nema-5-15p, connector: nema-5-15p, rating-a: 15, rating-v: 125}
+fields:
+  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 8.33}
+  jacket-color: {label: Jacket colour, type: text, default: '#1c1c1c'}
+unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
+provenance:
+  size: >-
+    drawing - registry `nema-5-15p-cord`. Volex Power Products catalogue,
+    Aug-2025, cat. no. PS204 "NEMA 5-15P Straight Plug for Class I
+    Appliance", drawing on p.147: the face view dimensions the moulding
+    26 +/-1 across the blades and 24.7 +/-0.5 from its flat edge to the tip
+    of the nose that carries the earth pin. The catalogue gives no drawing
+    number or revision. NEMA WD 6, which governs the blades and not the
+    body, is not held.
+  not-the-input-plug: >-
+    THIS IS NOT generic/nema-5-20p-plug@1 AND NOT A 15 A COPY OF IT. That
+    part is class `inlet`: the plug at the end of a PDU input cord, drawn
+    FACE ON with its three contacts, and it is the power port of the device
+    that places it (PART_POWER). This part is class `port`: the plug of a
+    cord that is a cable of a rack, drawn FROM THE CABLE SIDE, with `mates`,
+    a `cable` point and no contacts. A cable end is derived from the slot it
+    lands on, and this is what a 5-15R or a 5-20R slot offers.
+  name: >-
+    `-cord` and not `-plug`, by need. generic/nema-5-20p-plug@1 holds the
+    `-plug` name for the face-on input plug, and renaming a placed part costs
+    a major on every device that seats it. The 15 A and 20 A cord ends are a
+    pair and are named alike: the plug on its cord, seen from the cord.
+  mates: >-
+    A LIST: `nema-5-15r` and `nema-5-20r`. The two blades of a 5-15P are
+    parallel, and the T neutral slot of a 5-20R takes a parallel blade as
+    well as a turned one, so this plug enters both receptacles. The registry
+    entry `nema-5-20r` says the same of the receptacle (5-15P and 5-20P), and
+    std/nema-5-20r@1 draws the T. It seats at `mate` on either.
+  rating: >-
+    drawing - Volex catalogue Aug-2025 p.145 (PS204): Max. Rating 15A, 125V.
+    `rating-a` is what orders the plugs a receptacle offers: the lowest
+    first, so this plug comes before generic/nema-5-20p-cord@1 in a 5-20R.
+  outline: >-
+    drawing - Volex PS204, p.147 face view, every figure dimensioned: a
+    rectangular part 14.0 from the flat edge, R2.0 at its four corners, two
+    concave R14 flanks, and an R6.5 nose whose tip is the 24.7. The flanks
+    are drawn tangent to the nose. Where a flank meets a corner the R2.0 is
+    drawn as a short curve, not as a true arc.
+  blades: >-
+    drawing, NOT DRAWN. PS204 p.147: the blades 12.7 +/-0.127 apart, their
+    line 6.8 (REF) from the flat edge, the earth pin 11.89 +/-0.127 from that
+    line; the blades 15.88 MIN long and the earth pin 21.4 MAX. They are on
+    the plug face, which is in the receptacle; a front elevation of a seated
+    plug looks at the cable end. Qualtek 739W-X2/30, the drawing behind
+    std/nema-5-20r@1, puts its line slot and T stem 12.6 apart and its earth
+    hole 11.9 from their line, which agrees.
+  no-depth: >-
+    NO `size.d`, DELIBERATELY, as on generic/c13-plug@1. The overall length
+    (46, dimensioned) is in the registry entry and in the relief.
+  orientation: >-
+    DRAWN IN THE UNROTATED CONVENTION OF THE RECEPTACLE: std/nema-5-20r@1 draws
+    its earth hole up, so the nose is at the top. PS204 is drawn with the
+    earth to the right; it is turned a quarter here. Seen from the cable end
+    the moulding is the same either way round, left to right.
+  seated-depth: >-
+    THE FACE OF THE PLUG SITS ON THE FACE OF THE RECEPTACLE. A flat
+    receptacle face has no well: its holes take the blades, 17 and 21 deep on
+    std/nema-5-20r@1. So the plug stands its whole 46 in front of the face:
+    33 of moulding and 13 of strain relief.
+  frame: >-
+    THE RELIEF OF THE PLUG IS MEASURED FROM THE PRESENTED LIFT OF THE HOST, as on
+    generic/c13-plug@1. std/nema-5-20r@1 presents at its own face, so 0 here
+    is that face.
+  body: >-
+    drawing and estimated. PS204 p.147 side view: the moulding is 33 long,
+    and holds its full section for the front 11.5. Behind that it tapers to
+    the strain relief. THE TAPER IS BUILT AS ONE STEP, as on
+    generic/c13-plug@1: `body-rear`, 20 across (estimated, the middle of 26
+    and 14.5) by 14.5 on the earth axis (scaled, 5.8 px/mm on the printed
+    24.7: the nose slopes away and the rectangular part runs back).
+  relief-boot: >-
+    drawing and scaled. PS204 p.147: the strain relief runs from 33 to the
+    dimensioned 46 and is 14.5 across the blade axis. Its thickness on the
+    earth axis, about 11, is SCALED on the second side view (5.8 px/mm), and
+    so is its place: on the blade line, not at the middle of the moulding.
+    The ribs are not drawn.
+  stub: >-
+    estimated - the stub rule, docs/connectors-coax-design.md section 5: a
+    straight run of cord 30 long from the end of the strain relief.
+  cable-od: >-
+    datasheet - SJT 3 x 18 AWG, which Volex lists for PS204 against its C13
+    connectors (catalogue p.146), the cord generic/c13-plug@1 defaults to:
+    Belden 19348 technical data sheet, revision 0.388, 09-07-2025, p.1,
+    0.328 in nominal (8.33 mm converted). A placement or a wrapper sets the
+    cord it carries.
+  jacket-colour: >-
+    a FIELD, black by default, as on generic/c13-plug@1.
+  behaviour: >-
+    DELIBERATELY OMITTED, as on every class port contract.
+  axis: >-
+    scaled - `mate` and `cable` share one point, (13.0, 17.9): the middle of
+    the blade line, where the strain relief also sits on PS204.
+  dcim: >-
+    NO DCIM ROW, as generic/c13-plug@1 has none: a cord end is the end of a
+    cable, not a port of the device it is drawn on.
+elements: {}
+relief:
+  features:
+    - node: body
+      out: 11.5
+      shape: true
+      color: '#26282b'
+      confidence: drawing
+      source: >-
+        Volex catalogue Aug-2025 p.147 (PS204) side view: the moulding at
+        its full section for the front 11.5, dimensioned, from the face that
+        sits on the receptacle.
+    - node: body-rear
+      lift: 11.5
+      out: 33.0
+      color: '#2c2e32'
+      confidence: estimated
+      source: >-
+        Volex catalogue Aug-2025 p.147 (PS204) side view: the moulding ends
+        at the dimensioned 33. Estimated because the taper is built as one
+        step at a section between its two ends (provenance.body).
+    - node: relief-boot
+      lift: 33.0
+      out: 46.0
+      color: '#202225'
+      confidence: estimated
+      source: >-
+        Volex catalogue Aug-2025 p.147 (PS204) side view: the strain relief
+        from 33 to the dimensioned 46, 14.5 across (dimensioned). Estimated
+        because its thickness and its place are scaled.
+    - node: stub
+      lift: 46.0
+      cyl: 30
+      confidence: estimated
+      source: the stub rule, docs/connectors-coax-design.md section 5
+connection-points:
+  mate: {at: [13.0, 17.9], direction: front}
+  cable: {at: [13.0, 17.9], direction: front, 'on': stub}
+skins: [default]

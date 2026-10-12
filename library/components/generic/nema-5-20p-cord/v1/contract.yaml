@@ -1,0 +1,159 @@
+format: 1
+kind: component
+name: nema-5-20p-cord
+version: 1.0.0
+class: port
+mates: nema-5-20r
+conforms: nema-5-20p-cord
+profile: networking
+description: >-
+  A moulded straight NEMA 5-20P plug on its cord (20 A 125 V), seen from the
+  cable end as a front elevation sees it seated. It shows the moulding, the
+  strain relief and a short straight stub of cord whose diameter is the
+  cable-od field. It seats in a `nema-5-20r` receptacle at its own mate
+  point. A plain generic body: makers differ, and no mark is drawn.
+size: {w: 31.2, h: 29.8}
+size-confidence: {w: drawing, h: drawing}
+attrs: {media: nema-5-20p, connector: nema-5-20p, rating-a: 20, rating-v: 125}
+fields:
+  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 9.65}
+  jacket-color: {label: Jacket colour, type: text, default: '#1c1c1c'}
+unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
+provenance:
+  size: >-
+    drawing - registry `nema-5-20p-cord`. Volex Power Products catalogue,
+    Aug-2025, cat. no. PS520 "NEMA 5-20P Straight Plug for Class I
+    Appliance", p.159: the face view dimensions the moulding 31.2 across the
+    blades and 29.8 from its flat edge to the tip of the lobe that carries
+    the earth pin. The catalogue gives no drawing number or revision. NEMA
+    WD 6, which governs the blades and not the body, is not held.
+  not-the-input-plug: >-
+    THIS IS NOT generic/nema-5-20p-plug@1. That part is class `inlet`: the
+    plug at the end of a PDU input cord, drawn FACE ON with its three
+    contacts (Leviton 5366-C, a rewireable body), and it is the power port
+    of the device that places it (PART_POWER). This part is class `port`:
+    the plug of a cord that is a cable of a rack, drawn FROM THE CABLE SIDE
+    (Volex PS520, a moulded body), with `mates`, a `cable` point and no
+    contacts. A cable end is derived from the slot it lands on, and this is
+    one of the two plugs a 5-20R slot offers.
+  name: >-
+    `-cord` and not `-plug`, by need. generic/nema-5-20p-plug@1 holds the
+    `-plug` name for the face-on input plug, and renaming a placed part costs
+    a major on every device that seats it. The 15 A and 20 A cord ends are a
+    pair and are named alike: the plug on its cord, seen from the cord.
+  mates: >-
+    `nema-5-20r` ALONE. The neutral blade of a 5-20P is turned a quarter, and
+    only the T slot of a 5-20R takes it; a 5-15R has two parallel slots. It
+    seats at `mate`, as generic/nema-5-15p-cord@1 does in the same slot.
+  rating: >-
+    drawing - Volex catalogue Aug-2025 p.159 (PS520): Max. Rating 20A, 125V.
+    `rating-a` is what orders the plugs a receptacle offers: the lowest
+    first, so generic/nema-5-15p-cord@1 comes before this plug in a 5-20R.
+  outline: >-
+    drawing and scaled. The 31.2 and the 29.8 are dimensioned. The rest is
+    SCALED on the same face view (2.6 px/mm on both printed figures, good to
+    about 0.5): a rectangular part 15.4 from the flat edge, two rounded
+    shoulders, and a lobe about 7.4 in radius round the earth pin. The R2
+    corners at the flat edge are ESTIMATED: they take the R2.0 that Volex
+    dimensions on its 5-15P moulding (PS204, p.147).
+  blades: >-
+    drawing and scaled, NOT DRAWN. PS520 p.159: the two blades 15.47 +/-0.13
+    apart centre to centre, each 6.35 +/-0.13 by 1.52 +/-0.13, the earth pin
+    11.89 +/-0.13 from their line; the blades 15.88 MIN long and the earth
+    pin 21.41 MAX. The blade line is about 11.3 from the flat edge, SCALED
+    (the face view reads 11.5 and the side view 11.1). They are on the plug
+    face, which is in the receptacle. Leviton CATSTD-05366-00C-D01 rev 1,
+    the drawing behind generic/nema-5-20p-plug@1, reads 15.45 between the
+    blade centres, which agrees.
+  no-depth: >-
+    NO `size.d`, DELIBERATELY, as on generic/c13-plug@1. The overall length
+    (56.34, dimensioned) is in the registry entry and in the relief.
+  orientation: >-
+    DRAWN IN THE UNROTATED CONVENTION OF THE RECEPTACLE: std/nema-5-20r@1
+    draws its earth hole up, so the lobe is at the top. PS520 is drawn with
+    the earth down; it is turned a half here. Seen from the cable end the
+    moulding is the same either way round, left to right.
+  seated-depth: >-
+    THE FACE OF THE PLUG SITS ON THE FACE OF THE RECEPTACLE. A flat
+    receptacle face has no well: its holes take the blades. So the plug
+    stands its whole 56.34 in front of the face: about 39.0 of moulding and
+    17.34 of strain relief.
+  frame: >-
+    THE RELIEF OF THE PLUG IS MEASURED FROM THE PRESENTED LIFT OF THE HOST,
+    as on generic/c13-plug@1. std/nema-5-20r@1 presents at its own face, so
+    0 here is that face.
+  body: >-
+    scaled. PS520 p.159, the two side views (2.6 px/mm on the printed 56.34
+    and on the 29.8): the moulding holds its full section for about the
+    front 14.6 and ends about 39.0 from the face (the two views read 38.2
+    and 39.7). THE TAPER IS BUILT AS ONE STEP, as on generic/c13-plug@1:
+    `body-rear`, 28 across, the middle of the taper on that axis. On the
+    earth axis it runs 17.3, from 2.0 below the shoulders to 4.0 short of the flat
+    edge, ESTIMATED: the middle of the taper there is 23, which would stand
+    outside the front section beside the lobe.
+  relief-boot: >-
+    scaled. PS520 p.159: the strain relief runs from about 39.0 to the
+    dimensioned 56.34 and reads about 16.5 across on both side views, so it
+    is built round. The ribs are not drawn.
+  stub: >-
+    estimated - the stub rule, docs/connectors-coax-design.md section 5: a
+    straight run of cord 30 long from the end of the strain relief.
+  cable-od: >-
+    datasheet - SJT 3 x 14 AWG, which Volex lists for PS520 against its C19
+    connectors (catalogue p.159), the cord generic/c19-plug@1 and
+    generic/c20-plug@1 default to: Belden 19354 technical data sheet,
+    revision 0.525, 09-07-2025, p.1, 0.380 in nominal (9.65 mm converted). A
+    20 A cord is 3 x 12 AWG, which PS520 also lists; no data sheet for that
+    cord is held, so the default is the cord whose diameter is. A placement
+    or a wrapper sets the cord it carries.
+  jacket-colour: >-
+    a FIELD, black by default, as on generic/c13-plug@1.
+  behaviour: >-
+    DELIBERATELY OMITTED, as on every class port contract.
+  axis: >-
+    scaled - `mate` is the point of the blade line on the earth axis,
+    (15.6, 18.5): 11.3 from the flat edge. `cable` is the axis of the strain
+    relief, (15.6, 14.3): 15.5 from the flat edge on the side view, near the
+    middle of the moulding and not on the blade line.
+  dcim: >-
+    NO DCIM ROW, as generic/c13-plug@1 has none: a cord end is the end of a
+    cable, not a port of the device it is drawn on.
+elements: {}
+relief:
+  features:
+    - node: body
+      out: 14.6
+      shape: true
+      color: '#26282b'
+      confidence: estimated
+      source: >-
+        Volex catalogue Aug-2025 p.159 (PS520) side views, scaled on the
+        printed 56.34: the moulding at its full section for about the front
+        14.6, from the face that sits on the receptacle.
+    - node: body-rear
+      lift: 14.6
+      out: 39.0
+      color: '#2c2e32'
+      confidence: estimated
+      source: >-
+        Volex catalogue Aug-2025 p.159 (PS520) side views, scaled: the taper
+        to the strain relief, which starts about 39.0 from the face, built
+        as one step at its middle section (provenance.body).
+    - node: relief-boot
+      lift: 39.0
+      cyl: 17.34
+      color: '#202225'
+      confidence: estimated
+      source: >-
+        Volex catalogue Aug-2025 p.159 (PS520) side views: the strain relief
+        to the dimensioned 56.34 end, about 16.5 across. Estimated because
+        its start and its section are scaled.
+    - node: stub
+      lift: 56.34
+      cyl: 30
+      confidence: estimated
+      source: the stub rule, docs/connectors-coax-design.md section 5
+connection-points:
+  mate: {at: [15.6, 18.5], direction: front}
+  cable: {at: [15.6, 14.3], direction: front, 'on': stub}
+skins: [default]

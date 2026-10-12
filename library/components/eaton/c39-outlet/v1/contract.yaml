@@ -1,16 +1,17 @@
 format: 1
 kind: component
 name: c39-outlet
-version: 1.0.0
+version: 1.1.0
 class: inlet
 profile: power
+interface: eaton-c39
 description: >-
   Eaton's C39 outlet on a Rack PDU G4 - a proprietary combination of the C13 and
   C19 outlets that takes either a C14 or a C20 plug, with high retention. A rounded
   recess with a cross-shaped nose and three contacts.
 size: {w: 35.4, h: 26.6, d: 20}
 size-confidence: {w: drawing, h: drawing, d: registry}
-attrs: {outlet: eaton-c39, rating-a: 16, accepts: 'C14, C20'}
+attrs: {outlet: eaton-c39, media: ac, rating-a: 16, accepts: 'C14, C20'}
 provenance:
   method: >-
     drawing - Eaton drawing 9001-22301 (EVMI2130X, first issue 18-Aug-2023, D size,
@@ -42,8 +43,23 @@ provenance:
     bottom out; a C14 plug, 17, goes less far. No Eaton drawing or photograph held
     shows the C39 in section.
   interface: >-
-    NO `interface:` YET: the C39 is Eaton's own and no interface is registered for
-    it; a C14 or C20 cord end would seat in it, and neither is a part here yet.
+    `eaton-c39` in spec/schemas/connectors.yaml (#1045), the name both DCIM
+    targets give the outlet type. No standard is cited there: the C39 is no
+    IEC 60320 sheet. Two cord ends mate it and seat at `mate`:
+    generic/c14-plug@1 and generic/c20-plug@1, the two plugs section 1.5 of
+    P-164001156 rev 3 says the outlet is designed to take.
+  mate: >-
+    estimated - (17.7, 13.7), ONE POINT FOR TWO PLUGS. A C14 shroud, 24 by 16
+    inside, goes over the nose, 22.75 by 15.6, whose centre on 9001-22301 is
+    (17.73, 13.74). A C20 body, 33.75 by 25.75, fills the well, 35.4 by 26.6,
+    whose centre is (17.7, 13.3). The point is the centre of the nose, moved
+    0.04 so that a C20 seated on it stays inside the well. A C14 seated on it
+    is 0.04 off the nose, inside its 0.2 of play. No Eaton drawing held shows
+    either plug seated.
+  media: >-
+    `media: ac` (#1045): an outlet states what it hands on, as
+    std/c14-inlet@1 states what it takes. `outlet` is the DCIM type and says
+    which way power runs; it does not say AC.
   keys: >-
     drawing and photo - 9001-22301 draws a lens-shaped key across each corner of the
     well at the end away from the cord, and EVMI2130X-OUTLET-BANK_C5 shows them as
@@ -61,4 +77,6 @@ elements:
 relief:
   wall: '#1a1b1d'
   cavity: recess
+connection-points:
+  mate: {at: [17.7, 13.7], direction: front}
 skins: [default]

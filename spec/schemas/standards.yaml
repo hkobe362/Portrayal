@@ -2131,6 +2131,48 @@ standards:
       the earth pin 0.83 in [21 mm].
     notes: >-
       THE BODY, face on. NEMA WD 6 is not held.
+  nema-5-15p-cord:
+    registry: NEMA WD 6 configuration 5-15P (125 V 15 A straight blade), as the Volex Power Products catalogue, Aug-2025, draws the moulded cord plug cat. no. PS204 on p.147
+    w: 26.0
+    h: 24.7
+    confidence: drawing
+    depth: 46.0
+    depth-confidence: drawing
+    source: >-
+      Volex Power Products catalogue, Aug-2025, p.147 (PS204, "NEMA 5-15P
+      Straight Plug for Class I Appliance", listed on p.145): the moulding
+      26 +/-1 across the blades and 24.7 +/-0.5 from its flat edge to the tip
+      of the nose round the earth pin, on the face view, and 46 overall on
+      the side view, face to the end of the strain relief. The catalogue
+      gives no drawing number or revision.
+    notes: >-
+      THE END-ON BOX OF A MOULDED CORD PLUG, seen from the cable end. A
+      rectangular part 14.0 deep with R2.0 corners, two concave R14 flanks
+      and an R6.5 nose. The blades are 12.7 +/-0.127 apart and the earth pin
+      11.89 +/-0.127 from their line. NEMA WD 6 governs the blades and not
+      the body, and is not held; this is one maker's body, and makers
+      differ. Not `nema-5-20p-plug`, which is a rewireable 20 A plug face on.
+  nema-5-20p-cord:
+    registry: NEMA WD 6 configuration 5-20P (125 V 20 A straight blade), as the Volex Power Products catalogue, Aug-2025, draws the moulded cord plug cat. no. PS520 on p.159
+    w: 31.2
+    h: 29.8
+    confidence: drawing
+    depth: 56.34
+    depth-confidence: drawing
+    source: >-
+      Volex Power Products catalogue, Aug-2025, p.159 (PS520, "NEMA 5-20P
+      Straight Plug for Class I Appliance"): the moulding 31.2 across the
+      blades and 29.8 from its flat edge to the tip of the lobe round the
+      earth pin, on the face view, and 56.34 +/-1 overall on the side view,
+      face to the end of the strain relief. The catalogue gives no drawing
+      number or revision.
+    notes: >-
+      THE END-ON BOX OF A MOULDED CORD PLUG, seen from the cable end. The
+      blade centres are 15.47 +/-0.13 apart, the neutral blade turned a
+      quarter, and the earth pin 11.89 +/-0.13 from their line. NEMA WD 6
+      governs the blades and not the body, and is not held; this is one
+      maker's body, and makers differ. Not `nema-5-20p-plug`, which is the
+      rewireable Leviton 5366-C face on, a different body.
   cs8365c-plug:
     registry: California Standard CS8365C (250 V 50 A three-phase locking, 3P4W), as Hubbell drawing M-6590 rev 9 dimensions it
     w: 65.1
