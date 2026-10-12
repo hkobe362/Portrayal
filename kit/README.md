@@ -229,7 +229,7 @@ as `@portrayal/kit/rack/<module>`:
 | `rack/history.js` | undo and redo as snapshots |
 | `rack/editor.js` | `createRackEditor`: a rack document you edit by commands, with undo, redo and change events |
 | `rack/queries.js` | reading a rack: `fitsAt`, `freeUs`, `catalog`, `describe`, `inspect`, `selectCables`, `freePorts`, `suggestMedia`, `looseEnds` |
-| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `seatedPorts`, `fibrePorts` (the front or rear ports of its module type that a fibre adapter is, from `optical.ports` in `components.json`), and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
+| `rack/ports.js` | the ports of what a device's bays hold, read without a drawing: `seatedPort` (does a cable end name one, on which panel, and what holds it), `fibrePorts` (the front or rear ports of its module type that a fibre adapter is, from `optical.ports` in `components.json`), and `settleEnd` and `settleEnds`, which lay that over the facts a page read off its drawings |
 | `rack/resting.js` | internal, not exported: how a cable rests, for `route.js` (`DRAPE`, the free span's hang and landing, laid only where it leaves every corner its bend radius, the held face) |
 | `rack/slots.js` | internal, not exported: what a placed device holds, read without a drawing, for `commands.js` and `queries.js` |
 
@@ -676,8 +676,7 @@ removed, and the rack file and the export columns are as they were.
 - `freePorts` offers `{ path: '<bay>/module/<part>', view }` for a port on
   a back, and never an element id; `cable.add` and `cable.update` refuse an
   element id and say what to give.
-- `rack/ports.js` is new: `seatedPort`, `seatedPorts`, `settleEnd`,
-  `settleEnds`. A page reading whether an end lands can ask `seatedPort`
+- `rack/ports.js` is new: `seatedPort`, `settleEnd`, `settleEnds`. A page reading whether an end lands can ask `seatedPort`
   for an end under a bay and keep its drawing lookups for the rest; where it
   still looks in a drawing, a part on a back is `data-of`, not `data-path`.
 - `looseReason` reads one more fact, `onView`, and says which panel a port
@@ -843,9 +842,25 @@ Whether such an end lands is answered from the parts lists where they are
 loaded: `seatedPort(item, end, ctx)` in `rack/ports.js` reads the item's
 swaps, the part in the bay and the parts of its back, and `looseEnds`,
 `inspect`, `selectCables` and `suggestMedia` lay its answer over
-`ctx.cableFacts` (`settleEnds`). It answers only for a port the part
-composes; a port drawn by a skin alone, and every port of the device itself,
-is still the page's to read off the drawing. The front and the rear port of
+`ctx.cableFacts` (`settleEnds`). The exports settle the same way when they
+are handed the same lists: `cableFindings(rack, ends, parts)`, and `parts` in
+the options of `cableScheduleRows`, `cableNotes`, `sheetCableNotes`,
+`drawioCables`, `cableBomRows` and `cableImportRows`. Without `parts` an
+export has only what the page read, so a page passes both, or hands in ends
+it has already settled.
+
+The catalogue answers for less than a drawing shows, and says nothing where
+it cannot be sure:
+
+- only for a port the part composes. A port drawn by a skin alone, and every
+  port of the device itself, is the page's to read off the drawing.
+- only for a bay the item's swaps or its configuration names. A device may
+  give a bay to some configurations only, and `configs.json` lists every bay
+  without saying which; a bay nothing names reads as holding its default,
+  which the build does not draw in a configuration that has no such bay.
+- it does not say whether a bay shows the back of what it holds. An enclosure
+  with a closed rear has the rear adapters of its panels all the same: a
+  cable on one lands, and is not drawn there. The front and the rear port of
 one adapter are two ports, and each takes its own cable; that the glass
 joins them is not modelled here.
 

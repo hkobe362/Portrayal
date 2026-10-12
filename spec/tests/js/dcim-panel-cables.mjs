@@ -80,9 +80,11 @@ for (const target of ['netbox', 'nautobot']) {
                     items: [{id: 'i1', ref: 'fhd-1ufce', cfg: 'seated', label: 'pp', ru: 2, u: 1, face: 'front', turned: false}]};
       const resolve = resolverFor(rack, ctx, target, held);
       const named = new Set();
-      for (const port of P.seatedPorts(rack.items[0], ctx)) {
-        const key = `${port.back ? 'rear:' : ''}${port.path.split('/module/')[1]}`;
-        if (!Object.hasOwn(comp.optical.ports, key)) continue;   // a port the fibre graph does not reach (a monitor tap)
+      // every part the build published ports for, at its address: the face on the bay's panel, the back on the other
+      for (const key of Object.keys(comp.optical.ports)) {
+        const back = key.startsWith('rear:');
+        const port = {path: `bay-1/module/${back ? key.slice('rear:'.length) : key}`, view: back ? 'rear' : 'front'};
+        assert.equal(P.seatedPort(rack.items[0], {item: 'i1', ...port}, ctx)?.port, true, `${ref} ${key} is a port of what is seated`);
         ends++;
         const r = resolve({item: 'i1', path: port.path, view: port.view});
         const sections = Object.keys(comp.optical.ports[key]);

@@ -40,12 +40,12 @@ function portIn(comp, steps, compByRef) {
   }
   return steps.length ? c : null;
 }
-const portIdsIn = (comp, compByRef) => list(comp?.parts).filter(q => partOf(compByRef, q.ref)?.class === 'port').map(q => q.id);
 
 // WHAT A CABLE END UNDER A BAY NAMES, in the words looseReason reads, or null
 // when the catalogue cannot say: no parts list was loaded, the path is not
-// under a bay of this device, the part seated there is unknown, or the part
-// composes no port of that name on either side (the drawing decides then).
+// under a bay of this device, neither the item's swaps nor its configuration
+// names that bay, the part seated there is unknown, or the part composes no
+// port of that name on either side. The drawing decides then.
 //   port      a port is at the path on the end's panel
 //   onView    the panel the port is on; where `port` is false, the port is on
 //             that panel and the end names the other one
@@ -70,6 +70,13 @@ export function seatedPort(item, end, ctx) {
   const env = slotEnv(item, slots, ctx.compByRef), swaps = item.swaps || {};
   const bay = env.bays.find(b => b.id === p.slice(0, first));
   if (!bay || !OTHER[bay.view]) return null;
+  // ONLY A BAY THAT IS SPOKEN FOR: by the item's swaps, or by the
+  // configuration's own list. configs.json lists every bay of the device, and
+  // a device may give a bay to some configurations only (a double-width
+  // power bay where another has two card slots), which it does not publish.
+  // A bay nothing names reads as holding its default, and in a configuration
+  // that has no such bay the build draws nothing there.
+  if (!Object.hasOwn(swaps, bay.id) && env.built(bay.id) === undefined) return null;
   const R = resolverFor(env, swaps);
   const carrier = p.slice(0, cut), steps = p.slice(cut + MODULE.length).split('/');
   const ref = R.refAt(`${carrier}/module`);
@@ -92,29 +99,6 @@ export function seatedPort(item, end, ctx) {
   return {...base, port: true, onView: view, back, holder, cage: slot?.kind === 'cage',
           occupied: !!slot && holdsAt(env, swaps, p, {...slot, isCage: true}) != null,
           info: connectorOf({portMedia: drawn.attrs?.media || '', iface: slot?.interface || drawn.attrs?.connector || ''})};
-}
-
-// THE PORTS OF WHAT AN ITEM'S BAYS HOLD, as addresses: [{path, view, back,
-// media}], each part's face first and then its back. The device's own bays
-// only; a card inside a card is reached by its path all the same.
-export function seatedPorts(item, ctx) {
-  if (!item || !loaded(ctx)) return [];
-  const slots = ctx.slotsOf(item.ref);
-  if (!slots || slots.error) return [];
-  const env = slotEnv(item, slots, ctx.compByRef), R = resolverFor(env, item.swaps || {});
-  const out = [];
-  for (const bay of env.bays) {
-    if (!OTHER[bay.view]) continue;
-    const comp = partOf(ctx.compByRef, R.refAt(`${bay.id}/module`));
-    if (!comp) continue;
-    const add = (c, view, back) => {
-      for (const id of portIdsIn(c, ctx.compByRef))
-        out.push({path: `${bay.id}${MODULE}${id}`, view, back, media: portIn(c, [id], ctx.compByRef)?.attrs?.media ?? null});
-    };
-    add(comp, bay.view, false);
-    add(partOf(ctx.compByRef, faceRef(comp.faces?.rear)), OTHER[bay.view], true);
-  }
-  return out;
 }
 
 // ── what a DCIM calls the port ─────────────────────────────────────────────

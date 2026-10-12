@@ -10,12 +10,13 @@ const duplex = id => ({id, kind: 'connector', interface: 'lc-duplex', media: nul
   accepts: ['common/lc-duplex-dust-cap@2', 'generic/lc-duplex-plug@2'], default: 'common/lc-duplex-dust-cap@2'});
 const adapter = id => ({id, ref: 'common/lc-duplex-v-adapter@6'});
 
+export const CARRIER = 'acme/carrier@1';
 export const PANEL = 'fs/fhd-fap12lcd-os2@1', PANEL_OM4 = 'fs/fhd-fap12lcd-om4@1', CASSETTE = 'fs/fhd-1mtp6lcd-os2-a@4', BLANK = 'fs/fhd-fapb@1';
 export const COMPONENTS = [
   comp('common/lc-duplex-v-adapter@6', {class: 'port', kind: 'component', attrs: {connector: 'lc', media: 'fiber'},
     parts: [{id: '1', ref: 'std/lc-bulkhead-bore@1'}, {id: '2', ref: 'std/lc-bulkhead-bore@1'}], cages: [], bays: {}}),
   comp('std/lc-bulkhead-bore@1', {class: 'port', kind: 'component', attrs: {connector: 'lc', media: 'fiber'}, parts: [], cages: [], bays: {}}),
-  comp('std/mtp-adapter@1', {class: 'port', kind: 'component', attrs: {connector: 'mpo', media: 'fiber'}, parts: [], cages: [], bays: {}}),
+  comp('common/mpo-flange-adapter@2', {class: 'port', kind: 'component', attrs: {connector: 'mpo', media: 'fiber'}, parts: [], cages: [], bays: {}}),
   comp('common/led-dot@1', {class: 'led', kind: 'component', attrs: {}, parts: [], cages: [], bays: {}}),
   comp(PANEL, {class: 'adapter-panel', kind: 'module', attrs: {media: 'fiber', model: 'FHD-FAP12LCDXSMF'},
     description: 'FS FHD-FAP12LCDXSMF - FHD fiber adapter panel.', faces: {rear: 'fs/fhd-fap12lcd-os2-rear@1'},
@@ -28,19 +29,23 @@ export const COMPONENTS = [
   comp('fs/fhd-fap12lcd-om4-rear@1', {class: 'adapter-panel', kind: 'component', attrs: {media: 'fiber'},
     parts: [adapter('b01'), adapter('b02')], cages: [duplex('b01'), duplex('b02')], bays: {}}),
   comp(CASSETTE, {class: 'cassette', kind: 'module', attrs: {media: 'fiber', model: 'FHD-1MTP6LCDOS2A'},
-    description: 'FS FHD-1MTP6LCDOS2A - MTP-12 to six LC duplex.', faces: {rear: 'fs/fhd-1mtp6lcd-os2-a-rear@4'},
+    description: 'FS FHD-1MTP6LCDOS2A - MTP-12 to six LC duplex.', faces: {rear: 'fs/fhd-1mtp6lcd-rear@3'},
     parts: [adapter('lc1'), adapter('lc2'), {id: 'led', ref: 'common/led-dot@1'}], cages: [duplex('lc1'), duplex('lc2')], bays: {}}),
-  comp('fs/fhd-1mtp6lcd-os2-a-rear@4', {class: 'cassette', kind: 'component', attrs: {media: 'fiber'},
-    parts: [{id: 'mtp1', ref: 'std/mtp-adapter@1'}],
-    cages: [{id: 'mtp1', kind: 'connector', interface: 'mpo', media: null, bores: [], accepts: ['common/mtp-dust-cap@1'], default: 'common/mtp-dust-cap@1'}], bays: {}}),
+  comp('fs/fhd-1mtp6lcd-rear@3', {class: 'cassette', kind: 'component', attrs: {media: 'fiber'},
+    parts: [{id: 'mtp', ref: 'common/mpo-flange-adapter@2'}],
+    cages: [{id: 'mtp', kind: 'connector', interface: 'mpo', media: null, bores: [], accepts: ['common/mtp-dust-cap@1'], default: 'common/mtp-dust-cap@1'}], bays: {}}),
+  // a carrier with a bay of its own, which holds a panel: a part inside a part
+  comp(CARRIER, {class: 'carrier', kind: 'module', attrs: {model: 'CARRIER'}, description: 'Carrier.', parts: [], cages: [],
+    bays: {'sub-1': {accepts: [PANEL], default: PANEL}}}),
   comp(BLANK, {class: 'blank', kind: 'module', attrs: {model: 'FHD-FAPB'}, description: 'FS FHD-FAPB - blank panel.', parts: [], cages: [], bays: {}}),
   comp('generic/sfp-lc@1', {class: 'transceiver', kind: 'module', attrs: {media: 'fiber', face: 'lc-duplex', mode: 'single-mode'}, parts: [], cages: [], bays: {}}),
 ];
-const ACCEPTS = [PANEL, PANEL_OM4, CASSETTE, BLANK];
-const bay = id => ({id, group: 'slots', accepts: ACCEPTS, default: null});
+const ACCEPTS = [PANEL, PANEL_OM4, CASSETTE, BLANK, CARRIER];
+const bay = (id, def = null) => ({id, group: 'slots', accepts: ACCEPTS, default: def});
 export const SLOTS = {
-  pp: {default: 'panels', 'pdu-class': null, bays: {front: [bay('bay-1'), bay('bay-2'), bay('bay-3')], rear: []}, cages: {front: [], rear: []},
-       configs: [{name: 'panels', description: '', airflow: 'passive', bays: {'bay-1': PANEL, 'bay-2': CASSETTE}, occupants: {}},
+  pp: {default: 'panels', 'pdu-class': null, // bay-9 ships a panel, and is a bay of some configurations only, which configs.json does not say
+       bays: {front: [bay('bay-1'), bay('bay-2'), bay('bay-3'), bay('bay-4'), bay('bay-9', PANEL)], rear: []}, cages: {front: [], rear: []},
+       configs: [{name: 'panels', description: '', airflow: 'passive', bays: {'bay-1': PANEL, 'bay-2': CASSETTE, 'bay-4': CARRIER}, occupants: {}},
                  {name: 'base', description: '', airflow: 'passive', bays: {}, occupants: {}}]},
   sw: {default: 'base', 'pdu-class': null, bays: {front: [], rear: []},
        cages: {front: [1, 2].map(n => ({id: `port-${n}`, kind: 'cage', group: 'sfp', interface: 'sfp', media: 'sfp', accepts: ['generic/sfp-lc@1'], default: null})), rear: []},
@@ -66,6 +71,6 @@ const back = (bayId, x, ports) => g({id: `cutout-back-${bayId}`, 'data-path': `c
 export const REAR_FACE = {t: 'svg', a: {viewBox: '0 0 482.6 44'}, c: [
   g({id: 'chassis', 'data-class': 'chassis'}, [rect(0, 0, 482.6, 44)]),
   back('bay-1', 340, [['b01', 70, 'fiber'], ['b02', 50, 'fiber']]),
-  back('bay-2', 230, [['mtp1', 40, 'fiber']]),
+  back('bay-2', 230, [['mtp', 40, 'fiber']]),
   g({id: 'ground', 'data-class': 'port', 'data-path': 'ground'}, [rect(10, 30, 6, 6)]),
   g({id: 'label-1', 'data-class': 'port'}, [rect(20, 30, 6, 6)])]};

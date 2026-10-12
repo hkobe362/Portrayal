@@ -315,13 +315,14 @@ export const CABLE_IMPORT_COLUMNS = {
 //   names      uniqueNames(items); kept: the ids of the devices in the devices file
 //   resolve    end -> resolveEnd's answer for that end
 //   uOf        endName's: how tall a device is
+//   parts      the parts lists, {slotsOf, compByRef}: cableFindings settles the ends with them
 // `notes` are about rows that ARE written: a type left blank, a length changed.
-export function cableImportRows({rack, target = 'netbox', names, kept, resolve, ends = new Map(), unchecked = false, uOf}) {
+export function cableImportRows({rack, target = 'netbox', names, kept, resolve, ends = new Map(), unchecked = false, uOf, parts = null}) {
   const T = TARGET_NAME[target] || 'NetBox', nautobot = target === 'nautobot';
   const rows = [], left = [], notes = [], used = new Map(), inBundle = new Map();
   const several = [], perFibre = [], firstOnly = [];
   let dac = false;
-  for (const f of cableFindings(rack, ends)) {
+  for (const f of cableFindings(rack, ends, parts)) {
     const c = f.cable;
     let why = [], sides = [];
     if (unchecked || !f.checked) why = ['its ends could not be checked'];

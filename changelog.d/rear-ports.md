@@ -19,9 +19,12 @@
   lists (`loadSlots`) whether a cable end under a bay names a port of what
   is seated, on which panel, and what holds it, with no drawing.
   `settleEnds(rack, ends, ctx)` lays that over the facts a page read, and
-  `looseEnds`, `inspect`, `selectCables` and `suggestMedia` use it. It
-  answers for a port the part composes; a port a skin draws alone, and a
-  device's own ports, are still read off the drawing.
+  `looseEnds`, `inspect`, `selectCables` and `suggestMedia` use it. The
+  exports that read cable ends take the same lists as `parts` and settle
+  the same way. It answers for a port the part composes, in a bay the
+  item's swaps or its configuration names; a port a skin draws alone, a
+  bay left to its default and a device's own ports are still read off the
+  drawing.
 - **`exportName(zone)`** in `zones.js`: the name the draw.io and OmniGraffle
   exports write for a port. A projected port keeps the element id those
   files have carried, so a file exported again is unchanged, and a cable
