@@ -673,7 +673,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.27.0: a manager's stated count is a count of one kind of cable.**
+**New in 0.26.0: a manager's stated count is a count of one kind of cable.**
 `capacityOver(rack, ctx)` compared a manager's stated count with every cable
 through it. A maker counts with one cable (thirty Cat6 is the section of about
 a hundred and twenty 3 mm cords), so it now counts only the cables at least
@@ -689,7 +689,7 @@ No rack file changes.
   diameter counted, in mm. A page that reads `item` alone reads what it did.
 - `capacity.media` in `rack.json` has three shapes. A kind: compared as
   above. `null`: no source names the cable, and the count is never compared.
-  Anything else, which is no key (a catalogue built before 0.27.0) or a
+  Anything else, which is no key (a catalogue built before 0.26.0) or a
   kind this kit has no diameter for (a catalogue newer than the kit): its
   count is compared with the cables of 6 mm or more, so neither goes silent,
   with `media: null` in the entry. Only `null` means "never compare".

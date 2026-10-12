@@ -437,7 +437,7 @@ enters and leaves a duct is a separate question.
 
 ## 14. The count and the kind of cable
 
-(#1032, kit 0.27.0.) Decision 9 records a manager's capacity as one count and its basis
+(#1032, kit 0.26.0.) Decision 9 records a manager's capacity as one count and its basis
 in words. The kit compared that count with every cable through the manager, of any
 kind. A rack of 48 fibre cords of 3 mm through an FHD-CMP5DR, which states 30 Cat6
 24AWG, was warned of as over its capacity while its fullest ring stood at 45% of its
