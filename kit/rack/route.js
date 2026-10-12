@@ -2318,9 +2318,10 @@ export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = pathOf(ra
     // A LEAD LEFT IN A RING IT HAS NO ROOM TO TURN INTO (#1026): no ring on
     // its way left room, so the nearest stands and the finding says what
     // would give it room (closeRing, below). IN A FIELD OF ITS OWN, `advice`:
-    // `text` is the bend and no more, as it was, so a page that reads, clips
-    // or joins the sentences is not handed a longer one; and a cable with a
-    // bend at each end of one manager is told once (layNotesOf)
+    // `text` is the bend and no more, so the advice lengthens no sentence a
+    // page reads, clips or joins; and a schedule's note says it once for
+    // each end's device (layNotesOf). The sentence of a pair of turns is
+    // itself longer than any bend's was (up to 182 characters, from 150).
     const close = closeRing(rack, c, f, ctx);
     const help = !close ? '' : `${nameOf(close.manager)} stands too close to the port of ${c.id} on ${nameOf(close.device)} for the cable to turn into any ring on its way: ${
       [`set ${nameOf(close.device)} back from the rail`,
