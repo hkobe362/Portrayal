@@ -299,7 +299,7 @@ A page calls the two notice functions once it has loaded the parts lists
 (`loadSlots`); the editor cannot, since it holds none.
 
 A cable's lengths are named in `rack/route.js`: `needOf(path, cable,
-stock)`, `shortTolerance(cable, stock)`, `spareOf(rack, cable, ctx)` (need,
+stock)`, `shortTolerance(cable, stock)`, `spareOf(rack, cable, ctx, path)` (need,
 stock, spare, end play and what is to store, in metres, or null without a
 path) and `stockLength(need, {values})`. `rack/slack.js` resolves a cable's
 `slack` list against its route: `slackOf` (each entry with its metres and
@@ -662,6 +662,63 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.25.0: a large rack is read in a fraction of the time, and every
+answer is the one it was.** No path, length, need, stock size, finding,
+sentence, strap, spare figure or export row changes, and no name is removed
+or renamed. On a generated rack of thirteen two-unit switches, a lacer on
+each, two ducts and 300 cords, reading every cable's path took 36 s and
+takes 0.6 s; reading them again took 2.2 s and takes 3 ms; and each
+rack-wide call after that (`bendFindings`, `coverFindings`, `ringFindings`,
+`bodyFindings`, `fill`, `capacityOver`, `spareOf`, `anchorsOf`) took about
+2.2 s and takes 3 ms or less.
+
+- **The lay of a cable is kept, not only what was chosen for it.** A second
+  read of a rack in the same context lays nothing. A context **made anew**
+  that answers as the last one did lays nothing either (26 ms for the
+  300 cords, where it took 36 s): the kit keeps each lay under what the
+  lay read (the cable's ports, its diameter, reach, bend radius and drape,
+  its route and every waypoint's point, ring and tray) and under the solid
+  bodies, trays and lanes of the rack, all compared by value. So a page
+  that builds its context anew on every draw and every tool call pays for
+  a lay once.
+- **An edit to one cable lays that cable.** Another cable added, removed,
+  moved or edited, a label, a purpose, a length or a slack entry changed, a
+  rack renamed: no other cable is laid again (26 ms after one cord moved to
+  another port, where it took 36 s). **A device placed, moved, turned or
+  removed, a part beside the rack, or the frame's height or depth lays
+  every cable again** (0.6 s), the ones nowhere near it too: a detour
+  or a hang can reach round any body, and the kit does not record which
+  bodies a lay never came near.
+- **What a page holds to.** A rack and a context are made whole and not
+  changed, as before; a context changed in place now gives the path that
+  was laid before the change, whole (it gave a mixture). The lays are kept
+  at each cable's end `a`, the object, so an edit that keeps the objects of
+  the cables it does not touch (as `apply` and every command do) carries
+  them over; a rack read again from its file is read for the first time.
+  They are held weakly, and go when the rack's cables do.
+- **`routePath` hands out a copy** of the path kept, and `resolveRoute` its
+  own lists, so nothing a caller does to one reaches the next reader. The
+  findings do the same.
+- **`spareOf(rack, cable, ctx, path)`** takes the cable's `routePath` as a
+  fourth argument, for a caller that already has it; without it the path
+  kept is read. `bendFindingsOf` and `coverFindingsOf` already took one.
+- **What was slow.** A leg was tested against every solid of the rack, each
+  box read through six built strings and a regular expression: the solids of
+  one device are now under one box, and a leg that stays out of it tests
+  none of them. A span asked every surface of the rack for the ground under
+  each of its sixty points, and every span of every cable was tested against
+  every port of the rack: each now asks only what is near. The side of a
+  route was measured by laying the cable down both gutters and then laying
+  it again down the one chosen: the lay that was measured is the lay.
+- **What is as it was.** A cable is still laid from both ends and one lay
+  kept (0.21.0). No rule was found that says, without making the second lay,
+  that it would not be the better one.
+
+`spec/tests/js/rack-speed.mjs` holds the kit to this: a digest of every
+answer for 91 racks and 3,911 cables, recorded from 0.24.0, and budgets for
+a first read, a second, a new context and one cable moved at 300 cords.
+`spec/tests/js/speed-bench.mjs` prints the table.
+
 **New in 0.24.0: the DCIM cables files hold the cables on a panel or a
 cassette.** A cable on a fibre port of a module seated in a bay was left out
 of both files, because a module type does not name such a port by its part.
@@ -805,10 +862,11 @@ every port of a device is judged, cabled or not. `inspect` carries a cable's
 finding as `route.covers`, `describe` counts them, and
 `cableScheduleRows(..., { covers })` writes the sentence into the cable's
 notes. A port that states no size is taken as 12 by 10 mm, and a span covers
-a port no further than 100 mm out of its panel; both are estimates. What is decided for a cable
+a port no further than 100 mm out of its panel; both are estimates. What is laid for a cable
 is kept per rack, context and cable, so, as for a route's side, build a new
-context when what it reads changes: a context changed in place can give a
-path placed for what it read before. A cable is laid from both its ends and one lay is kept by a
+context when what it reads changes: a context changed in place gives the
+path laid for what it read before ("New in 0.25.0" below says what is kept
+and what lays a cable again). A cable is laid from both its ends and one lay is kept by a
 rule that does not know which was written first (fewer bodies crossed, then
 less short of room, then shorter, then the end whose port sorts first), so a
 cable written the other way round lays the same and reports the same bends
