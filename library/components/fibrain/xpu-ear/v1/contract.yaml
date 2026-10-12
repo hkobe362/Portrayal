@@ -1,0 +1,40 @@
+format: 1
+kind: component
+name: xpu-ear
+version: 1.0.0
+class: ear
+behaviour: mounts
+profile: optical
+description: >-
+  One rack ear of the Fibrain HD 1U frame XPU00 / XPS00. A bracket fixed to
+  the side of the frame, its face in the plane of the rack rails. It has a
+  round hole between two obround slots for the rack screws. Drawn as the left
+  ear; the right one is this part turned half a turn.
+size: {w: 24.7, h: 43.9}
+size-confidence: {w: drawing, h: drawing}
+elements:
+  plate: {at: [0.0, 0.0], size: [24.7, 43.9], class: bezel}
+relief:
+  features:
+    - node: plate
+      out: 1.5
+      color: '#1b1e21'
+      confidence: estimated
+      source: 'sheet steel of a gauge no document states; 1.5 is the usual gauge of a rack bracket, and the plan drawing shows the flange as a line'
+provenance:
+  size: >-
+    drawing - measured on the entities of the CAD libraries archive Fibrain publishes (hd.fibrain.com/dxf/cad-libraries.zip, files dated 2020-07-30), `XPS00.dxf`: AutoCAD 2007, units millimetres, one 1:1 front elevation.
+    The bracket's layer draws each ear 24.70 wide (0 to 24.70) and 43.90 high
+    (0.05 to 43.95), its two outer corners rounded at 3.0.
+  size-holes: >-
+    drawing - the same layer: one round hole 7.2 across, its centre 9.60 from
+    the outer edge and at mid height, and an obround slot 10.5 x 6.5 above and
+    below it, centres 15.9 either side of mid height, which is 31.8 apart.
+    The two round holes of a frame are 465.4 apart across the rack.
+  relief: >-
+    estimated - see the feature. The bracket stands in the plane of the rails
+    and the guide posts stand a little proud of it on the plan drawing.
+  color: >-
+    photo - black on every vendor render, as the frame is (RAL 9005 on the
+    datasheets).
+skins: [default]

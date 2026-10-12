@@ -1,0 +1,34 @@
+format: 1
+kind: component
+name: xmi1021ca-rear
+version: 2.0.0
+class: adapter-panel
+description: >-
+  The back of Fibrain XMI1021CA: the same adapters that face forward, seen from
+  behind, whose far ends take the pigtails spliced inside the panel.
+size: {w: 100.0, h: 21.0}
+size-confidence: {w: datasheet, h: datasheet}
+size-notes: >-
+  The holder's own 100 x 21 face seen from behind. No depth is declared: a
+  face is a drawing of a back, and the depth belongs to the holder, as
+  `body.depth`.
+attrs: {media: fiber}
+parts:
+  - {id: b01, ref: fibrain/lc-duplex-adapter@1, at: [83.900, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+  - {id: b02, ref: fibrain/lc-duplex-adapter@1, at: [67.800, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+  - {id: b03, ref: fibrain/lc-duplex-adapter@1, at: [51.700, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+  - {id: b04, ref: fibrain/lc-duplex-adapter@1, at: [35.600, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+  - {id: b05, ref: fibrain/lc-duplex-adapter@1, at: [19.500, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+  - {id: b06, ref: fibrain/lc-duplex-adapter@1, at: [3.400, 5.850], rotate: 180, attrs: {housing-finish: '#54ccde'}}
+provenance:
+  size: >-
+    datasheet - see size-notes.
+  parts: >-
+    THE FRONT's ADAPTERS, SEEN FROM BEHIND. Each front part has one entry here,
+    `bNN` behind `lcNN`, at the front column mirrored across the 100 face and
+    at the same height. Turned the other way from its front, so bore k is the same sleeve - see the holder's provenance.optical.
+  face-detail-gap: >-
+    the vendor's renders show the adapter bodies standing out of the back of
+    the holder and no printing; the moulding behind them is painted as the
+    front is.
+skins: [default]

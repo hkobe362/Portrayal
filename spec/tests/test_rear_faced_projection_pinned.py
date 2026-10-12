@@ -17,6 +17,13 @@ which case re-record the fixture in the same commit and say why, or a
 regression, which is what this exists to catch. The population is pinned too:
 a rear-faced model appearing or vanishing changes the key set.
 
+RE-RECORDED ONCE, FOR THE TWENTY FIBRAIN HOLDERS' NAUTOBOT DIGESTS (#1040).
+Their fibre maps and NetBox port lists did not move. Their Nautobot port names
+went from `{module.parent}/{module}/x` to `{module}/x`: a holder now seats
+directly in a bay of the 1U frame as well as in the XCU10's drawer, whose
+slots carry `drawer/` in their own position instead, so the rendered names
+are the ones they were.
+
 Reads the committed exports, so it needs no build.
 """
 import hashlib
