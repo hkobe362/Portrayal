@@ -1417,7 +1417,23 @@ moves: c8, to 547 mm from 619.2, still a 1 m cord.
 **Lengths change on saved racks.** A routed length and its stock size move
 the next time a page measures them, for a cable whose automatic route takes
 another ring or whose detour is laid another way; an entered length and a
-route made by hand are never touched.
+route made by hand are never touched. Everything read off a routed length
+moves with it: the cable schedule, the BOM's cord sizes, the spare and what
+is to store, a sheet, and the length a DCIM cables file gives a cable. A
+cord already bought at the size the kit chose before can now read as too
+short where its path grew: 4 of the 3,300 on the twelve racks above (1.5 m
+cords that need 1.58 to 1.61 m), none of the 1,803 on the sample.
+
+**What is kept.** The choice is part of a cable's route, and a lay is kept
+under its route written out (3.4), so a lead that takes another ring is
+another lay. The test of a lead is itself made in two steps, as a lay is:
+what it reads of the rack and the context, and the answer from that and the
+world; the answer is kept under the text of what was read, so a context made
+anew judges nothing again. `spec/tests/js/speed-goldens.json` is recorded
+again from this kit, since this change is meant to move numbers: 75 of its
+91 racks have an answer that moves. A first read of 300 cables takes about
+a fifth longer than it did in 0.25.0 (0.6 s for 0.5 s on one machine, the
+room tests), and a read in a context made anew the same as before.
 
 ## 4. Lay order
 
