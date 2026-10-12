@@ -58,6 +58,9 @@ def test_every_yes_is_drawn(sweep):
     assert sweep["phantom"] == [], sweep["phantom"][:10]
     assert sweep["said"] > 2000, f"the kit said yes to {sweep['said']} ports"
     assert sweep["shown"] + sweep["closed"] == sweep["said"]
+    # a yes by a slot (a supply inlet, a ground stud, #1045) has a part drawn at
+    # its path too, and the library has more than a hundred in listed bays
+    assert sweep["slots"] > 100, f"the kit said yes to {sweep['slots']} slots that take a cable end"
 
 
 def test_a_bay_the_configuration_does_not_list_gets_no_answer(sweep):
