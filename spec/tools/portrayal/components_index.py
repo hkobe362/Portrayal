@@ -607,6 +607,16 @@ def main():
                 # kit.
                 if data["optical"].get("paths"):
                     entry["optical"] = {**data["optical"], "ends": fibre_ends(data, load_ref)}
+                    # THE DCIM PORTS, BY PART (roc-ops/Portrayal#1020). A cable
+                    # in a rack lands on a part (`lc01`, the rear face's
+                    # `b01`), and its row in a DCIM cables file must name the
+                    # ports the module type lists for that part. Those names
+                    # are optical_ports' projection and nobody else's, so they
+                    # are written here from the walk that writes the type
+                    # file, under the gate that decides a type file has ports
+                    # at all, rather than re-derived in the kit.
+                    if optical_ports.projects(data):
+                        entry["optical"]["ports"] = optical_ports.part_ports(data, load_ref)
             index.append(entry)
     totals = {}
     for e in index:
