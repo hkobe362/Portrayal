@@ -327,43 +327,86 @@ const patchMemo = new WeakMap();
 // room that the whole path then leaves short, or the reverse; the path's
 // own `bends` are what is reported. A port that is not found, and a
 // ring the drawings do not place, have room: nothing is passed over for what
-// cannot be measured. Kept per rack, context and cable, as the side is.
+// cannot be measured.
+// KEPT AS A LAY IS (WHAT IS KEPT OF A LAY, below): per rack, context and
+// cable; and, since a page makes a context anew for every draw, by what the
+// test read. `leadInputs` reads the rack and the context and comes back with
+// all the test needs of them (the port, the plug's reach, the cable's
+// diameter and bend radius, the ring's point, depth and whether its opening
+// is placed, which way it is passed), and `leadFrom` judges from those and
+// the world (worldOf: the bodies, and the trays whose rings bound the
+// approach point) and from nothing else. So the answer is kept at the end,
+// under the text of the inputs and the world's id, and a new context that
+// answers as the last did judges nothing again. The route a lay is kept
+// under is written out in its key, so a lead that takes another ring is
+// another lay.
 function leadRoom(rack, cable, end, m, g, s, ctx) {
-  const keyed = ctx !== null && typeof ctx === 'object';
-  let per = leadMemo.get(rack);
-  if (!per) leadMemo.set(rack, per = new WeakMap());
-  let byCable = keyed ? per.get(ctx) : null;
-  if (keyed && !byCable) per.set(ctx, byCable = new WeakMap());
-  let known = byCable?.get(cable);
-  if (byCable && !known) byCable.set(cable, known = new Map());
+  const memo = perOf(leadMemo, rack, ctx, cable);
+  let known = memo?.get(cable);
+  if (memo && !known) memo.set(cable, known = new Map());
   const key = `${end?.item}|${end?.view === 'rear' ? 'rear' : 'front'}|${end?.path}|${m.id}|${g.via}|${s}`;
   if (known?.has(key)) return known.get(key);
-  const got = leadHasRoom(rack, cable, end, m, g, s, ctx);
+  const inp = leadInputs(rack, cable, end, m, g, s, ctx);
+  let got = true;
+  if (inp) {
+    const world = worldOf(rack, ctx);
+    const at = end !== null && typeof end === 'object' ? end : null;
+    const text = at && world.id !== null ? sigOf(inp.key) : null;
+    if (text === null) got = leadFrom(inp, world);
+    else {
+      let list = leadAt.get(at);
+      if (!list) leadAt.set(at, list = []);
+      const i = list.findIndex(e => e.world === world.id && e.text === text);
+      if (i >= 0) got = list[i].got;
+      else {
+        got = leadFrom(inp, world);
+        list.unshift({text, world: world.id, got});
+        if (list.length > 2 * KEPT) list.length = 2 * KEPT;
+      }
+    }
+  }
   known?.set(key, got);
   return got;
 }
-const leadMemo = new WeakMap();
-function leadHasRoom(rack, cable, end, m, g, s, ctx) {
+const leadMemo = new WeakMap(), leadAt = new WeakMap(), bandsOf = new WeakMap();
+// What the test of a lead reads of its rack and context: null where there is
+// nothing to measure (a port not found, a ring not placed, one that does not
+// run along x). `key` is what is written out for the answer kept; `others`,
+// the other rings of the same part, are read off the trays, which the world
+// the answer is kept with holds.
+function leadInputs(rack, cable, end, m, g, s, ctx) {
   const port = portPoint(rack, end, ctx), w = {item: m.id, via: g.via}, ring = ringOf(g);
   let c = pointOf(rack, w, ctx);
-  if (!port || !c || !ring || ring.run !== 'x') return true;
-  const diameter = cableDiameter(cable, ctx), r = diameter / 2, base = r + CLEAR;
-  const need = bendOf(cable, ctx), bend = Math.min(need, ROOM_MAX);
+  if (!port || !c || !ring || ring.run !== 'x') return null;
+  const diameter = cableDiameter(cable, ctx), r = diameter / 2;
+  const need = bendOf(cable, ctx);
   const mm = plugReach(cable, end, ctx);
   const p = mm > 0 ? reachPoint(rack, end, port, mm) : port;
   // the ring where the cable lies in it: on its sill, as layInputs puts it
   const open = ringOpening(rack, w, ctx);
   if (open) c = {...c, y: open.box.y0 + r, z: railSide(open.box.z0, open.box.z1, railZOf(rack, w.item), r)};
-  const half = ring.depth / 2, entry = {...c, x: c.x - s * half}, exit = {...c, x: c.x + s * half};
+  const others = open ? traysOf(rack, ctx).filter(t => t.item === m.id).flatMap(t => t.rings).filter(o => o.via !== g.via && o.run === 'x') : [];
+  const key = {port: {x: port.x, y: port.y, z: port.z}, p: {x: p.x, y: p.y, z: p.z}, mm, diameter, need, c: {x: c.x, y: c.y, z: c.z}, depth: ring.depth,
+    open: !!open, s, item: m.id, via: g.via};
+  return {...key, key, others};
+}
+// The test itself, from leadInputs' answer and the world.
+function leadFrom(inp, world) {
+  const {port, p, mm, diameter, need, c, depth, open, s, others} = inp, r = diameter / 2, base = r + CLEAR;
+  const bend = Math.min(need, ROOM_MAX);
+  const half = depth / 2, entry = {...c, x: c.x - s * half}, exit = {...c, x: c.x + s * half};
   // the bodies a lead can meet: those that reach into the heights it runs
   // at, four bend radii either way (no point here is moved further), so a
   // rack of many managers is not read through for each lead
   const lo = Math.min(p.y, c.y) - 4 * bend, hi = Math.max(p.y, c.y) + 4 * bend;
-  const solids = solidsOf(rack, ctx).filter(x => x.box.y1 >= lo && x.box.y0 <= hi);
-  const lanes = y => {
-    const ru = Math.max(1, Math.min(rack.frame.heightRU, Math.floor(y / RU) + 1));
-    return [...new Set(lanesOf(rack.frame).map(l => laneXAt(rack, l, ru, ctx?.chassisOf)))];
-  };
+  // (picked out once for a world and a band of heights: the leads of one
+  // row of ports to one manager read the same band)
+  let bands = bandsOf.get(world);
+  if (!bands) bandsOf.set(world, bands = new Map());
+  const band = `${lo}|${hi}`;
+  let solids = bands.get(band);
+  if (!solids) bands.set(band, solids = world.solids.filter(x => x.box.y1 >= lo && x.box.y0 <= hi));
+  const lanes = world.lanesAt;
   // the lead laid taut through `mid` (what stands between the plug's end and
   // the ring's near face), with its detours; null when a leg cannot be
   // cleared. `run` is a run-out: the cable goes on straight out of its plug
@@ -415,7 +458,6 @@ function leadHasRoom(rack, cable, end, m, g, s, ctx) {
   if (!open) return fits([]);
   // how far the approach point may stand from the near face: up to the next
   // ring of the same part on the port's side, less the radius and CLEAR
-  const others = traysOf(rack, ctx).filter(t => t.item === m.id).flatMap(t => t.rings).filter(o => o.via !== g.via && o.run === 'x');
   const gaps = others.map(o => (s < 0 ? o.box.x0 - entry.x : entry.x - o.box.x1)).filter(v => v > 0);
   const free = Math.max(base, Math.min(...gaps, Infinity) - base);
   const at = o => ({...entry, x: entry.x - s * o});

@@ -119,11 +119,11 @@ export function groundAt(surfaces, x, z, y) {
 function groundNear(surfaces, p, q) {
   const x0 = Math.min(p.x, q.x) - 1, x1 = Math.max(p.x, q.x) + 1, z0 = Math.min(p.z, q.z) - 1, z1 = Math.max(p.z, q.z) + 1;
   let near = null;
-  return (x, z, y) => {
-    if (!(x >= x0 && x <= x1 && z >= z0 && z <= z1)) return groundAt(surfaces, x, z, y);
-    near ??= surfaces.filter(s => !(s.x0 - EPS > x1 || s.x1 + EPS < x0 || s.z0 - EPS > z1 || s.z1 + EPS < z0));
-    return groundAt(near, x, z, y);
-  };
+  const picked = () => (near ??= surfaces.filter(s => !(s.x0 - EPS > x1 || s.x1 + EPS < x0 || s.z0 - EPS > z1 || s.z1 + EPS < z0)));
+  const at = (x, z, y) => (!(x >= x0 && x <= x1 && z >= z0 && z <= z1) ? groundAt(surfaces, x, z, y) : groundAt(picked(), x, z, y));
+  // the surfaces picked out, for another reader of the same span (overEdges)
+  at.near = picked;
+  return at;
 }
 
 // THE DROP from a support onto a surface below it, h mm, as a cable lays it:
@@ -171,9 +171,16 @@ function overEdges(p, q, pts, surfaces, r) {
   if (!pts.length || !surfaces.length) return pts;
   const chain = [p, ...pts, q], out = [];
   const inside = (s, o) => o.x >= s.x0 - EPS && o.x <= s.x1 + EPS && o.z >= s.z0 - EPS && o.z <= s.z1 + EPS;
+  // a leg passes an edge only from at or above where a cable lies on the
+  // surface to below it, so a surface whose lie is not within the heights
+  // of the span cannot have one
+  let yLo = Infinity, yHi = -Infinity;
+  for (const o of chain) { if (o.y < yLo) yLo = o.y; if (o.y > yHi) yHi = o.y; }
+  const level = surfaces.filter(s => s.y + r > yLo - EPS && s.y + r <= yHi + EPS);
+  if (!level.length) return pts;
   for (let k = 1; k < chain.length; k++) {
     const u = chain[k - 1], v = chain[k], add = [];
-    for (const s of surfaces) {
+    for (const s of level) {
       const lie = s.y + r;
       for (const [a, b] of [[u, v], [v, u]]) {
         if (!inside(s, a) || inside(s, b) || a.y < lie - EPS || b.y >= lie - EPS) continue;
@@ -254,6 +261,10 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
   const top = Math.max(p.y, q.y);
   // (the ground does not depend on the sag, so it is found once a point)
   const ground = groundNear(surfaces, p, q);
+  // (the edges a span passes are those of the same surfaces, less the ones
+  // above both its ends, which nothing of it lies on: overEdges)
+  let over = null;
+  const edged = pts => overEdges(p, q, pts, over ??= ground.near().filter(s => s.y + r <= top + EPS), r);
   const chords = Array.from({length: FINE + 1}, (_, k) => {
     const t = k / FINE, chord = lerp(p, q, t);
     return {t, chord, g: ground(chord.x, chord.z, Math.max(chord.y, top) - r)};
@@ -289,7 +300,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
           const g = ground(pt.x, pt.z, pt.y - r);
           if (g && pt.y < g.y + r) pt.y = g.y + r;
         }
-        const out = overEdges(p, q, apart(p, q, pts), surfaces, r);
+        const out = edged(apart(p, q, pts));
         if (out.length && ok(out)) return {points: out, lands: [land]};
         if (typeof fits !== 'function') break;
       }
@@ -314,7 +325,7 @@ export function hang(p, q, {r = 0, drape = 1, bend = 25, surfaces = [], fits = n
       const n = Math.min(24, Math.round(len / step));
       if (n < 2 || n === last) continue;
       last = n;
-      const out = overEdges(p, q, apart(p, q, evenly(raised, n)), surfaces, r);
+      const out = edged(apart(p, q, evenly(raised, n)));
       if (out.length && ok(out)) return {points: out, lands: landsOf(out)};
       if (typeof fits !== 'function') break;
     }

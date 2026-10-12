@@ -308,6 +308,34 @@ test('two turns that share a leg too short for both are one finding, and it says
   assert.deepEqual(X.layNotesOf('c1', {bends: found}), [found.find(x => x.cable === 'c1').text]);
 });
 
+// ── what is kept ─────────────────────────────────────────────────────────
+
+test('the ring chosen reads nothing that what is kept leaves out: every path laid again from nothing is the path kept', () => {
+  // `checkKept` on a context lays every path read again from a copy of the
+  // rack, the cable and the context, and throws on a difference. The choice
+  // of ring is part of the route a lay is kept under, and is itself kept by
+  // what it read (leadRoom), so a context made anew, and a rack edited as a
+  // command edits one, must give what a first read gives
+  let reads = 0;
+  for (const o of [{count: 43}, {count: 43, setback: 50}, {count: 43, lacer: 'bottom'}]) {
+    const {rack, ctx} = shape(o);
+    const first = {...ctx, checkKept: true};
+    for (const cx of [first, first, {...ctx, checkKept: true}]) {
+      for (const c of rack.cables) { R.routePath(rack, c, cx); reads++; }
+      R.bendFindings(rack, cx);
+    }
+    // two cables exchange ports on one switch: a new rack sharing the rest
+    const [c1, c9] = [cableOf(rack, 'c1'), cableOf(rack, 'c9')];
+    const moved = {...rack, cables: rack.cables.map(c => (c === c1 ? {...c, a: {...c9.a}} : c === c9 ? {...c, a: {...c1.a}} : c))};
+    const cx = {...ctx, checkKept: true};
+    for (const c of moved.cables) { R.routePath(moved, c, cx); reads++; }
+    // and the answer does follow the edit: c1 now leaves fab-8, and passes
+    // ring 2 where the lacer is on that unit and nothing is set back
+    assert.deepEqual(ringsOn(R.autoRoute(moved, cableOf(moved, 'c1'), cx), 'm3'), o.setback || o.lacer ? [2, 1] : [1], JSON.stringify(o));
+  }
+  assert.equal(reads, 3 * 4 * 43);
+});
+
 // ── the rack, counted ────────────────────────────────────────────────────
 
 test('the first 43 cables of the shape, lacer on the top unit: 37 corners short at no setback (69 before), none at 50 and 100 mm', () => {

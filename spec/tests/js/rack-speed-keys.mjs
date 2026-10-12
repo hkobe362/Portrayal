@@ -230,9 +230,13 @@ test('a list of solids is laid out again when it is another list, another length
 });
 
 // ── a span past a tray's edge ────────────────────────────────────────────
-// The spans of speed-fixture.mjs edgeSpans, as kit 0.24.0 hung them (recorded
-// from the kit of c3313dbb into speed-edge-spans.json, to a millionth of a
-// millimetre): the points of each, and what it lands on.
+// The spans of speed-fixture.mjs edgeSpans, as the kit hangs them (recorded
+// into speed-edge-spans.json, to a millionth of a millimetre): the points of
+// each, and what it lands on. Recorded from kit 0.24.0 (c3313dbb), and again
+// for 0.26.0 (#987): 39 of the 45 are as they were, and six have one or two
+// more points and no point gone, each where the span passes the edge of a
+// surface it lies on, at the height a cable lies on it (resting.js
+// overEdges); five of those name that surface among what they land on.
 const EDGE_SPANS = JSON.parse(readFileSync(new URL('./speed-edge-spans.json', import.meta.url), 'utf8'));
 test('a span that hangs past the edge of a tray lands, clears and drops as it did', () => {
   const got = edgeSpans(F, S, Rest);
