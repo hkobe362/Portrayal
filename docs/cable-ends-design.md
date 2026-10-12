@@ -36,14 +36,16 @@ and no class of the receptacle. A new interface needs no kit change and no devic
 edit: registering it and giving it a cord end is what makes it land.
 
 One function answers it, `cableLandsOn` in `rack/cable-rules.js`, and every reader
-in the kit calls it. Counted over the whole built catalogue:
+in the kit calls it. Counted over the built catalogue of 2026-10-12: every entry
+of `cages[]` in `components.json`, and every entry of every panel in each
+device's `configs.json`, by the class of the part that presents it:
 
 | slots | presented by | accepts | lands |
 |---|---|---|---|
-| 7,169 pluggable cages (`kind: cage`) | class `port` | optics | on its optic, as before; the cage is a port and says it holds no optic |
+| 7,240 pluggable cages (`kind: cage`) | class `port` | optics | on its optic, as before; the cage is a port and says it holds no optic |
 | 3,782 connector slots | class `port` (RJ45, LC, coax, USB, D-sub) | plugs, and caps on fibre | yes, as before |
-| 290 connector slots | class `inlet` (C13, C14, C19, C20, Saf-D-Grid, P40, DC barrel, terminal headers, a stud pair) | one cord end or lug | **yes, new** |
-| 126 connector slots | class `ground` | one lug | **yes, new** |
+| 305 connector slots | class `inlet` (C13, C14, C19, C20, Saf-D-Grid, P40, DC barrel, terminal headers, a stud pair) | one cord end or lug | **yes, new** |
+| 127 connector slots | class `ground` | one lug | **yes, new** |
 | 8 connector slots | class `screw` (the screws of a DC terminal) | one ring lug | **yes, new** |
 | 6 connector slots | class `psu` (a placed supply that presents its one inlet) | one cord end | **yes, new**, at the supply |
 | 1 connector slot | class `mechanical` (a breaker guard seat) | a touch guard | no |
@@ -78,8 +80,10 @@ feeds a C14 inlet through a cord with a different plug at each end.
   the first free screw in natural order, `<terminal>/lug-1`: free ports group
   the screws under their terminal (`of`) and mark that one (`first`). Every
   screw of a terminal is the same power port to a DCIM, so the row to come
-  does not depend on which was taken. The library can end the choice by
-  making the terminal the slot (section 8).
+  does not depend on which was taken. An end that names the terminal and no
+  screw does not land, and is not moved: its reason names the screws and the
+  path to give. The library can end the choice by making the terminal the
+  slot (section 8).
 - A derived plug is drawn and is never a swap, never a bill-of-materials line and
   never an export row: both ends belong to the cord.
 - The slots a cable landed on before this (LC, duplex LC, RJ45) keep their plug
@@ -166,7 +170,12 @@ The kit answers from the catalogue wherever the catalogue can:
   catalogue alone does not know the bay is built; once a page has read the panel
   and found a part there, the slot of what the bay ships with answers.
 - **A slot of the device itself** (`outlet-rear-3`, `ground`): `configs.json`
-  lists the slot, its view and what it accepts, so the end lands. It does not say
+  lists the slot, its panel and what it accepts, so the end lands. **Only on the
+  panel this configuration shows**: a device lists the slots of every panel it
+  has, and a 24-port build shows another front than the 48-port one, named in
+  the configuration's `views`. A slot of another build is not on this one, and
+  a path with nothing drawn reads "is not on this panel" as it always did. A
+  sweep of every configuration holds that at none. `configs.json` does not say
   what part presents the slot. That is the one thing a page adds, through a named
   reader on the context: **`drawnAt(end)`, the ref of the component drawn at the
   end's path on that panel**, or null. With it the end says what it is and an
@@ -176,7 +185,11 @@ The kit answers from the catalogue wherever the catalogue can:
   always did.
 
 So a page that still knows class `port` alone gets true answers from this kit for
-every end it reads. To offer the ends, it asks the zone reader for them:
+every end it reads, with one exception it must close before it offers power
+cabling: **without `drawnAt` an outlet-to-outlet or inlet-to-inlet cord on a
+device's own slots is not warned about**, since neither end says which it is.
+A page supplies `drawnAt` first, and shows those two warnings where they
+cannot be missed. To offer the ends, it asks the zone reader for them:
 `readSvg(text, {ends})` with the paths `cableEndPaths(item, view, ctx)` gives.
 Without `ends` the zone reader answers what it always did.
 
@@ -240,7 +253,27 @@ that accepts a class `port` part.
    (no terminal element at all) and `nokia/lpwr-f@1` (its `connector-block`).
    `common/dc-terminal-24@1` and `common/terminal-header-508-5f@2` are the shapes
    to follow. About forty other DC supplies are in the same state.
-7. **The name each end prints**, published where the kit can read it beside the
+7. **Nested slots of a part fixed to a chassis are not published.** `csr180`
+   and `csr200` place `common/dc-terminal-24@1` and `-27@1` on the chassis as
+   `psu1-input` and `psu2-input`. The screws are drawn, but `configs.json`
+   lists a device's own placements and not the slots of the parts a placed
+   part composes, so nothing lands there, while the same screw lands under a
+   bay (`tm-8104`). The build must publish them as it does a four-inlet
+   panel's, keyed `<placement>/<part>` (`render.py` `cage_entries`), or the
+   terminal must present one interface itself.
+8. **The power and ground ends still refused**, counted over the same
+   catalogue, each needing an `interface` and something of class `port` to
+   accept: `amphenol-ns/output-terminal` (176 placements),
+   `amphenol-ns/input-stud-pair` (88), `input-feed-studs` (44),
+   `input-feed-busbar` (18), `eaton/c39-outlet` (36), `std/nema-5-20r` (16),
+   the two chassis DC terminals above, `common/dc-terminal-plug-2`, the
+   `telco-systems` and `nokia` DC parts, `commscope/bp-p1` and `bp-p2`,
+   `common/orv3-busbar-connector`, the terminals drawn as skin art under bays
+   (about 290 elements), and the parts of class `ground` with no slot
+   (`common/ground-symbol` 242, `cisco/a9k-ground-pad`, the `casa` studs,
+   `common/ground-screw-washer`). `common/esd-jack` is rightly refused: a
+   wrist strap is no cable of the rack.
+9. **The name each end prints**, published where the kit can read it beside the
    path, for the DCIM cables file: a numbered outlet (`outlet-9` prints `9`,
    `outlet-front-1` prints `Front 1`) and a module power port (`terminal-block`
    prints `{module}/Inlet`). The type files hold these names already; nothing

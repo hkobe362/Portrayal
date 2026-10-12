@@ -723,10 +723,14 @@ module bay, a guard seat and a slot that accepts nothing do not land
   `rack/ports.js` makes the list. Without `ends` every answer is unchanged.
 - **A device's own slots** (a PDU outlet, a chassis inlet) are settled in the
   kit from `configs.json` where a page read "drawn, and no port"
-  (`ownSlot`), so they land with a page that has not changed. `ctx.drawnAt(end)`
+  (`ownSlot`), so they land with a page that has not changed, and only on the
+  panel the item's configuration shows (`shownEnv`: a configuration's `views`
+  names the panel of each face, and a slot of another build is not on it). `ctx.drawnAt(end)`
   is what a page adds: the ref of the component drawn at the end's path. With
   it an end says what it is and an outlet with no slot is named; without it
-  nothing is guessed.
+  nothing is guessed. **A page supplies `drawnAt` before it offers power
+  cabling**: without it an outlet-to-outlet or inlet-to-inlet cord between
+  two devices' own slots gets no warning.
 - **The DCIM cables file** leaves a ground wire out by name, and a power
   cable whose ends the type files do not name out with that reason; one they
   do name is written with a blank type and a note.

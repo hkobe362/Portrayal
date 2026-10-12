@@ -408,6 +408,7 @@
     },
     "plug": {
      "type": "string",
+     "minLength": 1,
      "description": "The plug or lug the cable has at this end, as a component ref. Stated only where the port takes more than one; absent, the plug is derived from what the port accepts."
     }
    }

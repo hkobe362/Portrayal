@@ -60,6 +60,11 @@ def test_every_yes_is_drawn(sweep):
     assert sweep["shown"] + sweep["closed"] == sweep["said"]
     # a yes by a slot (a supply inlet, a ground stud, #1045) has a part drawn at
     # its path too, and the library has more than a hundred in listed bays
+    # a slot of the device itself lands only where this configuration draws its
+    # part: asked of every slot the device lists on any panel, in every
+    # configuration, an undrawn one that landed would be in `phantom` above
+    assert sweep["undrawn"] > 500, f"only {sweep['undrawn']} undrawn slot paths were asked about"
+    assert sweep["own"] > 300, f"only {sweep['own']} of the devices' own slots landed"
     assert sweep["slots"] > 100, f"the kit said yes to {sweep['slots']} slots that take a cable end"
 
 

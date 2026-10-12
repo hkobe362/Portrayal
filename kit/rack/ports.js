@@ -22,6 +22,7 @@ const OTHER = {front: 'rear', rear: 'front'};
 const faceRef = f => (typeof f === 'string' ? f : f?.ref) || null;
 const list = v => (Array.isArray(v) ? v : []);
 const loaded = ctx => typeof ctx?.slotsOf === 'function' && typeof ctx?.compByRef === 'function';
+const natural = new Intl.Collator('en', {numeric: true});
 
 // A part as it is named in a reason: its model, else its ref's name in capitals.
 const modelOf = (comp, ref) => comp?.attrs?.model || String(ref).split('/').pop().split('@')[0].toUpperCase();
@@ -134,7 +135,12 @@ export function seatedPort(item, end, ctx, {seen = false} = {}) {
     const chain = view === bay.view ? chainIn(comp, steps, ctx.compByRef) : null;
     if (!chain) return null;
     const seat = R.entryAt(p);
-    if (!seat || seat.back || !takesCableEnd(seat, ctx.compByRef)) return {...base, holder, part: modelOf(chain.at(-1).comp, chain.at(-1).ref)};
+    if (!seat || seat.back || !takesCableEnd(seat, ctx.compByRef)) {
+      // no slot itself; where its own parts are (the screws of a DC terminal), they are named
+      const last = chain.at(-1);
+      const under = list(last.comp.parts).map(q => `${p}/${q.id}`).filter(x => takesCableEnd(R.entryAt(x), ctx.compByRef)).sort(natural.compare);
+      return {...base, holder, part: modelOf(last.comp, last.ref), ...(under.length ? {under} : {})};
+    }
     return {...base, port: true, slot: true, onView: view, holder,
             info: slotInfo(seat, [...chain.map(x => x.comp).reverse(), comp], end, ctx.compByRef)};
   }
@@ -188,6 +194,24 @@ export function portIdsOf(comp, compByRef) {
                   ...list(rear?.cages).map(g => g.id), ...list(rear?.parts).map(q => q.id)]);
 }
 
+// ── the panels this configuration shows ─────────────────────────────────
+// `configs.json` lists the bays and cages of EVERY panel the device has, each
+// under the name of its panel, and a device may have more than one panel for
+// a face: a 24-port build of a switch shows `front-24` where the 48-port one
+// shows `front`. Which one a configuration shows is its own `views`
+// (`{front: 'front-24'}`; a face it does not name shows the panel of that
+// name). slotEnv keeps every panel's slots, as the readers of a path need
+// them. THIS keeps only the slots of the panels the item's configuration
+// shows, each with `view` as the face it is on, so that a slot of another
+// build of the device is never taken for one of this build.
+const SIX = ['front', 'rear', 'left', 'right', 'top', 'bottom'];
+export function shownEnv(item, slots, compByRef = null) {
+  const env = slotEnv(item, slots, compByRef);
+  const faceOf = new Map(SIX.map(face => [env.cfg?.views?.[face] ?? face, face]));
+  const shown = s => (faceOf.has(s.view) ? [{...s, view: faceOf.get(s.view)}] : []);
+  return {...env, bays: env.bays.flatMap(shown), cages: env.cages.flatMap(shown)};
+}
+
 // ── a slot of the device itself ─────────────────────────────────────────
 // AN END ON ONE OF THE DEVICE'S OWN CONNECTOR SLOTS (an outlet of a PDU, a
 // chassis inlet, a ground stud): `<ref>.configs.json` lists the slot, its
@@ -195,6 +219,11 @@ export function portIdsOf(comp, compByRef) {
 // It is asked ONLY where a page read the panel and found no port at the path,
 // which is what a page that knows class `port` alone says of every such
 // slot; an end the page did not read, or read as a port, is left as it was.
+// ONLY A SLOT THIS CONFIGURATION BUILDS: a page that knows class `port` alone
+// says "no port" both of a slot that is drawn and of a path with nothing
+// drawn, so the slot is looked for on the panel the configuration shows for
+// that face (shownEnv) and nowhere else. Port 29 of a 48-port panel is not on
+// the 24-port build, whatever the device lists.
 //
 // WHAT A PAGE HANDS IN, `ctx.drawnAt(end)`: the ref of the component drawn at
 // the end's path on that panel (the `data-ref` of the element whose
@@ -220,7 +249,7 @@ export function ownSlot(item, end, ctx) {
   const slots = ctx.slotsOf(item.ref);
   if (!slots || slots.error) return null;
   const view = end.view === 'rear' ? 'rear' : 'front';
-  const takes = slotEnv(item, slots, ctx.compByRef).cages.filter(g => g.id === p && takesCableEnd(g, ctx.compByRef));
+  const takes = shownEnv(item, slots, ctx.compByRef).cages.filter(g => g.id === p && takesCableEnd(g, ctx.compByRef));
   const here = takes.find(g => g.view === view);
   const drawn = drawnComp(end, ctx);
   if (here) return {facts: {port: true, slot: true, cage: false, occupied: false, onView: view},
@@ -242,7 +271,8 @@ export function cableEndPaths(item, view, ctx) {
   if (!item || !loaded(ctx)) return [];
   const slots = ctx.slotsOf(item.ref);
   if (!slots || slots.error) return [];
-  const env = slotEnv(item, slots, ctx.compByRef), swaps = item.swaps || {};
+  // the panels this configuration shows, and no other build's (shownEnv)
+  const env = shownEnv(item, slots, ctx.compByRef), swaps = item.swaps || {};
   const R = resolverFor(env, swaps), out = new Set();
   const take = path => { if (takesCableEnd(R.entryAt(path), ctx.compByRef)) out.add(path); };
   const under = (comp, base, depth) => {
@@ -271,9 +301,14 @@ export function settleEnd(rack, end, got, ctx) {
   // answer for: the page saw a part drawn in it and no port at the path. The
   // catalogue is asked again, and heard only where it finds a slot that takes
   // a cable end, or a part that takes none; a port is still the page's to say.
+  // AND ONLY WHERE THE PAGE SAW WHAT THE BAY SHIPS WITH: the part it names is
+  // the one the catalogue holds there. A page whose drawing is of another
+  // configuration, or of a part swapped since, names another and is not heard.
+  // (A page names the part as modelOf does, as it always has: its model, else
+  // its ref's name in capitals.)
   if (!own && got?.facts?.drawing === true && got.facts.port === false && got.facts.holder?.part) {
     const again = seatedPort(item, end, ctx, {seen: true});
-    if (again?.slot || again?.part) own = again;
+    if ((again?.slot || again?.part) && again.holder?.part === got.facts.holder.part) own = again;
   }
   if (!own && got?.facts?.drawing === true && got.facts.port === false && !got.facts.holder) {
     // the device's own slot, where the page found no port (ownSlot)

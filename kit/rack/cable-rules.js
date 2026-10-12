@@ -398,6 +398,8 @@ export function elementIdReason(path) {
 // same device that has it (the back of a part in a bay shows on the other one).
 // part: where something is drawn at the path that is neither a port nor a slot
 // that takes a cable end (an outlet with no interface, a fixed cord), its name;
+// under: where that part is no slot and its own parts are (a DC terminal,
+// whose screws take the lugs), their paths, the one to take first;
 // side: where the path is a slot on a side, top or bottom view, that view.
 export function looseReason(end, facts) {
   if (!facts || !facts.item) return 'the device was removed';
@@ -408,6 +410,8 @@ export function looseReason(end, facts) {
     if (facts.side) return `${end.path} is on the ${facts.side} of the device, and a cable end can be given on the front or rear only`;
     if (!h) return facts.part ? `${end.path} is ${facts.part}, which takes no plug or lug the library knows` : `${end.path} is not on this panel`;
     const leaf = end.path.slice(h.path.length + '/module/'.length);
+    if (h.part && facts.part && !facts.onView && facts.under?.length)
+      return `${h.path} holds ${h.part}, whose ${leaf} takes a cable on ${facts.under.map(x => x.slice(x.lastIndexOf('/') + 1)).join(', ')} and not on itself; give the path ${facts.under[0]}`;
     if (h.part && facts.part && !facts.onView) return `${h.path} holds ${h.part}, whose ${leaf} takes no plug or lug the library knows`;
     if (h.part && facts.onView) return `${h.path} holds ${h.part}, whose port ${leaf} is on the ${facts.onView} panel; give view "${facts.onView}"`;
     return h.part ? `${h.path} holds ${h.part}, which has no port ${leaf}` : `${h.path} is empty`;

@@ -18,8 +18,18 @@
 // connector slot at its path and not as a part of class `port`. The build
 // drew a part at that path on that panel, of whatever class, or it is a
 // phantom like any other.
+//
+// A SLOT OF THE DEVICE ITSELF (an outlet, a chassis inlet, a ground stud) is
+// settled from the catalogue where a page found no port at the path
+// (ports.js ownSlot). A page that knows class `port` alone says that both of
+// a drawn slot and of a path with nothing drawn, so every path the device
+// lists as a slot ON ANY OF ITS PANELS, and every path cableEndPaths names,
+// is asked about in every configuration, on the front and the rear: one that
+// lands with no part drawn at it in that configuration is a phantom (port 29
+// of a 48-port panel, on the 24-port build). `undrawn` counts those asked,
+// `own` the slots that land with their part drawn.
 import fs from 'node:fs';
-import {seatedPort} from '../../../kit/rack/ports.js';
+import {seatedPort, settleEnd, cableEndPaths} from '../../../kit/rack/ports.js';
 
 const D = process.argv[2];
 const read = name => JSON.parse(fs.readFileSync(`${D}/${name}`, 'utf8'));
@@ -28,7 +38,7 @@ const compByRef = ref => (ref == null ? null : comps.get(String(ref).split(':')[
 const faceRef = f => (typeof f === 'string' ? f : f?.ref) || null;
 const attr = (tag, a) => (new RegExp(`\\s${a}="([^"]*)"`).exec(tag) || [])[1];
 
-const out = {devices: 0, configs: 0, drawn: 0, yes: 0, unsaid: 0, denied: [], asked: 0, said: 0, shown: 0, closed: 0, closedOn: [], phantom: [], unspoken: 0, slots: 0};
+const out = {devices: 0, configs: 0, drawn: 0, yes: 0, unsaid: 0, denied: [], asked: 0, said: 0, shown: 0, closed: 0, closedOn: [], phantom: [], unspoken: 0, slots: 0, undrawn: 0, own: 0};
 for (const f of fs.readdirSync(D).filter(n => n.endsWith('.configs.json')).sort()) {
   const ref = f.slice(0, -'.configs.json'.length), j = read(f);
   const slots = {bays: j.bays || {}, cages: j.cages || {}, configs: j.configs || [], default: j.default ?? null};
@@ -54,6 +64,19 @@ for (const f of fs.readdirSync(D).filter(n => n.endsWith('.configs.json')).sort(
         if (!got) out.unsaid++;
         else if (got.port) out.yes++;
         else out.denied.push(`${ref} ${cfg.name} ${view} ${path}`);
+      }
+    }
+    // the device's own slots, and every path a page would be told to read as an end
+    const everySlot = [...new Set(Object.values(slots.cages).flatMap(list => (list || []).map(g => g.id)))];
+    for (const view of ['front', 'rear']) {
+      if (!parts[view]) continue;
+      for (const path of new Set([...everySlot, ...cableEndPaths(item, view, ctx)])) {
+        // what a page that knows class port alone reads: a panel with a drawing, and no port at the path
+        const page = {facts: {item: true, drawing: true, port: false, cage: false, occupied: false, holder: null}, info: null, reason: 'no port'};
+        const lands = ports[view].has(path) ? false : settleEnd({items: [item], cables: []}, {item: 'i1', path, view}, page, ctx)?.facts?.port === true;
+        if (parts[view].has(path)) { if (lands) out.own++; continue; }
+        out.undrawn++;
+        if (lands) out.phantom.push(`${ref} ${cfg.name} ${view} ${path}: lands with no part drawn`);
       }
     }
     // kit -> drawn

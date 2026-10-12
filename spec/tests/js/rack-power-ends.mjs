@@ -104,6 +104,41 @@ test('a supply in a bay that only its default fills lands once a page has seen i
   assert.deepEqual((await Q.inspect(rack, 'c1', bare(rack))).mismatch, []);
   // a page that did not read the end leaves it not checked, as before
   assert.equal(P.settleEnd(rack, D3, undefined, ctx), null);
+  // A PORT IS STILL THE PAGE'S TO SAY: PSU-AC composes a jack `mgmt`, of class port, and the page found no port there
+  const MG = end('i1', 'psu-3/module/mgmt');
+  assert.equal(P.seatedPort(RACK.items[0], MG, ctx, {seen: true}).port, true, 'the catalogue, asked, would say yes');
+  const jack = cabled(RACK, {a: MG, b: OUT_F1});
+  assert.deepEqual(await loose(jack), ['c1 a: psu-3 holds PSU-AC, which has no port mgmt'], 'and is not heard for a port');
+  // AND ONLY FOR THE PART THE BAY SHIPS WITH: a page that names another part there (a stale drawing) is not heard
+  const stale = {facts: {item: true, drawing: true, port: false, cage: false, occupied: false, holder: {path: 'psu-3', part: 'PSU-DC'}}, info: {family: null, mode: null}, reason: 'as the page had it'};
+  assert.equal(P.settleEnd(rack, D3, stale, ctx), stale);
+  const seen = {...stale, facts: {...stale.facts, holder: {path: 'psu-3', part: 'PSU-AC'}}};
+  assert.equal(P.settleEnd(rack, D3, seen, ctx).reason, null);
+});
+
+test('a slot of another build of the device is not a slot of this one', async () => {
+  // `narrow` shows the panel front-narrow: rj-2 and out-2 are on the wide panel only. A page that knows class
+  // port alone says "no port" of a path with nothing drawn, exactly as it does of a drawn slot.
+  const narrow = add(M.newRack(), 'two', 5, {label: 'two-1', cfg: 'narrow'}), wide = add(M.newRack(), 'two', 5, {label: 'two-1', cfg: 'wide'});
+  const f = path => end('i1', path, 'front');
+  assert.equal(P.ownSlot(narrow.items[0], f('out-2'), ctx), null);
+  assert.equal(P.ownSlot(narrow.items[0], f('rj-2'), ctx), null);
+  assert.equal(P.ownSlot(narrow.items[0], f('out-1'), ctx).facts.port, true);
+  assert.equal(P.ownSlot(wide.items[0], f('out-2'), ctx).facts.port, true);
+  const rack = cabled(narrow, {a: f('rj-1'), b: f('rj-2'), media: 'cat6'}, {a: f('out-1'), b: f('out-2'), media: 'power'});
+  for (const c of [bare(rack), full(rack)])
+    assert.deepEqual(await loose(rack, c), ['c1 b: rj-2 is not on this panel', 'c2 b: out-2 is not on this panel']);
+  const facts = await oldPage()(rack);
+  assert.deepEqual(X.cableScheduleRows(rack, facts.ends, rack.items, null, {parts: full(rack)}).rows.map(r => r.status), ['loose end', 'loose end']);
+  const names = X.uniqueNames(rack.items), kept = new Set(['i1']);
+  assert.equal(D.cableImportRows({rack, names, kept, ends: facts.ends, uOf: () => 1, parts: full(rack),
+    resolve: e => ({ok: true, name: e.path, type: 'dcim.interface'})}).rows.length, 0);
+  // and nothing of the other build is offered
+  assert.deepEqual(P.cableEndPaths(narrow.items[0], 'front', ctx), ['rj-1', 'out-1']);
+  assert.deepEqual(P.cableEndPaths(wide.items[0], 'front', ctx), ['rj-1', 'rj-2', 'out-1', 'out-2']);
+  assert.deepEqual(P.shownEnv(narrow.items[0], SLOTS.two, compByRef).cages.map(g => [g.id, g.view]), [['rj-1', 'front'], ['out-1', 'front']]);
+  const stray = async (item, view) => (view === 'front' ? [...zonesOf('two', 'front', ['out-1']), {id: 'out-2', cls: 'inlet', path: 'out-2', end: true, ref: 'std/c13-outlet@1'}] : []);
+  assert.deepEqual((await Q.freePorts(narrow, 'i1', {...ctx, portsOf: stray})).map(p => p.path), ['rj-1', 'out-1']);
 });
 
 test('a cable to a slotted outlet of a rail-mounted PDU lands, with a page that knows class port alone', async () => {
@@ -160,6 +195,17 @@ test('an end saved to an -occupant path keeps working and is not rewritten', asy
   const rack = M.parseDoc(JSON.parse(JSON.stringify(saved))).racks[0];
   assert.deepEqual(rack.cables[0].a, end('i1', 'psu-1/module/inlet-occupant'), 'the address is kept as written');
   assert.deepEqual(await loose(rack), [], 'and lands, with nothing fitted there');
+  // no command rewrites it: an edit of the cable, and a new cable given such a path, keep the address as given
+  const OCC = end('i1', 'psu-1/module/inlet-occupant');
+  const edited = run(rack, [{op: 'cable.update', id: 'c1', label: 'kept', media: 'power'}, {op: 'cable.update', id: 'c1', a: OCC}]).rack;
+  assert.deepEqual([edited.cables[0].a, edited.cables[0].b.path, edited.cables[0].label], [OCC, 'outlet-front-1-occupant', 'kept']);
+  const added = run(RACK, [{op: 'cable.add', a: OCC, b: OUT_R1, media: 'power'}]).rack;
+  assert.deepEqual(added.cables[0].a, OCC);
+  assert.deepEqual(await loose(added), []);
+  // only a caller that names the slot's own path moves it there, and is told it moved
+  const moved = run(rack, [{op: 'cable.update', id: 'c1', a: INLET}]);
+  assert.deepEqual(moved.rack.cables[0].a, INLET);
+  assert.match(moved.summary, /^Moved end A of cable c1 to /);
   // it is the same port: a second cable to the slot is refused
   assert.match(run(rack, [{op: 'cable.add', a: INLET, b: OUT_R1}]).error, /already has a cable/);
   assert.equal(CR.sameEnd(end('i1', 'psu-1/module/inlet-occupant'), INLET), true);
@@ -168,7 +214,10 @@ test('an end saved to an -occupant path keeps working and is not rewritten', asy
 // ── a DC terminal ────────────────────────────────────────────────────────
 test('a DC feed lands on a screw of its terminal, and the terminal itself is named as no slot', async () => {
   const rack = cabled(RACK, {a: LUG1, b: OUT_R1, media: 'power'}, {a: end('i1', 'psu-2/module/terminal'), b: OUT_F1, media: 'power'});
-  assert.deepEqual(await loose(rack), ['c2 a: psu-2 holds PSU-DC, whose terminal takes no plug or lug the library knows']);
+  // the terminal is no slot and its screws are: the reason says which path to give
+  assert.deepEqual(await loose(rack), ['c2 a: psu-2 holds PSU-DC, whose terminal takes a cable on lug-1, lug-2, lug-10 and not on itself; give the path psu-2/module/terminal/lug-1']);
+  assert.deepEqual(P.seatedPort(rack.items[0], end('i1', 'psu-2/module/terminal'), ctx).under,
+    ['psu-2/module/terminal/lug-1', 'psu-2/module/terminal/lug-2', 'psu-2/module/terminal/lug-10']);
   const at = P.seatedPort(rack.items[0], LUG1, ctx);
   // the screw says nothing of itself: the terminal it is part of does
   assert.deepEqual(at.info, {family: 'power', mode: 'dc', role: 'inlet', plug: LUG, connector: 'terminal-stud inlet'});
@@ -185,6 +234,12 @@ test('the plug is derived from the slot: one accepted, several, stated, not acce
   assert.deepEqual(CR.endPlug(two, compByRef, 'acme/plug-20a@1:1.0.0'), {plug: 'acme/plug-20a@1', choices: ['acme/plug-15a@1', 'acme/plug-20a@1'], note: null});
   assert.equal(CR.endPlug(two, compByRef, C13).note,
     'it states the plug generic/c13-plug@1, which outlet-rear-2 does not take; set "plug" on the end to acme/plug-15a@1 or acme/plug-20a@1');
+  // the rating decides before the ref does: a 15 A plug whose ref sorts after the 20 A one is still first
+  const rated = ref => ({'acme/a-plug@1': {class: 'port', attrs: {'rating-a': 20}}, 'acme/z-plug@1': {class: 'port', attrs: {'rating-a': 15}},
+    'acme/m-plug@1': {class: 'port', attrs: {}}})[ref] ?? null;
+  assert.deepEqual(CR.cableEndsOf({kind: 'connector', accepts: ['acme/a-plug@1', 'acme/m-plug@1', 'acme/z-plug@1']}, rated),
+    ['acme/z-plug@1', 'acme/a-plug@1', 'acme/m-plug@1'], 'and a part that states no rating comes after those that do');
+  assert.equal(CR.endPlug({id: 's', kind: 'connector', accepts: ['acme/a-plug@1', 'acme/z-plug@1']}, rated).plug, 'acme/z-plug@1');
   // parts that state no rating are in the order of their refs
   assert.deepEqual(CR.cableEndsOf({kind: 'connector', accepts: [C20, C14, SFP]}, compByRef), [C14, C20]);
   assert.deepEqual(CR.endPlug(SLOTS.sw.cages.front[0], compByRef), {plug: null, choices: [], note: null}, 'a cage gives no plug');
@@ -268,6 +323,10 @@ test('media power and ground go through the commands, the file and the schema', 
   assert.deepEqual(validate(schema, {...JSON.parse(text), racks: [{...JSON.parse(text).racks[0],
     cables: [{...JSON.parse(text).racks[0].cables[0], b: {item: 'i2', path: 'outlet-rear-2', view: 'rear', plug: 5}}]}]}).map(e => e.path.join('/')),
     ['racks/0/cables/0/b/plug'], 'a plug is a string');
+  const blank = JSON.parse(text);
+  blank.racks[0].cables[0].b.plug = '';
+  assert.deepEqual(validate(schema, blank).map(e => e.keyword), ['minLength'], 'and not an empty one, as the command says');
+  assert.equal(COMMANDS['cable.add'].args.properties.a.properties.plug.minLength, 1);
 });
 
 test('a version 4 file with no power in it loads and saves as it was', () => {

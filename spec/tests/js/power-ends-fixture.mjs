@@ -50,7 +50,7 @@ export const COMPONENTS = [
   comp('std/rj45@1', {class: 'port', interface: 'rj45', attrs: {media: 'rj45'}}),
   // supplies
   comp(PSU_AC, {class: 'psu', kind: 'module', attrs: {model: 'PSU-AC', input: 'ac', inlet: 'c14'}, description: 'Acme PSU-AC - 550 W AC supply.',
-    parts: [part('inlet', 'std/c14-inlet@1'), part('led', 'common/led-dot@1')], cages: [slot('inlet', 'iec-c14', [C13])]}),
+    parts: [part('inlet', 'std/c14-inlet@1'), part('led', 'common/led-dot@1'), part('mgmt', 'std/rj45@1')], cages: [slot('inlet', 'iec-c14', [C13])]}),
   comp(PSU_DC, {class: 'psu', kind: 'module', attrs: {model: 'PSU-DC', input: 'dc'}, description: 'Acme PSU-DC - 550 W DC supply.',
     parts: [part('terminal', 'common/dc-terminal@1'), part('art', 'acme/fixed-cord@1')], cages: []}),
   // a breaker whose one slot takes a guard, not a cable
@@ -75,12 +75,20 @@ export const SLOTS = {
                 rear: [slot('input', 'iec-c20', [C19]), slot('outlet-rear-1', 'iec-c19', [C20]),
                        slot('outlet-rear-2', 'acme-t-slot', ['acme/plug-20a@1', 'acme/plug-15a@1']), slot('ground', 'terminal-stud', [LUG])]},
         configs: [{name: 'base', description: '', airflow: 'passive', bays: {}, occupants: {}}]},
+  // a device with two builds of its front: `wide` shows the panel `front`, `narrow` the panel `front-narrow`,
+  // which has the first jack and the first outlet and not the second of either (as a 24-port build of a 48-port switch)
+  two: {default: 'wide', 'pdu-class': null, bays: {front: [], 'front-narrow': [], rear: []},
+        cages: {front: [slot('rj-1', 'rj45', [RJ]), slot('rj-2', 'rj45', [RJ]), slot('out-1', 'iec-c13', [C14]), slot('out-2', 'iec-c13', [C14])],
+                'front-narrow': [slot('rj-1', 'rj45', [RJ]), slot('out-1', 'iec-c13', [C14])], rear: []},
+        configs: [{name: 'wide', description: '', airflow: 'passive', bays: {}, occupants: {}, views: {}},
+                  {name: 'narrow', description: '', airflow: 'passive', bays: {}, occupants: {}, views: {front: 'front-narrow'}}]},
   // a PDU whose outlets declare no interface: nothing is a slot
   nema: {default: 'base', 'pdu-class': 'managed', bays: {front: [], rear: []}, cages: {front: [], rear: []},
          configs: [{name: 'base', description: '', airflow: 'passive', bays: {}, occupants: {}}]},
 };
 export const SIZES = {sw: {ru: 1, w: 438, h: 43.6, d: 400, model: 'SW', manufacturer: 'Acme', kind: 'switch', configs: ['base'], default: 'base'},
                       pdu: {ru: 1, w: 434, h: 44.45, d: 108, model: 'PDU-IEC', manufacturer: 'Acme', kind: 'pdu', configs: ['base'], default: 'base'},
+                      two: {ru: 1, w: 438, h: 43.6, d: 200, model: 'TWO', manufacturer: 'Acme', kind: 'switch', configs: ['wide', 'narrow'], default: 'wide'},
                       nema: {ru: 1, w: 434, h: 44.45, d: 108, model: 'PDU-NEMA', manufacturer: 'Acme', kind: 'pdu', configs: ['base'], default: 'base'}};
 const byRef = new Map(COMPONENTS.map(c => [`${c.ns}/${c.name}@${c.major.slice(1)}`, c]));
 export const chassisOf = ref => SIZES[ref] || null;
@@ -104,6 +112,8 @@ export const DRAWN = {
   pdu: {front: {'outlet-front-1': ['inlet', 'std/c13-outlet@1', null], 'outlet-front-2': ['inlet', 'std/c13-outlet@1', null]},
         rear: {input: ['inlet', 'std/c20-inlet@1', 'ac'], 'outlet-rear-1': ['inlet', 'std/c19-outlet@1', null],
                'outlet-rear-2': ['inlet', 'acme/t-slot-outlet@1', null], ground: ['ground', 'common/ground-stud@1', null]}},
+  // (as its `narrow` configuration draws it)
+  two: {front: {'rj-1': ['port', 'std/rj45@1', 'rj45'], 'out-1': ['inlet', 'std/c13-outlet@1', null]}, rear: {}},
   nema: {front: {}, rear: {'outlet-9': ['inlet', 'std/nema-5-20r@1', null], input: ['inlet', 'acme/fixed-cord@1', null]}},
 };
 const strip = path => String(path).split('-occupant')[0];

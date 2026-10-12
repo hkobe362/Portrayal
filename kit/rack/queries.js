@@ -10,7 +10,7 @@ import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf, uText} from './m
 import {whereText, carriesLane} from './zero-u.js';
 import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText, isElementId, addressFor, portLabel,
         takesCableEnd, receptacleOf, endKind, connectorName, endPlug} from './cable-rules.js';
-import {seatedPort, settleEnds} from './ports.js';
+import {seatedPort, settleEnds, shownEnv} from './ports.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
 import {slackOf, spareLine, slackFindings} from './slack.js';
@@ -238,7 +238,8 @@ export async function freePorts(rack, itemId, {portsOf, slotsOf, compByRef}, {ki
   const seatAt = path => {
     if (seats === undefined) {
       const slots = typeof slotsOf === 'function' && typeof compByRef === 'function' ? slotsOf(item.ref) : null;
-      seats = slots && !slots.error ? resolverFor(slotEnv(item, slots, compByRef), item.swaps || {}) : null;
+      // the panels the item's configuration shows, and no other build's (ports.js shownEnv)
+      seats = slots && !slots.error ? resolverFor(shownEnv(item, slots, compByRef), item.swaps || {}) : null;
     }
     const slot = seats?.entryAt(path) ?? null;
     return slot && takesCableEnd(slot, compByRef) ? slot : null;
