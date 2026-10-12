@@ -21,13 +21,21 @@ const ctxFor = (rack, ports, extra = {}) => ({chassisOf,
   portX: end => ports[`${end.item}|${end.path}`] ?? 0});
 const cable = (a, b, extra = {}) => ({id: 'c1', a: {view: 'front', ...a}, b: {view: 'front', ...b}, route: [], ...extra});
 
-test('a port left of center leaves through the nearest ring, then every ring out to the left', () => {
+test('a port left of center leaves through the first ring it has room to turn into, then every ring out to the left', () => {
   let r = add(M.newRack(), 'sw', 20, {label: 'sw'});
   r = add(r, 'fhd-cmp5dr', 20, {on: 'i1', unit: 1});
   r = add(r, 'pp', 30);
-  const ctx = ctxFor(r, {'i1|p1': -100, 'i3|q1': -150});
+  const ctx = ctxFor(r, {'i1|p1': -80, 'i1|p2': -100, 'i3|q1': -150});
+  // 25 mm short of ring 2's near face (-105): room to turn into it
   assert.deepEqual(R.autoRoute(r, cable({item: 'i1', path: 'p1'}, {item: 'i3', path: 'q1'}), ctx), [
     {item: 'i2', via: 'guide-2'}, {item: 'i2', via: 'guide-1'},
+    {lane: 'left-front', ru: 20}, {lane: 'left-front', ru: 30}]);
+  // 5 mm short of it, the plug ending 15.6 mm behind the rings' line (39.4
+  // of 55): the lead would turn twice on 16.4 mm, and a cable with no media
+  // needs 24 mm. Ring 2 was the nearest and was taken until #1026; it is
+  // passed over, and the lead enters ring 1
+  assert.deepEqual(R.autoRoute(r, cable({item: 'i1', path: 'p2'}, {item: 'i3', path: 'q1'}), ctx), [
+    {item: 'i2', via: 'guide-1'},
     {lane: 'left-front', ru: 20}, {lane: 'left-front', ru: 30}]);
 });
 
@@ -35,16 +43,24 @@ test('a port right of center goes right; a port at the center goes left', () => 
   let r = add(M.newRack(), 'sw', 20);
   r = add(r, 'fhd-cmp5dr', 20, {on: 'i1', unit: 1});
   r = add(r, 'pp', 30);
-  // Under ring 4 (110, within half its depth): through it, then ring 5.
-  const right = R.autoRoute(r, cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'}), ctxFor(r, {'i1|p': 112, 'i3|q': 120}));
+  // 50 mm short of ring 4 (110): through it, then ring 5.
+  const right = R.autoRoute(r, cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'}), ctxFor(r, {'i1|p': 60, 'i3|q': 120}));
   assert.deepEqual(right.slice(0, 2), [{item: 'i2', via: 'guide-4'}, {item: 'i2', via: 'guide-5'}]);
   assert.equal(right[2].lane, 'right-front');
+  // Under ring 4 (within half its depth) the port is on the way through it,
+  // and until #1026 went through it. Its plug ends 15.6 mm short of the ring
+  // and would turn square into it there: no room, so the lead passes it and
+  // enters ring 5.
+  const under = R.autoRoute(r, cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'}), ctxFor(r, {'i1|p': 112, 'i3|q': 120}));
+  assert.deepEqual(under.slice(0, 2), [{item: 'i2', via: 'guide-5'}, {lane: 'right-front', ru: 20}]);
   // Past ring 4 on the way out: ring 4 is behind the port, and the cable
   // would enter and leave it by one face (#930), so it goes on from ring 5.
   const past = R.autoRoute(r, cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'}), ctxFor(r, {'i1|p': 120, 'i3|q': 120}));
   assert.deepEqual(past.slice(0, 2), [{item: 'i2', via: 'guide-5'}, {lane: 'right-front', ru: 20}]);
   const mid = R.autoRoute(r, cable({item: 'i1', path: 'p'}, {item: 'i3', path: 'q'}), ctxFor(r, {'i1|p': 0, 'i3|q': 0}));
-  assert.deepEqual(mid[0], {item: 'i2', via: 'guide-3'});
+  // at the center it is under ring 3, which it has no room to turn into
+  // either: the first ring on its way left is ring 2
+  assert.deepEqual(mid[0], {item: 'i2', via: 'guide-2'});
   assert.equal(mid.find(w => w.lane).lane, 'left-front');
 });
 
@@ -97,23 +113,28 @@ test('the same face, different sides: the shorter side is taken, whichever end i
   // the same cable written the other way round takes the same side
   const back = cable({item: 'i3', path: 'q'}, {item: 'i1', path: 'p'});
   assert.deepEqual(R.autoRoute(r, back, ctx), right.toReversed());
-  // ports at -100 and 100 are as far from either gutter, and until #973 the
-  // two sides measured the same to a micron, a tie, which keeps end a's side.
-  // They are the same legs still, but a span now hangs only as deep as the
-  // corners beside it have room for, and the two sides meet their short legs
-  // at different heights: the right measures 0.8 mm shorter, and is taken
-  // whichever end is a
+  // ports at -100 and 100 are as far from either gutter, each 5 mm short of
+  // the near face of the ring beside it (2 and 4). Until #1026 each went
+  // through that ring, and since #973 the two sides, the same legs, measured
+  // 0.8 mm apart (1393.52 by the left, 1392.74 by the right: a span hangs
+  // only as deep as the corners beside it have room for, and the two sides
+  // met their short legs at different heights), so the right was taken
+  // whichever end was a. Neither lead has room to turn into the ring beside
+  // it, so each passes it: by the left a takes ring 1 and b rings 3, 2 and 1,
+  // by the right a takes 3, 4 and 5 and b ring 5, mirror images that measure
+  // the same to a micron. A tie keeps end a's side, as it did before #973
   const near = ctxFor(r, {'i1|p': -100, 'i3|q': 100});
   const sides = [R.autoRoute(r, c, near), R.autoRoute(r, back, near)].map(rt => rt.find(w => w.lane).lane);
-  assert.deepEqual(sides, ['right-front', 'right-front']);
+  assert.deepEqual(sides, ['left-front', 'right-front']);
   const by = side => {
     const pick = (a, b) => (side === 'left' ? a : b);
-    return [...pick([2, 1], [3, 4, 5]).map(n => ({item: 'i2', via: `guide-${n}`})), {lane: `${side}-front`, ru: 20}, {lane: `${side}-front`, ru: 30},
-      ...pick([1, 2, 3], [5, 4]).map(n => ({item: 'i4', via: `guide-${n}`}))];
+    return [...pick([1], [3, 4, 5]).map(n => ({item: 'i2', via: `guide-${n}`})), {lane: `${side}-front`, ru: 20}, {lane: `${side}-front`, ru: 30},
+      ...pick([1, 2, 3], [5]).map(n => ({item: 'i4', via: `guide-${n}`}))];
   };
   const len = side => Math.round(R.routedLength(r, {...c, route: by(side), routeEdited: true}, near).measured * 1e5) / 100;
-  assert.deepEqual(R.autoRoute(r, c, near), by('right'));
-  assert.deepEqual([len('left'), len('right')], [1393.52, 1392.74]);
+  assert.deepEqual(R.autoRoute(r, c, near), by('left'));
+  assert.deepEqual(R.autoRoute(r, back, near), by('right').toReversed());
+  assert.deepEqual([len('left'), len('right')], [1379.87, 1379.87]);
 });
 
 test('opposite faces: front lane to rear lane on the A side, joined at the higher U', () => {

@@ -1194,6 +1194,72 @@ after, each where a lane's own run comes to the end of a short PDU and is
 taken over its face, the last way round of 1.3. A stored routed length and stock size move the next
 time a page measures them; an entered length is never touched.
 
+### 3.5 Room to turn into a ring (#1026)
+
+Built in kit 0.25.0. Until then the automatic route sent every lead through
+the ring of its manager nearest its port, whatever stood between. A lead is
+the stretch of a cable from the far end of its plug to the first thing that
+holds it. Where a lacer is hosted on the unit its ports are in, the nearest
+ring is so close that the lead has nowhere to turn. On a rack of thirteen 2U
+switches, each with an FHD-CMP5DR on its top unit, the rings stand 73.7 mm
+out of the rail and their sill 7 and 20 mm under the two rows of ports above
+it; an AOC's plug ends 64.8 mm out, 8.9 mm short of the line it has to turn
+onto, and needs 30 mm to turn. A port 6 mm to one side of a ring's face had
+two turns to make on 20 mm.
+
+**The rule: a lead enters the first ring along its way that it has room to
+turn into.** The rings on its way are the ones the route already listed,
+from the port out toward the gutter it takes. One that is too close to turn
+into is passed over, and the lead runs on to the next: over the tray, or
+through the opening of the ring it passed without lying in it. The choice is
+by room, not by distance.
+
+**What room is.** The lead is laid on its own, taut, by the rules of 3.4:
+from the plug's reach point to the ring's approach point, round whatever
+body stands between (1.3), and on through the ring. It has room when no
+corner of that has less than the cable's installed bend radius, a leg
+between two corners shared by need (3.4). The approach point is tried where
+3.4 may put it (at the bend radius from the band, at the radius and
+`CLEAR`, two radii past the plug with the lead led square or not, and to
+either side of a detour that comes back beside itself), and the plug's
+run-outs are tried where its own turn is what is short. One of these with
+room is room. So what decides is what stands in the rack: how far the plug
+reaches (1.5), how far out and how high the ring's sill is, the ring's own
+legs and the tray under it, which unit the manager is mounted on, and how
+far back the device is set. No distance is written into the rule; the 30 to
+40 mm at which a ring starts to leave an AOC room on this lacer comes out of
+those.
+
+It is a test of one lead, not the whole path: it lays no hang and none of
+the rest of the route, so it can call room where the path then reports a
+bend, or the reverse. The path's own `bends` are what is reported. A port
+the drawings do not place, and a ring they do not place, are taken as
+having room, so nothing is passed over for what cannot be measured.
+
+**Where no ring leaves room** the lead takes the nearest, as before, and its
+bend is a finding (3.4). The finding then also says why and what would help:
+"Lacer EDGE-0 stands too close to this port for the cable to turn into any
+ring on its way: set EDGE-0 back from the rail, mount the manager on another
+unit of EDGE-0, or leave EDGE-0 without a manager." The second remedy is
+offered only for a manager hosted on a device of two units or more, and a
+manager that is a rack item of its own is to be moved away, not left out.
+`bendFindingsOf` and `bendFindings` carry it in `text` and mark the finding
+`tooClose: {manager, device}`; the path's `bends` are unchanged. The lead is
+not sent straight to the gutter instead: with the plug ending 0.1 mm behind
+a ring's leg, the straight run clears the ring only on paper, and a lead
+that skips its device's manager is a span in front of other ports (1.7)
+with advice to add the manager it skipped.
+
+**A route made by hand is never overridden.** The rule is the automatic
+route's. A ring a hand route names is gone through, room or none, and its
+finding carries no advice about the manager: the ring was chosen.
+
+**Which leads are left without room** on that rack, at no setback: a port
+within some 35 mm inboard of the end ring, which has no ring after it; and
+a port in the lower row beside a ring, level with the ring's seat, whose way
+to the next ring is through that seat. Both are the manager standing where
+the ports are.
+
 ## 4. Lay order
 
 **Recommendation: cables that share a tray, ring or duct each get a position
