@@ -13,7 +13,7 @@
 ### Changed
 - **`@portrayal/kit` is 0.33.0: a rack-mounted manager's rings are at their
   real depth, and a manager taller than one unit is an `autoRoute`
-  neighbour** (#1027). The two entries below are what 0.33.0 changes.
+  neighbour** (#1027). The entry below says how the kit routes now.
 - **A rack-mounted ring manager's rings are at their depth, and a manager
   taller than one unit is used by `autoRoute`** (#1027, kit
   `rack/route.js` `guidesFor`, `rack/fit.js` `neighbours`). The kit stood
