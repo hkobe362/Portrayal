@@ -861,7 +861,12 @@ const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);
 //     the copper one (UNSET_D).
 // It does not see an optic in a cage: a port that holds one stands the plug
 // further out, which only the page knows.
-export const PLUG_REACH = {os2: 27.6, om3: 27.6, om4: 27.6, om5: 27.6, cat6: 39.4, cat6a: 39.4, dac: 64.8, aoc: 64.8};
+//   - power: 77.0, generic/c13-plug@1 as docs/connectors-power-design.md
+//     section 5 gives it: the plug stands 47.0 out of its inlet and its
+//     stub of cord ends 30 further, where the cord may first bend. A C19 is
+//     10 longer; the C13 is taken as the common cord. A ground wire has no
+//     figure of its own and takes the unset one.
+export const PLUG_REACH = {os2: 27.6, om3: 27.6, om4: 27.6, om5: 27.6, cat6: 39.4, cat6a: 39.4, dac: 64.8, aoc: 64.8, power: 77.0};
 const UNSET_REACH = 39.4;
 function plugReach(cable, end, ctx) {
   let v = null;
@@ -931,8 +936,15 @@ export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 // The kit does not know what a port holds: an LC cord into an optic's
 // receptacle enters it as it would an adapter's, and an AOC's head enters
 // the cage; an SFP head (47.5 inside, SFF-8432) is taken at the QSFP figure.
+//   - power: 17.0 mm, the plug inside: a C13 is 64 long and stands 47.0 out
+//     of the inlet the library models (docs/connectors-power-design.md
+//     section 5). ESTIMATED in one respect: no maker held says whether a
+//     cord's nominal length takes in its connectors, so tip to tip is assumed,
+//     and no maker's length tolerance is held, so shortTolerance gives a cord
+//     the copper rule.
+//   - ground: 0. A lug lies on the panel; nothing of the wire is inside it.
 export const END_ALLOWANCE_BY_MEDIA = {os2: 0.0131, om3: 0.0131, om4: 0.0131, om5: 0.0131,
-  cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524};
+  cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524, power: 0.017, ground: 0};
 const UNSET_ALLOWANCE = 0.0095;
 // What is inside the port at each end of a cable, in metres: its media's
 // figure from the table (the copper cord's for a cable with no media, or
@@ -2455,7 +2467,11 @@ export function bodyFindings(rack, ctx, nameOf = id => id) {
 
 // ── fill ──────────────────────────────────────────────────────────────────
 // Typical outside diameters (mm): a sketch of fill, not a measurement.
-export const DIAMETERS = {cat6: 6.0, cat6a: 7.5, os2: 3.0, om3: 3.0, om4: 3.0, om5: 3.0, dac: 5.0, aoc: 3.0};
+// `power` is the power-c13 cord of spec/schemas/cable-types.yaml (7.1, sourced
+// there; the C19 cord is 7.9 and a cable that names that type gets it).
+// `ground` is ESTIMATED: 6.3, about a 6 AWG insulated building wire, the gauge
+// of the library's lugs; no source is held and no type names it yet.
+export const DIAMETERS = {cat6: 6.0, cat6a: 7.5, os2: 3.0, om3: 3.0, om4: 3.0, om5: 3.0, dac: 5.0, aoc: 3.0, power: 7.1, ground: 6.3};
 const UNSET_D = 6.0;
 export const FILL_LIMIT = 0.4;
 const areaOf = media => Math.PI * ((ownMedia(DIAMETERS, media) ?? UNSET_D) / 2) ** 2;

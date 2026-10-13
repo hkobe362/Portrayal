@@ -2550,7 +2550,7 @@ def tokenize_module(doc):
     return doc
 
 
-def nested_bays_for(doc, target, withheld=(), through=()):
+def nested_bays_for(doc, target, withheld=(), through=(), anchored=None):
     """A written MODULE document's own bays as ONE DCIM takes them. Asked of
     module types only: a device type's `module-bays` are the chassis' own, are
     positioned by their id in both DCIMs, and never pass through here.
@@ -2600,6 +2600,13 @@ def nested_bays_for(doc, target, withheld=(), through=()):
     MPC an MX960 slot takes, and that MPC's `{module}/x` renders as the slot
     the adapter sits in, `fpc3/x`. NetBox keeps `fpc3/mpc/x`; the comments say so.
 
+    AND EXCEPT THE BAYS OF A CARRIER THAT HAS ONE SEAT (#1040). `anchored` is
+    (the position its carrier always sits at, the bay ids) from `anchored_bays`:
+    such a bay is written with that position in front of its own, `drawer/slot-1`,
+    which Nautobot copies as written - so what seats there names its ports
+    `{module}/x` and renders `drawer/slot-1/x`, NetBox's name, and the same
+    module in a chassis bay renders `slot-1/x`. The comments say so.
+
     IT NEEDS NETBOX 4.5.7. Position templating on a bay arrived in 4.5.6
     (release note #20467) and the single token's leaf rule in 4.5.7 (#20474).
     Before that the install FORMS refuse a card whose token count is not the
@@ -2630,9 +2637,17 @@ def nested_bays_for(doc, target, withheld=(), through=()):
         if withheld & through:
             raise ValueError(f"{doc.get('model')}: bay(s) {sorted(withheld & through)} "
                              "both withheld and passed through")
-        kept = [{**b, "position": ""} if b["position"] in through else dict(b)
+        seat, fixed = anchored or (None, ())
+        fixed = set(fixed)
+        if fixed & (withheld | through):
+            raise ValueError(f"{doc.get('model')}: bay(s) {sorted(fixed & (withheld | through))} "
+                             "anchored and also withheld or passed through")
+        kept = [{**b, "position": ""} if b["position"] in through
+                else {**b, "position": f"{seat}/{b['position']}"} if b["position"] in fixed
+                else dict(b)
                 for b in bays if b["position"] not in withheld]
         passed = [b["name"] for b in bays if b["position"] in through]
+        held = [b["name"] for b in bays if b["position"] in fixed]
         gone = [b["position"] for b in bays if b["position"] in withheld]
         if kept:
             out["module-bays"] = kept
@@ -2644,6 +2659,14 @@ def nested_bays_for(doc, target, withheld=(), through=()):
                        "that module's port names cannot carry this bay's parent, and "
                        "Nautobot copies a bay's position as written (position "
                        "templating is nautobot/nautobot#5823).")
+        if held:
+            _note(out, f"Given to Nautobot at the position {seat}/<bay>: module bay(s) "
+                       f"{', '.join(held)}. Each accepts a module that also seats directly "
+                       "in a chassis bay, and this module only ever sits in a bay named "
+                       f"{seat}, so its bays carry that position as written and a module "
+                       f"in one is named {seat}/<bay>/x, as NetBox names it. Import this "
+                       "type and the types of what seats in those bays together: one "
+                       "written before this rule does not name ports to match.")
         if passed:
             _note(out, f"Given to Nautobot with a blank position: module bay(s) "
                        f"{', '.join(passed)}. It accepts modules that also seat directly "
@@ -3171,6 +3194,69 @@ def pass_through_bays(dist):
     return out
 
 
+def _chassis_seats(dist):
+    """{module key: {the ids of the device bays that accept it}}: every view,
+    every configuration."""
+    seats = {}
+    for d in dist.devices:
+        dev = dist.manifest(d["name"])
+        for view in (dev.get("views") or {}).values():
+            for b in view_parts(view)["bays"]:
+                for ref in b.get("accepts") or []:
+                    c = dist.component_by_ref(ref)
+                    if c and c.get("kind") == "module":
+                        seats.setdefault(module_key(dist, c), set()).add(str(b.get("id")))
+    return seats
+
+
+def anchored_bays(dist):
+    """{(manufacturer, model): (seat, {bay id})} - the bays Nautobot is given
+    with their carrier's own position written in front of theirs (#1040).
+
+    A carrier qualifies when it has ONE SEAT: every device bay that accepts it
+    has the same id, and no module bay accepts it - a drawer that is the whole
+    front of its panel and sits in the bay `drawer` of every device that takes
+    it. Then the position its bays need in front of theirs is a constant, and
+    Nautobot, which copies a bay's position as written (position templating is
+    nautobot/nautobot#5823), can be given it: `drawer/slot-1`. Of its bays, the
+    ones that need it are those accepting a model that also seats directly in
+    a chassis bay, which are otherwise withheld (`nested_bays_for`); a carrier
+    with one such bay only is a pass-through (`pass_through_bays`) and is left
+    to that rule.
+
+    What seats in an anchored bay is at its carrier's depth as Nautobot counts
+    it (`seating_depths`): its `{module}` is filled with `drawer/slot-1` whole.
+    """
+    direct = _chassis_seated(dist)
+    seats = _chassis_seats(dist)
+    nested = set()                               # keys some module bay accepts
+    for c in dist.modules():
+        bays = c.get("bays")
+        if not isinstance(bays, dict) or c.get("superseded-by"):
+            continue
+        for b in bays.values():
+            for r in (b or {}).get("accepts") or []:
+                rc = dist.component_by_ref(r)
+                if rc and rc.get("kind") == "module":
+                    nested.add(module_key(dist, rc))
+    through = pass_through_bays(dist)
+    out = {}
+    for c in dist.modules():
+        bays = c.get("bays")
+        key = module_key(dist, c)
+        if (not isinstance(bays, dict) or c.get("superseded-by") or key in through
+                or key in nested or len(seats.get(key, ())) != 1):
+            continue
+        ids = {bid for bid, b in bays.items()
+               if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
+                      and module_key(dist, rc) in direct
+                      for r in (b or {}).get("accepts") or [])}
+        if ids:
+            seat, = seats[key]
+            out.setdefault(key, (seat, set()))[1].update(ids)
+    return out
+
+
 def seating_depths(dist):
     """{(manufacturer, model): {depth, ...}} - how deep in a bay tree each
     module model is seated anywhere in the library (#765), counted the way
@@ -3179,8 +3265,9 @@ def seating_depths(dist):
     Depth 1 is a bay on a device: every view, every configuration, because a
     module type is one document whichever chassis it is ordered for. Depth
     d + 1 is a bay on a module seated at d - except a pass-through bay
-    (`pass_through_bays`), whose blank position Nautobot skips, so what seats
-    there is at its carrier's depth. Computed to a fixpoint over keys rather
+    (`pass_through_bays`), whose blank position Nautobot skips, and an anchored
+    bay (`anchored_bays`), whose position is written whole, so what seats in
+    either is at its carrier's depth. Computed to a fixpoint over keys rather
     than refs, so a twin that no device names still passes its parent's depth
     to what it seats. A model no bay accepts has no entry.
     """
@@ -3190,6 +3277,7 @@ def seating_depths(dist):
 
     depths = {k: {1} for k in _chassis_seated(dist)}
     through = pass_through_bays(dist)
+    anchored = anchored_bays(dist)
 
     carriers = []                                # (key, [(accepted key, step)])
     for c in dist.modules():
@@ -3199,7 +3287,8 @@ def seating_depths(dist):
         if not isinstance(bays, dict) or c.get("superseded-by"):
             continue
         key = module_key(dist, c)
-        under = [(key_of(ref), 0 if bid in through.get(key, ()) else 1)
+        flat = set(through.get(key, ())) | set(anchored.get(key, (None, ()))[1])
+        under = [(key_of(ref), 0 if bid in flat else 1)
                  for bid, b in bays.items() for ref in (b or {}).get("accepts") or []]
         carriers.append((key, [(k, s) for k, s in under if k]))
 
@@ -3279,6 +3368,7 @@ def export_modules(dist, root, images=None):
     depths = seating_depths(dist)
     multi = {k for k, ds in depths.items() if len(ds) > 1}
     through_all = pass_through_bays(dist)
+    anchored_all = anchored_bays(dist)
 
     wrote = 0
     collisions = []                              # ((man, model), ref, kind)
@@ -3334,8 +3424,9 @@ def export_modules(dist, root, images=None):
             raise SystemExit(f"{man} {model}: bay(s) {', '.join(sorted(through))} pass "
                              "through to Nautobot with a blank position, so the carrier's "
                              "own ports would share its occupant's names (pass_through_bays)")
+        anchored = anchored_all.get((man, model))
         withheld = {bid for c in authors for bid, b in (c.get("bays") or {}).items()
-                    if bid not in through
+                    if bid not in through and bid not in (anchored or (None, ()))[1]
                     and any(dist.component_by_ref(r)
                             and module_key(dist, dist.component_by_ref(r)) in multi
                             for r in (b or {}).get("accepts") or [])}
@@ -3347,7 +3438,7 @@ def export_modules(dist, root, images=None):
             # Cisco ships part numbers with slashes in them - A9K-16T/8-B - and
             # a slash is a path separator, not a character. The model keeps the
             # real name; only the filename is sanitised.
-            written = for_target(nested_bays_for(doc, target, withheld, through),
+            written = for_target(nested_bays_for(doc, target, withheld, through, anchored),
                                  target, fibre_map)
             if target == "nautobot":
                 written = seat_names(written, depth)

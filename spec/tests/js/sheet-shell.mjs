@@ -15,6 +15,10 @@ console.log(JSON.stringify({
   sheetWell: m.cavityShell({d: 42, sheet: true}, 44),
   sheetWellDeep: m.cavityShell({d: 60, sheet: true}, 44),
   boxWell: m.cavityShell({d: 42}, 44),
+  // a passage through a sheet body, and an open bay's mouth in one: air
+  sheetPassage: m.cavityShell({d: 249, sheet: true, seeThrough: true}, 250),
+  sheetMouth: m.cavityShell({d: 37, sheet: true, hollow: true}, 250),
+  boxPassage: m.cavityShell({d: 249, seeThrough: true}, 250),
   // a handle standing in a well starts at the well's floor
   standsOnFloor: m.standsFrom({lift: -42}),
   standsOnFace: m.standsFrom({}),

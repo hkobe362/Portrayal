@@ -247,7 +247,7 @@ types:
                note: "TIA-568's rule under the maximum rated pulling tension, applied by analogy"}
 
   # ── power ──────────────────────────────────────────────────────────────
-  # No Rack Builder media names power yet; `power` is the media these share.
+  # `power` is the media these share, and a Rack Builder media since kit 0.30.0.
   # Makers' figures for H05VV-F cord are not known to agree; this takes the
   # one sourced figure, and marks it unverified until a second maker confirms it.
   # A type is one connector pair on one cord (`conductor`), so a North American

@@ -43,6 +43,16 @@ def test_a_well_in_a_sheet_is_its_floor_and_nothing_round_it(out):
     assert out["boxWell"] == {"walls": True, "floor": True, "back": True, "depth": 42}
 
 
+def test_a_passage_through_a_sheet_body_builds_nothing(out):
+    """An open frame of sheet metal with slots seen through from behind. A
+    passage in a box keeps its walls; in a sheet it is the space between the
+    plates, and a floor there closed every empty slot with a painted plane."""
+    air = {"walls": False, "floor": False, "back": False, "depth": 0}
+    assert out["sheetPassage"] == air
+    assert out["sheetMouth"] == air
+    assert out["boxPassage"] == {"walls": True, "floor": False, "back": False, "depth": 248}
+
+
 def test_a_handle_in_a_well_stands_on_the_wells_floor(out):
     """`uhandle` was built from the face plane whatever it stood in, so a ring
     `in:` a 42 mm well hung 42 mm above the floor it was drawn on."""

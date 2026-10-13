@@ -7,6 +7,9 @@ on the part that presents the port. Which LEVEL ships it follows the product:
   - common/lc-duplex-adapter@6 (Smartoptics): a simplex cap in EACH bore;
   - common/lc-duplex-v-adapter@6 (FS FHD, stacked): ONE duplex cap across both
     ports, on the adapter's own slot;
+  - fibrain/lc-duplex-adapter@1 (Fibrain HD holders, side by side): ONE duplex
+    cap across both ports, on the adapter's own slot. Assumed: Fibrain's renders
+    draw the bores empty and no document says what a holder ships with;
   - common/sc-duplex-adapter@5 (FS FHD SC): a cap in each opening;
   - common/mpo-adapter@2 (FS's MTP panel tile, unplaced) and the FHD cassette
     rears' flanged bulkheads common/mpo-flange-adapter@2 and
@@ -66,6 +69,7 @@ MPO12 = "generic/mpo12-plug@1"
 SHIPS = {
     "common/lc-duplex-adapter@6": ("bores", LC_CAP),
     "common/lc-duplex-v-adapter@6": ("self", DUPLEX_CAP),
+    "fibrain/lc-duplex-adapter@1": ("self", DUPLEX_CAP),
     "common/sc-duplex-adapter@5": ("bores", SC_CAP),
     "common/mpo-adapter@2": ("self", MPO_CAP),
     "common/mpo-flange-adapter@2": ("self", MPO_CAP),
@@ -403,7 +407,7 @@ def test_every_device_that_reaches_an_adapter_ships_its_ports_capped(tmp_path):
     names = sorted(f.parent.name for f in devs)
     assert names == ["ch3000", "dcp-2", "dcp-m32-cso-zr", "dcp-r-34d-cs",
                      "dcp-r-9d-cs", "fhd-1ube", "fhd-1ufce", "fhd-1ufmt-n",
-                     "fhd-1ufmt-s", "fhd-1ume", "fhd-2ufce", "fhd-4ufce", "xcu"], names
+                     "fhd-1ufmt-s", "fhd-1ume", "fhd-2ufce", "fhd-4ufce", "xcu", "xpu"], names
     total, bad_caps, rear_total = defaultdict(int), [], 0
     for f in devs:
         out = tmp_path / f.parent.name
@@ -455,8 +459,17 @@ def test_every_device_that_reaches_an_adapter_ships_its_ports_capped(tmp_path):
 # of the vertical adapter turned on its side, each shipping its duplex cap, so
 # 425. Its holders are a module inside the drawer module and show no built
 # backs.
+# THE FIBRAIN HOLDERS AT @2 (2026-10-12) compose Fibrain's own adapter,
+# fibrain/lc-duplex-adapter@1, which ships the same duplex cap on its own
+# slot. So those 48 leave the vertical adapter's count, 377, and are this
+# adapter's. THE 1U FRAME fibrain/xpu adds its two example builds: `mixed`
+# seats a 12-port and a 6-port LC holder in each row, 2 x (12 + 6) = 36, and
+# `lc-duplex-192` eight 12-port ones, 96 - so 48 + 36 + 96 = 180. Its rear
+# shows each holder's back as a projection, which carries no ref and is not
+# counted here; the frame ships empty, so its other builds add nothing.
 EXPECTED_DEVICE_SLOTS = {"common/lc-duplex-adapter@6": 478,
-                         "common/lc-duplex-v-adapter@6": 425,
+                         "common/lc-duplex-v-adapter@6": 377,
+                         "fibrain/lc-duplex-adapter@1": 180,
                          "common/mpo-adapter@2": 60,
                          "common/sc-duplex-adapter@5": 48}
 # The backs, one cap per MPO port: fhd-1ufce `populated`'s four cassette

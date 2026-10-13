@@ -20,7 +20,7 @@ const QSFP_LC = 20.0 + R.PLUG_REACH.om4;
 const optics = ctx => ({...ctx, plugReachOf: e => (e.item === 'i2' ? null : QSFP_LC)});
 
 test('the defaults are the library\'s plug and boot, per media', () => {
-  assert.deepEqual(R.PLUG_REACH, {os2: 27.6, om3: 27.6, om4: 27.6, om5: 27.6, cat6: 39.4, cat6a: 39.4, dac: 64.8, aoc: 64.8});
+  assert.deepEqual(R.PLUG_REACH, {os2: 27.6, om3: 27.6, om4: 27.6, om5: 27.6, cat6: 39.4, cat6a: 39.4, dac: 64.8, aoc: 64.8, power: 77.0});
   // the reach of end a, read off routePath: its reach point's distance out
   // of the face, or 0 when it has none
   const r = F.rack(), base = F.ctxOf(r), c1 = r.cables[0];
@@ -91,7 +91,7 @@ test('the reach point is out of the face the port is seen from: +z at the front,
 // figure a routed length was before, for every media, at every length to 5 m.
 test('the table is the plug inside the port alone; the short tolerance and the end play are their own', () => {
   assert.deepEqual(R.END_ALLOWANCE_BY_MEDIA, {os2: 0.0131, om3: 0.0131, om4: 0.0131, om5: 0.0131,
-    cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524});
+    cat6: 0.0095, cat6a: 0.0095, dac: 0, aoc: 0.0524, power: 0.017, ground: 0});
   assert.deepEqual([R.END_PLAY_M, R.BREAK_TOL_M, R.UNPLACED_WARN_M], [0.1, 0.01, 0.3]);
   const r = F.rack(), ctx = F.ctxOf(r), c1 = r.cables[0];
   const per = media => {

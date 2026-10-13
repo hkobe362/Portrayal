@@ -238,10 +238,12 @@ test('inspect states the count as its maker does: the count, the basis and the k
 });
 
 test('the device schema takes the kinds of cable a rack file names, and no other', () => {
-  // a device states the kind in the words a cable's `media` uses, so the two lists are one
+  // a device states the kind in the words a cable's `media` uses, so the two lists are one.
+  // A capacity is a count of data cords: no maker states one in power cables or ground
+  // wires, and the device schema does not take those two words (#1045).
   const schema = JSON.parse(readFileSync(new URL('../../schemas/device.schema.json', import.meta.url), 'utf8'));
   const performance = schema.properties.attrs.properties.performance;
-  assert.deepEqual(performance.properties['cable-capacity-media'].enum, C.MEDIA);
+  assert.deepEqual(performance.properties['cable-capacity-media'].enum, C.MEDIA.filter(m => m !== 'power' && m !== 'ground'));
   assert.deepEqual(performance.dependentRequired['cable-capacity-media'], ['cable-capacity']);
   // and the kit has a diameter for each, which is what the count is compared by
   for (const m of C.MEDIA) assert.ok(R.DIAMETERS[m] > 0, m);

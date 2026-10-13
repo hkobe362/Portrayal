@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="435.0mm" height="250.0mm" viewBox="0 0 435.0 250.0">
+  <!-- Fibrain HD 1U frame from above with nothing over it, rear at y=0: the
+       floor sheet is the strip across the front, deeper at each end. Behind
+       it the frame is open below. -->
+  <path id="floor" fill="#1b1e21" d="M 0 198.0 H 7 L 34 219.5 H 401.0 L 428.0 198.0 H 435.0 V 250.0 H 0 Z"/>
+</svg>

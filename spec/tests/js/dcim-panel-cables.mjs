@@ -66,14 +66,15 @@ const resolverFor = (rack, ctx, target, held) => D.endResolver({rack, ctx,
 //     front and a rear port at once and is left out by its reason; every port
 //     of the other 56 resolves.
 //   - Nautobot: of the 60, 4 types carry no glass (two couplers and two
-//     add/drop filters: a split has no Nautobot spelling), and 24 name their
-//     ports by a bay chain, {module.parent}/{module}/x (20 Fibrain panels,
-//     which seat in a drawer, and the 4 DCMs), which the kit does not read
-//     (#1024). Those 28 are left out by a reason, which is checked. The
-//     other 32 resolve whole.
-// The sweep seats each module straight in a device bay. A Fibrain panel is
-// never seated so in a rack (it sits in the XCU10 drawer), so its NetBox rows
-// here show the names agree, not that a rack reaches them.
+//     add/drop filters: a split has no Nautobot spelling), and the 4 DCMs
+//     name their ports by a bay chain, {module.parent}/{module}/x, which the
+//     kit does not read (#1024). Those 8 are left out by a reason, which is
+//     checked. The others resolve whole. The 20 Fibrain holders were among
+//     the bay-chain ones until #1040: they name their ports {module}/x now,
+//     the XCU10 drawer's slots carrying `drawer/` in their own position.
+// The sweep seats each module straight in a device bay, which is how a
+// Fibrain holder sits in the 1U frame fibrain/xpu; in the XCU10 it sits in
+// the drawer, a bay deeper, which this sweep does not seat.
 const FIBRE = COMPONENTS.filter(c => c.kind === 'module' && c.optical?.ports && !c['superseded-by']);
 
 test('the build publishes the ports of a part where it publishes the fibre graph of a projected module', () => {

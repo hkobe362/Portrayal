@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0.8mm" height="221.0mm" viewBox="0 0 0.8 221.0">
+  <!-- one side of the frame from above, rear at y=0: the arm, then the wall. -->
+  <rect id="arm" x="0" y="0" width="0.8" height="105.4" fill="#1b1e21"/>
+  <rect id="wall" x="0" y="105.4" width="0.8" height="115.6" fill="#1b1e21"/>
+</svg>

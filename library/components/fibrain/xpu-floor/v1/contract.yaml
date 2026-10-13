@@ -1,0 +1,36 @@
+format: 1
+kind: component
+name: xpu-floor
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  The inside of the Fibrain HD 1U frame XPU00 / XPS00, seen from above. It is
+  the space between the two sides: open above behind the top sheet, open below
+  behind the floor, open at the rear. It is drawn as the well its floor sheet
+  lies at the bottom of. The floor is the strip across the front under the
+  slot parts.
+size: {w: 435.0, h: 250.0, d: 43.15}
+size-confidence: {w: drawing, h: datasheet, d: drawing}
+relief: {wall: '#1b1e21'}
+elements:
+  floor: {at: [0.0, 198.0], size: [435.0, 52.0], class: bezel}
+provenance:
+  size: >-
+    drawing across, datasheet deep - the 435.00 between the ears off the front
+    elevation (the CAD libraries archive Fibrain publishes (hd.fibrain.com/dxf/cad-libraries.zip, files dated 2020-07-30), `XPS00.dxf`: AutoCAD 2007, units millimetres, one 1:1 front elevation),
+    and the 250 depth of both datasheets.
+  size-outline: >-
+    estimated - the front and plan line drawing on page 2 of DSH-XPU00 rev 2 (15.05.2020) and DSH-XPS00 rev 1 (24.05.2020), one image in both, 782 px across at 1.376 px/mm.
+    The floor sheet reaches 30.5 back from the face across the middle and 52
+    at each end, with a slope about 27 long between the two depths starting 7
+    in from each side. Read to a pixel, 0.7 mm, on a drawing that coarse.
+  depth: >-
+    drawing - the front elevation has the floor sheet 0.80 thick at 43.15 to
+    43.95 of a 43.955 envelope, so its top is 43.15 down, and that is the
+    depth stated. A 3D view builds a well no nearer the far side than 2 mm, so
+    it shows the floor 1.2 high; what a cable cannot pass through is derived
+    from the stated depth.
+  color: >-
+    photo - black, as the frame is on every vendor render.
+skins: [default]

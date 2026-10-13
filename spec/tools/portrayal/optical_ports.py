@@ -16,6 +16,7 @@ FAMILY = {
     "common/lc-duplex-adapter": "lc",
     "common/lc-duplex-v-adapter": "lc",
     "common/lc-duplex-shuttered-adapter": "lc",
+    "fibrain/lc-duplex-adapter": "lc",
     "common/sc-duplex-adapter": "sc",
     "common/sc-simplex-adapter": "sc",
     "common/mpo-adapter": "mpo",
