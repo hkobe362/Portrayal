@@ -67,6 +67,17 @@ file whole**, with its sentence, and does not open it in part.
   the spare cable. A draw.io edge label states the spare after the length.
   `describe` gains a `Spare:` line.
 
+**Added since, with no new version** (a reader keeps a cable key it does not
+know, so none was needed):
+
+- **`color` on a cable** (#1028, kit 0.31.0): the cable's own colour, `#`
+  and six lower-case hex digits. Absent, the cable is drawn in the jacket
+  colour its two ends agree on, else its named type's, else its media's. A
+  value the reader cannot use as a colour moves to `colorAsWritten`. A kit
+  before 0.31.0 keeps the key and draws the cable by its media. The schema
+  under `/schemas/v3/` describes both keys; `color` is the first key of that
+  schema with a `pattern`.
+
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
 and [DESIGN §9](../spec/DESIGN.md) covers it: art is a patch, an addition is a
@@ -607,6 +618,14 @@ Each type, keyed by its `id`, always carries:
   `note` and `unverified: true`, which marks a placeholder. `loaded` is `null`
   where no source gives one; `installed` is always present.
 
+A type may also carry `jacket` (#1028, table version 1.1.0): `{color, basis,
+sources, note}`, the colour of its sheath as `#` and six lower-case hex
+digits. `basis` is `standard`, `convention` or `photo` (counted on the
+maker's photograph; the `note` says what was counted). **A bare media type
+never carries one**, and the build refuses a table where one does: the
+colour a media is drawn in is the kit's `COLORS`. `aoc-siemon-q1q28f` is the
+first type with a jacket, and the first that names one maker's product.
+
 A type may also carry `fiber` (`mode`, `grade`, `core_um`, and for a named
 class `class` and its own `min_bend`), `shield` or `awg`. A `power` type
 always carries `conductor`, the cord it is made of (`H05VV-F 3G1.0`), so the
@@ -617,7 +636,8 @@ for a consumer that knows the cord allows the tighter figure.
 
 The kit's `rack/cable-types.js` reads it: `radiusMm(type)` turns a radius into
 millimetres, `bendLookup(types)` gives a cable's installed radius from its
-`type` when the table has that type, else from its `media`, and `loadCableTypes(dist)` fetches the file and
+`type` when the table has that type, else from its `media`, `jacketLookup(types)` gives the jacket colour of the type a
+cable names in its own `type` (never its media's), and `loadCableTypes(dist)` fetches the file and
 refuses any `format` but 1.
 
 ## The lint rules file

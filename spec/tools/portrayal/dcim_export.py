@@ -1829,9 +1829,13 @@ def worth_a_file(doc, dev):
     would publish an empty device type. RACK FURNITURE IS THE EXCEPTION, and by
     nature rather than by failure: a `passive` part (profiles.yaml) has nothing
     to plug in, and its header - what it is, what it weighs, that it takes no
-    rack unit - is everything a rack plan asks of it.
+    rack unit - is everything a rack plan asks of it. A BASIC PDU IS WORTH ONE
+    TOO: it has no network port and no bay, and its power outlets are what a
+    DCIM cables to. Outlets and not power ports, because a box whose only
+    resolved row is its own inlet is still the failure described above.
     """
-    if any(k in doc for k in ("console-ports", "interfaces", "module-bays")):
+    if any(k in doc for k in ("console-ports", "interfaces", "module-bays",
+                              "power-outlets")):
         return True
     return (dev or {}).get("profile") == "passive"
 

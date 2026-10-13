@@ -525,6 +525,14 @@
     "lengthAsWritten": {
      "description": "A length the loader could not use, kept whole as it was written."
     },
+    "color": {
+     "type": "string",
+     "pattern": "^#[0-9a-f]{6}$",
+     "description": "The cable's own color: # and six lower-case hex digits. Absent, the jacket color of its two ends (when both state one and they agree), else its type's, else its media's is drawn."
+    },
+    "colorAsWritten": {
+     "description": "A color the loader could not use, kept whole as it was written. The cable then has no color of its own."
+    },
     "route": {
      "type": "array",
      "description": "The waypoints the cable runs through, in order. Empty means the Rack Builder chooses the way.",

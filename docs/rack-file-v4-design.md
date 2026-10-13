@@ -59,6 +59,7 @@ same way.
 | `lay` | cable | section 3.9 | `face` is acted on; `position` is kept, and read when lay order is built |
 | `straps` (`every`, `breakout`, `anchors`) | bundle | section 3.10 | read, placed, counted |
 | `straps` (`anchors`) | cable | section 3.10 | read, placed, counted |
+| `color` | cable | section 14, added in kit 0.31.0 with no new version | read, checked, drawn, exported |
 | `setback` | frame, item | section 7 | read, fitted, used by routes |
 | `startU`, `holes.style: round` | frame | section 7 | read, labelled, drawn, exported |
 | `channel` | zero-U entry | section 7 | read; overlap judged per channel |
@@ -1851,3 +1852,178 @@ numbers are kept: a later reading takes the next one.
   the import script, since none exists; and a real PDU bracket or shelf
   host, since the catalogue has none: the bracket was a hand-made 0U type
   and the sizes nominal.
+
+## 14. A cable's own colour (#1028), added after version 4 shipped
+
+Built in kit 0.31.0, with no new rack file version: section 1.2 has a reader
+keep a cable key it does not know, so a kit before 0.31.0 opens a file that
+carries the key, keeps it, writes it back, and draws the cable by its media.
+
+### 14.1 What was there
+
+A drawn cable's colour was its media's and nothing else
+(`kit/rack/cable-geometry.js`, `COLORS` and `colorOf`). `cablePlan` handed a
+drawing the media and the purpose. A seated cable end's `jacket-color` field
+coloured its drawn stub and not the cable. The rack file had no colour for a
+cable, and the cable types table had none for a type. So an AOC was dark
+grey whatever was said of it, and on a dark stage nearly invisible.
+
+### 14.2 The order
+
+A cable is drawn in the first of these that says something:
+
+1. **its own colour**, `color` on the cable in the rack file;
+2. **its ends'**: the jacket colour its two seated ends state, when both
+   state one and the two agree;
+3. **its type's**: the `jacket` of the cable type it names in `type`;
+4. **its media's**, from `COLORS`, as before.
+
+Every view and export asks the kit: `cableColor(link)` gives `{color, from}`
+and `colorOf(link)` the colour, for a link of `cablePlan` or `cablePlan3d`,
+which carry what decides it (`color`, `jackets`, `typeColor`).
+
+![Four AOC cables on one rack: one with its own colour, one whose two ends agree, one whose ends differ, one with nothing stated](img/cable-colour-order.svg)
+
+The figure is a sketch drawn from the kit's own answers for one rack
+(`cablePlan` with the readers, then `colorOf` of each link), not a page's
+drawing. The last two cables are the media's dark grey, as every AOC was.
+
+### 14.3 What was decided in the build
+
+Each is built, and each waits for a person to confirm it, as section 13's do.
+
+1. **A colour is hex.** `#` and three or six hex digits, either case, stored
+   as `#rrggbb` in lower case. That is how `jacket-color` is written on
+   every cable end of the library (four values, all hex) and what
+   `fields.js strokeShade` reads. A colour name is not taken: `red` would
+   need a table of names nobody has agreed, and a draw.io file, NetBox and
+   Nautobot each take hex only. A value that is no colour is refused by the
+   commands with a sentence ("A cable color is # and three or six hex
+   digits, such as #2bb3c8, or empty for none of its own."), moved to
+   `colorAsWritten` by the reader, and never drawn: nothing here turns an
+   unreadable colour into black.
+2. **A default is not a statement.** The generic cable ends declare
+   `jacket-color` with a default, `#1c1c1c` on most. If a default counted,
+   every cable between two generic ends would turn black, which is the
+   opposite of what was asked. So an end states a jacket colour only when
+   the rack sets the field for the part seated in that port (`fields` of
+   the item; the default's own colour, set on purpose, counts) or when the
+   part's own contract gives its jacket one (a maker's part that composes
+   the generic end: `siemon/qsfp28-aoc@1` states its aqua so). That is the
+   library's own usage: a maker's part sets `jacket-color` on the generic
+   end it composes only where its document states the colour ("it is set
+   here because this document states it"), and leaves it out where the
+   document is silent ("NOT STATED ... the generic's default stands"). A
+   field value that is no hex colour states nothing, and does not fall back
+   to the part's own: the rack said something else of that end.
+3. **Both ends, or neither.** One stated end and one bare end is no
+   agreement, and nor are two ends that differ. The type then decides,
+   else the media. No colour is mixed or averaged.
+4. **The kit reads the ends from the parts lists** (`ports.js seatedJacket`,
+   over what `loadSlots` returns), so an agent with no drawing gets the same
+   answer as a page. A page that reads an end off its drawing passes a
+   `jacket` key on that end's entry of its cable facts, and where the key is
+   there it stands. A plug a page seats for a cable is in no rack file, so
+   only the page can speak for it.
+5. **A type's colour is read for a named type only.** A cable is drawn in a
+   type's `jacket` when its own `type` names that type. The bare type of
+   its media is never asked, and the cable types build refuses a `jacket`
+   on a bare media type, so that `COLORS` stays the one table of defaults.
+6. **A bundle's band.** Where a view draws one thing for a whole bundle, it
+   is the members' colour when they are all one, and no colour at all when
+   they differ (`bundleColor`: `color: null`, `mixed: true`). Any one
+   member's colour would say the others are that colour too. In the 2D
+   elevation and the 3D pack each member is drawn on its own and keeps its
+   own colour either way.
+7. **draw.io** draws a cable in its colour when rule 1, 2 or 3 gives one. A
+   cable coloured by its media alone is filed under its media as before,
+   and takes the entry of the draw.io writer's own palette.
+8. **NetBox and Nautobot** get the cable's own colour and nothing else, in
+   the `color` column both files already had and left blank: six lower-case
+   hex digits with no `#`. Both store a cable's colour so (NetBox v4.7.2
+   251458b8, `netbox/dcim/models/cables.py` `Cable.color`, a `ColorField`
+   whose `ColorValidator` in `netbox/utilities/validators.py` is
+   `^[0-9a-f]{6}$`, and `color` in the fields of `CableImportForm`,
+   `netbox/dcim/forms/bulk_import.py`; Nautobot v3.2.6 3dc554b4,
+   `nautobot/dcim/models/cables.py` `Cable.color`, the same field and
+   validator in `nautobot/core/models/fields.py`). A colour worked out from
+   the ends, the type or the media is how the kit draws the cable, not a
+   fact someone recorded of it, so it is not written. **Not tried on a
+   running instance.**
+9. **The cable schedule and the BOM gain no column.** `describe` and
+   `inspect` show a cable's own colour when it states one.
+10. **A colour is no part of a lay.** Nothing in `route.js` reads it, so a
+    colour set or cleared lays no cable again, and `ctx.checkKept` has
+    nothing to find.
+
+### 14.4 One-way items
+
+| item | where | what moves |
+|---|---|---|
+| `color` and `colorAsWritten` on a cable | rack file | saved files carry them; a `color` that is no colour, which a kit before 0.31.0 kept as an unknown key, now moves to `colorAsWritten` |
+| the two keys in `rack.schema.json`, `color` with a `pattern` | published schema, `/schemas/v3/` | the first `pattern` in that schema; a validator that does not know the keyword passes any text |
+| `color` on `cable.add` and `cable.update` | kit commands | agent sessions call them by name |
+| `color`, `jackets`, `typeColor` on a link of `cablePlan` and `cablePlan3d`, each only when it says something; their second argument | kit output | a reader that compares a link key for key sees them on a cable that states a colour |
+| `colorOf` reads those keys before the media | kit API | a caller that put a `color` on a link for its own use is now drawn in it |
+| `color` on a row of `drawioCables`, and the draw.io writer drawing it | draw.io export | only a cable whose colour is said |
+| the `color` cell of both DCIM cables files | DCIM export | only a cable with its own colour; blank before |
+| `color` in `inspect` of a cable, and after the media in `describe` | kit output | only a cable with its own colour |
+| `validate` knows `pattern` | kit API | a command argument or schema with a `pattern` is now held to it; none had one |
+| `jacket` on a cable type, table version 1.1.0, and the type `aoc-siemon-q1q28f` | `cable-types.json` | additive; no rack names the type |
+| `typeColorOf` in what `loadCableTypes` returns | kit output | additive |
+
+**What does not move:** the colour of every media, so every drawing, sheet
+and 3D file of a rack that states no colour; the four values of `JACKETS`;
+every recorded answer of `spec/tests/js/speed-goldens.json`; the columns of
+every export.
+
+**What does move, by design:** a rack that already seats two cable ends
+that state the same jacket colour is drawn in that colour once a page passes
+the readers. That is rule 2 doing what it was asked to. Four parts of the
+library state one today, and no device or lab sets the field:
+
+| both ends | states | on | the cable goes from | to |
+|---|---|---|---|---|
+| `siemon/qsfp28-aoc@1` | `#49eaf8` | counted on the sheet's photograph | `#3a3f45` (aoc) | `#49eaf8` |
+| `volex/qsfp-dd-passive-dac@1` | `#1c1c1c` | the datasheet's "Cable Colour Black" | `#15171a` (dac) | `#1c1c1c` |
+| `amphenol/qsfp56-linear-active@1` | `#1c1c1c` | the drawing's "PVC BLACK" | `#15171a` (dac) | `#1c1c1c` |
+| `credo/hiwire-shift-qsfp-dd@1` | `#6b3fa0` | the brief's word "purple"; **the shade is an estimate, not a reading** | its media's | `#6b3fa0` |
+
+The two blacks differ from the DAC default by seven steps a channel and
+read the same. The purple is the one colour here that nothing counted: its
+contract says so, and a cable between two such ends takes it.
+
+### 14.5 Open: three tables name a colour for an AOC, and they disagree
+
+Not settled here. No colour was changed to settle it.
+
+- `COLORS.aoc` in `kit/rack/cable-geometry.js` is `#3a3f45`, dark grey. It
+  decides what the Rack Builder draws: the elevation, the sheet and 3D.
+- `JACKETS` in the same file has no entry for an AOC. Its comment said
+  multimode fibre and AOCs are aqua, and the front-page hero draws an AOC
+  with the `mm` jacket, `#2bb3c8`. `JACKETS` now names entries of `COLORS`
+  and holds no colour of its own, so the two tables cannot drift; what the
+  hero passes for an AOC is the hero's choice, and is as it was.
+- `CABLE_COLOURS.aoc` in `kit/drawio.js` is `#2F80C0`, blue. That table is
+  the draw.io writer's own palette for a white page, and differs from
+  `COLORS` for every media, not only this one.
+
+The one source the library holds is Siemon's 100G QSFP28 AOC, aqua on its
+maker's photograph (`#49eaf8`, counted). It is now the `jacket` of the named
+type `aoc-siemon-q1q28f` and was already the stated jacket of
+`siemon/qsfp28-aoc@1`, so a cable between two of those ends is aqua by rule
+2. No source is held for a 400G QSFP-DD AOC.
+
+**The question:** should `COLORS.aoc` become aqua? One maker's 100G cable is
+not every AOC, and a changed default recolours every drawing, sheet and 3D
+file with an AOC in it. If it should, the change is one line in `COLORS`,
+with a test that says so (`rack-cable-colour.mjs` holds every default to
+what it was). Whether the draw.io palette should follow `COLORS` is the
+same kind of question for every media.
+
+### 14.6 Not built
+
+- A command that sets a cable's `type` (#897). A type's colour reaches a
+  cable whose file names the type; nothing in the kit writes that key yet.
+- A colour for a bundle, a strap, or a plug.
+- A jacket colour for any type but the one with a source.
