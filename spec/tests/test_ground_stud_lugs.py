@@ -94,8 +94,8 @@ OLD_NUT_TR = "25.35,6.15 23.4,9.53 19.5,9.53 17.55,6.15 19.5,2.77 23.4,2.77"
 OLD_SHIFT = {"stud-tr": (0.0, 0.0), "stud-bl": (-15.3, 15.3), "stud-br": (0.0, 15.3)}
 
 # The census, counted off the library by walking every device view and every
-# component's `parts:`: part -> (placements, devices). 49 placements on 31
-# devices. On main (796eb08) the same walk read 145 on 61; the grounding batch
+# component's `parts:`: part -> (placements, devices). 50 placements on 32
+# devices (49 on 31 before the Eaton PDU12IEC, below). On main (796eb08) the same walk read 145 on 61; the grounding batch
 # (#828, #830) moved 86 single studs into pair hosts, which compose a sized
 # screw or the MX stud twice and which test_two_hole_lugs.py and
 # test_grounding_devices.py count:
@@ -112,10 +112,14 @@ OLD_SHIFT = {"stud-tr": (0.0, 0.0), "stud-bl": (-15.3, 15.3), "stud-br": (0.0, 1
 # holes (Edgecore DCS500 twice, EPS112, EPS203, AGR560) both screws are the
 # symbol-less common/ground-screw@1, ten placements on four devices, with the
 # printed earth mark drawn as silkscreen.
+# The Eaton PDU12IEC (#1044) then placed common/ground-stud@1 once on its rear
+# face, 3 -> 4 on 3 -> 4 devices: the grounding stud its spec sheet calls the
+# rear-panel grounding lug, one threaded stud under a hex nut and no pair, so
+# a single stud is the part and a ring lug lands on it.
 CENSUS = {
     "common/ground-lug@1": (35, 23),
     "common/ground-screw@1": (10, 4),
-    "common/ground-stud@1": (3, 3),
+    "common/ground-stud@1": (4, 4),
     CASA: (1, 1),
 }
 # juniper/mx-ground-stud@1 IS PLACED BY NO DEVICE SINCE #828: the five MX
@@ -394,8 +398,8 @@ def test_the_census_of_ground_stud_placements(placed):
     got = {ref: (n, len(devs)) for ref, (n, devs) in counts.items()}
     assert got == CENSUS
     assert all(n > 0 and d > 0 for n, d in got.values())
-    assert sum(n for n, _ in got.values()) == 49
-    assert len({where for where, _, _ in placed}) == 31
+    assert sum(n for n, _ in got.values()) == 50
+    assert len({where for where, _, _ in placed}) == 32
     # the MX stud is still a part, composed twice by each MX pair host, and no
     # device places it straight on a face any more
     assert "juniper/mx-ground-stud@1" not in got
@@ -437,7 +441,7 @@ def test_every_single_stud_placement_is_a_slot_of_its_device_offering_the_lug(pl
         assert c["mate"] == pytest.approx(want, abs=EPS)
         seen += 1
     # every placement of the census but the Casa terminal's one
-    assert seen == 48
+    assert seen == 49
 
 
 def test_the_only_turned_placements_are_turned_90(placed):

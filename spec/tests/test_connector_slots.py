@@ -72,9 +72,14 @@ def test_the_connector_registry_is_not_vacuous():
     # pdu-button: NOT A CONNECTOR - the rack PDU mounting interface (#934). A keyhole
     # in a bracket or a channel presents it and eaton/g4-mounting-button@1 mates it;
     # nothing presents it yet, so it is in the registry and in no slot below
+    # nema-5-15r/nema-5-20r/eaton-c39: the NEMA straight-blade receptacles and the
+    # Eaton combination outlet, made slots for a cord end (#1045). std/nema-5-20r@1
+    # and eaton/c39-outlet@1 present two of them. No part presents nema-5-15r yet:
+    # it is registered because a 5-15P names it in `mates`, and it is in no slot below
     assert set(reg) == {"lc", "lc-duplex", "sc", "mpo", "mpo16", "rj45",
                          "f-type", "sma", "smb", "mcx", "bnc", "din-1-0-2-3",
                          "iec-c13", "iec-c14", "iec-c20", "iec-c19", "saf-d-grid",
+                         "nema-5-15r", "nema-5-20r", "eaton-c39",
                          "usb-a", "micro-usb-b", "usb-c",
                          "db9", "hd15", "da15", "db25",
                          "terminal-508-2", "terminal-508-5", "terminal-508-6",

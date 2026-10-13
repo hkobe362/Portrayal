@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: evmi2130x
-version: 0.2.1
+version: 0.3.0
 maturity: modelled
 manufacturer: Eaton
 model: EVMI2130X

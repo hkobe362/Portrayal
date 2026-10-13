@@ -263,6 +263,24 @@ def presented_point(contract):
     return cps.get(contract.get("interface-at") or "mate")
 
 
+def mates_of(contract):
+    """The interfaces a contract `mates`, as a list in the order it states
+    them; `[]` when it states none.
+
+    `mates` IS ONE INTERFACE OR A LIST OF THEM (#1045). One plug can seat in
+    more than one receptacle: a NEMA 5-15P goes into a 5-15R and into the T
+    slot of a 5-20R, and a C14 plug into a C13 outlet and an Eaton C39. Each
+    of those receptacles is its own interface, because what each ACCEPTS
+    differs, so the plug names every one it seats in. THE ONE READING of the
+    key: every reader of `mates` asks this, and none tests the value's type
+    itself. A single string is the one-item list, so a contract that states
+    one interface reads as it always did."""
+    m = (contract or {}).get("mates")
+    if not m:
+        return []
+    return [m] if isinstance(m, str) else [x for x in m if x]
+
+
 def presented_interface(contract, resolve):
     """What a receptacle presents to a module, and where the module mates into it.
 

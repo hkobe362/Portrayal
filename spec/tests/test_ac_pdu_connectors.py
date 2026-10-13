@@ -81,7 +81,8 @@ def test_a_flat_receptacle_face_has_no_pit():
 
 def test_the_c20_plug_stands_its_length_less_the_well_in_front_of_the_outlet():
     plug = contract("generic/c20-plug")
-    assert plug["mates"] == contract("std/c19-outlet")["interface"] == "iec-c19"
+    # `mates` is a list since #1045: the C19 outlet first, then the Eaton C39
+    assert plug["mates"][0] == contract("std/c19-outlet")["interface"] == "iec-c19"
     feats = {f["node"]: f for f in plug["relief"]["features"]}
     boot = feats["relief-boot"]
     overall = std()["c20-plug"]["depth"]
@@ -95,7 +96,7 @@ def test_the_c14_plug_stands_its_length_less_the_c13_well():
     plug follows if that part's depth moves."""
     plug = contract("generic/c14-plug")
     outlet = contract("std/c13-outlet")
-    assert plug["mates"] == outlet["interface"] == "iec-c13"
+    assert plug["mates"][0] == outlet["interface"] == "iec-c13"
     assert outlet["size"]["d"] == 18
     feats = {f["node"]: f for f in contract("generic/c14-plug")["relief"]["features"]}
     boot = feats["relief-boot"]

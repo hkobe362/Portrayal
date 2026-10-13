@@ -162,6 +162,97 @@ check it against.
 7. 3D: every solid is right side out and the chain has no gap.
 8. The stub's diameter is `cable-od`, by default and from a placement.
 
+## 9. The outlet side: NEMA receptacles and the Eaton C39
+
+Issue #1045. Sections 1 to 8 made an inlet a slot. A rack PDU's C13 and C19 outlets became
+slots with #933. Two outlet parts were still no slot, so a cord could not be addressed to
+them: `std/nema-5-20r@1` and `eaton/c39-outlet@1`.
+
+### 9.1 Three interfaces
+
+| interface | presented by | mated by |
+|---|---|---|
+| `nema-5-15r` | no part yet | `generic/nema-5-15p-cord@1` |
+| `nema-5-20r` | `std/nema-5-20r@1` | `generic/nema-5-15p-cord@1`, `generic/nema-5-20p-cord@1` |
+| `eaton-c39` | `eaton/c39-outlet@1` | `generic/c14-plug@1`, `generic/c20-plug@1` |
+
+- **The key names the receptacle**, as `iec-c13` names the outlet and not the plug that
+  enters it. `nema-5-15r` and `nema-5-20r` are the NEMA WD 6 designations in lower case:
+  the spelling the `nema-5-20r` entry of `standards.yaml` and the outlet type of both DCIM
+  targets already have. `eaton-c39` is the outlet type both targets carry.
+- **A 5-15R and a 5-20R are two interfaces.** What each accepts differs: a 5-20P does not
+  enter a 5-15R. One interface for both would offer a 20 A plug to a 15 A receptacle.
+- **`nema-5-15r` is registered with nothing presenting it.** A 5-15P must name it to be a
+  true statement of where the plug goes, and the first 5-15R part then needs no change to
+  the plug. It cites no standard: no drawing of a 5-15R is held.
+- **The C39 takes a C14 or a C20 plug.** The Eaton Rack PDU G4 installation and setup
+  guide, P-164001156 rev 3, section 1.5, says the outlet is a combination of the C13 and
+  C19 styles designed to accept both.
+
+### 9.2 `mates` is one interface or a list
+
+A 5-15P seats in two receptacles, and so does each of the C14 and C20 plugs. `mates` on a
+component is therefore one interface, as before, or a list of them. A part is offered by a
+slot that presents any interface it lists. A contract that states one interface is read
+and published exactly as it was.
+
+Rejected: an `also-accepts` on a connector interface, as pluggable families have. That
+would say a 5-20R accepts whatever mates a 5-15R, which is true today and is a statement
+about receptacles that the plug contract can make more plainly about itself. It would
+also not serve the C39, which takes two plugs that share no other receptacle.
+
+One reading serves every tool: `manifest.mates_of(contract)` gives the list. Its readers
+are `render.py` (the candidate walk behind every accept list, its on-disk cache, a seated
+part's own slot and `mount-points`), `lint.py` (L12, L102, L116 and the family lookup),
+`components_catalogue.py` (the `fits` column) and, in the kit, `rack/zero-u.js` (a mount
+point's `mates`). `components_index.py` publishes the key as the contract states it, so
+`mates` in `components.json` is a string or a list of strings.
+
+### 9.3 Two cord ends
+
+`generic/nema-5-15p-cord@1` and `generic/nema-5-20p-cord@1`, by the rules of section 2:
+`class: port`, `mates`, drawn from the cable end, a 30 mm stub sized by `cable-od`, no
+`size.d`. Each states `attrs.rating-a`, 15 and 20, so a reader that orders the plugs of a
+5-20R by rating puts the 5-15P first.
+
+- **Not `generic/nema-5-20p-plug@1`.** That part is `class: inlet`: the plug at the end of
+  a PDU input cord, drawn face on with its contacts, and it exports as the power port of
+  the device. It mates nothing and is unchanged. The name `-plug` is its own, so the cord
+  ends are `-cord`: a rename of a placed part costs a major on every device that seats it.
+- **Sources.** Volex Power Products catalogue, Aug-2025: PS204 (5-15P, drawing on p.147)
+  and PS520 (5-20P, p.159), both moulded straight plugs. PS204 is dimensioned throughout.
+  PS520 dimensions its two face figures, its blades and its length; its shoulders, lobe
+  and taper are scaled at 2.6 px/mm.
+- **A plain body.** A moulded cord cap differs by maker. Each part draws one maker's
+  outline with no grip pattern and no mark, and says so.
+- **Seated depth.** A flat receptacle face has no well. The face of the plug sits on the
+  face of the receptacle, and the plug stands its whole length in front of it.
+- **The blades are not drawn.** They are in the receptacle, as a C13's contacts are.
+
+### 9.4 The outlets
+
+`std/nema-5-20r@1` and `eaton/c39-outlet@1` gain `interface` and a `mate` point, and
+nothing drawn moves. The 5-20R's `mate` is on its earth axis at the line of the blades,
+which is 2.6 left of the middle of its face. The C39's is one point for two plugs, 0.04
+from the middle of its nose (its contract says why).
+
+All four AC outlet parts now state `media: ac` beside `outlet`. `outlet` is the DCIM type
+and says which way power runs. It did not say AC, so a reader could not tell a C13 outlet
+from a DC terminal.
+
+What it costs: a minor on each part and on the four Eaton PDUs that place them. Each
+outlet of the PDUMH20NET, EVMI2130X and EVMA8365X that was no slot is one now, in the
+`cages` of its `configs.json`. No DCIM export changes beyond its version line: an outlet
+exports because `PART_OUTLET` lists its part, and a slot adds no row.
+
+### 9.5 Not done here
+
+- DC: the output terminals and input studs of the breaker panels, and the DC terminals
+  that supplies draw as art.
+- Cord types with two named ends, and the cable types for them.
+- The printed name of an outlet beside its path, for a cables export.
+- A 5-15R part.
+
 ## Decisions taken
 
 - 2026-10-05: the three inlet interfaces are connector slots; the inlets are unchanged.
@@ -170,3 +261,5 @@ check it against.
 - 2026-10-05: each plug seats with its nose on the inlet's modelled cavity floor, and
   records that the nose is longer than that cavity.
 - 2026-10-05: a cord end's `media` is its connector, not `ac`.
+- 2026-10-12: `nema-5-15r`, `nema-5-20r` and `eaton-c39` are connector slots; `mates` is
+  one interface or a list; the NEMA cord ends are `-cord` parts beside the face-on plug.

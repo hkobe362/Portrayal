@@ -193,6 +193,15 @@ def test_a_header_alone_is_not_worth_a_file_unless_the_part_is_passive():
     assert dx.worth_a_file({**header, "interfaces": [{}]}, {"profile": "networking"})
 
 
+def test_a_basic_pdu_is_worth_a_file_for_its_outlets():
+    """A PDU with no network card has no interface, console or bay, and its
+    outlets are the whole of what a DCIM cables to. A power port alone is not
+    enough: that is a box whose export resolved nothing but its inlet."""
+    header = {"manufacturer": "T", "model": "T", "u_height": 1.0}
+    assert dx.worth_a_file({**header, "power-outlets": [{}]}, {"profile": "power"})
+    assert not dx.worth_a_file({**header, "power-ports": [{}]}, {"profile": "power"})
+
+
 def test_a_rack_device_that_leaves_the_far_face_free_says_so():
     """#854: is_full_depth is stated, not guessed from depth - an 87 mm cable
     manager says `full-depth: false`, and a short box that says nothing keeps

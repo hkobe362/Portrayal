@@ -23,7 +23,7 @@ from portrayal import libwalk
 # libyaml, through the shared loader, now that every build runs this: the
 # pure-Python parser made it the slowest walk in the build's index pass
 # (about 16 s against about 3 s, every contract and manifest read once).
-from portrayal.manifest import load_yaml
+from portrayal.manifest import load_yaml, mates_of
 
 REF = re.compile(r"\b([a-z0-9-]+)/([a-z0-9-]+)@(\d+)\b")
 
@@ -148,8 +148,10 @@ def composer_counts(roots):
 
 def fits(doc):
     """The page's `conforms / interface` column: what a contract conforms to,
-    else the interface it presents, else what it mates."""
-    return doc.get("conforms") or doc.get("interface") or doc.get("mates") or ""
+    else the interface it presents, else what it mates. `mates` is one
+    interface or a list (manifest.mates_of); a list reads as its interfaces
+    joined by a comma, and one interface as itself."""
+    return doc.get("conforms") or doc.get("interface") or ", ".join(mates_of(doc))
 
 
 def build(library):

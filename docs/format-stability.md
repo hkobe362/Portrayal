@@ -259,7 +259,9 @@ reader that does not know it finds every field it read before.
   `at`, which is millimetres from the bottom of its view to the point's
   `mate`. A mount point is a placement of a `class: mount` part that declares
   `mates`. The pitch is the difference of two `at`s and is stated nowhere
-  else. Always a list; `[]` on a device with none.
+  else. Always a list; `[]` on a device with none. `mates` is published as
+  the part states it: one interface, or a list of interfaces for a part that
+  mates more than one (#1045). No mount part states a list today.
 - **`configs[].slots`** in `<device>.configs.json`
   ([`rack-file-v4-design.md`](rack-file-v4-design.md) section 5): the other
   side of a mount point. Each slot a configuration offers a hanging part,

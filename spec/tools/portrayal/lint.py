@@ -1852,10 +1852,17 @@ def _family_mated_by(interface):
     same field L11 and L12 already hold a receptacle and its occupant to - so
     this looks the value up as an interface rather than assuming it equals a
     family's own key, which is only true of this registry by coincidence.
+
+    `mates` IS ONE INTERFACE OR A LIST (manifest.mates_of, #1045), and this
+    takes either: for a list, the first of its interfaces a family presents.
+    No part mates two pluggable families, so the order chooses nothing today:
+    every list in the library names connector interfaces, which have no family.
     """
-    for name, fam in PLUGGABLE_FAMILIES.items():
-        if fam.get("interface") == interface:
-            return name, fam
+    wanted = [interface] if isinstance(interface, str) else list(interface or [])
+    for want in wanted:
+        for name, fam in PLUGGABLE_FAMILIES.items():
+            if fam.get("interface") == want:
+                return name, fam
     return None
 
 
@@ -5110,15 +5117,18 @@ def _mate_check(path, where, occ_ref, host_ref, lib_roots):
     # only the wrapper's own key is why 7,058 ports in this library could not be
     # populated while the mechanism to populate them worked.
     want, _, _ = presented_interface(hc, _res)
-    have = oc.get("mates")
+    # `mates` is one interface or a list (manifest.mates_of): the occupant
+    # fits when the host presents ANY of them. `stated` is the value as the
+    # contract wrote it, so a single interface reads in the message as before.
+    have, stated = _manifest.mates_of(oc), oc.get("mates")
     if not have:
         err(path, "L12", f"{where}: {occ_ref} declares no 'mates', "
                          "so it cannot occupy anything")
     if not want:
         err(path, "L12", f"{where}: host {host_ref} presents no "
                          "'interface', so nothing can mate into it")
-    if want and have and want != have and not _also_accepted(want, have):
-        err(path, "L12", f"{where}: {occ_ref} mates {have!r} but "
+    if want and have and want not in have and not _also_accepted(want, have):
+        err(path, "L12", f"{where}: {occ_ref} mates {stated!r} but "
                          f"{host_ref} presents {want!r}")
 
 
@@ -9684,8 +9694,15 @@ def _spanning_part_drawn_across(path, data):
     does cover both bores. What it catches is the narrow one, which is every
     duplex part in this library drawn the wrong way round.
     """
-    iface = data.get("mates")
-    entry = (_connectors().get(iface) or {}) if iface else {}
+    # `mates` is one interface or a list (manifest.mates_of); each spanning
+    # interface among them is held to its own pitch
+    for iface in _manifest.mates_of(data):
+        _lint_spanning_occupant(path, data, iface)
+
+
+def _lint_spanning_occupant(path, data, iface):
+    """L116 for one interface a part mates (_spanning_part_drawn_across)."""
+    entry = _connectors().get(iface) or {}
     spans = entry.get("spans")
     if not spans:
         return

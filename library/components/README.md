@@ -203,6 +203,9 @@ The rest earns its place:
   with the registry.
 - `interface` if the part is a receptacle; `mates` plus a `mate` connection
   point if it is an occupant (a transceiver, a card, a PSU in a bay).
+  `mates` is one interface, or a list for a part that seats in more than one
+  kind of receptacle: `mates: [nema-5-15r, nema-5-20r]` on a NEMA 5-15P. Write
+  the single interface where there is one.
 - `parts` to compose: a vendor PSU that contains a `std/c14-inlet` and a
   `common/led` says so instead of redrawing them. Lint (L10) checks the
   composition resolves and does not cycle; L46 checks composed parts do not
