@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: c13-plug
-version: 1.1.0
+version: 1.2.0
 class: port
 mates: iec-c14
 conforms: c13-plug
@@ -17,7 +17,7 @@ size-confidence: {w: drawing, h: estimated}
 size-notes: the 26 width is dimensioned on the drawing; the 16.0 thickness is scaled off the same face view, which prints no figure for it
 attrs: {media: c13, connector: c13}
 fields:
-  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 8.33}
+  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 7.1}
   jacket-color: {label: Jacket colour, type: text, default: '#1c1c1c'}
 unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
 provenance:
@@ -88,18 +88,21 @@ provenance:
     scaled - the strain relief is 20.0 long (V1625BS; 20.1 on V1625) and
     round with flex slots. Its section differs by variant: about 11.4-11.9
     on V1625 and about 12.8 x 13.0 on V1625BS, the larger-cable part. The
-    18 AWG default cord belongs with V1625, so 11.6, the middle of its
-    reading. The flex slots are not drawn.
+    boot moulded on the 18 AWG SJT cord belongs with V1625, so 11.6, the middle of its
+    reading; it is not tapered to the thinner default cord. The flex slots are not drawn.
   stub: >-
     estimated - the stub rule, docs/connectors-coax-design.md section 5: a
     straight run of cord 30 long starting where the strain relief ends (47.0
     in front of the inlet face). The cord's bend is the installation's.
   cable-od: >-
-    datasheet - SJT 3 x 18 AWG, the North American cord Volex lists against
-    V1625 (catalogue p.144). Belden 19348 technical data sheet, revision
-    0.388, 09-07-2025, p.1, Overall Cable Diameter (Nominal) 0.328 in; the
-    sheet prints inches only, and 8.33 mm is that figure converted. A
-    placement or a wrapper sets the cord it actually carries.
+    datasheet - H05VV-F 3G1.0, the cord the Rack Builder draws for an IEC cord
+    (spec/schemas/cable-types.yaml `power-c13`), so a cord drawn between two ends
+    is as wide as this stub (#1060). Oznur Kablo, H05VV-F 300/500 V flexible
+    cord technical data, the 3x1 row, nominal overall diameter 7.1 mm
+    (min and max are not printed). The SJT cord this default was before,
+    SJT 3 x 18 AWG, Belden 19348 (0.328 in, 8.33 mm), the cord Volex lists against V1625 (catalogue p.144), is a sourced North
+    American alternative; a placement or a wrapper
+    sets the cord it carries, at its own `cable-od`.
   jacket-colour: >-
     a FIELD. Black is the default because every held source that states a
     colour states black (Belden 19348 lists one put-up, black; the

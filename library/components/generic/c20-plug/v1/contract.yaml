@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: c20-plug
-version: 1.1.0
+version: 1.2.0
 class: port
 mates: [iec-c19, eaton-c39]
 conforms: c20-plug
@@ -16,7 +16,7 @@ size: {w: 33.75, h: 25.75}
 size-confidence: {w: drawing, h: drawing}
 attrs: {media: c20, connector: c20}
 fields:
-  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 9.65}
+  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 7.9}
   jacket-color: {label: Jacket colour, type: text, default: '#1c1c1c'}
 unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
 provenance:
@@ -65,10 +65,14 @@ provenance:
     estimated - the stub rule, docs/connectors-coax-design.md section 5: a
     straight run of cord 30 long starting where the strain relief ends.
   cable-od: >-
-    datasheet - SJT 3 x 14 AWG, the cord generic/c19-plug@1 defaults to and
-    one VAC20S lists (p.283, SJT + H05VV-F, 3 x AWG 14). Belden 19354
-    technical data sheet, revision 0.525, 09-07-2025, p.1, 0.380 in (9.65 mm)
-    nominal. A placement sets the cord it carries.
+    datasheet - H05VV-F 3G1.5, the cord the Rack Builder draws for an IEC cord
+    (spec/schemas/cable-types.yaml `power-c19`), so a cord drawn between two ends
+    is as wide as this stub (#1060). Oznur Kablo, H05VV-F 300/500 V flexible
+    cord technical data, the 3x1.5 row, nominal overall diameter 7.9 mm
+    (min and max are not printed). The SJT cord this default was before,
+    SJT 3 x 14 AWG, Belden 19354 (0.380 in, 9.65 mm), the cord VAC20S lists, is a sourced North
+    American alternative; a placement or a wrapper
+    sets the cord it carries, at its own `cable-od`.
   jacket-colour: >-
     a FIELD, black by default, as on generic/c13-plug@1.
   contacts: >-
