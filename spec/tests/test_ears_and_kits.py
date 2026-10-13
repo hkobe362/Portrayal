@@ -435,12 +435,14 @@ def test_a_devices_dependencies_include_its_kits(lib):
 
 # --- the one device that states ears today -------------------------------------
 
-def test_the_bare_behind_device_is_unchanged_and_clean():
+def test_the_behind_device_is_clean():
     """The three rules ears and kits reach, and the schema, on the real file -
-    not the whole of `lint_device`, which took 5 s to say the same thing."""
+    not the whole of `lint_device`, which took 5 s to say the same thing. The
+    file said `ears: behind` until P-0015 added its default position, which a
+    bare string cannot hold; the object says the same with `behind: true`."""
     path = ROOT / "library/devices/fs/uscmh-sfdabsb2u/device.yaml"
     doc = yaml.safe_load(path.read_text())
-    assert doc["chassis"]["ears"] == "behind"
+    assert doc["chassis"]["ears"] == {"behind": True, "positions": [{"name": "proud", "at": 168.5, "default": True}]}
     assert _schema_errors(doc) == []
     with lint.collecting() as found:
         lint.lint_device_rack_ears(path, doc)

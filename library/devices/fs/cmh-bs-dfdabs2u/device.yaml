@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-bs-dfdabs2u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-BS-DFDABS2U
@@ -13,6 +13,14 @@ description: >-
   channel. The covers are 93.5 mm high, taller than the 87 mm ears.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. This is
+      Portrayal's reading of the datasheet plan: the duct reaches 99.6 mm in front of its
+      ears and 76.4 behind them (see `full-depth`). No fs.com product page for this part
+      was found to check it against. `at` is 99.6, so the part spans the rail. This states
+      a placement; no dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -144,6 +152,9 @@ chassis:
   depth: 176
   ru: 2
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 99.6, default: true}
   shell: sheet
   thickness: 7.3
   color: '#2a2c2e'

@@ -104,6 +104,36 @@ def test_kind_is_a_plain_word_from_the_profile_and_the_vendors_own_words(device,
     assert rack_index.kind_of(device, chassis) == kind
 
 
+def test_the_default_ear_position_is_written_only_where_the_device_states_one(tmp_path):
+    """P-0015: the kit's setbackOf reads `ears.default.at` and puts the front of a
+    part that states it that far in front of the rail. rack.json is the only
+    file it reads, so a position the part states has to reach it."""
+    positions = [{"name": "recessed", "at": -25.4}, {"name": "proud", "at": 75.7, "default": True}]
+    d = _dist(tmp_path, {"h": 44, "d": 174, "ears": {"positions": positions, "h": 40.0}})
+    assert rack_index.build(d)["devices"]["mgr"]["ears"] == {"default": {"name": "proud", "at": 75.7}}
+    # a position with no `at` is a name only: nothing to place by
+    d = _dist(tmp_path, {"h": 44, "ears": {"positions": [{"name": "flush", "default": True}]}})
+    assert "ears" not in rack_index.build(d)["devices"]["mgr"]
+    # none is the default, no positions, `behind` alone, or no ears at all
+    for ears in ({"positions": [{"name": "proud", "at": 40}]}, {"behind": True}, {}, None):
+        d = _dist(tmp_path, {"h": 44, "ears": ears} if ears is not None else {"h": 44})
+        assert "ears" not in rack_index.build(d)["devices"]["mgr"], ears
+
+
+def test_the_default_ear_position_reaches_the_real_rack_json():
+    """The five FS managers whose source states a position carry it; the one
+    whose source states none (CMH-4DRB1U: no recess figure) carries nothing."""
+    from pathlib import Path
+    built = Path(__file__).resolve().parents[2] / "library/dist/rack.json"
+    if not built.exists():
+        pytest.skip("library/dist not built - run ./build.sh")
+    devices = json.loads(built.read_text())["devices"]
+    assert devices["cmh-dfd1u"]["ears"] == {"default": {"name": "proud", "at": 75.7}}
+    assert devices["cmh-5dr1u"]["ears"]["default"]["at"] == 85.5
+    assert "ears" not in devices["cmh-4drb1u"]
+    assert not any("ears" in devices[n] for n in devices if n.startswith("cmv-"))
+
+
 def test_every_device_carries_its_kind(tmp_path):
     d = _dist(tmp_path, {"h": 44, "airflow": "passive"}, device={"profile": "optical"})
     assert rack_index.build(d)["devices"]["mgr"]["kind"] == "patch panel"

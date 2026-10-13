@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: uscmh-sfdabsb2u
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: FS.com
 model: USCMH-SFDABSB2U
@@ -50,7 +50,11 @@ provenance:
       rails in front of it. The side view draws that plate 74.33 high behind the 84.33
       finger walls. It is a different moulding, not the 1U part made taller: it bolts
       to the face of the rails through the ends of that plate and stands entirely in
-      front of them, so `ears: behind`.
+      front of them, so `ears: behind`. `positions` states where the ears bolt, for the
+      Rack Builder: Portrayal's reading of the side view puts the whole duct and its
+      mounting plate in front of the rails (see `full-depth`), so `at` is 168.5, the whole
+      depth. `behind: true` is the same statement the bare string made. This states a
+      placement; no dimension changed.
   shell:
     confidence: drawing
     note: >-
@@ -145,7 +149,10 @@ chassis:
   height: 88.81
   depth: 168.5
   ru: 2
-  ears: behind
+  ears:
+    behind: true
+    positions:
+      - {name: proud, at: 168.5, default: true}
   full-depth: false
   shell: sheet
   thickness: 9.5

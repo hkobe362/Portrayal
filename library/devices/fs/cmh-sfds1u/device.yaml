@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-sfds1u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-SFDS1U
@@ -15,6 +15,13 @@ description: >-
   Three long pass-through holes in the backbone lead cables to the other side.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. The backbone
+      is the mounting plane and the duct stands 113.3 mm in front of it (the end view of
+      the steel datasheet, page 4; see `full-depth`). `at` is 113.3, so all of the depth is
+      in front of the rail. This states a placement; no dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -146,6 +153,9 @@ chassis:
   depth: 113.3
   ru: 1
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 113.3, default: true}
   shell: sheet
   thickness: 1.2
   weight-kg: 1.04

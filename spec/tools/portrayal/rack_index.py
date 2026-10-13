@@ -122,6 +122,13 @@ def build(dist):
             entry["mount"] = c["mount"]
         if c.get("shell"):
             entry["shell"] = c["shell"]
+        # where the ears bolt, behind the front of the part: the kit's setbackOf
+        # stands the part that far in front of the rail (rack-mounting-design.md
+        # sections 3 and 9). Only a position that states its `at`; none, no key.
+        ears = c.get("ears") if isinstance(c.get("ears"), dict) else {}
+        pos = next((p for p in ears.get("positions") or [] if p.get("default") and p.get("at") is not None), None)
+        if pos:
+            entry["ears"] = {"default": {"name": pos.get("name"), "at": pos["at"]}}
         perf = (idx.get("attrs") or {}).get("performance") or {}
         if perf.get("cable-capacity") is not None:
             entry["capacity"] = {"count": perf["cable-capacity"], "basis": perf.get("cable-capacity-basis", "")}

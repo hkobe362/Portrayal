@@ -10,7 +10,7 @@ Tracked in #904. Follows #865, which added `chassis.ears: behind` and
 | `chassis.ears` as an object, `chassis.kits`, lint L160 to L163 (#906) | built |
 | ears and kits in `configs.json` and the DCIM exports (#907) | built |
 | the generic L-bracket ear, drawn only when asked for (#909) | built |
-| the default position in `rack.json` (#908) | not built |
+| the default position in `rack.json` (#908) | built; the default kit is not |
 | the move off `common/rack-ear@1` (#910) | open: 36 devices still place it |
 | the worked examples (#912 to #915) | not built |
 
@@ -323,9 +323,10 @@ key.
 - `kits.json` publishes every kit as its contract states it, with its
   provenance, beside `components.json` (#905). Its parts are refs, not
   geometry. With no kit in the library the file is `{"kits": []}`.
-- `rack.json` does not carry ears or kits. #908 is to add the default
-  position and the motion and depth range of the default kit, so the Rack
-  Builder can place a device without fetching its `configs.json`.
+- `rack.json` carries the default ear position as `ears.default` (`name` and
+  `at`), where the default position states an `at`. It does not yet carry kits.
+  #908 is still to add the motion and depth range of the default kit, so the
+  Rack Builder can place a device without fetching its `configs.json`.
 - The DCIM exports say both in `comments`, one paragraph for the ears and one
   sentence for the kits, as `overhang` does: neither NetBox nor Nautobot has a
   field. A kit as an inventory item or a module is left for later; the trial
@@ -382,8 +383,8 @@ to the shipped position, offer only the positions a device has, slide a
 `sliding` kit out by its travel, warn when a rack is outside the range of a
 kit or a device plus its CMA is deeper than the rack, and draw the rails.
 
-`rack.json` will carry the default position and the default kit once #908 is
-built, enough to place a device in a rack from one file.
+`rack.json` carries the default position now and will carry the default kit
+once #908 is built, enough to place a device in a rack from one file.
 
 The setback of an item in a rack is the mm its faceplate stands behind the
 rail plane, so the setback of a position is `-at`. The

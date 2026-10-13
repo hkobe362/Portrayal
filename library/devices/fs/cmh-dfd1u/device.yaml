@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-dfd1u
-version: 0.1.3
+version: 0.1.4
 maturity: modelled
 manufacturer: FS.com
 model: CMH-DFD1U
@@ -15,6 +15,14 @@ description: >-
   pass-through holes through the joined bases lead cables from one channel to the other.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. The ear flange
+      is drawn once, at the base of the front duct (the top view, datasheet page 5), so the
+      front cover stands 75.7 mm in front of the ear plane and the rest of the 174 behind
+      it: 98.3 (see `full-depth` and `chassis`). `at` is 75.7, so the part spans the rail.
+      This states a placement; no dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -152,6 +160,9 @@ chassis:
   depth: 174.0
   ru: 1
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 75.7, default: true}
   shell: sheet
   thickness: 7.3
   weight-kg: 0.88

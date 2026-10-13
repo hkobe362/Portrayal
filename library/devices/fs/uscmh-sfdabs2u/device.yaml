@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: uscmh-sfdabs2u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: USCMH-SFDABS2U
@@ -11,6 +11,13 @@ description: >-
   2U single-sided horizontal cable manager, FS SKU #317017: a black ABS finger duct with a double-hinged cover that opens upward or downward, the two-unit USCMH-SFDABS1U. A base plate between the rack ears carries a row of nine fingers along its top edge and another along its bottom, and the curved cover clips on the finger tips to close the channel; two rows of pass-through windows lead through the plate, and a ribbed moulding stiffens it behind.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. This is
+      Portrayal's reading of the top view: the fingers and cover stand 71.45 mm in front of
+      the plane of the ears and the base 35.55 behind it (see `full-depth`). `at` is 71.45.
+      This states a placement; no dimension changed.
   capacity:
     confidence: estimated
     note: >-
@@ -143,6 +150,9 @@ chassis:
   depth: 107
   ru: 2
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 71.45, default: true}
   shell: sheet
   thickness: 10
   color: '#2a2c2e'
