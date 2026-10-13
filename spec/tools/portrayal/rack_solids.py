@@ -449,6 +449,57 @@ def _ring_openings(root, fr):
     return out
 
 
+def ring_depths(faces, chassis, vias=()):
+    """Where each ring of a rack device stands in depth, for rack.json
+    (#1027): `{via: {"z": ..., "depth": ...}}` or None. `z` is the middle of
+    the ring on the plan, in mm back from the device's front, and `depth` the
+    band it is along its run, its contract's `depth` where it states one. A
+    cable passes the ring there and not on the rail plane. A ring is a
+    component carrying `data-guide`, or the rects of a drawn ring, which the
+    plan names `<via>-top`, `<via>-arm` and so on, `data-kind="ring"`, for
+    each of `vias`, the ids the device's faces mark as guides. A ring of a
+    rack-face part is placed by the kit from the part's own depth, and a ring
+    standing on a tray is the tray's (`trays`); neither is read here."""
+    root = faces.get("top")
+    if root is None or chassis.get("mount") not in (None, "rack"):
+        return None
+    d = _num(chassis.get("d"))
+    if not d > 0:
+        return None
+    walked = _walk(root)
+    rings = {}     # via -> (matrix of the ring, its element or None, the footprints on the plan)
+    for el, m, _lift, _guide, _mounts in walked:
+        if el.get("data-guide") == "ring" and el.get("id"):
+            under = set(el.iter())
+            feet = [f for e, em, *_ in walked if e in under for f in _shapes(e, em)]
+            rings[el.get("id")] = (m, el, feet)
+    for via in vias:
+        if via in rings:
+            continue
+        feet = [f for el, m, *_ in walked if el.get("data-kind") == "ring"
+                and re.fullmatch(re.escape(via) + r"-[a-z]+", el.get("id") or "")
+                for f in _shapes(el, m)]
+        if feet:
+            rings[via] = (IDENT, None, feet)
+    out = {}
+    for via, (m, el, feet) in rings.items():
+        if not feet:
+            continue
+        x0, y0 = min(f[0] for f in feet), min(f[1] for f in feet)
+        x1, y1 = max(f[0] + f[2] for f in feet), max(f[1] + f[3] for f in feet)
+        # the run as drawn, through the placement's turn: along the plan's x or its y
+        ux, uy = _apply(m, 1.0, 0.0), _apply(m, 0.0, 0.0)
+        along_x = abs(ux[0] - uy[0]) >= abs(ux[1] - uy[1])
+        drawn = (el.get("data-guide-run") if el is not None else None) or "x"
+        band = (x1 - x0) if (drawn == "x") == along_x else (y1 - y0)
+        stated = _attr_nums(el, "data-guide-depth") if el is not None else None
+        entry = {"z": _r(d - (y0 + y1) / 2)}
+        if drawn in ("x", "y"):
+            entry["depth"] = _r(stated[0] if stated else band)
+        out[via] = entry
+    return out or None
+
+
 def trays(faces, chassis):
     """The `trays` of one device, for rack.json, or None: each tray drawn on
     its plan (a part's `tray:` under its instance, or the view's own `trays`),

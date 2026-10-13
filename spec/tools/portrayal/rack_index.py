@@ -153,6 +153,15 @@ def build(dist):
         tray = rack_solids.trays(faces, c)
         if tray:
             entry["trays"] = tray
+        # where a rack device's rings stand in depth, so a cable meets a ring
+        # where it is and not on the rail plane (#1027); a ring on a tray is
+        # the tray's
+        depths = rack_solids.ring_depths(faces, c, {v for vs in entry.get("guides", {}).values() for v in vs})
+        if depths:
+            on_trays = {r["via"] for t in tray or [] for r in t.get("rings", [])}
+            depths = {k: v for k, v in depths.items() if k not in on_trays}
+            if depths:
+                entry["rings"] = depths
         out[d["name"]] = entry
     return {"format": FORMAT,
             "generated-from": "devices.json and <name>.configs.json, by rack_index.py",
