@@ -34,6 +34,8 @@ def _refs_in(node, out):
     """
     if isinstance(node, dict):
         for k, v in node.items():
+            if k == "supersedes":
+                continue   # the refs a redirect names are gone from the library by design (L184)
             if k in ("ref", "default") and isinstance(v, str) and "@" in v:
                 out.add(v)
             elif k == "accepts" and isinstance(v, list):

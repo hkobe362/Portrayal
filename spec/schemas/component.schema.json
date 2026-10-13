@@ -595,7 +595,7 @@
      }
     }
    },
-   "description": "THE REMOVED REFS THIS PART STANDS IN FOR (#1049). A saved rack names parts by ref, and a ref whose major was removed no longer resolves, so the rack quietly loses the part. The replacement says which refs it replaces, only where it is a drop-in (same part ids, port paths and names), and the build publishes the list on this part's components.json entry as `supersedes`. The rack kit follows an old ref to this part when it reads a swap, and writes the new ref when the rack is next saved after an edit. A ref named here must not be in the library any more: a retired major that is kept says `superseded-by` instead. Lint L184 checks the shape; the build checks the signature."
+   "description": "THE REMOVED REFS THIS PART STANDS IN FOR. A saved rack names parts by ref, and a ref whose major was removed no longer resolves, so the rack quietly loses the part. The replacement says which refs it replaces, only where it is a drop-in (same part ids, port paths and names), and the build publishes the list on this part's components.json entry as `supersedes`. The rack kit follows an old ref to this part when it reads a swap, and writes the new ref when the rack is next saved after an edit. A ref named here must not be in the library any more: a retired major that is kept says `superseded-by` instead. Lint L184 checks the shape; the build checks the signature."
   },
   "size": {
    "$ref": "#/$defs/wh",
