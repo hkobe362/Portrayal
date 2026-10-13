@@ -5,6 +5,11 @@ open the pull request, and the maintainer merges it once the gates are green.
 
 ## How a merge happens, and why it is a script
 
+**This is the older single-pull-request path.** A set of ready pull requests is
+now tested together once on a `train/` branch and merged in that order with the
+lines the train prints ([`docs/merging.md`](merging.md)); `main` no longer
+requires a branch to be up to date, which the script below still insists on.
+
 ```sh
 .github/merge-if-green.sh <pr-number>
 ```

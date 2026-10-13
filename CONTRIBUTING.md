@@ -337,7 +337,9 @@ The maintainer merges once the `gates` check is green. Anything under
 `library/exports/` or `library/dist/` is generated; a review comment on one of
 those files is fixed in the source it came from.
 
-How the maintainer merges, and why it is a script, is in
+How a merge happens now, which is a set of ready pull requests tested together
+once on a `train/` branch before the maintainer merges them in order, is in
+[`docs/merging.md`](docs/merging.md). Other maintainer notes are in
 [`docs/maintainers.md`](docs/maintainers.md).
 
 ## Preflight, before you ask for review
