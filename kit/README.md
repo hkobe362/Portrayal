@@ -230,7 +230,7 @@ compared, and a difference throws ("New in 0.25.0" below).
 | `rack/managers.js` | cable managers: `placement` of a manager onto the device behind it, and moving one |
 | `rack/cable-rules.js` | cables: which two ports may be joined, `withCable`, media and lengths; a cable's own colour (`parseColor`), what decides the colour it is drawn in (`colorFacts`, `cableColorOf`, `colorsKey`), and the plans a drawing reads (`cablePlan`, `cablePlan3d`) |
 | `rack/cable-types.js` | the cable types (`cable-types.json`): `loadCableTypes(dist)` fetches them and returns `typeOf`, `bendOf` and `diameterOf` over them; the same lookups are exported to build over a table already in hand (a fixture, a cached copy): `typeOf(types, id)`, `cableTypeOf(types, cable)`, `radiusMm(type, which)`, `installedRadiusMm(types, id)`, `bendLookup(types)` and `diameterLookup(types)`, each radius in millimetres; `jacketLookup(types)` and the loaded `typeColorOf` give the jacket colour of the type a cable names |
-| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`); and the colour a cable is drawn in: `COLORS`, `cableColor`, `colorOf`, `hexColor`, `agreedJacket`, `bundleColor` |
+| `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`); and the colour a cable is drawn in: `COLORS`, `cableColor`, `colorOf`, `hexColor`, `agreedJacket`, `bundleColor`; and the width it is drawn at: `WIDTH`, `widthOf` |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, what the lay finds as notes (`layNotes`, `layNotesOf`), and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
@@ -673,6 +673,14 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
+(3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
+size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:
+for media `power` its type's `od_mm` (`diameterOf` is the cable types lookup, `diameterLookup`),
+else 7.1 mm, the `power-c13` cord; for every other media `WIDTH`, as before. **A page that draws a
+cable at `WIDTH` and wants the cord to meet its plug calls `widthOf` instead; a page that does not
+changes nothing.** The site's `cables.js` (2D strokes, 3D tubes) and the bundle views are such pages.
 
 **New in 0.32.0: a replaced part leaves a redirect** (#1049). A rack file names parts by ref, and a ref whose
 major was removed no longer resolves: the slot refuses it, the swap is ignored,

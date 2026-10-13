@@ -55,8 +55,8 @@ EACH = pytest.mark.parametrize("ref", PLUGS)
 # INLET's own `size.d`, pinned here so a change to it fails and is carried
 # through the plug. The nose is longer than the cavity on all three.
 FIGURES = {
-    "generic/c13-plug@1": (64.0, 18.0, 17.0, 8.33),
-    "generic/c19-plug@1": (76.0, 20.0, 19.0, 9.65),
+    "generic/c13-plug@1": (64.0, 18.0, 17.0, 7.1),
+    "generic/c19-plug@1": (76.0, 20.0, 19.0, 7.9),
     "generic/saf-d-grid-plug@1": (80.5, 25.5, 17.0, 9.65),
 }
 # plug -> its strain relief: a `cyl` where the section is round, a box where
@@ -241,6 +241,24 @@ def test_its_fields_are_the_cord(ref):
     assert set(f) == {"cable-od", "jacket-color"}
     assert f["cable-od"]["default"] == pytest.approx(FIGURES[ref][3])
     assert f["jacket-color"]["default"] == "#1c1c1c"
+
+
+# #1060: the cord the kit draws between two IEC ends is its cable type's, at
+# `od_mm`, so an IEC end's stub is that figure by default and the two meet.
+CORD_TYPE = {"generic/c13-plug@1": "power-c13", "generic/c14-plug@1": "power-c13",
+             "generic/c19-plug@1": "power-c19", "generic/c20-plug@1": "power-c19"}
+
+
+@pytest.mark.parametrize("ref", sorted(CORD_TYPE))
+def test_an_iec_stub_is_the_diameter_of_the_cord_the_kit_draws(ref):
+    types = yaml.safe_load((ROOT / "spec/schemas/cable-types.yaml").read_text())["types"]
+    c = _contract(ref)
+    od = c["fields"]["cable-od"]["default"]
+    assert od == pytest.approx(types[CORD_TYPE[ref]]["od_mm"])
+    stub = ET.parse(_skin_path(ref)).getroot().find(".//{*}circle[@id='stub']")
+    assert float(stub.get("r")) * 2 == pytest.approx(od)
+    assert str(od) in c["provenance"]["cable-od"]
+    assert "Oznur" in c["provenance"]["cable-od"]
 
 
 @EACH

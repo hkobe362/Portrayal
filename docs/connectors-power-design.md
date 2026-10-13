@@ -71,8 +71,9 @@ IEC 60320-1 is not held. Every "IEC-shaped" figure is what a vendor drawing prin
 | C13 | Volex Power Products catalogue, Aug-2025, cat. no. V1625, p.240, and V1625BS, p.249 | overall 64 +/-1; nose 18 MIN, 23 x 15.8, two corners cut at 45 degrees; overmould 26 +/-0.5 |
 | C19 | the same catalogue, cat. no. VAC19, p.262 | overall 76 +/-1; nose 20 (MIN), 28 x 20, R3.5 (MIN) four times; overmould 29 x 24, 26.00 long; lugs 37 across; strain relief 30.0 +/-0.5 |
 | Saf-D-Grid | Anderson Power Products data sheet DS-SDG REV 19, p.16 | 26.0 wide, 18.9 high, 80.5 long, and nothing else |
-| C13 cord | Belden 19348 technical data sheet, revision 0.388, 09-07-2025, p.1 | SJT 3 x 18 AWG, 0.328 in nominal (8.33 mm, converted) |
-| C19 and Saf-D-Grid cord | Belden 19354 technical data sheet, revision 0.525, 09-07-2025, p.1 | SJT 3 x 14 AWG, 0.380 in (9.65 mm) nominal |
+| C13 cord (the `cable-od` of a NEMA 5-15P cord; the IEC ends default to the H05VV-F rows below, #1060) | Belden 19348 technical data sheet, revision 0.388, 09-07-2025, p.1 | SJT 3 x 18 AWG, 0.328 in nominal (8.33 mm, converted) |
+| C19 and Saf-D-Grid cord (the 5-20P cord's `cable-od` and the Saf-D-Grid end's) | Belden 19354 technical data sheet, revision 0.525, 09-07-2025, p.1 | SJT 3 x 14 AWG, 0.380 in (9.65 mm) nominal |
+| C13/C14 and C19/C20 cord, IEC ends' default | Oznur Kablo, H05VV-F 300/500 V flexible cord technical data (cited in `spec/schemas/cable-types.yaml`) | H05VV-F 3G1.0 7.1 mm and 3G1.5 7.9 mm nominal overall diameter: the `power-c13` and `power-c19` cords the kit draws |
 
 The Volex catalogue gives no drawing number or revision for a connector; the citation is
 catalogue, date and page. All three drawings are of moulded straight connectors. A

@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: c14-plug
-version: 1.1.0
+version: 1.2.0
 class: port
 mates: [iec-c13, eaton-c39]
 conforms: c14-plug
@@ -17,7 +17,7 @@ size: {w: 29.0, h: 21.0}
 size-confidence: {w: drawing, h: drawing}
 attrs: {media: c14, connector: c14}
 fields:
-  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 8.33}
+  cable-od: {label: Cable outside diameter, type: number, unit: mm, default: 7.1}
   jacket-color: {label: Jacket colour, type: text, default: '#1c1c1c'}
 unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
 provenance:
@@ -72,9 +72,14 @@ provenance:
   stub: >-
     estimated - the stub rule, docs/connectors-coax-design.md section 5.
   cable-od: >-
-    datasheet - SJT 3 x 18 AWG, which VNBC14S lists (catalogue p.270), the
-    cord generic/c13-plug@1 defaults to: Belden 19348 technical data sheet,
-    revision 0.388, 09-07-2025, p.1, 0.328 in nominal (8.33 mm converted).
+    datasheet - H05VV-F 3G1.0, the cord the Rack Builder draws for an IEC cord
+    (spec/schemas/cable-types.yaml `power-c13`), so a cord drawn between two ends
+    is as wide as this stub (#1060). Oznur Kablo, H05VV-F 300/500 V flexible
+    cord technical data, the 3x1 row, nominal overall diameter 7.1 mm
+    (min and max are not printed). The SJT cord this default was before,
+    SJT 3 x 18 AWG, Belden 19348 (0.328 in, 8.33 mm), the cord VNBC14S lists, is a sourced North
+    American alternative; a placement or a wrapper
+    sets the cord it carries, at its own `cable-od`.
   jacket-colour: >-
     a FIELD, black by default, as on generic/c13-plug@1.
   contacts: >-
