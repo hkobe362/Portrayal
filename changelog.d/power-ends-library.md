@@ -35,7 +35,7 @@
   power runs and did not say AC, so a reader could not tell an AC outlet
   from a DC terminal. Each placed outlet gains `data-media="ac"` on its
   drawing.
-- Eaton PDUMH20NET 0.2.0, EVMI2130X 0.3.0, EVMA8365X 0.2.0 and
-  PDUMV20HVNETLX 0.2.0, for the parts above. Their DCIM exports change in
+- Eaton PDUMH20NET 0.2.0, EVMI2130X 0.3.0, EVMA8365X 0.2.0, PDUMV20HVNETLX
+  0.2.0 and PDU12IEC 0.2.0, for the parts above. Their DCIM exports change in
   the drawing version line and nowhere else: the same power outlets, by the
   same names, of the same types.

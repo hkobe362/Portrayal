@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: pdu12iec
-version: 0.1.2
+version: 0.2.0
 maturity: modelled
 manufacturer: Eaton
 model: PDU12IEC

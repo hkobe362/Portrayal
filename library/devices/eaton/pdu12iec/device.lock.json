@@ -1,11 +1,11 @@
 {
  "bay-accepts": {},
- "composed": "b707dd46ae9426b3",
+ "composed": "c7983cf78f9a85ed",
  "composed-refs": {
   "common/breaker-push-reset@1": "1.0.0+6b43b91710c16bb9",
   "common/ground-stud@1": "1.0.1+8ee1c47866e993c9",
-  "std/c13-outlet@1": "1.0.0+4c2ec0215cfdc077",
-  "std/c19-outlet@1": "1.0.1+0e8370a77e7841c5",
+  "std/c13-outlet@1": "1.1.0+99d4f2c7aa898c37",
+  "std/c19-outlet@1": "1.1.0+610bc32957b2ab61",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa"
  },
  "configs": [
@@ -120,5 +120,5 @@
  "placement-surface": "d3dd3eba4ff1cf82",
  "shape": "a8396cb7d43e0dab",
  "surface": "18baa6d412f89877",
- "version": "0.1.2"
+ "version": "0.2.0"
 }
