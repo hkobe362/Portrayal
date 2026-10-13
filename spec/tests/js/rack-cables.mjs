@@ -151,7 +151,7 @@ test('the loader keeps every cable: it fixes the shape and never drops one', () 
     cables: [
       {id: 'c1', a: {item: 'i1', path: 'port-1', view: 'front'}, b: {item: 'gone', path: 'port-2', view: 'rear'},
        media: 'os2', purpose: 'uplink', label: 'A1', length: {value: '2', unit: 'm', source: 'entered'},
-       route: [{item: 'i1'}], color: 'red'},
+       route: [{item: 'i1'}], color: 'red', note: 'kept'},
       {id: 'c1', a: {item: 'i1', path: 'port-3'}, b: null, media: 'os1', length: {value: 0}},
       {},
       'nonsense',
@@ -161,8 +161,8 @@ test('the loader keeps every cable: it fixes the shape and never drops one', () 
   assert.equal(cs.length, 5, 'five in, five out');
   assert.deepEqual(cs[0], {id: 'c1', a: {item: 'i1', path: 'port-1', view: 'front'},
     b: {item: 'gone', path: 'port-2', view: 'rear'}, media: 'os2', purpose: 'uplink', label: 'A1',
-    length: {value: 2, unit: 'm', source: 'entered'}, route: [], routeAsWritten: [{item: 'i1'}], color: 'red'},
-    'a missing item is kept; route and unknown fields survive');
+    length: {value: 2, unit: 'm', source: 'entered'}, route: [], routeAsWritten: [{item: 'i1'}], colorAsWritten: 'red', note: 'kept'},
+    'a missing item is kept; route and unknown fields survive, and a color that is none moves aside (#1028)');
   assert.equal(new Set(cs.map(c => c.id)).size, 5, 'ids are unique');
   assert.equal(cs[4].id, 'c2', 'a declared id is not taken by a repaired one before it');
   assert.deepEqual(cs[1].b, {item: '', path: '', view: 'front'});

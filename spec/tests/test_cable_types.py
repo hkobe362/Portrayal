@@ -135,6 +135,59 @@ def test_the_bases_say_how_sure_each_figure_is(built):
     assert t["power-c19"]["conductor"] == "H05VV-F 3G1.5"
 
 
+def test_the_one_jacket_colour_is_the_sheet_s(built):
+    # #1028: Siemon's QSFP28 AOC sheet shows an aqua jacket and states 3.0 mm
+    # and a 30 mm minimum bend radius. The colour is the reading the library
+    # already holds on the cable end, so the two cannot drift apart.
+    from portrayal.manifest import load_yaml
+    t = built["types"]["aoc-siemon-q1q28f"]
+    assert t["media"] == "aoc" and t["od_mm"] == 3.0
+    assert t["min_bend_radius"]["installed"]["mm"] == 30
+    assert t["jacket"]["color"] == "#49eaf8" and t["jacket"]["basis"] == "photo"
+    assert "164,214 pixels" in t["jacket"]["note"]
+    assert built["sources"]["siemon-qsfp28-aoc"]["url"].startswith("https://files.siemon.com/")
+    end = load_yaml(ROOT / "library/components/siemon/qsfp28-aoc/v1/contract.yaml")
+    body = next(p for p in end["parts"] if p["id"] == "body")
+    assert body["attrs"]["jacket-color"] == t["jacket"]["color"]
+    assert body["attrs"]["cable-od"] == t["od_mm"]
+
+
+def test_no_bare_media_type_states_a_jacket(built):
+    # One table holds the colour a media is drawn in: the kit's COLORS. A bare
+    # type with a jacket would be a second, and would recolour every drawing
+    # of that media the day a consumer read it.
+    bare = [tid for tid, t in built["types"].items() if t["media"] == tid]
+    assert len(bare) == 8
+    assert [tid for tid in bare if "jacket" in built["types"][tid]] == []
+    stated = sorted(tid for tid, t in built["types"].items() if "jacket" in t)
+    assert stated == ["aoc-siemon-q1q28f"], "a new jacket colour comes with its source and its own check"
+
+
+@pytest.mark.parametrize("jacket,says", [
+    ({"color": "aqua", "basis": "standard", "sources": ["foa-tia568"]}, "color is # and six lower case hex digits"),
+    ({"color": "#49EAF8", "basis": "standard", "sources": ["foa-tia568"]}, "color is # and six lower case hex digits"),
+    ({"color": "#49eaf8", "basis": "seen", "sources": ["foa-tia568"]}, "jacket: basis must be"),
+    ({"color": "#49eaf8", "basis": "standard", "sources": []}, "jacket: no sources"),
+    ({"color": "#49eaf8", "basis": "standard", "sources": ["nope"]}, "jacket: unknown source"),
+    ({"color": "#49eaf8", "basis": "photo", "sources": ["foa-tia568"]}, "says what was counted"),
+    ({"color": "#49eaf8", "basis": "standard", "sources": ["foa-tia568"], "shade": "light"}, "jacket: unknown key 'shade'"),
+    ("#49eaf8", "jacket: not a mapping"),
+])
+def test_a_bad_jacket_is_refused(jacket, says):
+    d = _doc()
+    d["types"]["dac-26awg"]["jacket"] = jacket
+    assert any(says in p for p in cti.problems(d)), cti.problems(d)
+
+
+def test_a_jacket_on_a_bare_media_type_is_refused():
+    d = _doc()
+    good = {"color": "#2bb3c8", "basis": "standard", "sources": ["foa-tia568"]}
+    d["types"]["dac-26awg"]["jacket"] = dict(good)
+    assert cti.problems(d) == [], "a named type may state one"
+    d["types"]["om4"]["jacket"] = dict(good)
+    assert cti.problems(d) == ["type om4: a bare media type states no jacket; a media's colour is the kit's COLORS"]
+
+
 def _doc():
     from portrayal.manifest import load_yaml
     return copy.deepcopy(load_yaml(cti.SCHEMAS / "cable-types.yaml"))
