@@ -10,7 +10,7 @@ import * as Q from '../../../kit/rack/queries.js';
 import {cableScheduleRows} from '../../../kit/rack/export-data.js';
 import {RU, OPENING, RAIL_W} from '../../../kit/rack/rails.js';
 import * as M from '../../../kit/rack/model.js';
-import {fitsZeroU} from '../../../kit/rack/fit.js';
+import {fitsZeroU, zeroUTouched as F_span} from '../../../kit/rack/fit.js';
 import * as F from './cable-solids-fixture.mjs';
 
 const raw = path => path.points.filter(p => p.at !== 'detour');
@@ -313,6 +313,9 @@ test('a zero-U part at a part-unit offset is drawn where fit judges it, in milli
     assert.equal(M.zeroUBottomMm(r.zeroU[0]), off);
     assert.equal(fitsZeroU(r, {...r.zeroU[0], id: 'other', at: 'right-front'}, ctx.chassisOf).ok, true);
     const body = S.solidsOf(r, ctx).filter(x => x.item === 'z2');
+    // the lane test reads the same millimetres: the units the part touches
+    const span = F_span(r.zeroU[0], ctx.chassisOf);
+    assert.deepEqual(span, [Math.floor(off / RU + 1e-6) + 1, Math.ceil((off + 30 * RU) / RU - 1e-6)]);
     assert.ok(body.length);
     assert.ok(Math.abs(Math.min(...body.map(x => x.box.y0)) - off) < 1e-9, `${off}: ${JSON.stringify(body.map(x => x.box))}`);
   }
