@@ -869,6 +869,20 @@ superseded major that still ships from a dead one is pending
 marker, a stated support window, and the L89 distinction.
 DESIGN §9 has the reasoning.
 
+**A removed ref that a saved rack names** (#1049). A rack file names parts by
+ref, and removing a major leaves its refs dangling there. The replacement can
+say which removed refs it stands in for, `supersedes:` on its contract, only
+where it is a drop-in (the same part ids, port paths and names); the build
+publishes the list on the replacement's `components.json` entry as
+`supersedes`, `[{"ref", "signature", "from"}]`, and `[]` on every other row.
+The `signature` is a hash of the removed part's published form, recorded once
+and recomputed from the replacement at every build, so a replacement that
+stops being a drop-in stops the build. A consumer that reads a rack follows
+the redirect when it reads a swap (kit 0.32.0, `kit/redirects.js`), never
+rewrites a file on load, and writes the new ref only when the rack is saved
+after an edit. A removed ref with no redirect is reported as no longer in the
+library and kept as written.
+
 **A lint code.** A device manifest waives a rule by its code (`lint.waive`),
 so lint codes are never renumbered or reused. A rule that is deleted keeps its
 code, listed as retired, and a new rule always takes a new code. A test pins

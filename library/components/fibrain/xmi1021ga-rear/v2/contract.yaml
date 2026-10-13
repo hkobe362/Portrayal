@@ -32,3 +32,9 @@ provenance:
     the holder and no printing; the moulding behind them is painted as the
     front is.
 skins: [default]
+# The @1 of this part is gone from the library (#1046). A rack file that names it
+# is read as this one: the ids of its parts, its ports and their names are the same.
+supersedes:
+  - ref: fibrain/xmi1021ga-rear@1
+    signature: sha256:60358c29c23a27d9ba9a1e158c566b06d5a360124a9d0ee0b0c925f8d00d0857
+    from: 8c7f9a3b1d34

@@ -436,6 +436,10 @@ def _component_digest(version_dir: pathlib.Path, contract: dict) -> str:
     skins = {}
     for skin in sorted((version_dir / "skins").glob("*.svg")):
         skins[skin.name] = hashlib.sha256(skin.read_bytes()).hexdigest()[:16]
+    # `supersedes` (#1049) lists the removed refs this part stands in for. It
+    # says nothing about what the part draws, so a device that seats it is not
+    # redrawn by it: adding a redirect to a part does not re-lock its devices.
+    contract = {k: v for k, v in contract.items() if k != "supersedes"} if isinstance(contract, dict) else contract
     return _digest({"contract": contract, "skins": skins})
 
 

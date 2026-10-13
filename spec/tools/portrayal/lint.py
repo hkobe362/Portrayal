@@ -651,6 +651,9 @@ RULES = {
     "L183": ("device",     "an attr that restates an adjustment equals it: an attr whose name is the id of the adjustment, with any words before it, followed by `-mm` holds the default, and one followed by `-min-mm` or `-max-mm`, or with `min` or `max` among the words before the id, holds that end of the range (`minimum` and `maximum` are read as `min` and `max`, and no other word names an end); a name that says both ends is not paired; on an adjustment with stops and no range, the minimum is the lowest stop and the maximum the highest", "correct the attr, or the range or the stop it restates, so that the two agree; rename an attr that measures something else",
              "The attrs are how the travel of a part reaches the DCIM export comments, and two statements of one number drift apart: a range against its attrs, or a row of stops against the lowest and highest an attr claims.",
              ERROR),
+    "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
+             "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -3856,6 +3859,43 @@ def lint_component_superseded_by(path, data, lib_roots):
             f"superseded-by: {ref}, which is {'not ' if was_kit else ''}a kit, and "
             f"this part {'is' if was_kit else 'is not'} - a kit's successor is a kit, "
             "and a component's is not")
+
+
+def lint_component_supersedes(path, data, lib_roots):
+    """L184: the shape of a `supersedes` list (#1049).
+
+    The schema checks the keys; this checks what a schema cannot: that a listed
+    ref is not the part itself and is GONE from the library (a retired major
+    that is kept says `superseded-by`, and a ref both published and redirected
+    would be read two ways), that no ref is listed twice, and the signature and
+    commit are well formed. Whether the signature still MATCHES the replacement
+    is the build's check (components_index, redirects.problems): it needs the
+    part as published, which lint does not compose.
+    """
+    if not isinstance(data, dict) or not data.get("supersedes"):
+        return
+    own = libwalk.ref_of(path)
+    seen = set()
+    for i, c in enumerate(data["supersedes"]):
+        if not isinstance(c, dict):
+            err(path, "L184", f"supersedes[{i}]: not a mapping with ref, signature and from")
+            continue
+        ref = c.get("ref")
+        if not isinstance(ref, str) or not re.fullmatch(r"[a-z0-9-]+/[a-z0-9-]+@\d+", ref):
+            err(path, "L184", f"supersedes[{i}]: ref {ref!r} is not an ns/name@major ref")
+        elif ref == own:
+            err(path, "L184", f"supersedes: {ref} is this part itself - a part does not replace itself")
+        elif ref in seen:
+            err(path, "L184", f"supersedes: {ref} is listed twice")
+        elif resolve_component(ref, lib_roots):
+            err(path, "L184", f"supersedes: {ref} is still in the library - a redirect is for a ref that is gone; "
+                              "a retired major that is kept says `superseded-by` instead")
+        seen.add(ref)
+        if not isinstance(c.get("signature"), str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", c["signature"]):
+            err(path, "L184", f"supersedes[{i}]: signature {c.get('signature')!r} is not sha256: and 64 lower-case hex digits")
+        if not isinstance(c.get("from"), str) or not re.fullmatch(r"[0-9a-f]{7,40}", c["from"]):
+            err(path, "L184", f"supersedes[{i}]: from {c.get('from')!r} is not the commit the signature was taken from "
+                              "(7 to 40 hex digits)")
 
 
 def _kit_ranges(depth):
@@ -13616,6 +13656,7 @@ def main():
                     f, d, args.library,
                     f"{f.parents[2].name}/{d.get('name')}@{f.parent.name[1:]}")
                 lint_component_superseded_by(f, d, args.library)
+                lint_component_supersedes(f, d, args.library)
                 lint_component_pluggable_rate(f, d)
                 lint_component_optical_endpoints(f, d, args.library)
                 lint_component_optical_faces(f, d)
