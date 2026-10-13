@@ -168,7 +168,7 @@ def test_a_contract_with_no_supersedes_is_clean():
     ("an upper-case signature", good(signature="sha256:" + "A" * 64), "sha256"),
     ("no commit", good(**{"from": ""}), "from"),
     ("a duplicate", {"name": "holder", "supersedes": [good()["supersedes"][0], good()["supersedes"][0]]}, "twice"),
-    ("a live part", good(ref="common/psu-550w@1"), "still in the library"),
+    ("a live part", good(ref="juniper/mic-3d-20ge-sfp-v@1"), "still in the library"),
 ])
 def test_a_malformed_supersedes_is_an_error(what, doc, words):
     out = lint(doc)

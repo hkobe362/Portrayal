@@ -25,7 +25,7 @@ import {validate, same} from './validate.js';
 import {withRoutedLengths, pathwaysOf, lanesOf} from './route.js';
 import {slotsFor, slotEnv, resolverFor, holdsAt, partName, partOf} from './slots.js';
 import {acceptSwaps, underCarrier} from '../swap.js';
-import {followSwaps, keptSwaps, unknownTexts, auditRack, rewriteRack, rewroteText, pairText} from '../redirects.js';
+import {followSwaps, keptSwaps, unknownTexts, rewriteRack, rewroteText, pairText} from '../redirects.js';
 import {fieldAccepts} from '../fields.js';
 
 export const GONE = 'That device is no longer in the rack.';
@@ -1390,7 +1390,7 @@ export function apply(rack, cmds, ctx) {
   const bound = new Map(), created = {}, ids = [], summaries = [], findings = [];
   let cur = rack, step = false;
   // WHAT THIS RACK SAYS THAT THE LIBRARY HAS REPLACED, as the file has it
-  const said = ctx?.redirects?.size ? auditRack(rack, ctx).redirected : [];
+  const said = ctx?.redirects?.size ? rewriteRack(rack, ctx.redirects).changed : [];
   for (const [index, raw] of list.entries()) {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw) || typeof raw.op !== 'string')
       return {error: 'A command is an object with an op.', index};
