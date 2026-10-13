@@ -40,7 +40,7 @@
 // check and the detours read only boxes.
 
 import {RU, SIDES} from './rails.js';
-import {zeroUOf, zeroUBottom} from './model.js';
+import {zeroUOf, zeroUBottomMm} from './model.js';
 import {isZeroUPart, railOf, itemBox, setbackOf, isQuarter} from './fit.js';
 import {rollOf} from './model.js';
 import {zeroUX, faceOfAt, carriesLane} from './zero-u.js';
@@ -127,7 +127,7 @@ function zeroUPlacer(rack, z, c) {
   // centred on its upright's depth, behind the mounting face; a rear upright
   // carries its part facing rearward
   const zc = rear ? -railDepthOf(f) + POST_D / 2 : -POST_D / 2;
-  return placer({cx: zeroUX(z, () => c), w, y0: (zeroUBottom(z) - 1) * RU, h,
+  return placer({cx: zeroUX(z, () => c), w, y0: zeroUBottomMm(z), h,
                  zFront: rear ? zc - d / 2 : zc + d / 2, outward: rear ? -1 : 1, mirror: rear, flipY: false});
 }
 
