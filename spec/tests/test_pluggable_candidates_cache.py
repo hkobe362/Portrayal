@@ -90,7 +90,11 @@ def reference(roots):
         c = R.load_yaml(cf) or {}
         if c.get("superseded-by") or not c.get("mates"):
             continue
-        out.setdefault(c["mates"], []).append((libwalk.ref_of(cf), c))
+        # `mates` is one interface or a list (#1045), read here without the
+        # helper the walk uses, so the two readings are independent
+        m = c["mates"]
+        for iface in ([m] if isinstance(m, str) else m):
+            out.setdefault(iface, []).append((libwalk.ref_of(cf), c))
     return out
 
 
@@ -102,6 +106,21 @@ def test_a_hit_answers_exactly_what_a_computation_does(cache_dir, monkeypatch):
     second = fresh([LIB])
     assert shape(second) == shape(first)
     assert list(second) == list(first)
+
+
+def test_a_part_that_mates_two_interfaces_is_stored_and_read_back(cache_dir, monkeypatch):
+    """`mates` may be a list (#1045): the entry holds one row per interface,
+    so an index repeats, and a hit still reads it without parsing."""
+    first = fresh([LIB])
+    (entry,) = entries(cache_dir)
+    rows = json.loads(entry.read_text())["picked"]
+    idx = [i for _m, i in rows]
+    assert len(idx) > len(set(idx)), "no contract in the library lists two interfaces"
+    assert idx == sorted(idx)
+    NoParse(monkeypatch)
+    again = fresh([LIB])
+    assert shape(again) == shape(first)
+    assert [r for r, _c in again["eaton-c39"]] == ["generic/c14-plug@1", "generic/c20-plug@1"]
 
 
 def test_changing_one_contracts_mates_misses_the_cache(lib, cache_dir):

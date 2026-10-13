@@ -33,7 +33,7 @@ import onebuild
 import warmrender
 from portrayal import render as render_mod
 from portrayal.artifacts import face_file
-from portrayal.manifest import presented_interface
+from portrayal.manifest import mates_of, presented_interface
 from test_coax_slots import _contract, _skin_path
 from test_head_3d import apply, box, lift_of
 from test_nested_occupants import (assert_same_turn, by_path, cage_mate, device_matrix,
@@ -246,9 +246,10 @@ def test_each_interface_is_mated_by_exactly_its_plug(comps):
     plug."""
     mating = {}
     for ref in comps:
-        m = _contract(ref).get("mates")
-        if m in PAIRS:
-            mating.setdefault(m, []).append(ref)
+        # `mates` is one interface or a list (#1045)
+        for m in mates_of(_contract(ref)):
+            if m in PAIRS:
+                mating.setdefault(m, []).append(ref)
     assert mating == {iface: [plug] for iface, (_h, plug, _n) in PAIRS.items()}
 
 

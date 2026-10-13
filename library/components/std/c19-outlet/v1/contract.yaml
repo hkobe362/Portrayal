@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: c19-outlet
-version: 1.0.1
+version: 1.1.0
 class: inlet
 profile: power
 conforms: c19-outlet
@@ -12,7 +12,7 @@ description: >-
   its three contact slots standing in it, earth slot up. Mates C20 cords.
 size: {w: 35.6, h: 27.7, d: 20}
 size-confidence: {w: drawing, h: drawing, d: estimated}
-attrs: {outlet: iec-60320-c19, rating-a: 16}
+attrs: {outlet: iec-60320-c19, media: ac, rating-a: 16}
 provenance:
   method: >-
     drawing - SCHURTER 4710-5 data sheet ("IEC Appliance Outlet J, Snap-in
@@ -55,6 +55,10 @@ provenance:
     cut out of it (evenodd), so the 3D walls follow the rounded corners and
     the nose, which stands 20 from the floor to the face (kit/relief.js
     outlineWalls). Its contact slots are painted on its top, not sunk.
+  media: >-
+    `media: ac` (#1045): an outlet states what it hands on, as
+    std/c14-inlet@1 states what it takes. `outlet` is the DCIM type and says
+    which way power runs; it does not say AC.
   orientation: >-
     drawing - SCHURTER 4710-5 draws the earth slot up and the line and neutral
     below. A placement turns the part for an outlet mounted the other way up.

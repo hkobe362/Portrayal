@@ -1,6 +1,6 @@
 {
  "bay-accepts": {},
- "composed": "51efa8874a2c61b9",
+ "composed": "e4038253bdb38bc5",
  "composed-refs": {
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
@@ -8,8 +8,8 @@
   "eaton/tripplite-led@1": "1.0.0+64f34a2cfe93ab69",
   "eaton/tripplite-load-meter@1": "1.0.0+4445880267fd5064",
   "eaton/tripplite-mounting-button@1": "1.0.0+6302c978c24525a1",
-  "std/c13-outlet@1": "1.0.0+4c2ec0215cfdc077",
-  "std/c19-outlet@1": "1.0.1+0e8370a77e7841c5",
+  "std/c13-outlet@1": "1.1.0+99d4f2c7aa898c37",
+  "std/c19-outlet@1": "1.1.0+610bc32957b2ab61",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa",
   "std/rj45@2": "2.1.0+2c8fec73bdc493fb",
   "std/usb-a@1": "1.3.0+3c77f06ea6794bfc"
@@ -356,5 +356,5 @@
  "placement-surface": "333026e235eb1421",
  "shape": "c2316cbba68133ad",
  "surface": "c30ff027e03f3904",
- "version": "0.1.1"
+ "version": "0.2.0"
 }

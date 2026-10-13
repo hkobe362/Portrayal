@@ -1,9 +1,9 @@
 format: 1
 kind: component
 name: c20-plug
-version: 1.0.0
+version: 1.1.0
 class: port
-mates: iec-c19
+mates: [iec-c19, eaton-c39]
 conforms: c20-plug
 profile: networking
 description: >-
@@ -11,7 +11,7 @@ description: >-
   jumper that goes into a PDU's C19 outlet, seen from the cable end as a front
   elevation sees it seated: the overmould, the strain relief and a short
   straight stub of cord whose diameter is the cable-od field. Seats in an
-  `iec-c19` outlet at its own mate point.
+  `iec-c19` outlet at its own mate point, and in an `eaton-c39` outlet.
 size: {w: 33.75, h: 25.75}
 size-confidence: {w: drawing, h: drawing}
 attrs: {media: c20, connector: c20}
@@ -29,6 +29,13 @@ provenance:
     earth 8 +/-0.2 off their line. The catalogue gives no drawing number or
     revision. Anderson Power Products DS-SDG REV 19 p.16 draws a moulded C20
     plug 34.0 x 26.0 x 86.8, which agrees to 0.3 across.
+  mates: >-
+    A LIST: `iec-c19` and `eaton-c39`. `iec-c19` is the C19 outlet
+    std/c19-outlet@1 presents. `eaton-c39` is the Eaton combination outlet
+    eaton/c39-outlet@1 presents, which is designed to take a C14 or a C20
+    plug (Eaton Rack PDU G4 installation and setup guide P-164001156 rev 3,
+    section 1.5). Both wells are modelled 20 deep, so the plug stands the
+    same 63.75 in front of either. It seats at the `mate` of the outlet.
   no-depth: >-
     NO `size.d`, DELIBERATELY, as on generic/c19-plug@1: a `size.d` on a part
     with no `behaviour` is built as a pit behind its box. The length is in the

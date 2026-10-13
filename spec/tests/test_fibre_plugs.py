@@ -40,7 +40,7 @@ from test_slot_defaults import _copy, build, face, run
 from test_connector_slots import comps                                # noqa: F401
 
 from portrayal import lint
-from portrayal.manifest import (load_yaml, nested_key_host,
+from portrayal.manifest import (load_yaml, mates_of, nested_key_host,
                                 presented_interface, seat_point)
 
 SPEC = LIB.parent / "spec"
@@ -257,6 +257,9 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
     assert copper_multipair
     for f in (LIB / "components").rglob("v*/contract.yaml"):
         c = load_yaml(f) or {}
+        # `mates` is one interface or a list (#1045): a part is left out when
+        # ANY interface it mates is one of the kind named
+        ms = mates_of(c)
         if (c.get("attrs") or {}).get("media") == "rj45":
             continue
         # NOR ARE THE COAX PLUGS (#650). generic/sma-plug@1, smb-plug@1 and
@@ -272,7 +275,7 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
         # IS - it mates an interface a `class: inlet` part presents, and no
         # fibre runs through an appliance inlet - and their census is
         # spec/tests/test_ac_cord_ends.py.
-        if c.get("mates") in ac_inlets:
+        if any(m in ac_inlets for m in ms):
             continue
         # NOR ARE THE USB CABLE PLUGS (#786). generic/usb-a-plug@1,
         # micro-usb-b-plug@1 and usb-c-plug@1 mate `usb-a`, `micro-usb-b` and
@@ -280,7 +283,7 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
         # Left out by what each IS - it mates an interface presented by a
         # part whose medium is a USB connector, and no fibre runs through
         # one - and their census is spec/tests/test_usb_plugs.py.
-        if c.get("mates") in usb_receptacles:
+        if any(m in usb_receptacles for m in ms):
             continue
         # NOR ARE THE D-SUB AND VGA CABLE PLUGS (#787). generic/db9-plug@1,
         # hd15-plug@1, da15-plug@1 and db25-plug@1 mate `db9`, `hd15`, `da15`
@@ -288,13 +291,13 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
         # Left out by what each IS - it mates an interface presented by a
         # part that conforms to a D-subminiature shell, and no fibre runs
         # through one - and their census is spec/tests/test_dsub_plugs.py.
-        if c.get("mates") in dsub_connectors:
+        if any(m in dsub_connectors for m in ms):
             continue
         # NOR IS A COVER (#807). amphenol-ns/touch-guard-1ru@1 mates
         # `breaker-1ru-guard`, the face of a plug-in breaker, which the registry
         # holds so a guard that ships on a breaker can come off. Left out by what
         # the INTERFACE is - the registry marks it `cover: true` - not by name.
-        if (connectors.get(c.get("mates")) or {}).get("cover"):
+        if any((connectors.get(m) or {}).get("cover") for m in ms):
             continue
         # NOR IS A MOUNT POINT (#934). eaton/g4-mounting-button@1 mates
         # `pdu-button`, the keyhole a rack PDU hangs on, which the registry
@@ -312,21 +315,21 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
         # spec/tests/test_dc_terminal_plugs.py. generic/dc-barrel-plug@1 mates
         # `dc-barrel`, a power inlet's interface, and is left out with them;
         # its census is spec/tests/test_dc_barrel_plug.py.
-        if c.get("mates") in terminal_headers:
+        if any(m in terminal_headers for m in ms):
             continue
         # NOR IS THE RING LUG (#789). generic/ring-lug@1 mates `terminal-stud`,
         # the interface a barrier block's terminal screw presents. Left out by
         # what it IS - it mates an interface presented by a screw, and it
         # carries one copper wire - and its census is
         # spec/tests/test_terminal_lugs.py.
-        if c.get("mates") in terminal_screws:
+        if any(m in terminal_screws for m in ms):
             continue
         # NOR ARE THE TWO-HOLE LUGS (#828). generic/two-hole-lug-*@1 mate a
         # `stud-pair-*` interface, which spans two `terminal-stud` seats. Left
         # out by what each IS - a lug on one copper wire - and their census is
         # spec/tests/test_two_hole_lugs.py.
-        if (connectors.get(c.get("mates")) or {}).get("spans", {}).get("interface") \
-                in terminal_screws:
+        if any((connectors.get(m) or {}).get("spans", {}).get("interface") in terminal_screws
+               for m in ms):
             continue
         # NOR ARE THE MRJ21, VHDCI AND RJ11 CABLE PLUGS (#790).
         # generic/mrj21-plug@1, vhdci-plug@1 and rj11-plug@1 mate `mrj21`,
@@ -335,9 +338,9 @@ def test_the_librarys_fibre_plugs_are_these_six_and_there_are_six():
         # whose medium is one of those three copper connectors, and no fibre
         # runs through one - and their census is
         # spec/tests/test_small_connector_plugs.py.
-        if c.get("mates") in copper_multipair:
+        if any(m in copper_multipair for m in ms):
             continue
-        if c.get("mates") in connectors and c.get("class") != "cap":
+        if any(m in connectors for m in ms) and c.get("class") != "cap":
             ns = f.parents[2].name
             found[f"{ns}/{c['name']}@{c['version'].split('.')[0]}"] = c
     # THE SIXTH, WITH ITS PARAGRAPH. generic/mpo16-plug@1 mates `mpo16`: the

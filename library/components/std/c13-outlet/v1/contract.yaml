@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: c13-outlet
-version: 1.0.0
+version: 1.1.0
 class: inlet
 profile: power
 conforms: c13-outlet
@@ -12,7 +12,7 @@ description: >-
   contacts standing in it to the face. Drawn with its chamfered end uppermost.
 size: {w: 30.4, h: 22, d: 18}
 size-confidence: {w: registry, h: registry, d: estimated}
-attrs: {outlet: iec-60320-c13, rating-a: 10}
+attrs: {outlet: iec-60320-c13, media: ac, rating-a: 10}
 provenance:
   size: >-
     registry - the `c13-outlet` entry of spec/schemas/standards.yaml: the well 30.4
@@ -38,6 +38,10 @@ provenance:
   interface: >-
     `iec-c13` in spec/schemas/connectors.yaml, standard `c13-outlet`: a C14 cord
     end (generic/c14-plug@1) mates it, seating at `mate`, the centre of the well.
+  media: >-
+    `media: ac` (#1045): an outlet states what it hands on, as
+    std/c14-inlet@1 states what it takes. `outlet` is the DCIM type and says
+    which way power runs; it does not say AC.
   orientation: >-
     the part is drawn with its chamfered end up, as on the standing Eaton G4; a
     placement turns it where a panel holds it otherwise.

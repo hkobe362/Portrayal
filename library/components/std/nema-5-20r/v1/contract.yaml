@@ -1,10 +1,11 @@
 format: 1
 kind: component
 name: nema-5-20r
-version: 1.0.1
+version: 1.1.0
 class: inlet
 profile: power
 conforms: nema-5-20r
+interface: nema-5-20r
 description: >-
   A NEMA 5-20R single receptacle face, 20 A 125 V, as a rack PDU carries it: a
   flat face with the U earth hole up, the line slot on the left and the T
@@ -12,7 +13,7 @@ description: >-
   5-20P.
 size: {w: 27.0, h: 27.0}
 size-confidence: {w: drawing, h: drawing}
-attrs: {outlet: nema-5-20r, rating-a: 20, accepts: '5-15P, 5-20P'}
+attrs: {outlet: nema-5-20r, media: ac, rating-a: 20, accepts: '5-15P, 5-20P'}
 provenance:
   size: >-
     drawing - Qualtek 739W-X2/30 "Snap-in 20 Amp T-slot receptacle", drawn
@@ -55,9 +56,25 @@ provenance:
     When it lands, these three pockets take `shape: true` and nothing else
     moves.
   interface: >-
-    NO `interface:` YET. No plug in the library seats here as a cord end:
-    generic/nema-5-20p-plug@1 is the face of a PDU's input plug, drawn face on,
-    not a cord end seen from its cable.
+    `nema-5-20r` in spec/schemas/connectors.yaml, standard `nema-5-20r`
+    (#1045). Two cord ends mate it and seat at `mate`:
+    generic/nema-5-15p-cord@1, whose parallel neutral blade enters the stem
+    of the T, and generic/nema-5-20p-cord@1, whose turned one enters its arm.
+    generic/nema-5-20p-plug@1 is NOT one of them: it is the input plug of a
+    PDU drawn face on, class `inlet`, and it mates nothing.
+  mate: >-
+    drawing - (10.89, 19.0): the earth axis, on the line of the two blades.
+    The earth hole is centred at x 10.89. The line slot and the stem of the
+    T are centred at y 18.99 and 19.07, read off the same paths, and the
+    line is taken at 19.0. NOT THE CENTRE OF THE FACE, which is 2.6 to the
+    right: Qualtek 739W-X2/30 sets the pattern left of centre to make room
+    for the arm of the T. Both cord ends put their own `mate` on the same
+    point of their blade pattern.
+  media: >-
+    `media: ac` (#1045): an outlet states what it hands on, as
+    std/c14-inlet@1 states what it takes, so a reader can tell an AC outlet
+    from a DC terminal. `outlet` is the DCIM type and says which way power
+    runs; it does not say AC.
 elements:
   face: {at: [0, 0], size: [27.0, 27.0], class: inlet}
 relief:
@@ -81,4 +98,6 @@ relief:
       source: >-
         Leviton CATSTD-05366-00C-D01 rev 1, the 5-20P blades 0.67 in [17 mm]
         long: as deep as a seated blade reaches.
+connection-points:
+  mate: {at: [10.89, 19.0], direction: front}
 skins: [default]

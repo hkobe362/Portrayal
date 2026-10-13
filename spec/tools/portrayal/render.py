@@ -40,7 +40,7 @@ from portrayal.manifest import (presented_point, back_hosts, back_parts, key_on_
                       occupant_spec, nested_key_host, slot_default, drawn_refs,
                       spanned_slots, spanning_axis, summed_rotate, presented_turn,
                       allowed_turns, text_extent, alias_names, config_airflow,
-                      config_power, device_options, pdu_class)
+                      config_power, device_options, pdu_class, mates_of)
 from portrayal import capability
 from portrayal import ears as ears_mod
 from portrayal import bevel as _bevel
@@ -4710,7 +4710,14 @@ def _mounts(device, cfg_name, cfg, lib, key):
             at = seat_point(p["at"], {"w": size.get("w", 0), "h": size.get("h", 0)},
                             p.get("rotate", 0), mate)
             out.append({key: contract[key], "at": round(float(h) - at[1], 2)})
-    return sorted(out, key=lambda m: (m["at"], m[key]))
+    # `mates` may be a list (manifest.mates_of); it is published as stated and
+    # ordered as text, so a list never meets a string in a comparison
+    return sorted(out, key=lambda m: (m["at"], _interface_text(m[key])))
+
+
+def _interface_text(value):
+    """One interface, or a list of them, as the text it is ordered by."""
+    return value if isinstance(value, str) else "\0".join(value)
 
 
 def config_slots(device, cfg_name, cfg, lib):
@@ -4993,7 +5000,7 @@ def _family_by_rate(families, media):
 # THE DIRECTORY IS lint's (`_id_corpus_cache_dir`: $PORTRAYAL_CACHE_DIR, else
 # $XDG_CACHE_HOME/portrayal, else ~/.cache/portrayal), so one setting moves
 # both caches, and the suite's conftest keeps this one out of ~/.cache too.
-_CANDIDATES_CACHE_FORMAT = 1
+_CANDIDATES_CACHE_FORMAT = 2
 _CANDIDATES_CACHE_KEEP = 50         # entries kept; the oldest by mtime go first
 _CANDIDATES_TMP_MAX_AGE = 3600      # seconds before a stray temp file is an orphan
 
@@ -5068,16 +5075,17 @@ _CANDIDATE_MATES = {}
 
 
 def _candidate_mates(data, sha):
-    """The interface one contract offers itself under - its `mates:`, unless it
-    is `superseded-by` something - or None. The parser load_yaml uses, on the
-    hashed bytes; memoised by sha256."""
+    """The interfaces one contract offers itself under - its `mates:`, one
+    interface or a list (manifest.mates_of), as a tuple in the order stated -
+    or None when it states none or is `superseded-by` something. The parser
+    load_yaml uses, on the hashed bytes; memoised by sha256."""
     if data is None:
         return None
     if sha in _CANDIDATE_MATES:
         return _CANDIDATE_MATES[sha]
     from portrayal import manifest as _manifest_mod
     c = yaml.load(data, Loader=_manifest_mod._Loader) or {}
-    mates = None if c.get("superseded-by") else (c.get("mates") or None)
+    mates = None if c.get("superseded-by") else (tuple(mates_of(c)) or None)
     _CANDIDATE_MATES[sha] = mates
     return mates
 
@@ -5092,7 +5100,9 @@ def _candidates_prime(lib_roots):
 def _candidates_cache_load(path, digest, nfiles):
     """The cached selection as [(interface, index)], or None if the entry is
     missing, unreadable, or anything other than what `_candidates_cache_store`
-    writes for `digest` over `nfiles` contracts."""
+    writes for `digest` over `nfiles` contracts. A contract that mates more
+    than one interface has a row for each, so an index may repeat and never
+    goes back."""
     try:
         with open(path, "rb") as fh:
             doc = json.loads(fh.read().decode("utf-8"))
@@ -5105,7 +5115,7 @@ def _candidates_cache_load(path, digest, nfiles):
         picked, last = [], -1
         for row in rows:
             if not (isinstance(row, list) and len(row) == 2 and type(row[0]) is str
-                    and row[0] and type(row[1]) is int and last < row[1] < nfiles):
+                    and row[0] and type(row[1]) is int and last <= row[1] < nfiles):
                 return None
             last = row[1]
             picked.append((row[0], row[1]))
@@ -5201,8 +5211,9 @@ def _pluggable_candidates(lib_roots):
         with contextlib.suppress(OSError):
             os.utime(entry)
     else:
-        picked = [(mates, i) for i, (_n, _rel, _cf, data, sha) in enumerate(files)
-                  if (mates := _candidate_mates(data, sha)) is not None]
+        # one row per interface a contract mates, in the order it states them
+        picked = [(iface, i) for i, (_n, _rel, _cf, data, sha) in enumerate(files)
+                  for iface in (_candidate_mates(data, sha) or ())]
         # a file that vanished mid-walk is a tree being changed under us:
         # answer from what was read, but do not record it for anyone else
         if (digest is not None and all(data is not None for *_, data, _sha in files)
@@ -5537,7 +5548,7 @@ def component_presents(ref, lib, families, candidates, connectors=None):
     seat's lift, as the build stacks a chain.
     """
     contract, _skins = lib.resolve(ref)
-    if not contract.get("mates"):
+    if not mates_of(contract):
         return None
 
     def _resolve(r):
