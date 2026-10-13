@@ -307,6 +307,17 @@ test('what sits under a ref that is gone is kept with it', () => {
   assert.deepEqual(res.rack.items[0].swaps, {'bay-1': GONE, 'bay-1/module/lc1': 'acme/lc-plug@1'});
 });
 
+test('a ref that is gone, seated under a live carrier the same map seats, is kept', () => {
+  const swaps = {'bay-1': NEW, 'bay-1/module/lc1': GONE};
+  const rack = rackWith(swaps);
+  const res = apply(rack, {op: 'patch', id: 'i1', swaps}, withR);
+  assert.deepEqual(res.rack.items[0].swaps, swaps);
+  assert.match(res.findings.map(f => f.text).join('\n'), /acme\/gone@1 .*bay-1\/module\/lc1.* is no longer in the library/);
+  assert.ok(!res.findings.some(f => /Left out/.test(f.text)));
+  const seen = auditRack(rack, withR);
+  assert.deepEqual(seen.unknown.map(u => u.path), ['bay-1/module/lc1']);
+});
+
 test('a ref that is gone, on a slot that does not exist, is still dropped as before', () => {
   const rack = rackWith({});
   const res = apply(rack, {op: 'patch', id: 'i1', swaps: {'bay-99': GONE}}, withR);

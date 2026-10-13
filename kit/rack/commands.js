@@ -130,7 +130,7 @@ function patch(rack, {id, ...given}, ctx) {
       // under it, and named (kit/redirects.js): neither is dropped.
       p.swaps = followSwaps(p.swaps, ctx.redirects).swaps;
       const env = slotEnv({...it, cfg: p.cfg ?? it.cfg}, s, ctx.compByRef, ctx.redirects);
-      const {kept, rest, gone} = keptSwaps(p.swaps, ctx, path => resolverFor(env, {}).entryAt(path));
+      const {kept, rest, gone} = keptSwaps(p.swaps, ctx, path => resolverFor(env, p.swaps).entryAt(path));
       const {accepted, ignored} = acceptSwaps(rest, env);
       p.swaps = {...accepted, ...kept};
       if (ignored.length) findings.push(note(`Left out ${ignored.join(', ')}: not a slot on ${it.label}, or a part that slot does not take.`));
