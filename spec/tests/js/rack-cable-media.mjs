@@ -4,8 +4,9 @@ import * as C from '../../../kit/rack/cable-rules.js';
 
 const end = (item, path, view = 'front') => ({item, path, view});
 
-test('the media enum is the eight the rulings name, each with a label and a kind', () => {
-  assert.deepEqual(C.MEDIA, ['os2', 'om3', 'om4', 'om5', 'cat6', 'cat6a', 'dac', 'aoc']);
+test('the media enum is the eight data media, then power and ground (#1045), each with a label and a kind', () => {
+  assert.deepEqual(C.MEDIA, ['os2', 'om3', 'om4', 'om5', 'cat6', 'cat6a', 'dac', 'aoc', 'power', 'ground']);
+  assert.deepEqual([C.mediaKind('power'), C.mediaKind('ground')], [{family: 'power', mode: null}, {family: 'ground', mode: null}]);
   for (const m of C.MEDIA) { assert.ok(C.MEDIA_LABELS[m], m); assert.ok(C.mediaKind(m).family, m); }
   assert.deepEqual(C.mediaKind('os2'), {family: 'fiber', mode: 'single-mode'});
   assert.deepEqual(C.mediaKind('om5'), {family: 'fiber', mode: 'multimode'});

@@ -544,6 +544,25 @@ no `bundles` key and saves as it was.
   `parseDoc(input, {notes})` says so, one sentence per repair naming its
   rack. No note is kept in the file.
 
+### Power and ground cables (kit 0.30.0)
+
+Added to the rack file without raising its version, since each is a new value
+or a new optional key and nothing that was valid reads differently
+([cable-ends-design.md](cable-ends-design.md)):
+
+- a cable's `media` may be `power` (an AC cord or a DC feed) or `ground` (a
+  bonding wire). A reader that does not know a media keeps it and draws the
+  cable as one with no media;
+- an end may carry `plug`, a component ref: the plug or lug the cable has
+  there, stated only where the port takes more than one. A reader that does
+  not know the key keeps it on load;
+- an end's `path` may be the path of a connector slot that is no part of class
+  `port`: a power inlet, an outlet, a DC terminal's screw, a ground stud. A
+  reader older than 0.30.0 reads such an end as loose.
+
+A device's `attrs.performance.cable-capacity-media` does not take the two new
+words: a capacity is a count of data cords.
+
 ## The cable types file
 
 `cable-types.json` names the cable types a rack tool can lay: each one's
@@ -573,8 +592,10 @@ Each type, keyed by its `id`, always carries:
   The bare ids `os2`, `om3`, `om4`, `om5`, `cat6`, `cat6a`, `dac` and `aoc` are
   those media values themselves, so a rack cable's media names its type. A
   refinement (`cat6a-ftp`, `os2-g657a2`, `dac-26awg`) has its own id and
-  names the media it refines. `power` is the media of the power cords, which
-  no Rack Builder media names yet.
+  names the media it refines. `power` is the media of the power cords, and
+  since kit 0.30.0 a Rack Builder media too; it has no bare type, so a cable
+  of media `power` that names no type is drawn and measured as the
+  `power-c13` cord.
 - `family`: `fiber`, `copper`, `dac`, `aoc` or `power`.
 - `od_mm` and `od_sources`: a typical outside diameter, a sketch and not a
   measurement of any one cable.
