@@ -59,7 +59,7 @@ same way.
 | `lay` | cable | section 3.9 | `face` is acted on; `position` is kept, and read when lay order is built |
 | `straps` (`every`, `breakout`, `anchors`) | bundle | section 3.10 | read, placed, counted |
 | `straps` (`anchors`) | cable | section 3.10 | read, placed, counted |
-| `color` | cable | section 14, added in kit 0.29.0 with no new version | read, checked, drawn, exported |
+| `color` | cable | section 14, added in kit 0.31.0 with no new version | read, checked, drawn, exported |
 | `setback` | frame, item | section 7 | read, fitted, used by routes |
 | `startU`, `holes.style: round` | frame | section 7 | read, labelled, drawn, exported |
 | `channel` | zero-U entry | section 7 | read; overlap judged per channel |
@@ -1855,8 +1855,8 @@ numbers are kept: a later reading takes the next one.
 
 ## 14. A cable's own colour (#1028), added after version 4 shipped
 
-Built in kit 0.29.0, with no new rack file version: section 1.2 has a reader
-keep a cable key it does not know, so a kit before 0.29.0 opens a file that
+Built in kit 0.31.0, with no new rack file version: section 1.2 has a reader
+keep a cable key it does not know, so a kit before 0.31.0 opens a file that
 carries the key, keeps it, writes it back, and draws the cable by its media.
 
 ### 14.1 What was there
@@ -1960,7 +1960,7 @@ Each is built, and each waits for a person to confirm it, as section 13's do.
 
 | item | where | what moves |
 |---|---|---|
-| `color` and `colorAsWritten` on a cable | rack file | saved files carry them; a `color` that is no colour, which a kit before 0.29.0 kept as an unknown key, now moves to `colorAsWritten` |
+| `color` and `colorAsWritten` on a cable | rack file | saved files carry them; a `color` that is no colour, which a kit before 0.31.0 kept as an unknown key, now moves to `colorAsWritten` |
 | the two keys in `rack.schema.json`, `color` with a `pattern` | published schema, `/schemas/v3/` | the first `pattern` in that schema; a validator that does not know the keyword passes any text |
 | `color` on `cable.add` and `cable.update` | kit commands | agent sessions call them by name |
 | `color`, `jackets`, `typeColor` on a link of `cablePlan` and `cablePlan3d`, each only when it says something; their second argument | kit output | a reader that compares a link key for key sees them on a cable that states a colour |

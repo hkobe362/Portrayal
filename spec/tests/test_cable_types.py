@@ -70,9 +70,15 @@ def test_every_rack_builder_media_is_a_type_of_its_own(built):
     # So a rack cable's media names its type with no mapping.
     # The bare types (id == media) are exactly the Rack Builder's media: a new
     # media without a type, or a bare type no media names, fails here.
+    # `power` and `ground` (#1045) are the two media with no bare type: a power
+    # type is one connector pair on one cord, so no cord is "power" and nothing
+    # more, and no ground wire has a type yet. The kit gives a cable of either
+    # media that names no type the power-c13 cord's figures and an estimate.
     media = _kit_list("kit/rack/cable-rules.js", "MEDIA")
     bare = {tid for tid, t in built["types"].items() if t["media"] == tid}
-    assert media and bare == set(media)
+    assert media and bare == set(media) - {"power", "ground"}
+    assert {"power", "ground"} <= set(media)
+    assert {t["media"] for t in built["types"].values()} <= set(media)
 
 
 def test_the_bare_types_agree_with_the_kit_s_fill_diameters(built):
@@ -80,6 +86,10 @@ def test_the_bare_types_agree_with_the_kit_s_fill_diameters(built):
     body = re.search(r"export const DIAMETERS = \{([^}]*)\}", text).group(1)
     fill = {k: float(v) for k, v in re.findall(r"(\w+): ([\d.]+)", body)}
     assert fill
+    # a ground wire has no type: its diameter is the kit's estimate alone
+    assert "ground" not in built["types"] and fill.pop("ground") > 0
+    # `power` has no bare type; the kit takes the power-c13 cord for it
+    assert fill.pop("power") == built["types"]["power-c13"]["od_mm"]
     for k, d in fill.items():
         assert built["types"][k]["od_mm"] == d, k
 

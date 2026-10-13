@@ -15,6 +15,9 @@ LIB = ROOT / "library" / "components"
 FIBRE_CONNECTORS = [
     "common/lc-duplex-adapter/v6", "common/lc-duplex-v-adapter/v6",
     "common/lc-duplex-shuttered-adapter/v2",
+    # Fibrain's own LC duplex adapter, bores side by side, off the maker's
+    # front elevations of the HD slot fronts
+    "fibrain/lc-duplex-adapter/v1",
     "common/mpo-adapter/v2", "common/mpo-flange-adapter/v2",
     "common/mpo24-flange-adapter/v2",
     # the MTP-16 panel tile: the MPO tile with sixteen fibre positions

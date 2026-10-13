@@ -8,8 +8,9 @@ import {fits, isRackFace, heightOf, railOf, isZeroUPart, zeroUUnits, itemUnits, 
 import {placement, managersOf} from './managers.js';
 import {uLabel, zeroUOf, zeroUBottom, firstU, holderOf, rollOf, uText} from './model.js';
 import {whereText, carriesLane} from './zero-u.js';
-import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText, isElementId, addressFor, portLabel} from './cable-rules.js';
-import {seatedPort, settleEnds} from './ports.js';
+import {portFree, endKey, proposeMedia, mismatch, endName, carriedU, portPathOf, matches, lengthText, isElementId, addressFor, portLabel,
+        takesCableEnd, receptacleOf, endKind, connectorName, endPlug} from './cable-rules.js';
+import {seatedPort, settleEnds, shownEnv} from './ports.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
 import {slackOf, spareLine, slackFindings} from './slack.js';
@@ -17,7 +18,7 @@ import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
 import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText, fewText,
         layoutOf} from './bundles.js';
-import {slotEnv, slotTree, partName, partOf} from './slots.js';
+import {slotEnv, slotTree, partName, partOf, resolverFor} from './slots.js';
 import {fieldRows} from '../fields.js';
 
 export function fitsAt(rack, {ref, face, ru}, {chassisOf}) {
@@ -210,13 +211,60 @@ export function describe(rack, ctx, {section, offset, limit} = {}) {
 // projected part's path so). An element id is never offered: a reader that
 // hands one in has it turned into the address it stands for where the
 // catalogue (`slotsOf`, `compByRef`) knows a port there, and dropped otherwise.
-export async function freePorts(rack, itemId, {portsOf, slotsOf, compByRef}) {
+//
+// THE SLOTS A CABLE LANDS ON (cable-rules.js cableLandsOn: a power inlet, an
+// outlet, a DC terminal, a ground stud) are listed where the reader hands
+// them in (zones.js readSvg `ends`) and the catalogue has the slot. Each
+// carries, beside what a port carries:
+//   kind       'power', 'ground', or 'other' for a slot whose part says neither
+//   connector  the end for a person: "C13 outlet", "C20 inlet"
+//   plug       the plug or lug a cable is given there (endPlug)
+//   of, first  where the slot is one of several under one part that is no
+//              slot itself (the screws of a DC terminal), that part's path,
+//              and `first: true` on the one to take: a feed is one cable, and
+//              it lands on the first free screw of its terminal
+// A PORT OF CLASS `port` IS LISTED EXACTLY AS BEFORE, with none of those keys.
+// `kinds` narrows the list: any of 'data' (the ports), 'power', 'ground',
+// 'other'. A picker for a data cable asks for ['data'].
+const FREE_KINDS = ['data', 'power', 'ground', 'other'];
+const natural = new Intl.Collator('en', {numeric: true});
+export async function freePorts(rack, itemId, {portsOf, slotsOf, compByRef}, {kinds = null} = {}) {
   const item = rack.items.find(i => i.id === itemId);
   if (!item) return {error: GONE};
+  if (kinds != null && !(Array.isArray(kinds) && kinds.every(k => FREE_KINDS.includes(k))))
+    return {error: `kinds is a list of ${FREE_KINDS.join(', ')}.`};
+  const want = k => kinds == null || kinds.includes(k);
   const out = [], seen = new Set();
+  // the catalogue's slots of this device, read once and only when a slot is asked about
+  let seats;
+  const seatAt = path => {
+    if (seats === undefined) {
+      const slots = typeof slotsOf === 'function' && typeof compByRef === 'function' ? slotsOf(item.ref) : null;
+      // the panels the item's configuration shows, and no other build's (ports.js shownEnv)
+      seats = slots && !slots.error ? resolverFor(shownEnv(item, slots, compByRef), item.swaps || {}) : null;
+    }
+    const slot = seats?.entryAt(path) ?? null;
+    return slot && takesCableEnd(slot, compByRef) ? slot : null;
+  };
   for (const view of ['front', 'rear']) {
     for (const p of await portsOf(item, view)) {
-      if (p.cls !== 'port') continue;
+      if (p.cls !== 'port') {
+        // a slot a cable lands on: only where the reader says so and the catalogue has it
+        const slot = p.end === true && !isElementId(p.path) && (seen.has(`${view}|${p.path}`) ? null : seatAt(p.path));
+        if (!slot || (slot.view && slot.view !== view)) continue;
+        seen.add(`${view}|${p.path}`);
+        // what it is: its own part says, else the part it is one piece of (a terminal's screw)
+        let info = receptacleOf(partOf(compByRef, p.ref));
+        for (let q = p.path; !info.family && q.lastIndexOf('/') > 0;) {
+          q = q.slice(0, q.lastIndexOf('/'));
+          info = receptacleOf(partOf(compByRef, seats?.refAt(q)));
+        }
+        if (!want(endKind(info)) || !portFree(rack, {item: itemId, path: p.path, view}).ok) continue;
+        out.push({path: p.path, view, label: portLabel(p.path), media: p.media ?? null, speed: p.speed ?? null,
+                  kind: endKind(info), connector: connectorName(slot, info), plug: endPlug(slot, compByRef).plug});
+        continue;
+      }
+      if (!want('data')) continue;
       let path = p.path;
       if (isElementId(path)) {
         const to = addressFor(path);
@@ -228,6 +276,15 @@ export async function freePorts(rack, itemId, {portsOf, slotsOf, compByRef}) {
       if (!portFree(rack, {item: itemId, path, view}).ok) continue;
       out.push({path, view, label: portLabel(path), media: p.media ?? null, speed: p.speed ?? null});
     }
+  }
+  // SEVERAL SLOTS UNDER ONE PART THAT IS NO SLOT ITSELF: grouped by that part,
+  // the first in natural order marked as the one a cable takes.
+  const under = e => { const cut = e.path.lastIndexOf('/'); return e.kind && cut > 0 && !e.path.slice(0, cut).endsWith('/module') ? e.path.slice(0, cut) : null; };
+  const groups = new Map();
+  for (const e of out) { const g = under(e); if (g) groups.set(`${e.view}|${g}`, [...(groups.get(`${e.view}|${g}`) || []), e]); }
+  for (const [key, list] of groups) {
+    const first = [...list].sort((a, b) => natural.compare(a.path, b.path))[0];
+    for (const e of list) { e.of = key.slice(key.indexOf('|') + 1); if (e === first) e.first = true; }
   }
   return out;
 }
