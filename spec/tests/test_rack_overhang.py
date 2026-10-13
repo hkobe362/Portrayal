@@ -245,6 +245,7 @@ def test_configs_json_carries_the_two_keys(built):
     ringed = json.loads((built / "cmh-6dr1u.configs.json").read_text())["chassis"]
     assert ringed["overhang"] == {"left": 43.0, "right": 43.0}
     duct = json.loads((built / "uscmh-sfdabsb2u.configs.json").read_text())["chassis"]
-    assert duct["ears"] == {"behind": True} and "overhang" not in duct
-    plain = json.loads((built / "cmh-5dr1u.configs.json").read_text())["chassis"]
+    assert duct["ears"] == {"behind": True, "positions": [{"name": "proud", "at": 168.5, "default": True}]}
+    assert "overhang" not in duct
+    plain = json.loads((built / "cmh-4drb1u.configs.json").read_text())["chassis"]
     assert "overhang" not in plain and "ears" not in plain

@@ -697,9 +697,15 @@ configuration's front, rear and top views.
 
 `format` is 1. Each device, keyed by `name`, always carries `manufacturer`,
 `model`, `family`, `ru`, `h`, `w`, `d`, `airflow`, `default`, `configs`
-(the names of its configurations) and `kind`. Six keys appear only when the
+(the names of its configurations) and `kind`. Seven keys appear only when the
 device has them:
 
+- `ears`: `{"default": {"name", "at"}}`, the default position of
+  `chassis.ears.positions` that states an `at`, in mm from the front of the
+  part back to the plane its ears bolt to (docs/rack-mounting-design.md
+  section 3). The kit's `setbackOf` stands the part `at` mm in front of the
+  rail. A device whose default position states no `at`, or that has none,
+  has no `ears` key, and the kit places its front on the rail.
 - `mount`: the device's `chassis.mount`, present only when it is not `rack`.
 - `shell`: `chassis.shell`, `sheet` for a body that is a sheet and not a box.
 - `capacity`: `{"count", "basis", "media"}`, the cable capacity the vendor

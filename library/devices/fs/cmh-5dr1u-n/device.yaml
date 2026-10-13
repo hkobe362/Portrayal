@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-5dr1u-n
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-5DR1U-N
@@ -14,6 +14,14 @@ description: >-
   through the slit between them.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. The ears are
+      the flat ends of the panel, so the ear plane is the panel face, and the rings stand
+      88 mm in front of it (the vendor's side view, datasheet page 4, 3.4 in [88mm]). `at`
+      is 88. Of the 100 depth, 12 stands behind the rail. This states a placement; no
+      dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -112,6 +120,9 @@ chassis:
   depth: 100.0
   ru: 1
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 88, default: true}
   shell: sheet
   thickness: 1.2
   weight-kg: 0.64

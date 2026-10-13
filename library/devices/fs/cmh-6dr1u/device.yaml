@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-6dr1u
-version: 1.0.1
+version: 1.0.2
 maturity: modelled
 manufacturer: FS.com
 model: CMH-6DR1U
@@ -98,7 +98,12 @@ provenance:
     note: >-
       drawing - the ears are the plate's flat ends outside the folds, 26.3 wide, with an
       oval rack-screw slot near the top and the bottom of each, read off the front view
-      (fs/cmh-6dr1u-ear@1). They are drawn because they carry the end rings.
+      (fs/cmh-6dr1u-ear@1). They are drawn because they carry the end rings. `positions`
+      states where they bolt, for the Rack Builder: the ear plane is the panel face, and
+      the rings stand 88 mm in front of it (the D-rings datasheet, page 5, as the
+      CMH-5DR1U-N). `at` is 88. Of the 100 depth, 12 stands behind the rail, on the
+      CMH-5DR1U-N's 12 mm folds (see `gaps`). This states a placement; no dimension
+      changed.
   mount:
     confidence: datasheet
     note: >-
@@ -159,6 +164,9 @@ chassis:
   ru: 1
   overhang: {left: 43.0, right: 43.0}
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 88, default: true}
   shell: sheet
   thickness: 1.2
   weight-kg: 0.66

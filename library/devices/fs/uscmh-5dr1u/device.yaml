@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: uscmh-5dr1u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: USCMH-5DR1U
@@ -15,6 +15,14 @@ description: >-
   cables through to the back.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. This is
+      Portrayal's reading of the datasheet: the frames and cover stand 82 mm in front of the
+      panel's back, and only the folded edges stand behind it (see `full-depth`). `at` is
+      82. Of the 88.8 depth, 6.8 stands behind the rail. This states a placement; no
+      dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -125,6 +133,9 @@ chassis:
   depth: 88.8
   ru: 1
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 82, default: true}
   shell: sheet
   thickness: 1.2
   weight-kg: 0.41

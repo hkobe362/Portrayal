@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-sfd1u
-version: 0.1.4
+version: 0.1.5
 maturity: modelled
 manufacturer: FS.com
 model: CMH-SFD1U
@@ -15,6 +15,13 @@ description: >-
   the width of the rack. Two pass-through holes in the base lead cables to the other side.
 profile: passive
 provenance:
+  ears:
+    confidence: drawing
+    note: >-
+      drawing - `positions` states where the ears bolt, for the Rack Builder. The base
+      stands 11.3 mm behind the plane of the ears and the cover 75.7 in front of it (the
+      top and side views, datasheet page 5; see `chassis`). `at` is 75.7. This states a
+      placement; no dimension changed.
   full-depth:
     confidence: drawing
     note: >-
@@ -169,6 +176,9 @@ chassis:
   depth: 87.0
   ru: 1
   full-depth: false
+  ears:
+    positions:
+      - {name: proud, at: 75.7, default: true}
   shell: sheet
   thickness: 7.3
   weight-kg: 0.45
