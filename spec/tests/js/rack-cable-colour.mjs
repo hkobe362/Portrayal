@@ -122,7 +122,9 @@ test('a default is not a statement: two generic ends at their declared default d
   for (const media of C.MEDIA) {
     const got = drawn(pair({a: 'generic/qsfp-cable@1', b: 'generic/qsfp-cable@1', media}));
     assert.equal(got.from, 'media', media);
-    assert.notEqual(got.color, BLACK, media);
+    // a power cord is black by its media's own default (#1052 and #1053), which is no default read from the field
+    if (media !== 'power') assert.notEqual(got.color, BLACK, media);
+    else assert.equal(got.color, G.COLORS.power, media);
   }
   // the links of the plan carry nothing for them either
   assert.deepEqual(Object.keys(C.cablePlan(rack, readers(rack)).links[0]), ['id', 'media', 'purpose', 'from', 'to']);
@@ -225,14 +227,15 @@ test('rule 3: a named type\'s colour, where the table states one; a bare media t
 });
 
 // ── no default changed ──────────────────────────────────────────────────
-// The colours of main at 9e250dba7, written out by hand.
+// The colours of main at dc96952ac, written out by hand.
 const MAIN = {os2: '#e8c547', om3: '#2bb3c8', om4: '#2bb3c8', om5: '#9acd32', cat6: '#5aa7ff', cat6a: '#5aa7ff',
-              dac: '#15171a', aoc: '#3a3f45', unset: '#9aa3ad'};
+              dac: '#15171a', aoc: '#3a3f45', unset: '#9aa3ad', power: '#1c1c1c', ground: '#3f9b4b'};
 const mainColor = l => (l.media === 'copper' ? (l.purpose === 'management' ? '#9aa3ad' : '#5aa7ff') : (Object.hasOwn(MAIN, l.media) ? MAIN[l.media] : '#e8c547'));
 
 test('rule 4, and no default changed: every media is the colour it was', () => {
   for (const media of C.MEDIA) assert.equal(G.colorOf({media}), MAIN[media], media);
-  assert.deepEqual(C.MEDIA.map(m => MAIN[m]).length, 8);
+  assert.deepEqual(C.MEDIA.map(m => MAIN[m]).length, 10);
+  assert.deepEqual(C.MEDIA.filter(m => !Object.hasOwn(MAIN, m)), [], 'a media with no recorded colour');
   assert.equal(G.colorOf({media: 'aoc'}), '#3a3f45', 'an AOC is still dark grey');
   assert.equal(G.colorOf({media: 'unset'}), '#9aa3ad');
   assert.equal(G.colorOf({media: 'copper', purpose: 'server'}), '#5aa7ff');
