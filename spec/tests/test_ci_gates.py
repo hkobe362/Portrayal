@@ -388,8 +388,11 @@ def test_a_tool_going_missing_is_caught(tmp_path):
 def test_the_allow_list_matches_what_the_suite_skips_today():
     """A list that has drifted from the suite is the same silence one level up:
     it passes because nothing matches it rather than because nothing is wrong."""
+    # ONE PROCESS, NOT `-n auto`. Collection is the whole of this run, and under
+    # xdist every worker collects the suite again: on an 80-core machine that was
+    # eighty collections of the same tests to read one return code.
     r = subprocess.run([sys.executable, "-m", "pytest", str(ROOT / "spec/tests"),
-                        "-q", "-rs", "-n", "auto", "--co", "-q"],
+                        "-q", "-rs", "--co", "-q"],
                        capture_output=True, text=True, cwd=ROOT)
     assert r.returncode == 0, r.stdout[-500:]
     allowed = [l for l in ALLOW.read_text().splitlines()

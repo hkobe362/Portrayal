@@ -16,6 +16,7 @@ It also silently corrupts 3D, because the face texture is rasterised from this
 SVG - which is how it was found: the owner reported cards apparently 30% too
 wide and PEMs missing from a view whose YAML places them correctly.
 """
+import os
 import pathlib
 import re
 
@@ -75,9 +76,23 @@ def rendered_as(d, vname, view):
                 if (v or {}).get("face") == face]
     taken = {DIST / f"{d['name']}.{cn}.{face}.svg"
              for var in variants for cn in selected_by(var)}
-    on_disk = {p for p in DIST.glob(f"{d['name']}.*{face}.svg")
-               if p.name.endswith(f".{face}.svg")}
+    on_disk = {DIST / n for n in _dist_names()
+               if n.startswith(f"{d['name']}.") and n.endswith(f".{face}.svg")}
     return sorted(on_disk - taken)
+
+
+_DIST_NAMES = None
+
+
+def _dist_names():
+    """Every file name in the dist, listed ONCE. `cases()` runs at collection,
+    in every xdist worker, and a glob per view scanned the whole directory -
+    about ten thousand entries, 1,543 times - which was the largest single cost
+    of collecting the suite."""
+    global _DIST_NAMES
+    if _DIST_NAMES is None:
+        _DIST_NAMES = sorted(os.listdir(DIST)) if DIST.is_dir() else []
+    return _DIST_NAMES
 
 
 def cases():

@@ -11793,21 +11793,27 @@ def _air_fraction(box, decor, grid=9):
     x0, y0, x1, y1 = box
     if x1 <= x0 or y1 <= y0 or not decor:
         return 0.0
+    # EACH RECTANGLE ONCE, NOT ONCE PER POINT. The topmost surface under a point
+    # is the last one in paint order that contains it, so the list is walked from
+    # the top down and the first hit is the answer. An outline draws a line, not
+    # a surface - it hides nothing - so it is not in the list at all. Computing
+    # the boxes inside the point loop was 46 million calls on a library lint and
+    # most of the time `lint_device` took.
+    surfaces = []
+    for d in decor:
+        b = _decor_box(d)
+        if b and not (d.get("stroke") and not d.get("fill")):
+            surfaces.append((b, d.get("pattern") == "vent" or bool(d.get("vent"))))
+    surfaces.reverse()
     air = 0
     for i in range(grid):
         px = x0 + (x1 - x0) * (i + 0.5) / grid
         for j in range(grid):
             py = y0 + (y1 - y0) * (j + 0.5) / grid
-            top = None
-            for d in decor:
-                b = _decor_box(d)
-                if b and b[0] <= px <= b[2] and b[1] <= py <= b[3]:
-                    # an outline draws a line, not a surface - it hides nothing
-                    if d.get("stroke") and not d.get("fill"):
-                        continue
-                    top = d
-            if top is not None and (top.get("pattern") == "vent" or top.get("vent")):
-                air += 1
+            for b, vent in surfaces:
+                if b[0] <= px <= b[2] and b[1] <= py <= b[3]:
+                    air += vent
+                    break
     return air / (grid * grid)
 
 
