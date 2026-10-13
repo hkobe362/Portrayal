@@ -1,0 +1,63 @@
+format: 1
+kind: component
+name: breaker-push-reset
+version: 1.0.0
+class: breaker
+profile: power
+description: >-
+  A push-to-reset thermal circuit breaker as a panel shows it - a round plunger
+  in a threaded bushing, held to the panel by a hex nut. The plunger pops out
+  when the breaker trips and is pressed back in to reset it. It stands for the
+  class and is no one maker's part: the rating is the placement's to state.
+size: {w: 16.5, h: 14.3}
+size-confidence: {w: estimated, h: photo-measured}
+provenance:
+  size: >-
+    photo-measured for the height, estimated for the width - the two breakers on
+    the rear of the Eaton Tripp Lite series PDU12IEC, in Eaton's straight-on
+    rear photograph (PDU12IEC_BK, a 3000 px master read at 5.801 px per mm, the
+    scale its eight C13 outlets give on their stated 28.75 mm pitch). The upper
+    nut lies with its flats top and bottom and reads 14.4 across them; a 9/16
+    in nut is 14.29 across the flats, drawn 14.3. Its corners read 15.2 to
+    15.5 apart and are rounded in the photograph; the 16.5 drawn, about 1 mm
+    over that reading, is what a hexagon 14.3 across the flats measures
+    corner to corner, a figure of geometry and not of the photograph. The bushing reads 10.0 across (a 3/8 in thread is 9.5
+    at its crest) and the plunger 7.9.
+  relief: >-
+    estimated - no held source shows a breaker of this kind from the side. The
+    nut is given 2.5, the bushing 5.0 and the plunger 6.5 off the panel, the
+    proportions of the photograph's highlights and no measurement.
+  colour: >-
+    photo-measured - the nut and bushing read #938c8c and #9e9798 at the median
+    (3547 and 3597 pixels brighter than 85 of 255 in the two bezels), a nickel
+    finish; the plunger #2a2e35 (1800 pixels).
+  states: >-
+    the plunger is `on` while the breaker is closed and `off` once it has
+    tripped, the vocabulary eaton/g4-breaker-20a-2p@1 gives its rocker. Both
+    are drawn alike: nothing held shows a tripped plunger face on.
+elements:
+  plunger: {at: [4.3, 3.2], size: [7.9, 7.9], class: breaker, states: ['on', 'off']}
+relief:
+  features:
+    - node: nut
+      out: 2.5
+      color: '#989192'
+      confidence: estimated
+      source: >-
+        common/breaker-push-reset@1 relief key - by eye off the PDU12IEC rear
+        photograph; not measured.
+    - node: bushing
+      cyl: 5.0
+      color: '#aaa3a4'
+      confidence: estimated
+      source: >-
+        common/breaker-push-reset@1 relief key - by eye off the PDU12IEC rear
+        photograph; not measured.
+    - node: plunger
+      cyl: 6.5
+      color: '#2a2e35'
+      confidence: estimated
+      source: >-
+        common/breaker-push-reset@1 relief key - by eye off the PDU12IEC rear
+        photograph; not measured.
+skins: [default]
