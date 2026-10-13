@@ -177,3 +177,9 @@ provenance:
     common/sc-simplex-adapter@1 seats no cap - an inconsistency of that part,
     not a fact about Fibrain.
 skins: [default]
+# The @1 of this part is gone from the library (#1046). A rack file that names it
+# is read as this one: the ids of its parts, its ports and their names are the same.
+supersedes:
+  - ref: fibrain/xmn1021db@1
+    signature: sha256:6fc09a5aa24483385f7b634a96655bef50a60a34f5200358f21f6e859633fa0b
+    from: 8c7f9a3b1d34

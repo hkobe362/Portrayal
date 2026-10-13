@@ -33,6 +33,7 @@ from portrayal.render import (SVG_NS, STATE_CSS, Library, instance_group,  # noq
                     _pluggable_families, _pluggable_candidates,
                     _connector_registry)
 from portrayal import libwalk  # noqa: E402
+from portrayal import redirects  # noqa: E402
 from portrayal import optical, optical_ports  # noqa: E402
 from portrayal import facets as _facets  # noqa: E402
 from portrayal.components_catalogue import seat_counts, composer_counts  # noqa: E402
@@ -351,6 +352,11 @@ def main():
                 # a consumer offering parts must not offer it: the DCIM module
                 # export reads this to leave it out.
                 "superseded-by": data.get("superseded-by"),
+                # THE REMOVED REFS THIS PART STANDS IN FOR (#1049): each with the
+                # signature of the removed part's published form, which the
+                # check below recomputes from this entry. The rack kit follows
+                # an old ref here (kit/redirects.js). [] on every other row.
+                "supersedes": [dict(c) for c in data.get("supersedes") or []],
                 # HOW MANY DEVICES SEAT THIS MAJOR, the number CATALOGUE.md
                 # shows in its `devices` column and counted by the same
                 # function (components_catalogue.seat_counts): a placement or
@@ -618,6 +624,12 @@ def main():
                     if optical_ports.projects(data):
                         entry["optical"]["ports"] = optical_ports.part_ports(data, load_ref)
             index.append(entry)
+    # A REDIRECT HOLDS OR THE BUILD STOPS: a replacement that no longer matches
+    # the signature it recorded would turn a saved rack's swap into a part with
+    # other slots or ports.
+    broken = redirects.problems(index)
+    if broken:
+        sys.exit("REDIRECT: " + "\nREDIRECT: ".join(broken))
     totals = {}
     for e in index:
         for k, n in e["relief-confidence"].items():

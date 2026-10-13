@@ -38,3 +38,9 @@ provenance:
     the holder and no printing; the moulding behind them is painted as the
     front is.
 skins: [default]
+# The @1 of this part is gone from the library (#1046). A rack file that names it
+# is read as this one: the ids of its parts, its ports and their names are the same.
+supersedes:
+  - ref: fibrain/xmn1041db-rear@1
+    signature: sha256:7a949df974da85478cc42ff840b8878584f2018c894184eb15578ff5e1927d3e
+    from: 8c7f9a3b1d34

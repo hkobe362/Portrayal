@@ -75,6 +75,7 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 | `share.js` | GLB and USDZ export |
 | `gif.js` | GIF capture |
 | `swap.js` | swapping a component into a bay, or an occupant into a slot at the turn it takes there (`seatTurn`); the `swap=` and `turn=` location strings (`encodeSwaps`, `decodeSwaps`, `encodeTurns`, `decodeTurns`) |
+| `redirects.js` | a part the library replaced: `redirectsOf(components)` reads the `supersedes` lists of `components.json` into a resolver (`follow(ref)`, `trace(ref)`), and a rack is audited (`auditRack`) and rewritten (`rewriteRack`) against it; the rules are under "New in 0.32.0" in [Racks](#racks) |
 | `fields.js` | writing a field on a part at runtime - its text and its colour, the build's rule, for 2D and 3D alike; and what a form of a part's fields needs: its rows (`fieldRows`), whether a value is one the field takes (`fieldAccepts`), and the `fields=` location string (`encodeFields`, `decodeFields`); and a part that slides: whether a value is a position (`adjustmentAccepts`), the rows of its control (`adjustmentRows`), what a face declares (`adjustmentsOf`) and the move itself (`paintAdjustments`); see [A part that slides](#a-part-that-slides) |
 | `devsel.js` | device selection and filtering - hardware by its maker, and each NOS vendor's listings under that vendor (`listings.json`, #709) |
 | `nosnames.js` | what the chosen listing's NOS calls each port (`swp7`, `Ethernet24`, `ge100-0/0/7`), expanded by the same grammar as the DCIM export (#712) |
@@ -672,6 +673,48 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.32.0: a replaced part leaves a redirect** (#1049). A rack file names parts by ref, and a ref whose
+major was removed no longer resolves: the slot refuses it, the swap is ignored,
+a cable on the part's ports goes loose, and the next edit that writes back what
+a slot accepts drops the entry. The library now says, on the **replacement**,
+which removed refs it stands in for (`supersedes` in its contract). The build
+publishes the list on the replacement's `components.json` entry, with the
+signature of the removed part's published form that proves it a drop-in (the
+same part ids, port paths and names); a replacement that stops being one stops
+the build.
+
+`rack/catalog.js` `loadSlots` reads it into `redirects`, beside `slotsOf` and
+`compByRef`; hand `redirects` on in the same context (`{ ...slots }`).
+`redirects.follow(ref)` is the ref to read: the replacement of a removed ref,
+the ref itself otherwise (one hop, or a chain, never a loop; a `:suffix` is
+kept). With the context:
+
+- **Reading follows and changes nothing.** `inspect` lists the parts a slot
+  holds as the replacement, says in `notes` that the old ref was read as the
+  new one, and gives `redirected: [{ path, from, to }]`. Ports, cables, the
+  exports and `fit` read the same way. **A plain load and save is
+  byte-identical:** `createRackEditor(...).loadDoc(doc, { ctx })` says what it
+  reads as what, in its findings, and the document is not touched.
+- **The first edit that lands writes the new refs, and says so.** `apply`
+  rewrites every redirected swap of every device and part beside the rack, in
+  the same step as the edit (one undo takes both back), and the first finding
+  of the answer starts "This rack named refs the library has replaced, and the
+  edit wrote the new ones". An edit that changes nothing, one that is refused
+  and a command that is no step (`dcim`) write nothing. `patch` with a whole
+  `swaps` map follows before it asks the slot, so an echo of what was read is
+  kept, not dropped. `fit` with an old ref fits the new part.
+- **A ref that is gone and redirected nowhere is kept and named.** `inspect`
+  gives `unknown: [{ path, ref }]` and a note ("... is no longer in the
+  library; it is kept as written"); `patch` keeps the entry, and what is seated
+  under it, instead of leaving it out as a ref the slot does not take. It is
+  never replaced by the slot's default.
+- **No redirects in the context, none followed.** A context without
+  `redirects`, or a `components.json` from before the key, behaves as before.
+
+The page that writes back only the swaps its own slots accept (the Explorer's
+lens) is the site's, and is not changed here: it drops an old ref on its next
+write until it passes `redirects` on.
 
 **New in 0.31.0: a cable's colour.** A cable was drawn in the colour of its
 media and nothing could change it. It is now drawn, in this order, in:

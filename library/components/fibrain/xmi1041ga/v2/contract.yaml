@@ -127,3 +127,9 @@ provenance:
     SM'. The 14.12.2023 issue of the same sheet named the fibre as G.657A1 and
     the product page says OS2 G.652D; the current sheet says only SM.
 skins: [default]
+# The @1 of this part is gone from the library (#1046). A rack file that names it
+# is read as this one: the ids of its parts, its ports and their names are the same.
+supersedes:
+  - ref: fibrain/xmi1041ga@1
+    signature: sha256:512f51ef620eeb3b326771e93d79de63a800ae2da77076891d01890bffb6e928
+    from: 8c7f9a3b1d34

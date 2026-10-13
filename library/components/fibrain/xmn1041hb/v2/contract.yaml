@@ -142,3 +142,9 @@ provenance:
     at the back, so front `scNN.1` reaches rear `bNN.1`. The rear face
     composes each adapter at the mirrored column.
 skins: [default]
+# The @1 of this part is gone from the library (#1046). A rack file that names it
+# is read as this one: the ids of its parts, its ports and their names are the same.
+supersedes:
+  - ref: fibrain/xmn1041hb@1
+    signature: sha256:65eaef4cb73ccb5f91a774eba6be2c0eedfd704efaaeb9d9b7c73fb38f53e9a0
+    from: 8c7f9a3b1d34

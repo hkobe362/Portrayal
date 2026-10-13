@@ -284,6 +284,7 @@ ISSUED = {
     "L181": "device",
     "L182": "device",
     "L183": "device",
+    "L184": "component",
 }
 
 

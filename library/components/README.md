@@ -103,6 +103,16 @@ an outside manifest pinning `name@2` is the consumer coexistence exists for and
 this library acquires those the day it goes public. `spec/DESIGN.md` §9 carries
 the measurement that decision was made on.
 
+**A removed major that a saved rack names gets a redirect, on the replacement**
+(#1049): `supersedes: [{ref, signature, from}]` in the replacement's contract,
+which the build publishes on its `components.json` entry. Write it only where
+the replacement is a drop-in (the same part ids, port paths and names) and the
+old major is gone from the tree. `signature` is the hash of what the old part
+published, taken once from the tree at `from` with
+`python -m portrayal.redirects sign <components.json> <ref>` and recomputed
+from the replacement at every build, which stops when they differ; L184 checks
+the shape. A major that is kept says `superseded-by` instead.
+
 The bump rules, from DESIGN.md: **art is a patch** (a skin redrawn, a colour, a
 label), **additive is a minor** (a new element, a new state, a new skin),
 **geometry or ids are a major** (the size changed, an element something
