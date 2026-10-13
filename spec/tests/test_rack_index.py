@@ -121,8 +121,9 @@ def test_the_default_ear_position_is_written_only_where_the_device_states_one(tm
 
 
 def test_the_default_ear_position_reaches_the_real_rack_json():
-    """The five FS managers whose source states a position carry it; the one
-    whose source states none (CMH-4DRB1U: no recess figure) carries nothing."""
+    """The FS managers whose source states a position carry it (two are read
+    here); the one whose source states none (CMH-4DRB1U: no recess figure) and
+    the rack-side verticals carry nothing."""
     from pathlib import Path
     built = Path(__file__).resolve().parents[2] / "library/dist/rack.json"
     if not built.exists():

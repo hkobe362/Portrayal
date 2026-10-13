@@ -130,8 +130,10 @@ gets no generic ear, so it would have no use for `h`, `y` or `color`.)
   Absent, the generic ear is silver (`#c8cacc`): most network gear has bare or
   plated steel ears even when its faceplate is black.
 - **`behind`** keeps the meaning #865 gave it. A device file may still say
-  `ears: behind` as a bare string, so `fs/uscmh-sfdabsb2u` does not move, and
+  `ears: behind` as a bare string, and
   L43 stands down for `{behind: true}` as it does for the string.
+  `fs/uscmh-sfdabsb2u` now writes the object, `behind: true` with a `proud`
+  position, because a bare string cannot hold a position.
 - `ears` and `kits` are for a `rack` device only (L125).
 
 The [rack products note](rack-products-design.md) (section 7.1) proposes one
