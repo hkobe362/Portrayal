@@ -16,7 +16,7 @@ import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
-import {isZeroUPart, zeroUSpan, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, isQuarter, unitsOf} from './fit.js';
+import {isZeroUPart, zeroUTouched, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, isQuarter, unitsOf} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
@@ -668,7 +668,7 @@ export const laneX = side => (side === 'left' ? -1 : 1) * (OPENING / 2 + RAIL_W 
 const besideLane = (rack, lane, ru, chassisOf) => zeroUOf(rack).find(z => {
   const c = chassisOf(z.ref);
   if (z.at !== lane || !isZeroUPart(c) || carriesLane(c) || !(Number(c.w) > 0)) return false;
-  const [lo, hi] = zeroUSpan(z, chassisOf);
+  const [lo, hi] = zeroUTouched(z, chassisOf);
   return ru >= lo && ru <= hi;
 }) ?? null;
 export function laneXAt(rack, lane, ru, chassisOf) {
