@@ -283,6 +283,32 @@ class Train(unittest.TestCase):
             self.review("approve", body="I would say REVIEW: approve if it were mine")]
         self.refused("1", why="#1")
 
+    def test_a_workers_task_id_before_the_verdict_is_accepted(self):
+        self.state["prs"]["1"]["comments"] = [
+            self.review("approve", body="[P-0012] REVIEW: approve the rings look right")]
+        self.assertEqual(self.run_train("--dry-run", "1").returncode, 0)
+
+    def test_a_task_id_changes_verdict_still_counts_as_changes(self):
+        self.state["prs"]["1"]["comments"] = [
+            self.review("approve", "2026-10-13T09:00:00Z"),
+            self.review("changes", "2026-10-13T10:00:00Z", body="[P-0012] REVIEW: changes")]
+        self.refused("1", why="REVIEW: changes")
+
+    def test_a_task_id_comment_still_needs_a_trusted_commenter_and_a_fresh_head(self):
+        body = "[P-0012] REVIEW: approve"
+        self.state["prs"]["1"]["comments"] = [
+            {**self.review("approve", body=body), "authorAssociation": "NONE"}]
+        self.refused("1", why="REVIEW: approve")
+        self.state["prs"]["1"]["comments"] = [
+            self.review("approve", "2026-10-13T07:00:00Z", body=body)]
+        self.refused("1", why="before the head commit")
+
+    def test_only_a_bracketed_word_may_precede_the_verdict(self):
+        for body in ("[two words] REVIEW: approve", "[P-0012]REVIEW: approve",
+                     "see [P-0012] REVIEW: approve", "[] REVIEW: approve"):
+            self.state["prs"]["1"]["comments"] = [self.review("approve", body=body)]
+            self.refused("1", why="#1")
+
     def test_a_one_way_door_needs_an_owner_decision(self):
         self.state["prs"]["1"]["body"] = "**Door:** one-way, it renames a component\n"
         r = self.refused("1", why="OWNER DECISION")
