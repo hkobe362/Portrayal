@@ -242,8 +242,8 @@ def test_the_kit_ships_the_resolver():
 
 def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert tuple(map(int, pkg["version"].split("."))) >= (0, 32, 0)
-    assert "0.32.0" in (ROOT / "changelog.d/ref-redirects.md").read_text()
+    assert pkg["version"] == "0.34.0"
+    assert "0.34.0" in (ROOT / "changelog.d/power-cord-diameter.md").read_text()
 
 
 # --- the device lock ------------------------------------------------------

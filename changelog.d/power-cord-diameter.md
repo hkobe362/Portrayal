@@ -2,7 +2,7 @@
 - **A power cord is drawn at its real diameter, and meets the plug stub**
   (#1060). Every cable was drawn 3 mm wide, so an IEC cord, 7.1 mm, was a thin
   line going into a plug stub drawn at the cord's real size, in 2D and 3D.
-  `@portrayal/kit` is 0.33.0: `widthOf(cable, diameterOf)` in
+  `@portrayal/kit` is 0.34.0: `widthOf(cable, diameterOf)` in
   `rack/cable-geometry.js` gives the width to draw a cable at, the type's
   `od_mm` for media `power` (7.1 mm for the `power-c13` cord when it names no
   type) and `WIDTH` for every other media, so a cable of another media is

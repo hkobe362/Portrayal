@@ -674,7 +674,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.33.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
+**New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:
 for media `power` its type's `od_mm` (`diameterOf` is the cable types lookup, `diameterLookup`),
