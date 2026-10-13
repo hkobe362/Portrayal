@@ -1,19 +1,19 @@
 format: 1
 kind: device
 name: pdu12iec
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: Eaton
 model: PDU12IEC
 description: >-
   Eaton Tripp Lite series basic PDU, 1U horizontal: a black metal box about 434
-  mm wide and 108 mm deep that hands a single-phase 100 to 240 V feed, 16 A, on
+  mm wide and 108 mm deep. It hands a single-phase 100 to 240 V feed, 16 A, on
   to 14 unswitched outlets in one load bank. On the front, four IEC C13
-  outlets; on the rear, an IEC C20 inlet for a cord the user supplies, a
-  grounding stud, two 16 A push-to-reset breakers, two IEC C19 outlets and
-  eight IEC C13 outlets. No switch, no meter, no network interface. The housing
-  is reversible and its two mounting ears are separate brackets, which also
-  turn for 0U, wall and under-counter mounting.
+  outlets. On the rear are an IEC C20 inlet for a cord the user supplies, a
+  grounding stud and two 16 A push-to-reset breakers. Also on the rear, two IEC
+  C19 outlets and eight IEC C13 outlets. No switch, no meter, no network
+  interface. The housing is reversible and its two mounting ears are separate
+  brackets, which also turn for 0U, wall and under-counter mounting.
 profile: power
 provenance:
   method:
@@ -262,7 +262,7 @@ attrs:
     capacity-kw: 3.84
     capacity-scope: >-
       the load the PDU can hand on, 3.84 kW at 240 V down to 1.92 kW at 120 V,
-      16 A in all (spec sheet); it is not what the PDU draws itself, which no
+      16 A in all (spec sheet). It is not what the PDU draws itself, which no
       document held states
     output-voltage: 120-240 V
     output-rating: 16 A total; 16 A max per C19; 12 A (10 A CE) max per C13
@@ -487,7 +487,7 @@ configurations:
     default: true
     description: >-
       The PDU as it ships: no cord, nothing seated. The two mounting ears are
-      on it and are drawn only where a viewer asks for ears; the cable clamp
+      on it and are drawn only where a viewer asks for ears. The cable clamp
       and its screws are in the box and are not drawn.
     part-numbers:
       PDU12IEC: {}
