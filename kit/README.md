@@ -673,6 +673,74 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.30.0: a power cord, a DC feed and a ground wire can land.** A
+cable landed only on a part of class `port`, and no power end is one: an
+inlet, an outlet and a DC terminal are class `inlet`, a ground stud class
+`ground`. The rule is now one function, `cableLandsOn({ cls, slot },
+compByRef)` in `rack/cable-rules.js`: **a part of class `port`, or a connector
+slot (`kind: 'connector'` in `cages[]`) that accepts at least one part of
+class `port`**, which is what every cord end and lug is. A pluggable cage, a
+module bay, a guard seat and a slot that accepts nothing do not land
+(`takesCableEnd(slot, compByRef)` is the slot half). The design is
+[docs/cable-ends-design.md](../docs/cable-ends-design.md).
+
+- **The address of such an end is the path of its slot**:
+  `{ item, path: 'psu-1/module/inlet', view: 'rear' }`, `outlet-rear-3`,
+  `ground`. An end saved to `<slot>-occupant` names the same port and still
+  lands.
+- **`media` has two more values, `power` and `ground`.** `power` is an AC cord
+  or a DC feed (one cable; its type says which), `ground` a bonding wire.
+  `MEDIA`, `MEDIA_LABELS`, `mediaKind`, `proposeMedia`, `DIAMETERS` (7.1 and
+  6.3 mm), `PLUG_REACH` (77.0 for `power`), `END_ALLOWANCE_BY_MEDIA` (0.017
+  and 0) and `COLORS` (`#1c1c1c` and `#3f9b4b`) each have the rows. The ground
+  figures are estimates.
+- **An end may state its plug**: `{ item, path, view, plug }`, a component
+  ref, only where the slot takes more than one. `endPlug(slot, compByRef,
+  stated)` gives `{ plug, choices, note }`: the one accepted end, else the
+  stated one, else the first of `cableEndsOf(slot, compByRef)`, which sorts
+  by `attrs['rating-a']` and then by ref. `plugSeats(path, slots, swaps, {
+  cls, compByRef, plug })` seats it for a page that draws plugs. A derived
+  plug is never a swap, a BOM line or an export row.
+- **`receptacleOf(component)`** says what the part that presents a slot is:
+  `{ family, mode, role }`, with `family` `power` or `ground`, `role`
+  `outlet` or `inlet` where `attrs.outlet` or `attrs.input` says, and `mode`
+  `ac` or `dc` where stated. `connectorName(slot, info)` words it: "C13
+  outlet", "C20 inlet".
+- **`mismatch` warns, as it always has, and refuses nothing**: a data cable
+  into a power end, a power cable into a data port, power to ground, AC to
+  DC, and two outlets or two inlets, each only where both ends state it.
+- **`looseReason` reads two more facts**: `part` ("outlet-9 is NEMA 5-20R,
+  which takes no plug or lug the library knows") and `side` (a slot on a side
+  view, where an end cannot yet be given).
+- **`freePorts(rack, id, ctx, { kinds })`** lists slot ends where the reader
+  hands them in, each with `kind` (`power`, `ground`, `other`), `connector`
+  and `plug`; the screws of one DC terminal carry `of` and the first
+  `first: true`. `kinds: ['data']` is the ports alone. A port of class `port`
+  is the same entry it was.
+- **`zones.js`**: `readSvg(text, { ends })` and `readDrawing(root, doc, { ends
+  })` read the part at each path in `ends` as a zone with `end: true` and its
+  `ref`; `portsOf` includes them. `cableEndPaths(item, view, ctx)` in
+  `rack/ports.js` makes the list. Without `ends` every answer is unchanged.
+- **A device's own slots** (a PDU outlet, a chassis inlet) are settled in the
+  kit from `configs.json` where a page read "drawn, and no port"
+  (`ownSlot`), so they land with a page that has not changed, and only on the
+  panel the item's configuration shows (`shownEnv`: a configuration's `views`
+  names the panel of each face, and a slot of another build is not on it). `ctx.drawnAt(end)`
+  is what a page adds: the ref of the component drawn at the end's path. With
+  it an end says what it is and an outlet with no slot is named; without it
+  nothing is guessed. **How a page names a part**, in the `holder.part` of an
+  end's facts: by its `attrs.model`, else its ref's name in capitals
+  (`celestica/psu-r3059-f8001@1` is `PSU-R3059-F8001`), exactly as the kit
+  does. For a supply in a bay that only its default fills, the kit hears the
+  page only where that name is the part the bay ships with; a page that hands
+  in a ref for a part with no model is not heard, and the end stays loose.
+  **A page supplies `drawnAt` before it offers power
+  cabling**: without it an outlet-to-outlet or inlet-to-inlet cord between
+  two devices' own slots gets no warning.
+- **The DCIM cables file** leaves a ground wire out by name, and a power
+  cable whose ends the type files do not name out with that reason; one they
+  do name is written with a blank type and a note.
+
 **New in 0.28.0: a bundle's straps are measured and placed on its cables.**
 `straps(rack, bundle, ctx)` and `trunkLength` measured a trunk along the
 straight line from one waypoint to the next. The members do not run there: a
