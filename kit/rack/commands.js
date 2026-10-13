@@ -132,9 +132,14 @@ function patch(rack, {id, ...given}, ctx) {
       const env = slotEnv({...it, cfg: p.cfg ?? it.cfg}, s, ctx.compByRef, ctx.redirects);
       const {kept, rest, gone} = keptSwaps(p.swaps, ctx, path => resolverFor(env, p.swaps).entryAt(path));
       const {accepted, ignored} = acceptSwaps(rest, env);
-      p.swaps = {...accepted, ...kept};
-      if (ignored.length) findings.push(note(`Left out ${ignored.join(', ')}: not a slot on ${it.label}, or a part that slot does not take.`));
-      findings.push(...unknownTexts(gone.map(u => ({...u, label: it.label}))).map(note));
+      // what sits under a carrier the slot refuses goes with it
+      const orphan = path => ignored.some(c => underCarrier(path, c));
+      const stays = Object.fromEntries(Object.entries(kept).filter(([path]) => !orphan(path)));
+      const dropped = Object.keys(kept).filter(path => orphan(path));
+      p.swaps = {...accepted, ...stays};
+      const left = [...ignored, ...dropped];
+      if (left.length) findings.push(note(`Left out ${left.join(', ')}: not a slot on ${it.label}, or a part that slot does not take.`));
+      findings.push(...unknownTexts(gone.filter(u => !orphan(u.path)).map(u => ({...u, label: it.label}))).map(note));
     }
   }
   const changes = Object.fromEntries(['cfg', 'swaps', 'fields', 'label', 'turned']

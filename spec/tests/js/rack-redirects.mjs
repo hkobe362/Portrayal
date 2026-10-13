@@ -318,6 +318,20 @@ test('a ref that is gone, seated under a live carrier the same map seats, is kep
   assert.deepEqual(seen.unknown.map(u => u.path), ['bay-1/module/lc1']);
 });
 
+test('a ref that is gone, under a carrier the slot refuses, goes with the carrier', () => {
+  const refuses = {...withR, slotsOf: ref => {
+    const s = slotsOf(ref);
+    if (ref !== 'pp') return s;
+    return {...s, bays: {...s.bays, front: s.bays.front.map(b => (b.id === 'bay-1' ? {...b, accepts: b.accepts.filter(r => r !== NEW)} : b))}};
+  }};
+  const swaps = {'bay-1': NEW, 'bay-1/module/lc1': GONE};
+  const res = apply(rackWith(swaps), {op: 'patch', id: 'i1', swaps}, refuses);
+  assert.deepEqual(res.rack.items[0].swaps, {});
+  const said = res.findings.map(f => f.text).join('\n');
+  assert.match(said, /Left out bay-1, bay-1\/module\/lc1/);
+  assert.ok(!/kept as written/.test(said));
+});
+
 test('a ref that is gone, on a slot that does not exist, is still dropped as before', () => {
   const rack = rackWith({});
   const res = apply(rack, {op: 'patch', id: 'i1', swaps: {'bay-99': GONE}}, withR);
