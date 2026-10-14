@@ -23,7 +23,7 @@ provenance:
   lid: >-
     datasheet - the specification table of the FS Horizontal Cable Managers with Finger Duct
     datasheet, which also covers CMH-DFD1U, lists a "detachable cover" (hinged, as the
-    device's `cover-hinge` gap records), and its top and side views draw it clipped over
+    device's `cover-hinge` gap records), and its top view draws it clipped over
     the finger tips. It lifts off and opens the channel, so it is a lid
     (`lid: true`) and a pass-through in the base beneath it may be declared.
   color: >-
