@@ -2842,6 +2842,262 @@ export async function buildFaceRelief(F, ctx) {
     // server, H 44 and D 700, a top-face cavity was free to sink 698 mm into a
     // 44 mm box and come out of the underside. Falls back to D so a caller that
     // has not been taught the difference behaves exactly as before.
+// ── A FACE IS DRAWN IN BATCHES ───────────────────────────────────────────────
+// Every cage, pin, latch and wall above is a mesh of its own, most with
+// materials of their own, and each mesh is a draw call for every material it
+// has: a box is six. A switch face was some thousand draws, and a large rack
+// a hundred thousand and more a frame, nearly all of it the GPU being told
+// what to draw next rather than drawing it. So once a face is built
+// (batchRelief, at the end of buildFaceRelief):
+//
+//   - a texture whose pixels and settings equal another's on the face is
+//     that one, so the second is never uploaded;
+//   - a material equal to another (the same kind, colour, textures and
+//     settings) is that one;
+//   - and the meshes that share a material, a part and a frame are one mesh,
+//     their geometry carried into the frame.
+//
+// THREE THINGS KEEP A MESH APART, because something reads it later:
+//   - its PART (`userData.portrayalPath`). A host hides, fades or dims a part
+//     by the path on its meshes (a pulled cover, the Rack Builder's covers and
+//     plugs), and does it through their materials, so a material is shared
+//     only within one part;
+//   - its FRAME. A FRU's group moves (an eject), so what is in it is merged
+//     within it and never with the face around it;
+//   - a LIVE material: one a restyle repaints or recolours later (`live`,
+//     only when the caller collects `ctx.restyle`), which keeps its identity,
+//     though meshes that already share it still merge.
+// What the face looks like does not change: the same triangles, normals,
+// texture coordinates, textures and material settings, in fewer draws. The
+// vertices are carried into their frame here rather than on the GPU, so a
+// value can differ in its last bit, and an edge pixel or a surface level
+// with another can then come out a few levels apart.
+//
+// A PART IS EVERY PATH UNLESS THE HOST SAYS OTHERWISE. A switch's every port
+// is a part, so kept apart a port costs a draw for each material it has.
+// `ctx.parts(path)` lets a host name the parts it styles on its own; the
+// rest are the face's, share materials across parts and merge, and lose
+// their path from what they are merged into (a mesh left whole keeps its
+// own). The Rack Builder styles a cable end's port and its plug (hover.js)
+// and a cover (covers.js), and nothing else.
+// `ctx.batch === false` builds the face as it was before 0.42.0.
+
+// Two textures are one when their settings match and their images are the
+// same object or two canvases with the same pixels. A canvas of over a
+// million pixels is compared by identity only (a whole face).
+const _TEX_FIELDS = ['wrapS', 'wrapT', 'magFilter', 'minFilter', 'anisotropy', 'generateMipmaps', 'colorSpace',
+                     'flipY', 'premultiplyAlpha', 'unpackAlignment', 'format', 'type', 'rotation', 'mapping'];
+function _texSig(t) {
+  return [..._TEX_FIELDS.map(k => t[k]), t.repeat.x, t.repeat.y, t.offset.x, t.offset.y, t.center.x, t.center.y,
+          t.matrixAutoUpdate].join(',');
+}
+function _pixels(img) {
+  if (!img || typeof img.getContext !== 'function' || !img.width || !img.height
+      || img.width * img.height > (1 << 20)) return null;
+  const d = img.getContext('2d').getImageData(0, 0, img.width, img.height).data;
+  // FNV-1a over the words, for a bucket; equal buckets are then compared whole
+  const w = new Uint32Array(d.buffer, d.byteOffset, d.byteLength >> 2);
+  let h = 0x811c9dc5;
+  for (let i = 0; i < w.length; i++) h = Math.imul(h ^ w[i], 16777619);
+  return {key: `${img.width}x${img.height}:${h >>> 0}`, data: d};
+}
+function _sameBytes(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+function _texturePool() {
+  const bySig = new Map(), seen = new Map(), ids = new WeakMap();
+  let n = 0;
+  const idOf = img => { if (!ids.has(img)) ids.set(img, ++n); return ids.get(img); };
+  return tex => {
+    if (!tex) return tex;
+    if (seen.has(tex)) return seen.get(tex);
+    const img = tex.image, px = _pixels(img);
+    const sig = `${_texSig(tex)}|${px ? px.key : `#${idOf(img)}`}`;
+    const list = bySig.get(sig) || bySig.set(sig, []).get(sig);
+    let same = list.find(e => e.img === img || (px && e.px && _sameBytes(e.px.data, px.data)));
+    if (!same) list.push(same = {tex, img, px});
+    seen.set(tex, same.tex);
+    return same.tex;
+  };
+}
+const _MAT_FIELDS = ['type', 'side', 'transparent', 'opacity', 'alphaTest', 'alphaToCoverage', 'visible',
+                     'depthTest', 'depthWrite', 'depthFunc', 'blending', 'wireframe', 'vertexColors',
+                     'flatShading', 'fog', 'toneMapped', 'colorWrite', 'polygonOffset', 'polygonOffsetFactor',
+                     'polygonOffsetUnits', 'premultipliedAlpha', 'dithering', 'forceSinglePass', 'stencilWrite',
+                     'reflectivity', 'refractionRatio', 'combine', 'lightMapIntensity', 'aoMapIntensity',
+                     'emissiveIntensity'];
+const _MAT_MAPS = ['map', 'alphaMap', 'lightMap', 'aoMap', 'emissiveMap', 'specularMap', 'envMap', 'bumpMap',
+                   'normalMap', 'displacementMap'];
+// A material with anything this pass does not know (a clipping plane, a
+// shader hook, user data) is left as it is.
+function _plainMaterial(m) {
+  return (m.isMeshBasicMaterial || m.isMeshLambertMaterial) && !m.clippingPlanes
+    && m.onBeforeCompile === THREE.Material.prototype.onBeforeCompile
+    && m.customProgramCacheKey === THREE.Material.prototype.customProgramCacheKey
+    && !Object.keys(m.userData || {}).length && !m.name && !(m.defines && Object.keys(m.defines).length);
+}
+function _matKey(m, texId) {
+  return [..._MAT_FIELDS.map(k => m[k]), m.color ? m.color.getHex() : '', m.emissive ? m.emissive.getHex() : '',
+          ..._MAT_MAPS.map(k => texId(m[k]))].join('|');
+}
+
+// THE GEOMETRY OF SEVERAL PIECES AS ONE, each carried by its own matrix
+// (column-major 4x4, into the frame they are merged in). A piece is a range
+// of a geometry: `pos`, `nrm`, `uv` as flat arrays, `index` or null, and the
+// `start`/`count` of its draw (of the index when there is one). Only the
+// vertices the range uses are kept. A matrix that mirrors (a negative
+// determinant) reverses each triangle, so a face that was in front still is.
+// Pure, so it is checked under node.
+export function mergePieces(pieces, {normals = true, uvs = true} = {}) {
+  const pos = [], nrm = [], uv = [], idx = [];
+  for (const p of pieces) {
+    const e = p.matrix;
+    const det = e[0] * (e[5] * e[10] - e[9] * e[6]) - e[4] * (e[1] * e[10] - e[9] * e[2])
+              + e[8] * (e[1] * e[6] - e[5] * e[2]);
+    // the normal matrix, row by row: the cofactors of the upper 3x3, which
+    // are its inverse transpose times its determinant
+    const n = [e[5] * e[10] - e[6] * e[9], e[2] * e[9] - e[1] * e[10], e[1] * e[6] - e[2] * e[5],
+               e[6] * e[8] - e[4] * e[10], e[0] * e[10] - e[2] * e[8], e[2] * e[4] - e[0] * e[6],
+               e[4] * e[9] - e[5] * e[8], e[1] * e[8] - e[0] * e[9], e[0] * e[5] - e[1] * e[4]];
+    const nv = p.pos.length / 3;
+    const end = p.index ? Math.min(p.index.length, p.start + p.count) : Math.min(nv, p.start + p.count);
+    const map = new Int32Array(nv).fill(-1);
+    const base = pos.length / 3;
+    let next = 0;
+    const take = v => {
+      if (map[v] >= 0) return map[v];
+      map[v] = base + next++;
+      const x = p.pos[3 * v], y = p.pos[3 * v + 1], z = p.pos[3 * v + 2];
+      pos.push(e[0] * x + e[4] * y + e[8] * z + e[12], e[1] * x + e[5] * y + e[9] * z + e[13],
+               e[2] * x + e[6] * y + e[10] * z + e[14]);
+      if (normals) {
+        const a = p.nrm[3 * v], b = p.nrm[3 * v + 1], c = p.nrm[3 * v + 2];
+        const nx = n[0] * a + n[1] * b + n[2] * c, ny = n[3] * a + n[4] * b + n[5] * c,
+              nz = n[6] * a + n[7] * b + n[8] * c;
+        const l = Math.hypot(nx, ny, nz) || 1;
+        // (divided by the determinant's sign, it is the inverse transpose's)
+        const s = det < 0 ? -1 / l : 1 / l;
+        nrm.push(nx * s, ny * s, nz * s);
+      }
+      if (uvs) uv.push(p.uv[2 * v], p.uv[2 * v + 1]);
+      return map[v];
+    };
+    for (let i = p.start; i + 2 < end; i += 3) {
+      const a = take(p.index ? p.index[i] : i), b = take(p.index ? p.index[i + 1] : i + 1),
+            c = take(p.index ? p.index[i + 2] : i + 2);
+      if (det < 0) idx.push(a, c, b); else idx.push(a, b, c);
+    }
+  }
+  return {pos, nrm: normals ? nrm : null, uv: uvs ? uv : null, index: idx};
+}
+
+// The pass itself. `anchors` are the groups that move (the face's own group
+// and every FRU group); `keep` the meshes something holds on to after the
+// build (a well's walls, which ventWellWalls repaints); `live` the materials
+// a restyle changes. Returns what it did, for a host or a harness.
+export function batchRelief(root, {anchors = new Set(), keep = new Set(), live = new Set(), parts = null} = {}) {
+  anchors = new Set([root, ...anchors]);
+  // which part a mesh is kept apart as: its own, unless the host has said it
+  // never styles that part on its own (`parts`), when it is the face's
+  const partOf = p => (p && (!parts || parts(p)) ? p : '');
+  root.updateMatrixWorld(true);
+  const texOf = _texturePool();
+  const texIds = new Map();
+  const texId = t => { if (!t) return ''; if (!texIds.has(t)) texIds.set(t, texIds.size + 1); return texIds.get(t); };
+  const pool = new Map();
+  const canon = (m, path) => {
+    if (!m || live.has(m) || !_plainMaterial(m)) return m;
+    for (const k of _MAT_MAPS) if (m[k]) m[k] = texOf(m[k]);
+    const key = `${path}|${_matKey(m, texId)}`;
+    if (!pool.has(key)) pool.set(key, m);
+    return pool.get(key);
+  };
+  const OK_ATTRS = new Set(['position', 'normal', 'uv']);
+  const meshes = [];
+  root.traverse(o => { if (o.isMesh) meshes.push(o); });
+  const buckets = new Map();
+  const drawsOf = mesh => Array.isArray(mesh.material) ? mesh.geometry.groups.length : 1;
+  const before = {meshes: meshes.length, draws: 0};
+  const after = {meshes: 0, draws: 0};
+  for (const mesh of meshes) {
+    before.draws += drawsOf(mesh);
+    const g = mesh.geometry;
+    const path = partOf(mesh.userData.portrayalPath);
+    const plain = mesh.constructor === THREE.Mesh && !keep.has(mesh) && !mesh.children.length
+      && mesh.visible && mesh.renderOrder === 0 && mesh.layers.mask === 1 && mesh.frustumCulled
+      && !mesh.castShadow && !mesh.receiveShadow && !mesh.name && !mesh.morphTargetInfluences
+      && Object.keys(mesh.userData).every(k => k === 'portrayalPath')
+      && g && g.isBufferGeometry && g.attributes.position && !Object.keys(g.morphAttributes).length
+      && Object.keys(g.attributes).every(k => OK_ATTRS.has(k))
+      && Object.values(g.attributes).every(a => !a.isInterleavedBufferAttribute)
+      && g.drawRange.start === 0 && g.drawRange.count === Infinity;
+    let anchor = plain ? mesh.parent : null;
+    while (anchor && !anchors.has(anchor)) anchor = anchor.parent;
+    if (!anchor) {
+      after.meshes++;
+      after.draws += drawsOf(mesh);
+      continue;
+    }
+    const rel = anchor.matrixWorld.clone().invert().multiply(mesh.matrixWorld);
+    const ranges = Array.isArray(mesh.material)
+      ? g.groups.map(r => ({start: r.start, count: r.count, m: mesh.material[r.materialIndex]}))
+      : [{start: 0, count: g.index ? g.index.count : g.attributes.position.count, m: mesh.material}];
+    mesh.userData.__batched = true;
+    for (const r of ranges) {
+      // a range with no material, or an invisible one, was never drawn
+      if (!r.m || r.m.visible === false) continue;
+      const m = canon(r.m, path);
+      const normals = !!g.attributes.normal, uvs = _MAT_MAPS.some(k => m[k]) && !!g.attributes.uv;
+      const key = [anchor.uuid, path, m.uuid, normals, uvs].join('|');
+      let b = buckets.get(key);
+      if (!b) buckets.set(key, b = {anchor, path, m, normals, uvs, pieces: []});
+      b.pieces.push({mesh, matrix: rel.elements, start: r.start, count: r.count});
+    }
+  }
+  // a single whole mesh with one material keeps its place and takes the
+  // pooled material; everything else is rebuilt as merged meshes
+  for (const b of buckets.values()) {
+    const first = b.pieces[0].mesh;
+    after.meshes++;
+    after.draws++;
+    if (b.pieces.length === 1 && !Array.isArray(first.material)) {
+      first.material = b.m;
+      delete first.userData.__batched;
+      continue;
+    }
+    const {normals, uvs} = b;
+    const arr = (a) => a ? a.array : null;
+    const merged = mergePieces(b.pieces.map(p => ({
+      matrix: p.matrix, start: p.start, count: p.count,
+      pos: arr(p.mesh.geometry.attributes.position),
+      nrm: normals ? arr(p.mesh.geometry.attributes.normal) : null,
+      uv: uvs ? arr(p.mesh.geometry.attributes.uv) : null,
+      index: arr(p.mesh.geometry.index)})), {normals, uvs});
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(merged.pos, 3));
+    if (merged.nrm) geo.setAttribute('normal', new THREE.Float32BufferAttribute(merged.nrm, 3));
+    if (merged.uv) geo.setAttribute('uv', new THREE.Float32BufferAttribute(merged.uv, 2));
+    geo.setIndex(merged.index);
+    geo.computeBoundingBox();
+    geo.computeBoundingSphere();
+    const mesh = new THREE.Mesh(geo, b.m);
+    if (b.path) mesh.userData.portrayalPath = b.path;
+    b.anchor.add(mesh);
+  }
+  // the meshes that were merged leave, and their geometry with them unless a
+  // mesh that stayed draws it too
+  const still = new Set(meshes.filter(m => !m.userData.__batched).map(m => m.geometry));
+  for (const mesh of meshes) {
+    if (!mesh.userData.__batched) continue;
+    delete mesh.userData.__batched;
+    mesh.parent.remove(mesh);
+    if (!still.has(mesh.geometry)) mesh.geometry.dispose();
+  }
+  return {before, after};
+}
+
     const INTO = ctx.deep ?? D;
     // THE ONE THAT WAS MISSED LAST TIME read through ctx and named no scope, and
     // resolved against the default while looking like a rendering fault. Read the
@@ -2879,6 +3135,12 @@ export async function buildFaceRelief(F, ctx) {
       return;
     }
     const {cavities, outs, domes, vents, apertures = [], frus, subBodies = [], flatLifted = [],
+    // what a restyle will change, kept whole by the batch pass; with no
+    // `ctx.restyle` nothing ever runs a restyle, so nothing is live
+    const live = new Set();
+    const liveMat = (...ms) => { if (ctx.restyle) for (const m of ms) if (m) live.add(m); };
+    // and the meshes something holds on to after the build
+    const held = new Set();
            cleanText} = await extractRelief(src, ctx.scope, {back: !!ctx.back});
     if (ctx.apertures) ctx.apertures[F.view] = apertures;
     // A MODULE PREVIEW IS THE PART'S SIZE BOX HERE. A part that declares
@@ -3110,7 +3372,7 @@ export async function buildFaceRelief(F, ctx) {
       if (walls) addTo(walls);
       // a box well whose sides are the chassis: a side against another face
       // shows that face's vents (ventWellWalls, once every face is read)
-      if (walls && ctx.wells && c.wallsInside && !c.rings && !c.round && !c.tilt)
+      if (walls && ctx.wells && c.wallsInside && !c.rings && !c.round && !c.tilt) {
         ctx.wells.push({view: F.view, mesh: walls, well: c, d});
       if (!shell.floor) continue;
       // textured floor: the aperture art, pushed to the back of the recess
@@ -3128,6 +3390,8 @@ export async function buildFaceRelief(F, ctx) {
         // the facet clear is REAPPLIED: a restyle re-cuts the floor from the art
         remap(floorMat, clearFloor(shapeFloor(
           crop(g2, {x: pc.x - c.grpRect.x, y: pc.y - c.grpRect.y, w: pc.w, h: pc.h}, PX)),
+        held.add(walls);
+      }
           floorClears, pc.x, pc.y, PX));
         for (const ft of cavCrops) {
           const pf = projOf(ft);
@@ -3139,6 +3403,7 @@ export async function buildFaceRelief(F, ctx) {
       const maxSink = Math.max(0, ...c.features.filter(f => f.kind === 'sink').map(f => f.val));
       // ...and the closed back, 0.25 behind the floor, is cleared under a sunk
       // facet the same way, or it is the plane that crosses the cage wells
+      liveMat(floorMat);
       // (and a shaped cavity's back is its outline, as its floor is)
       if (floorClears.length || cavCv) {
         const acv = document.createElement('canvas');
@@ -3176,6 +3441,7 @@ export async function buildFaceRelief(F, ctx) {
         } else {   // sink: a deeper pocket beyond the floor
           const mat = new THREE.MeshLambertMaterial({color: ft.color, side: THREE.DoubleSide});
           let m;
+          liveMat(ft.mat);
           if (ft.round) {
             m = new THREE.Mesh(new THREE.CylinderGeometry(ft.w / 2, ft.w / 2, ft.val, 24), mat);
             m.rotation.x = Math.PI / 2;
@@ -3238,6 +3504,7 @@ export async function buildFaceRelief(F, ctx) {
         facePunch[F.view].push(fp);
       }
       // A FACET'S SURFACE CARRIES THE PARTS ON IT. Its own art is the first
+      liveMat(m.material);
       // layer and the parts' art goes over it at their front-view rects; each
       // is a text a restyle can change, so each has a slot (see `reg` below).
       const facetTexts = o.facet && o.parts && o.parts.length
@@ -3621,6 +3888,7 @@ export async function buildFaceRelief(F, ctx) {
       // is the size of the whole slot - so cropping `cv` gave the module an
       // empty plane: adapters floating in front of an open passage and no
       // faceplate. Cut from the pristine art instead, and re-open only the
+      liveMat(faceTex, ...bodyMats);
       // module's own cavities (the mouth is the bay's hole, not the module's).
       // A TILTED MODULE (an optic in a cage on a facet) is cut from the face at
       // its front-view rect `pf`, and its plane and body take its true size,
@@ -3698,6 +3966,7 @@ export async function buildFaceRelief(F, ctx) {
       // size of the whole slot, and replaying it here cut the entire faceplate
       // out of every module seated in an open-backed bay.
       // (a tilted module, like a lifted one, replays none: its holes are `bores`)
+      liveMat(plane.material, opticMat);
       const punchesHere = f.lift || f.tilt ? [] : facePunch[F.view].filter(p => !p.mouth &&
         p.x < pf.x + pf.w && p.x + p.w > pf.x && p.y < pf.y + pf.h && p.y + p.h > pf.y);
       reg(f.svgText, async text => {
@@ -3871,3 +4140,6 @@ export async function buildFaceRelief(F, ctx) {
   }
   meshes.push(grp);
 }
+  if (ctx.batch !== false)
+    batchRelief(grp, {anchors: new Set(Object.values(fruGroups)), keep: held, live,
+                      parts: typeof ctx.parts === 'function' ? ctx.parts : null});
