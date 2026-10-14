@@ -34,7 +34,7 @@ provenance:
   height: >-
     estimated - 2.5 above the card's top edge: the brief's "clearance above the
     north edge should meet or exceed 2.5 mm". It is drawn as the connector
-    ends' height; the cover stands higher, on a guess (`form-3d`).
+    ends' height; the cover stands higher (to 6.0 with its ridges), on a guess (`form-3d`).
   identity: >-
     datasheet - NVIDIA A100 80GB PCIe product brief PB-10577-001 v03, "NVLink
     Bridge": "The 2-slot NVLink Bridge for the NVIDIA A100 80GB PCIe card has the

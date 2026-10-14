@@ -202,7 +202,7 @@ def test_the_bridge_is_wide_enough_to_reach_both_connectors():
 # --- the 3D form (P-0031) ---------------------------------------------------------
 #
 # Each part was a box with its 2D skin painted on one face. The form is built the
-# way the library builds depth anywhere (docs/connectors-gpu-design.md section 9):
+# way the library builds depth anywhere (docs/connectors-gpu-design.md section 8):
 # a header's `relief.cavity` names ONE path of one subpath a cell, so each cell is
 # its own recess walled in its own shape; its contacts are `top` features standing
 # on the cavity floor; a plug is a `shape` tube whose holes are the cells, closed
