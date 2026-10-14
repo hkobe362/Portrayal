@@ -8,9 +8,10 @@ profile: server
 description: >-
   NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card.
   The bracket face carries one vent window and no ports. Three NVLink bridge
-  connectors sit on the top edge. One CPU 8-pin power connector sits on the far
-  end of the card. NVIDIA's straight or long offset extender can be fitted to
-  the far end; the `extender` field chooses it.
+  connectors sit on the top edge. The far end is open and shows the heat sink's
+  fins edge-on. It has one black CPU 8-pin power connector by the top edge and
+  two bosses for an extender. NVIDIA's straight or long offset extender can be
+  fitted to the far end; the `extender` field chooses it.
 unplaced: >-
   Nothing in the library seats a card two slots wide. Every riser bay is one
   slot, 120.02 x 21.59 on the 20.32 pitch, and a bay has no way to span its
@@ -47,6 +48,8 @@ fields:
       The bracket at the card's far end that a server's card guide holds. The
       straight one (NVPN 682-00007-5555-001) makes the card 312 mm long. The
       long offset one (NVPN 682-00007-5555-000) makes it 339 mm.
+faces:
+  rear: {ref: nvidia/a100-pcie-80gb-tail@1}
 provenance:
   sources: >-
     NVIDIA A100 80GB PCIe Product Brief PB-10577-001_v03, March 2022, fetched
@@ -174,12 +177,42 @@ provenance:
     estimated. The library has no NVLink interface, so the connectors are
     boxes and nothing can mate a bridge to them.
   body-power-connector: >-
-    estimated - PB-10577: "a CPU 8-pin power connector on the east edge of the
-    board", and figure 6 draws it at the top of the end face. Its size is the
-    2 x 4 receptacle's figure 6 proportions at 5.06 px/mm, 18.3 along the edge
-    and 9.9 across. It stands on the board's component side, with its face at
-    the card's end. The library has no EPS12V or CPU 8-pin interface, so the
-    connector is a box and no power cord can mate it.
+    photo-measured - PB-10577: "a CPU 8-pin power connector on the east edge of the
+    board" (datasheet; the fact is one connector). Its place is IT Creations'
+    575TK_5, the card's east end, at matched scale: the end face's 97.9 across is
+    about 978 px, 9.99 px/mm, and the housing is 185 px wide, 18.4 mm, from
+    105.6 to 124.0 on the card's x, 2.3 from the top edge, with its top flush with
+    the cover's. The photograph is from above, so its height, 10.9 (y 3.5 to
+    14.4), is read at the 4.2 mm cell pitch and is good to about 1 mm; the
+    brief's figure 6 had given 9.9. The housing is BLACK on this card (the
+    photograph); they are usually white and sometimes black. It is eight dark
+    cells in two rows of four in a housing standing 0.4 proud of the end plate.
+    THE PORT is `aux-power` on the tail face (`faces.rear`, nvidia/a100-pcie-80gb-
+    tail@1), a STAND-IN, nvidia/a100-eps12v-standin@1, which presents no
+    interface. PR #1076 adds `eps12v-8pin`; the GPU batch swaps the stand-in for
+    `std/eps12v-header@1` once it merges. The boxes below are its 3D body.
+  body-end: >-
+    estimated - the black end plate (backplate, board and cover) stops 0.4 short
+    of the shroud's lip and the connector housing stands 0.4 proud of it, so the
+    housing and the mount bosses are not buried in the plate's own boxes. The
+    photograph does not show the step.
+  body-tail-fins: >-
+    photo-measured - the shroud is open at its far end, and 575TK_5 shows the heat
+    sink's fins edge-on behind it. 18 fins at a pitch of 5.0 (50.2 px at 9.99
+    px/mm): THE TAIL VIEW SHOWS OTHERWISE THAN THE 2.194 OF `body-ribs`, which is
+    the shroud's outer rib pitch; the fins agree with the 5.0 of the 16 fins seen
+    through the bracket's window (`face-grille`). The first is at x 31.25 on that
+    window's grid. A fin is 0.8 thick and the wall round the opening 2.1 (both
+    estimated); the fins are drawn 40 mm deep, on a dark floor, because the
+    photograph does not show how far they run in.
+  body-extender-mount: >-
+    estimated - the two bosses the extenders' thumbscrews fasten to, at the
+    card's x 35.3 and 64.1 and y 8.4: the screws in 575TK_5 are 28.8 apart at
+    matched scale, centred on the flange's width. 4.0 across, 0.4 proud of the end
+    plate, in zinc. NVIDIA's brief names the extenders and their lengths, not the
+    screws. With no extender they show; with one the flange sits on them and its
+    two knurled thumbscrew heads (7 across, from the photograph) stand on its
+    outer face.
   power: >-
     datasheet - PB-10577 table 1: total board power 300 W default, 300 W
     maximum, 150 W minimum. The brief gives no ambient for it. The
@@ -222,9 +255,12 @@ provenance:
     x 71.05. The upright is 15 wide (14.7 measured) and runs from x 28.41 to
     123.3. The fillet between the plate and the upright is drawn as one step.
     The plate's 1.2 thickness, its place across the card (y 9.6 to 10.8, the
-    cover band, as 575TK_6 and 575TK_5 show it) and the upright's 8.4 channel
-    depth are estimated. The flange that bolts to the card's end is estimated
-    from 575TK_5.
+    cover band, as 575TK_6 and 575TK_5 show it) are estimated. THE UPRIGHT IS
+    FLAT, 1.2 THICK LIKE THE PLATE: 575TK_5 shows its strip as a thin sheet
+    across the far end, not a channel, so it no longer stands 8.4 tall and
+    hides the power connector from behind (it did, as first drawn). Its height
+    was never measured; the broad side's photograph cannot show it. The flange
+    that bolts to the card's end is estimated from 575TK_5.
   body-extender-long-offset: >-
     estimated - no photograph of the long offset extender was found. PB-10577
     figure 8 draws it beside the straight one: the same slotted plate and
@@ -290,9 +326,9 @@ body:
   - {id: board-notch, at: [31.96, 4.44], size: [94.35, 1.57], from: 140.93, depth: 19.50,
      color: '#1d2420', confidence: drawing, shows: [right],
      source: 'PB-10577 fig 3: the notch, 3.55 REF deep and 19.50 REF long, 59.05 + 81.88 behind the bracket'}
-  - {id: board-east, at: [28.41, 4.44], size: [97.90, 1.57], from: 160.43, depth: 108.17,
+  - {id: board-east, at: [28.41, 4.44], size: [97.90, 1.57], from: 160.43, depth: 107.77,
      color: '#1d2420', confidence: drawing, shows: [right],
-     source: 'PB-10577 fig 3: lower edge W + 13.25 again east of the notch, to the 268.60 end'}
+     source: 'PB-10577 fig 3: lower edge W + 13.25 again east of the notch, to the 268.60 end less the 0.4 step (provenance body-end)'}
   - {id: edge-tab-short, at: [15.16, 4.44], size: [13.25, 1.57], from: 46.90, depth: 11.20,
      color: '#1d2420', confidence: drawing,
      source: 'PB-10577 fig 3: key datum 59.05 behind the bracket, tab 13.25 deep; CEM 5.0 fig 6-5: 12.15 to the tab end, notch 1.90'}
@@ -311,7 +347,7 @@ body:
   - {id: backplate-notch, at: [31.96, 1.77], size: [94.35, 2.67], from: 140.93, depth: 19.50,
      color: '#202326', confidence: estimated, shows: [right],
      source: 'as the backplate, inside the PB-10577 fig 3 notch'}
-  - {id: backplate-east, at: [28.41, 1.77], size: [97.90, 2.67], from: 160.43, depth: 108.17,
+  - {id: backplate-east, at: [28.41, 1.77], size: [97.90, 2.67], from: 160.43, depth: 107.77,
      color: '#202326', confidence: estimated, shows: [right],
      source: 'as the backplate, east of the notch'}
   - {id: cover, at: [28.41, 6.01], size: [97.90, 8.39], from: 0.90, depth: 140.03,
@@ -320,7 +356,7 @@ body:
   - {id: cover-notch, at: [31.96, 6.01], size: [94.35, 8.39], from: 140.93, depth: 19.50,
      color: '#202326', confidence: estimated, shows: [right],
      source: 'as the cover, inside the PB-10577 fig 3 notch'}
-  - {id: cover-east, at: [28.41, 6.01], size: [97.90, 8.39], from: 160.43, depth: 108.17,
+  - {id: cover-east, at: [28.41, 6.01], size: [97.90, 8.39], from: 160.43, depth: 107.77,
      color: '#202326', confidence: estimated, shows: [right],
      source: 'as the cover, east of the notch'}
   - {id: shroud, at: [28.41, 14.40], size: [97.90, 25.60], from: 0.90, depth: 140.03,
@@ -329,9 +365,60 @@ body:
   - {id: shroud-notch, at: [31.96, 14.40], size: [94.35, 25.60], from: 140.93, depth: 19.50,
      color: '#b8a68c', confidence: drawing, shows: [right, left, bottom],
      source: 'PB-10577 fig 3 notch; IT Creations 575TK_7 shows it in the shroud outline at 145..160'}
-  - {id: shroud-east, at: [28.41, 14.40], size: [97.90, 25.60], from: 160.43, depth: 108.17,
+  - {id: shroud-east, at: [28.41, 14.40], size: [97.90, 25.60], from: 160.43, depth: 67.97,
      color: '#b8a68c', confidence: estimated, shows: [right, left, bottom],
-     source: 'as the shroud, east of the notch'}
+     source: 'as the shroud, east of the notch, to where the open end begins at 228.40'}
+  # THE OPEN END (provenance body-tail-fins): a rim round an opening, with the
+  # fin stack edge-on inside it, on a dark floor.
+  - {id: shroud-end-floor, at: [30.51, 14.40], size: [93.70, 23.50], from: 228.40, depth: 0.20,
+     color: '#07080a', confidence: estimated,
+     source: 'the dark floor the open end looks onto; 575TK_5 shows the gaps between fins dark'}
+  - {id: shroud-end-skin, at: [28.41, 37.90], size: [97.90, 2.10], from: 228.40, depth: 40.20,
+     color: '#b8a68c', confidence: estimated, shows: [right, left, bottom],
+     source: 'the broad side''s wall round the opening; 2.1 thick is estimated from 575TK_5'}
+  - {id: shroud-end-low, at: [28.41, 14.40], size: [2.10, 23.50], from: 228.40, depth: 40.20,
+     color: '#b8a68c', confidence: estimated, shows: [left],
+     source: 'the lower edge''s wall round the opening; 2.1 thick is estimated'}
+  - {id: shroud-end-top, at: [124.21, 14.40], size: [2.10, 23.50], from: 228.40, depth: 40.20,
+     color: '#b8a68c', confidence: estimated, shows: [right],
+     source: 'the top edge''s wall round the opening; 2.1 thick is estimated'}
+  - {id: fin-01, at: [30.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured,
+     source: 'IT Creations 575TK_5 at matched scale: 18 fins edge-on on a 5.0 pitch; the first at x 31.25, the face window''s grid; 0.8 thick and 40 deep are estimated'}
+  - {id: fin-02, at: [35.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 36.25'}
+  - {id: fin-03, at: [40.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 41.25'}
+  - {id: fin-04, at: [45.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 46.25'}
+  - {id: fin-05, at: [50.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 51.25'}
+  - {id: fin-06, at: [55.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 56.25'}
+  - {id: fin-07, at: [60.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 61.25'}
+  - {id: fin-08, at: [65.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 66.25'}
+  - {id: fin-09, at: [70.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 71.25'}
+  - {id: fin-10, at: [75.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 76.25'}
+  - {id: fin-11, at: [80.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 81.25'}
+  - {id: fin-12, at: [85.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 86.25'}
+  - {id: fin-13, at: [90.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 91.25'}
+  - {id: fin-14, at: [95.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 96.25'}
+  - {id: fin-15, at: [100.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 101.25'}
+  - {id: fin-16, at: [105.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 106.25'}
+  - {id: fin-17, at: [110.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 111.25'}
+  - {id: fin-18, at: [115.85, 14.40], size: [0.80, 23.50], from: 228.60, depth: 40.00,
+     color: '#2b2e32', confidence: photo-measured, source: 'as fin-01, x 116.25'}
   - {id: nvlink-1, at: [126.31, 2.20], size: [0.50, 6.60], from: 13.50, depth: 49.50,
      color: '#2b2f33', confidence: estimated, shows: [right],
      source: 'PNY top render at 2.555 px/mm: caps 49.5 long from 13.5, 6.6 wide; 0.5 proud is estimated'}
@@ -341,9 +428,34 @@ body:
   - {id: nvlink-3, at: [126.31, 2.20], size: [0.50, 6.60], from: 126.10, depth: 49.50,
      color: '#2b2f33', confidence: estimated, shows: [right],
      source: 'PNY top render at 2.555 px/mm: the third cap from 126.1'}
-  - {id: power-8pin, at: [105.40, 6.01], size: [18.30, 9.90], from: 250.60, depth: 18.00,
-     color: '#1a1a1a', confidence: estimated,
-     source: 'PB-10577 fig 6: CPU 8-pin at the top of the east end, 2 x 4 receptacle about 18.3 x 9.9; face flush with the 268.60 end'}
+  # THE CPU 8-PIN (provenance body-power-connector): a black housing with eight
+  # dark cells, the 3D body of the tail face's `aux-power` port.
+  - {id: power-8pin, at: [105.60, 3.50], size: [18.40, 10.90], from: 250.60, depth: 17.80,
+     color: '#17191c', confidence: photo-measured,
+     source: 'IT Creations 575TK_5 at matched scale: 18.4 wide, 2.3 from the top edge, top flush with the cover; 10.9 high is read at the cell pitch (about 1 mm); black housing'}
+  - {id: power-8pin-cell-1, at: [119.30, 4.80], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured,
+     source: 'IT Creations 575TK_5: two rows of four cells on the 4.2 pitch; 3.2 across is about 40 of the 50 px pitch'}
+  - {id: power-8pin-cell-2, at: [115.10, 4.80], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-3, at: [110.90, 4.80], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-4, at: [106.70, 4.80], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-5, at: [119.30, 9.00], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-6, at: [115.10, 9.00], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-7, at: [110.90, 9.00], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  - {id: power-8pin-cell-8, at: [106.70, 9.00], size: [3.20, 3.20], from: 268.40, depth: 0.20,
+     color: '#08090a', confidence: photo-measured, source: 'as cell 1'}
+  # THE EXTENDER MOUNT (provenance body-extender-mount): two bosses on the end plate
+  - {id: mount-boss-1, shape: cylinder, axis: z, at: [33.30, 6.40], size: [4.00, 4.00], from: 268.20, depth: 0.40,
+     color: '#8a9199', confidence: estimated,
+     source: 'IT Creations 575TK_5: the extender''s thumbscrews, 28.8 apart at matched scale, centred on the flange; 4.0 across and 0.4 proud are estimated'}
+  - {id: mount-boss-2, shape: cylinder, axis: z, at: [62.10, 6.40], size: [4.00, 4.00], from: 268.20, depth: 0.40,
+     color: '#8a9199', confidence: estimated, source: 'as mount-boss-1, the second thumbscrew'}
   # THE BRACKET'S FOOT below the card (provenance body-bracket-foot)
   - {id: bracket-tab-1, at: [0.00, 7.40], size: [7.27, 9.80], from: 0.30, depth: 0.90,
      color: '#9aa1a8', confidence: estimated,
@@ -375,9 +487,9 @@ body:
   - {id: ext-straight-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 288.00, depth: 9.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
      source: 'IT Creations 575TK_7: the fillet into the upright, drawn as one step'}
-  - {id: ext-straight-upright, at: [28.41, 6.01], size: [94.89, 8.39], from: 297.00, depth: 15.00,
+  - {id: ext-straight-upright, at: [28.41, 9.60], size: [94.89, 1.20], from: 297.00, depth: 15.00,
      color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
-     source: 'IT Creations 575TK_7: 14.7 wide, x 28.41..123.3; far edge at 312, PB-10577; channel depth estimated'}
+     source: 'IT Creations 575TK_7: 14.7 wide, x 28.41..123.3; far edge at 312, PB-10577; a flat strip as 575TK_5 shows it, 1.2 thick estimated'}
   - {id: ext-long-flange, at: [28.41, 6.01], size: [42.64, 4.79], from: 268.60, depth: 1.20,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
      source: 'as the straight extender''s flange; PB-10577 fig 8 draws the same mounting'}
@@ -396,9 +508,23 @@ body:
   - {id: ext-long-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 315.00, depth: 9.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
      source: 'as the straight extender''s fillet'}
-  - {id: ext-long-upright, at: [28.41, 6.01], size: [94.89, 8.39], from: 324.00, depth: 15.00,
+  - {id: ext-long-upright, at: [28.41, 9.60], size: [94.89, 1.20], from: 324.00, depth: 15.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
      source: 'far edge at 339, PB-10577 "card + extender"; the upright is the straight one''s, PB-10577 fig 8'}
+  # THE THUMBSCREWS that fasten either extender to the mount bosses
+  # (provenance body-extender-mount), on the flange's outer face at 269.80.
+  - {id: ext-straight-screw-1, shape: cylinder, axis: z, at: [31.80, 4.90], size: [7.00, 7.00], from: 269.80, depth: 3.00,
+     color: '#a8afb5', confidence: estimated, when: {extender: [straight]},
+     source: 'IT Creations 575TK_5: a knurled head about 7 across over each boss; 3.0 tall is estimated'}
+  - {id: ext-straight-screw-2, shape: cylinder, axis: z, at: [60.60, 4.90], size: [7.00, 7.00], from: 269.80, depth: 3.00,
+     color: '#a8afb5', confidence: estimated, when: {extender: [straight]},
+     source: 'as the first thumbscrew'}
+  - {id: ext-long-screw-1, shape: cylinder, axis: z, at: [31.80, 4.90], size: [7.00, 7.00], from: 269.80, depth: 3.00,
+     color: '#a8afb5', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s: PB-10577 fig 8 draws the same mounting; no photograph of the long offset one'}
+  - {id: ext-long-screw-2, shape: cylinder, axis: z, at: [60.60, 4.90], size: [7.00, 7.00], from: 269.80, depth: 3.00,
+     color: '#a8afb5', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the first thumbscrew'}
 elements:
   grille: {at: [29.80, 9.90], size: [87.80, 29.40], class: bezel}
   vent: {at: [31.20, 11.80], size: [84.60, 25.80], class: vent}
