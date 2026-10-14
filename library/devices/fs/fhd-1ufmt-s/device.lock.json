@@ -36,6 +36,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -75,6 +77,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -114,6 +118,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -153,13 +159,16 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ]
  },
- "composed": "7bd8167aaeff62d0",
+ "composed": "6479cfe0e8c06792",
  "composed-refs": {
   "common/fibre-splice@1": "1.0.0+fc9da478db2a176a",
+  "common/keystone-blank@1": "1.0.0+ea7ba43f3fb87317",
   "common/keystone-clip@2": "2.0.0+5e63cac60d80c300",
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/lc-duplex-shuttered-adapter@2": "2.0.2+8f4908f4aaeeed75",
@@ -232,12 +241,15 @@
   "fs/fhd-fap8mtp-b-rear@1": "1.0.0+eda6040f15c9d559",
   "fs/fhd-fap8mtp-b@1": "1.0.0+6d18459552742440",
   "fs/fhd-fapb@1": "1.0.0+9a096c0ba4f6a558",
+  "fs/fhd-fapm6-blank@1": "1.0.0+92aa2f6597c8ad65",
+  "fs/fhd-fapm6-rj45@1": "1.0.0+47060185c3f7ab3a",
   "fs/fhd-fapm6@1": "1.0.0+8b5494b8ab712402",
   "fs/fhd-splice-12-lc-rear@2": "2.0.0+6365c19befedc151",
   "fs/fhd-splice-12-lc@3": "3.1.0+ad07de833573a544",
   "std/lc-bulkhead-bore@1": "1.0.1+bec8fa23019b19ae",
   "std/mpo16@1": "1.0.0+b3ccddfb5cdea37a",
   "std/mpo@2": "2.0.3+dc3a2ccceb1560b5",
+  "std/rj45@2": "2.1.0+2c8fec73bdc493fb",
   "std/sc-bore@1": "1.0.0+f9b52936418ba281"
  },
  "configs": [
@@ -245,7 +257,7 @@
   "panels"
  ],
  "format": 1,
- "gaps": "984c9bedd5ebdafa",
+ "gaps": "63ac8445502a33a9",
  "groups": [
   "furniture",
   "slots"
@@ -258,7 +270,7 @@
   "front/placements/ear-left",
   "front/placements/ear-right"
  ],
- "names": "bfe1ed0ebd62f188",
+ "names": "e7d8c6168b579dce",
  "placement-addressing": {
   "rel-pos": {
    "front/bays/bay-1": 1,
@@ -282,5 +294,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "8359a897e9f443db",
  "surface": "bab997712d228720",
- "version": "1.0.1"
+ "version": "1.1.0"
 }

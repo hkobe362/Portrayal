@@ -1,0 +1,39 @@
+format: 1
+kind: component
+name: keystone-blank
+version: 1.0.0
+class: mechanical
+profile: networking
+description: >-
+  A blanking insert for a keystone opening: the snap-on ABS plug that closes
+  an unused opening in a keystone faceplate or modular panel. FS blanking
+  insert for faceplate, FBPWH white (#159373) and FBPBL black. It carries no
+  connector and no port; the face is a flat plug.
+size: {w: 16.5, h: 14.9}
+conforms: keystone-opening
+size-confidence: {w: datasheet, h: datasheet}
+size-notes: >-
+  THE OPENING IT CLOSES, as common/keystone-clip@2 takes it: the registry's
+  keystone-opening, 16.5 x 14.9 landscape. FS draws the insert's body through
+  the opening 16.1 x 14.6 (the blanking insert datasheet, p3: 16.1 and 14.6),
+  which is 0.4 and 0.3 inside the opening and is drawn here as the plug with a
+  thin dark margin to the metal. The envelope is the opening.
+attrs: {opening: keystone, finish: white}
+provenance:
+  size: >-
+    datasheet - see size-notes. Blanking insert datasheet
+    (resource.fs.com/mall/doc/20231207141153wvi0lg.pdf) p3, drawing read as an
+    image. The figures printed on it: 14.6 and 17 across the front elevation
+    (body, collar), 16.1 and 19.8 across the section, 18.8 overall height, and
+    two 8s. The 14.6 by 16.1 body is the keystone jack's 14.5 by 16.1 section
+    (cat6 datasheet p3), turned on its side in a landscape opening.
+  face: >-
+    ESTIMATED. The datasheet draws the insert in section and in elevation, not
+    face-on, and says nothing of what the front shows. Drawn: a plain flat plug
+    16.1 x 14.6 with no collar. Whether the 19.8 x 17 collar stands in front of
+    the plate or behind it is not stated. Colour is white (#159373, FBPWH); the
+    datasheet also lists FBPBL in black (#185432 and #203961).
+  colour: >-
+    ESTIMATED. The datasheet names the colours (white, black) and gives no
+    figure; #ece9e2, as common/keystone-clip@2 draws FS's white plastic.
+skins: [default]
