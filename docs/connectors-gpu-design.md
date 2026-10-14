@@ -145,10 +145,46 @@ of them (the briefs say "16-pin"). Read each brief's figure; a card built to CEM
 other card's connector in the table is unchecked and is to be read from that
 card's NVIDIA brief before it is wired in.
 
-## 8. Not done
+## 8. The 3D form (P-0031)
+
+Each part was a box with its skin painted on one face: a header's cells were grey
+squares on a black face and the bridge a plain slab. They are built now with the
+relief keys the library already has, none of them new (library/components/README.md,
+docs/modelling-pitfalls.md "Relief and 3D"). The same keys do it for an IEC inlet
+(`std/c14-inlet@1`: a `cavity` and pins as `top` features) and a D-sub
+(`std/db9@1`: a `shape` outline that is a tube).
+
+| part | how it is built |
+|---|---|
+| header | `relief.cavity` names one path of one subpath a cell, so the kit punches the housing top in each cell's shape and walls each one down to `size.d`; the housing between cells stays solid. A contact is a `top` feature standing on the cell floor. The latch ramp is an `out` wedge with a `profile`. The 16-pin headers' four sense cells are 1.6 square against the power cells' 2.4 |
+| plug | `body` is a `shape` outline with a hole a cell, so it builds as a tube open at the mating face; `back` is a `shape` plate from `lift` to the body's `out`, closing it. The latch arm and hook are `out` boxes with a `lift`. Each wire is a `cyl` with a `lift`, a `comb` plate gathers them, and the stub starts after it |
+| NVLink connector | the well is the cavity; `rim` is a `shape` ring standing proud round it; two contact `top` rows stand in it |
+| bridge | four `shape` steps from the plate up to a raised centre, and three ridges |
+
+**No capability was added.** `out` is the absolute top and `lift` the base of a
+feature (relief.js builds `out - lift`), which is what makes the plug's rear wall
+possible without a new key.
+
+What is estimated, all of it low confidence, each in the contract's `provenance`:
+the cell sizes (the pitches are sourced, the cells are proportional); the contact
+heights (tips 2.4 behind the face; the 12V-2x6 sense contacts 1.5 shorter, one of
+four secondary readings); the latch ramps, arms and hooks; the rear wall, comb and
+wire lengths; the rim and contact rows of the NVLink connector; and the whole of
+the bridge's cover. NVIDIA publishes no drawing of the bridge, and no photograph or
+vendor figure was traced or copied: its steps are what a bridge with two connector
+ends and a cover between them has to be, and their heights are guesses.
+
+Known gaps, both honest: the header's latch ramp slopes along the mating axis in
+life, which a face drawing cannot give, so it is a wedge laid across the face; and
+the plug's cells are open at the header's mouth, where its modelled nose begins,
+because the nose inside the header is not built (docs/connectors-power-design.md
+section 5), so the open cells are seen only on a plug that is not seated.
+
+## 9. Not done
 
 - The 6-pin PCIe connector, and the 6+2 plug's split.
-- Locking tabs and polarisation as geometry; the chamfers are schematic.
+- Polarisation as geometry beyond one chamfered cell a housing; the chamfers are
+  schematic. The latches are drawn (section 8) but not their travel.
 - Right-angle, vertical and edge-mount board forms: the header presents its
   mating face and says nothing of how it sits on the board.
 - The wire bundle's bend, and the adapter cable with an EPS plug at one end and
@@ -161,3 +197,6 @@ card's NVIDIA brief before it is wired in.
   16-pin plug mating both 16-pin interfaces.
 - 2026-10-14: headers export as `other` power ports labelled with the connector.
 - 2026-10-14: the bridge is one part with a `mate` and a `mate-b`.
+- 2026-10-14: the 3D form uses the existing relief keys and adds none; a header
+  keeps its `size.d` cavity (so a plug still seats on its floor) and a plug keeps
+  its 30 mm stub.

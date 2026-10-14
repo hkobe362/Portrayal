@@ -46,11 +46,51 @@ provenance:
     `std/pcie-8pin-header@1` are two interfaces.
   power: >-
     datasheet - Molex Mini-Fit Jr. 9.0 A a contact (16 AWG), 600 V.
+  cells-3d: >-
+    estimated - `inlet-face` is the eight cells as eight subpaths, each 3.4 x 3.0
+    on the 4.20 pitch (0.8 of wall between them), so in 3D each is its own recess
+    to the full 9.9, walled in the cell's own shape, and the housing top between
+    them is solid. The cell size is proportional, not dimensioned: Molex's
+    catalogue gives the pitch and no cavity drawing.
+  pins-3d: >-
+    estimated - a 1.6 square contact stands in each cell, its tip 2.4 behind the
+    housing's face (7.5 above the cavity floor). Molex's catalogue gives the 4.20
+    pitch and the current rating and no contact length.
+  latch: >-
+    estimated - Mini-Fit Jr. headers carry a latch ramp on a long side wall that
+    the plug's latch rides over. It is drawn as a 1.8 x 8.0 wedge on the housing's
+    margin, 0.3 rising to 1.4 across its length. SCHEMATIC IN ITS DIRECTION: the
+    real ramp slopes along the mating axis, which a face drawing cannot give, so
+    the slope is laid across the face. Its height is not dimensioned anywhere held.
 elements:
   opening: {at: [0.0, 0.0], size: [12.6, 18.0], class: cutout}
 relief:
-  wall: '#141619'
+  wall: '#2c3036'
   cavity: inlet-face
+  features:
+    - node: latch
+      out: 1.4
+      profile-y: [[0, 0.3], [8, 1.4]]
+      color: '#2c3036'
+      confidence: estimated
+      source: >-
+        Molex Mini-Fit Jr. catalogue MX10, E-57 to E-63, names a latch ramp and
+        draws no dimension; 1.4 is a guess at its height
+    - &pin
+      node: pin-1
+      top: 7.5
+      color: '#b9bfc6'
+      confidence: estimated
+      source: >-
+        a contact tip 2.4 behind the housing face in a 9.9 cavity; Molex gives no
+        contact length
+    - {<<: *pin, node: pin-2}
+    - {<<: *pin, node: pin-3}
+    - {<<: *pin, node: pin-4}
+    - {<<: *pin, node: pin-5}
+    - {<<: *pin, node: pin-6}
+    - {<<: *pin, node: pin-7}
+    - {<<: *pin, node: pin-8}
 connection-points:
   mate: {at: [6.3, 9.0], direction: front}
 skins: [default]

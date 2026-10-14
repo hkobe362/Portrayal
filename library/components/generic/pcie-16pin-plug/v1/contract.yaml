@@ -46,19 +46,82 @@ provenance:
     sockets, and "the cables and their plugs remained unchanged"; Corsair says
     existing cables work in the new connector. Secondary sources; PCI-SIG's CEM
     5.1 is not held.
+  form-3d: >-
+    estimated - the 5.0 of housing that stands outside the header is a tube with
+    its sixteen cells cut through, open at the header's mouth where the modelled
+    nose begins, closed by a 2.5 rear wall. The cells are 2.4 square (power) and
+    1.6 square (sense) at the drawing's pitches, so their size is proportional.
+    A latch arm 10.85 wide and 1.4 thick stands over the top wall from 0.5 to
+    5.0, with a hook at the mating end; its size is a guess and it sits outside
+    the 11.7 outline. Sixteen wires leave the rear wall for 6.0 (twelve 1.8 power
+    wires, yellow over black, and four 1.1 sense wires, all colours estimated),
+    then a 2.0 comb gathers them and the stub carries on to the same 30 from the
+    housing as before.
 relief:
   features:
     - node: body
       out: 5.0
       shape: true
-      color: '#202225'
+      color: '#3a3e44'
       confidence: estimated
       source: Molex 2191140001-SD rev A, the 14.00 housing less the 9.0 the header is modelled
-    - node: stub
-      lift: 5.0
-      cyl: 30
+    - node: back
+      out: 5.0
+      lift: 2.5
+      shape: true
+      color: '#26282c'
       confidence: estimated
-      source: the stub rule, docs/connectors-coax-design.md section 5
+      source: a 2.5 rear wall is a guess; the drawing does not section the housing
+    - node: latch-arm
+      out: 5.0
+      lift: 0.5
+      color: '#2c3036'
+      confidence: estimated
+      source: the latch's size is a guess; the drawing marks no latch dimension
+    - node: latch-hook
+      out: 2.5
+      lift: 0.5
+      color: '#3a3e43'
+      confidence: estimated
+      source: the latch's hook is a guess; the drawing marks no latch dimension
+    - &wire
+      node: wire-1
+      lift: 5.0
+      cyl: 6.0
+      confidence: estimated
+      source: a short stub of each wire; the length is the modeller's, not a source's
+    - {<<: *wire, node: wire-2}
+    - {<<: *wire, node: wire-3}
+    - {<<: *wire, node: wire-4}
+    - {<<: *wire, node: wire-5}
+    - {<<: *wire, node: wire-6}
+    - {<<: *wire, node: wire-7}
+    - {<<: *wire, node: wire-8}
+    - {<<: *wire, node: wire-9}
+    - {<<: *wire, node: wire-10}
+    - {<<: *wire, node: wire-11}
+    - {<<: *wire, node: wire-12}
+    - &sense-wire
+      node: sense-wire-1
+      lift: 5.0
+      cyl: 6.0
+      confidence: estimated
+      source: a short stub of each sense wire; the length is the modeller's, not a source's
+    - {<<: *sense-wire, node: sense-wire-2}
+    - {<<: *sense-wire, node: sense-wire-3}
+    - {<<: *sense-wire, node: sense-wire-4}
+    - node: comb
+      out: 13.0
+      lift: 11.0
+      shape: true
+      color: '#2a2c30'
+      confidence: estimated
+      source: a 2.0 comb that gathers the wires; a guess
+    - node: stub
+      lift: 13.0
+      cyl: 22.0
+      confidence: estimated
+      source: the stub rule, docs/connectors-coax-design.md section 5, 30 from the housing, less the wires and comb
 connection-points:
   mate: {at: [10.425, 5.85], direction: front}
   cable: {at: [10.425, 5.85], direction: front, 'on': stub}

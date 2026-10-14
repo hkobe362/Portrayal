@@ -8,6 +8,8 @@ these tests hold the shape: what mates what, what is exported, and that every
 size is stated with a confidence.
 """
 import json
+import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -195,6 +197,229 @@ def test_the_bridge_is_wide_enough_to_reach_both_connectors():
     conn = _contract(NVLINK_CONNECTOR)
     assert c["size"]["w"] == pytest.approx(2 * SLOT_PITCH + conn["size"]["w"])
     assert c["size"]["h"] == pytest.approx(conn["size"]["h"])
+
+
+# --- the 3D form (P-0031) ---------------------------------------------------------
+#
+# Each part was a box with its 2D skin painted on one face. The form is built the
+# way the library builds depth anywhere (docs/connectors-gpu-design.md section 9):
+# a header's `relief.cavity` names ONE path of one subpath a cell, so each cell is
+# its own recess walled in its own shape; its contacts are `top` features standing
+# on the cavity floor; a plug is a `shape` tube whose holes are the cells, closed
+# by a rear wall. These tests hold that shape; the heights are estimates and are
+# not asserted beyond their order.
+
+def _skin(ref):
+    from test_coax_slots import _skin_path
+    return ET.parse(_skin_path(ref)).getroot()
+
+
+def _node(root, node_id):
+    hits = [e for e in root.iter() if e.get("id") == node_id]
+    assert len(hits) == 1, f"{node_id}: {len(hits)} nodes"
+    return hits[0]
+
+
+def _subpaths(path_el):
+    return len(re.findall(r"[Mm]", path_el.get("d")))
+
+
+def _features(ref):
+    return {f["node"]: f for f in _contract(ref)["relief"]["features"]}
+
+
+def _cell_boxes(path_el):
+    """The bounding boxes of a cavity path's subpaths (H/V/L/Z, absolute)."""
+    boxes = []
+    for sub in re.findall(r"M[^M]*", path_el.get("d")):
+        nums = [float(n) for n in re.findall(r"-?\d+\.?\d*", sub)]
+        cmds = re.findall(r"[MHVLZ]", sub)
+        x = y = None
+        xs, ys, i = [], [], 0
+        for c in cmds:
+            if c in "ML":
+                x, y = nums[i], nums[i + 1]; i += 2
+            elif c == "H":
+                x = nums[i]; i += 1
+            elif c == "V":
+                y = nums[i]; i += 1
+            else:
+                continue
+            xs.append(x); ys.append(y)
+        boxes.append((min(xs), min(ys), max(xs), max(ys)))
+    return boxes
+
+
+@EACH_HEADER
+def test_a_header_cavity_is_one_recess_a_cell(iface):
+    ref = HEADERS[iface][0]
+    c = _contract(ref)
+    root = _skin(ref)
+    cavity = _node(root, c["relief"]["cavity"])
+    assert _subpaths(cavity) == PINS[iface]
+    # the cells are separate: no two boxes overlap, so the housing top stands between
+    boxes = _cell_boxes(cavity)
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            assert a[2] <= b[0] + 1e-9 or b[2] <= a[0] + 1e-9 or a[3] <= b[1] + 1e-9 or b[3] <= a[1] + 1e-9
+    # and each is inside the opening
+    w, h = c["size"]["w"], c["size"]["h"]
+    assert all(b[0] > 0 and b[1] > 0 and b[2] < w and b[3] < h for b in boxes)
+
+
+@EACH_HEADER
+def test_a_header_has_a_contact_standing_in_each_cell_short_of_the_face(iface):
+    ref = HEADERS[iface][0]
+    c = _contract(ref)
+    root = _skin(ref)
+    feats = _features(ref)
+    pins = [f for n, f in feats.items() if "top" in f]
+    assert len(pins) == PINS[iface]
+    boxes = _cell_boxes(_node(root, c["relief"]["cavity"]))
+    for f in pins:
+        el = _node(root, f["node"])
+        assert 0 < f["top"] < c["size"]["d"], f["node"]
+        assert f["confidence"] == "estimated" and f["source"]
+        x, y = float(el.get("x")), float(el.get("y"))
+        w, h = float(el.get("width")), float(el.get("height"))
+        # the contact stands wholly inside one cell
+        assert any(b[0] <= x and x + w <= b[2] and b[1] <= y and y + h <= b[3] for b in boxes), f["node"]
+
+
+@EACH_HEADER
+def test_a_header_carries_a_latch_ramp_on_the_housing(iface):
+    ref = HEADERS[iface][0]
+    f = _features(ref)["latch"]
+    assert f["out"] > 0 and (f.get("profile") or f.get("profile-y"))
+    # a ramp rises: it ends higher than it starts
+    prof = f.get("profile") or f["profile-y"]
+    assert prof[-1][1] > prof[0][1] and f["out"] == pytest.approx(prof[-1][1])
+    assert f["confidence"] == "estimated"
+    assert "latch" in _contract(ref)["provenance"]
+
+
+@pytest.mark.parametrize("iface", ["pcie-12vhpwr", "pcie-12v-2x6"])
+def test_the_16_pin_headers_have_four_smaller_sense_cells(iface):
+    ref = HEADERS[iface][0]
+    boxes = _cell_boxes(_node(_skin(ref), _contract(ref)["relief"]["cavity"]))
+    area = sorted((b[2] - b[0]) * (b[3] - b[1]) for b in boxes)
+    assert len(boxes) == 16
+    assert area[3] < area[4] and area[0] == pytest.approx(area[3])
+    assert area[4] == pytest.approx(area[-1])
+
+
+def test_the_12v_2x6_sense_contacts_stand_shorter_than_the_12vhpwr_s():
+    h = _features(HEADERS["pcie-12vhpwr"][0])
+    n = _features(HEADERS["pcie-12v-2x6"][0])
+    for i in range(1, 5):
+        assert n[f"sense-{i}"]["top"] < h[f"sense-{i}"]["top"]
+        assert n[f"sense-{i}"]["top"] < n["pin-1"]["top"]
+    assert h["sense-1"]["top"] == h["pin-1"]["top"]
+
+
+@EACH_PLUG
+def test_a_plug_is_a_tube_with_its_cells_open_and_a_rear_wall(ref):
+    c = _contract(ref)
+    root = _skin(ref)
+    feats = _features(ref)
+    pins = c["attrs"]["pins"]
+    body = feats["body"]
+    assert body["shape"] is True and "lift" not in body
+    # the body outline plus one hole a cell
+    assert _subpaths(_node(root, "body")) == 1 + pins
+    assert _node(root, "body").get("fill-rule") == "evenodd"
+    back = feats["back"]
+    assert back["shape"] is True and back["out"] == body["out"]
+    assert 0 < back["lift"] < body["out"]
+    assert _subpaths(_node(root, "back")) == 1
+
+
+@EACH_PLUG
+def test_a_plug_has_a_latch_arm_on_top_and_a_wire_at_each_cell(ref):
+    c = _contract(ref)
+    root = _skin(ref)
+    feats = _features(ref)
+    body_out = feats["body"]["out"]
+    arm, hook = feats["latch-arm"], feats["latch-hook"]
+    assert arm["lift"] < arm["out"] <= body_out
+    # the hook is at the mating end, short of the arm's far end
+    assert hook["lift"] == arm["lift"] and hook["out"] < arm["out"]
+    # the latch stands above the housing's top edge
+    assert float(_node(root, "latch-arm").get("y")) < 0
+    wires = [f for n, f in feats.items() if n.startswith(("wire-", "sense-wire-"))]
+    assert len(wires) == c["attrs"]["pins"]
+    for f in wires:
+        assert f["lift"] == pytest.approx(body_out) and f["cyl"] > 0
+        _node(root, f["node"])
+
+
+@EACH_PLUG
+def test_a_plug_keeps_its_thirty_millimetre_stub_and_it_starts_after_the_comb(ref):
+    feats = _features(ref)
+    body_out = feats["body"]["out"]
+    comb, stub = feats["comb"], feats["stub"]
+    wire_end = max(f["lift"] + f["cyl"] for n, f in feats.items() if "wire-" in n)
+    assert comb["lift"] == pytest.approx(wire_end)
+    assert stub["lift"] == pytest.approx(comb["out"])
+    # the cable still ends 30 from the body, as before the form was built
+    assert stub["lift"] + stub["cyl"] == pytest.approx(body_out + 30)
+
+
+def test_the_nvlink_connector_is_a_slot_with_a_rim_and_two_contact_rows():
+    c = _contract(NVLINK_CONNECTOR)
+    root = _skin(NVLINK_CONNECTOR)
+    feats = _features(NVLINK_CONNECTOR)
+    assert c["relief"]["cavity"] == "inlet-face"
+    rim = feats["rim"]
+    assert rim["shape"] is True and rim["out"] > 0
+    # the rim is a ring with the well cut out of it
+    assert _subpaths(_node(root, "rim")) == 2
+    rows = [f for n, f in feats.items() if n.startswith("contact-")]
+    assert len(rows) == 2
+    assert all(0 < f["top"] < c["size"]["d"] for f in rows)
+    # the rows stand inside the well
+    well = _node(root, "inlet-face")
+    x0, x1 = float(well.get("x")), float(well.get("x")) + float(well.get("width"))
+    for f in rows:
+        el = _node(root, f["node"])
+        assert x0 < float(el.get("x")) and float(el.get("x")) + float(el.get("width")) < x1
+
+
+def test_the_bridge_is_stepped_up_from_its_plate_to_its_raised_centre():
+    c = _contract(BRIDGE)
+    root = _skin(BRIDGE)
+    feats = _features(BRIDGE)
+    order = ["body", "end-a", "cover", "cover-top", "ridge-1"]
+    heights = [feats[n]["out"] for n in order]
+    assert heights == sorted(heights) and len(set(heights)) == len(heights)
+    assert feats["end-a"]["out"] == feats["end-b"]["out"]
+    assert all(f["confidence"] == "estimated" for f in feats.values())
+    # the two ends are the connector's width, one two-slot pitch apart, and the
+    # `mate` points land at their centres
+    conn = _contract(NVLINK_CONNECTOR)["size"]["w"]
+    a, b = _node(root, "end-a"), _node(root, "end-b")
+    assert float(a.get("width")) == pytest.approx(conn) == pytest.approx(float(b.get("width")))
+    assert float(b.get("x")) - float(a.get("x")) == pytest.approx(2 * SLOT_PITCH)
+    cp = c["connection-points"]
+    assert cp["mate"]["at"][0] == pytest.approx(float(a.get("x")) + conn / 2)
+    assert cp["mate-b"]["at"][0] == pytest.approx(float(b.get("x")) + conn / 2)
+    # the cover sits between the ends and the centre inside the cover
+    cov, top = _node(root, "cover"), _node(root, "cover-top")
+    assert float(a.get("x")) + conn <= float(cov.get("x"))
+    assert float(cov.get("x")) + float(cov.get("width")) <= float(b.get("x"))
+    assert float(cov.get("x")) < float(top.get("x"))
+    assert float(top.get("x")) + float(top.get("width")) < float(cov.get("x")) + float(cov.get("width"))
+    assert "form-3d" in c["provenance"] and c["provenance"]["form-3d"].startswith("estimated")
+
+
+def test_every_3d_feature_of_every_part_says_how_sure_it_is_and_every_node_exists():
+    refs = [h[0] for h in HEADERS.values()] + list(PLUGS) + [NVLINK_CONNECTOR, BRIDGE]
+    for ref in refs:
+        root = _skin(ref)
+        for f in _contract(ref)["relief"]["features"]:
+            assert f["confidence"] in ("estimated", "drawing"), (ref, f["node"])
+            assert f["source"], (ref, f["node"])
+            _node(root, f["node"])
 
 
 def test_every_estimated_bridge_figure_says_so():

@@ -37,7 +37,9 @@ provenance:
     contacts are: Corsair says 1.5 mm, Hardware Busters 4 mm to 2.75 mm, another
     guide 0.1 mm, and Tom's Hardware says PCI-SIG made the tip-to-edge spacing
     1.7 mm. The contact point at 3 mm is unchanged. The skin draws the sense
-    contacts smaller to say they differ, and nothing is built from them.
+    contacts smaller to say they differ, and the 3D form builds them 1.5 shorter
+    than the power contacts (Corsair's reading, one of the four, so low
+    confidence).
   contacts: >-
     drawing - Molex 2191140001-SD: twelve power cells on a 3.00 pitch, four
     sense cells on a 2.00 pitch; the same centres as std/12vhpwr-header@1.
@@ -45,11 +47,63 @@ provenance:
     datasheet - 600 W at 12 V (PCIe CEM 5.1 as Wikipedia, "12VHPWR", reports it).
     Molex's 12V-2x6 page says up to 675 W at 9.5 A a contact; not stored, since it
     is a different measure from the standard's.
+  cells-3d: >-
+    estimated - `inlet-face` is the sixteen cells as sixteen subpaths, so in 3D
+    each is its own recess to the full 9.0, walled in its own shape, with the
+    housing top solid between them. The twelve power cells are 2.4 square on the
+    3.00 pitch, the four sense cells 1.6 square on the 2.00 pitch, centred on the
+    contacts the drawing places. The cell sizes are proportional, not dimensioned:
+    the Molex drawing is of the cable housing and gives the pitches only.
+  pins-3d: >-
+    estimated - a 0.8 square power contact stands in each power cell, its tip 2.4
+    behind the housing's face (6.6 above the cavity floor); the 0.6 square sense
+    contacts are 1.5 shorter (5.1), the recess of `sense-recess` above. No contact
+    length is held.
+  latch: >-
+    estimated - the header's latch ramp, drawn as a 6.8 x 1.0 wedge on the top
+    wall, 0.3 rising to 1.4 along its length. SCHEMATIC IN ITS DIRECTION: the real
+    ramp slopes along the mating axis, which a face drawing cannot give. Its
+    height is not dimensioned anywhere held.
 elements:
   opening: {at: [0.0, 0.0], size: [20.85, 11.7], class: cutout}
 relief:
-  wall: '#141619'
+  wall: '#2c3036'
   cavity: inlet-face
+  features:
+    - node: latch
+      out: 1.4
+      profile: [[0, 0.3], [6.8, 1.4]]
+      color: '#2c3036'
+      confidence: estimated
+      source: the cable housing's top wall in Molex 2191140001-SD; the ramp and its 1.4 height are a guess
+    - &pin
+      node: pin-1
+      top: 6.6
+      color: '#b9bfc6'
+      confidence: estimated
+      source: a contact tip 2.4 behind the housing face in a 9.0 cavity; no contact length is held
+    - {<<: *pin, node: pin-2}
+    - {<<: *pin, node: pin-3}
+    - {<<: *pin, node: pin-4}
+    - {<<: *pin, node: pin-5}
+    - {<<: *pin, node: pin-6}
+    - {<<: *pin, node: pin-7}
+    - {<<: *pin, node: pin-8}
+    - {<<: *pin, node: pin-9}
+    - {<<: *pin, node: pin-10}
+    - {<<: *pin, node: pin-11}
+    - {<<: *pin, node: pin-12}
+    - &sense
+      node: sense-1
+      top: 5.1
+      color: '#b9bfc6'
+      confidence: estimated
+      source: >-
+        1.5 shorter than a power contact (Corsair's reading of the 12V-2x6 sense
+        recess, one of four that disagree)
+    - {<<: *sense, node: sense-2}
+    - {<<: *sense, node: sense-3}
+    - {<<: *sense, node: sense-4}
 connection-points:
   mate: {at: [10.425, 5.85], direction: front}
 skins: [default]

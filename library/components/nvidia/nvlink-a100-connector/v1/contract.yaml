@@ -44,11 +44,35 @@ provenance:
   caps: >-
     datasheet - PB-10577: "NVLink bridge interfaces of the A100 80GB PCIe card
     include removable caps". The cap is not drawn and is not a part here.
+  slot-3d: >-
+    estimated - the well is 5.0 x 47.9 inside a 0.8 rim that stands 1.0 proud of
+    the face, and 2.5 deep. The rim's height is a guess; the well's depth is
+    `depth` above. Two contact rows stand on the floor, 1.2 tall, each a
+    continuous blade drawn 0.9 wide at 2.2 centres. The real contacts are
+    individual pads and their count is not published, so the rows are schematic
+    and nothing here should be counted.
 elements:
   opening: {at: [0.0, 0.0], size: [6.6, 49.5], class: cutout}
 relief:
-  wall: '#141619'
+  wall: '#2c3036'
   cavity: inlet-face
+  features:
+    - node: rim
+      out: 1.0
+      shape: true
+      color: '#2c3036'
+      confidence: estimated
+      source: no source holds the rim's height; 1.0 is a guess at a housing standing round the slot
+    - node: contact-a
+      top: 1.2
+      color: '#b9bfc6'
+      confidence: estimated
+      source: two contact rows, as this part's 2D skin has always drawn them; their height is a guess
+    - node: contact-b
+      top: 1.2
+      color: '#b9bfc6'
+      confidence: estimated
+      source: two contact rows, as this part's 2D skin has always drawn them; their height is a guess
 connection-points:
   mate: {at: [3.3, 24.75], direction: front}
 skins: [default]
