@@ -674,6 +674,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.36.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
+on a part beside the rack (`item: 'z3'`, `path: 'outlet-a2'`), on one of its own connector slots.
+The commands, `settleEnds`, the routes, `freePorts`, `inspect` and the exports find it as they find
+a port of a device. Its place is the slot's `mate` in `configs.json`, so **a route context needs
+`slotsOf` and `compByRef`** (what `loadSlots` returns) to measure a cord to it; without them the
+cord has no length, as for a port not found. `freePorts(rack, 'z3', ctx, {type: 'C39', near: 35})`
+lists the free C39 outlets nearest U35. A page that draws cords reads the plug each end takes from
+the settled facts (`info.plug`): at a slot that takes two, it pairs with the far end's plug.
+
 **New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
 stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
 vertical manager's beside the rack, as well as on a tray or at an end. `SPARE_HOLDS` in
