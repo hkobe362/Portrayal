@@ -152,6 +152,12 @@ views:
       - {id: rear-brush, at: [9, 6], size: [465, 32], shape: rect, cover: brush}
 ```
 
+A pass-through lies under no placed part, with two exceptions (L136): a well that holds it
+whole, and a LID - a part whose contract says `lid: true`. A lid is a hinged or removable
+cover that opens over a duct (a finger duct's cover clips off its finger tips), so the hole
+beneath it is where a cable crosses once it is open. It is declared only where the vendor's
+sources show the cover opening; a cover they do not show opening is a solid body.
+
 A `ring` guide on a component contract:
 
 ```yaml

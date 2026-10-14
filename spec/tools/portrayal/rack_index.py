@@ -148,6 +148,12 @@ def build(dist):
                 entry.setdefault("guides", {})[view] = g
             if ps:
                 entry.setdefault("passes", {})[view] = ps
+        # a hole in an end wall (CMH-4DRB1U) is declared on the left or right
+        # view; only its pass-throughs are read there, never a guide
+        for view in ("left", "right"):
+            ps = marked(dist / face_file(idx, d["name"], idx.get("default"), view))[1]
+            if ps:
+                entry.setdefault("passes", {})[view] = ps
         # what a cable may not pass through, where that is not the envelope:
         # derived from the same faces, never stated (cable-lay-design 1.1).
         # A zero-U part with a pathway carries a lane (the kit's zero-u.js
