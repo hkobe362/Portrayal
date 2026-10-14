@@ -1885,7 +1885,7 @@ export function rasterKey(text) {
 // THE KEPT RASTERS, oldest first, bounded by pixels rather than by count:
 // most are a cage's few thousand pixels and a few are a whole face's million.
 // A raster a page asks for again is moved to the back. `setRasterBudget(0)`
-// keeps nothing, and every raster is then drawn again, as before 0.42.0.
+// keeps nothing, and every raster is then drawn again, as before 0.43.0.
 const RASTERS = new Map();
 let _budget = 32e6, _held = 0;
 const _rstats = {asked: 0, drawn: 0, ms: 0};
@@ -2911,7 +2911,7 @@ export async function ventWellWalls({wells = [], apertures = {}, frames = {}, sc
 // their path from what they are merged into (a mesh left whole keeps its
 // own). The Rack Builder styles a cable end's port and its plug (hover.js)
 // and a cover (covers.js), and nothing else.
-// `ctx.batch === false` builds the face as it was before 0.42.0.
+// `ctx.batch === false` builds the face as it was before 0.43.0.
 
 // Two textures are one when their settings match and their images are the
 // same object or two canvases with the same pixels. A canvas of over a

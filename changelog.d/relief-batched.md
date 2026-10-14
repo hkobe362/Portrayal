@@ -13,7 +13,7 @@
   document for each element's CTM and box once. Measured on a generated rack
   of 42 parts and 456 cables in headless Chromium: 14,737 SVG rasters to 185,
   and 59,739 draw calls a frame to 28,863 (23,101 with `parts`). `@portrayal/kit`
-  is 0.42.0.
+  is 0.43.0.
 - **A USDZ download now carries the relief that was a box of several
   materials.** three's USDZ exporter writes no mesh with more than one
   material, so every such box (a raised part's sides, a cage's walls) was left

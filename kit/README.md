@@ -674,7 +674,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.42.0: the 3D relief is built and drawn in batches.** `relief.js` rasterises a drawing once
+**New in 0.43.0: the 3D relief is built and drawn in batches.** `relief.js` rasterises a drawing once
 however often a face asks for it, keeping each raster by what decides its pixels (`rasterKey`; see
 `rasterSource`, `setRasterBudget`, `clearRasterCache`, `rasterStats`). Once a face is built,
 `batchRelief` shares equal textures and materials and merges the meshes that share a material, a part
@@ -682,6 +682,14 @@ however often a face asks for it, keeping each raster by what decides its pixels
 `ctx.parts(path)` to merge the rest across parts; `ctx.batch: false` builds a face as before. A USDZ
 now carries the relief boxes it used to leave out. **A page that vendors the kit changes nothing to
 keep its hover, dimming and covers; passing `parts` is optional.**
+
+**New in 0.42.0: a power cord reaches a vertical PDU's outlet from beside it.** A leg that lands on the
+outward face of a zero-U part is taken in past the side that faces the rails, at the outlet's height,
+and no longer over the top or under the foot; the crossing finding does not count the body of the part
+a cable ends on, at that end; and a four-post offers `left-rear-inner` (and `right-rear-`, `left-front-`,
+`right-front-`) between a rail and a part beside it, listed by `waypointLanesOf(frame)` and `inspect`'s
+`lanes`. The routed length of such a cord follows. **A page that vendors the kit re-vendors it, and
+changes nothing else.**
 
 **New in 0.41.0: the 3D build looks ids up from a map.** `cablePoints` and `extractRelief`
 (`relief.js`) found each cable point's feature and each cavity's node with a selector per lookup.

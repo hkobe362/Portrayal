@@ -1,4 +1,4 @@
-// The relief built and drawn in batches (kit 0.42.0): one raster per drawing,
+// The relief built and drawn in batches (kit 0.43.0): one raster per drawing,
 // kept by what decides its pixels (rasterKey), and a face's pieces merged into
 // one geometry each carried by its own matrix (mergePieces). Run under bare
 // node with a stand-in image and canvas, so it checks the bookkeeping and the

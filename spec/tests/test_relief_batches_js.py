@@ -1,4 +1,4 @@
-"""The relief is built and drawn in batches (kit 0.42.0, relief-batches.mjs).
+"""The relief is built and drawn in batches (kit 0.43.0, relief-batches.mjs).
 
 A large rack's 3D asked for some 7,000 SVG rasters, one Blob and Image each,
 and drew some 140,000 meshes a frame. Two rules make that cheaper without
