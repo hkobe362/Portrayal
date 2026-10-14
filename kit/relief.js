@@ -2840,7 +2840,7 @@ export async function buildFaceRelief(F, ctx) {
       return;
     }
     const {cavities, outs, domes, vents, apertures = [], frus, subBodies = [], flatLifted = [],
-           cleanText, shown = {}} = await extractRelief(src, ctx.scope, {back: !!ctx.back});
+           cleanText, shown} = await extractRelief(src, ctx.scope, {back: !!ctx.back});
     if (ctx.apertures) ctx.apertures[F.view] = apertures;
     // A MODULE PREVIEW IS THE PART'S SIZE BOX HERE. A part that declares
     // `head:` publishes a preview whose viewBox also holds the head and its

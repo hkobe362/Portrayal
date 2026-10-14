@@ -16,7 +16,8 @@
 
   ?c=        the component, ns/name@major
   ?skin=     a skin other than the default
-  ?view=     the camera to start from: iso, front, rear, left, right, top, bottom
+  ?view=     the camera to start from: iso (from above the face's top),
+             under (from below its bottom), front, rear, left, right, top, bottom
   ?lens=flat a narrow lens from far away, near enough to an orthographic
              view to lay over a straight-on photograph
   ?pxmm=     with lens=flat, the scale on screen in px/mm; the face texture
@@ -32,8 +33,9 @@
 -->
 <style>
   html, body { margin: 0; height: 100%; background: #f3f4f6; font: 13px system-ui, sans-serif; }
-  #bar { position: fixed; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; gap: 6px;
-         align-items: center; padding: 6px 8px; background: #1f2328; color: #e6e6e6; z-index: 2; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; height: 34px; box-sizing: border-box;
+         display: flex; gap: 6px; align-items: center; padding: 0 8px; overflow-x: auto;
+         white-space: nowrap; background: #1f2328; color: #e6e6e6; z-index: 2; }
   #bar button, #bar select { font: inherit; padding: 2px 8px; border: 1px solid #555;
                              background: #2b3036; color: #e6e6e6; cursor: pointer; }
   #bar button.on { background: #f59e0b; color: #111; border-color: #f59e0b; }
@@ -68,11 +70,11 @@ const v = createViewer(document.getElementById('v'),
 // a direction to look FROM, and the up the camera keeps; a top or bottom view
 // is looked at a hair off the vertical so the orbit keeps its own up
 const VIEWS = {
-  iso: [[0.55, 0.45, 1], [0, 1, 0]], front: [[0, 0, 1], [0, 1, 0]], rear: [[0, 0, -1], [0, 1, 0]],
+  iso: [[0.55, 0.45, 1], [0, 1, 0]], under: [[0.55, -0.45, 1], [0, 1, 0]], front: [[0, 0, 1], [0, 1, 0]], rear: [[0, 0, -1], [0, 1, 0]],
   right: [[1, 0, 0], [0, 1, 0]], left: [[-1, 0, 0], [0, 1, 0]],
   top: [[0, 1, 1e-4], [0, 1, 0]], bottom: [[0, -1, 1e-4], [0, 1, 0]],
 };
-let flat = q.get('lens') === 'flat', current = q.get('view') || 'iso';
+let flat = q.get('lens') === 'flat', current = q.get('view') || 'iso', target = [0, 0, 0];
 
 function bounds() {
   const box = new THREE.Box3();
@@ -85,16 +87,27 @@ function view(name = current) {
   current = name;
   const {camera, controls} = v.three;
   const box = bounds(), centre = box.getCenter(new THREE.Vector3());
-  const r = box.getSize(new THREE.Vector3()).length() / 2 || 100;
+  const size = box.getSize(new THREE.Vector3());
+  const r = size.length() / 2 || 100;
   const el = document.getElementById('v');
-  camera.fov = flat ? 2 : 40;
+  const n = new THREE.Vector3(...dir).normalize();
+  // A FLAT LENS LOOKS AT THE SIDE IT FACES. Its scale holds on the plane it
+  // is aimed at, and a face 130 mm nearer than the part's middle came out 9
+  // percent large at 2 degrees; aimed at the nearest extent of the part, at
+  // half a degree, what stands 10 mm behind that is 0.2 percent small.
+  if (flat && !['iso', 'under'].includes(name))
+    centre.addScaledVector(n, Math.abs(n.x) * size.x / 2 + Math.abs(n.y) * size.y / 2 +
+                              Math.abs(n.z) * size.z / 2);
+  target = centre.toArray();
+  camera.fov = flat ? 0.5 : 40;
   // far enough that the part fills about 85 percent of the view, or, with a
   // flat lens and a scale, far enough that a millimetre is `pxmm` pixels
   const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
   const d = flat && pxmm ? el.clientHeight / pxmm / 2 / half : r / half / 0.85;
   camera.near = Math.max(d - 2 * r, 1); camera.far = d + 2 * r;
+  // the orbit's own limit would pull a flat lens back in, inside its near plane
+  controls.maxDistance = Math.max(2500, d * 1.5);
   camera.updateProjectionMatrix();
-  const n = new THREE.Vector3(...dir).normalize();
   camera.up.set(...up);
   camera.position.copy(centre).addScaledVector(n, d);
   controls.target.copy(centre);
@@ -144,10 +157,11 @@ try {
   window.__ready = 'error: ' + (e.message || e);
   console.error(e);
 }
-// `bounds` is what the camera centres on, in the scene's mm (y up, the face
-// plane at z = depth / 2), so a script can lay a flat view over a photograph
+// `target` is the point at the middle of the view and `bounds` the part's
+// extent, in the scene's mm (y up, the face plane at z = depth / 2), so a
+// script can lay a flat view over a photograph
 window.preview = {view, setField, get flat() { return flat; },
-                  set flat(b) { flat = !!b; view(); },
+                  set flat(b) { flat = !!b; view(); }, target: () => [...target],
                   bounds: () => { const b = bounds(); return {min: b.min.toArray(), max: b.max.toArray()}; }};
 </script>
 </body>
