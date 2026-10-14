@@ -33,26 +33,26 @@ const findings = (r, rt = route) => Q.describe(r, {chassisOf, route: rt}).split(
 
 // ── issue 4: the ring findings and the short cords, in describe and inspect ─
 
-test('describe counts the rings entered and left by one face and the cords shorter than their route needs', () => {
+test('describe counts the cables that enter and leave a ring by one face and the cords shorter than their route needs', () => {
   const r = rackOf([cable('c1', DOUBLES, short(0.3)), cable('c2', DOUBLES, short(0.2)), cable('c3', [RING2], short(5))]);
-  // what the Warnings panel counts: a finding a ring, and a cord a cable
+  // what the Warnings panel counts: a row a cable, as the line counts the cables with a tight bend
   const rings = R.ringFindings(r, route), cords = r.cables.filter(c => R.spareOf(r, c, route)?.spare_m < -1e-9);
-  assert.deepEqual([rings.length, cords.length], [2, 2], 'the fixture has what the line must count');
+  assert.deepEqual([rings.map(f => f.cable), cords.length], [['c1', 'c2'], 2], 'the fixture has what the line must count');
   const line = findings(r);
-  assert.match(line, /2 rings are entered and left by one face \(c1, c2\)/);
+  assert.match(line, /2 cables enter and leave a ring by one face \(c1, c2\)/);
   // the worst is the one that falls shortest of what its route needs: c2, 0.2 m
   assert.match(line, /2 cords are shorter than their route needs \(the worst c2, \d+(\.\d+)? m short\)\.$/);
-  assert.ok(line.indexOf('entered and left') < line.indexOf('tight bend') && line.indexOf('tight bend') < line.indexOf('shorter'), line);
+  assert.ok(line.indexOf('a ring by one face') <line.indexOf('tight bend') && line.indexOf('tight bend') < line.indexOf('shorter'), line);
   // a windowed reading carries the same line
   assert.ok(Q.describe(r, {chassisOf, route}, {section: 'cables', limit: 1}).split('\n').includes(line));
 });
 
-test('describe says one ring and one cord in the singular, and nothing when there is none', () => {
+test('describe says one cable and one cord in the singular, and nothing when there is none', () => {
   const one = rackOf([cable('c1', DOUBLES, short(0.3))]);
-  assert.match(findings(one), /^Findings: 1 ring is entered and left by one face \(c1\); .*; 1 cord is shorter than its route needs \(c1, \d+(\.\d+)? m short\)\.$/);
+  assert.match(findings(one), /^Findings: 1 cable enters and leaves a ring by one face \(c1\); .*; 1 cord is shorter than its route needs \(c1, \d+(\.\d+)? m short\)\.$/);
   const clean = rackOf([cable('c1', [RING2], short(5))]);
   assert.match(findings(clean) ?? '', /^(Findings: [^;]*tight bend[^;]*\.)?$/);
-  assert.doesNotMatch(findings(clean) ?? '', /entered and left|shorter/);
+  assert.doesNotMatch(findings(clean) ?? '', /by one face|shorter/);
   // the routes not known: no line at all
   assert.equal(Q.describe(one, {chassisOf}).includes('Findings:'), false);
   // a cable with no length has nothing bought: it is not short

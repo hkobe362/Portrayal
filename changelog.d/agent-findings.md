@@ -1,8 +1,8 @@
 ### Added
 - **An agent is told what a person sees in the Rack Builder's Warnings panel.**
-  `describe`'s `Findings:` line counts the rings a route would enter and leave
-  by one face and the cords shorter than their route needs, beside the tight
-  bends and the covered ports it already counted. `inspect` of a cable carries
+  `describe`'s `Findings:` line counts the cables whose route would enter and
+  leave a ring by one face and the cords shorter than their route needs,
+  beside the tight bends and the covered ports it already counted. `inspect` of a cable carries
   `route.ring_findings` (`{item, via, text}`), from the new `ringFindingsOf` in
   `rack/route.js`. Kit 0.35.0.
 

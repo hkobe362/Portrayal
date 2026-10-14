@@ -86,8 +86,12 @@ function bundleLine(rack, b, ctx) {
 // (#949), those with a corner short of their bend radius and the cable
 // shortest of it (#973, #1007), and those with a span in front of other
 // ports and the cable that covers most (#1013), with what was judged when
-// the page listed no ports (`ctx.route.portBoxesOf`). Each cable's path is
-// read once.
+// the page listed no ports (`ctx.route.portBoxesOf`). P-0018 adds the cables
+// that would enter and leave a ring by one face ("3 cables enter and leave a
+// ring by one face (c1, c2, c3)", up to three named) and the cords shorter
+// than their route needs (a pinned length under the need, the worst named
+// with its shortfall): a cable counts once, as one row of the page's Warnings
+// panel does. Each cable's path is read once.
 function findingsText(rack, ctx) {
   if (!ctx?.route) return null;
   let bodies = 0, bends = 0, covers = 0, worst = null, most = null, cabled = false;
@@ -97,8 +101,8 @@ function findingsText(rack, ctx) {
       const path = routePath(rack, c, ctx.route);
       if (!path) continue;
       if (path.crossings?.length) bodies++;
-      // a ring a route would enter and leave by one face, as the Warnings panel counts them: one a finding
-      for (const _ of path.findings || []) rings.push(c.id);
+      // a ring a route would enter and leave by one face: the cable counts once, as a row of the Warnings panel does
+      if (path.findings?.length) rings.push(c.id);
       // a cord shorter than its route needs (the pinned length under the need), the shortfall in metres
       if (c.length) {
         const s = slackOf(rack, c, ctx.route);
@@ -116,11 +120,11 @@ function findingsText(rack, ctx) {
       }
     }
   } catch { return null; }
-  const ids = [...new Set(rings)];
+  const ids = rings;
   const worstCord = cords.reduce((m, x) => (!m || x.short > m.short ? x : m), null);
   const parts = [
     ...(bodies ? [`${count(bodies, 'cable')} cross${bodies === 1 ? 'es' : ''} a body`] : []),
-    ...(rings.length ? [`${count(rings.length, 'ring')} ${rings.length === 1 ? 'is' : 'are'} entered and left by one face (${
+    ...(ids.length ? [`${count(ids.length, 'cable')} ${ids.length === 1 ? 'enters' : 'enter'} and ${ids.length === 1 ? 'leaves' : 'leave'} a ring by one face (${
       ids.length > 3 ? `${ids.slice(0, 3).join(', ')} and ${ids.length - 3} more` : ids.join(', ')})`] : []),
     ...(bends ?[`${count(bends, 'cable')} ${bends === 1 ? 'has' : 'have'} a tight bend (${bends === 1 ? '' : 'the worst '}${worst.id}, ${worst.short} mm short)`] : []),
     ...(covers ? [`${count(covers, 'cable')} cross${covers === 1 ? 'es' : ''} in front of other ports (${covers === 1 ? '' : 'the most '}${most.id}, ${count(most.n, 'port')}${cabled ? '; only ports that hold a cable were judged' : ''})`] : []),

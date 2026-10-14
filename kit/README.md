@@ -675,8 +675,8 @@ a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
 **New in 0.35.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
-the rings a route would enter and leave by one face (`2 rings are entered and left by one face (c1, c2)`)
-and the cords shorter than their route needs (`2 cords are shorter than their route needs (the worst c2,
+the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
+face (c1, c2)`) and the cords shorter than their route needs (`2 cords are shorter than their route needs (the worst c2,
 1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
 `{item, via, text}`, from the new `ringFindingsOf(rack, cable, ctx, nameOf, path)` in `rack/route.js`
 (`ringFindings` is now one call of it for each cable); a short cord was already in its `spare_findings`.
