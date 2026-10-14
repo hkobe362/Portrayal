@@ -242,7 +242,8 @@ def test_the_kit_ships_the_resolver():
 
 def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert pkg["version"] == "0.41.0"
+    assert pkg["version"] == "0.42.0"
+    assert "0.42.0" in (ROOT / "changelog.d/zero-u-pdu-cord-route.md").read_text()
     assert "0.41.0" in (ROOT / "changelog.d/relief-id-lookups.md").read_text()
     assert "0.40.0" in (ROOT / "changelog.d/estimated-duct-capacity.md").read_text()
     assert "0.39.0" in (ROOT / "changelog.d/spare-in-ducts-fixes.md").read_text()
