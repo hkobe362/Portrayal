@@ -44,7 +44,8 @@ provenance:
     with 9.8 tabs.
   the-tabs: >-
     TWO OF THE SINGLE BRACKET'S TAB, ON THE SLOT PITCH. The figure prints the
-    tabs at 4.11 to 14.30 and 24.43 to 34.62 from the solder-side edge: 10.20
+    tabs at 4.11 to 14.30 and 24.43 to 34.62 from its zero datum, the bottom edge
+    here, away from the PCB: 10.20
     wide each and 20.32 apart, std/pcie-bracket-fh@2's tab twice. They run
     7.14 from the tip (120.07 - 112.93), against the single bracket's 7.27,
     and each is reached by a 45 degree chamfer of 4.12 from the body edge;
@@ -54,7 +55,7 @@ provenance:
   the-keyed-top: >-
     THE SAME KEY AS THE SINGLE BRACKET, ON THE SAME SIDE. The figure prints
     38.74 for the body and 41.91 overall, so the flange end steps out by 3.17
-    on the top edge, and 2.54 on the solder-side edge steps in, as on
+    on the top edge, and 2.54 on the bottom edge steps in, as on
     std/pcie-bracket-fh@2. The top step is flat for the printed 2.57 from the
     flange and comes down at 45 degrees; the bottom step starts 5.33 from the
     flange's outer face (measured 113.40 to 115.71 along). Drawn with the tip
@@ -86,8 +87,8 @@ provenance:
     107.31 off the tip. The upper hatch runs a little past the edge where it
     passes under the ear recesses; the window is kept 0.5 inside the metal
     there rather than drawn through the plate.
-  the-solder-side-line: >-
-    the figure draws a line 1.71 inside the solder-side edge from 9.72 to
+  the-bottom-edge-line: >-
+    the figure draws a line 1.71 inside the bottom edge from 9.72 to
     114.70 along. Nothing dimensions it and the side view does not explain
     it, so it is drawn as a line and not raised.
   orientation: >-

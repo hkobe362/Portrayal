@@ -18,6 +18,6 @@
   <path id="flange-fold" d="M119.21 1.67 V37.7" stroke="#5f666d" stroke-width="0.3" fill="none"/>
   <!-- 5.08 across the outboard end of each retention tab -->
   <path d="M5.08 7.58 V17.18 M5.08 27.9 V37.5" stroke="#5f666d" stroke-width="0.3" fill="none"/>
-  <!-- the line the figure draws 1.71 inside the solder-side edge -->
+  <!-- the line the figure draws 1.71 inside the bottom edge -->
   <path d="M9.72 40.2 H114.7" stroke="#5f666d" stroke-width="0.3" fill="none"/>
 </svg>

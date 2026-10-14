@@ -388,7 +388,7 @@
    "std/drive-25-plan@1"
   ]
  },
- "composed": "203e01d47a5e550a",
+ "composed": "d10c73adce08b2d8",
  "composed-refs": {
   "common/db9-receptacle@1": "1.1.0+92f8de85b306faeb",
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
@@ -512,7 +512,7 @@
   "std/drive-35@1": "1.0.0+2135298397168592",
   "std/micro-usb@1": "1.0.1+623c203fe8667fd2",
   "std/osfp@1": "1.0.0+ba456f3b08fbea70",
-  "std/pcie-bracket-fh-2slot@1": "1.0.0+be9a6336022a531d",
+  "std/pcie-bracket-fh-2slot@1": "1.0.0+db87a6e5176b35e8",
   "std/pcie-bracket-fh@2": "2.0.0+d3e0736218959c12",
   "std/pcie-bracket-lp@1": "1.2.1+3508b9d259b9e98d",
   "std/qsfp28@1": "1.4.1+f836f540ce576bbc",
