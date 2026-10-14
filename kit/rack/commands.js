@@ -1116,7 +1116,7 @@ function cableLay(rack, args, ctx) {
     let sharing = null;
     try {
       sharing = rack.cables.filter(x => resolveRoute(rack, x, ctx.route).waypoints.some(w => w.item === where.item && w.via === where.via)).map(x => x.id);
-    } catch { sharing = null; }
+    } catch { sharing = null; }   // a route that cannot be read leaves the position unjudged, as a face is when no path is found
     if (sharing && !sharing.includes(c.id)) return {error: `${c.id} does not pass through ${name}, so it has no position there.`};
     if (sharing && args.position > sharing.length)
       return {error: `${name} carries ${sharing.length} cable${sharing.length === 1 ? '' : 's'}, so a position there runs from 1 to ${sharing.length}; ${args.position} is past it.`};

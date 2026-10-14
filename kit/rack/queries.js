@@ -91,7 +91,7 @@ function bundleLine(rack, b, ctx) {
 // ring by one face (c1, c2, c3)", up to three named) and the cords shorter
 // than their route needs (a pinned length under the need, the worst named
 // with its shortfall): a cable counts once, as one row of the page's Warnings
-// panel does. Each cable's path is read once.
+// panel does. Each cable's path is read once (slackOf reads the same kept path).
 function findingsText(rack, ctx) {
   if (!ctx?.route) return null;
   let bodies = 0, bends = 0, covers = 0, worst = null, most = null, cabled = false;
@@ -120,12 +120,11 @@ function findingsText(rack, ctx) {
       }
     }
   } catch { return null; }
-  const ids = rings;
   const worstCord = cords.reduce((m, x) => (!m || x.short > m.short ? x : m), null);
   const parts = [
     ...(bodies ? [`${count(bodies, 'cable')} cross${bodies === 1 ? 'es' : ''} a body`] : []),
-    ...(ids.length ? [`${count(ids.length, 'cable')} ${ids.length === 1 ? 'enters' : 'enter'} and ${ids.length === 1 ? 'leaves' : 'leave'} a ring by one face (${
-      ids.length > 3 ? `${ids.slice(0, 3).join(', ')} and ${ids.length - 3} more` : ids.join(', ')})`] : []),
+    ...(rings.length ? [`${count(rings.length, 'cable')} ${rings.length === 1 ? 'enters' : 'enter'} and ${rings.length === 1 ? 'leaves' : 'leave'} a ring by one face (${
+      rings.length > 3 ? `${rings.slice(0, 3).join(', ')} and ${rings.length - 3} more` : rings.join(', ')})`] : []),
     ...(bends ?[`${count(bends, 'cable')} ${bends === 1 ? 'has' : 'have'} a tight bend (${bends === 1 ? '' : 'the worst '}${worst.id}, ${worst.short} mm short)`] : []),
     ...(covers ? [`${count(covers, 'cable')} cross${covers === 1 ? 'es' : ''} in front of other ports (${covers === 1 ? '' : 'the most '}${most.id}, ${count(most.n, 'port')}${cabled ? '; only ports that hold a cable were judged' : ''})`] : []),
     ...(cords.length ? [`${count(cords.length, 'cord')} ${cords.length === 1 ? 'is' : 'are'} shorter than ${cords.length === 1 ? 'its' : 'their'} route needs (${cords.length === 1 ? '' : 'the worst '}${worstCord.id}, ${mText(worstCord.short)} short)`] : [])];

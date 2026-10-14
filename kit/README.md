@@ -676,8 +676,8 @@ a millimetre, are one finding.
 
 **New in 0.35.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
 the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
-face (c1, c2)`) and the cords shorter than their route needs (`2 cords are shorter than their route needs (the worst c2,
-1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
+face (c1, c2)`) and the cords shorter than their route needs (for example `2 cords are shorter than their route needs (the
+worst c2, 1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
 `{item, via, text}`, from the new `ringFindingsOf(rack, cable, ctx, nameOf, path)` in `rack/route.js`
 (`ringFindings` is now one call of it for each cable); a short cord was already in its `spare_findings`.
 A bend of one turn that is at a stop of the route has `stop`, that waypoint, in `routePath`'s `bends`, in
