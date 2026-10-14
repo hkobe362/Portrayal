@@ -674,6 +674,17 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
+stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
+vertical manager's beside the rack, as well as on a tray or at an end. `SPARE_HOLDS` in
+`rack/slack.js` is the one rule for which pathway kinds hold spare. A refusal says where the spare
+can go (`whereText`). A duct is counted against the capacity its part states (`spareLoad`), and
+`spareMarks(rack, cable, ctx)` gives the point, in rack millimetres, a page draws each stored loop
+at. A route may name a zero-U part's duct (resolved as the lane run through it) or a window
+(`pass-through-N`), and a pathway by its spoken name (`pathwayId`); `routeText` takes a fourth
+argument, `ductsThrough(rack, chassisOf, nameOf)`, to say a lane run goes through a duct.
+**A page that draws stored spare calls `spareMarks`; one that does not changes nothing.**
+
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:
