@@ -1312,6 +1312,23 @@ standards:
       the key - because the extension lines for the four dimensions printed there
       trace like an outline. An extension line runs above the part; an outline
       edge starts at it.
+  pcie-bracket-fh-2slot:
+    w: 120.07
+    h: 41.91
+    description: >-
+      PCI Express two-slot (full height) add-in card I/O bracket - two slots of
+      the 20.32 pitch plus the keyed top, 38.74 body and 41.91 overall across
+    confidence: verified
+    registry: PCIe CEM 5.0 fig 11-13
+    source: >-
+      PCI Express Card Electromechanical Specification Revision 5.0, June 2021,
+      figure 11-13 "Detailed Two-Slot I/O Bracket Design", page 181. 120.07
+      long overall and 112.93 from the flange to the retention tabs; 38.74
+      body and 41.91 overall across; two tabs at 4.11 to 14.30 and 24.43 to
+      34.62, which is the single bracket's 10.20 tab twice on the 20.32 pitch.
+      41.91 IS 20.32 + 21.59: one slot pitch plus a single bracket's overall
+      width, so the two-slot bracket ends exactly where a single one seated in
+      the second slot would.
   pcie-bracket-lp:
     w: 79.20
     h: 18.42

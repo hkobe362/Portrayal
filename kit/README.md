@@ -674,6 +674,18 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.35.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
+part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card
+`n` slots wide seats only in a bay whose `span` names `n - 1` bays, and only while each of them holds
+nothing; it is drawn in the box those bays make together (`spanBox`, which `bayTransform` now uses),
+and the bay it covers is marked `data-covered-by` its bay on the face (`markSpan`). `spanWhy(path,
+ref, {holds, comp})` gives the sentence a refusal says, and `coveredBy` the card's bay. `acceptSwaps`
+refuses both claims on one pair and returns `why`, by key; the rack's `fit` says which bay to empty;
+`slotTree` lists `covers` on the card's bay and `covered-by` on the covered one; and the explorer's
+inspector disables a covered bay's select and a two-slot option over a full bay. **A rack file does
+not change**: a two-slot card is a swap in its bay and `""` in the bay it covers, so an older kit
+reads it, centres the card on its own bay and does not refuse a fill of the covered one.
+
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:

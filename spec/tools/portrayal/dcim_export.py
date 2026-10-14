@@ -2180,8 +2180,13 @@ def contract_view(entry):
             "optical": entry.get("optical") or {}}
 
 
-def bay_row(bay_id, accepts=None):
-    """One `module-bays` row, for a bay on a device or a bay on a module."""
+def bay_row(bay_id, accepts=None, span=None):
+    """One `module-bays` row, for a bay on a device or a bay on a module.
+
+    `span` is the bays a card wider than one slot covers from here
+    (docs/pcie-two-slot-bays-design.md, R5). Neither DCIM can reserve a second
+    bay for one module, so it is said first in the description, where a person
+    installing a card reads it: the covered bay stays empty in the DCIM."""
     name = (bay_id.replace("psu-", "PSU ").replace("fan-", "Fan ")
             .replace("front-", "Front ").replace("rear-", "Rear "))
     # THE POSITION IS THE BAY'S WHOLE ID, because it is what a card's
@@ -2192,9 +2197,13 @@ def bay_row(bay_id, accepts=None):
     # Neither library can express what a bay accepts as data yet, so it
     # goes where a person will still see it. Truncated to the 200 the
     # NetBox schema allows on a bay description.
+    spans = (f"Spans {', '.join(span)} for a card {len(span) + 1} slots wide. "
+             if span else "")
     if accepts:
         bay["description"] = fit_items(
-            "Accepts: ", [a.split("/")[-1].split("@")[0] for a in accepts])
+            spans + "Accepts: ", [a.split("/")[-1].split("@")[0] for a in accepts])
+    elif spans:
+        bay["description"] = spans.strip()
     return bay
 
 
@@ -2445,7 +2454,8 @@ def build_module(contract, manufacturer, load_ref=None, dropped=None,
     nested = contract.get("bays") or {}
     if isinstance(nested, dict) and nested:
         out["module-bays"] = sorted(
-            (bay_row(bid, (b or {}).get("accepts")) for bid, b in nested.items()),
+            (bay_row(bid, (b or {}).get("accepts"), (b or {}).get("span"))
+             for bid, b in nested.items()),
             key=bay_order)
 
     # THE GLASS, IF THIS MODULE CARRIES ANY. A fibre cassette has no interfaces
@@ -2486,6 +2496,12 @@ def build_module(contract, manufacturer, load_ref=None, dropped=None,
         typed.add("inlet")
     facts = [f"- {k}: {v}" for k, v in attrs.items()
              if k not in typed and isinstance(v, (str, int, float))]
+    # A CARD WIDER THAN ONE SLOT (docs/pcie-two-slot-bays-design.md, R5): a
+    # module sits in one bay in both DCIMs, so the bay it also covers is said
+    # here and stays empty there.
+    if isinstance(contract.get("slot-width"), int) and contract["slot-width"] > 1:
+        facts.append(f"- slot-width: {contract['slot-width']} (seated, it also covers "
+                     "the bay beside its own, which stays empty)")
     if facts:
         body.append("Facts carried in the model that this schema has no field for:")
         body += facts
