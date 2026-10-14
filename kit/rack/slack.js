@@ -202,8 +202,20 @@ function ownSlack(rack, cable, ctx) {
 // {stated: false} where the part states no count, {stated: true, compared:
 // false} where it states one of no named kind (never compared), else
 // {stated: true, compared: true, count, capacity, media, over}. Never a
-// capacity the data does not state.
-export function spareLoad(rack, id, ctx, extra = null) {
+// capacity the data does not state. Kept per rack, context and part: every
+// cable storing in one duct asks the same question.
+const loadMemo = new WeakMap();
+export function spareLoad(rack, id, ctx) {
+  const isObj = v => v !== null && typeof v === 'object';
+  if (!isObj(rack) || !isObj(ctx)) return loadOf(rack, id, ctx);
+  let per = loadMemo.get(rack);
+  if (!per) loadMemo.set(rack, per = new WeakMap());
+  let by = per.get(ctx);
+  if (!by) per.set(ctx, by = new Map());
+  if (!by.has(id)) by.set(id, loadOf(rack, id, ctx));
+  return {...by.get(id)};
+}
+function loadOf(rack, id, ctx) {
   const it = rack.items.find(i => i.id === id), z = it ? null : zeroUById(rack, id);
   const c = typeof ctx?.chassisOf === 'function' ? ctx.chassisOf((it || z)?.ref) : null;
   if (!(c?.capacity?.count > 0)) return {stated: false};
