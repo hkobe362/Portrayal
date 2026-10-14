@@ -1802,20 +1802,131 @@ export function toSizeBox(text, w, h) {
   });
 }
 
-export async function svgCanvas(url, wmm, hmm, flipX = false, flipYax = false, scope) {
-  const text = await svgSource(url, scope);
+// ONE RASTER PER DRAWING. Every raster here is an SVG drawn through an image
+// (a Blob, an object URL, an Image, a drawImage), and that is the dearest
+// thing the build does: about 20 ms of main thread each, plus the browser's
+// own work for each image, which no profile names. A face asks for the same
+// drawing many times. Each of a switch's 64 cages is the same art under
+// another id, a cavity's outline is drawn for the punch and again for the
+// plate it seats in, and twenty switches of one model draw everything twenty
+// times. So a raster is kept by what decides its pixels, the text and the
+// canvas size and flip, and drawn once (RASTERS below).
+//
+// WHAT DECIDES THE PIXELS IS NOT EVERY CHARACTER OF THE TEXT. An id, a
+// `data-` attribute and a <title>'s words reach the picture only through
+// the drawing's own stylesheet and its references. So the key leaves out the
+// value of an id that no `#id`, `url(#id)` or `href="#id"` names, the value
+// of a `data-` attribute the stylesheet only tests for presence, every
+// `data-` attribute the stylesheet does not name, and a title's words
+// (rasterKey). Two texts with one key differ only there and draw the same
+// pixels, so the first text seen is the one drawn. Anything else differing,
+// however small, is another key and another raster.
+const _CSS_INFO = new Map();
+function _cssInfo(css) {
+  let info = _CSS_INFO.get(css);
+  if (info) return info;
+  // every `#name` (colours too, which only keep more ids than needed), and
+  // every attribute selector, by whether it reads the value
+  const ids = new Set([...css.matchAll(/#(-?[_a-zA-Z][\w-]*)/g)].map(m => m[1]));
+  const valued = new Set(), present = new Set();
+  for (const m of css.matchAll(/\[\s*([\w-]+)\s*([~|^$*]?=)?/g)) (m[2] ? valued : present).add(m[1]);
+  info = {ids, valued, present, anyId: valued.has('id') || present.has('id')};
+  if (_CSS_INFO.size > 64) _CSS_INFO.clear();
+  _CSS_INFO.set(css, info);
+  return info;
+}
+export function rasterKey(text) {
+  text = String(text ?? '');
+  const css = [...text.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+  const info = _cssInfo(css);
+  const refs = new Set(info.ids);
+  for (const m of text.matchAll(/(?:url\(\s*['"]?#|href\s*=\s*["']#)([^)'"\s]+)/g)) refs.add(m[1]);
+  // Inside start tags only, and never inside a <style>: a stylesheet or a
+  // run of text keeps every character it has.
+  const tag = t => t.replace(/(\s)(id|data-[\w.:-]+)="([^"]*)"/g, (all, sp, name, val) => {
+    if (name === 'id') return info.anyId || refs.has(val) ? all : `${sp}id=""`;
+    if (info.valued.has(name)) return all;
+    return info.present.has(name) ? `${sp}${name}=""` : '';
+  });
+  return text.split(/(<style\b[^>]*>[\s\S]*?<\/style>)/).map((part, i) => i % 2 ? part
+    : part.replace(/<[a-zA-Z][^>]*>/g, tag)
+          // the words go, the element stays: a selector may count it
+          .replace(/(<title\b[^>]*>)([^<]+)(<\/title>)/g, '$1.$3')).join('');
+}
+
+// THE KEPT RASTERS, oldest first, bounded by pixels rather than by count:
+// most are a cage's few thousand pixels and a few are a whole face's million.
+// A raster a page asks for again is moved to the back. `setRasterBudget(0)`
+// keeps nothing, and every raster is then drawn again, as before 0.42.0.
+const RASTERS = new Map();
+let _budget = 32e6, _held = 0;
+const _rstats = {asked: 0, drawn: 0, ms: 0};
+export function setRasterBudget(px) { _budget = Math.max(0, +px || 0); _trimRasters(); }
+export function clearRasterCache() { RASTERS.clear(); _held = 0; }
+/** How many rasters were asked for, how many were drawn, and the drawing's main-thread ms. */
+export function rasterStats() { return {..._rstats, kept: RASTERS.size, px: _held}; }
+function _trimRasters() {
+  for (const [k, e] of RASTERS) {
+    if (_held <= _budget) break;
+    RASTERS.delete(k);
+    _held -= e.px;
+  }
+}
+async function _drawSvg(text, cw, ch, flipX, flipY) {
+  const t0 = performance.now();
   const img = new Image();
   const blobUrl = URL.createObjectURL(new Blob([text], {type: 'image/svg+xml'}));
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = blobUrl; });
+  let t = performance.now() - t0;
+  try {
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = blobUrl; });
+    const t1 = performance.now();
+    const cv = document.createElement('canvas');
+    cv.width = cw; cv.height = ch;
+    const ctx = cv.getContext('2d');
+    if (flipX) { ctx.translate(cv.width, 0); ctx.scale(-1, 1); }
+    if (flipY) { ctx.translate(0, cv.height); ctx.scale(1, -1); }
+    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    t += performance.now() - t1;
+    return cv;
+  } finally {
+    URL.revokeObjectURL(blobUrl);
+    _rstats.drawn++;
+    _rstats.ms += t;
+  }
+}
+// The kept raster for a text at a canvas size: SHARED, so a caller draws FROM
+// it and never into it. A drawing that fails to load is not kept.
+function _rasterShared(text, cw, ch, flipX = false, flipY = false) {
+  _rstats.asked++;
+  const key = `${cw}x${ch}${flipX ? 'x' : ''}${flipY ? 'y' : ''}|${rasterKey(text)}`;
+  const hit = RASTERS.get(key);
+  if (hit) {
+    RASTERS.delete(key);
+    RASTERS.set(key, hit);
+    return hit.cv;
+  }
+  const e = {cv: _drawSvg(text, cw, ch, flipX, flipY), px: cw * ch};
+  e.cv.catch(() => { if (RASTERS.get(key) === e) { RASTERS.delete(key); _held -= e.px; } });
+  if (_budget > 0) {
+    RASTERS.set(key, e);
+    _held += e.px;
+    _trimRasters();
+  }
+  return e.cv;
+}
+// a canvas of its own, to draw on
+function _copyOf(src) {
   const cv = document.createElement('canvas');
+  cv.width = src.width; cv.height = src.height;
+  if (cv.width && cv.height) cv.getContext('2d').drawImage(src, 0, 0);
+  return cv;
+}
+
+export async function svgCanvas(url, wmm, hmm, flipX = false, flipYax = false, scope) {
+  const text = await svgSource(url, scope);
   const px = _px(scope);
-  cv.width = Math.round(wmm * px); cv.height = Math.round(hmm * px);
-  const ctx = cv.getContext('2d');
-  if (flipX) { ctx.translate(cv.width, 0); ctx.scale(-1, 1); }
-  if (flipYax) { ctx.translate(0, cv.height); ctx.scale(1, -1); }
-  ctx.drawImage(img, 0, 0, cv.width, cv.height);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  URL.revokeObjectURL(blobUrl);
+  const cv = _copyOf(await _rasterShared(text, Math.round(wmm * px), Math.round(hmm * px), flipX, flipYax));
   cv._svgText = text;      // kept for adaptive re-rasterisation (see LOD below)
   return cv;
 }
@@ -2649,21 +2760,24 @@ export function recolourBody(derived, mats, cv) {
 }
 
 export async function rasterize(svgText, wmm, hmm, pxmm = PXMM, flipX = false, flipY = false) {
-  const img = new Image();
-  const blobUrl = URL.createObjectURL(new Blob([svgText], {type: 'image/svg+xml'}));
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = blobUrl; });
-  const cv = document.createElement('canvas');
-  cv.width = Math.max(1, Math.round(wmm * pxmm)); cv.height = Math.max(1, Math.round(hmm * pxmm));
+  const cv = _copyOf(await rasterSource(svgText, wmm, hmm, pxmm, flipX, flipY));
   const ctx = cv.getContext('2d');
   if (flipX) { ctx.translate(cv.width, 0); ctx.scale(-1, 1); }
   if (flipY) { ctx.translate(0, cv.height); ctx.scale(1, -1); }
-  ctx.drawImage(img, 0, 0, cv.width, cv.height);
-  URL.revokeObjectURL(blobUrl);
   return cv;
 }
 
 // six-sided FRU body: same art the component tab shows, reused inside the device
 
+// A raster of the caller's own, which it may draw on. `rasterSource` is the
+// kept one itself, for a caller that only draws FROM it: a punch, a mask, a
+// crop, a part laid on another raster.
+export function rasterSource(svgText, wmm, hmm, pxmm = PXMM, flipX = false, flipY = false) {
+  return _rasterShared(svgText, Math.max(1, Math.round(wmm * pxmm)), Math.max(1, Math.round(hmm * pxmm)),
+                       flipX, flipY);
+}
+// ITS CONTEXT IS LEFT FLIPPED, as it always was: a punch drawn into a mirrored
+// face at drawing coordinates lands where the mirrored art put the part.
 // THE VENTS OF A FACE, ON THE WELL WALL BEHIND IT. Run once every face has
 // been built: `wells` and `apertures` are what buildFaceRelief recorded into
 // its ctx, `frames` a faceFrame per view. A side of a well that lies against
@@ -2690,7 +2804,7 @@ export async function ventWellWalls({wells = [], apertures = {}, frames = {}, sc
       const x = cv.getContext('2d');
       x.fillStyle = well.wall; x.fillRect(0, 0, cv.width, cv.height);
       for (const a of aps)
-        x.drawImage(await rasterize(a.svgText, a.w, a.h, PX),
+        x.drawImage(await rasterSource(a.svgText, a.w, a.h, PX),
                     Math.round((a.x - r.x) * PX), Math.round((a.y - r.y) * PX));
       const geo = mesh.geometry, pos = geo.attributes.position, uv = geo.attributes.uv;
       const g = geo.groups.find(q => q.materialIndex === hit.wall);
@@ -2824,7 +2938,7 @@ export async function buildFaceRelief(F, ctx) {
       if (vb0) {
         const [bx, by, bw, bh] = vb0.slice(1).map(parseFloat);
         beyond = {x: bx, y: by, w: bw, h: bh,
-                  cv: await rasterize(squareFaceplate(cleanText), bw, bh, PX)};
+                  cv: await rasterSource(squareFaceplate(cleanText), bw, bh, PX)};
       }
     }
     const pastFace = r => r.x < -0.01 || r.y < -0.01 || r.x + r.w > fw + 0.01 || r.y + r.h > fh + 0.01;
@@ -2900,7 +3014,7 @@ export async function buildFaceRelief(F, ctx) {
       const d = builtDepth(c);
       // floor + feature art comes from the cavity group rendered standalone, so
       // raised bezel plates (drawn over the cavity on the face) never leak in
-      const gcv = await rasterize(c.grpSvg, c.grpRect.w, c.grpRect.h, PX);
+      const gcv = await rasterSource(c.grpSvg, c.grpRect.w, c.grpRect.h, PX);
       const floorCv = crop(gcv, {x: pc.x - c.grpRect.x, y: pc.y - c.grpRect.y, w: pc.w, h: pc.h}, PX);
       const cavCrops = [];
       const fctx = floorCv.getContext('2d');
@@ -2925,7 +3039,7 @@ export async function buildFaceRelief(F, ctx) {
       // A SHAPED CAVITY'S FLOOR IS ITS OUTLINE. The group art round the opening
       // is the housing's face; at the bottom of the socket it was a second copy
       // of that face. Cut to the outline, what is left is what the walls enclose.
-      const cavCv = c.rings ? await rasterize(c.cavSvg, c.w, c.h, PX) : null;
+      const cavCv = c.rings ? await rasterSource(c.cavSvg, c.w, c.h, PX) : null;
       const shapeFloor = cvs => {
         if (!cavCv) return cvs;
         const x = cvs.getContext('2d');
@@ -2942,7 +3056,7 @@ export async function buildFaceRelief(F, ctx) {
         // facet it stands on instead (the outs loop).
         const pctx = cv.getContext('2d');
         pctx.globalCompositeOperation = 'destination-out';
-        pctx.drawImage(cavCv || await rasterize(c.cavSvg, c.w, c.h, PX),
+        pctx.drawImage(cavCv || await rasterSource(c.cavSvg, c.w, c.h, PX),
                        Math.round(c.x * PX), Math.round(c.y * PX));
         pctx.globalCompositeOperation = 'source-over';
         facePunch[F.view].push({kind: 'shape', svg: c.cavSvg,
@@ -3010,7 +3124,7 @@ export async function buildFaceRelief(F, ctx) {
       // they are redrawn together from the one group svg they were cut from
       const floorMat = floor.material;
       reg(c.grpSvg, async text => {
-        const g2 = await rasterize(text, c.grpRect.w, c.grpRect.h, PX);
+        const g2 = await rasterSource(text, c.grpRect.w, c.grpRect.h, PX);
         // the facet clear is REAPPLIED: a restyle re-cuts the floor from the art
         remap(floorMat, clearFloor(shapeFloor(
           crop(g2, {x: pc.x - c.grpRect.x, y: pc.y - c.grpRect.y, w: pc.w, h: pc.h}, PX)),
@@ -3094,7 +3208,8 @@ export async function buildFaceRelief(F, ctx) {
       curOwner = dm.owner;
       curTilt = dm.tilt || null;
       // (LED lamps, bulged fan guards); apex proud, rim sunk 0.15 into the face
-      const dcv = await rasterize(dm.svgText, dm.w, dm.h, PX);
+      // (the kept raster itself: a texture only reads it)
+      const dcv = await rasterSource(dm.svgText, dm.w, dm.h, PX);
       const geo = new THREE.CircleGeometry(0.5, 48);
       const pos = geo.attributes.position;
       for (let i = 0; i < pos.count; i++) {
@@ -3132,7 +3247,7 @@ export async function buildFaceRelief(F, ctx) {
         const fx = cvs.getContext('2d');
         for (let i = 0; i < o.parts.length; i++) {
           const p = o.parts[i];
-          fx.drawImage(await rasterize(facetTexts[i + 1], p.w, p.h, PX),
+          fx.drawImage(await rasterSource(facetTexts[i + 1], p.w, p.h, PX),
                        Math.round((p.x - o.x) * PX), Math.round((p.y - o.y) * PX));
         }
         return cvs;
@@ -3179,13 +3294,13 @@ export async function buildFaceRelief(F, ctx) {
       // front-view rects scaled into the raster, which then holds either frame.
       const put = async (octx, cvs, e, text) => {
         if (!o.tilt && !e.tilt) {
-          octx.drawImage(await rasterize(text, e.w, e.h, PX),
+          octx.drawImage(await rasterSource(text, e.w, e.h, PX),
                          Math.round((e.x - o.x) * PX), Math.round((e.y - o.y) * PX));
           return;
         }
         const po = projOf(o), pe = projOf(e);
         const kx = cvs.width / po.w, ky = cvs.height / po.h;
-        octx.drawImage(await rasterize(text, pe.w, pe.h, PX),
+        octx.drawImage(await rasterSource(text, pe.w, pe.h, PX),
                        Math.round((pe.x - po.x) * kx), Math.round((pe.y - po.y) * ky),
                        Math.round(pe.w * kx), Math.round(pe.h * ky));
       };
@@ -3518,7 +3633,7 @@ export async function buildFaceRelief(F, ctx) {
       const unpunch = async (ctx2, p) => {
         if (p.kind === 'rect') { ctx2.clearRect(...punchRectPx(p, pf.x, pf.y, PX)); return; }
         ctx2.globalCompositeOperation = 'destination-out';
-        ctx2.drawImage(await rasterize(p.svg, p.w, p.h, PX),
+        ctx2.drawImage(await rasterSource(p.svg, p.w, p.h, PX),
                        Math.round((p.x - pf.x) * PX), Math.round((p.y - pf.y) * PX));
         ctx2.globalCompositeOperation = 'source-over';
       };
@@ -3531,7 +3646,7 @@ export async function buildFaceRelief(F, ctx) {
       const unbore = async ctx2 => {
         for (const c of bores) {
           ctx2.globalCompositeOperation = 'destination-out';
-          ctx2.drawImage(await rasterize(c.cavSvg, c.proj.w, c.proj.h, PX),
+          ctx2.drawImage(await rasterSource(c.cavSvg, c.proj.w, c.proj.h, PX),
                          Math.round((c.proj.x - pf.x) * PX), Math.round((c.proj.y - pf.y) * PX));
           ctx2.globalCompositeOperation = 'source-over';
         }
@@ -3551,7 +3666,7 @@ export async function buildFaceRelief(F, ctx) {
       // and left a hole in the panel where they had been. So the crop is
       // masked by the module's own art, exactly as a cavity's punch is: what
       // the module paints comes with it, and what it does not stays.
-      const mask = await rasterize(f.svgText, pf.w, pf.h, PX);
+      const mask = await rasterSource(f.svgText, pf.w, pf.h, PX);
       // a seated optic with no `body:` gets one (opticBody, built below)
       const ob = opticBody({behaviour: f.behaviour, body: FRU_META[f.path].body,
                             depth: f.depth, w: f.w, h: f.h});
