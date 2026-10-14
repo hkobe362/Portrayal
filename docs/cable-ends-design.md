@@ -206,8 +206,15 @@ Without `ends` the zone reader answers what it always did.
 
 ## 7. Later steps, named
 
-1. **A zero-U part as an end** (a vertical PDU). The rule above is about the slot
-   and does not care what carries it.
+1. **A zero-U part as an end** (a vertical PDU): **done in kit 0.38.0.** An end
+   names the part's id as its `item` and one of its own connector slots as its
+   `path`. No page reads a part beside the rack, so the catalogue answers for
+   the end whole: the slot is its outlet, a C13, C19 or C39 by its interface,
+   and its place is the slot's `mate`, which the routes measure to. Where no
+   part says which way a coupler faces, IEC 60320's numbering does: odd is a
+   female connector (an outlet), even a male inlet. A cord set pairs its ends,
+   C13 with C14 and C19 with C20, so a slot that takes two plugs (a C39) draws
+   the one that pairs with the plug at the cord's other end.
 2. **Ends on side, top and bottom views.** An end states `front` or `rear` only,
    so the ground studs on the sides of a panel cannot be reached yet.
 3. **A feed end outside the rack**: the far end of a fixed input cord, a branch

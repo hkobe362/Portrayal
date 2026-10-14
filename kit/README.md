@@ -674,6 +674,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.38.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
+on a part beside the rack (`item: 'z3'`, `path: 'outlet-a2'`), on one of its own connector slots.
+The commands, `settleEnds`, the routes, `freePorts`, `inspect` and the exports find it as they find
+a port of a device. Its place is the slot's `mate` in `configs.json`, so **a route context needs
+`slotsOf` and `compByRef`** (what `loadSlots` returns) to measure a cord to it; without them the
+cord has no length, as for a port not found. `freePorts(rack, 'z3', ctx, {type: 'C39', near: 35})`
+lists the free C39 outlets nearest U35. A page that draws cords reads the plug each end takes from
+the settled facts (`info.plug`): at a slot that takes two, it pairs with the far end's plug.
+
 **New in 0.37.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
 the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
 face (c1, c2)`) and the cords shorter than their route needs (for example `2 cords are shorter than their route needs (the

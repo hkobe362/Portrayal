@@ -11,13 +11,15 @@
 // to the right as seen from the FRONT. This file imports no DOM and nothing of
 // the site's pages, so the rack kit can take it as it is.
 
-import {uLabel, zeroUOf, zeroUById, bundlesOf, rollOf} from './model.js';
+import {uLabel, zeroUOf, zeroUById, bundlesOf, rollOf, zeroUPane, zeroUBottom} from './model.js';
+import {zeroUEnds} from './ports.js';
+import {portPathOf} from './cable-rules.js';
 import {followTrunk} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
-import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF} from './zero-u.js';
+import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF, sideOfAt} from './zero-u.js';
 import {isZeroUPart, zeroUTouched, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, railOf, isQuarter, unitsOf} from './fit.js';
-import {solidsOf, traysOf, detour, legCrossings, CLEAR} from './solids.js';
+import {solidsOf, traysOf, detour, legCrossings, CLEAR, zeroUPanelPoint} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, newCrossing} from './resting.js';
 
 export const LANE_GAP = 40;          // mm: a lane runs in the middle of a 40 mm gutter outside each rail
@@ -56,9 +58,11 @@ function guidesFor(it, ctx, id = it?.id) {
 // Which face an end's port is seen from: its item's face, or the other one
 // for the panel that faces away (a turned item swaps the two).
 // Mirrors cable-rules.js paneOf, duplicated so this file stays kit-ready.
+// An end on a part beside the rack is on the pane that part looks out of
+// (model.js zeroUPane).
 export function endPane(rack, end) {
   const it = itemOf(rack, end.item);
-  if (!it) return null;
+  if (!it) { const z = zeroUById(rack, end.item); return z ? zeroUPane(z, end.view === 'rear' ? 'rear' : 'front') : null; }
   const outward = (end.view === 'rear') === !!it.turned;
   return outward ? it.face : (it.face === 'front' ? 'rear' : 'front');
 }
@@ -215,9 +219,9 @@ function byGutter(rack, A, B, mA, mB, side, ctx, roomOf = null) {
   const f = rack.frame;
   const laneA = laneFor(f, side, A.pane), laneB = laneFor(f, side, B.pane);
   const lanes = laneA === laneB
-    ? [{lane: laneA, ru: A.it.ru}, {lane: laneA, ru: B.it.ru}]
-    : (() => { const top = Math.max(A.it.ru, B.it.ru);
-        return [{lane: laneA, ru: A.it.ru}, {lane: laneA, ru: top}, {lane: laneB, ru: top}, {lane: laneB, ru: B.it.ru}]; })();
+    ? [{lane: laneA, ru: A.ru}, {lane: laneA, ru: B.ru}]
+    : (() => { const top = Math.max(A.ru, B.ru);
+        return [{lane: laneA, ru: A.ru}, {lane: laneA, ru: top}, {lane: laneB, ru: top}, {lane: laneB, ru: B.ru}]; })();
   const outA = through(mA, A.pane, A.x, side, crossing, ctx, roomOf?.(A, mA, side));
   const outB = through(mB, B.pane, B.x, side, crossing, ctx, roomOf?.(B, mB, side)).reverse();
   return dedupe([...outA, ...lanes, ...outB]);
@@ -247,12 +251,28 @@ function byGutter(rack, A, B, mA, mB, side, ctx, roomOf = null) {
 export function autoRoute(rack, cable, ctx, {gutter = false} = {}) {
   const ends = [cable.a, cable.b].map(e => {
     const it = itemOf(rack, e.item), pane = it && endPane(rack, e);
+    // AN END ON A PART BESIDE THE RACK (a zero-U PDU's outlet, P-0019) has no
+    // manager, stands on the side of its upright and at the unit of its slot
+    // (the part's bottom where the slot is not placed), and takes the gutter
+    // beside that upright
+    if (!it) {
+      const z = zeroUById(rack, e.item);
+      if (!z) return null;
+      const p = zeroUEndPoint(rack, e, ctx);
+      return {e, it: null, z, pane: endPane(rack, e), x: p?.x ?? zeroUX(z, ctx.chassisOf), ru: p ? unitAt(rack, p.y) : zeroUBottom(z), side: sideOfAt(z.at)};
+    }
     // A port not found only defaults the SIDE (to the left, as a port at the centre does);
     // no length is ever measured from it (portPoint).
-    return it && pane ? {e, it, pane, x: ctx.portX(e) ?? 0} : null;
+    return pane ? {e, it, pane, x: ctx.portX(e) ?? 0, ru: it.ru} : null;
   });
   if (ends.some(x => !x)) return [];
   const [A, B] = ends;
+  if (A.z || B.z) {
+    const side = (A.z ? A : B).side, mOf = E => (E.it ? managerOf(rack, E.it, E.pane, ctx) : null);
+    if (!gutter && !A.z !== !B.z && !mOf(A.z ? B : A) && A.pane === B.pane && Math.abs(A.ru - B.ru) <= SHORT) return [];
+    const roomOf = (E, m, s) => g => leadRoom(rack, cable, E.e, m, g, s === 'left' ? -1 : 1, ctx);
+    return byGutter(rack, A, B, mOf(A), mOf(B), side, ctx, roomOf);
+  }
   const mA = managerOf(rack, A.it, A.pane, ctx), mB = managerOf(rack, B.it, B.pane, ctx);
   if (!gutter && !mA && !mB && A.pane === B.pane && Math.abs(A.it.ru - B.it.ru) <= SHORT) return [];
   if (mA && mA === mB && A.pane === B.pane) {
@@ -667,7 +687,7 @@ export const trayOf = (rack, w, ctx) => (w?.item && !w.lane
 export function ownRoute(rack, cable, ctx, {gutter = false} = {}) {
   const auto = cable.routeEdited !== true;
   const list = auto ? autoRoute(rack, cable, ctx, {gutter}) : (cable.route || []);
-  const ends = [cable.a, cable.b].map(e => itemOf(rack, e?.item)?.ru ?? null);
+  const ends = [cable.a, cable.b].map(e => endUnit(rack, e, ctx));
   const {waypoints, gone} = resolvedList(rack, list, ctx, ends);
   return {waypoints, gone, auto};
 }
@@ -872,8 +892,45 @@ export function pointOf(rack, w, ctx) {
   return {...rollPoint(rack, it, {x: centreX(it, ctx.chassisOf) + turned * g.x, y: anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
+// THE SLOT OF A PART BESIDE THE RACK (P-0019): where the catalogue puts it
+// on the part (ports.js zeroUEnds, which needs `ctx.slotsOf` and
+// `ctx.compByRef`), placed as the part's body is (solids.js
+// zeroUPanelPoint). null when the catalogue is not given or has no such
+// slot: then no length is measured, as for a port not found. Read once per
+// rack and context.
+const zeroUPointMemo = new WeakMap();
+export function zeroUEndPoint(rack, end, ctx) {
+  const z = zeroUById(rack, end?.item);
+  if (!z || typeof ctx?.chassisOf !== 'function') return null;
+  // no catalogue yet: no point, and nothing kept, so one given later is read
+  if (typeof ctx.slotsOf !== 'function' || typeof ctx.compByRef !== 'function') return null;
+  const keyed = ctx !== null && typeof ctx === 'object';
+  let per = zeroUPointMemo.get(rack);
+  if (!per) zeroUPointMemo.set(rack, per = new WeakMap());
+  let known = keyed ? per.get(ctx) : null;
+  if (keyed && !known) per.set(ctx, known = new Map());
+  const view = end.view === 'rear' ? 'rear' : 'front', key = `${z.id}|${view}|${end.path}`;
+  if (known?.has(key)) return known.get(key);
+  const s = zeroUEnds(z, ctx).find(e => e.path === portPathOf(end.path) && e.view === view);
+  const p = s && s.x != null ? zeroUPanelPoint(rack, z, ctx.chassisOf(z.ref), {x: s.x, y: s.y}, view) : null;
+  known?.set(key, p);
+  return p;
+}
+// The unit a point `y` mm up from the floor of U1 is in, within the rack.
+const unitAt = (rack, y) => Math.min(rack.frame.heightRU, Math.max(1, Math.floor(y / RU) + 1));
+// The unit an end stands at: its item's, or its slot's on a part beside the rack.
+function endUnit(rack, e, ctx) {
+  const it = itemOf(rack, e?.item);
+  if (it) return it.ru;
+  const z = zeroUById(rack, e?.item);
+  if (!z) return null;
+  const p = zeroUEndPoint(rack, e, ctx);
+  return p ? unitAt(rack, p.y) : zeroUBottom(z);
+}
+
 export function portPoint(rack, end, ctx) {
   const it = itemOf(rack, end.item), pane = it && endPane(rack, end);
+  if (!it) return zeroUEndPoint(rack, end, ctx);
   if (!pane) return null;
   // No port found on the drawing: no point, and so no length - never an invented x of 0.
   const x = ctx.portX(end);
