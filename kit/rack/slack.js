@@ -98,7 +98,8 @@ export function whereText(rack, cable, ctx, path = undefined) {
 export function amountRefusal(rack, cable, entry, ctx, path) {
   if (!ctx) return null;
   const spare = spareOf(rack, cable, ctx, path);
-  if (!spare) return null;
+  // a routed length grows by what is stored and may move up a stock size, so only a pinned length is a limit
+  if (!spare || !spare.pinned) return null;
   if (spare.spare_m < -1e-9) return `${cable.id} is ${mText(-spare.spare_m)} short of what its route needs, so it has no spare to store.`;
   const value = toMetres(entry.value, entry.unit);
   if (entry.value == null || value == null) return null;

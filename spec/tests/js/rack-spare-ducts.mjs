@@ -283,6 +283,9 @@ test('an amount larger than the cable\'s spare is refused, and any stored spare 
   const msg = `c1 is ${SL.mText(lack)} short of what its route needs, so it has no spare to store.`;
   for (const cmd of [{at: DUCT}, {at: DUCT, value: 0.1}, {at: {end: 'b'}}, {at: {end: 'a'}, value: 0.1}])
     assert.equal(run(short, {op: 'cable.slack', id: 'c1', ...cmd}).error, msg);
+  // a routed length is no limit: it grows by what is stored
+  const routed = {...r, cables: r.cables.map(c => (c.id === 'c1' ? {...c, length: {value: 1, unit: 'm', source: 'routed'}} : c))};
+  assert.equal(run(routed, {op: 'cable.slack', id: 'c1', at: DUCT, value: 5}).error, undefined);
   // without routes nothing can be judged, and it is recorded as given
   assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: DUCT, value: 5}, {chassisOf}).error, undefined);
 });
