@@ -1,0 +1,55 @@
+format: 1
+kind: component
+name: pcie-8pin-header
+version: 1.0.0
+class: inlet
+profile: server
+conforms: mini-fit-8-header
+interface: pcie-8pin
+description: >-
+  The PCIe 8-pin (6+2) power connector on a board, seen end on. It is a 2 x 4
+  Mini-Fit housing with the PCIe polarisation, three 12 V and five ground
+  contacts. The A10 takes one. It presents `pcie-8pin`, which
+  generic/pcie-8pin-plug@1 mates. It is the size of std/eps12v-header@1 and not
+  the same interface.
+size: {w: 12.6, h: 18.0, d: 9.9}
+size-confidence: {w: estimated, h: estimated, d: estimated}
+size-notes: the 12.6 is printed on NVIDIA's adapter drawing; the 18.0 and the 9.9 are not dimensioned for this connector
+unplaced: a GPU card composes it; the A10 that takes it is not modelled to (docs/connectors-gpu-design.md section 7)
+attrs:
+  media: pcie-8pin
+  input: dc
+  pins: 8
+  pins-12v: 3
+  pins-ground: 5
+  pitch-mm: 4.2
+  power-rated-w: 150
+provenance:
+  size: >-
+    estimated - registry `mini-fit-8-header`; the same housing as
+    std/eps12v-header@1, with the same figures and the same unreconciled 21.1 on
+    NVIDIA PB-10577 figure 7.
+  depth: >-
+    estimated - 9.9 is the plug's nose in figure 7, taken as the depth the cavity
+    gives it.
+  contacts: >-
+    datasheet - NVIDIA PB-10577 figure 7, the P2 and P3 "PCI-E 2*4" ends: pins
+    1, 2 and 3 are 12 V (yellow) and the other five are ground (black). The
+    figure marks pin 4 as tied to 7 and 8, and draws cell 4 with a differently
+    shaped corner. The A10 takes this connector (NVIDIA's coverage list).
+  keying: >-
+    estimated - Molex's catalogue calls the Mini-Fit PCIe housing a "unique
+    polarization scheme ... for PCI Express applications only", 8 A a contact,
+    six-circuit listed. The one drawn chamfer follows figure 7's cell 4 and is
+    schematic.
+  power: >-
+    estimated - 150 W is the figure the PCIe CEM gives an 8-pin auxiliary
+    connector. No document held states it.
+elements:
+  opening: {at: [0.0, 0.0], size: [12.6, 18.0], class: cutout}
+relief:
+  wall: '#141619'
+  cavity: inlet-face
+connection-points:
+  mate: {at: [6.3, 9.0], direction: front}
+skins: [default]

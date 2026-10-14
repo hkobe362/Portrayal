@@ -1,0 +1,55 @@
+format: 1
+kind: component
+name: 12v-2x6-header
+version: 1.0.0
+class: inlet
+profile: server
+conforms: pcie-16pin-header
+interface: pcie-12v-2x6
+description: >-
+  The 16-pin 12V-2x6 GPU power connector of PCIe CEM 5.1 and ATX 3.1 on a board.
+  It is the 12VHPWR housing with the sense contacts recessed further, so they
+  touch only when the power contacts are home. It presents `pcie-12v-2x6`, which
+  generic/pcie-16pin-plug@1 mates.
+size: {w: 20.85, h: 11.7, d: 9.0}
+size-confidence: {w: estimated, h: estimated, d: estimated}
+size-notes: the opening is taken as the plug's own outline; no header drawing was readable
+unplaced: a GPU card composes it; the 16-pin cards are not modelled to (docs/connectors-gpu-design.md section 7)
+attrs:
+  media: pcie-12v-2x6
+  input: dc
+  pins: 16
+  pins-power: 12
+  pins-sense: 4
+  pitch-mm: 3.0
+  power-rated-w: 600
+provenance:
+  size: >-
+    estimated - registry `pcie-16pin-header`, the same figures as
+    std/12vhpwr-header@1: the cable housing's outline from Molex customer drawing
+    2191140001-SD rev A (2024-03-11), whose housing is marked "H++", the 12V-2x6
+    mark. The header's own shroud is not dimensioned in anything held.
+  depth: >-
+    estimated - 9.0 is a guess at the shroud's depth, bounded above by the
+    plug's 14.00.
+  sense-recess: >-
+    estimated - NOT DRAWN. The sources disagree on how much shorter the sense
+    contacts are: Corsair says 1.5 mm, Hardware Busters 4 mm to 2.75 mm, another
+    guide 0.1 mm, and Tom's Hardware says PCI-SIG made the tip-to-edge spacing
+    1.7 mm. The contact point at 3 mm is unchanged. The skin draws the sense
+    contacts smaller to say they differ, and nothing is built from them.
+  contacts: >-
+    drawing - Molex 2191140001-SD: twelve power cells on a 3.00 pitch, four
+    sense cells on a 2.00 pitch; the same centres as std/12vhpwr-header@1.
+  power: >-
+    datasheet - 600 W at 12 V (PCIe CEM 5.1 as Wikipedia, "12VHPWR", reports it).
+    Molex's 12V-2x6 page says up to 675 W at 9.5 A a contact; not stored, since it
+    is a different measure from the standard's.
+elements:
+  opening: {at: [0.0, 0.0], size: [20.85, 11.7], class: cutout}
+relief:
+  wall: '#141619'
+  cavity: inlet-face
+connection-points:
+  mate: {at: [10.425, 5.85], direction: front}
+skins: [default]

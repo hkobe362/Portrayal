@@ -1,0 +1,63 @@
+format: 1
+kind: component
+name: nvlink-bridge-a100-2slot
+version: 1.0.0
+class: port
+mates: nvlink-a100-pcie
+profile: server
+description: >-
+  NVIDIA's two-slot NVLink bridge for the A100 PCIe card, 900-53651-0000-000,
+  seen from above. One bridge spans two adjacent cards, plugging into the same
+  top-edge connector on each. Those sit two slot pitches (2 x 20.32) apart, and
+  three bridges join one pair of cards. `mate` seats on the first card and
+  `mate-b` on the second. The library seats a part at `mate` only, so nothing
+  seats the second end yet.
+size: {w: 47.24, h: 49.5}
+size-confidence: {w: estimated, h: estimated}
+size-notes: the span is two slot pitches plus one connector's width; the body between the ends is not dimensioned in anything held
+attrs:
+  media: nvlink
+  connector: nvlink-a100-pcie
+  part-number: 900-53651-0000-000
+  spans-slots: 2
+  per-card-pair: 3
+  weight-g: 20.5
+unplaced: seated by configurations downstream of this library; no bay spans two cards yet
+provenance:
+  size: >-
+    estimated - WIDTH 47.24 = 2 x 20.32 + 6.6: the CEM slot pitch twice (NVIDIA
+    PB-10577 names it "2-slot" and reseller listings say it is for 2-slot board
+    spacing), plus the 6.6 one connector spans across the card. LENGTH 49.5: the
+    connector's, which the plug fills. Neither is a measurement of the bridge: no
+    NVIDIA drawing of it is public. A reseller lists a 12.50 cm figure for the
+    part (Galaxus) whose meaning is unclear, and it is not used.
+  height: >-
+    estimated - 2.5 above the card's top edge: the brief's "clearance above the
+    north edge should meet or exceed 2.5 mm", so the bridge fits inside it. An
+    upper bound, drawn as the stand-off; the real body may be lower.
+  identity: >-
+    datasheet - NVIDIA A100 80GB PCIe product brief PB-10577-001 v03, "NVLink
+    Bridge": "The 2-slot NVLink Bridge for the NVIDIA A100 80GB PCIe card has the
+    following NVIDIA part number: 900-53651-0000-000". Three bridges join one
+    adjacent pair, all three required (figure 4 marks anything else incorrect),
+    20.5 g each (table 1).
+  ends: >-
+    estimated - the two ends are the connector's centre line, 3.3 from the part's
+    edge and 40.64 apart, from the CEM slot pitch. The connector is the same on
+    both cards, so one interface covers both ends.
+  other-cards: >-
+    estimated - the A30, A40, H100 PCIe, H100 NVL and H200 NVL take bridges of
+    their own part numbers. This part is the A100's and is not offered to their
+    connectors until a source says they intermate.
+relief:
+  features:
+    - node: body
+      out: 2.5
+      shape: true
+      color: '#202225'
+      confidence: estimated
+      source: the brief's 2.5 clearance above the north edge, an upper bound on the bridge's height
+connection-points:
+  mate: {at: [3.3, 24.75], direction: front}
+  mate-b: {at: [43.94, 24.75], direction: front}
+skins: [default]

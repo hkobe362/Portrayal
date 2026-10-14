@@ -1,0 +1,61 @@
+format: 1
+kind: component
+name: eps12v-8pin-plug
+version: 1.0.0
+class: port
+mates: eps12v-8pin
+conforms: mini-fit-8-plug
+profile: server
+description: >-
+  A 2 x 4 cable plug of the EPS12V (CPU 8-pin) kind on its cord, seen from the
+  cable end. It is the housing and a short straight stub of wire bundle whose
+  diameter is the cable-od field. It seats in an `eps12v-8pin` header at its own
+  mate point. A PCIe 8-pin plug does not mate it.
+size: {w: 12.6, h: 18.0}
+size-confidence: {w: estimated, h: estimated}
+size-notes: the 12.6 is printed on NVIDIA's adapter drawing for the PCIe plug of the same family; the 18.0 is four pitches and a wall
+attrs: {media: eps12v, connector: eps12v, pins: 8, pins-12v: 4, pins-ground: 4}
+fields:
+  cable-od: {label: Wire bundle diameter, type: number, unit: mm, default: 9.0}
+  jacket-color: {label: Sleeve colour, type: text, default: '#1c1c1c'}
+unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
+provenance:
+  size: >-
+    estimated - registry `mini-fit-8-plug`. The plug is the Molex Mini-Fit Jr.
+    5557 dual-row receptacle housing (39-01-2085 for eight circuits). NVIDIA
+    PB-10577 figure 7 draws the ATX 2*4 end P1 as a plug housing and prints no
+    size for it; the sizes are the PCIe plug's. No EPS12V plug drawing is held.
+  no-depth: >-
+    estimated - NO `size.d`, as on generic/c13-plug@1; the depth is carried by the
+    relief.
+  seated-depth: >-
+    estimated - the nose, 9.9 long on figure 7's PCIe plug, enters the header's
+    modelled 9.9 cavity, so the 20.1 of body stands in front of the header's face
+    and the stub starts there. An EPS plug is taken to have the same body.
+  body: >-
+    estimated - 20.1, NVIDIA PB-10577 figure 7, the plug body beside the 9.9
+    nose, on the PCIe plug; taken for this one.
+  stub: >-
+    estimated - the stub rule, docs/connectors-coax-design.md section 5: 30
+    straight, from the end of the body. The 9.0 bundle diameter is an estimate:
+    eight 18 AWG wires in a sleeve, with no source.
+  contacts: >-
+    datasheet - NOT DRAWN: the sockets are on the front face, inside the header.
+    Four 12 V and four ground, NVIDIA PB-10577 figure 7.
+relief:
+  features:
+    - node: body
+      out: 20.1
+      shape: true
+      color: '#202225'
+      confidence: estimated
+      source: NVIDIA PB-10577 figure 7, the 20.1 body of the PCIe 2x4 plug, taken for this one
+    - node: stub
+      lift: 20.1
+      cyl: 30
+      confidence: estimated
+      source: the stub rule, docs/connectors-coax-design.md section 5
+connection-points:
+  mate: {at: [6.3, 9.0], direction: front}
+  cable: {at: [6.3, 9.0], direction: front, 'on': stub}
+skins: [default]

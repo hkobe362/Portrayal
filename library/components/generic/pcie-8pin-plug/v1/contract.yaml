@@ -1,0 +1,61 @@
+format: 1
+kind: component
+name: pcie-8pin-plug
+version: 1.0.0
+class: port
+mates: pcie-8pin
+conforms: mini-fit-8-plug
+profile: server
+description: >-
+  The PCIe 8-pin (6+2) cable plug on its cord, seen from the cable end. It is the
+  2 x 4 housing and a short straight stub of wire bundle whose diameter is the
+  cable-od field. It seats in a `pcie-8pin` header at its own mate point. An
+  EPS12V header does not take it.
+size: {w: 12.6, h: 18.0}
+size-confidence: {w: drawing, h: estimated}
+size-notes: the 12.6 is printed on NVIDIA's adapter drawing; the 18.0 is four pitches and a wall, not printed
+attrs: {media: pcie-8pin, connector: pcie-8pin, pins: 8, pins-12v: 3, pins-ground: 5}
+fields:
+  cable-od: {label: Wire bundle diameter, type: number, unit: mm, default: 9.0}
+  jacket-color: {label: Sleeve colour, type: text, default: '#1c1c1c'}
+unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
+provenance:
+  size: >-
+    drawing - registry `mini-fit-8-plug`. NVIDIA A100 80GB PCIe product brief
+    PB-10577-001 v03 figure 7, the adapter's P2 and P3 "PCI-E 2*4 (FEMALE)"
+    housings: 12.6 across the face, 21.1 along it, a 20.1 body and a 9.9 nose.
+    THE 18.0 IS ESTIMATED: figure 7 prints 21.1 for the long side, four 4.20
+    pitches with a wall come to 18.0, and a distributor lists the family's
+    39-01-2085 at 18. The 3.1 between the two is not reconciled.
+  no-depth: >-
+    estimated - NO `size.d`, as on generic/c13-plug@1; the depth is carried by the
+    relief.
+  seated-depth: >-
+    drawing - the 9.9 nose enters the header's modelled 9.9 cavity, so the 20.1
+    body stands in front of the header's face. Figure 7 prints both figures and
+    not which part of the housing each is; the 9.9 is read as the nose.
+  stub: >-
+    estimated - the stub rule, docs/connectors-coax-design.md section 5: 30
+    straight, from the end of the body. The 9.0 bundle diameter is an estimate;
+    the figure shows 18 AWG wires in a sleeve and prints no diameter.
+  contacts: >-
+    datasheet - NOT DRAWN: the sockets are on the front face, inside the header.
+    Three 12 V and five ground, NVIDIA PB-10577 figure 7. The 6+2 plug's split (a
+    6-pin and a 2-pin that clip together) is not drawn.
+relief:
+  features:
+    - node: body
+      out: 20.1
+      shape: true
+      color: '#202225'
+      confidence: drawing
+      source: NVIDIA PB-10577 figure 7, the 20.1 body of the PCI-E 2*4 plug
+    - node: stub
+      lift: 20.1
+      cyl: 30
+      confidence: estimated
+      source: the stub rule, docs/connectors-coax-design.md section 5
+connection-points:
+  mate: {at: [6.3, 9.0], direction: front}
+  cable: {at: [6.3, 9.0], direction: front, 'on': stub}
+skins: [default]

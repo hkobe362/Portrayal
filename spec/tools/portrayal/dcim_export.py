@@ -648,7 +648,36 @@ PART_POWER = {
     "generic/nema-l5-20p-plug": "nema-l5-20p",
     "generic/nema-5-20p-plug": "nema-5-20p",
     "generic/cs8365c-plug": "cs8365c",
+    # A GPU CARD'S AUXILIARY POWER INLET (P-0028, docs/connectors-gpu-design.md).
+    # Neither target has a type for these: PowerPortTypeChoices in
+    # netbox-community/netbox (netbox/dcim/choices.py at main, 2026-10-14) holds
+    # Molex Micro-Fit 1x2, 2x2, 2x3 and 2x4, which are a 3.0 mm family, and no
+    # Mini-Fit Jr., PCIe or 16-pin entry; nautobot/nautobot's list at develop has
+    # no Molex entry at all. So they are `other`, as `common/dc-barrel` is, and
+    # POWER_LABEL below says which connector, as OUTLET_LABEL does for an outlet.
+    "std/eps12v-header": "other",
+    "std/pcie-8pin-header": "other",
+    "std/12vhpwr-header": "other",
+    "std/12v-2x6-header": "other",
 }
+# THE CONNECTOR A `other` POWER PORT IS, for a reader who would otherwise see
+# "Other". Only the parts above that have no upstream type are listed; a test
+# holds the two tables to each other.
+POWER_LABEL = {
+    "std/eps12v-header": "EPS12V 8-pin (CPU 8-pin)",
+    "std/pcie-8pin-header": "PCIe 8-pin (6+2)",
+    "std/12vhpwr-header": "12VHPWR 16-pin",
+    "std/12v-2x6-header": "12V-2x6 16-pin",
+}
+
+
+def power_row(ref, pid):
+    """The power-port row an inlet `ref` placed as `pid` exports, with the
+    connector as its label where the type is `other`."""
+    row = {"name": pid or "Inlet", "type": PART_POWER[ref]}
+    if ref in POWER_LABEL:
+        row["label"] = POWER_LABEL[ref]
+    return row
 
 # WHERE A DEVICE HANDS POWER ON: a power OUTLET, the other half of PART_POWER
 # (docs/power-outlets-design.md, #806). A distribution panel's output circuit
@@ -1386,7 +1415,7 @@ def route_part(part, attrs, defaulted=None):
     if ref == DB9_CONSOLE_REF and DB9_CONSOLE.search(db9_words(part)):
         return "console", {"name": pid, "type": "de-9"}
     if ref in PART_POWER:
-        return "power", {"name": pid or "Inlet", "type": PART_POWER[ref]}
+        return "power", power_row(ref, pid)
     if ref in PART_CONSOLE:
         return "console", {"name": pid or "Console", "type": PART_CONSOLE[ref]}
     if ref in USB_CONSOLE_REFS:
@@ -1994,9 +2023,7 @@ def build(dev, cfg_name, cfg, listing, dist=None, frus=None, label=None, trace=N
                 if trace is not None:
                     trace.add(p["id"])
             if p["ref"].split("@")[0] in PART_POWER:
-                powers.setdefault(p["id"], {
-                    "name": p["id"] or "Inlet",
-                    "type": PART_POWER[p["ref"].split("@")[0]]})
+                powers.setdefault(p["id"], power_row(p["ref"].split("@")[0], p["id"]))
                 if trace is not None:
                     trace.add(p["id"])
             # WHERE IT HANDS POWER ON (#806): one outlet per placement of a

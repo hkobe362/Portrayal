@@ -1,0 +1,57 @@
+format: 1
+kind: component
+name: eps12v-header
+version: 1.0.0
+class: inlet
+profile: server
+conforms: mini-fit-8-header
+interface: eps12v-8pin
+description: >-
+  The 8-pin CPU / EPS12V power connector on a board, seen end on from the cable
+  side. It is a Molex Mini-Fit Jr. 2 x 4 header with four 12 V and four ground
+  contacts. A GPU card whose brief says "CPU 8-pin" (the A100 and A30) carries
+  one. It presents `eps12v-8pin`, which generic/eps12v-8pin-plug@1 mates.
+size: {w: 12.6, h: 18.0, d: 9.9}
+size-confidence: {w: estimated, h: estimated, d: estimated}
+size-notes: the 12.6 is printed on NVIDIA's adapter drawing; the 18.0 and the 9.9 are not dimensioned for this connector
+unplaced: a GPU card composes it; the A100 and A30 cards that take it are not modelled to (docs/connectors-gpu-design.md section 7)
+attrs:
+  media: eps12v
+  input: dc
+  pins: 8
+  pins-12v: 4
+  pins-ground: 4
+  pitch-mm: 4.2
+  voltage-rating-v: 600
+  current-rating-a: 9.0
+provenance:
+  size: >-
+    estimated - registry `mini-fit-8-header`. 12.6 across: NVIDIA A100 80GB PCIe
+    product brief PB-10577-001 v03 figure 7, the PCI-E 2x4 housing. 18.0 long:
+    four pitches of 4.20 plus a 1.2 wall, and the 18 mm a distributor lists for
+    the Molex 39-01-2085. Figure 7 prints 21.1 for the long side, not
+    reconciled. Molex's Mini-Fit Jr. catalogue (MX10, E-57 to E-63) gives the 4.20
+    pitch, 9.0 A, 600 V and the part numbers 5566 (vertical header), 5569 (right
+    angle) and 5557 (receptacle), and no dimensioned drawing.
+  depth: >-
+    estimated - 9.9 is the plug's nose in figure 7, taken as the depth the cavity
+    gives it.
+  contacts: >-
+    datasheet - NVIDIA PB-10577 figure 7: the ATX 2*4 end has pins 1 to 4 black
+    and 5 to 8 yellow, four ground and four 12 V. The CPU 8-pin is the connector
+    table 7 lists as the A100's, and figure 6 draws it as two columns of four.
+  keying: >-
+    estimated - the one chamfered cell is schematic. No drawing of the EPS12V
+    header is held. Molex states only that its PCIe housing is polarised
+    differently from the Mini-Fit Jr., which is why this and
+    `std/pcie-8pin-header@1` are two interfaces.
+  power: >-
+    datasheet - Molex Mini-Fit Jr. 9.0 A a contact (16 AWG), 600 V.
+elements:
+  opening: {at: [0.0, 0.0], size: [12.6, 18.0], class: cutout}
+relief:
+  wall: '#141619'
+  cavity: inlet-face
+connection-points:
+  mate: {at: [6.3, 9.0], direction: front}
+skins: [default]
