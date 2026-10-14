@@ -242,7 +242,8 @@ def test_the_kit_ships_the_resolver():
 
 def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert pkg["version"] == "0.36.0"
+    assert pkg["version"] == "0.37.0"
+    assert "0.37.0" in (ROOT / "changelog.d/agent-findings.md").read_text()
     assert "0.36.0" in (ROOT / "changelog.d/manager-pass-through.md").read_text()
     assert "0.35.0" in (ROOT / "changelog.d/spare-in-ducts.md").read_text()
 
