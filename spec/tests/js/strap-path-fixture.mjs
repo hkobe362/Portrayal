@@ -5,9 +5,10 @@
 // duct beside each front upright, and 96 cords in eight bundles of twelve.
 // Four bundles run on the front, from a switch's lacer up a front lane to
 // the panel's. Four run from the rear lacer down a REAR lane and then a
-// FRONT lane to a lacer under a switch: between the two lanes a cord goes
-// round the duct by a detour point, so its path is well off the straight
-// line from one lane point to the other, and longer. Of each rear bundle
+// FRONT lane to a lacer under a switch: between the two lanes a cord crosses
+// the duct's back through its top window (P-0016; it went over the duct
+// before), so its path is well off the straight line from one lane point to
+// the other, and longer. Of each rear bundle
 // four cords leave at the first ring of that lacer, four at the second and
 // four at the third, so the trunk is ridden by twelve, then eight, then four.
 // The devices are cable-solids-fixture's (the catalogue's lacer and duct);
