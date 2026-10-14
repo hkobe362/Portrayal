@@ -674,6 +674,21 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.35.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
+the rings a route would enter and leave by one face (`2 rings are entered and left by one face (c1, c2)`)
+and the cords shorter than their route needs (`2 cords are shorter than their route needs (the worst c2,
+1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
+`{item, via, text}`, from the new `ringFindingsOf(rack, cable, ctx, nameOf, path)` in `rack/route.js`
+(`ringFindings` is now one call of it for each cable); a short cord was already in its `spare_findings`.
+A bend of one turn that is at a stop of the route has `stop`, that waypoint, in `routePath`'s `bends`, in
+`bendFindingsOf` and in `inspect`'s `route.bends`, and its sentence names it before the two stops either side
+(`c1 turns 90 degrees at right-front U20, between lacer ring 1 and right-front U30, with room for ...`); a corner in a
+lead or a detour has no `stop` and reads as before. `cable.lay`, when the routes are known, refuses a
+`position` past the number of cables whose routes pass through the pathway, and one for a cable that does not
+pass through it, and says of a face on a ring or a duct that it is one. **A page that shows a bend's sentence
+shows the new wording without a change; a page that lists a cable's findings adds `route.ring_findings`; the
+text of `describe` has two new clauses, and a page or an agent that parses it adds them.**
+
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:
