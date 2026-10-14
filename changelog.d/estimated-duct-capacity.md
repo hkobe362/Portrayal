@@ -18,6 +18,6 @@
   in it, against an estimated 54 cat6 cables' worth (its maker states none).`
   It is a note when within the count (`spare-capacity-estimated`), and the
   refusal past it and the note of cables through a manager read "an estimated".
-  `inspect` gives `capacity.estimated`. A part that still states none keeps
+  `inspect` gives `capacity.estimated`. `@portrayal/kit` is 0.40.0. A part that still states none keeps
   `spare-capacity-unstated`. The USCMH-SFDABS1U, 2U and B1U keep the earlier
   estimates, with no kind and no mark.
