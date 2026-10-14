@@ -73,7 +73,8 @@ format, or `{error}` (GONE or CABLE_GONE).
 
 - `routed` comes from `routedLength(rack, cable, ctx)` and `stockLength`, when
   `ctx.route` is given. `route.text` comes from `routeText`.
-- `lanes` comes from `lanesOf(frame)`. `passes` holds the ring, duct and pass-through
+- `lanes` comes from `waypointLanesOf(frame)`: the gutters and, on a four-post, the
+  inner lane of each (P-0037). `passes` holds the ring, duct and pass-through
   ids on the cable's two devices, from `rack.json`'s `guides` and `passes`.
 - `loose` and `mismatch` come from `ctx.cableFacts` facts when given, through
   `looseReason` and `mismatch`. A reader that rejects, or facts that say so,

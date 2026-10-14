@@ -91,7 +91,7 @@ test('inspect: a cable, with its routed length from a route context', async () =
     // a route down an empty gutter has no duct or tray for its spare: only its ends
     spare_places: [],
     route: {edited: false, waypoints: [{lane: 'left-front', ru: 10}, {lane: 'left-front', ru: 20}], text: 'left-front U10-U20'},
-    lanes: ['left-front', 'right-front', 'left-rear', 'right-rear'],
+    lanes: ['left-front', 'right-front', 'left-rear', 'right-rear', 'left-front-inner', 'right-front-inner', 'left-rear-inner', 'right-rear-inner'],
     passes: {i3: ['guide-1', 'guide-2', 'window-1']},
     loose: null, mismatch: null});
 });
