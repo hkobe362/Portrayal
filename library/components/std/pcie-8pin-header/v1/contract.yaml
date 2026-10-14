@@ -9,13 +9,13 @@ interface: pcie-8pin
 description: >-
   The PCIe 8-pin (6+2) power connector on a board, seen end on. It is a 2 x 4
   Mini-Fit housing with the PCIe polarisation, three 12 V and five ground
-  contacts. The A10 takes one. It presents `pcie-8pin`, which
+  contacts. It presents `pcie-8pin`, which
   generic/pcie-8pin-plug@1 mates. It is the size of std/eps12v-header@1 and not
   the same interface.
 size: {w: 12.6, h: 18.0, d: 9.9}
 size-confidence: {w: estimated, h: estimated, d: estimated}
 size-notes: the 12.6 is printed on NVIDIA's adapter drawing; the 18.0 and the 9.9 are not dimensioned for this connector
-unplaced: a GPU card composes it; the A10 that takes it is not modelled to (docs/connectors-gpu-design.md section 7)
+unplaced: a GPU card composes it; no card that takes it is modelled to (docs/connectors-gpu-design.md section 7)
 attrs:
   media: pcie-8pin
   input: dc
@@ -36,7 +36,8 @@ provenance:
     datasheet - NVIDIA PB-10577 figure 7, the P2 and P3 "PCI-E 2*4" ends: pins
     1, 2 and 3 are 12 V (yellow) and the other five are ground (black). The
     figure marks pin 4 as tied to 7 and 8, and draws cell 4 with a differently
-    shaped corner. The A10 takes this connector (NVIDIA's coverage list).
+    shaped corner. Which cards take this connector is not read from a brief
+    held here.
   keying: >-
     estimated - Molex's catalogue calls the Mini-Fit PCIe housing a "unique
     polarization scheme ... for PCI Express applications only", 8 A a contact,

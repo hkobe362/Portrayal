@@ -26,8 +26,9 @@ attrs:
 provenance:
   size: >-
     estimated - registry `pcie-16pin-header`. The opening is the cable housing's
-    outline, 20.85 x 11.70, from Molex customer drawing 2191140001-SD rev A
-    (2024-03-11), which is the plug that enters it. The header's own shroud is
+    outline, 20.85 x 11.7 (the height is read between two figures on the
+    drawing), from Molex customer drawing 2191140001-SD rev A (2024-03-11),
+    which is the plug that enters it. The header's own shroud is
     not dimensioned in anything held. The Amphenol Minitek Pwr CEM-5
     specification GS-12-1706 and Molex's header pages could not be downloaded.
   depth: >-

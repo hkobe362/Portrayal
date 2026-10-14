@@ -199,5 +199,6 @@ def test_the_bridge_is_wide_enough_to_reach_both_connectors():
 
 def test_every_estimated_bridge_figure_says_so():
     c = _contract(BRIDGE)
-    assert c["size-confidence"]["w"] == "estimated" or "estimated" in c["provenance"]["size"]
-    assert "estimated" in json.dumps(c["provenance"]).lower()
+    assert c["size-confidence"] == {"w": "estimated", "h": "estimated"}
+    assert c["provenance"]["size"].startswith("estimated")
+    assert c["provenance"]["height"].startswith("estimated")

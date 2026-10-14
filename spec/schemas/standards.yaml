@@ -2757,10 +2757,11 @@ standards:
     source: >-
       WIDTH 12.6: NVIDIA A100 80GB PCIe product brief PB-10577-001 v03, figure
       7 (the CPU 8-pin to PCIe 8-pin adapter drawing), which prints 12.6 across
-      the face of the PCI-E 2x4 housing; it is three pitches of 4.20. LENGTH
-      18.0: a distributor listing of the Molex 39-01-2085 8-circuit receptacle
-      housing (RS Components, 18 x 15.1 x 19.6 mm), and four pitches plus a
-      1.2 wall comes to the same 18.0. Figure 7 prints 21.1 for the same
+      the face of the PCI-E 2x4 housing, across its two columns. LENGTH 18.0: a
+      distributor listing of the Molex 39-01-2085 8-circuit receptacle housing
+      (RS Components, 18 x 15.1 x 19.6 mm), and four pitches plus a 1.2 wall
+      comes to the same 18.0. That listing's 15.1 across disagrees with figure
+      7's 12.6, so it is not shown to be the same housing. Figure 7 prints 21.1 for the same
       housing's long side; that is 3.1 more and is not reconciled, so the
       length is estimated. The Molex catalogue states the 4.20 pitch, the 9.0 A
       and 600 V ratings and the part numbers (header 5566 vertical and 5569
@@ -2817,13 +2818,14 @@ standards:
     registry: Molex 2191140001-SD rev A (2024-03-11), "PCIE CEM 5 12V2X6 RECEPTACLE HOUSING", part 2191140161
     w: 20.85
     h: 11.7
-    confidence: drawing
+    confidence: estimated
     depth: 14.0
     depth-confidence: drawing
     source: >-
-      Molex 2191140001-SD rev A: 20.85 across the front, 14.00 deep from the
-      front to the rear of the housing, 11.70 high on the end view (the side
-      view reads 11.63 across the lower body); 12 power contacts, two rows of
+      Molex 2191140001-SD rev A: 20.85 across the front and 14.00 deep from the
+      front to the rear of the housing, both drawing figures. The height is
+      estimated: 11.70 is dimensioned on the same axis as the 14.00 and 11.63 is
+      the end view's width, so the face height is read between them as 11.7. 12 power contacts, two rows of
       six on a 3.00 pitch (15.00 across the outer pair), four sense contacts on
       a 2.00 pitch (6.00 across the outer pair), the housing marked "H++".
     notes: >-

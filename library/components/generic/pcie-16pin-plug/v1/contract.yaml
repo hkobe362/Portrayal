@@ -12,7 +12,7 @@ description: >-
   diameter the cable-od field. The same housing serves 12VHPWR and 12V-2x6
   cables. It seats in a `pcie-12vhpwr` or `pcie-12v-2x6` header at its mate point.
 size: {w: 20.85, h: 11.7}
-size-confidence: {w: drawing, h: drawing}
+size-confidence: {w: drawing, h: estimated}
 attrs: {media: pcie-16pin, connector: pcie-16pin, pins: 16, pins-power: 12, pins-sense: 4}
 fields:
   cable-od: {label: Wire bundle diameter, type: number, unit: mm, default: 10.0}
@@ -20,10 +20,11 @@ fields:
 unplaced: seated by configurations downstream of this library; see docs/pluggables-design.md decision 2
 provenance:
   size: >-
-    drawing - registry `pcie-16pin-plug`. Molex customer drawing 2191140001-SD
-    rev A (2024-03-11), "PCIE CEM 5 12V2X6 RECEPTACLE HOUSING", part 2191140161:
-    20.85 across the front, 14.00 deep, 11.70 on the end view (the side view
-    reads 11.63 across the lower body). The housing is marked "H++".
+    drawing for the width, estimated for the height - registry `pcie-16pin-plug`.
+    Molex customer drawing 2191140001-SD rev A (2024-03-11), "PCIE CEM 5 12V2X6
+    RECEPTACLE HOUSING", part 2191140161: 20.85 across the front and 14.00 deep.
+    The 11.7 height is read between 11.70, dimensioned on the depth's axis, and
+    the end view's 11.63. The housing is marked "H++".
   no-depth: >-
     drawing - NO `size.d`, as on generic/c13-plug@1; the depth is carried by the
     relief.

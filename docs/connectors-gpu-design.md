@@ -49,14 +49,15 @@ Every figure is a transcription. Nothing is copied from a datasheet or a photogr
 
 | part | figure | source | confidence |
 |---|---|---|---|
-| `mini-fit-8-header`, `-plug` (EPS12V and PCIe 8-pin) | 12.6 across | NVIDIA A100 80GB PCIe brief PB-10577-001 v03, figure 7 | drawing |
+| `mini-fit-8-header`, `-plug` (EPS12V and PCIe 8-pin) | 12.6 across | NVIDIA A100 80GB PCIe brief PB-10577-001 v03, figure 7 | drawing (the registry entry as a whole is estimated, for the length) |
 | | 18.0 long | four 4.20 pitches and a wall; a distributor lists the Molex 39-01-2085 at 18 mm | estimated |
 | | 21.1 long (not used) | figure 7, the same housing; 3.1 more than 18.0, not reconciled | |
 | | 4.20 pitch, 9.0 A, 600 V | Molex Mini-Fit Jr. catalogue MX10 pp. E-57 to E-63 | datasheet |
 | | plug body 20.1, nose 9.9 | figure 7 | drawing; which is which is read from the picture |
 | | header cavity 9.9 | taken from the plug's nose | estimated |
-| | pins: EPS 4 x 12 V + 4 ground; PCIe 3 + 5 | figure 7's pin table | datasheet |
-| `pcie-16pin-plug` | 20.85 x 11.70, 14.00 deep | Molex customer drawing 2191140001-SD rev A (2024-03-11), part 2191140161, marked "H++" | drawing |
+| | pins: EPS 4 x 12 V + 4 ground; PCIe 3 + 5 | figure 7's pin table | drawing |
+| `pcie-16pin-plug` | 20.85 wide, 14.00 deep | Molex customer drawing 2191140001-SD rev A (2024-03-11), part 2191140161, marked "H++" | drawing |
+| | 11.7 high | read between the drawing's 11.70 (on the depth's axis) and 11.63 (the end view's width) | estimated |
 | | 12 power on 3.00 pitch, 4 sense on 2.00 | same | drawing |
 | `pcie-16pin-header` | opening 20.85 x 11.70 | the plug's own outline; no header drawing was readable | estimated |
 | | depth 9.0 | a guess, bounded by the plug's 14.00 | estimated |
@@ -132,17 +133,17 @@ The other cards:
 
 | card | connector | part to use |
 |---|---|---|
-| A100 40GB PCIe, A30, A40, A16 (coverage list) | CPU 8-pin | `std/eps12v-header@1` |
-| A10 | PCIe 8-pin | `std/pcie-8pin-header@1` |
+| A100 40GB PCIe, A30, A40, A16 | CPU 8-pin, per the staging notes of the A100 pilot; unchecked | `std/eps12v-header@1` |
+| A10 | PCIe 8-pin, same source; unchecked | `std/pcie-8pin-header@1` |
 | H100 PCIe, L40S, L40, H200 NVL, RTX PRO 6000 and 4500 Blackwell SE | 16-pin | `std/12vhpwr-header@1` or `std/12v-2x6-header@1`, by the card's brief |
 | A100 40GB PCIe | NVLink, 3 bridges | `nvidia/nvlink-a100-connector@1`, if the 40GB connectors match the 80GB's; unchecked |
 | A30, A40, H100 PCIe, H100 NVL, H200 NVL | NVLink | not these: each has its own bridge and no source says the connectors intermate |
 
 Which of 12VHPWR and 12V-2x6 each card has is not in the briefs held here for any
 of them (the briefs say "16-pin"). Read each brief's figure; a card built to CEM
-5.1 or later has 12V-2x6. The briefs for the L40S, L40, H100 and H200 are staged
-at `~/machine-queue/refs/` only for the A100, so the cards' connector facts are
-the coverage list's and are to be checked against the briefs.
+5.1 or later has 12V-2x6. Only the A100 brief was read for this change, so every
+other card's connector in the table is unchecked and is to be read from that
+card's NVIDIA brief before it is wired in.
 
 ## 8. Not done
 
