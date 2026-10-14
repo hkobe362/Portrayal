@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmv-dfds45u5w
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMV-DFDS45U5W
@@ -187,7 +187,8 @@ attrs:
     cable-capacity-basis: >-
       ESTIMATE, not stated by FS - Cat6 24AWG (6.1 mm), both channels. A channel cross-section of
       2 x (141.52 x 150.83) mm (42690.9 mm2) at 4.7 mm2 a cable, the figure FS's own Cat6
-      counts for the CMV-SFD45U5W and CMV-DFD45U5W imply, rounded down (see provenance `capacity`)
+      counts for the CMV-SFD45U5W and CMV-DFD45U5W imply, rounded down. That is FS's scale,
+      not a packing: 4.7 mm2 is a sixth of one cable's section (see provenance `capacity`)
     cable-capacity-media: cat6
     cable-capacity-estimated: true
   compliance:

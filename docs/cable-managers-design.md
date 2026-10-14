@@ -495,9 +495,11 @@ fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
 ## 15. An estimated count, where the maker states none
 
 (P-0027.) Eight FS managers state no cable capacity. A part that states none
-accepts a stored loop with a finding and counts nothing against it. Each now
-carries an **estimate**, so spare stored in it counts against a figure, and
-every place the figure is read says it is one.
+accepts a stored loop with a finding and counts nothing against it. Seven now
+carry an **estimate**, so spare stored in them counts against a figure, and
+every place the figure is read says it is one. The eighth, the CMH-DFDS1U, is
+left unstated: no side view is drawn, so its channel height is not read from
+any source.
 
 - **The mark.** `attrs.performance.cable-capacity-estimated: true`, beside a
   `cable-capacity` and a `cable-capacity-media`. `rack.json` carries
@@ -554,7 +556,13 @@ every place the figure is read says it is one.
   keeps `spare-capacity-unstated`.
 - **Not changed.** The USCMH-SFDABS1U, USCMH-SFDABS2U and USCMH-SFDABSB1U
   carry estimates made earlier on 39.9 mm2 a cable, with no kind and no mark:
-  they are shown and never compared, as before.
+  they are shown and never compared, as before. The USCMH-SFDABSB2U is on
+  47.7 mm2 because that is the figure FS's own counts give; on 39.9 it would be
+  223, not 186. Putting the four on one figure is a follow-up.
+- **The CMV-SFD42U9W depth is a choice.** Its channel floor is a 1.5 mm web,
+  so the depth runs from the web (149.6 mm); the 45U parts the figure is
+  calibrated on start at a solid 26.9 mm back plate. From this part's 37.2 mm
+  flanges the depth is 106.2 mm and the count 1421.
 
 ## Decisions taken
 

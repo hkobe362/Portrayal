@@ -16,13 +16,19 @@ DEVICES = {p.parent.name: yaml.safe_load(p.read_text()) for p in sorted(LIB.glob
 ESTIMATED = {n: d for n, d in DEVICES.items() if (d.get("attrs", {}).get("performance") or {}).get("cable-capacity-estimated")}
 
 # every FS cable manager with a duct and no count its maker states
-FS_NO_COUNT = {"cmh-sfds1u", "cmh-sfds2u", "cmh-dfds1u", "cmh-dfds2u", "cmv-sfd42u9w", "cmv-sfds45u5w", "cmv-dfds45u5w",
-               "uscmh-sfdabsb2u"}
+FS_NO_COUNT = {"cmh-sfds1u", "cmh-sfds2u", "cmh-dfds2u", "cmv-sfd42u9w", "cmv-sfds45u5w", "cmv-dfds45u5w", "uscmh-sfdabsb2u"}
+# its channel height rests on finger rows no drawing gives, so no cross-section is read: left unstated
+LEFT_UNSTATED = {"cmh-dfds1u"}
 
 
 def test_the_fs_ducts_that_state_no_count_carry_an_estimate():
     fs = {n for n, d in ESTIMATED.items() if d.get("manufacturer") == "FS.com"}
     assert fs == FS_NO_COUNT
+
+
+def test_a_duct_whose_cross_section_no_drawing_gives_states_nothing():
+    for n in LEFT_UNSTATED:
+        assert "cable-capacity" not in (DEVICES[n].get("attrs", {}).get("performance") or {})
 
 
 @pytest.mark.parametrize("name", sorted(ESTIMATED))

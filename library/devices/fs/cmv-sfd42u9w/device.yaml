@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmv-sfd42u9w
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: CMV-SFD42U9W
@@ -169,7 +169,10 @@ provenance:
       vertical counts are not a fill of the channel, and this one is as far from one. It
       puts this part beside its sisters on the same table. The 62.9 width rests on the
       walls this file estimates at 13 (provenance `guides`): 10 or 16 would move the count by
-      about 10 per cent. The count is of Cat6 24AWG and is marked as an estimate
+      about 10 per cent. The depth is taken from the 1.5 mm web, the floor of this channel,
+      to the cover plate; the 45U calibration parts start at a solid 26.9 mm back plate, and
+      measuring from this part's 37.2 mm channel flanges instead would give 106.2 mm deep and
+      a count of 1421. The count is of Cat6 24AWG and is marked as an estimate
       (`cable-capacity-estimated`).
   weight:
     confidence: datasheet
@@ -197,7 +200,9 @@ attrs:
     cable-capacity-basis: >-
       ESTIMATE, not stated by FS - Cat6 24AWG (6.1 mm). A channel cross-section of 62.9 x 149.6
       mm (9409.8 mm2) at 4.7 mm2 a cable, the figure FS's own Cat6 counts for the CMV-SFD45U5W
-      and CMV-DFD45U5W imply, rounded down (see provenance `capacity`)
+      and CMV-DFD45U5W imply, rounded down. That is FS's scale, not a packing: 4.7 mm2 is
+      a sixth of one cable's section. The width rests on estimated walls (see provenance
+      `capacity`)
     cable-capacity-media: cat6
     cable-capacity-estimated: true
   compliance:
