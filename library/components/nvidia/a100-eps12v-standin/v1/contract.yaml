@@ -23,9 +23,10 @@ provenance:
   size: >-
     photo-measured - IT Creations' photograph of the card's east end (575TK_5)
     at matched scale: the end face is 97.9 across (28.41 to 126.31 from the
-    bracket's tip, PB-10577 figure 3) and measures about 978 px between its
-    edges at the connector's height, which is 9.99 px/mm. The housing is 185 px
-    wide, 18.5 mm, and the 18.40 here is that, rounded. Its height is read down
+    bracket's tip, PB-10577 figure 3) and measures about 1068 px of the
+    3630 px photograph between its edges at the connector's height, which is
+    about 10.9 px/mm. The housing is about 203 px
+    wide, 18.6 mm, and the 18.40 here is that within the reading's error. Its height is read down
     the end face at the 4.2 mm cell pitch of two rows, about 10.9 mm, and
     is good to about 1 mm: the photograph is taken from above and the
     vertical scale is not known as the horizontal one is.
@@ -41,7 +42,7 @@ provenance:
     PENDING - the brief calls it a "CPU 8-pin" connector on the card's east
     edge (PB-10577 table 1 and figure 6). The library registers no interface for
     it on this branch. PR #1076 adds `eps12v-8pin` and `std/eps12v-header@1`;
-    the GPU batch replaces this part with that one, keeping the id `aux-power`
+    a later change replaces this part with that one, keeping the id `aux-power`
     where the tail face composes it.
 elements:
   opening: {at: [0.0, 0.0], size: [18.40, 10.90], class: bezel}

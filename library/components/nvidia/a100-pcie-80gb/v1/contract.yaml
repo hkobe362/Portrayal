@@ -180,26 +180,28 @@ provenance:
     photo-measured - PB-10577: "a CPU 8-pin power connector on the east edge of the
     board" (datasheet; the fact is one connector). Its place is IT Creations'
     575TK_5, the card's east end, at matched scale: the end face's 97.9 across is
-    about 978 px, 9.99 px/mm, and the housing is 185 px wide, 18.4 mm, from
+    about 1068 px of the 3630 px photograph, 10.9 px/mm, and the housing is about
+    203 px wide, 18.6 mm (18.4 is drawn, within the error), from
     105.6 to 124.0 on the card's x, 2.3 from the top edge, with its top flush with
     the cover's. The photograph is from above, so its height, 10.9 (y 3.5 to
     14.4), is read at the 4.2 mm cell pitch and is good to about 1 mm; the
     brief's figure 6 had given 9.9. The housing is BLACK on this card (the
     photograph); they are usually white and sometimes black. It is eight dark
-    cells in two rows of four in a housing standing 0.4 proud of the end plate.
+    cells in two rows of four in a housing standing 0.2 proud of the end plate, the
+    cells 0.4 (the step is estimated, see body-end).
     THE PORT is `aux-power` on the tail face (`faces.rear`, nvidia/a100-pcie-80gb-
     tail@1), a STAND-IN, nvidia/a100-eps12v-standin@1, which presents no
-    interface. PR #1076 adds `eps12v-8pin`; the GPU batch swaps the stand-in for
+    interface. PR #1076 adds `eps12v-8pin`; a later change swaps the stand-in for
     `std/eps12v-header@1` once it merges. The boxes below are its 3D body.
   body-end: >-
     estimated - the black end plate (backplate, board and cover) stops 0.4 short
-    of the shroud's lip and the connector housing stands 0.4 proud of it, so the
+    of the shroud's lip and the connector housing stands 0.2 proud of it, so the
     housing and the mount bosses are not buried in the plate's own boxes. The
     photograph does not show the step.
   body-tail-fins: >-
     photo-measured - the shroud is open at its far end, and 575TK_5 shows the heat
-    sink's fins edge-on behind it. 18 fins at a pitch of 5.0 (50.2 px at 9.99
-    px/mm): THE TAIL VIEW SHOWS OTHERWISE THAN THE 2.194 OF `body-ribs`, which is
+    sink's fins edge-on behind it. 18 fins at a pitch of 5.0 (about 55 px at 10.9
+    px/mm, 5.0 to 5.1): THE TAIL VIEW SHOWS OTHERWISE THAN THE 2.194 OF `body-ribs`, which is
     the shroud's outer rib pitch; the fins agree with the 5.0 of the 16 fins seen
     through the bracket's window (`face-grille`). The first is at x 31.25 on that
     window's grid. A fin is 0.8 thick and the wall round the opening 2.1 (both
@@ -207,8 +209,8 @@ provenance:
     photograph does not show how far they run in.
   body-extender-mount: >-
     estimated - the two bosses the extenders' thumbscrews fasten to, at the
-    card's x 35.3 and 64.1 and y 8.4: the screws in 575TK_5 are 28.8 apart at
-    matched scale, centred on the flange's width. 4.0 across, 0.4 proud of the end
+    card's x 35.3 and 64.1 and y 8.4: the screws in 575TK_5 are about 28.7 apart
+    at matched scale (313 px at 10.9 px/mm), centred on the flange's width. 4.0 across, 0.4 proud of the end
     plate, in zinc. NVIDIA's brief names the extenders and their lengths, not the
     screws. With no extender they show; with one the flange sits on them and its
     two knurled thumbscrew heads (7 across, from the photograph) stand on its
@@ -258,8 +260,10 @@ provenance:
     cover band, as 575TK_6 and 575TK_5 show it) are estimated. THE UPRIGHT IS
     FLAT, 1.2 THICK LIKE THE PLATE: 575TK_5 shows its strip as a thin sheet
     across the far end, not a channel, so it no longer stands 8.4 tall and
-    hides the power connector from behind (it did, as first drawn). Its height
-    was never measured; the broad side's photograph cannot show it. The flange
+    hides the power connector from behind (it did, as first drawn). Its place
+    across the card (y 9.6 to 10.8) is estimated, and as drawn it still crosses
+    the connector's lower row seen from straight behind, which the photograph,
+    taken from above, does not show. Its height was never measured; the broad side's photograph cannot show it. The flange
     that bolts to the card's end is estimated from 575TK_5.
   body-extender-long-offset: >-
     estimated - no photograph of the long offset extender was found. PB-10577
