@@ -1264,7 +1264,7 @@
       "items": {"$ref": "#/$defs/segment"},
       "minItems": 1,
       "uniqueItems": true,
-      "description": "THE SIBLING BAYS A CARD WIDER THAN ONE SLOT COVERS when it is seated here, in order along the card's component side (the bay's own +y, turned by its `rotate`). A card `slot-width: n` wide takes the first n - 1 of them, and each must hold nothing, after defaults resolve: a configuration that seats a two-slot card in `slot-1` also empties `slot-2`. Ids in this same `bays:` map only, so a card never spans two risers. Absent means a card seated here is one slot wide. docs/pcie-two-slot-bays-design.md; L185 holds the geometry, L186 the exclusion."
+      "description": "THE SIBLING BAYS A CARD WIDER THAN ONE SLOT COVERS when it is seated here, in order along the card's component side (the bay's own +y, turned by its `rotate`). A card `slot-width: n` wide takes the first n - 1 of them, and each must hold nothing, after defaults resolve: a configuration that seats a two-slot card in `slot-1` also empties `slot-2`. Ids in this same `bays:` map only, so a card never spans two risers. Absent means a card seated here is one slot wide. L185 holds the geometry, L186 the exclusion."
      }
     }
    }
@@ -1273,7 +1273,7 @@
    "type": "integer",
    "minimum": 1,
    "maximum": 4,
-   "description": "HOW MANY ADJACENT SLOTS THIS PART TAKES when it is seated in a bay: 2 for a dual-slot PCIe card (CEM figure 11-11), whose cooler covers the opening beside its own. Absent means 1. A bay seats it only if its `span` names enough siblings, and those siblings hold nothing while it is there. docs/pcie-two-slot-bays-design.md."
+   "description": "HOW MANY ADJACENT SLOTS THIS PART TAKES when it is seated in a bay: 2 for a dual-slot PCIe card (CEM figure 11-11), whose cooler covers the opening beside its own. Absent means 1. A bay seats it only if its `span` names enough siblings, and those siblings hold nothing while it is there."
   },
   "guide": {
    "type": "object",

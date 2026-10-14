@@ -1482,7 +1482,7 @@ export async function applyOverrides(rootEl, bays, overrides, loadSkin, isCurren
     if (!isCurrent(bay.id)) continue;         // a newer swap owns this bay
     g.querySelector(`[id="${CSS.escape(idBase)}--module"]`)?.remove();
     applied++;
-    markSpan(rootEl, bay, ref && loaded ? loaded.comp : null);
+    if (bay.span?.length) markSpan(rootEl, bay, ref && loaded ? loaded.comp : null);
     if (!ref) continue;                       // deliberately empty
     if (!loaded) continue;                    // unknown ref: leave the bay open
     g.appendChild(seatModule(rootEl.ownerDocument, bay.id, bay, ref,

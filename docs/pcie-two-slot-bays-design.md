@@ -1,9 +1,8 @@
 # Two-slot cards: a bay that a card can span
 
-Status: decided 2026-10-14, built with this note. The decision is option A:
-
-> "for the two slot bay I think we want to go with option A because I think
-> that's how it works in the real world"
+Status: decided 2026-10-14, built with this note. The decision is option A,
+in the maintainer's words: "for the two slot bay I think we want to go with
+option A", "because I think that's how it works in the real world".
 
 Option A: a bay can be spanned. A card seated in it covers the next bay too, the
 way a dual-slot GPU sits in a riser: it plugs into its own slot and its cooler
