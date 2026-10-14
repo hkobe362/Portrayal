@@ -9,7 +9,8 @@ description: >-
   NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card.
   The bracket face carries one vent window and no ports. Three NVLink bridge
   connectors sit on the top edge. One CPU 8-pin power connector sits on the far
-  end of the card.
+  end of the card. NVIDIA's straight or long offset extender can be fitted to
+  the far end; the `extender` field chooses it.
 unplaced: >-
   Nothing in the library seats a card two slots wide. Every riser bay is one
   slot, 120.02 x 21.59 on the 20.32 pitch, and a bay has no way to span its
@@ -35,6 +36,17 @@ attrs:
   weight-kg: 1.17
   eol: announced
   eol-announcement: 'https://onestopsystems.com/blogs/eol-notices/nvidia-hgx-a100-4-gpu-80gb-nvidia-pcie-a100-80gb-cowos-hbm2-and-nvidia-tesla-t4-passive-gpu-2560-cores'
+fields:
+  extender:
+    label: Extender
+    type: choice
+    options: [none, straight, long-offset]
+    default: none
+    drawn-by-absence: [none]
+    description: >-
+      The bracket at the card's far end that a server's card guide holds. The
+      straight one (NVPN 682-00007-5555-001) makes the card 312 mm long. The
+      long offset one (NVPN 682-00007-5555-000) makes it 339 mm.
 provenance:
   sources: >-
     NVIDIA A100 80GB PCIe Product Brief PB-10577-001_v03, March 2022, fetched
@@ -193,10 +205,67 @@ provenance:
     bridge is NVIDIA part 900-53651-0000-000. All three are needed.
   extenders: >-
     datasheet - PB-10577 "Extenders": a long offset extender (NVPN
-    682-00007-5555-000, card plus extender 339 mm) and a straight extender
-    (NVPN 682-00007-5555-001, 312 mm) bolt to the east edge. They are
-    accessories and are not drawn; IT Creations' photographs show a card with
-    the straight one fitted.
+    682-00007-5555-000, card plus extender 339 mm, 48 g) and a straight
+    extender (NVPN 682-00007-5555-001, 312 mm, 32 g) bolt to the east edge.
+    Figure 8 draws both. The `extender` field fits either, or none (the
+    default); the pieces are `when` boxes. IT Creations' photographs show a
+    card with the straight one fitted.
+  body-extender-straight: >-
+    photo-measured - IT Creations 575TK_7, the broad side straight on at 9.29
+    px/mm across and 9.33 along, shows the straight extender fitted. Its far
+    edge is put at 312, the brief's card-plus-extender length. Read off the
+    photo, it is 304. The extender lies at the board's depth, about 34 behind
+    the shroud face the scale was taken on, so perspective pulls it toward the
+    photo's centre. 575TK_7 puts the finger tab about 4 mm out the same way.
+    Corrected by that factor (0.958), the photo gives 311. The plate has three
+    slots 6.2 wide between four bars 4.5 wide, from the card's lower edge to
+    x 71.05. The upright is 15 wide (14.7 measured) and runs from x 28.41 to
+    123.3. The fillet between the plate and the upright is drawn as one step.
+    The plate's 1.2 thickness, its place across the card (y 9.6 to 10.8, the
+    cover band, as 575TK_6 and 575TK_5 show it) and the upright's 8.4 channel
+    depth are estimated. The flange that bolts to the card's end is estimated
+    from 575TK_5.
+  body-extender-long-offset: >-
+    estimated - no photograph of the long offset extender was found. PB-10577
+    figure 8 draws it beside the straight one: the same slotted plate and
+    mounting, a longer reach and a flat upright. Its far edge is the brief's
+    339. Its plate and upright are the straight one's, moved out to that
+    length. The offset its name refers to is not dimensioned anywhere held,
+    so the upright stays in the plate's plane.
+  body-top-edge: >-
+    photo-measured - the printing on the top edge, from IT Creations 575TK_6,
+    the top edge straight on at 9.83 px/mm (267.7 shroud length over 2632 px;
+    the black band and the champagne band come out 11.9 and 25.6 across,
+    against the contract's 12.6 and 25.6). "A100" is 1.8 tall, 2.9 to 8.6 behind the
+    bracket. "NVLINK" is 1.8 tall and centred under each cap. The photo shows
+    it under the first and third caps; glare hides the second, and PNY's
+    top render shows all three. The NVIDIA mark is not drawn: L172 reserves
+    its box as `logo-zone`, 230.5 to 239.5 behind the bracket. The word
+    "NVIDIA" beside it is plain text, 3.2 tall, 240.7 to 261.6. Every glyph is
+    drawn in-house in Arial, not traced. The caps in the drawing are the
+    contract's nvlink boxes. The photo puts them about 1.3 nearer the bracket
+    than PNY's render does, which is within this reading.
+  body-ribs: >-
+    photo-measured - the shroud's top edge is ribbed along its whole length.
+    On 575TK_6 at 9.83 px/mm, 124 grooves run on a 21.58 px pitch, which is
+    2.195. That is 122 ribs on the 267.7 shroud; the drawing uses 267.7 / 122,
+    2.194. The lower edge is ribbed too: 575TK_4 shows it and 575TK_7 shows
+    its scalloped outline. Its pitch is not measured and is taken as the top
+    edge's. The broad side is not ribbed.
+  body-broad-side: >-
+    estimated - 575TK_7 shows the broad side as a fine-grained matte finish,
+    a little lighter toward the lower edge (#8e8573 near the top edge, #a39988
+    near the lower edge, in that photo's light). It is drawn as faint streaks
+    along the card on that gradient. The grain is not measured.
+  body-bracket-foot: >-
+    photo-measured - below the card the bracket is the plate's two retention
+    tabs, and behind it a dark standoff. 575TK_7 shows the standoff 7.6 tall
+    from the card's lower edge and 2.4 along the card. Corrected for
+    perspective as the extender is, it sits 1.2 to 3.6 behind the bracket's
+    face. Its place across the card is estimated, at the board. The tabs are
+    the face outline's (skins/default.svg), 0.9 thick, which is estimated. A
+    flat plate seen from the side is still a line; the photo's wider foot is
+    the plate seen at an angle.
   lifecycle: >-
     One Stop Systems' end-of-life notice dated 24 January 2024 lists the
     NVIDIA PCIe A100 80GB: final order 26 April 2024, final ship from factory
@@ -211,15 +280,18 @@ body:
   plate: {at: [9.80, 4.10], size: [109.40, 35.90]}
   # x along the bracket from its tip, y across it from the keyed edge,
   # `from` back from the bracket's outer face.
+  # THE SIDES CARRY THE PART'S OWN DRAWINGS (`shows`): skins/body-right.svg is
+  # the top edge (the printing, the caps, the ribs), body-left.svg the
+  # shroud's ribbed lower edge and body-bottom.svg its broad side.
   boxes:
   - {id: board, at: [28.41, 4.44], size: [97.90, 1.57], from: 0.90, depth: 140.03,
-     color: '#1d2420', confidence: drawing,
+     color: '#1d2420', confidence: drawing, shows: [right],
      source: 'PB-10577 fig 3: lower edge W + 13.25, top edge W + 111.15, to the notch at 140.93; CEM 5.0: 1.57 board, 1.27 inside the bracket keyed edge'}
   - {id: board-notch, at: [31.96, 4.44], size: [94.35, 1.57], from: 140.93, depth: 19.50,
-     color: '#1d2420', confidence: drawing,
+     color: '#1d2420', confidence: drawing, shows: [right],
      source: 'PB-10577 fig 3: the notch, 3.55 REF deep and 19.50 REF long, 59.05 + 81.88 behind the bracket'}
   - {id: board-east, at: [28.41, 4.44], size: [97.90, 1.57], from: 160.43, depth: 108.17,
-     color: '#1d2420', confidence: drawing,
+     color: '#1d2420', confidence: drawing, shows: [right],
      source: 'PB-10577 fig 3: lower edge W + 13.25 again east of the notch, to the 268.60 end'}
   - {id: edge-tab-short, at: [15.16, 4.44], size: [13.25, 1.57], from: 46.90, depth: 11.20,
      color: '#1d2420', confidence: drawing,
@@ -234,44 +306,99 @@ body:
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0 fig 6-5: the x16 pad run on 1.00 pitch'}
   - {id: backplate, at: [28.41, 1.77], size: [97.90, 2.67], from: 0.90, depth: 140.03,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'PB-10577: backside clearance 2.67 from the rear PCB surface; IT Creations 575TK_8 shows a black plate over the rear'}
   - {id: backplate-notch, at: [31.96, 1.77], size: [94.35, 2.67], from: 140.93, depth: 19.50,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'as the backplate, inside the PB-10577 fig 3 notch'}
   - {id: backplate-east, at: [28.41, 1.77], size: [97.90, 2.67], from: 160.43, depth: 108.17,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'as the backplate, east of the notch'}
   - {id: cover, at: [28.41, 6.01], size: [97.90, 8.39], from: 0.90, depth: 140.03,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'PNY top render: the black band is 32 of the card''s 98 px, on the board side'}
   - {id: cover-notch, at: [31.96, 6.01], size: [94.35, 8.39], from: 140.93, depth: 19.50,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'as the cover, inside the PB-10577 fig 3 notch'}
   - {id: cover-east, at: [28.41, 6.01], size: [97.90, 8.39], from: 160.43, depth: 108.17,
-     color: '#202326', confidence: estimated,
+     color: '#202326', confidence: estimated, shows: [right],
      source: 'as the cover, east of the notch'}
   - {id: shroud, at: [28.41, 14.40], size: [97.90, 25.60], from: 0.90, depth: 140.03,
-     color: '#b8a68c', confidence: estimated,
-     source: 'thickness bounded at 38.2 (see provenance thickness); outline as the board; champagne finish from the photographs'}
+     color: '#b8a68c', confidence: estimated, shows: [right, left, bottom],
+     source: 'thickness bounded at 38.2 (see provenance thickness); outline as the board; champagne finish from the photographs; the sides are provenance body-ribs and body-broad-side'}
   - {id: shroud-notch, at: [31.96, 14.40], size: [94.35, 25.60], from: 140.93, depth: 19.50,
-     color: '#b8a68c', confidence: drawing,
+     color: '#b8a68c', confidence: drawing, shows: [right, left, bottom],
      source: 'PB-10577 fig 3 notch; IT Creations 575TK_7 shows it in the shroud outline at 145..160'}
   - {id: shroud-east, at: [28.41, 14.40], size: [97.90, 25.60], from: 160.43, depth: 108.17,
-     color: '#b8a68c', confidence: estimated,
+     color: '#b8a68c', confidence: estimated, shows: [right, left, bottom],
      source: 'as the shroud, east of the notch'}
   - {id: nvlink-1, at: [126.31, 2.20], size: [0.50, 6.60], from: 13.50, depth: 49.50,
-     color: '#2b2f33', confidence: estimated,
+     color: '#2b2f33', confidence: estimated, shows: [right],
      source: 'PNY top render at 2.555 px/mm: caps 49.5 long from 13.5, 6.6 wide; 0.5 proud is estimated'}
   - {id: nvlink-2, at: [126.31, 2.20], size: [0.50, 6.60], from: 70.70, depth: 49.50,
-     color: '#2b2f33', confidence: estimated,
+     color: '#2b2f33', confidence: estimated, shows: [right],
      source: 'PNY top render at 2.555 px/mm: the second cap from 70.7'}
   - {id: nvlink-3, at: [126.31, 2.20], size: [0.50, 6.60], from: 126.10, depth: 49.50,
-     color: '#2b2f33', confidence: estimated,
+     color: '#2b2f33', confidence: estimated, shows: [right],
      source: 'PNY top render at 2.555 px/mm: the third cap from 126.1'}
   - {id: power-8pin, at: [105.40, 6.01], size: [18.30, 9.90], from: 250.60, depth: 18.00,
      color: '#1a1a1a', confidence: estimated,
      source: 'PB-10577 fig 6: CPU 8-pin at the top of the east end, 2 x 4 receptacle about 18.3 x 9.9; face flush with the 268.60 end'}
+  # THE BRACKET'S FOOT below the card (provenance body-bracket-foot)
+  - {id: bracket-tab-1, at: [0.00, 7.40], size: [7.27, 9.80], from: 0.30, depth: 0.90,
+     color: '#9aa1a8', confidence: estimated,
+     source: 'the retention tab of skins/default.svg; 0.9 thick, estimated'}
+  - {id: bracket-tab-2, at: [0.00, 27.90], size: [7.27, 9.70], from: 0.30, depth: 0.90,
+     color: '#9aa1a8', confidence: estimated,
+     source: 'the second retention tab of skins/default.svg; 0.9 thick, estimated'}
+  - {id: bracket-standoff, at: [20.80, 2.00], size: [7.61, 2.40], from: 1.20, depth: 2.40,
+     color: '#26292c', confidence: photo-measured,
+     source: 'IT Creations 575TK_7: 7.6 below the lower edge, 2.4 along the card, 1.2..3.6 behind the face after the perspective correction; y estimated'}
+  # THE EXTENDERS, fitted by the `extender` field (provenance
+  # body-extender-straight and body-extender-long-offset). x from the card's
+  # lower edge (28.41) up; the plate is four bars with three slots between.
+  - {id: ext-straight-flange, at: [28.41, 6.01], size: [42.64, 4.79], from: 268.60, depth: 1.20,
+     color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
+     source: 'the bent flange that bolts to the card end, from IT Creations 575TK_5; size estimated'}
+  - {id: ext-straight-bar-1, at: [60.38, 9.60], size: [10.67, 1.20], from: 268.60, depth: 28.40,
+     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7, perspective-corrected: the top bar, x 60.38..71.05, to the upright at 297.0'}
+  - {id: ext-straight-bar-2, at: [49.69, 9.60], size: [4.50, 1.20], from: 268.60, depth: 28.40,
+     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: the bar between the first and second slots, x 49.69..54.19'}
+  - {id: ext-straight-bar-3, at: [39.03, 9.60], size: [4.50, 1.20], from: 268.60, depth: 28.40,
+     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: the bar between the second and third slots, x 39.03..43.53'}
+  - {id: ext-straight-bar-4, at: [28.41, 9.60], size: [4.44, 1.20], from: 268.60, depth: 28.40,
+     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: the bottom bar, from the card''s lower edge to 32.85'}
+  - {id: ext-straight-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 288.00, depth: 9.00,
+     color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: the fillet into the upright, drawn as one step'}
+  - {id: ext-straight-upright, at: [28.41, 6.01], size: [94.89, 8.39], from: 297.00, depth: 15.00,
+     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: 14.7 wide, x 28.41..123.3; far edge at 312, PB-10577; channel depth estimated'}
+  - {id: ext-long-flange, at: [28.41, 6.01], size: [42.64, 4.79], from: 268.60, depth: 1.20,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s flange; PB-10577 fig 8 draws the same mounting'}
+  - {id: ext-long-bar-1, at: [60.38, 9.60], size: [10.67, 1.20], from: 268.60, depth: 55.40,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'the straight extender''s top bar, run out to the upright at 324.0'}
+  - {id: ext-long-bar-2, at: [49.69, 9.60], size: [4.50, 1.20], from: 268.60, depth: 55.40,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s second bar, run out to 324.0'}
+  - {id: ext-long-bar-3, at: [39.03, 9.60], size: [4.50, 1.20], from: 268.60, depth: 55.40,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s third bar, run out to 324.0'}
+  - {id: ext-long-bar-4, at: [28.41, 9.60], size: [4.44, 1.20], from: 268.60, depth: 55.40,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s bottom bar, run out to 324.0'}
+  - {id: ext-long-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 315.00, depth: 9.00,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'as the straight extender''s fillet'}
+  - {id: ext-long-upright, at: [28.41, 6.01], size: [94.89, 8.39], from: 324.00, depth: 15.00,
+     color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
+     source: 'far edge at 339, PB-10577 "card + extender"; the upright is the straight one''s, PB-10577 fig 8'}
 elements:
   grille: {at: [29.80, 9.90], size: [87.80, 29.40], class: bezel}
   vent: {at: [31.20, 11.80], size: [84.60, 25.80], class: vent}

@@ -674,6 +674,16 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.35.0: a body piece carries a side drawing, and a fitted piece follows its field.**
+A piece in `body.boxes` that `shows: [left|right|top|bottom]` is painted on that side with the patch
+of the part's own `body-<side>.svg` it lies under (`pieceArtCrop` in `relief.js` gives the frames;
+`components.json` publishes each drawing under `body.drawings` with its viewBox origin as `at`).
+A piece with `when: {field: [options]}` is built only while the part's drawing shows a node for one
+of those options (`pieceFitted`, `shownOptions`), so `setFields` on the part's path fits or removes
+it, and the scene is rebuilt as for any field that shows a node. `svgCanvas` takes an optional
+density, `pxmm`. A page that does neither changes nothing. `kit/component.html` opens one component
+in the 3D viewer with camera presets and its choice fields.
+
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:

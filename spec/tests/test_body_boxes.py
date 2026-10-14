@@ -76,6 +76,109 @@ def test_a_piece_can_be_round_and_can_show_the_part_s_own_drawing():
     assert set(out["demoted"]) == {"id", "x", "y", "w", "h", "z0", "z1", "color"}
 
 
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
+def test_a_piece_carries_the_patch_of_a_side_drawing_it_lies_under():
+    """A GPU's top edge is printed and its shroud is ribbed, and a body piece
+    was a colour. A box now carries the patch of the part's own
+    body-<side>.svg it lies under, in the frame the one-box body reads that
+    drawing in, from a viewBox that need not start at zero."""
+    script = SPEC / "tests/js/body-boxes.mjs"
+    p = subprocess.run(["node", str(script)], capture_output=True, text=True, cwd=str(script.parent))
+    assert p.returncode == 0, p.stderr
+    s = json.loads(p.stdout.strip().splitlines()[-1])["sides"]
+    # the top edge: across is mm behind the face, down the face's y
+    assert s["rightFrontTop"] == [0.9, 14.4] and s["rightBackBottom"] == [140.93, 40]
+    # the lower edge: across from the far end, 268.6 - 140.93
+    assert s["leftBackTop"] == [127.67, 14.4]
+    # the top: across the face's x, down from the far end
+    assert s["topFrontLeft"] == [28.41, 267.7]
+    # the broad side: across from the face's width, 120.02 - 28.41, and the
+    # top edge at 126.31 lands at -6.29, inside the drawing's own origin
+    assert s["bottomBackLeft"] == [91.61, 127.67] and s["bottomFrontRight"] == [-6.29, 267.7]
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
+def test_a_fitted_piece_stands_while_its_option_is_shown():
+    """An extender bolted to a card's far end is a choice. The piece stands
+    while the part's drawing shows a node for its option, which a
+    configuration and a viewer both settle; hidden nodes show nothing, and a
+    piece turned plain keeps its `when`."""
+    script = SPEC / "tests/js/body-boxes.mjs"
+    p = subprocess.run(["node", str(script)], capture_output=True, text=True, cwd=str(script.parent))
+    assert p.returncode == 0, p.stderr
+    out = json.loads(p.stdout.strip().splitlines()[-1])
+    assert out["fitted"] == [True, False, False, True, False]
+    assert out["keptWhen"]["when"] == {"extender": ["straight"]} and "shows" not in out["keptWhen"]
+    assert out["shown"] == {"card": {"extender": ["straight"]},
+                            "riser/module/slot-1/module": {"extender": ["long-offset"]}}
+
+
+def _sided(tmp_path, box, svg=None, side="right"):
+    """A part in tmp_path with one box and, unless `svg` is None, a side drawing."""
+    (tmp_path / "skins").mkdir(exist_ok=True)
+    if svg is not None:
+        (tmp_path / "skins" / f"body-{side}.svg").write_text(svg)
+    return tmp_path / "contract.yaml", {
+        "size": {"w": 120.0, "h": 40.0, "d": 200.0},
+        "body": {"depth": 200.0, "boxes": [{"id": "b", "at": [10, 5], "size": [100, 30],
+                                            "from": 0, "depth": 200.0,
+                                            "confidence": "estimated", **box}]}}
+
+
+def test_a_shown_side_is_drawn_and_covers_the_piece(tmp_path):
+    run = lambda p, d: _caught("L71", lint.lint_component_body_boxes, p, d)
+    svg = lambda vb, w, h: (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}mm" '
+                            f'height="{h}mm" viewBox="{vb}"/>')
+    # the right side of a box 0..200 deep, y 5..35, inside a 0 0 200 40 drawing
+    assert not run(*_sided(tmp_path, {"shows": ["right"]}, svg("0 0 200 40", 200, 40)))
+    undrawn = tmp_path / "undrawn"
+    undrawn.mkdir()
+    assert any("there is no skins/body-right.svg" in m
+               for m in run(*_sided(undrawn, {"shows": ["right"]})))
+    assert any("viewBox covers" in m for m in
+               run(*_sided(tmp_path, {"shows": ["right"]}, svg("0 10 200 30", 200, 30))))
+    assert any("state it as 40mm" in m for m in
+               run(*_sided(tmp_path, {"shows": ["right"]}, svg("0 0 200 40", 200, 45))))
+    assert any("no viewBox" in m for m in
+               run(*_sided(tmp_path, {"shows": ["right"]}, '<svg xmlns="http://www.w3.org/2000/svg"/>')))
+    # the bottom is measured from the face's width: 120 - 110 .. 120 - 10
+    assert not run(*_sided(tmp_path, {"shows": ["bottom"]}, svg("10 0 100 200", 100, 200), "bottom"))
+    assert any("viewBox covers" in m for m in
+               run(*_sided(tmp_path, {"shows": ["bottom"]}, svg("0 0 100 200", 100, 200), "bottom")))
+    assert any("both `plan` and `top`" in m for m in
+               run(*_sided(tmp_path, {"shows": ["plan", "top"]}, svg("10 0 100 200", 100, 200), "top")))
+
+
+def test_a_fitted_piece_may_reach_past_the_bare_part():
+    part = {"size": {"w": 100.0, "h": 40.0, "d": 200.0},
+            "body": {"depth": 200.0, "boxes": [
+                {"id": "ext", "at": [0, 0], "size": [10, 10], "from": 200.0, "depth": 40.0,
+                 "confidence": "estimated", "when": {"extender": ["straight"]}}]}}
+    assert not _caught("L71", lint.lint_component_body_boxes, pathlib.Path("x.yaml"), part)
+    del part["body"]["boxes"][0]["when"]
+    assert _caught("L71", lint.lint_component_body_boxes, pathlib.Path("x.yaml"), part)
+
+
+def test_a_fitted_piece_names_a_choice_the_drawing_can_show(tmp_path):
+    (tmp_path / "skins").mkdir()
+    skin = tmp_path / "skins" / "default.svg"
+    part = lambda when, field=None: {
+        "skins": ["default"],
+        "fields": {"extender": field or {"type": "choice", "options": ["none", "straight", "long"],
+                                         "drawn-by-absence": ["none"]}},
+        "body": {"depth": 10, "boxes": [{"id": "ext", "at": [0, 0], "size": [1, 1],
+                                         "depth": 1, "when": when}]}}
+    run = lambda d: _caught("L148", lint.lint_component_fitted_pieces, tmp_path / "contract.yaml", d)
+    skin.write_text('<svg xmlns="http://www.w3.org/2000/svg">'
+                    '<g data-show-from="extender" data-show="straight" display="none"/></svg>')
+    assert not run(part({"extender": ["straight"]}))
+    assert any("not an option" in m for m in run(part({"extender": ["sideways"]})))
+    assert any("not a choice" in m for m in run(part({"colour": ["red"]})))
+    assert any("not a choice" in m for m in run(part({"extender": ["straight"]}, {"type": "text"})))
+    hits = run(part({"extender": ["long"]}))
+    assert hits and "never built" in hits[0], hits
+
+
 def test_a_round_piece_says_how_it_stands_and_a_shown_drawing_exists():
     def part(box, faces=None):
         d = {"size": {"w": 100.0, "h": 20.0, "d": 100.0},
