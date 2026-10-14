@@ -2123,13 +2123,30 @@ export function opticBody({behaviour, body, depth, w, h} = {}) {
 export function nodeTools(svg, {back = false} = {}) {
   const q = sel => [...svg.querySelectorAll(sel)].filter(el => !el.closest('[data-projection]'));
   const inv = svg.getScreenCTM().inverse();
+  // ONE MATRIX AND ONE BOX PER ELEMENT, asked of the document once. An
+  // extraction asks for the same node's several times over (a cavity's rect,
+  // its group's, the art of each, a tilted part's frame), and every ask walks
+  // the node's ancestors again. Kept for the life of these tools, so the
+  // caller does not change the drawing's layout while it uses them: the
+  // extraction moves nothing until it has read everything, and lamps.js reads
+  // a document it has just opened.
+  const ctms = new Map(), rects = new Map();
+  const ctmOf = el => {
+    let m = ctms.get(el);
+    if (!m) ctms.set(el, m = inv.multiply(el.getScreenCTM()));
+    return m;
+  };
   const mmRect = el => {
-    const b = el.getBBox();
-    const m = inv.multiply(el.getScreenCTM());
-    const pts = [[b.x, b.y], [b.x + b.width, b.y + b.height]]
-      .map(([x, y]) => ({x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f}));
-    const x0 = Math.min(pts[0].x, pts[1].x), y0 = Math.min(pts[0].y, pts[1].y);
-    return {x: x0, y: y0, w: Math.abs(pts[1].x - pts[0].x), h: Math.abs(pts[1].y - pts[0].y)};
+    let r = rects.get(el);
+    if (!r) {
+      const b = el.getBBox();
+      const m = ctmOf(el);
+      const pts = [[b.x, b.y], [b.x + b.width, b.y + b.height]]
+        .map(([x, y]) => ({x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f}));
+      const x0 = Math.min(pts[0].x, pts[1].x), y0 = Math.min(pts[0].y, pts[1].y);
+      rects.set(el, r = {x: x0, y: y0, w: Math.abs(pts[1].x - pts[0].x), h: Math.abs(pts[1].y - pts[0].y)});
+    }
+    return {...r};
   };
   const shared = [...q('style, defs')].map(n => n.outerHTML).join('');
   // HOW FAR OFF THE FACE A FEATURE STARTS, summed up the ANCESTOR CHAIN.
@@ -2240,7 +2257,7 @@ export function nodeTools(svg, {back = false} = {}) {
   // card's own art leaves out the optics seated on it, which are FRUs of their
   // own (bodyRole) and cut their own plane.
   const nodeSvg = (el, rect, hide = null) => {
-    const m = inv.multiply(el.getScreenCTM());
+    const m = ctmOf(el);
     const clone = el.cloneNode(true);
     clone.removeAttribute('transform');   // the CTM below already includes it
     // raised descendants (collars, handles) render as their own geometry -
@@ -2255,7 +2272,7 @@ export function nodeTools(svg, {back = false} = {}) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rect.w} ${rect.h}"` +
       ` width="${rect.w}mm" height="${rect.h}mm">${shared}<!--art-->` + live + `</svg>`;
   };
-  return {inv, mmRect, shared, liftOf, ownerOf, scopeWrap, nodeSvg};
+  return {inv, ctmOf, mmRect, shared, liftOf, ownerOf, scopeWrap, nodeSvg};
 }
 
 // standards-relief extraction: cavities (with interior features) + outward protrusions.
@@ -2321,7 +2338,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
   // never rebuild to show it (#874).
   markPositionFields(svg);
   for (const el of [...q('[data-show-from][display="none"]')]) el.remove();
-  const {inv, mmRect, shared, liftOf, ownerOf, nodeSvg} = nodeTools(svg, {back});
+  const {ctmOf, mmRect, shared, liftOf, ownerOf, nodeSvg} = nodeTools(svg, {back});
   // TILTED FACETS (docs/tilted-facets-design.md).
   // A node under a `[data-tilt-on]` group is measured foreshortened; it is
   // unprojected here to its true size about its part's anchor, and the builder
@@ -2329,8 +2346,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
   // drawing with no facets.
   // Lifts inside a tilted part are measured from the plane the part sits on,
   // which is the facet (tiltTools' `base`).
-  const {facetInfo, tiltRec} = tiltTools(svg, {mmRect, liftOf,
-                                               ctmOf: n => inv.multiply(n.getScreenCTM())});
+  const {facetInfo, tiltRec} = tiltTools(svg, {mmRect, liftOf, ctmOf});
   // `proj` keeps the front-view rect: rasters, crops and punches are cut from
   // the face art at it, while geometry takes the true rect.
   const tilted = (e, t) => {
@@ -2370,7 +2386,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
     return hit;
   };
   const ringsOf = (el, stepMm = RING_STEP) => {
-    const m = inv.multiply(el.getScreenCTM());
+    const m = ctmOf(el);
     const paths = el.tagName === 'path' ? [el] : [...el.querySelectorAll('path')];
     const rings = [];
     for (const q of paths) {
@@ -2647,7 +2663,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
     if (role.sub) {
       // the body index lives with the builder; every nested module is
       // recorded here and the builder keeps the ones that declare boxes
-      const m = inv.multiply(el.getScreenCTM());
+      const m = ctmOf(el);
       subBodies.push({path: full, owner: path, ref: el.dataset.ref.split(':')[0], lift: liftOf(el),
                       toFace: {a: m.a, b: m.b, c: m.c, d: m.d, e: m.e, f: m.f}});
       // on a facet: its boxes are unprojected and built in the tilt frame
@@ -2703,7 +2719,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
                // placed from the bbox stood that far out through the chassis
                // wall. This is local mm -> face mm, mirror included, so a box
                // in the contract's frame lands where the contract says.
-               toFace: (() => { const m = inv.multiply(el.getScreenCTM());
+               toFace: (() => { const m = ctmOf(el);
                                 return {a: m.a, b: m.b, c: m.c, d: m.d, e: m.e, f: m.f}; })()});
     // AN OPTIC IN A TILTED CAGE IS TILTED WITH IT. render.py copies the tilt
     // onto the occupant; a seat without it takes its mate-to host's.
@@ -2759,6 +2775,15 @@ export function recolourBody(derived, mats, cv) {
   return c;
 }
 
+// A raster of the caller's own, which it may draw on. `rasterSource` is the
+// kept one itself, for a caller that only draws FROM it: a punch, a mask, a
+// crop, a part laid on another raster.
+export function rasterSource(svgText, wmm, hmm, pxmm = PXMM, flipX = false, flipY = false) {
+  return _rasterShared(svgText, Math.max(1, Math.round(wmm * pxmm)), Math.max(1, Math.round(hmm * pxmm)),
+                       flipX, flipY);
+}
+// ITS CONTEXT IS LEFT FLIPPED, as it always was: a punch drawn into a mirrored
+// face at drawing coordinates lands where the mirrored art put the part.
 export async function rasterize(svgText, wmm, hmm, pxmm = PXMM, flipX = false, flipY = false) {
   const cv = _copyOf(await rasterSource(svgText, wmm, hmm, pxmm, flipX, flipY));
   const ctx = cv.getContext('2d');
@@ -2769,15 +2794,6 @@ export async function rasterize(svgText, wmm, hmm, pxmm = PXMM, flipX = false, f
 
 // six-sided FRU body: same art the component tab shows, reused inside the device
 
-// A raster of the caller's own, which it may draw on. `rasterSource` is the
-// kept one itself, for a caller that only draws FROM it: a punch, a mask, a
-// crop, a part laid on another raster.
-export function rasterSource(svgText, wmm, hmm, pxmm = PXMM, flipX = false, flipY = false) {
-  return _rasterShared(svgText, Math.max(1, Math.round(wmm * pxmm)), Math.max(1, Math.round(hmm * pxmm)),
-                       flipX, flipY);
-}
-// ITS CONTEXT IS LEFT FLIPPED, as it always was: a punch drawn into a mirrored
-// face at drawing coordinates lands where the mirrored art put the part.
 // THE VENTS OF A FACE, ON THE WELL WALL BEHIND IT. Run once every face has
 // been built: `wells` and `apertures` are what buildFaceRelief recorded into
 // its ctx, `frames` a faceFrame per view. A side of a well that lies against
@@ -2826,22 +2842,6 @@ export async function ventWellWalls({wells = [], apertures = {}, frames = {}, sc
   return done;
 }
 
-// Build the relief geometry for one face: the recesses, raised parts, domes,
-// vents and FRU sub-groups a compiled face describes. Returns nothing - it
-// fills the collections the caller owns, because a device viewer wants these
-// parented per instance while a rack viewer wants them built once per model.
-export async function buildFaceRelief(F, ctx) {
-  const {src, faceCv, faceSvg, facePunch, meshes,
-         FRU_GROUPS, FRU_META, BODY_META, D, bodyBoxMesh} = ctx;
-  const pieceTex = new Map();   // one texture per drawing, for this build of this face (pieceArt)
-    // HOW FAR INTO THE BOX THIS FACE LOOKS, which is not the same number on every
-    // face and was the device's DEPTH on all of them. Depth is right for front and
-    // rear and wrong for the other four: into a top or a bottom you go the chassis
-    // HEIGHT, into a side its WIDTH. Nothing caught it because the parts on those
-    // faces are shallow - a ground lug does not test a depth clamp - but on a 1U
-    // server, H 44 and D 700, a top-face cavity was free to sink 698 mm into a
-    // 44 mm box and come out of the underside. Falls back to D so a caller that
-    // has not been taught the difference behaves exactly as before.
 // ── A FACE IS DRAWN IN BATCHES ───────────────────────────────────────────────
 // Every cage, pin, latch and wall above is a mesh of its own, most with
 // materials of their own, and each mesh is a draw call for every material it
@@ -3098,6 +3098,22 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
   return {before, after};
 }
 
+// Build the relief geometry for one face: the recesses, raised parts, domes,
+// vents and FRU sub-groups a compiled face describes. Returns nothing - it
+// fills the collections the caller owns, because a device viewer wants these
+// parented per instance while a rack viewer wants them built once per model.
+export async function buildFaceRelief(F, ctx) {
+  const {src, faceCv, faceSvg, facePunch, meshes,
+         FRU_GROUPS, FRU_META, BODY_META, D, bodyBoxMesh} = ctx;
+  const pieceTex = new Map();   // one texture per drawing, for this build of this face (pieceArt)
+    // HOW FAR INTO THE BOX THIS FACE LOOKS, which is not the same number on every
+    // face and was the device's DEPTH on all of them. Depth is right for front and
+    // rear and wrong for the other four: into a top or a bottom you go the chassis
+    // HEIGHT, into a side its WIDTH. Nothing caught it because the parts on those
+    // faces are shallow - a ground lug does not test a depth clamp - but on a 1U
+    // server, H 44 and D 700, a top-face cavity was free to sink 698 mm into a
+    // 44 mm box and come out of the underside. Falls back to D so a caller that
+    // has not been taught the difference behaves exactly as before.
     const INTO = ctx.deep ?? D;
     // THE ONE THAT WAS MISSED LAST TIME read through ctx and named no scope, and
     // resolved against the default while looking like a rendering fault. Read the
@@ -3119,6 +3135,12 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
     // `anim` - the material and its mm size - is what lets the viewer redraw
     // the same texture at several instants of a CSS animation (see lamps.js)
     const reg = (svgText, run, anim = null) => { if (svgText) restyle.push({svgText, run, anim}); };
+    // what a restyle will change, kept whole by the batch pass; with no
+    // `ctx.restyle` nothing ever runs a restyle, so nothing is live
+    const live = new Set();
+    const liveMat = (...ms) => { if (ctx.restyle) for (const m of ms) if (m) live.add(m); };
+    // and the meshes something holds on to after the build
+    const held = new Set();
     // `let`, because the drawing may state a different size below and a face
     // is drawn at its own size rather than at its plane's.
     let fw = F.fw(), fh = F.fh();
@@ -3135,12 +3157,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       return;
     }
     const {cavities, outs, domes, vents, apertures = [], frus, subBodies = [], flatLifted = [],
-    // what a restyle will change, kept whole by the batch pass; with no
-    // `ctx.restyle` nothing ever runs a restyle, so nothing is live
-    const live = new Set();
-    const liveMat = (...ms) => { if (ctx.restyle) for (const m of ms) if (m) live.add(m); };
-    // and the meshes something holds on to after the build
-    const held = new Set();
            cleanText} = await extractRelief(src, ctx.scope, {back: !!ctx.back});
     if (ctx.apertures) ctx.apertures[F.view] = apertures;
     // A MODULE PREVIEW IS THE PART'S SIZE BOX HERE. A part that declares
@@ -3374,6 +3390,8 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       // shows that face's vents (ventWellWalls, once every face is read)
       if (walls && ctx.wells && c.wallsInside && !c.rings && !c.round && !c.tilt) {
         ctx.wells.push({view: F.view, mesh: walls, well: c, d});
+        held.add(walls);
+      }
       if (!shell.floor) continue;
       // textured floor: the aperture art, pushed to the back of the recess
       const floor = new THREE.Mesh(new THREE.PlaneGeometry(c.w, c.h),
@@ -3385,13 +3403,12 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       // one raster feeds the floor and every raised feature standing in it, so
       // they are redrawn together from the one group svg they were cut from
       const floorMat = floor.material;
+      liveMat(floorMat);
       reg(c.grpSvg, async text => {
         const g2 = await rasterSource(text, c.grpRect.w, c.grpRect.h, PX);
         // the facet clear is REAPPLIED: a restyle re-cuts the floor from the art
         remap(floorMat, clearFloor(shapeFloor(
           crop(g2, {x: pc.x - c.grpRect.x, y: pc.y - c.grpRect.y, w: pc.w, h: pc.h}, PX)),
-        held.add(walls);
-      }
           floorClears, pc.x, pc.y, PX));
         for (const ft of cavCrops) {
           const pf = projOf(ft);
@@ -3403,7 +3420,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       const maxSink = Math.max(0, ...c.features.filter(f => f.kind === 'sink').map(f => f.val));
       // ...and the closed back, 0.25 behind the floor, is cleared under a sunk
       // facet the same way, or it is the plane that crosses the cage wells
-      liveMat(floorMat);
       // (and a shaped cavity's back is its outline, as its floor is)
       if (floorClears.length || cavCv) {
         const acv = document.createElement('canvas');
@@ -3425,6 +3441,7 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
           const mats = sideMats(ft.color);
           mats[4] = new THREE.MeshBasicMaterial({map: canvasTex(ft.faceCv)});
           ft.mat = mats[4];
+          liveMat(ft.mat);
           let m;
           if (ft.round) {
             // CylinderGeometry's materials are [side, +Y cap, -Y cap] and it stands
@@ -3441,7 +3458,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
         } else {   // sink: a deeper pocket beyond the floor
           const mat = new THREE.MeshLambertMaterial({color: ft.color, side: THREE.DoubleSide});
           let m;
-          liveMat(ft.mat);
           if (ft.round) {
             m = new THREE.Mesh(new THREE.CylinderGeometry(ft.w / 2, ft.w / 2, ft.val, 24), mat);
             m.rotation.x = Math.PI / 2;
@@ -3488,6 +3504,7 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       m.scale.set(dm.w, dm.h, dm.dome + 0.15);
       m.position.set(LX(dm.x, dm.w), LY(dm.y, dm.h), (dm.lift || 0) - 0.15);
       addTo(m);
+      liveMat(m.material);
       reg(dm.svgText, async text => remap(m.material, await rasterize(text, dm.w, dm.h, PX)),
           {mat: m.material, w: dm.w, h: dm.h, path: dm.owner});
     }
@@ -3504,7 +3521,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
         facePunch[F.view].push(fp);
       }
       // A FACET'S SURFACE CARRIES THE PARTS ON IT. Its own art is the first
-      liveMat(m.material);
       // layer and the parts' art goes over it at their front-view rects; each
       // is a text a restyle can change, so each has a slot (see `reg` below).
       const facetTexts = o.facet && o.parts && o.parts.length
@@ -3872,6 +3888,7 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
         m.position.set(LX(o.x, o.w), LY(o.y, o.h), o.lift + depth / 2);
         addTo(m);
       }
+      liveMat(faceTex, ...bodyMats);
     }
     curOwner = null;
     curTilt = null;
@@ -3888,7 +3905,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       // is the size of the whole slot - so cropping `cv` gave the module an
       // empty plane: adapters floating in front of an open passage and no
       // faceplate. Cut from the pristine art instead, and re-open only the
-      liveMat(faceTex, ...bodyMats);
       // module's own cavities (the mouth is the bay's hole, not the module's).
       // A TILTED MODULE (an optic in a cage on a facet) is cut from the face at
       // its front-view rect `pf`, and its plane and body take its true size,
@@ -3950,6 +3966,7 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
         new THREE.MeshBasicMaterial({map: canvasTex(faceCrop), transparent: true, alphaTest: 0.1, alphaToCoverage: true}));
       plane.position.set(LX(f.x, f.w), LY(f.y, f.h), zf + 0.3);
       fg.add(plane);
+      liveMat(plane.material, opticMat);
       // A FIELD OR A STATE WRITTEN ON A MODULE REPAINTS ITS PLANE. The crop above
       // is a one-time cut of the face canvas, so a wattage written on a supply
       // after the build changed the face texture and left the supply's own
@@ -3966,7 +3983,6 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
       // size of the whole slot, and replaying it here cut the entire faceplate
       // out of every module seated in an open-backed bay.
       // (a tilted module, like a lifted one, replays none: its holes are `bores`)
-      liveMat(plane.material, opticMat);
       const punchesHere = f.lift || f.tilt ? [] : facePunch[F.view].filter(p => !p.mouth &&
         p.x < pf.x + pf.w && p.x + p.w > pf.x && p.y < pf.y + pf.h && p.y + p.h > pf.y);
       reg(f.svgText, async text => {
@@ -4138,8 +4154,8 @@ export function batchRelief(root, {anchors = new Set(), keep = new Set(), live =
     plane.position.set(LX(beyond.x, beyond.w), LY(beyond.y, beyond.h), 0.02);
     grp.add(plane);
   }
-  meshes.push(grp);
-}
   if (ctx.batch !== false)
     batchRelief(grp, {anchors: new Set(Object.values(fruGroups)), keep: held, live,
                       parts: typeof ctx.parts === 'function' ? ctx.parts : null});
+  meshes.push(grp);
+}
