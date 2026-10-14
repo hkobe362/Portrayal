@@ -15,3 +15,5 @@
   of the wall at the mouth to 1.4 at its far end. To say it, a relief feature that
   declares `profile` or `profile-y` may now have a negative `lift`, which starts
   it behind the face (component.schema.json). Nothing else in the library does.
+  The ramp's node stands outside the skin's outline, so the 2D drawing no longer
+  shows it; it is a side-wall feature.
