@@ -149,8 +149,9 @@ provenance:
     of the thickness nearest the board: PNY's top render gives 32 of 98 px
     black. The black backplate covers the rear of the board (IT Creations
     575TK_8). The shroud follows the board's outline, notch included. The
-    cover and the backplate are each one box, from the board's lower edge to
-    its top edge, the card's length deep.
+    cover and the backplate are each three boxes, split at the notch as the
+    board is, from the board's lower edge to its top edge, the card's length
+    deep.
   body-nvlink: >-
     photo-measured - three NVLink bridge connectors on the top edge, each
     under a removable cap (PB-10577: "NVLink bridge interfaces ... include
@@ -232,12 +233,24 @@ body:
   - {id: edge-pads-long, at: [17.76, 4.39], size: [3.00, 1.67], from: 60.25, depth: 70.60,
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0 fig 6-5: the x16 pad run on 1.00 pitch'}
-  - {id: backplate, at: [28.41, 1.77], size: [97.90, 2.67], from: 0.90, depth: 267.70,
+  - {id: backplate, at: [28.41, 1.77], size: [97.90, 2.67], from: 0.90, depth: 140.03,
      color: '#202326', confidence: estimated,
      source: 'PB-10577: backside clearance 2.67 from the rear PCB surface; IT Creations 575TK_8 shows a black plate over the rear'}
-  - {id: cover, at: [28.41, 6.01], size: [97.90, 8.39], from: 0.90, depth: 267.70,
+  - {id: backplate-notch, at: [31.96, 1.77], size: [94.35, 2.67], from: 140.93, depth: 19.50,
+     color: '#202326', confidence: estimated,
+     source: 'as the backplate, inside the PB-10577 fig 3 notch'}
+  - {id: backplate-east, at: [28.41, 1.77], size: [97.90, 2.67], from: 160.43, depth: 108.17,
+     color: '#202326', confidence: estimated,
+     source: 'as the backplate, east of the notch'}
+  - {id: cover, at: [28.41, 6.01], size: [97.90, 8.39], from: 0.90, depth: 140.03,
      color: '#202326', confidence: estimated,
      source: 'PNY top render: the black band is 32 of the card''s 98 px, on the board side'}
+  - {id: cover-notch, at: [31.96, 6.01], size: [94.35, 8.39], from: 140.93, depth: 19.50,
+     color: '#202326', confidence: estimated,
+     source: 'as the cover, inside the PB-10577 fig 3 notch'}
+  - {id: cover-east, at: [28.41, 6.01], size: [97.90, 8.39], from: 160.43, depth: 108.17,
+     color: '#202326', confidence: estimated,
+     source: 'as the cover, east of the notch'}
   - {id: shroud, at: [28.41, 14.40], size: [97.90, 25.60], from: 0.90, depth: 140.03,
      color: '#b8a68c', confidence: estimated,
      source: 'thickness bounded at 38.2 (see provenance thickness); outline as the board; champagne finish from the photographs'}
