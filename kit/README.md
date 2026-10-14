@@ -674,6 +674,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.42.0: the 3D relief is built and drawn in batches.** `relief.js` rasterises a drawing once
+however often a face asks for it, keeping each raster by what decides its pixels (`rasterKey`; see
+`rasterSource`, `setRasterBudget`, `clearRasterCache`, `rasterStats`). Once a face is built,
+`batchRelief` shares equal textures and materials and merges the meshes that share a material, a part
+(`userData.portrayalPath`) and a frame. A host that styles only some parts by path names them with
+`ctx.parts(path)` to merge the rest across parts; `ctx.batch: false` builds a face as before. A USDZ
+now carries the relief boxes it used to leave out. **A page that vendors the kit changes nothing to
+keep its hover, dimming and covers; passing `parts` is optional.**
+
 **New in 0.41.0: the 3D build looks ids up from a map.** `cablePoints` and `extractRelief`
 (`relief.js`) found each cable point's feature and each cavity's node with a selector per lookup.
 Each now reads an id map (one per drawing, or per marker host), with the same results, warnings and
