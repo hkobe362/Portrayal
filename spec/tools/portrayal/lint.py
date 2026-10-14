@@ -2841,6 +2841,43 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
                                  f"the part declares no `faces.{which}`")
     if unmarked:
         warn(path, "L71", f"{unmarked} of {len(boxes)} body boxes carry no confidence")
+    for a, b, axis, at in coplanar_box_faces(boxes):
+        err(path, "L71", f"body boxes {a} and {b} share a face plane at {axis} {at:g} where "
+                         f"they overlap - the two faces z-fight and shimmer in 3D; end one "
+                         f"of them 0.05 short of the plane")
+
+
+def coplanar_box_faces(boxes):
+    """Pairs of plain boxes that have a face on one plane and overlap there.
+
+    Two faces on the same plane, facing the same way, over a shared patch are
+    drawn at one depth and the GPU picks between them pixel by pixel, so the
+    patch shimmers as the camera moves. Faces that face opposite ways (boxes
+    that abut) are not this. Pieces fitted for different options are never
+    drawn together and are not compared. Returns (id, id, axis, plane)."""
+    def extent(b):
+        x, y = (float(v) for v in b["at"])
+        w, h = (float(v) for v in b["size"])
+        z = float(b.get("from") or 0)
+        return {"x": (x, x + w), "y": (y, y + h), "z": (z, z + float(b["depth"]))}
+
+    plain = [(b.get("id") or str(i), b) for i, b in enumerate(boxes)
+             if (b.get("shape") or "box") == "box"]
+    found = []
+    for i, (na, a) in enumerate(plain):
+        for nb, b in plain[i + 1:]:
+            if a.get("when") and b.get("when") and a["when"] != b["when"]:
+                continue
+            ea, eb = extent(a), extent(b)
+            for axis in "xyz":
+                others = [k for k in "xyz" if k != axis]
+                if any(min(ea[k][1], eb[k][1]) - max(ea[k][0], eb[k][0]) <= 1e-6
+                       for k in others):
+                    continue
+                for end in (0, 1):
+                    if abs(ea[axis][end] - eb[axis][end]) < 1e-6:
+                        found.append((na, nb, axis, ea[axis][end]))
+    return found
 
 
 def lint_component_fitted_pieces(path, data):

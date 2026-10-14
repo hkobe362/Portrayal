@@ -11,4 +11,9 @@
 
 ### Changed
 - `nvidia/a100-pcie-80gb@1`'s extender upright is a flat strip, 1.2 thick,
-  like the rest of its plate, where it had stood 8.4 tall.
+  like the rest of its plate, where it had stood 8.4 tall. It stops short of
+  the 8-pin connector in x, so neither extender's strip cuts the connector's
+  lower row from behind, and the connector housing is 10.85 high so its
+  bottom is not in the plane of the cover's, which shimmered in 3D.
+- `portrayal-lint` L71 refuses two body boxes that share a face plane where
+  they overlap (they z-fight in 3D).

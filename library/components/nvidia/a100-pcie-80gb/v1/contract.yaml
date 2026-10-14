@@ -183,8 +183,10 @@ provenance:
     about 1068 px of the 3630 px photograph, 10.9 px/mm, and the housing is about
     203 px wide, 18.6 mm (18.4 is drawn, within the error), from
     105.6 to 124.0 on the card's x, 2.3 from the top edge, with its top flush with
-    the cover's. The photograph is from above, so its height, 10.9 (y 3.5 to
-    14.4), is read at the 4.2 mm cell pitch and is good to about 1 mm; the
+    the cover's. The photograph is from above, so its height, 10.85 (y 3.5 to
+    14.35), is read at the 4.2 mm cell pitch and is good to about 1 mm; it ends
+    0.05 short of the cover-east ceiling (y 14.4) so the two faces are not
+    coplanar, which shimmered under the connector in 3D; the
     brief's figure 6 had given 9.9. The housing is BLACK on this card (the
     photograph); they are usually white and sometimes black. It is eight dark
     cells in two rows of four in a housing standing 0.2 proud of the end plate, the
@@ -263,7 +265,11 @@ provenance:
     hides the power connector from behind (it did, as first drawn). Its place
     across the card (y 9.6 to 10.8) is estimated, and as drawn it still crosses
     the connector's lower row seen from straight behind, which the photograph,
-    taken from above, does not show. Its height was never measured; the broad side's photograph cannot show it. The flange
+    taken from above, does not show. THE UPRIGHT ENDS AT x 103.41, 2.2 short of
+    the connector (x 105.6), estimated: 575TK_5 shows the extender fitted with
+    the 8-pin fully clear, and the strip's measured run to 123.3 would cut the
+    lower row to a slit from behind. The long offset extender's is the same.
+    Its height was never measured; the broad side's photograph cannot show it. The flange
     that bolts to the card's end is estimated from 575TK_5.
   body-extender-long-offset: >-
     estimated - no photograph of the long offset extender was found. PB-10577
@@ -434,9 +440,9 @@ body:
      source: 'PNY top render at 2.555 px/mm: the third cap from 126.1'}
   # THE CPU 8-PIN (provenance body-power-connector): a black housing with eight
   # dark cells, the 3D body of the tail face's `aux-power` port.
-  - {id: power-8pin, at: [105.60, 3.50], size: [18.40, 10.90], from: 250.60, depth: 17.80,
+  - {id: power-8pin, at: [105.60, 3.50], size: [18.40, 10.85], from: 250.60, depth: 17.80,
      color: '#17191c', confidence: photo-measured,
-     source: 'IT Creations 575TK_5 at matched scale: 18.4 wide, 2.3 from the top edge, top flush with the cover; 10.9 high is read at the cell pitch (about 1 mm); black housing'}
+     source: 'IT Creations 575TK_5 at matched scale: 18.4 wide, 2.3 from the top edge, top flush with the cover; 10.85 high (y 3.5 to 14.35) is read at the cell pitch (about 1 mm, so 10.9 is as good) and ends 0.05 short of the cover-east ceiling at y 14.4, which a flush bottom would share and flicker on; black housing'}
   - {id: power-8pin-cell-1, at: [119.30, 4.80], size: [3.20, 3.20], from: 268.40, depth: 0.20,
      color: '#08090a', confidence: photo-measured,
      source: 'IT Creations 575TK_5: two rows of four cells on the 4.2 pitch; 3.2 across is about 40 of the 50 px pitch'}
@@ -473,9 +479,9 @@ body:
   # THE EXTENDERS, fitted by the `extender` field (provenance
   # body-extender-straight and body-extender-long-offset). x from the card's
   # lower edge (28.41) up; the plate is four bars with three slots between.
-  - {id: ext-straight-flange, at: [28.41, 6.01], size: [42.64, 4.79], from: 268.60, depth: 1.20,
+  - {id: ext-straight-flange, at: [28.46, 6.01], size: [42.54, 4.74], from: 268.65, depth: 1.15,
      color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
-     source: 'the bent flange that bolts to the card end, from IT Creations 575TK_5; size estimated'}
+     source: 'the bent flange that bolts to the card end, from IT Creations 575TK_5; size estimated. Drawn 0.05 inside the bars at the sides and back, so no face of it lies in a bar''s plane'}
   - {id: ext-straight-bar-1, at: [60.38, 9.60], size: [10.67, 1.20], from: 268.60, depth: 28.40,
      color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
      source: 'IT Creations 575TK_7, perspective-corrected: the top bar, x 60.38..71.05, to the upright at 297.0'}
@@ -491,10 +497,10 @@ body:
   - {id: ext-straight-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 288.00, depth: 9.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
      source: 'IT Creations 575TK_7: the fillet into the upright, drawn as one step'}
-  - {id: ext-straight-upright, at: [28.41, 9.60], size: [94.89, 1.20], from: 297.00, depth: 15.00,
-     color: '#1c1e20', confidence: photo-measured, when: {extender: [straight]},
-     source: 'IT Creations 575TK_7: 14.7 wide, x 28.41..123.3; far edge at 312, PB-10577; a flat strip as 575TK_5 shows it, 1.2 thick estimated'}
-  - {id: ext-long-flange, at: [28.41, 6.01], size: [42.64, 4.79], from: 268.60, depth: 1.20,
+  - {id: ext-straight-upright, at: [28.41, 9.60], size: [75.00, 1.20], from: 297.00, depth: 15.00,
+     color: '#1c1e20', confidence: estimated, when: {extender: [straight]},
+     source: 'IT Creations 575TK_7: the strip starts at x 28.41 and far edge at 312, PB-10577; a flat strip as 575TK_5 shows it, 1.2 thick estimated. It ends at x 103.41, 2.2 short of the 8-pin housing (105.6), estimated: 575TK_5 shows the connector clear of the extender (the 575TK_7 width, x to 123.3, would cross its lower row from behind)'}
+  - {id: ext-long-flange, at: [28.46, 6.01], size: [42.54, 4.74], from: 268.65, depth: 1.15,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
      source: 'as the straight extender''s flange; PB-10577 fig 8 draws the same mounting'}
   - {id: ext-long-bar-1, at: [60.38, 9.60], size: [10.67, 1.20], from: 268.60, depth: 55.40,
@@ -512,9 +518,9 @@ body:
   - {id: ext-long-fillet, at: [71.05, 9.60], size: [3.55, 1.20], from: 315.00, depth: 9.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
      source: 'as the straight extender''s fillet'}
-  - {id: ext-long-upright, at: [28.41, 9.60], size: [94.89, 1.20], from: 324.00, depth: 15.00,
+  - {id: ext-long-upright, at: [28.41, 9.60], size: [75.00, 1.20], from: 324.00, depth: 15.00,
      color: '#1c1e20', confidence: estimated, when: {extender: [long-offset]},
-     source: 'far edge at 339, PB-10577 "card + extender"; the upright is the straight one''s, PB-10577 fig 8'}
+     source: 'far edge at 339, PB-10577 "card + extender"; the upright is the straight one''s, PB-10577 fig 8, ending at x 103.41 clear of the 8-pin housing as the straight one does (estimated)'}
   # THE THUMBSCREWS that fasten either extender to the mount bosses
   # (provenance body-extender-mount), on the flange's outer face at 269.80.
   - {id: ext-straight-screw-1, shape: cylinder, axis: z, at: [31.80, 4.90], size: [7.00, 7.00], from: 269.80, depth: 3.00,

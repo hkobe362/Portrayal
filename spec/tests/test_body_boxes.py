@@ -222,6 +222,34 @@ def test_a_box_cannot_reach_past_the_part_s_own_depth():
     assert hits and "body.depth" in hits[0], hits
 
 
+def test_two_boxes_cannot_share_a_face_plane_where_they_overlap():
+    """Coplanar faces z-fight: the A100's connector housing ended at y 14.4,
+    the plane of the cover's bottom, and the ceiling under it shimmered."""
+    part = lambda *boxes: {"size": {"w": 100.0, "h": 60.0, "d": 50.0},
+                           "body": {"depth": 50.0, "boxes": [
+                               dict(b, confidence="measured") for b in boxes]}}
+    cover = {"id": "cover", "at": [0, 6.01], "size": [100, 8.39], "from": 0, "depth": 50}
+    flush = {"id": "housing", "at": [10, 3.5], "size": [18, 10.9], "from": 10, "depth": 20}
+    lifted = dict(flush, size=[18, 10.85])
+    run = lambda *b: _caught("L71", lint.lint_component_body_boxes, pathlib.Path("x.yaml"), part(*b))
+    hits = run(cover, flush)
+    assert hits and "cover" in hits[0] and "housing" in hits[0] and "y 14.4" in hits[0], hits
+    assert not run(cover, lifted)
+    # boxes that abut, or only touch at an edge, are not coplanar overlaps
+    assert not run(cover, {"id": "next", "at": [0, 14.4], "size": [100, 5], "from": 0, "depth": 50})
+    assert not run(cover, {"id": "beside", "at": [100, 6.01], "size": [5, 8.39], "from": 0, "depth": 50})
+    # options that are never drawn together are not compared
+    a = dict(flush, when={"extender": ["straight"]})
+    b = dict(cover, when={"extender": ["long-offset"]})
+    assert not run(a, b)
+
+
+def test_no_library_part_has_coplanar_body_boxes():
+    for f in sorted((LIB / "components").glob("**/contract.yaml")):
+        boxes = ((yaml.safe_load(f.read_text()) or {}).get("body") or {}).get("boxes") or []
+        assert not lint.coplanar_box_faces(boxes), (f, lint.coplanar_box_faces(boxes)[:3])
+
+
 def test_every_riser_carries_its_pcb_and_a_connector_per_card_slot():
     """The point of the exercise: the riser IS its PCB, and a slot that takes
     a card has a connector behind it while one that takes only a filler has
