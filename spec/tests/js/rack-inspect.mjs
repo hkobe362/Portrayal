@@ -88,6 +88,8 @@ test('inspect: a cable, with its routed length from a route context', async () =
     // store, with no place said for it, which is a finding past 0.3 m)
     routed: {metres: 1.17, stock: 1.5}, slack: {metres: 1.03, at_ends_m: 0.2, said: false, stored: [], unplaced_m: 0.83},
     spare_findings: [{kind: 'spare-unplaced', text: 'c1 has 0.83 m to store and no place for it.'}],
+    // a route down an empty gutter has no duct or tray for its spare: only its ends
+    spare_places: [],
     route: {edited: false, waypoints: [{lane: 'left-front', ru: 10}, {lane: 'left-front', ru: 20}], text: 'left-front U10-U20'},
     lanes: ['left-front', 'right-front', 'left-rear', 'right-rear'],
     passes: {i3: ['guide-1', 'guide-2', 'window-1']},

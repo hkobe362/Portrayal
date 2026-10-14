@@ -1,6 +1,6 @@
 ### Changed
 - **A cable crosses a vertical manager front to rear through its back
-  windows, not over its top.** `@portrayal/kit` is 0.35.0. In
+  windows, not over its top.** `@portrayal/kit` is 0.36.0. In
   `rack/solids.js`, `legCrossings` now judges a pass-through on the stretch of
   the true plate, not the plate grown by the cable's radius, so a cable at a
   window's height crosses straight (no cable could pass any window before).
