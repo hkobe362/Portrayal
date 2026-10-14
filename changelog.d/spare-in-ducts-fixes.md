@@ -1,6 +1,6 @@
 ### Fixed
 - **Spare in a duct, as a tester found it through the Rack Builder preview.**
-  `cable.slack` refuses an amount larger than the cable's spare (the others
+  `@portrayal/kit` is 0.39.0. `cable.slack` refuses an amount larger than the cable's spare (the others
   already stored count toward it) and any spare on a cable that is short, and
   says how much spare there is or how short the cable is. A duct's cable count
   is the cable's own kind: a fibre cable is not counted against a count of
