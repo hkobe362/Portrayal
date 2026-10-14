@@ -1,9 +1,10 @@
 format: 1
 kind: component
 name: cmh-sfd1u-cover
-version: 1.1.0
+version: 1.2.0
 class: mechanical
 behaviour: mounts
+lid: true
 description: >-
   The detachable cover of the FS CMH-SFD1U finger duct, seen from the front - an ABS
   channel whose face closes the duct and whose two lips clip over the finger tips
@@ -19,6 +20,12 @@ provenance:
     above the floor and its lips 60.5 to 75.5. The face is 1.5 thick and the lips 1.5
     high, both estimated: no view dimensions the cover section, and the renders show a
     thin moulding.
+  lid: >-
+    datasheet - the specification table of the FS Horizontal Cable Managers with Finger Duct
+    datasheet, which also covers CMH-DFD1U, lists a "detachable cover" (hinged, as the
+    device's `cover-hinge` gap records), and its top and side views draw it clipped over
+    the finger tips. It lifts off and opens the channel, so it is a lid
+    (`lid: true`) and a pass-through in the base beneath it may be declared.
   color: >-
     estimated - "Color: Black" in the datasheet table. Every image FS publishes of the
     part is a render; the cover there reads a median of 45 on each channel against 37 on
