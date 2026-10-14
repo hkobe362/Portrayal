@@ -7,7 +7,7 @@ profile: networking
 description: >-
   A blanking insert for a keystone opening: the snap-on ABS plug that closes
   an unused opening in a keystone faceplate or modular panel. FS blanking
-  insert for faceplate, FBPWH white (#159373) and FBPBL black. It carries no
+  insert for faceplate, FBPWH white (#159373, #185432) and FBPBL black (#203961). It carries no
   connector and no port; the face is a flat plug.
 size: {w: 16.5, h: 14.9}
 conforms: keystone-opening
@@ -31,8 +31,8 @@ provenance:
     ESTIMATED. The datasheet draws the insert in section and in elevation, not
     face-on, and says nothing of what the front shows. Drawn: a plain flat plug
     16.1 x 14.6 with no collar. Whether the 19.8 x 17 collar stands in front of
-    the plate or behind it is not stated. Colour is white (#159373, FBPWH); the
-    datasheet also lists FBPBL in black (#185432 and #203961).
+    the plate or behind it is not stated. Colour is white: FBPWH is #159373
+    (1 piece) and #185432 (20 pieces), and FBPBL, in black, is #203961 (p2).
   colour: >-
     ESTIMATED. The datasheet names the colours (white, black) and gives no
     figure; #ece9e2, as common/keystone-clip@2 draws FS's white plastic.

@@ -493,10 +493,10 @@
    "fs/fhd-splice-12-lc@3"
   ]
  },
- "composed": "6aa08d5a5411cad2",
+ "composed": "53440a8d4fc4760b",
  "composed-refs": {
   "common/fibre-splice@1": "1.0.0+fc9da478db2a176a",
-  "common/keystone-blank@1": "1.0.0+ea7ba43f3fb87317",
+  "common/keystone-blank@1": "1.0.0+9fac58230e7dc2a0",
   "common/keystone-clip@2": "2.0.0+5e63cac60d80c300",
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/lc-duplex-shuttered-adapter@2": "2.0.2+8f4908f4aaeeed75",
@@ -568,8 +568,8 @@
   "fs/fhd-fap8mtp-b-rear@1": "1.0.0+eda6040f15c9d559",
   "fs/fhd-fap8mtp-b@1": "1.0.0+6d18459552742440",
   "fs/fhd-fapb@1": "1.0.0+9a096c0ba4f6a558",
-  "fs/fhd-fapm6-blank@1": "1.0.0+92aa2f6597c8ad65",
-  "fs/fhd-fapm6-rj45@1": "1.0.0+47060185c3f7ab3a",
+  "fs/fhd-fapm6-blank@1": "1.0.0+96611ca45ad14c50",
+  "fs/fhd-fapm6-rj45@1": "1.0.0+ffb4f6e0a087c80e",
   "fs/fhd-fapm6@1": "1.0.0+8b5494b8ab712402",
   "fs/fhd-splice-12-lc-rear@2": "2.0.0+6365c19befedc151",
   "fs/fhd-splice-12-lc@3": "3.1.0+ad07de833573a544",

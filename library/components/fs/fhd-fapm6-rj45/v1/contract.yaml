@@ -64,8 +64,8 @@ provenance:
     dual-colour-coded labelling for 568A/B (p1, "Fast installation with
     special punch tool or crimping tool"). ESTIMATED: that #72818 is that
     jack. The FAPM6 datasheet (p5) gives the number and no description, and
-    the jack datasheet gives no item number, so the match rests on the
-    brief's reading of #72818 as a toolless IDC Cat6 UTP jack. Either way the
+    the jack datasheet gives no item number, so the match is
+    assumed, and no public page calls #72818 toolless. Either way the
     conductors are punched down into the jack, so the rear offers no port to
     cable to and the part declares no rear face.
   face-legends: >-

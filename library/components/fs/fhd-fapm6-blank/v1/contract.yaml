@@ -31,8 +31,8 @@ provenance:
   parts: >-
     SIX BLANKING INSERTS AT THE FAPM6's SIX CLIP POSITIONS. The blanking
     insert datasheet (resource.fs.com/mall/doc/20231207141153wvi0lg.pdf) says
-    the insert fits a standard keystone opening, and names the FHD
-    multimedia copper/fibre panels among those it suits. Each fills the 16.5 x
+    the insert fits a standard keystone opening, and names multimedia
+    copper/fibre panels among those it suits. Each fills the 16.5 x
     14.9 opening, as the clip does; see common/keystone-blank@1 for what is
     drawn and what is estimated.
   ports: >-
