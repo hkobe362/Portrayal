@@ -674,6 +674,16 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.36.0: a cable crosses a vertical manager through its back windows** (P-0016). A cable
+routed front to rear past a full-height vertical duct used to go over the top of the duct, because
+`legCrossings` judged a window on the plate grown by the cable's radius, where no cable fits. A window
+is now judged on the true plate, so a cable at a window's height crosses straight, and `waysRound`
+tries a zero-U part's holes, nearest first, before its top or bottom edge, so a cable routed at a
+height with no window crosses at the nearest window. Horizontal managers are routed as before.
+`pointOf` also puts the duct waypoint of a narrow rack-face part on a rail (the CMV-5U3W) on the
+part, where it was at the rack's centre. **A page that vendors the kit changes nothing; the cables
+through a vertical or the 5U bracket measure shorter or longer, as they are really laid.**
+
 **New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
 stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
 vertical manager's beside the rack, as well as on a tray or at an end. `SPARE_HOLDS` in
