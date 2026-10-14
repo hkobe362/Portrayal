@@ -1340,7 +1340,7 @@ export const COMMANDS = {
       route: {type: 'array', description: 'In order: {item, via} for a pathway on a device or a part beside the rack (its duct, a window), {lane, ru} for a gutter at a U.',
         items: WAYPOINT},
       summary: SUMMARY})},
-  'cable.slack': {run: cableSlack, description: 'Say where the spare length of a cable is stored: in a finger duct its route uses (a horizontal manager, a vertical manager beside the rack, a rack-face bracket), on a tray it rests on, or at one of its ends. A ring, a lacer bar, a pass-through and a pathway off its route hold none. With no value the place takes what is left to store. A duct is counted against the cable capacity its maker states, or against an estimate the note says is one. Refused, with where the spare can go, for a place that cannot hold it.',
+  'cable.slack': {run: cableSlack, description: 'Say where the spare length of a cable is stored: in a finger duct its route uses (a horizontal manager, a vertical manager beside the rack, a rack-face bracket), on a tray it rests on, or at one of its ends. A ring, a lacer bar, a pass-through and a pathway off its route hold none. With no value the place takes what is left to store. A duct is counted against its cable capacity, stated or estimated. Refused, with where the spare can go, for a place that cannot hold it.',
     args: args(['id', 'at'], {id: ID('cable'),
       at: {type: 'object', additionalProperties: false, description: 'The place: {item, via} for a duct or a tray on a device or on a part beside the rack, or {end} for an end of the cable.',
         properties: {item: {type: 'string', minLength: 1, description: 'The device or the part beside the rack the duct or tray is on, with via.'},
