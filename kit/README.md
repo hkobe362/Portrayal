@@ -674,6 +674,12 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.41.0: the 3D build looks ids up from a map.** `cablePoints` and `extractRelief`
+(`relief.js`) found each cable point's feature and each cavity's node with a selector per lookup.
+Each now reads an id map (one per drawing, or per marker host), with the same results, warnings and
+first-match order; the gain is in a drawing that is not attached to the page. **A page that vendors
+the kit changes nothing.**
+
 **New in 0.40.0: an estimated duct capacity says it is an estimate.** A stored loop in a part whose
 capacity is an estimate (`attrs.performance.cable-capacity-estimated`) reads "an estimated 54 cat6
 cables' worth" in `cable.slack` and its findings (`spare-capacity-estimated` within the count), and
