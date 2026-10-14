@@ -147,6 +147,36 @@ test('a duct past the capacity its maker states is refused; one whose count name
   assert.deepEqual(loose.findings.map(f => f.text), ['hm-1 states no cable capacity for a named kind of cable, so the spare stored in it is not counted.']);
 });
 
+test('a duct whose count is an estimate counts the spare against it and says it is an estimate (P-0027)', () => {
+  const est = n => ({...SIZES['cmh-bs-sfds1u'], capacity: {count: n, basis: 'ESTIMATE', media: 'cat6', estimated: true}});
+  const cx = c => ({chassisOf: ref => (ref === 'cmh-bs-sfds1u' ? c : chassisOf(ref)), route: routeCtx({chassisOf: ref => (ref === 'cmh-bs-sfds1u' ? c : chassisOf(ref))})});
+  const r = rack();
+  // within it: accepted, with a note that says what the figure is
+  const ok = run(r, {op: 'cable.slack', id: 'c1', at: DUCT}, cx(est(120)));
+  assert.equal(ok.error, undefined, ok.error);
+  const load = SL.spareLoad(ok.rack, 'i3', cx(est(120)).route);
+  assert.deepEqual(load, {stated: true, compared: true, estimated: true, count: load.count, capacity: 120, media: 'cat6', over: false});
+  const said = `hm-1 holds ${load.count} cat6 cables' worth with the spare stored in it, against an estimated 120 cat6 cables' worth (its maker states none).`;
+  assert.deepEqual(ok.findings.map(f => f.text), [said]);
+  assert.deepEqual(SL.slackFindings(ok.rack, cx(est(120)).route).filter(f => f.cable === 'c1'),
+    [{kind: 'spare-capacity-estimated', cable: 'c1', text: said}]);
+  // past it: refused, and the refusal says the figure is an estimate
+  const no = run(r, {op: 'cable.slack', id: 'c1', at: DUCT}, cx(est(3)));
+  assert.match(no.error, /^hm-1 holds \d+ cat6 cables' worth with the spare stored in it, past an estimated 3 cat6 cables' worth \(its maker states none\)\. Store less there/);
+  // a stated count keeps its wording and gains no key
+  const stated = SL.spareLoad(ok.rack, 'i3', routeCtx());
+  assert.equal('estimated' in stated, false);
+});
+
+test('a manager whose count is an estimate is warned of past it in the notes, as an estimate (P-0027)', () => {
+  const {count} = SL.spareLoad(rack(), 'i3', routeCtx());
+  const small = {...SIZES['cmh-bs-sfds1u'], capacity: {count: count - 1, basis: 'ESTIMATE', media: 'cat6', estimated: true}};
+  const c = {chassisOf: ref => (ref === 'cmh-bs-sfds1u' ? small : chassisOf(ref))};
+  const over = R.capacityOver(rack(), routeCtx(c));
+  assert.deepEqual(over.map(o => [o.item, o.estimated]), [['i3', true]]);
+  assert.equal(R.capacityOver(rack(), routeCtx()).length, 0);
+});
+
 test('spareMarks: the point a drawing puts each stored loop at, on its pathway', () => {
   let r = run(rack(), {op: 'cable.slack', id: 'c1', at: DUCT}).rack;
   r = run(r, {op: 'cable.slack', id: 'c2', at: VDUCT}).rack;

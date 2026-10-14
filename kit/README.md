@@ -674,6 +674,12 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.40.0: an estimated duct capacity says it is an estimate.** A stored loop in a part whose
+capacity is an estimate (`attrs.performance.cable-capacity-estimated`) reads "an estimated 54 cat6
+cables' worth" in `cable.slack` and its findings (`spare-capacity-estimated` within the count), and
+`inspect` and `rack.json` carry `capacity.estimated: true`. A part that states none keeps
+`spare-capacity-unstated`. **A page that vendors the kit changes nothing.**
+
 **New in 0.39.0: fixes to spare in ducts.** `cable.slack` refuses an amount larger than the cable's
 spare (what is already stored counts toward it) and any spare on a short cable, and says how much
 spare there is or how short the cable is. A duct's cable count is the cable's own kind: a fibre cable

@@ -715,7 +715,8 @@ end play plus the inside ends plus the tolerance equals the stock length.
   against the cable count the part states (`capacity`, on the basis
   `route.js capacityOver` uses), and is refused past it; a part that states
   no count accepts it with a finding (`spare-capacity-unstated`). No
-  capacity is ever assumed.
+  capacity is ever assumed; an estimated one is marked
+  (`capacity.estimated`, cable-managers-design.md section 15) and said to be one.
 - **It does not judge how much a tray holds,** and does not refuse or warn
   for a full one (decision 13).
 - **It does not place spare on its own** (decision 8). A cable with no

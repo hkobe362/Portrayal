@@ -498,6 +498,78 @@ fill limit. By section, 30 Cat6 cables of 6 mm are 120 such cords.
   of its fill limit; the limit is 40% of the opening." The earlier wording, "112% of a
   40% fill", could be read as a share of the opening.
 
+## 15. An estimated count, where the maker states none
+
+(P-0027.) Eight FS managers state no cable capacity. A part that states none
+accepts a stored loop with a finding and counts nothing against it. Seven now
+carry an **estimate**, so spare stored in them counts against a figure, and
+every place the figure is read says it is one. The eighth, the CMH-DFDS1U, is
+left unstated: no side view is drawn, so its channel height is not read from
+any source.
+
+- **The mark.** `attrs.performance.cable-capacity-estimated: true`, beside a
+  `cable-capacity` and a `cable-capacity-media`. `rack.json` carries
+  `capacity.estimated: true`, and no such key for a stated count. The
+  `cable-capacity-basis` opens with ESTIMATE; provenance `capacity` is
+  `estimated` and names the method, the parts it was calibrated on, the
+  cross-section used and where it is read. The `cable-capacity` gap stays
+  (`vendor-silent`): FS has still stated nothing.
+- **The method.** The channel's inside cross-section divided by the area a
+  cable takes. The cross-section is the `duct` guide's height (a vertical
+  duct's width) by the depth from the front face of the base to the rear face
+  of the cover on the part's own side view; a dual part adds its two channels.
+  The area a cable takes is **FS's own**: for each part that states a Cat6
+  count, its cross-section divided by its count, and the median of those
+  by type, rounded up to 0.1 mm2. The count is rounded down. A part whose
+  cross-section no drawing gives is left unstated.
+- **What FS's counts imply** (mm2 a Cat6 cable, theoretical, no fill stated):
+
+  | part | cross-section (mm) | mm2 | count | mm2 a cable |
+  |---|---|---|---|---|
+  | CMH-SFD1U | 25 x 74.2 | 1855.0 | 48 | 38.65 |
+  | CMH-DFD1U (two channels) | 2 x 25 x 74.2 | 3710.0 | 96 | 38.65 |
+  | CMH-SFD2U | 69.5 x 74.2 | 5156.9 | 124 | 41.59 |
+  | CMH-UHD-SFDABS1U | 24.4 x 170.4 | 4157.8 | 96 | 43.31 |
+  | CMH-BS-SFDS1U | 31.8 x 66.2 | 2105.2 | 48 | 43.86 |
+  | CMH-UHD-SFDABS2U | 58 x 170.4 | 9883.2 | 192 | 51.48 |
+  | CMH-BS-DFDABS2U (two channels) | 70 x (73.7 + 74.2) | 10353.0 | 192 | 53.92 |
+  | CMH-UHD-SFDABS3U | 102.5 x 170.4 | 17466.0 | 288 | 60.65 |
+  | CMH-HD-SFDABS3U | 102.5 x 107.4 | 11008.5 | 144 | 76.45 |
+  | CMH-HD-SFDABS4U | 148 x 107.4 | 15895.2 | 192 | 82.79 |
+  | CMV-SFD45U5W | 93.4 x 136.7 | 12767.8 | 2745 | 4.65 |
+  | CMV-DFD45U5W (two channels) | 2 x 93.4 x 136.7 | 25535.6 | 5490 | 4.65 |
+  | CMV-5U3W (not used: an open bracket, no closed channel) | 14.6 x 67.4 | 984.0 | 188 | 5.23 |
+
+  The ten horizontal ducts have a **median of 47.67**, taken as **47.7**; a
+  1U duct runs 38.7 to 43.9 and the taller ones climb to 82.8, because FS's
+  counts rise with the rack units and not with the section. The two vertical
+  ducts give **4.65**, taken as **4.7**. No part is a ring: every manager
+  with rings states its count, so no ring figure was needed.
+- **FS's vertical counts are not a fill.** 4.65 mm2 is a sixth of the 29.2
+  mm2 section of one 6.1 mm cable, so no vertical duct could hold what FS
+  counts. The vertical estimates keep FS's scale so a part with no figure sits
+  beside its sisters on the same table; they will not be reached by a stored
+  loop (a loop counts one cable for each run of the duct it takes).
+- **The kit.** A loop in a part with an estimated count counts against it
+  as against a stated one, and refuses past it. The words say it is an
+  estimate: `hm-1 holds 5 cat6 cables' worth with the spare stored in it,
+  against an estimated 54 cat6 cables' worth (its maker states none).` A
+  store within it gives that sentence as a note (`spare-capacity-estimated`
+  in `slackFindings`); past it, the refusal reads `past an estimated 54 ...`.
+  The through-cable check in the notes reads `more than the estimated 54 Cat 6
+  copper cables (its maker states none)`. `inspect` gives `capacity:
+  {count, basis, media, estimated: true}`. A part that still states none
+  keeps `spare-capacity-unstated`.
+- **Not changed.** The USCMH-SFDABS1U, USCMH-SFDABS2U and USCMH-SFDABSB1U
+  carry estimates made earlier on 39.9 mm2 a cable, with no kind and no mark:
+  they are shown and never compared, as before. The USCMH-SFDABSB2U is on
+  47.7 mm2 because that is the figure FS's own counts give; on 39.9 it would be
+  223, not 186. Putting the four on one figure is a follow-up.
+- **The CMV-SFD42U9W depth is a choice.** Its channel floor is a 1.5 mm web,
+  so the depth runs from the web (149.6 mm); the 45U parts the figure is
+  calibrated on start at a solid 26.9 mm back plate. From this part's 37.2 mm
+  flanges the depth is 106.2 mm and the count 1421.
+
 ## Decisions taken
 
 Agreed 2026-10-06:
