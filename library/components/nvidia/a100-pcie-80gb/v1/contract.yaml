@@ -1,0 +1,287 @@
+format: 1
+kind: module
+name: a100-pcie-80gb
+version: 1.0.0
+class: expansion-card
+behaviour: fills
+profile: server
+description: >-
+  NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card.
+  The bracket face carries one vent window and no ports. Three NVLink bridge
+  connectors sit on the top edge. One CPU 8-pin power connector sits on the far
+  end of the card.
+unplaced: >-
+  Nothing in the library seats a card two slots wide. Every riser bay is one
+  slot, 120.02 x 21.59 on the 20.32 pitch, and a bay has no way to span its
+  neighbour. A dual-slot bay, or a span across two bays, would seat it.
+size: {w: 120.02, h: 41.91, d: 268.60}
+size-confidence: {w: registry, h: registry, d: drawing}
+attrs:
+  model: 'A100 80GB PCIe'
+  part-numbers: '900-21001-0020-000, 900-21001-0020-100'
+  board-sku: 'P1001 SKU 230, NVPN 699-21001-0230-xxx'
+  role: gpu
+  form-factor: 'Full-height, full-length (FHFL) 10.5 in, dual-slot'
+  slots: 2
+  pcie-connector: x16
+  pcie-generation: 4
+  pcie-height: full
+  power-draw-max-w: 300
+  power-input: 'host PCIe slot and one CPU 8-pin auxiliary connector'
+  memory: '80 GB HBM2e, 5120-bit, up to 1.94 TB/s'
+  cooling: passive
+  airflow: 'bidirectional; the heat sink takes system airflow either way along the card'
+  nvlink: 'three bridge connectors on the top edge; 600 GB/s with one adjacent A100 80GB'
+  weight-kg: 1.17
+  eol: announced
+  eol-announcement: 'https://onestopsystems.com/blogs/eol-notices/nvidia-hgx-a100-4-gpu-80gb-nvidia-pcie-a100-80gb-cowos-hbm2-and-nvidia-tesla-t4-passive-gpu-2560-cores'
+provenance:
+  sources: >-
+    NVIDIA A100 80GB PCIe Product Brief PB-10577-001_v03, March 2022, fetched
+    from https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/PB-10577-001_v02.pdf
+    (the URL says v02, the document inside is v03; PNY mirrors it at
+    https://pnypartners.com/wp-content/uploads/ampere-a100-80gb-datasheet-update-us-partner-1344850-r1.pdf).
+    Tables 1, 2, 4 and 5, figure 3 (card dimensions), figure 5 (NVLink keep-out),
+    figure 6 (CPU 8-pin connector, an end view) and the NVLink and power text.
+    The A100 datasheet, https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/nvidia-a100-datasheet-nvidia-us-2188504-web.pdf.
+    The A100 40GB brief PB-10137, https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/A100-PCIE-Prduct-Brief.pdf,
+    is the same shape and is not used for any number here (see `size-length`).
+    NVIDIA's brief forbids reproducing its figures, so its facts are
+    transcribed and none of its figures is copied.
+  reference-bracket-photo: >-
+    reference - https://www.itcreations.com/images/products/large/575TK_1.jpg,
+    IT Creations' listing for the Dell 575TK, which is this card (its label
+    photo, 575TK_8.jpg, reads 699-21001-0230-601, the brief's SKU 230). It
+    shows the bracket face straight on, about 3630 x 2723 px. Licence not
+    stated; facts read from it, picture not used.
+  reference-card-photos: >-
+    reference - IT Creations 575TK_4.jpg to 575TK_8.jpg (3/4, east end, top
+    edge, broad side, backplate) and PNY's product images under
+    https://d2vfia6k6wrouk.cloudfront.net/productimages/edd51eab-59dc-42d5-a57d-ad7100b737d8/images/
+    (a100pcie_fr.png broad side, a100pcie_top.png top edge, a100-pcie-3qtr.png).
+    Licence not stated; facts read from them, pictures not used.
+  size: >-
+    registry - w is the full-height bracket's 120.02 (std/pcie-bracket-fh@2,
+    PCIe CEM 5.0 figure 11-5). h is two slots: the single bracket's 21.59 plus
+    one 20.32 slot pitch, 41.91. That is the envelope two adjacent slots give a
+    card, not a measurement of this bracket; the drawn plate sits inside it
+    (see `face-outline`).
+  depth: >-
+    drawing - PB-10577 figure 3: product length 268.60 with the I/O bracket,
+    267.70 without. The card ends 268.60 behind the bracket's outer face.
+  size-length: >-
+    THE 80GB AND 40GB DRAWINGS DIFFER. PB-10577 figure 3 (80GB) prints 267.70
+    without the bracket and 268.60 with it, the key datum 59.05 from the
+    bracket, 111.15 card height and 104.86 to the bracket's flange end. PB-10137
+    figure 3 (40GB) prints 266.7 +/-1.4 overall and the CEM datum 57.15 from
+    the bracket. Every length here is the 80GB drawing's.
+  face-outline: >-
+    photo-measured - the bracket photograph above, mapped into this frame with
+    the two retention tabs as the ruler: their centres are 403.5 px apart,
+    which is the 20.32 slot pitch, so 19.86 px/mm. At that scale the plate
+    measures 119.8 long against the standard's 120.02, so the face is near
+    orthographic along its length. The first tab's centre is put at y 12.38,
+    where std/pcie-bracket-fh@2 puts its own, so the board lands where a
+    single-slot card's does. Read that way the plate runs y 4.1 to 40.0 (5.1
+    for the first 20 mm from the tip), 36 across, against 38.74 for two
+    CEM single-slot bodies on one pitch; the tabs are 9.8 wide against CEM's
+    10.20; and the tip has a V notch between the tabs, apex 11.5 from the tip.
+    The photograph is 0.6 degree off square and in slight perspective, so each
+    reading is good to about half a millimetre.
+  face-keyed-flange: >-
+    estimated - the flange end is seen edge-on in the photograph as a strip
+    from y 0.3 to 39.7, about 3.7 past the plate on the board side, the way a
+    single bracket's keyed top steps out on that side. It is drawn as a band
+    0.8 wide at the flange end. The fold's 9.40 is CEM's (figure 11-5),
+    not measured on this bracket.
+  face-grille: >-
+    photo-measured - a raised frame held by four Torx screws covers one vent
+    window. Frame x 29.8 to 117.6, y 9.9 to 39.3, corners about R2. Screw
+    centres at x 32.5 and 114.6, y 13.0 and 35.8, heads about 4.3 across. The
+    window runs x 31.2 to 115.8, y 11.8 to 37.6, with its corners cut round
+    each screw boss, about R3.5 from the screw centre. Behind it the heat-sink
+    fins show as lines across the window on a 5.0 pitch, the first at x 36.25,
+    sixteen in all. Readings on the far half are corrected for the
+    photograph's 0.6 degree turn.
+  face-markings: >-
+    photo-measured - the bracket carries no lamp, no label, no printing and
+    no connector. The control is the fins and the Torx recesses, which
+    resolve in the same photograph at the same scale.
+  thickness: >-
+    estimated - nothing held states the card's thickness. Two figures measure
+    it at about 38.7: PB-10577 figure 6, the end view, scaled by the 126.31 from
+    the bracket tip to the card's top edge (PCIe CEM 5.0: 104.86 + 15.16 +
+    6.29), gives 196 px at 5.06 px/mm; and PNY's top-edge render, scaled by
+    the 267.70 card length, gives 99 px at 2.555 px/mm. Neither is a drawing
+    at known aspect (PNY's broad-side render is 5 percent out between its two
+    axes), so the 3D body is bounded by what is stated instead. The back face is
+    2.67 behind the board's rear surface, the brief's backside clearance for
+    the NVLink bridges. The front face stops at the plate's far edge, y 40.0.
+    That gives 38.2. This is the CEM dual-slot envelope that
+    common/pcie-card-fh@2 already cites, not a source we found for this card.
+  orientation: >-
+    drawn TIP-LEFT, as std/pcie-bracket-fh@2 is: the photograph has the tip
+    at the right and the backplate side at the bottom, so it is turned a
+    half-turn into this frame. The board, and the bracket's keyed side, are at
+    the top (small y).
+  body: >-
+    the board, its edge and the pads follow PCIe CEM 5.0 (figures 6-5 and 11-3,
+    as nvidia/mcx755106-fh@1 has them) at PB-10577 figure 3's lengths. Figure 3
+    puts the card's lower edge 13.25 above the finger datum W, with a notch
+    3.55 REF deep and 19.50 REF long whose near end is 59.05 + 81.88 = 140.93
+    behind the bracket. The notch's 2 x 120 degree sides are drawn square. W
+    is at x 15.16 (120.02 - 104.86) and the top edge at 126.31 (W + 111.15).
+    The finger tab runs from the key less 12.15 to the key plus 81.88, the
+    length figure 3 draws, which is longer than the x16 pad run. Near the
+    bracket the board steps down toward W for about 18 mm; that step is not a
+    box. The board's colour is estimated from the photographs.
+  body-lower-edge: >-
+    photo-measured, as a check of figure 3 - IT Creations 575TK_7 is the
+    broad side straight on, at 9.30 px/mm down the 111.15 and 9.33 along the
+    268.60, so near orthographic. It puts the lower edge 12.3 to 13.5 above W
+    and the notch top 16.7 above it, between 145 and 160 behind the bracket,
+    which is figure 3. PNY's broad-side render puts the edge about 8.7 above
+    W, and that render is 5 percent out between its axes; it is not used for
+    the outline.
+  body-shroud: >-
+    estimated - the heat-sink shroud is champagne on the broad side. A black
+    cover runs the top edge on the board's side of the card, about the third
+    of the thickness nearest the board: PNY's top render gives 32 of 98 px
+    black. The black backplate covers the rear of the board (IT Creations
+    575TK_8). The shroud follows the board's outline, notch included. The
+    cover and the backplate are each one box, from the board's lower edge to
+    its top edge, the card's length deep.
+  body-nvlink: >-
+    photo-measured - three NVLink bridge connectors on the top edge, each
+    under a removable cap (PB-10577: "NVLink bridge interfaces ... include
+    removable caps"). On PNY's top render at 2.555 px/mm they are 49.5 long,
+    starting 13.5, 70.7 and 126.1 behind the bracket's face, and 6.6 wide
+    from 2.2 to 8.8 across the card. Figure 5 is the keep-out and has no
+    dimensions. The caps are drawn 0.5 proud of the top edge, which is
+    estimated. The library has no NVLink interface, so the connectors are
+    boxes and nothing can mate a bridge to them.
+  body-power-connector: >-
+    estimated - PB-10577: "a CPU 8-pin power connector on the east edge of the
+    board", and figure 6 draws it at the top of the end face. Its size is the
+    2 x 4 receptacle's figure 6 proportions at 5.06 px/mm, 18.3 along the edge
+    and 9.9 across. It stands on the board's component side, with its face at
+    the card's end. The library has no EPS12V or CPU 8-pin interface, so the
+    connector is a box and no power cord can mate it.
+  power: >-
+    datasheet - PB-10577 table 1: total board power 300 W default, 300 W
+    maximum, 150 W minimum. The brief gives no ambient for it. The
+    programmable power cap goes down to the 150 W minimum.
+  weight: >-
+    datasheet - PB-10577 table 1: board 1170 g, excluding the bracket,
+    extenders and bridges. The bracket with screws is 20 g, each NVLink bridge
+    20.5 g, the long offset extender 48 g and the straight extender 32 g.
+  memory: >-
+    datasheet - PB-10577 table 2: HBM2e, 80 GB, 5120-bit, 1512 MHz, up to
+    1.94 TB/s.
+  pcie: >-
+    datasheet - PB-10577 table 1: PCI Express 4.0 x16, lane and polarity
+    reversal supported.
+  part-numbers: >-
+    datasheet - PB-10577 "Root of Trust": 900-21001-XXXX-0XX with the CEC1712
+    secondary root of trust, 900-21001-XXXX-1XX without. 900-21001-0020-000
+    is the order code resellers list; the -100 variant is listed without the
+    CEC1712. Table 1 gives the board SKU and NVPN.
+  nvlink: >-
+    datasheet - PB-10577 table 5 and the NVLink text: three bridges, 96 lanes
+    at 50 Gbps per direction, 600 GB/s with one adjacent A100 80GB. Each 2-slot
+    bridge is NVIDIA part 900-53651-0000-000. All three are needed.
+  extenders: >-
+    datasheet - PB-10577 "Extenders": a long offset extender (NVPN
+    682-00007-5555-000, card plus extender 339 mm) and a straight extender
+    (NVPN 682-00007-5555-001, 312 mm) bolt to the east edge. They are
+    accessories and are not drawn; IT Creations' photographs show a card with
+    the straight one fitted.
+  lifecycle: >-
+    One Stop Systems' end-of-life notice dated 24 January 2024 lists the
+    NVIDIA PCIe A100 80GB: final order 26 April 2024, final ship from factory
+    31 December 2024. It is an integrator's notice passing on NVIDIA's, and
+    NVIDIA publishes no GPU end-of-life list. PNY lists the card under legacy
+    data-center GPUs.
+body:
+  depth: 268.60
+  # the plate slab's sides are the bracket's metal; every box has its own colour
+  color: '#9aa1a8'
+  # The slab is the plate between the tip's chamfers and the flange band.
+  plate: {at: [9.80, 4.10], size: [109.40, 35.90]}
+  # x along the bracket from its tip, y across it from the keyed edge,
+  # `from` back from the bracket's outer face.
+  boxes:
+  - {id: board, at: [28.41, 4.44], size: [97.90, 1.57], from: 0.90, depth: 140.03,
+     color: '#1d2420', confidence: drawing,
+     source: 'PB-10577 fig 3: lower edge W + 13.25, top edge W + 111.15, to the notch at 140.93; CEM 5.0: 1.57 board, 1.27 inside the bracket keyed edge'}
+  - {id: board-notch, at: [31.96, 4.44], size: [94.35, 1.57], from: 140.93, depth: 19.50,
+     color: '#1d2420', confidence: drawing,
+     source: 'PB-10577 fig 3: the notch, 3.55 REF deep and 19.50 REF long, 59.05 + 81.88 behind the bracket'}
+  - {id: board-east, at: [28.41, 4.44], size: [97.90, 1.57], from: 160.43, depth: 108.17,
+     color: '#1d2420', confidence: drawing,
+     source: 'PB-10577 fig 3: lower edge W + 13.25 again east of the notch, to the 268.60 end'}
+  - {id: edge-tab-short, at: [15.16, 4.44], size: [13.25, 1.57], from: 46.90, depth: 11.20,
+     color: '#1d2420', confidence: drawing,
+     source: 'PB-10577 fig 3: key datum 59.05 behind the bracket, tab 13.25 deep; CEM 5.0 fig 6-5: 12.15 to the tab end, notch 1.90'}
+  - {id: edge-tab-long, at: [15.16, 4.44], size: [13.25, 1.57], from: 60.00, depth: 80.93,
+     color: '#1d2420', confidence: drawing,
+     source: 'PB-10577 fig 3: the tab runs 81.88 REF past the key datum'}
+  - {id: edge-pads-short, at: [17.76, 4.39], size: [3.00, 1.67], from: 47.25, depth: 10.60,
+     color: '#d4a72c', confidence: registry,
+     source: 'CEM 5.0 fig 6-5: pads 2.60..5.60 up the tab, pins 1-11 on 1.00 pitch'}
+  - {id: edge-pads-long, at: [17.76, 4.39], size: [3.00, 1.67], from: 60.25, depth: 70.60,
+     color: '#d4a72c', confidence: registry,
+     source: 'CEM 5.0 fig 6-5: the x16 pad run on 1.00 pitch'}
+  - {id: backplate, at: [28.41, 1.77], size: [97.90, 2.67], from: 0.90, depth: 267.70,
+     color: '#202326', confidence: estimated,
+     source: 'PB-10577: backside clearance 2.67 from the rear PCB surface; IT Creations 575TK_8 shows a black plate over the rear'}
+  - {id: cover, at: [28.41, 6.01], size: [97.90, 8.39], from: 0.90, depth: 267.70,
+     color: '#202326', confidence: estimated,
+     source: 'PNY top render: the black band is 32 of the card''s 98 px, on the board side'}
+  - {id: shroud, at: [28.41, 14.40], size: [97.90, 25.60], from: 0.90, depth: 140.03,
+     color: '#b8a68c', confidence: estimated,
+     source: 'thickness bounded at 38.2 (see provenance thickness); outline as the board; champagne finish from the photographs'}
+  - {id: shroud-notch, at: [31.96, 14.40], size: [94.35, 25.60], from: 140.93, depth: 19.50,
+     color: '#b8a68c', confidence: drawing,
+     source: 'PB-10577 fig 3 notch; IT Creations 575TK_7 shows it in the shroud outline at 145..160'}
+  - {id: shroud-east, at: [28.41, 14.40], size: [97.90, 25.60], from: 160.43, depth: 108.17,
+     color: '#b8a68c', confidence: estimated,
+     source: 'as the shroud, east of the notch'}
+  - {id: nvlink-1, at: [126.31, 2.20], size: [0.50, 6.60], from: 13.50, depth: 49.50,
+     color: '#2b2f33', confidence: estimated,
+     source: 'PNY top render at 2.555 px/mm: caps 49.5 long from 13.5, 6.6 wide; 0.5 proud is estimated'}
+  - {id: nvlink-2, at: [126.31, 2.20], size: [0.50, 6.60], from: 70.70, depth: 49.50,
+     color: '#2b2f33', confidence: estimated,
+     source: 'PNY top render at 2.555 px/mm: the second cap from 70.7'}
+  - {id: nvlink-3, at: [126.31, 2.20], size: [0.50, 6.60], from: 126.10, depth: 49.50,
+     color: '#2b2f33', confidence: estimated,
+     source: 'PNY top render at 2.555 px/mm: the third cap from 126.1'}
+  - {id: power-8pin, at: [105.40, 6.01], size: [18.30, 9.90], from: 250.60, depth: 18.00,
+     color: '#1a1a1a', confidence: estimated,
+     source: 'PB-10577 fig 6: CPU 8-pin at the top of the east end, 2 x 4 receptacle about 18.3 x 9.9; face flush with the 268.60 end'}
+elements:
+  grille: {at: [29.80, 9.90], size: [87.80, 29.40], class: bezel}
+  vent: {at: [31.20, 11.80], size: [84.60, 25.80], class: vent}
+  screw-1: {at: [30.35, 10.85], size: [4.30, 4.30], class: screw}
+  screw-2: {at: [112.45, 10.85], size: [4.30, 4.30], class: screw}
+  screw-3: {at: [30.35, 33.65], size: [4.30, 4.30], class: screw}
+  screw-4: {at: [112.45, 33.65], size: [4.30, 4.30], class: screw}
+relief:
+  wall: '#8a9199'
+  features:
+  - node: grille
+    out: 0.8
+    color: '#9aa1a8'
+    confidence: estimated
+    source: >-
+      the grille frame is a separate plate on four screws, raised off the
+      bracket. Its 0.8 is estimated from the shadow line in the reference
+      photograph.
+  - node: flange-fold
+    out: 9.4
+    color: '#9aa1a8'
+    confidence: estimated
+    source: >-
+      the fold at the flange end, PCIe CEM 5.0 figure 11-5's 9.40, drawn as on
+      std/pcie-bracket-fh@2. Not measured on this bracket.
+skins: [default]
