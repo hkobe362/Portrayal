@@ -1094,7 +1094,7 @@ function cableSlack(rack, {id, at: where, value, unit, form}, ctx) {
       let load = null;
       try { load = spareLoad(updateCable(rack, id, {slack: next}), entry.item, ctx.route); } catch { load = null; }
       if (load?.over) return {error: `${loadText(rack, entry.item, load)} Store less there, or in another duct or tray. ${spareWhere(rack, c, ctx.route, path ?? undefined)}`};
-      if (load && !load.compared) findings.push(note(loadText(rack, entry.item, load)));
+      if (load && (!load.compared || load.estimated)) findings.push(note(loadText(rack, entry.item, load)));
     }
   }
   if (same(next, had) && Array.isArray(c.slack)) return unchanged(rack);

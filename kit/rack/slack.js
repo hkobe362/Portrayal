@@ -230,12 +230,16 @@ function loadOf(rack, id, ctx) {
     try { s = ownSlack(rack, cable, ctx); } catch { s = null; }
     for (const e of s?.entries || []) if (e.item === id && e.ok && e.metres > 0 && run > 0) count += Math.ceil(e.metres / run - 1e-9);
   }
-  return {stated: true, compared: true, count, capacity: b.count, media: b.media, over: count > b.count};
+  return {stated: true, compared: true, ...(b.estimated ? {estimated: true} : {}), count, capacity: b.count, media: b.media, over: count > b.count};
 }
-// The sentence of a load: what the part holds against what its maker states.
+// The sentence of a load: what the part holds against what its maker states,
+// or, where the count is an estimate (P-0027), against that estimate.
 export const loadText = (rack, id, load) => (load.compared
-  ? `${labelOf(rack, id)} holds ${load.count} ${load.media ?? ''}${load.media ? ' ' : ''}cables' worth with the spare stored in it, past the ${load.capacity} its maker states.`
-  : `${labelOf(rack, id)} states no cable capacity${load.stated ? ' for a named kind of cable' : ''}, so the spare stored in it is not counted.`);
+  ? `${labelOf(rack, id)} holds ${load.count} ${load.media ?? ''}${load.media ? ' ' : ''}cables' worth with the spare stored in it, ` +
+    (load.estimated
+      ? `${load.over ? 'past' : 'against'} an estimated ${load.capacity} ${load.media ?? ''}${load.media ? ' ' : ''}cables' worth (its maker states none).`
+      : `past the ${load.capacity} its maker states.`)
+  :`${labelOf(rack, id)} states no cable capacity${load.stated ? ' for a named kind of cable' : ''}, so the spare stored in it is not counted.`);
 
 // ── where a stored loop is, for a drawing ────────────────────────────────
 // Each place a cable's spare is stored in a duct or on a tray, as a point in
@@ -316,6 +320,7 @@ export function slackFindings(rack, ctx, nameOf = id => id) {
       if (!e.ok || !e.load) continue;
       if (e.load.over) out.push({kind: 'spare-over-capacity', cable: c.id, text: loadText(rack, e.item, e.load)});
       else if (!e.load.compared) out.push({kind: 'spare-capacity-unstated', cable: c.id, text: loadText(rack, e.item, e.load)});
+      else if (e.load.estimated) out.push({kind: 'spare-capacity-estimated', cable: c.id, text: loadText(rack, e.item, e.load)});
     }
   }
   return out;

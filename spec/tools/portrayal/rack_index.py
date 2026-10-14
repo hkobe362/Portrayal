@@ -138,6 +138,10 @@ def build(dist):
             # has no `media` at all, and a reader must be able to tell "no
             # source names the cable" from "built too early to say".
             entry["capacity"]["media"] = perf.get("cable-capacity-media") or None
+            # a count the maker does not state, worked out from the drawing:
+            # said only where it is one, so a stated count has no such key
+            if perf.get("cable-capacity-estimated") is True:
+                entry["capacity"]["estimated"] = True
         for view in ("top", "front", "rear"):
             g, ps = marked(dist / face_file(idx, d["name"], idx.get("default"), view))
             if g:

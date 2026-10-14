@@ -58,6 +58,19 @@ def test_a_capacity_carries_the_kind_of_cable_it_counts_only_where_the_device_st
     assert rack_index.build(d)["devices"]["mgr"]["capacity"] == {"count": 30, "basis": "Cat6 24AWG", "media": "cat6"}
 
 
+def test_an_estimated_capacity_is_marked_and_a_stated_one_never_is(tmp_path):
+    """P-0027: `cable-capacity-estimated: true` marks a count the maker does not
+    state. `rack.json` carries `estimated: true` for it and no key at all for a
+    stated count, so every catalogue built before it reads as stated."""
+    perf = {"cable-capacity": 54, "cable-capacity-basis": "ESTIMATE, not stated", "cable-capacity-media": "cat6"}
+    mount = {"w": 483, "h": 44, "d": 110, "ru": 1, "mount": "rack-face"}
+    est = rack_index.build(_dist(tmp_path, mount, {"performance": {**perf, "cable-capacity-estimated": True}}))
+    assert est["devices"]["mgr"]["capacity"] == {"count": 54, "basis": "ESTIMATE, not stated", "media": "cat6", "estimated": True}
+    (tmp_path / "s").mkdir()
+    stated = rack_index.build(_dist(tmp_path / "s", mount, {"performance": perf}))
+    assert "estimated" not in stated["devices"]["mgr"]["capacity"]
+
+
 def test_a_rack_device_states_no_mount_and_derives_its_units(tmp_path):
     e = rack_index.build(_dist(tmp_path, {"w": 440, "h": 88.9, "d": 300, "mount": "rack"}))["devices"]["mgr"]
     assert "mount" not in e and "shell" not in e and "capacity" not in e and e["ru"] == 2
