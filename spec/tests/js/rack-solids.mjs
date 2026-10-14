@@ -284,7 +284,10 @@ test('a duct whose fingers are its own body (CMV-5U3W): a route through its chan
   assert.ok(Math.abs(at.x - (flange.x0 + 7.3)) < 1e-9, `the duct point is on the part: ${at.x} against ${flange.x0 + 7.3}`);
   assert.ok(at.x < -200 && at.x > -260, `a left-rail part's duct point is at about -233: ${at.x}`);
   const right = F.add(F.ownerRack(), 'cmv-5u3w', 12, {side: 'right', label: 'duct'});
-  assert.ok(R.pointOf(right, {item: 'i5', via: 'duct'}, ctx).x > 200, 'and a right-rail part\'s is on the right');
+  // a right-rail part is turned end over end, so its channel is mirrored about its centre
+  const rflange = S.solidsOf(right, F.ctxOf()).find(q => q.item === 'i5').box;
+  const rx = R.pointOf(right, {item: 'i5', via: 'duct'}, ctx).x;
+  assert.ok(Math.abs(rx - (rflange.x1 - 7.3)) < 1e-9, `a right-rail part's duct point is over its channel: ${rx} against ${rflange.x1 - 7.3}`);
   assert.deepEqual(p.crossings, []);
   assert.deepEqual(p.detours.filter(d => d.between.some(w => w.item === 'i5')), []);
 });
