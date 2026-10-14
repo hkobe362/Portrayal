@@ -14,7 +14,7 @@ import {ownRoute, autoRoute, routedLength, pointOf, portPoint, routePath} from '
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
 import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
 import {stateRefusal} from './states.js';
-import {spareRefusal, spareLoad, loadText, whereText as spareWhere, trayText, FORMS, mText} from './slack.js';
+import {spareRefusal, amountRefusal, spareLoad, loadText, whereText as spareWhere, trayText, FORMS, mText} from './slack.js';
 import {traysOf} from './solids.js';
 import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
@@ -1066,7 +1066,7 @@ function cableSlack(rack, {id, at: where, value, unit, form}, ctx) {
   if (isEnd && form != null) return {error: 'Spare left at an end has no form.'};
   // judged against the route when the routes are known; else recorded as given
   let path = null;
-  if (isTray && ctx.route) { try { path = routePath(rack, c, ctx.route); } catch { path = null; } }
+  if (ctx.route) { try { path = routePath(rack, c, ctx.route); } catch { path = null; } }
   const andWhere = () => (ctx.route ? ` ${spareWhere(rack, c, ctx.route, path ?? undefined)}` : '');
   let via = where.via;
   if (isTray) {
@@ -1084,6 +1084,9 @@ function cableSlack(rack, {id, at: where, value, unit, form}, ctx) {
   if (no) return {error: /is not on the route|holds no spare|has no pathway/.test(no) ? `${no}${andWhere()}` : no};
   const had = Array.isArray(c.slack) ? c.slack : [];
   const others = had.filter(e => !sameAt(e, entry));
+  // no more than the cable has to store, and nothing on a cable that is short
+  const tooMuch = path ? amountRefusal(rack, {...c, slack: others}, entry, ctx.route, path) : null;
+  if (tooMuch) return {error: tooMuch};
   if (value == null && others.some(e => e.value == null))
     return {error: `${c.id} already has an entry that takes the rest of its spare: give this one a value.`};
   const findings = [];
@@ -1092,7 +1095,7 @@ function cableSlack(rack, {id, at: where, value, unit, form}, ctx) {
     // a duct is counted against what its maker states, with this entry in it
     if (ctx.route && pathwaysAt(rack, entry.item, ctx.route).find(p => p.via === entry.via)?.kind === 'duct') {
       let load = null;
-      try { load = spareLoad(updateCable(rack, id, {slack: next}), entry.item, ctx.route); } catch { load = null; }
+      try { load = spareLoad(updateCable(rack, id, {slack: next}), entry.item, ctx.route, c); } catch { load = null; }
       if (load?.over) return {error: `${loadText(rack, entry.item, load)} Store less there, or in another duct or tray. ${spareWhere(rack, c, ctx.route, path ?? undefined)}`};
       if (load && !load.compared) findings.push(note(loadText(rack, entry.item, load)));
     }
@@ -1340,7 +1343,7 @@ export const COMMANDS = {
       route: {type: 'array', description: 'In order: {item, via} for a pathway on a device or a part beside the rack (its duct, a window), {lane, ru} for a gutter at a U.',
         items: WAYPOINT},
       summary: SUMMARY})},
-  'cable.slack': {run: cableSlack, description: 'Say where the spare length of a cable is stored: in a finger duct its route uses (a horizontal manager, a vertical manager beside the rack, a rack-face bracket), on a tray it rests on, or at one of its ends. A ring, a lacer bar, a pass-through and a pathway off its route hold none. With no value the place takes what is left to store. A duct is counted against the cable capacity its maker states. Refused, with where the spare can go, for a place that cannot hold it.',
+  'cable.slack': {run: cableSlack, description: 'Say where the spare length of a cable is stored: in a finger duct its route uses (a horizontal manager, a vertical manager beside the rack, a rack-face bracket), on a tray it rests on, or at one of its ends. A ring, a lacer bar, a pass-through and a pathway off its route hold none. With no value the place takes what is left to store. A duct is counted against the cable capacity its maker states. Refused, with where the spare can go, for a place that cannot hold it; refused too for more than the cable has spare, or any on a short cable.',
     args: args(['id', 'at'], {id: ID('cable'),
       at: {type: 'object', additionalProperties: false, description: 'The place: {item, via} for a duct or a tray on a device or on a part beside the rack, or {end} for an end of the cable.',
         properties: {item: {type: 'string', minLength: 1, description: 'The device or the part beside the rack the duct or tray is on, with via.'},
