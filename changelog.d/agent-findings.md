@@ -4,7 +4,7 @@
   leave a ring by one face and the cords shorter than their route needs,
   beside the tight bends and the covered ports it already counted. `inspect` of a cable carries
   `route.ring_findings` (`{item, via, text}`), from the new `ringFindingsOf` in
-  `rack/route.js`. Kit 0.35.0.
+  `rack/route.js`. Kit 0.37.0.
 
 ### Changed
 - **A tight bend is named at the stop where the cable turns.** A corner of one

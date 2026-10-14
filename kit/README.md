@@ -674,7 +674,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.35.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
+**New in 0.37.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
 the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
 face (c1, c2)`) and the cords shorter than their route needs (for example `2 cords are shorter than their route needs (the
 worst c2, 1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
@@ -688,6 +688,27 @@ lead or a detour has no `stop` and reads as before. `cable.lay`, when the routes
 pass through it, and says of a face on a ring or a duct that it is one. **A page that shows a bend's sentence
 shows the new wording without a change; a page that lists a cable's findings adds `route.ring_findings`; the
 text of `describe` has two new clauses, and a page or an agent that parses it adds them.**
+
+**New in 0.36.0: a cable crosses a vertical manager through its back windows** (P-0016). A cable
+routed front to rear past a full-height vertical duct used to go over the top of the duct, because
+`legCrossings` judged a window on the plate grown by the cable's radius, where no cable fits. A window
+is now judged on the true plate, so a cable at a window's height crosses straight, and `waysRound`
+tries a zero-U part's holes, nearest first, before its top or bottom edge, so a cable routed at a
+height with no window crosses at the nearest window. Horizontal managers are routed as before.
+`pointOf` also puts the duct waypoint of a narrow rack-face part on a rail (the CMV-5U3W) on the
+part, where it was at the rack's centre. **A page that vendors the kit changes nothing; the cables
+through a vertical or the 5U bracket measure shorter or longer, as they are really laid.**
+
+**New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
+stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
+vertical manager's beside the rack, as well as on a tray or at an end. `SPARE_HOLDS` in
+`rack/slack.js` is the one rule for which pathway kinds hold spare. A refusal says where the spare
+can go (`whereText`). A duct is counted against the capacity its part states (`spareLoad`), and
+`spareMarks(rack, cable, ctx)` gives the point, in rack millimetres, a page draws each stored loop
+at. A route may name a zero-U part's duct (resolved as the lane run through it) or a window
+(`pass-through-N`), and a pathway by its spoken name (`pathwayId`); `routeText` takes a fourth
+argument, `ductsThrough(rack, chassisOf, nameOf)`, to say a lane run goes through a duct.
+**A page that draws stored spare calls `spareMarks`; one that does not changes nothing.**
 
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real

@@ -48,6 +48,24 @@ def test_a_rack_face_sheet_with_a_capacity(tmp_path):
     assert e["passes"] == {"front": ["window-1"]}
 
 
+def test_a_pass_through_on_a_side_view_is_exported_and_a_guide_there_is_not(tmp_path):
+    """P-0016: the CMH-4DRB1U's end walls each have a hole, declared on its
+    left and right views. Only the top, front and rear views were read, so
+    those never reached rack.json. A pass-through is read from the sides too;
+    guides stay the three views they were (a side view's marks are not a
+    pathway a route names)."""
+    side = FACE.replace('id="pass--window-1"', 'id="pass--end-hole"')
+    d = _dist(tmp_path, {"w": 440, "h": 44, "d": 88, "ru": 1, "mount": "rack-face"},
+              faces={"front": FACE, "left": side, "right": side})
+    e = rack_index.build(d)["devices"]["mgr"]
+    assert e["passes"] == {"front": ["window-1"], "left": ["end-hole"], "right": ["end-hole"]}
+    assert e["guides"] == {"front": ["duct", "guide-1", "guide-2", "guide-3"]}
+    # a part with none on its sides gains no key
+    (tmp_path / "none").mkdir()
+    d = _dist(tmp_path / "none", {"w": 440, "h": 44, "d": 88, "ru": 1}, faces={"front": FACE, "left": FACE.replace("pass--window-1", "x")})
+    assert rack_index.build(d)["devices"]["mgr"]["passes"] == {"front": ["window-1"]}
+
+
 def test_a_capacity_carries_the_kind_of_cable_it_counts_only_where_the_device_states_it(tmp_path):
     """#1032: `cable-capacity-media` is what a rack tool compares the count
     with. The test above is the other half: a device that states none gets
