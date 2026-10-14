@@ -174,11 +174,37 @@ the bridge's cover. NVIDIA publishes no drawing of the bridge, and no photograph
 vendor figure was traced or copied: its steps are what a bridge with two connector
 ends and a cover between them has to be, and their heights are guesses.
 
-Known gaps, both honest: the header's latch ramp slopes along the mating axis in
-life, which a face drawing cannot give, so it is a wedge laid across the face; and
-the plug's cells are open at the header's mouth, where its modelled nose begins,
-because the nose inside the header is not built (docs/connectors-power-design.md
-section 5), so the open cells are seen only on a plug that is not seated.
+Known gap: the plug's cells are open at the header's mouth, where its modelled
+nose begins, because the nose inside the header is not built
+(docs/connectors-power-design.md section 5), so the open cells are seen only on a
+plug that is not seated.
+
+### Cleanup (P-0034)
+
+A browser scan (each box in a flat colour, the camera nudged 0.05 mm, pixels
+whose box changes counted) found four things, and each has its fix and its check:
+
+- **Coplanar joints flickered.** A plug's rear wall had the housing's outline and
+  stopped on the housing's rear face, its wires and stub started on the face of
+  what they leave, and the bridge's ends and steps stood on the plate's underside
+  and edge. Two faces on one plane are drawn by whichever the depth buffer prefers
+  pixel by pixel, so the housing's side showed streaks of the wall's darker
+  colour. Every piece now starts or ends inside its neighbour or 0.05 short of
+  its face. `test_no_two_pieces_of_a_connector_share_a_plane` compares the faces
+  of all nine parts in pairs (the lint rule for it, L71 on PR #1070, is not on
+  this branch).
+- **A sliver at the cell walls.** The face is a raster; its cell openings are
+  punched at 4 px/mm (more as the camera nears) and land up to a pixel off the
+  exact walls. Measured on the 12V-2x6 header at the base density the cut ran
+  0.22 past a wall on some edges, so the dark behind showed. Each header carries
+  a `plate`, an exact skin 0.05 proud of the face whose cells are cut 0.03
+  smaller than the cells, which covers the walls' top edges.
+- **The latch ramp** is now a wedge on the outside of the wall, sloping along the
+  mating axis, from 0.3 out of the wall at the mouth to 1.4 at its far end over
+  the 8.0 (6.8 on the 16-pin headers) the earlier version spread across the face.
+  The numbers are the same guesses. It starts behind the face, which the schema
+  allowed only for a facet: a feature that declares `profile` or `profile-y` may
+  now have a negative `lift`. The renderer already built it.
 
 ## 9. Not done
 

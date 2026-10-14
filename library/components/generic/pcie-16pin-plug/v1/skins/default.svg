@@ -10,11 +10,11 @@
         d="M 0 0 H 20.85 V 7.8 H 17.85 L 16.85 11.7 H 4 L 3 7.8 H 0 Z M 1.725 1.4 H 4.125 V 3.8 H 1.725 Z M 4.725 1.4 H 7.125 V 3.8 H 4.725 Z M 7.725 1.4 H 10.125 V 3.8 H 7.725 Z M 10.725 1.4 H 13.125 V 3.8 H 10.725 Z M 13.725 1.4 H 16.125 V 3.8 H 13.725 Z M 16.725 1.4 H 19.125 V 3.8 H 16.725 Z M 1.725 4.4 H 4.125 V 6.8 H 1.725 Z M 4.725 4.4 H 7.125 V 6.8 H 4.725 Z M 7.725 4.4 H 10.125 V 6.8 H 7.725 Z M 10.725 4.4 H 13.125 V 6.8 H 10.725 Z M 13.725 4.4 H 16.125 V 6.8 H 13.725 Z M 16.725 4.4 H 19.125 V 6.8 H 16.725 Z M 6.625 8.3 H 8.225 V 9.9 H 6.625 Z M 8.625 8.3 H 10.225 V 9.9 H 8.625 Z M 10.625 8.3 H 12.225 V 9.9 H 10.625 Z M 12.625 8.3 H 14.225 V 9.9 H 12.625 Z"/>
   <!-- The housing's rear wall, closing the cells where the wires enter. -->
   <path id="back" fill="#26282c" stroke="#4a4d52" stroke-width="0.12"
-        d="M 0 0 H 20.85 V 7.8 H 17.85 L 16.85 11.7 H 4 L 3 7.8 H 0 Z"/>
+        d="M 0.05 0.05 H 20.8 V 7.75 H 17.81 L 16.81 11.65 H 4.04 L 3.04 7.75 H 0.05 Z"/>
   <!-- The latch arm along the top wall, and the hook at its mating end. They stand
        above the housing, outside its drawn outline. -->
   <rect id="latch-arm" x="5" y="-1.2" width="10.85" height="1.4" rx="0.3" fill="#2c3036" stroke="#4a4d52" stroke-width="0.1"/>
-  <rect id="latch-hook" x="5" y="-2.2" width="10.85" height="1.0" rx="0.3" fill="#3a3e43" stroke="#4a4d52" stroke-width="0.1"/>
+  <rect id="latch-hook" x="5.05" y="-2.2" width="10.75" height="1.05" rx="0.3" fill="#3a3e43" stroke="#4a4d52" stroke-width="0.1"/>
   <!-- A wire stub out of each cell: twelve power wires, yellow over black, and four
        thin grey sense wires. -->
   <g>

@@ -420,8 +420,10 @@
        "node"
       ],
       "if": {
-       "required": [
-        "facet"
+       "anyOf": [
+        {"required": ["facet"]},
+        {"required": ["profile"]},
+        {"required": ["profile-y"]}
        ]
       },
       "else": {
@@ -485,7 +487,7 @@
        },
        "lift": {
         "type": "number",
-        "description": "standoff: the feature starts this many mm off the face (floating handle bars, stacked washers). Greater than 0, except on a feature that declares `facet`, where a negative lift sinks the facet's root edge that far below the plate, into a `pocket` at least that deep (L117)."
+        "description": "standoff: the feature starts this many mm off the face (floating handle bars, stacked washers). Greater than 0, except on a feature that declares `facet`, where a negative lift sinks the facet's root edge that far below the plate, into a `pocket` at least that deep (L117), and on one that declares `profile` or `profile-y`, where a negative lift starts the wedge that far BEHIND the face, so a ramp on a housing's side wall can slope back along the mating axis (a header's latch ramp: `lift` -8, `profile` running from -8 at its outer edge up to the face at its inner one). The node then stands outside the part's drawn outline, as a latch arm does."
        },
        "knurl": {
         "type": "boolean",

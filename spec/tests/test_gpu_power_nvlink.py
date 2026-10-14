@@ -294,6 +294,18 @@ def test_a_header_carries_a_latch_ramp_on_the_housing(iface):
     # a ramp rises: it ends higher than it starts
     prof = f.get("profile") or f["profile-y"]
     assert prof[-1][1] > prof[0][1] and f["out"] == pytest.approx(prof[-1][1])
+    # it slopes along the mating axis: it starts behind the face (negative lift),
+    # its profile runs from that depth at its outer edge up to the face at its
+    # inner one, and its node is the wedge seen end on, outside the part's outline
+    assert f["lift"] < 0 and prof[0][1] == pytest.approx(f["lift"])
+    assert -f["lift"] <= _contract(ref)["size"]["d"]
+    el = _node(_skin(ref), "latch")
+    w, h = _contract(ref)["size"]["w"], _contract(ref)["size"]["h"]
+    x, y = float(el.get("x")), float(el.get("y"))
+    ew, eh = float(el.get("width")), float(el.get("height"))
+    assert x + ew <= 0 or x >= w or y + eh <= 0 or y >= h
+    # the profile spans the node across the wall (x for a side wall, y for the top)
+    assert prof[-1][0] == pytest.approx(ew if f.get("profile") else eh)
     assert f["confidence"] == "estimated"
     assert "latch" in _contract(ref)["provenance"]
 
@@ -329,7 +341,9 @@ def test_a_plug_is_a_tube_with_its_cells_open_and_a_rear_wall(ref):
     assert _subpaths(_node(root, "body")) == 1 + pins
     assert _node(root, "body").get("fill-rule") == "evenodd"
     back = feats["back"]
-    assert back["shape"] is True and back["out"] == body["out"]
+    # the wall ends a hair short of the housing's rear face, so the two do not
+    # share that plane (test_no_two_pieces_of_a_connector_share_a_plane)
+    assert back["shape"] is True and back["out"] == pytest.approx(body["out"] - 0.05)
     assert 0 < back["lift"] < body["out"]
     assert _subpaths(_node(root, "back")) == 1
 
@@ -342,14 +356,17 @@ def test_a_plug_has_a_latch_arm_on_top_and_a_wire_at_each_cell(ref):
     body_out = feats["body"]["out"]
     arm, hook = feats["latch-arm"], feats["latch-hook"]
     assert arm["lift"] < arm["out"] <= body_out
-    # the hook is at the mating end, short of the arm's far end
-    assert hook["lift"] == arm["lift"] and hook["out"] < arm["out"]
+    # the hook is at the mating end, short of the arm's far end, and stands
+    # 0.05 inside the arm's start and sides so they share no plane
+    assert hook["lift"] == pytest.approx(arm["lift"] + 0.05) and hook["out"] < arm["out"]
     # the latch stands above the housing's top edge
     assert float(_node(root, "latch-arm").get("y")) < 0
     wires = [f for n, f in feats.items() if n.startswith(("wire-", "sense-wire-"))]
     assert len(wires) == c["attrs"]["pins"]
+    back = feats["back"]
     for f in wires:
-        assert f["lift"] == pytest.approx(body_out) and f["cyl"] > 0
+        # each wire starts inside the rear wall it leaves, not on the plane of its face
+        assert back["lift"] < f["lift"] < back["out"] and f["cyl"] > 0
         _node(root, f["node"])
 
 
@@ -359,8 +376,10 @@ def test_a_plug_keeps_its_thirty_millimetre_stub_and_it_starts_after_the_comb(re
     body_out = feats["body"]["out"]
     comb, stub = feats["comb"], feats["stub"]
     wire_end = max(f["lift"] + f["cyl"] for n, f in feats.items() if "wire-" in n)
-    assert comb["lift"] == pytest.approx(wire_end)
-    assert stub["lift"] == pytest.approx(comb["out"])
+    # the wires end inside the comb and the stub starts inside it, so neither
+    # shares a plane with the comb's faces
+    assert comb["lift"] < wire_end < comb["out"]
+    assert comb["lift"] < stub["lift"] < comb["out"]
     # the cable still ends 30 from the body, as before the form was built
     assert stub["lift"] + stub["cyl"] == pytest.approx(body_out + 30)
 
@@ -394,15 +413,16 @@ def test_the_bridge_is_stepped_up_from_its_plate_to_its_raised_centre():
     assert heights == sorted(heights) and len(set(heights)) == len(heights)
     assert feats["end-a"]["out"] == feats["end-b"]["out"]
     assert all(f["confidence"] == "estimated" for f in feats.values())
-    # the two ends are the connector's width, one two-slot pitch apart, and the
+    # the two ends are the connector's width less 0.05 a side (so they do not
+    # share a plane with the plate's edge), one two-slot pitch apart, and the
     # `mate` points land at their centres
     conn = _contract(NVLINK_CONNECTOR)["size"]["w"]
     a, b = _node(root, "end-a"), _node(root, "end-b")
-    assert float(a.get("width")) == pytest.approx(conn) == pytest.approx(float(b.get("width")))
+    assert float(a.get("width")) == pytest.approx(conn - 0.1) == pytest.approx(float(b.get("width")))
     assert float(b.get("x")) - float(a.get("x")) == pytest.approx(2 * SLOT_PITCH)
     cp = c["connection-points"]
-    assert cp["mate"]["at"][0] == pytest.approx(float(a.get("x")) + conn / 2)
-    assert cp["mate-b"]["at"][0] == pytest.approx(float(b.get("x")) + conn / 2)
+    assert cp["mate"]["at"][0] == pytest.approx(float(a.get("x")) + float(a.get("width")) / 2)
+    assert cp["mate-b"]["at"][0] == pytest.approx(float(b.get("x")) + float(b.get("width")) / 2)
     # the cover sits between the ends and the centre inside the cover
     cov, top = _node(root, "cover"), _node(root, "cover-top")
     assert float(a.get("x")) + conn <= float(cov.get("x"))
@@ -427,3 +447,112 @@ def test_every_estimated_bridge_figure_says_so():
     assert c["size-confidence"] == {"w": "estimated", "h": "estimated"}
     assert c["provenance"]["size"].startswith("estimated")
     assert c["provenance"]["height"].startswith("estimated")
+
+
+# --- no two faces share a plane (P-0034) -----------------------------------------
+# Two faces on one plane where they overlap are drawn by whichever the depth
+# buffer happens to prefer, pixel by pixel, and the choice changes when the camera
+# moves: a flicker. A browser scan (each box drawn in a flat colour, the camera
+# nudged 0.05 mm) found it between a plug's housing and its rear wall, between
+# its wires and the housing, and between the bridge's plate and its ends. The
+# lint rule for it (L71 on PR #1070) is not on this branch, so the nine parts are
+# held here the same way: every box a part builds, its faces compared in pairs.
+
+ALL_NINE = [h[0] for h in HEADERS.values()] + sorted(PLUGS) + [NVLINK_CONNECTOR, BRIDGE]
+
+
+def _bbox(el):
+    tag = el.tag.split("}")[-1]
+    if tag == "rect":
+        x, y = float(el.get("x", 0)), float(el.get("y", 0))
+        return x, y, x + float(el.get("width")), y + float(el.get("height"))
+    if tag == "circle":
+        cx, cy, r = float(el.get("cx")), float(el.get("cy")), float(el.get("r"))
+        return cx - r, cy - r, cx + r, cy + r
+    assert tag == "path", tag
+    xs, ys, x, y = [], [], 0.0, 0.0
+    for cmd, args in re.findall(r"([MLHVAQZ])([^MLHVAQZ]*)", el.get("d")):
+        n = [float(v) for v in re.findall(r"-?\d*\.?\d+", args)]
+        if cmd in "ML":
+            x, y = n[0], n[1]
+        elif cmd == "H":
+            x = n[0]
+        elif cmd == "V":
+            y = n[0]
+        elif cmd == "A":
+            x, y = n[5], n[6]
+        elif cmd == "Q":
+            x, y = n[2], n[3]
+        else:
+            continue
+        xs.append(x); ys.append(y)
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _boxes(ref):
+    """Each feature that builds a solid: (node, x range, y range, z range, flat),
+    `flat` when its sides are planes. A cylinder and a sloped wedge have only the
+    planes of their ends. A `top` feature stands on a cavity floor and is left out."""
+    root = _skin(ref)
+    out = []
+    for f in _contract(ref)["relief"]["features"]:
+        if "top" in f or "sink" in f:
+            continue
+        lift = f.get("lift", 0.0)
+        z1 = lift + f["cyl"] if "cyl" in f else f.get("out")
+        if z1 is None:
+            continue
+        x0, y0, x1, y1 = _bbox(_node(root, f["node"]))
+        flat = "cyl" not in f and not (f.get("profile") or f.get("profile-y"))
+        out.append((f["node"], (x0, x1), (y0, y1), (lift, z1), flat))
+    return out
+
+
+def _overlap(a, b):
+    return min(a[1], b[1]) - max(a[0], b[0])
+
+
+@pytest.mark.parametrize("ref", ALL_NINE)
+def test_no_two_pieces_of_a_connector_share_a_plane(ref):
+    boxes = _boxes(ref)
+    assert boxes, ref
+    bad = []
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            for axis in range(3):          # 0: x planes, 1: y planes, 2: z planes
+                if axis < 2 and not (a[4] and b[4]):
+                    continue
+                others = [k for k in range(3) if k != axis]
+                if any(_overlap(a[1 + k], b[1 + k]) <= 1e-9 for k in others):
+                    continue
+                for pa in a[1 + axis]:
+                    for pb in b[1 + axis]:
+                        if abs(pa - pb) < 1e-6:
+                            bad.append((a[0], b[0], "xyz"[axis], pa))
+    assert not bad, f"{ref}: faces on one plane where they overlap: {bad}"
+
+
+@EACH_HEADER
+def test_a_header_has_a_plate_over_its_face_that_overhangs_every_cell_wall(iface):
+    """The face is a raster whose cell openings are punched at 4 px/mm and land up
+    to a pixel off the exact cell walls, which left a sliver of the dark behind
+    between a wall and the face. An exact skin 0.05 proud of the face, its cells
+    cut slightly smaller, covers the walls' top edges."""
+    ref = HEADERS[iface][0]
+    c = _contract(ref)
+    root = _skin(ref)
+    f = _features(ref)["plate"]
+    assert f["shape"] is True and 0 < f["out"] <= 0.1 and "lift" not in f
+    plate = _node(root, "plate")
+    assert plate.get("fill-rule") == "evenodd"
+    assert _subpaths(plate) == 1 + PINS[iface]
+    holes = ET.Element("path", d=" ".join(re.findall(r"M[^M]*", plate.get("d"))[1:]))
+    cells = _cell_boxes(_node(root, c["relief"]["cavity"]))
+    cut = _cell_boxes(holes)
+    assert len(cut) == len(cells)
+    for cell, hole in zip(cells, cut):
+        # inside the cell, by about 0.03 on every side: more than the raster's
+        # fraction of a texel at the base density, little enough to see
+        for k in (0, 1):
+            assert 0.02 <= hole[k] - cell[k] <= 0.05, (cell, hole)
+            assert 0.02 <= cell[k + 2] - hole[k + 2] <= 0.05, (cell, hole)

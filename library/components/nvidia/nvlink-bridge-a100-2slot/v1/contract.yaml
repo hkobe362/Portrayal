@@ -53,11 +53,14 @@ provenance:
     estimated - NO DIMENSIONED SOURCE: NVIDIA publishes no drawing of the bridge
     and the figures held place only its two ends. The body is built in steps, from
     what a bridge has to be (two connector ends two slot pitches apart, a cover
-    between them): a 1.6 base plate, the two 6.6 x 49.5 connector ends standing
-    2.5, a top cover 31.24 x 43.5 standing 4.0 and a raised centre 19.24 x 33.5
+    between them): a 1.6 base plate, the two 6.5 x 49.4 connector ends (the 6.6 x
+    49.5 connector less 0.05 a side) standing 2.5, a top cover 31.24 x 43.5 standing 4.0 and a raised centre 19.24 x 33.5
     standing 5.5 with three grip ridges to 6.0. The cover's and centre's
-    footprints are proportional and their heights are guesses. It replaces the
-    earlier single 2.5 box, whose 2.5 (the brief's clearance above the card's top
+    footprints are proportional and their heights are guesses. No two faces share
+    a plane where they overlap: the ends stand 0.05 inside the plate's edge, and
+    each piece above the plate starts 0.05 higher than the one it stands on (the
+    ends and the cover at 0.05, the centre at 0.10, the ridges at 0.15). It
+    replaces the earlier single 2.5 box, whose 2.5 (the brief's clearance above the card's top
     edge) was read as an upper bound on the whole bridge; it is now only the ends'
     shoulder, and the clearance is no longer claimed to contain the cover.
 relief:
@@ -70,24 +73,28 @@ relief:
       source: no source holds the base plate's thickness; 1.6 is a guess (a PCB's usual thickness)
     - node: end-a
       out: 2.5
+      lift: 0.05
       shape: true
       color: '#2c2e32'
       confidence: estimated
       source: the brief's 2.5 clearance above the north edge, taken as the connector ends' height
     - node: end-b
       out: 2.5
+      lift: 0.05
       shape: true
       color: '#2c2e32'
       confidence: estimated
       source: the brief's 2.5 clearance above the north edge, taken as the connector ends' height
     - node: cover
       out: 4.0
+      lift: 0.05
       shape: true
       color: '#25282c'
       confidence: estimated
       source: no source holds the cover; its footprint and its 4.0 height are guesses
     - node: cover-top
       out: 5.5
+      lift: 0.1
       shape: true
       color: '#2e3136'
       confidence: estimated
@@ -95,6 +102,7 @@ relief:
     - &ridge
       node: ridge-1
       out: 6.0
+      lift: 0.15
       color: '#3a3e43'
       confidence: estimated
       source: no source holds the grip; three 0.5 ridges on the raised centre are a guess

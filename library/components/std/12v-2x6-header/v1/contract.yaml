@@ -53,26 +53,41 @@ provenance:
     housing top solid between them. The twelve power cells are 2.4 square on the
     3.00 pitch, the four sense cells 1.6 square on the 2.00 pitch, centred on the
     contacts the drawing places. The cell sizes are proportional, not dimensioned:
-    the Molex drawing is of the cable housing and gives the pitches only.
+    the Molex drawing is of the cable housing and gives the pitches only. The face
+    is a raster whose cell openings are punched at 4 px/mm and land up to a pixel
+    off the walls, so a `plate` skin 0.05 proud of it, with each cell cut 0.03
+    smaller than the cell, covers the walls' top edges and no sliver of the dark
+    behind shows.
   pins-3d: >-
     estimated - a 0.8 square power contact stands in each power cell, its tip 2.4
     behind the housing's face (6.6 above the cavity floor); the 0.6 square sense
     contacts are 1.5 shorter (5.1), the recess of `sense-recess` above. No contact
     length is held.
   latch: >-
-    estimated - the header's latch ramp, drawn as a 6.8 x 1.0 wedge on the top
-    wall, 0.3 rising to 1.4 along its length. SCHEMATIC IN ITS DIRECTION: the real
-    ramp slopes along the mating axis, which a face drawing cannot give. Its
-    height is not dimensioned anywhere held.
+    estimated - the header's latch ramp, built as a 1.0 wide wedge on the outside
+    of the top wall, 6.8 long along the mating axis, standing 0.3 out of the wall
+    at the mouth and 1.4 at the far end, so it slopes along the axis a plug comes
+    in on. The node is the wedge seen end on, above the 11.7 outline, and its
+    `lift` of -6.8 starts it behind the face. Its length, width and height are
+    guesses; none is dimensioned anywhere held.
 elements:
   opening: {at: [0.0, 0.0], size: [20.85, 11.7], class: cutout}
 relief:
   wall: '#2c3036'
   cavity: inlet-face
   features:
+    - node: plate
+      out: 0.05
+      shape: true
+      color: '#23262b'
+      confidence: estimated
+      source: >-
+        not a part of the connector: a 0.05 skin over the housing's face that closes
+        the seam between the raster face and the exact cell walls (`cells-3d`)
     - node: latch
-      out: 1.4
-      profile: [[0, 0.3], [6.8, 1.4]]
+      lift: -6.8
+      out: 0.05
+      profile-y: [[0, -6.8], [1.1, 0.05], [1.4, 0.05]]
       color: '#2c3036'
       confidence: estimated
       source: the cable housing's top wall in Molex 2191140001-SD; the ramp and its 1.4 height are a guess
