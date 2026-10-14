@@ -732,7 +732,9 @@ export function pointOf(rack, w, ctx) {
   const z = c.mount !== 'rack-face' ? panelZ(rack, it, g.face, ctx) + inward
     : g.face === 'rear' ? planeZ(f, 'rear') - out : planeZ(f, 'front') + out;
   // the guide where it is as mounted: turned with the item by its roll
-  return {...rollPoint(rack, it, {x: g.x, y: anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
+  // A narrow rack-face part on a rail stands over its hole line, as solids.js
+  // itemPlacer places its body: its guide's x is from the part's centre.
+  return {...rollPoint(rack, it, {x: centreX(it, ctx.chassisOf) + g.x, y: anchorY(rack, it, ctx.chassisOf)}, ctx.chassisOf), z};
 }
 
 export function portPoint(rack, end, ctx) {

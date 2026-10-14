@@ -674,6 +674,16 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.35.0: a cable crosses a vertical manager through its back windows** (P-0016). A cable
+routed front to rear past a full-height vertical duct used to go over the top of the duct, because
+`legCrossings` judged a window on the plate grown by the cable's radius, where no cable fits. A window
+is now judged on the true plate, so a cable at a window's height crosses straight, and `waysRound`
+tries a zero-U part's holes, nearest first, before its top or bottom edge, so a cable routed at a
+height with no window crosses at the nearest window. Horizontal managers are routed as before.
+`pointOf` also puts the duct waypoint of a narrow rack-face part on a rail (the CMV-5U3W) on the
+part, where it was at the rack's centre. **A page that vendors the kit changes nothing; the cables
+through a vertical or the 5U bracket measure shorter or longer, as they are really laid.**
+
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
 size. `widthOf(cable, diameterOf)` in `rack/cable-geometry.js` answers the width to draw a cable at:
