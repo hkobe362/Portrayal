@@ -207,6 +207,62 @@ test('a vertical duct is its walls and back, and an automatic route through its 
   assert.deepEqual(hit.map(h => h.solid.part), ['base/floor']);
 });
 
+// ── front to rear through a vertical's back windows (P-0016) ───────────────
+// The 45U fixture duct has eight windows in its back, 56 mm wide, the tall ones
+// 81.8 mm. The lane runs down its channel, so a cable crossing front to rear at
+// the lane meets the back plate at the height it is routed at.
+function crossing(y, diameter = 6) {
+  const {rack, ctx} = ducted();
+  // the 42U's windows are cut through the plate's thickness and no deeper (the
+  // 45U fixture's run the part's whole depth, which hides a cable's radius
+  // pushing the stretch out of the hole): clip these to the plate
+  const duct = S.solidsOf(rack, ctx).filter(x => x.item === 'z1').map(s => (s.holes.length
+    ? {...s, holes: s.holes.map(h => ({...h, box: {...h.box, z0: s.box.z0, z1: s.box.z1}}))} : s));
+  const lane = R.laneXAt(rack, 'left-front', 11, ctx.chassisOf);
+  const a = {x: lane, y, z: 0}, b = {x: lane, y, z: -250};
+  const mids = duct[0].holes.map(h => (h.box.y0 + h.box.y1) / 2).sort((p, q) => p - q);
+  return {duct, a, b, mids, top: duct[0].box.y1, opts: {diameter, lanes: [lane]}};
+}
+
+test('a cable at a window\'s height crosses the vertical\'s back straight, whatever its thickness that fits', () => {
+  for (const d of [0, 3, 6, 9, 20]) {
+    const {duct, a, b, mids} = crossing(0, d);
+    const y = mids[5];
+    const [p, q] = [{...a, y}, {...b, y}];
+    assert.deepEqual(S.legCrossings(p, q, duct, {diameter: d}), [], `diameter ${d}`);
+    assert.deepEqual(S.detour(p, q, duct, {diameter: d, lanes: [a.x]}), [], `diameter ${d}`);
+  }
+  // a cable wider than the window is still stopped by it
+  const {duct, a, b, mids} = crossing(0);
+  const hit = S.legCrossings({...a, y: mids[7]}, {...b, y: mids[7]}, duct, {diameter: 20});
+  assert.deepEqual(hit.map(h => h.solid.part), ['base/floor']);
+});
+
+test('a cable at a height with no window crosses at the nearest window, and never over the duct\'s top', () => {
+  const {duct, a, b, mids, top, opts} = crossing(0);
+  for (const y of [mids[0] + 200, mids[3] + 25, mids[6] - 100, top - 5, 3]) {
+    const p = {...a, y}, q = {...b, y};
+    const pts = S.detour(p, q, duct, opts);
+    assert.ok(Array.isArray(pts) && pts.length > 0, `y ${y}`);
+    assert.ok(pts.every(w => w.y <= top), `y ${y}: no point above the duct's top`);
+    const chain = [p, ...pts, q];
+    assert.deepEqual(chain.slice(1).flatMap((w, i) => S.legCrossings(chain[i], w, duct, {diameter: 6})), [], `y ${y}: the way crosses nothing`);
+    const nearest = mids.reduce((m, v) => (Math.abs(v - y) < Math.abs(m - y) ? v : m));
+    assert.ok(pts.some(w => Math.abs(w.y - nearest) < 1e-6), `y ${y}: through the window at ${nearest}, ${JSON.stringify(pts)}`);
+  }
+});
+
+test('the ways through windows are for a zero-U part only: a rack device\'s plate with the same holes is gone round its edge', () => {
+  const {duct, a, b, mids, top, opts} = crossing(0);
+  const y = mids[1] + 150;                       // between two windows
+  const p = {...a, y}, q = {...b, y};
+  const plate = {...duct[0], zeroU: false};
+  const horiz = S.detour(p, q, [plate], opts);
+  assert.ok(horiz.some(w => w.y > top || w.y < duct[0].box.y0), 'over an edge, as before');
+  const vert = S.detour(p, q, [duct[0]], opts);
+  assert.ok(vert.every(w => w.y <= top && w.y >= duct[0].box.y0));
+});
+
 test('a duct whose fingers are its own body (CMV-5U3W): a route through its channel goes straight through', () => {
   // the 5U finger duct on the left rail beside the panel, U12 to U16
   const r = F.add(F.ownerRack(), 'cmv-5u3w', 12, {side: 'left', label: 'duct'});
@@ -215,13 +271,23 @@ test('a duct whose fingers are its own body (CMV-5U3W): a route through its chan
   // stand inside the duct's footprint and are left open
   assert.deepEqual(s.map(x => x.part), ['flange/floor']);
   const flange = s[0].box;
-  const x = flange.x0 + 7.3;            // the middle of the 14.6 channel
+  // the middle of the 14.6 channel, from the part's centre as the library gives
+  // a guide's x (the 26 mm flange is centred on the part)
+  const x = 7.3 - 13;
   const ctx = F.ctxOf({guides: {i5: [{via: 'duct', kind: 'duct', face: 'front', run: 'y', x}]}});
   const c = F.cable('c1', F.end('i4', 'p150'), F.end('i2', 'bay2'), 'om4',
     {route: [{item: 'i5', via: 'duct'}], routeEdited: true});
   const p = R.routePath({...r, cables: [c]}, c, ctx);
   const at = p.points.find(q => q.at === 'pathway');
   assert.ok(at.z > flange.z1, `the duct point stands in front of its flange: ${at.z} > ${flange.z1}`);
+  // ... and on the rail, over its channel, not at the rack's centre (P-0016)
+  assert.ok(Math.abs(at.x - (flange.x0 + 7.3)) < 1e-9, `the duct point is on the part: ${at.x} against ${flange.x0 + 7.3}`);
+  assert.ok(at.x < -200 && at.x > -260, `a left-rail part's duct point is at about -233: ${at.x}`);
+  const right = F.add(F.ownerRack(), 'cmv-5u3w', 12, {side: 'right', label: 'duct'});
+  // a right-rail part is turned end over end, so its channel is mirrored about its centre
+  const rflange = S.solidsOf(right, F.ctxOf()).find(q => q.item === 'i5').box;
+  const rx = R.pointOf(right, {item: 'i5', via: 'duct'}, ctx).x;
+  assert.ok(Math.abs(rx - (rflange.x1 - 7.3)) < 1e-9, `a right-rail part's duct point is over its channel: ${rx} against ${rflange.x1 - 7.3}`);
   assert.deepEqual(p.crossings, []);
   assert.deepEqual(p.detours.filter(d => d.between.some(w => w.item === 'i5')), []);
 });

@@ -206,7 +206,7 @@ Without `ends` the zone reader answers what it always did.
 
 ## 7. Later steps, named
 
-1. **A zero-U part as an end** (a vertical PDU): **done in kit 0.36.0.** An end
+1. **A zero-U part as an end** (a vertical PDU): **done in kit 0.38.0.** An end
    names the part's id as its `item` and one of its own connector slots as its
    `path`. No page reads a part beside the rack, so the catalogue answers for
    the end whole: the slot is its outlet, a C13, C19 or C39 by its interface,

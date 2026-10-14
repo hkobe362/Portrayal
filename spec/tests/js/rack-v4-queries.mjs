@@ -116,9 +116,11 @@ test('cable.lay pins the face a cable lies on in a tray, and the routes act on i
 });
 
 test('cable.lay keeps a key left out, unpins with null, and removes an entry with neither left', () => {
-  const r = onTray(), ctx = {route: FX.ctxOf(r)};
+  // a position is one of the cables that share the pathway (P-0018): three of them are on the tray
+  const r0 = onTray(), G4 = {item: 'i4', via: 'guide-4'};
+  const r = {...r0, cables: r0.cables.map((c, k) => (k < 3 ? {...c, route: [TRAY], routeEdited: true} : c))}, ctx = {route: FX.ctxOf(r)};
   const lay = rack => rack.cables[0].lay;
-  const a = run(r, {op: 'cable.lay', id: 'c1', at: TRAY, face: 'underside', position: 2}, ctx).rack;
+  const a = run(r,{op: 'cable.lay', id: 'c1', at: TRAY, face: 'underside', position: 2}, ctx).rack;
   assert.deepEqual(lay(a), [{item: 'i4', via: 'tray', position: 2, face: 'underside'}]);
   // position is kept and not acted on: the path is the one of the face alone
   const faceOnly = run(r, {op: 'cable.lay', id: 'c1', at: TRAY, face: 'underside'}, ctx).rack;
@@ -133,12 +135,16 @@ test('cable.lay keeps a key left out, unpins with null, and removes an entry wit
   assert.equal(d.summary, 'c1 is no longer pinned in CM-01 tray.');
   assert.equal(run(d.rack, {op: 'cable.lay', id: 'c1', at: TRAY, position: null}, ctx).noop, true);
   // a second pathway is a second entry, and the first is left as it was
-  const two = run(a, {op: 'cable.lay', id: 'c1', at: {item: 'i4', via: 'guide-4'}, position: 1}, ctx).rack;
+  // (a pathway the cable does not use takes no position)
+  assert.match(run(a, {op: 'cable.lay', id: 'c1', at: G4, position: 1}, ctx).error, /^c1 does not pass through CM-01 guide-4/);
+  const via4 = {...a, cables: [{...a.cables[0], route: [TRAY, G4]}, ...a.cables.slice(1)]};
+  const two = run(via4, {op: 'cable.lay', id: 'c1', at: G4, position: 1}, ctx).rack;
   assert.deepEqual(lay(two), [{item: 'i4', via: 'tray', position: 2, face: 'underside'}, {item: 'i4', via: 'guide-4', position: 1}]);
   // what the file holds that is no usable entry is kept as written, and the routes pass over it
   const odd = {...r, cables: [{...r.cables[0], lay: ['x', {item: 'i4'}, {item: 'i4', via: 'tray', face: 'sideways'}]}, ...r.cables.slice(1)]};
   assert.deepEqual(R.routePath(odd, odd.cables[0], ctx.route).points, R.routePath(r, r.cables[0], ctx.route).points);
-  const kept = run(odd, {op: 'cable.lay', id: 'c1', at: {item: 'i4', via: 'guide-4'}, position: 1}, ctx).rack;
+  const odd4 = {...odd, cables: [{...odd.cables[0], route: [TRAY, G4]}, ...odd.cables.slice(1)]};
+  const kept = run(odd4, {op: 'cable.lay', id: 'c1', at: G4, position: 1}, ctx).rack;
   assert.deepEqual(lay(kept).slice(0, 2), ['x', {item: 'i4'}]);
   for (const l of [null, 7, 'tray', {item: 'i4', via: 'tray', face: 'underside'}])
     assert.equal(R.layFaceOf({lay: l}, TRAY), null, JSON.stringify(l));
@@ -147,7 +153,7 @@ test('cable.lay keeps a key left out, unpins with null, and removes an entry wit
 test('cable.lay refuses a face on a ring, a held face the tray does not offer, and a cable or device that is gone', () => {
   const r = onTray(), ctx = {route: FX.ctxOf(r)};
   const err = (cmd, c = ctx, rack = r) => run(rack, {op: 'cable.lay', id: 'c1', ...cmd}, c).error;
-  assert.equal(err({at: {item: 'i4', via: 'guide-4'}, face: 'top'}), 'CM-01 guide-4 is no tray, so a cable has no face to lie on there.');
+  assert.equal(err({at: {item: 'i4', via: 'guide-4'}, face: 'top'}), 'CM-01 guide-4 is a ring or a duct, not a tray: a cable has no face to lie on there.');
   assert.equal(err({at: TRAY}), 'cable.lay needs a position or a face: a value to pin it, or null to unpin it.');
   assert.equal(err({at: {item: 'i99', via: 'tray'}, face: 'top'}), 'i99 is not in the rack.');
   assert.equal(run(r, {op: 'cable.lay', id: 'c99', at: TRAY, face: 'top'}, ctx).error, run(r, {op: 'cable.update', id: 'c99', label: 'x'}, ctx).error);

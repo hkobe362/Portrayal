@@ -1,6 +1,6 @@
 ### Added
 - **A cable can end on an outlet of a zero-U PDU** beside the rack.
-  `@portrayal/kit` is 0.36.0. An end is `{item, path, view}` with `item` the
+  `@portrayal/kit` is 0.38.0. An end is `{item, path, view}` with `item` the
   part's id (`z3`) and `path` one of its own connector slots (`outlet-a2`).
   `cable.add` and `cable.update` take it; a path the part does not have is
   refused, naming the slots it has by type. Taking the part away keeps its

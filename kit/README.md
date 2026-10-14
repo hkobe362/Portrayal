@@ -674,7 +674,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.36.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
+**New in 0.38.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
 on a part beside the rack (`item: 'z3'`, `path: 'outlet-a2'`), on one of its own connector slots.
 The commands, `settleEnds`, the routes, `freePorts`, `inspect` and the exports find it as they find
 a port of a device. Its place is the slot's `mate` in `configs.json`, so **a route context needs
@@ -682,6 +682,31 @@ a port of a device. Its place is the slot's `mate` in `configs.json`, so **a rou
 cord has no length, as for a port not found. `freePorts(rack, 'z3', ctx, {type: 'C39', near: 35})`
 lists the free C39 outlets nearest U35. A page that draws cords reads the plug each end takes from
 the settled facts (`info.plug`): at a slot that takes two, it pairs with the far end's plug.
+
+**New in 0.37.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
+the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
+face (c1, c2)`) and the cords shorter than their route needs (for example `2 cords are shorter than their route needs (the
+worst c2, 1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
+`{item, via, text}`, from the new `ringFindingsOf(rack, cable, ctx, nameOf, path)` in `rack/route.js`
+(`ringFindings` is now one call of it for each cable); a short cord was already in its `spare_findings`.
+A bend of one turn that is at a stop of the route has `stop`, that waypoint, in `routePath`'s `bends`, in
+`bendFindingsOf` and in `inspect`'s `route.bends`, and its sentence names it before the two stops either side
+(`c1 turns 90 degrees at right-front U20, between lacer ring 1 and right-front U30, with room for ...`); a corner in a
+lead or a detour has no `stop` and reads as before. `cable.lay`, when the routes are known, refuses a
+`position` past the number of cables whose routes pass through the pathway, and one for a cable that does not
+pass through it, and says of a face on a ring or a duct that it is one. **A page that shows a bend's sentence
+shows the new wording without a change; a page that lists a cable's findings adds `route.ring_findings`; the
+text of `describe` has two new clauses, and a page or an agent that parses it adds them.**
+
+**New in 0.36.0: a cable crosses a vertical manager through its back windows** (P-0016). A cable
+routed front to rear past a full-height vertical duct used to go over the top of the duct, because
+`legCrossings` judged a window on the plate grown by the cable's radius, where no cable fits. A window
+is now judged on the true plate, so a cable at a window's height crosses straight, and `waysRound`
+tries a zero-U part's holes, nearest first, before its top or bottom edge, so a cable routed at a
+height with no window crosses at the nearest window. Horizontal managers are routed as before.
+`pointOf` also puts the duct waypoint of a narrow rack-face part on a rail (the CMV-5U3W) on the
+part, where it was at the rack's centre. **A page that vendors the kit changes nothing; the cables
+through a vertical or the 5U bracket measure shorter or longer, as they are really laid.**
 
 **New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
 stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
