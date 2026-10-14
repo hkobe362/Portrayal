@@ -898,6 +898,8 @@ const zeroUPointMemo = new WeakMap();
 export function zeroUEndPoint(rack, end, ctx) {
   const z = zeroUById(rack, end?.item);
   if (!z || typeof ctx?.chassisOf !== 'function') return null;
+  // no catalogue yet: no point, and nothing kept, so one given later is read
+  if (typeof ctx.slotsOf !== 'function' || typeof ctx.compByRef !== 'function') return null;
   const keyed = ctx !== null && typeof ctx === 'object';
   let per = zeroUPointMemo.get(rack);
   if (!per) zeroUPointMemo.set(rack, per = new WeakMap());

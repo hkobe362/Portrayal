@@ -326,9 +326,10 @@ export async function freePorts(rack, itemId, ctx, {kinds = null, type = null, n
   return type == null ? out : out.filter(e => e.connector && ofType({type: String(e.connector).split(' ')[0]}));
 }
 // THE SLOTS OF A RACK ITEM A CABLE LANDS ON, from the catalogue alone (ports.js
-// cableEndPaths), front then rear: {path, view, kind, connector, plug}. What
-// each is comes from the part it is one piece of (a supply says it is an AC
-// inlet), else from the coupler it is; [] without the catalogue.
+// cableEndPaths) that are power or ground ends, front then rear: {path, view,
+// kind, connector, plug}. What each is comes from the part it is one piece of
+// (a supply says it is an AC inlet), else from the coupler it is; [] without
+// the catalogue.
 export function slotEnds(item, {slotsOf, compByRef, redirects = null} = {}) {
   const slots = typeof slotsOf === 'function' && typeof compByRef === 'function' ? slotsOf(item.ref) : null;
   if (!slots || slots.error) return [];
@@ -342,6 +343,9 @@ export function slotEnds(item, {slotsOf, compByRef, redirects = null} = {}) {
       info = receptacleOf(partOf(compByRef, seats.refAt(q)));
     }
     if (!info.family && couplerRole(slot.interface)) info = {family: 'power', mode: null, role: couplerRole(slot.interface)};
+    // a power or ground end only: a slot whose part says neither (an RJ45
+    // jack) is a data port, which the reader of the drawing lists
+    if (endKind(info) === 'other') return [];
     return [{path, view, kind: endKind(info), connector: connectorName(slot, info), plug: endPlug(slot, compByRef).plug}];
   }));
 }

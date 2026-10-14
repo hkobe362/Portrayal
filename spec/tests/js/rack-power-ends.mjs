@@ -383,6 +383,8 @@ test('free ports list power and ground ends with words a person reads, and the p
   assert.deepEqual(old.filter(p => p.kind === 'power').map(p => [p.path, p.connector]), [
     ['psu-1/module/inlet', 'C14 inlet'], ['psu-2/module/terminal/lug-1', 'terminal-stud inlet'], ['psu-2/module/terminal/lug-2', 'terminal-stud inlet'],
     ['psu-2/module/terminal/lug-10', 'terminal-stud inlet'], ['psu-3/module/inlet', 'C14 inlet']]);
+  // and never a data slot (rj-1 is the reader's to list) nor a slot whose part says nothing
+  assert.deepEqual(old.filter(p => p.kind && p.kind !== 'power'), []);
   const now = await Q.freePorts(RACK, 'i1', {...ctx, portsOf});
   assert.deepEqual(now.filter(p => !p.kind), was, 'every port of class port is the same entry, key for key');
   assert.deepEqual(await Q.freePorts(RACK, 'i1', {...ctx, portsOf}, {kinds: ['data']}), was, 'and a data picker gets only those');

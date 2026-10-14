@@ -11,6 +11,7 @@ import * as R from '../../../kit/rack/route.js';
 import * as P from '../../../kit/rack/ports.js';
 import * as X from '../../../kit/rack/export-data.js';
 import * as CR from '../../../kit/rack/cable-rules.js';
+import * as S from '../../../kit/rack/solids.js';
 import {apply, NOT_ADDED, GONE} from '../../../kit/rack/commands.js';
 import {OPENING, RAIL_W} from '../../../kit/rack/rails.js';
 import {compByRef, SLOTS, SIZES, oldPage, C13, C14, C19, C20} from './power-ends-fixture.mjs';
@@ -155,6 +156,25 @@ test('the cord ends at the outlet: its place on the PDU, and the length to it, t
   // and withRoutedLengths gives the cord its stock length
   const sized = R.withRoutedLengths(lo, rc);
   assert.equal(sized.cables[0].length.source, 'routed');
+});
+
+test('at a front upright the panel is not mirrored, a raised part carries its outlets up, and its back looks the other way', () => {
+  const r = run(M.withItem(M.newRack(), {ref: 'sw', cfg: 'base', ru: 35, label: 'sw-1'}).rack,
+    {op: 'zerou.place', ref: 'vpdu', at: 'left-front', ru: 2, label: 'PDU-F'}).rack;
+  const z = r.zeroU[0], up = M.zeroUOffset(2), cx = -(OPENING / 2 + RAIL_W + 26);
+  assert.deepEqual([M.zeroUPane(z), M.zeroUPane(z, 'rear')], ['front', 'rear']);
+  const p = R.portPoint(r, at('outlet-a1'), rc);
+  const near = (a, b) => ['x', 'y', 'z'].every(k => Math.abs(a[k] - b[k]) < 1e-6);
+  // a front upright: the PDU looks forward, its panel as drawn, its face half its depth before the post's middle
+  assert.ok(near(p, {x: cx - 26 + 24.3, y: up + H - 1619.67, z: -17 + 65 / 2}), JSON.stringify(p));
+  // its back panel is the depth behind, and drawn from behind (x runs the other way)
+  const b = S.zeroUPanelPoint(r, z, SIZES2.vpdu, {x: 10, y: 100}, 'rear');
+  assert.ok(near(b, {x: cx - 26 + (52 - 10), y: up + 100, z: -17 - 65 / 2}), JSON.stringify(b));
+  // with no catalogue in the context there is no point, and none is kept for a context that has one
+  const bare = {chassisOf: ctx.chassisOf, guidesOf: () => [], portX: () => 0};
+  assert.equal(R.portPoint(r, at('outlet-a1'), bare), null);
+  bare.slotsOf = ctx.slotsOf; bare.compByRef = ctx.compByRef;
+  assert.ok(near(R.portPoint(r, at('outlet-a1'), bare), p));
 });
 
 test('free ports: the PDU\'s outlets by type, nearest a unit, and a device\'s inlets beside its data ports', async () => {
