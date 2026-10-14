@@ -656,7 +656,9 @@ function unitOf(rack, w, ctx) {
 }
 // The waypoints that resolve, with each on a zero-U part as its lane run.
 // `ends` are the units of the cable's two ports, or none for a trunk.
-function resolvedList(rack, list, ctx, ends = [null, null]) {
+// `marks`, when given, takes {lane, ru, item, via} for each window of a
+// zero-U part the route names, at the lane point it resolves to (windowsOf).
+function resolvedList(rack, list, ctx, ends = [null, null], marks = null) {
   const kept = [], gone = [];
   for (const w of list) (resolves(rack, w, ctx) ? kept : gone).push(w);
   // a route that names no zero-U part is as it was, waypoint for waypoint
@@ -668,10 +670,25 @@ function resolvedList(rack, list, ctx, ends = [null, null]) {
       for (let j = from; j >= 0 && j < kept.length; j += step) { const u = unitOf(rack, kept[j], ctx); if (u != null) return u; }
       return end;
     };
-    out.push(...zeroULanes(rack, w, near(k - 1, -1, ends[0]), near(k + 1, 1, ends[1]), ctx));
+    const lanes = zeroULanes(rack, w, near(k - 1, -1, ends[0]), near(k + 1, 1, ends[1]), ctx);
+    if (marks && zeroUPathways(rack, zeroUById(rack, w.item), ctx).find(p => p.via === w.via)?.kind === 'pass')
+      marks.push({lane: lanes[0].lane, ru: lanes[0].ru, item: w.item, via: w.via});
+    out.push(...lanes);
   });
   // two lane points in a row at one unit are one (a duct entered and left there)
   return {waypoints: out.filter((w, i) => i === 0 || !(w.lane && sameWp(w, out[i - 1]))), gone};
+}
+
+// THE WINDOWS A CABLE'S ROUTE NAMES, [{lane, ru, item, via}]: each window of
+// a part beside the rack in a route written by hand, with the lane point it
+// resolves to, in route order. resolveRoute keeps only that point, so this is
+// how a summary can still name the window (routeText, ductsThrough). [] for a
+// route the kit chose.
+export function windowsOf(rack, cable, ctx) {
+  if (cable.routeEdited !== true) return [];
+  const marks = [];
+  resolvedList(rack, cable.route || [], ctx, [cable.a, cable.b].map(e => itemOf(rack, e?.item)?.ru ?? null), marks);
+  return marks;
 }
 
 // THE TRAY A WAYPOINT NAMES (docs/cable-lay-design.md section 2.1), placed
@@ -806,12 +823,16 @@ export function routeText(route, nameOf = id => id, frame = null, through = null
 }
 // THE DUCTS A LANE RUN GOES THROUGH, for routeText: the zero-U parts that
 // carry a lane, on this one, over any unit of the run, each as "<name> <its
-// duct>". `nameOf(id)` names a part.
-export const ductsThrough = (rack, chassisOf, nameOf = id => id) => (lane, from, to) => {
+// duct>". `nameOf(id)` names a part. `windows` (windowsOf) adds each window
+// the route names on this lane within the run, "<name> <window>", after the
+// ducts.
+export const ductsThrough = (rack, chassisOf, nameOf = id => id, windows = []) => (lane, from, to) => {
   if (typeof chassisOf !== 'function') return [];
   const run = [{lane, ru: from}, {lane, ru: to}];
-  return zeroUOf(rack).filter(z => carriesLane(chassisOf(z.ref)) && runsThrough(run, z, chassisOf))
+  const ducts = zeroUOf(rack).filter(z => carriesLane(chassisOf(z.ref)) && runsThrough(run, z, chassisOf))
     .map(z => `${nameOf(z.id)} ${zeroUPathways(rack, z, {chassisOf}).find(p => p.kind === 'duct')?.via ?? 'duct'}`);
+  const [lo, hi] = [Math.min(from, to), Math.max(from, to)];
+  return [...ducts, ...windows.filter(m => m.lane === lane && m.ru >= lo && m.ru <= hi).map(m => `${nameOf(m.item)} ${m.via}`)];
 };
 
 // ── geometry, in rack coordinates (mm) ────────────────────────────────────

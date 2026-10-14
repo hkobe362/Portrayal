@@ -251,3 +251,122 @@ test('the tool descriptions say where spare can go, and that a route can name a 
   assert.match(COMMANDS['cable.route'].description, /beside the rack: its duct/);
   assert.match(COMMANDS['cable.route'].args.properties.route.description, /beside the rack/);
 });
+
+// ── what a tester found through the Rack Builder preview (P-0026) ────────
+
+const withLength = (r, id, value) => ({...r, cables: r.cables.map(c => (c.id === id ? {...c, length: {value, unit: 'm', source: 'entered'}} : c))});
+const spareOf = (r, id) => SL.slackOf(r, r.cables.find(c => c.id === id), routeCtx()).spare.spare_m;
+
+test('an amount larger than the cable\'s spare is refused, and any stored spare on a short cable', () => {
+  const r = rack();
+  const spare = spareOf(r, 'c1');
+  assert.ok(spare > 0.5 && spare < 3);
+  const big = run(r, {op: 'cable.slack', id: 'c1', at: DUCT, value: 5});
+  assert.equal(big.error, `c1 has only ${SL.mText(spare)} of spare, so storing 5 m is more than it has.`);
+  // in feet, and at an end
+  assert.match(run(r, {op: 'cable.slack', id: 'c1', at: DUCT, value: 20, unit: 'ft'}).error, /^c1 has only \d\.\d+ m of spare, so storing 6\.1 m is more than it has\.$/);
+  assert.match(run(r, {op: 'cable.slack', id: 'c1', at: {end: 'a'}, value: 5}).error, /^c1 has only /);
+  // what it has fits; and with another amount stored already, the two together are counted
+  const fits = run(r, {op: 'cable.slack', id: 'c1', at: DUCT, value: 0.3});
+  assert.equal(fits.error, undefined, fits.error);
+  const two = run(fits.rack, {op: 'cable.slack', id: 'c1', at: {end: 'a'}, value: spare});
+  assert.equal(two.error, `c1 has only ${SL.mText(spare)} of spare and 0.3 m of it is stored already, so storing ${SL.mText(spare)} more is too much.`);
+  // by default the place takes what is left to store: never more than the spare
+  const dflt = run(r, {op: 'cable.slack', id: 'c1', at: DUCT});
+  assert.equal(dflt.error, undefined, dflt.error);
+  const s = SL.slackOf(dflt.rack, dflt.rack.cables[0], routeCtx());
+  assert.ok(s.entries[0].metres <= spare + 1e-9 && s.over_m === 0);
+  // a short cable stores nothing, whether or not it says how much
+  const short = withLength(r, 'c1', 0.3);
+  const lack = -spareOf(short, 'c1');
+  assert.ok(lack > 0);
+  const msg = `c1 is ${SL.mText(lack)} short of what its route needs, so it has no spare to store.`;
+  for (const cmd of [{at: DUCT}, {at: DUCT, value: 0.1}, {at: {end: 'b'}}, {at: {end: 'a'}, value: 0.1}])
+    assert.equal(run(short, {op: 'cable.slack', id: 'c1', ...cmd}).error, msg);
+  // a routed length is no limit: it grows by what is stored
+  const routed = {...r, cables: r.cables.map(c => (c.id === 'c1' ? {...c, length: {value: 1, unit: 'm', source: 'routed'}} : c))};
+  assert.equal(run(routed, {op: 'cable.slack', id: 'c1', at: DUCT, value: 5}).error, undefined);
+  // without routes nothing can be judged, and it is recorded as given
+  assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: DUCT, value: 5}, {chassisOf}).error, undefined);
+});
+
+test('spare can go in a duct the route passes through by a lane run, in the list and in a refusal', async () => {
+  // a vertical part of 8 units on the right-front lane, and routes that pass it
+  const short = {...SIZES['cmv-sfd45u5w'], ru: 8, h: 8 * 44.45};
+  const cs = ref => (ref === 'cmv-sfd45u5w' ? short : chassisOf(ref));
+  const cx = {chassisOf: cs, route: routeCtx({chassisOf: cs})};
+  const r = rack([
+    cable('c1', 'i1', 'i2', [{lane: 'right-front', ru: 44}, {lane: 'right-front', ru: 5}]),
+    cable('c2', 'i1', 'i2', [{lane: 'right-front', ru: 44}, {item: 'i3', via: 'duct'}, {lane: 'right-front', ru: 5}]),
+    cable('c3', 'i1', 'i2', [{lane: 'right-front', ru: 44}, {lane: 'right-rear', ru: 20}, {lane: 'right-front', ru: 2}]),
+  ]);
+  const z = {...r.zeroU[0], offsetMm: 20 * 44.45};
+  const rr = {...r, zeroU: [z]};
+  const places = async id => (await Q.inspect(rr, id, cx)).spare_places;  const [lo, hi] = [z.offsetMm, z.offsetMm + short.h];
+  assert.ok(lo > 0 && hi < 45 * 44.45);
+  // c1 runs from above the part to below it: through the duct with no waypoint in it
+  assert.deepEqual(await places('c1'), [{item: 'z1', via: 'duct', kind: 'duct'}]);
+  assert.match(run(rr, {op: 'cable.slack', id: 'c1', at: {item: 'i3', via: 'duct'}}, cx).error, /The spare of c1 can go in vcm-1 duct, or at an end/);
+  // a route that names the duct is the same run
+  const named = run(rr, {op: 'cable.route', id: 'c2', route: [{item: 'z1', via: 'duct'}]}, cx);
+  assert.deepEqual(await places('c1'), (await Q.inspect(named.rack, 'c2', cx)).spare_places);
+  // crossing to the rear lane first, the front lane is not run along
+  assert.deepEqual(await places('c3'), []);
+});
+
+test('the route text names a window of a part beside the rack, as it names a duct', async () => {
+  const r = rack();
+  const w = run(r, {op: 'cable.route', id: 'c2', route: [{lane: 'right-front', ru: 39}, {item: 'z1', via: 'pass-through 5'}, {lane: 'right-rear', ru: 38}]});
+  assert.equal(w.error, undefined, w.error);
+  const text = (await Q.inspect(w.rack, 'c2', ctxFor())).route.text;
+  assert.match(text, /^right-front U39-U\d+, through vcm-1 duct and vcm-1 pass-through-5 > right-rear U38$/);
+  // a window is named only where the route names it
+  assert.equal((await Q.inspect(r, 'c2', ctxFor())).route.text, 'right-front U30-U26, through vcm-1 duct');
+  assert.deepEqual(R.windowsOf(w.rack, w.rack.cables[1], routeCtx()).map(m => [m.item, m.via, m.lane]), [['z1', 'pass-through-5', 'right-front']]);
+  assert.deepEqual(R.windowsOf(r, r.cables[1], routeCtx()), []);
+  assert.equal(R.routeText(DOWN, id => id, r.frame, R.ductsThrough(r, chassisOf, id => id, [{item: 'z1', via: 'pass-through-5', lane: 'right-front', ru: 28}])),
+    'right-front U30-U26, through z1 duct and z1 pass-through-5');
+});
+
+test('a summary names a vertical beside the rack by its label, and by its id where two share one', async () => {
+  const one = rack();
+  assert.equal((await Q.inspect(one, 'c2', ctxFor())).route.text, 'right-front U30-U26, through vcm-1 duct');
+  // two verticals of one model: the label alone does not say which
+  const two = {...one, zeroU: [...one.zeroU, {id: 'z2', ref: 'cmv-sfd45u5w', cfg: 'base', label: 'vcm-1', at: 'left-front', offsetMm: 0}],
+    cables: [...one.cables, cable('c6', 'i1', 'i2', [{lane: 'left-front', ru: 30}, {lane: 'left-front', ru: 26}])]};
+  assert.equal((await Q.inspect(two, 'c2', ctxFor())).route.text, 'right-front U30-U26, through vcm-1 (z1) duct');
+  assert.equal((await Q.inspect(two, 'c6', ctxFor())).route.text, 'left-front U30-U26, through vcm-1 (z2) duct');
+  const w = run(two, {op: 'cable.route', id: 'c6', route: [{lane: 'left-front', ru: 30}, {item: 'z2', via: 'pass-through-5'}, {lane: 'left-rear', ru: 20}]});
+  assert.match((await Q.inspect(w.rack, 'c6', ctxFor())).route.text, /through vcm-1 \(z2\) duct and vcm-1 \(z2\) pass-through-5/);
+  // and the capacity sentences say the same
+  assert.equal(SL.loadText(two, 'z1', {stated: false}), 'vcm-1 (z1) states no cable capacity, so the spare stored in it is not counted.');
+});
+
+test('a fibre cable is not counted against a Cat6 figure, and the count is worded in the singular', () => {
+  const small = n => ({...SIZES['cmh-bs-sfds1u'], capacity: {count: n, basis: 'Cat6 24AWG', media: 'cat6'}});
+  const cxn = n => { const c = small(n), ch = ref => (ref === 'cmh-bs-sfds1u' ? c : chassisOf(ref)); return {chassisOf: ch, route: routeCtx({chassisOf: ch})}; };
+  // c1 is Cat6 and c3 is fibre; both run through the duct, and the figure is a count of Cat6
+  const r = rack();
+  const fibre = {...r, cables: r.cables.map(c => (c.id === 'c3' ? {...c, media: 'om4', length: {value: 2, unit: 'm', source: 'entered'}} : c))};
+  const ok = run(fibre, {op: 'cable.slack', id: 'c3', at: DUCT}, cxn(1));
+  assert.equal(ok.error, undefined, ok.error);
+  assert.deepEqual(ok.findings.map(f => f.text),
+    ['hm-1 states its cable capacity for cat6 cables, and fibre (om4) is not counted against a cat6 figure, so the spare stored in it is not counted.']);
+  const load = SL.spareLoad(ok.rack, 'i3', cxn(1).route, ok.rack.cables[2]);
+  assert.deepEqual([load.stated, load.compared, load.notCounted], [true, false, true]);
+  // a Cat6 cable is counted, and a duct past its count by the other cables is not blamed on the fibre one
+  const full = run(fibre, {op: 'cable.slack', id: 'c1', at: DUCT}, cxn(1));
+  assert.match(full.error, /^hm-1 holds \d cat6 cables' worth with the spare stored in it, past the 1 its maker states\./);
+  const full2 = run(ok.rack, {op: 'cable.slack', id: 'c1', at: DUCT, value: 0.2}, cxn(1));
+  assert.match(full2.error, /^hm-1 holds \d cat6 cables' worth/);
+  assert.equal(run(fibre, {op: 'cable.slack', id: 'c3', at: DUCT}, cxn(0)).error, undefined);
+  const over = SL.slackFindings(ok.rack, cxn(1).route).filter(f => f.cable === 'c3');
+  assert.deepEqual(over.map(f => f.kind), ['spare-capacity-unstated']);
+  assert.match(over[0].text, /fibre \(om4\) is not counted against a cat6 figure/);
+  // the plural
+  assert.equal(SL.loadText(r, 'i3', {compared: true, count: 1, capacity: 0, media: 'cat6'}), "hm-1 holds 1 cat6 cable's worth with the spare stored in it, past the 0 its maker states.");
+  assert.equal(SL.loadText(r, 'i3', {compared: true, count: 2, capacity: 1, media: 'cat6'}), "hm-1 holds 2 cat6 cables' worth with the spare stored in it, past the 1 its maker states.");
+  assert.equal(SL.loadText(r, 'i3', {compared: true, count: 1, capacity: 0, media: null}), "hm-1 holds 1 cable's worth with the spare stored in it, past the 0 its maker states.");
+  // a maker that states none stays as it was
+  assert.equal(SL.loadText(r, 'z1', {stated: false}), 'vcm-1 states no cable capacity, so the spare stored in it is not counted.');
+});

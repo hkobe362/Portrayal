@@ -15,9 +15,9 @@ import {zeroUById, zeroUBottomMm} from './model.js';
 import {RU} from './rails.js';
 import {configFacts} from './catalog.js';
 import {lanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf, ringFindingsOf, ductsThrough,
-  zeroUPathways, pathwaysAt} from './route.js';
+  zeroUPathways, pathwaysAt, windowsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
-import {slackOf, slackFindings, sparePlaces, holdsSpare, spareExports, trayText, mText} from './slack.js';
+import {slackOf, slackFindings, sparePlaces, holdsSpare, spareExports, trayText, mText, labelOf} from './slack.js';
 import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
 import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText, fewText,
@@ -538,14 +538,16 @@ async function cableInfo(rack, cable, ctx) {
   const uOf = ctx.chassisOf ? heightOf(ctx.chassisOf) : carriedU;
   const end = e => ({item: e.item, path: e.path, view: e.view, name: endName(rack, e, uOf)});
   const l = cable.length;
-  const label = id => rack.items.find(i => i.id === id)?.label ?? (zeroUOf(rack).find(z => z.id === id)?.label || id);
+  // a part beside the rack is named as the page names it: its label, and its id too where another part has the label
+  const label = id => labelOf(rack, id);
   const edited = cable.routeEdited === true;
   // A route context's readers come from the page's drawings and may throw; a
   // measure that fails is "not measured", never an error.
-  let routed = null, waypoints = edited ? cable.route || [] : [], rings = null, crosses = null, rests = null, bends = null, covers = null, ringNote = null;
+  let routed = null, waypoints = edited ? cable.route || [] : [], windows = [], rings = null, crosses = null, rests = null, bends = null, covers = null, ringNote = null;
   if (ctx.route) {
     try {
       waypoints = resolveRoute(rack, cable, ctx.route).waypoints;
+      windows = windowsOf(rack, cable, ctx.route);
       // one path for the length and the rings (#930)
       const path = routePath(rack, cable, ctx.route);
       const r = pathLength(path);
@@ -636,7 +638,7 @@ async function cableInfo(rack, cable, ctx) {
     ...(spareNote?.length ? {spare_findings: spareNote} : {}), ...(places ? {spare_places: places} : {}),
     // how it was laid by hand in a pathway, as the file has it (`cable.lay`)
     ...(Array.isArray(cable.lay) && cable.lay.length ? {lay: cable.lay} : {}),
-    route: {edited, waypoints, text: routeText(waypoints, label, rack.frame, ductsThrough(rack, ctx.chassisOf, label)), ...(rings ? {rings} : {}), ...(crosses ? {crosses} : {}), ...(rests ? {rests} : {}),
+    route: {edited, waypoints, text: routeText(waypoints, label, rack.frame, ductsThrough(rack, ctx.chassisOf, label, windows)), ...(rings ? {rings} : {}), ...(crosses ? {crosses} : {}), ...(rests ? {rests} : {}),
             ...(bends ? {bends} : {}), ...(covers ? {covers} : {}), ...(ringNote ? {ring_findings: ringNote} : {})}, lanes: lanesOf(rack.frame), passes,
     loose, mismatch: warn, ...(unchecked ? {unchecked: true} : {})};
 }

@@ -674,6 +674,14 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.39.0: fixes to spare in ducts.** `cable.slack` refuses an amount larger than the cable's
+spare (what is already stored counts toward it) and any spare on a short cable, and says how much
+spare there is or how short the cable is. A duct's cable count is the cable's own kind: a fibre cable
+is not counted against a count of Cat6, and a finding says so. A route summary names a window the
+route goes through (`windowsOf` in `rack/route.js`), and names a part beside the rack by its label
+and, where another part shares the label, its id. **A page that vendors the kit changes nothing; a
+`cable.slack` that was accepted may now be refused.**
+
 **New in 0.38.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
 on a part beside the rack (`item: 'z3'`, `path: 'outlet-a2'`), on one of its own connector slots.
 The commands, `settleEnds`, the routes, `freePorts`, `inspect` and the exports find it as they find
