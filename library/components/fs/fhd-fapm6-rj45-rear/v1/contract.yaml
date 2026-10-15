@@ -1,0 +1,41 @@
+format: 1
+kind: component
+name: fhd-fapm6-rj45-rear
+version: 1.0.0
+class: adapter-panel
+description: >-
+  The back of the FAPM6 loaded with six Cat6 RJ45 keystone jacks
+  (fs/fhd-fapm6-rj45@1): the punch-down (IDC) back of each jack, seen from
+  behind, where each cable is terminated.
+size: {w: 88.0, h: 34.8}
+size-confidence: {w: drawing, h: drawing}
+size-notes: >-
+  THE FAPM6's JACK BLOCK, 88 x 34.8 as the front declares it (its body
+  footprint), seen from behind. NO DEPTH IS DECLARED: a face is a drawing of a
+  back, and the depth belongs to the panel, as `body.depth`.
+attrs: {media: idc}
+parts:
+  - {id: b1, ref: common/idc-termination@1, at: [62.04, 18.595]}
+  - {id: b2, ref: common/idc-termination@1, at: [62.04, 1.695]}
+  - {id: b3, ref: common/idc-termination@1, at: [35.95, 18.595]}
+  - {id: b4, ref: common/idc-termination@1, at: [35.95, 1.695]}
+  - {id: b5, ref: common/idc-termination@1, at: [9.86, 18.595]}
+  - {id: b6, ref: common/idc-termination@1, at: [9.86, 1.695]}
+provenance:
+  size: >-
+    drawing - see size-notes.
+  parts: >-
+    THE FRONT's JACKS, SEEN FROM BEHIND. Each front jack `pN` has the entry
+    `bN` here, behind it (a rear id may not repeat a front id, lint L112),
+    centred where the front jack is centred in the 88 block and mirrored
+    across it (seen from behind, the left column is on the right), at the same
+    height. Each is common/idc-termination@1, a 16.1 x 14.5 jack body. A jack
+    is one piece, so `bN` is the back of `pN` and a link passes through the
+    panel from the one to the other. The ESTIMATED part is that FS's FHD-FAPM6
+    datasheet (p5) lists #72818 as the Cat6 keystone jack and does not describe
+    it, and the jack datasheet that describes a punch-down jack gives no item
+    number; see fs/fhd-fapm6-rj45@1.
+  face-detail-gap: >-
+    FS shows no render of the loaded panel's back; the steel behind the jacks
+    is painted as one dark field.
+skins: [default]

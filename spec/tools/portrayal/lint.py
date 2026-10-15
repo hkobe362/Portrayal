@@ -394,7 +394,7 @@ RULES = {
             "A dimension with no confidence reads exactly like a measured one to anything that has only the number, so an estimated size passes for a measured one.",
             WARNING),
     "L98": ("component",  "a character display says how wide it is, and every reading fits", "add `characters:` to the `class: display` element, and keep each `messages[].text` inside it",
-            "A display with no character width cannot have its readings checked, so a reading too long for the display survives as a silent transcription error.",
+            "A display with no character width cannot have its readings checked, so a reading too long for the display survives as a silent transcription error. Its `kind` decides what a rack file may put on it, so a kind its numbers contradict would be believed.",
             MIXED),
     "L99": ("component",  "a generic stays generic - no rate, reach, wavelength or wattage under generic/", "move the figure to the vendor wrapper's attrs; a generic/ part stands for every module of its kind",
             "A generic part stands for every module of its kind, so a rate, reach or wattage on it would make one product's figure look like a property of the whole family.",
@@ -2122,8 +2122,24 @@ def lint_component_display(path, data, _lib_roots=None):
                              f"{cls!r}. A message vocabulary is what a DISPLAY "
                              f"reads; a lamp's vocabulary is `states`")
             continue
+        kind = spec.get("kind")
+        if (kind or spec.get("rows")) and cls != "display":
+            err(path, "L98", f"element {eid} carries `kind` or `rows` and is "
+                             f"class {cls!r}. Only a display has a window a "
+                             f"rack file can set")
+            continue
         if cls != "display":
             continue
+        # WHAT A RACK FILE MAY PUT ON IT depends on the kind (kit/displays.js),
+        # so the kind has to be one the numbers agree with.
+        if spec.get("rows") and kind != "character":
+            err(path, "L98", f"display {eid} has `rows` and is kind {kind!r}. "
+                             f"Only a character display has rows; a pixel "
+                             f"display has none and a segment cell is one")
+        if kind == "segment" and cells != 1:
+            err(path, "L98", f"display {eid} is kind 'segment' and shows "
+                             f"{cells!r} characters. A segment cell is one "
+                             f"digit, `characters: 1`")
         if not cells:
             warn(path, "L98", f"display {eid} does not say how many characters "
                               f"it shows. Add `characters:` - it is what a "

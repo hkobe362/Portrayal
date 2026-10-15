@@ -1,6 +1,6 @@
 ### Fixed
 - **The Fibrain XCU10's adapters are couplers with a cable end on each face,
-  and its body is open behind them** (P-0047). `@portrayal/kit` is 0.45.0. A
+  and its body is open behind them** (P-0047). `@portrayal/kit` is 0.48.0. A
   holder seated in the drawer's slot (`drawer/module/slot-1/module/…`) was
   unknown to the kit: an end on it was neither accepted nor refused, and the
   far end of an adapter on the panel into the rack was a loose end. `seatedPort`
