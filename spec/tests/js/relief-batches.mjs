@@ -154,6 +154,14 @@ const bodies = ['<rect id="n1" data-path="a"/>', '<rect id="n2" data-path="b"/>'
                 '<title>y</title><rect/>', '<rect id="led-sys"/>', '<style>.a{}</style><rect/>', '<rect/>'];
 const texts = [];
 for (const p of [faceA, faceB, faceC]) for (const b of bodies) texts.push(node(p, b));
+// an id only the art names, held by another element of an otherwise equal prefix
+const swapA = '<svg><defs><g id="foo"><rect width="1"/></g><g id="x"><rect width="2"/></g></defs>';
+const swapB = '<svg><defs><g id="x"><rect width="1"/></g><g id="foo"><rect width="2"/></g></defs>';
+for (const p of [swapA, swapB]) for (const b of ['<use href="#foo"/>', '<use href="#x"/>', '<rect/>']) texts.push(node(p, b));
+// a prefix with a stylesheet the cut leaves open, an open tag at the cut, a stylesheet in the art
+texts.push('<svg><style>.a{}<!--art--></style><g/></svg>', '<svg><style>.a{}<!--art--></style><g/></svg>'.replace('.a', '.b'),
+           '<svg><g id="q" <!--art--> data-x="1"/></svg>', '<svg><g id="r" <!--art--> data-x="1"/></svg>',
+           node(faceA, '<style>#n1{fill:red}</style><rect id="n1"/>'), node(faceA, '<style>#n1{fill:red}</style><rect id="n2"/>'));
 texts.push('<svg>no marker</svg>', '<svg>no marker</svg>', '', node('<svg><style>', 'x'), node(sheet + '<g ', 'x'));
 const ks = texts.map(t => m.rasterKey(t)), fs = texts.map(t => m.rasterKeyText(t));
 let partition = true;

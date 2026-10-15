@@ -1909,7 +1909,13 @@ function _prefixOf(p) {
   const info = _cssInfo(_cssOf(p));
   const refs = new Set(info.ids);
   for (const m of p.matchAll(_URL_REFS)) refs.add(m[1]);
-  const ids = new Set([...p.matchAll(/\sid="([^"]*)"/g)].map(m => m[1]));
+  // each id value, with the places (by order among the prefix's ids) it stands at
+  const ids = new Map();
+  let nth = 0;
+  for (const m of p.matchAll(/\sid="([^"]*)"/g)) {
+    const at = ids.get(m[1]);
+    if (at) at.push(nth++); else ids.set(m[1], [nth++]);
+  }
   // it splits cleanly: ends between tags, and every <style> in it is closed
   const ok = p.lastIndexOf('<') < p.lastIndexOf('>') && p.lastIndexOf('<style') <= p.lastIndexOf('</style>')
     && p.split('<style').length === p.split('</style>').length;
@@ -1976,7 +1982,8 @@ function _rasterKey(text) {
       let named = '';
       if (refs.size && !e.info.anyId) {
         const ids = [];
-        for (const v of refs) if (e.ids.has(v) && !e.refs.has(v)) ids.push(v);
+        // the name and where it stands: two prefixes of one rewrite may hold it on different elements
+        for (const v of refs) if (e.ids.has(v) && !e.refs.has(v)) ids.push(`${v}@${e.ids.get(v)}`);
         if (ids.length) named = '\u0002' + ids.sort().join('\u0002');
       }
       return `${_prefixId(e)}${named}\u0001${_normText(r, e.info, all)}`;
