@@ -23,7 +23,7 @@ import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey, parseColor,
         connectorOf, mediaKind, portPathOf, isElementId, elementIdReason, MEDIA, MEDIA_LABELS} from './cable-rules.js';
-import {portIdsOf, zeroUEnds, zeroUEndsText} from './ports.js';
+import {portIdsOf, zeroUEnds, zeroUEndsText, seatedEndReason} from './ports.js';
 import {validate, same} from './validate.js';
 import {withRoutedLengths, pathwaysOf, waypointLanesOf, resolveRoute, pathwaysAt, zeroUPathways, pathwayId} from './route.js';
 import {slotsFor, slotEnv, resolverFor, holdsAt, partName, partOf} from './slots.js';
@@ -695,10 +695,16 @@ function zeroUEndRefused(rack, ends, ctx) {
   }
   return null;
 }
+// AN END ON A VIEW OR PORT THAT A SEATED PART DOES NOT HAVE is refused with the
+// sentence the loose-end finding gives (ports.js seatedEndReason).
+function seatedEndRefused(rack, ends, ctx) {
+  const why = seatedEndReason(rack, ends, ctx);
+  return why ? {error: `${why}.`} : null;
+}
 function cableAdd(rack, {a, b, media = '', purpose = '', label = '', length = null, color = null}, ctx) {
   const {chassisOf} = ctx;
   if (!hasEnd(rack, a.item) || !hasEnd(rack, b.item)) return {error: NOT_ADDED};
-  const refused = endRefused([a, b]) ?? zeroUEndRefused(rack, [a, b], ctx);
+  const refused = endRefused([a, b]) ?? zeroUEndRefused(rack, [a, b], ctx) ?? seatedEndRefused(rack, [a, b], ctx);
   if (refused) return refused;
   const tint = parseColor(color);
   if (!tint.ok) return {error: tint.reason};
@@ -721,7 +727,8 @@ function cableUpdate(rack, {id, a, b, ...p}, ctx) {
   const ends = {a: a ? endOf(a) : c.a, b: b ? endOf(b) : c.b};
   const moved = ['a', 'b'].filter(k => endKey(ends[k]) !== endKey(c[k]));
   if (moved.some(k => !hasEnd(rack, ends[k].item))) return {error: GONE};
-  const refused = endRefused(moved.map(k => ends[k])) ?? zeroUEndRefused(rack, moved.map(k => ends[k]), ctx);
+  const refused = endRefused(moved.map(k => ends[k])) ?? zeroUEndRefused(rack, moved.map(k => ends[k]), ctx)
+    ?? seatedEndRefused(rack, moved.map(k => ends[k]), ctx);
   if (refused) return refused;
   const uOf = heightOf(chassisOf);
   if (moved.length) {
@@ -1404,9 +1411,9 @@ export const COMMANDS = {
     args: args(['id', 'on'], {id: ID('part beside the rack'),
       on: {type: ['array', 'null'], minItems: 1, description: 'The ids of the brackets that hold it, or null to take it off them.',
         items: {type: 'string', minLength: 1, description: 'A bracket id, or "@name" from earlier in this batch.'}}})},
-  'state.set': {run: stateSet, description: 'Set what one part of a placed device or of a part beside the rack is, such as an outlet of a PDU on or off; null clears it. Refused, with what the part can be, when it declares no such state.',
+  'state.set': {run: stateSet, description: 'Set what one part of a placed device or of a part beside the rack is, such as a status lamp lit, a port lamp up, a PSU or fan lamp ok, or an outlet of a PDU on or off; null clears it. `inspect` of the device lists every path it can set and what each can be (`settable`). Refused, with what the device does declare, when the path or the state is not one of them.',
     args: args(['id', 'path', 'state'], {id: ID('device or part beside the rack'),
-      path: {type: 'string', minLength: 1, description: 'The part, by its path on the device (e.g. outlet-a1).'},
+      path: {type: 'string', minLength: 1, description: 'The part, by its path on the device, as `inspect` lists it under settable (e.g. led-sys, led-port-3, outlet-a1).'},
       state: {type: ['string', 'null'], minLength: 1, description: 'The state name, as the part declares it (e.g. on, off); null to clear.'}})},
   'readings.set': {run: readingsSet, description: 'Store readings taken from a device or a part beside the rack, with where they came from and when; null clears them.',
     args: args(['id', 'readings'], {id: ID('device or part beside the rack'),

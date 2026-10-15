@@ -676,7 +676,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.45.0: a display in a rack shows text, digits or an image.** An item and a part beside the
+**New in 0.47.0: a display in a rack shows text, digits or an image.** An item and a part beside the
 rack take `displays`, a map of the path of a display to `{text: [lines]}`, `{digits: "04"}` or
 `{image: <data URL or library asset>}`, as `states` takes a state. The rack file's version and schema do
 not change: a reader that does not know the key keeps it. `display.set` sets and clears one, and refuses
@@ -691,6 +691,19 @@ the one painter both halves use (`paintDisplays`). A page draws it with `shell.s
 relief and its batches are as they were. [`docs/display-content-design.md`](../docs/display-content-design.md)
 is the design. **A page that vendors the kit hands both `displaysFor` of each entry, and changes nothing
 else.**
+
+**New in 0.46.0: a cable end on a view or port a seated part does not have is refused when it is added.**
+`cable.add` and `cable.update` (and so a dry run) refuse an end under a bay whose seated part is known and has
+no port at that path on that panel, with the sentence the loose-end finding gives (`bay-4 holds FHD-FAPM6-RJ45,
+whose port p1 is on the front panel; give view "front"`), and so does a made-up port of a passive panel
+(class `adapter-panel`) or the rear of a panel with no rear. A part's rear face is listed by `freePorts` from the
+reader of the rear panel, as for any panel. `partName` falls back to `attrs.model` before a raw ref.
+
+**New in 0.45.0: every lamp and digit a drawing declares can be set in a rack.** `configs[].states` lists
+what each configuration's faces declare (`data-states` on a `data-path`): `led-sys`, `psu-0/module/status-led`,
+`led-port-0/lamp`, `status-display/digit-1`, `breaker-a/rocker`, an outlet's lamp, as well as the outlets.
+`state.set` and `statesFor` take any of them and refuse the rest, naming what the device declares;
+`inspect` of a device gives `settable` (grouped by vocabulary) and `states` (what it is set to).
 
 **New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
 lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a

@@ -1,6 +1,6 @@
 ### Added
 - **A display in a rack shows text, digits or an image** (P-0042).
-  `@portrayal/kit` is 0.45.0. An item and a part beside the rack take
+  `@portrayal/kit` is 0.47.0. An item and a part beside the rack take
   `displays`, a map of the path of a display to what it shows, as `states` says
   what a part is: `{text: [lines]}` (drawn in the display's font, cut to its
   columns and rows), `{digits: "04"}` (a segment display) or `{image: ...}` (an

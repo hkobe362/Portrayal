@@ -14,6 +14,7 @@ import {seatedPort, settleEnds, shownEnv, cableEndPaths, zeroUEnds} from './port
 import {zeroUById, zeroUBottomMm} from './model.js';
 import {RU} from './rails.js';
 import {configFacts} from './catalog.js';
+import {settableOf} from './states.js';
 import {waypointLanesOf, pathwaysOf, resolveRoute, pathLength, routePath, routeText, bendFindingsOf, coverFindingsOf, ringFindingsOf, ductsThrough,
   zeroUPathways, pathwaysAt, windowsOf} from './route.js';
 import {catalogEntries} from './catalog.js';
@@ -428,6 +429,19 @@ const capacityFact = c => (c?.capacity?.count != null
   ? {capacity: {count: c.capacity.count, basis: c.capacity.basis ?? '', media: c.capacity.media ?? null,
                 ...(c.capacity.estimated === true ? {estimated: true} : {})}} : {});
 
+// WHAT AN ENTRY'S PARTS CAN BE SET TO, and what it is set to (P-0041), for
+// `inspect` of a device or a part beside the rack: `settable` is
+// `[{can: [names], paths: [...]}]`, the lamps, outlets and breakers its
+// configuration declares grouped by vocabulary (`state.set` takes any path
+// listed); `states` is what the entry is set to now. Each is left out when
+// there is none, and `settable` when the parts list is not loaded.
+function settableFacts(entry, ctx) {
+  const facts = typeof ctx.slotsOf === 'function' ? configFacts(ctx.slotsOf(entry.ref), entry.cfg) : null;
+  const settable = settableOf(facts);
+  const set = entry.states && typeof entry.states === 'object' && Object.keys(entry.states).length ? entry.states : null;
+  return {...(settable.length ? {settable} : {}), ...(set ? {states: {...set}} : {})};
+}
+
 function itemFacts(rack, item, ctx) {
   const c = ctx.chassisOf?.(item.ref) || null;
   const slots = typeof ctx.slotsOf === 'function' ? ctx.slotsOf(item.ref) : null;
@@ -442,6 +456,7 @@ function itemFacts(rack, item, ctx) {
   // its rings, ducts, pass-throughs and trays, and which hold spare (issue 1)
   const ways = pathwayFacts(rack, item.id, ctx);
   if (ways.length) out.pathways = ways;
+  Object.assign(out, settableFacts(item, ctx));
   // A DEVICE OF A HEIGHT THAT IS NO WHOLE NUMBER OF UNITS may start on a
   // whole unit or on a half, and whether its ears meet the rail holes there
   // is checked only when the catalogue states its ear slot heights. None
@@ -663,7 +678,7 @@ function zeroUFacts(rack, z, ctx) {
     // ITS ENDS (P-0019): each outlet a cable can end on, by type, the unit
     // it stands at and the cable on it (null when free), from the catalogue
     // and the cables on it, when there are any
-    ...zeroUEndFacts(rack, z, ctx), ...(on.length ? {cables: on} : {}),
+    ...zeroUEndFacts(rack, z, ctx), ...(on.length ? {cables: on} : {}), ...settableFacts(z, ctx),
     ...(shownOn(rack, z, ctx).length ? {displays: shownOn(rack, z, ctx)} : {})};
 }
 const shownOn = (rack, z, ctx) => displayList(rack, ctx, z.id).map(({item: _i, ...d}) => d);
