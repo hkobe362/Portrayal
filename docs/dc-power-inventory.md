@@ -24,12 +24,12 @@ Library: 1499 component contracts, 258 devices.
 | other | 1 |
 | p40-connector | 1 |
 | plug-fixed | 3 |
-| pluggable-header | 3 |
+| pluggable-header | 2 |
 | protector | 2 |
 | screw-terminal | 3 |
-| supply: DC end not drawn | 23 |
+| supply: DC end not drawn | 21 |
 | supply: DC inlet, connector unspecified | 6 |
-| supply: HVDC through the AC inlet | 6 |
+| supply: HVDC through the AC inlet | 9 |
 | supply: plug | 2 |
 | supply: terminal block | 22 |
 | terminal-block | 6 |
@@ -41,17 +41,18 @@ Library: 1499 component contracts, 258 devices.
 | amphenol-ns | 7 |
 | casa | 2 |
 | celestica | 1 |
-| cisco | 5 |
-| common | 11 |
+| cisco | 7 |
+| common | 10 |
 | commscope | 3 |
 | dell | 6 |
 | edgecore | 9 |
-| juniper | 9 |
+| juniper | 6 |
+| maiaedge | 1 |
 | nokia | 10 |
 | oscilloquartz | 2 |
 | smartoptics | 1 |
 | supermicro | 1 |
-| telco-systems | 6 |
+| telco-systems | 7 |
 | ufispace | 12 |
 
 ### By direction
@@ -67,9 +68,9 @@ Library: 1499 component contracts, 258 devices.
 | | parts |
 |---|---:|
 | n/a | 2 |
-| no | 64 |
-| via-parts | 10 |
-| yes | 9 |
+| no | 63 |
+| via-parts | 12 |
+| yes | 8 |
 
 ### Kind by cable end
 
@@ -83,33 +84,34 @@ Library: 1499 component contracts, 258 devices.
 | other / no | 1 |
 | p40-connector / yes | 1 |
 | plug-fixed / no | 3 |
-| pluggable-header / yes | 3 |
+| pluggable-header / yes | 2 |
 | protector / n/a | 2 |
 | screw-terminal / yes | 3 |
-| supply: DC end not drawn / no | 23 |
+| supply: DC end not drawn / no | 21 |
 | supply: DC inlet, connector unspecified / no | 6 |
-| supply: HVDC through the AC inlet / via-parts | 6 |
+| supply: HVDC through the AC inlet / no | 1 |
+| supply: HVDC through the AC inlet / via-parts | 8 |
 | supply: plug / no | 2 |
 | supply: terminal block / no | 21 |
 | supply: terminal block / via-parts | 1 |
 | terminal-block / no | 3 |
 | terminal-block / via-parts | 3 |
 
-### Placements on a device face, by cable end (235 in all)
+### Placements on a device face, by cable end (225 in all)
 
 | | placements |
 |---|---:|
 | n/a | 0 |
 | no | 92 |
 | via-parts | 5 |
-| yes | 138 |
+| yes | 128 |
 
 ### Is polarity stated
 
 | | parts |
 |---|---:|
-| none stated | 36 |
-| stated, prose only | 39 |
+| none stated | 35 |
+| stated, prose only | 40 |
 | stated, structured | 10 |
 
 ### Devices by vendor
@@ -120,12 +122,12 @@ Library: 1499 component contracts, 258 devices.
 | aurcore | 10 |
 | casa | 2 |
 | celestica | 3 |
-| cisco | 5 |
+| cisco | 7 |
 | commscope | 1 |
 | dell | 1 |
 | edgecore | 27 |
 | halny | 1 |
-| juniper | 10 |
+| juniper | 8 |
 | nokia | 11 |
 | oscilloquartz | 4 |
 | readylinks | 1 |
@@ -191,12 +193,11 @@ Library: 1499 component contracts, 258 devices.
 | `telco-systems/xm3352-dc-plug@1` | inlet | input | - | no: presents no interface | none stated | - | 0 (0) |
 | `telco-systems/xm8424-dc-plug@1` | inlet | input | - | no: presents no interface | none stated | - | 0 (0) |
 
-### pluggable-header (3)
+### pluggable-header (2)
 
 | part | class | direction | drawn as | cable end | polarity (stated) | source | devices (placements) |
 |---|---|---|---|---|---|---|---|
 | `common/dc-terminal-header-6@1` | inlet | input | - | yes: terminal-508-6 | none stated | - | 1 (2) |
-| `common/terminal-header-508-2@3` | port | input | - | yes: terminal-508-2 | none stated | - | 10 (10) |
 | `common/terminal-header-508-5f@2` | inlet | input | - | yes: terminal-508-5 | ground (prose) | - | 10 (10) |
 
 ### protector (2)
@@ -214,7 +215,7 @@ Library: 1499 component contracts, 258 devices.
 | `common/terminal-screw-38@1` | screw | input | - | yes: terminal-stud | none stated | - | 0 (0) |
 | `nokia/sr-1-dc-stud@1` | screw | input | - | yes: terminal-stud | none stated | - | 0 (0) |
 
-### supply: DC end not drawn (23)
+### supply: DC end not drawn (21)
 
 | part | class | direction | drawn as | cable end | polarity (stated) | source | devices (placements) |
 |---|---|---|---|---|---|---|---|
@@ -223,6 +224,8 @@ Library: 1499 component contracts, 258 devices.
 | `cisco/a9k-1600w-dc@1` | psu | input | - | no: presents no interface | none stated | input | 1 (0) |
 | `cisco/a9k-750w-dc@1` | psu | input | - | no: presents no interface | -48V (prose) | inlet | 1 (0) |
 | `cisco/a9k-dc-pem-v3@1` | power | input | - | no: presents no interface | none stated | power | 0 (0) |
+| `cisco/a9k-pwr-1p5kw-dc@1` | psu | input | - | no: presents no interface | none stated | power | 2 (0) |
+| `cisco/a9k-pwr-2kw-dc@1` | psu | input | - | no: presents no interface | none stated | power | 2 (0) |
 | `cisco/pwr-1p6kw-dc@1` | psu | input | - | no: presents no interface | -48V (prose) | input | 2 (0) |
 | `cisco/pwr-2kw-dc-v2@1` | psu | input | - | no: presents no interface | none stated | power | 1 (0) |
 | `commscope/ps3248d@1` | psu | input | - | no: presents no interface | -48V (prose) | inlet | 1 (0) |
@@ -230,11 +233,7 @@ Library: 1499 component contracts, 258 devices.
 | `edgecore/agr-psu-dc@1` | psu | input | - | no: presents no interface | -48V (prose) | terminal | 2 (0) |
 | `edgecore/amx-3200-48v-psu@1` | psu | input | - | no: presents no interface | RTN / ground / -48V (prose) | inlet | 1 (0) |
 | `edgecore/csr310-psu-dc@1` | psu | input | - | no: presents no interface | ground / -48V (prose) | power | 2 (0) |
-| `juniper/mx10003-psu-ac@1` | psu | input | - | no: presents no interface | none stated | power | 1 (0) |
 | `juniper/mx2000-psm-dc-v@1` | psu | input | - | no: presents no interface | none stated | power | 3 (0) |
-| `juniper/mx304-psu-hvacdc@1` | psu | input | - | no: presents no interface | none stated | - | 1 (0) |
-| `juniper/mx480-psu-ac@1` | psu | input | - | no: presents no interface | none stated | inlet | 1 (0) |
-| `juniper/mx960-psu-ac@1` | psu | input | - | no: presents no interface | none stated | inlet | 1 (0) |
 | `nokia/ngfc-g@1` | power | input | - | no: presents no interface | BAT / RET / ground (structured) | power | 1 (0) |
 | `nokia/ngfc-h@1` | power | input | terminal-cover | no: presents no interface | BAT / RET / ground (structured) | terminals | 1 (0) |
 | `nokia/sr-7-power-filter@1` | filter | input | - | no: presents no interface | none stated | power | 1 (0) |
@@ -253,7 +252,7 @@ Library: 1499 component contracts, 258 devices.
 | `ufispace/psu-162-dc@1` | psu | input | dc-input | no: presents no interface | -48V (prose) | inlet | 3 (0) |
 | `ufispace/psu-242-dc@1` | psu | input | dc-input | no: presents no interface | -48V (prose) | inlet | 1 (0) |
 
-### supply: HVDC through the AC inlet (6)
+### supply: HVDC through the AC inlet (9)
 
 | part | class | direction | drawn as | cable end | polarity (stated) | source | devices (placements) |
 |---|---|---|---|---|---|---|---|
@@ -263,6 +262,9 @@ Library: 1499 component contracts, 258 devices.
 | `dell/psu-700w-ac-60mm@1` | psu | input | - | via inlet | none stated | inlet | 0 (0) |
 | `dell/psu-800w-ac-60mm@1` | psu | input | - | via inlet | none stated | inlet | 0 (0) |
 | `edgecore/dcs520-psu-ac@1` | psu | input | - | via inlet | none stated | power | 0 (0) |
+| `juniper/mx304-psu-hvacdc@1` | psu | input | - | no: presents no interface | none stated | - | 0 (0) |
+| `maiaedge/psu-550w@1` | psu | input | - | via inlet | none stated | input | 0 (0) |
+| `telco-systems/xm8424-psu-ac@1` | psu | input | - | via inlet | ground (prose) | power | 0 (0) |
 
 ### supply: plug (2)
 
@@ -324,22 +326,24 @@ Library: 1499 component contracts, 258 devices.
 | `amphenol-ns/nrg300cb08-sens-sc` | - | `amphenol-ns/input-feed-studs@1` (placed:rear); `amphenol-ns/output-p40@1` (placed:rear) | yes |
 | `amphenol-ns/nrgils300cb08` | - | `amphenol-ns/input-feed-studs@1` (placed:rear); `amphenol-ns/output-terminal@1` (placed:rear) | no |
 | `amphenol-ns/nrgils300cb08-sc` | - | `amphenol-ns/input-feed-studs@1` (placed:rear); `amphenol-ns/output-p40@1` (placed:rear) | yes |
-| `aurcore/ais2001` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2001p` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2002` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2002p` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2003` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2003p` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2004` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais2004p` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais4001` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
-| `aurcore/ais4001p` | dc | `common/terminal-header-508-2@3` (placed:top); `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2001` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2001p` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2002` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2002p` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2003` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2003p` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2004` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais2004p` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais4001` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
+| `aurcore/ais4001p` | dc | `common/terminal-header-508-5f@2` (placed:top) | yes |
 | `casa/c100g` | - | `casa/pem@1` (bay:rear) | no |
 | `casa/c40g` | - | `casa/c40g-pem@1` (bay:rear, config:bdm-3plus1, config:docsis-classic, config:docsis-non-redundant) | no |
 | `celestica/ds3001` | ac, dc | none found | no part |
 | `celestica/ds6000` | ac, dc | none found: The inlet is read as IEC C20 from the pin layout in ds6000-A-3; no document names it. | no part |
 | `celestica/ds6001` | dc | `common/orv3-busbar-connector@1` (placed:rear) | no |
 | `cisco/asr-9001` | - | `cisco/a9k-750w-dc@1` (bay:front) | no |
+| `cisco/asr-9006` | - | `cisco/a9k-pwr-1p5kw-dc@1` (bay:front); `cisco/a9k-pwr-2kw-dc@1` (bay:front, config:dc) | no |
+| `cisco/asr-9010` | - | `cisco/a9k-pwr-1p5kw-dc@1` (bay:front); `cisco/a9k-pwr-2kw-dc@1` (bay:front, config:dc) | no |
 | `cisco/asr-9901` | - | `cisco/a9k-1600w-dc@1` (bay:rear, config:dc) | no |
 | `cisco/asr-9902` | - | `cisco/pwr-1p6kw-dc@1` (bay:rear, config:dc) | no |
 | `cisco/asr-9903` | - | `cisco/pwr-1p6kw-dc@1` (bay:rear, config:dc) | no |
@@ -374,16 +378,14 @@ Library: 1499 component contracts, 258 devices.
 | `edgecore/ecs4120-28fv2-i` | ac, dc | `common/dc-terminal-plug-2@1` (placed:front) | no |
 | `edgecore/ecs4530-54csfp-i` | dc | `common/dc-terminal-plug-2@1` (placed:front) | no |
 | `halny/hlx-tgv` | - | `common/dc-barrel@1` (placed:rear) | yes |
-| `juniper/mx10003` | - | `juniper/mx10003-psu-ac@1` (bay:rear) | no |
 | `juniper/mx104` | - | `juniper/mx104-psu-dc@1` (bay:front) | no |
 | `juniper/mx2008` | - | `juniper/mx2000-psm-dc-v@1` (bay:rear) | no |
 | `juniper/mx2010` | - | `juniper/mx2000-psm-dc-v@1` (bay:rear) | no |
 | `juniper/mx2020` | - | `juniper/mx2000-psm-dc-v@1` (bay:rear) | no |
 | `juniper/mx204` | - | `juniper/mx204-psu-dc@1` (bay:rear, config:dc) | no |
 | `juniper/mx240` | - | `juniper/mx240-psu-dc@1` (bay:rear) | no |
-| `juniper/mx304` | - | `juniper/mx304-psu-dc@1` (bay:rear, config:dc); `juniper/mx304-psu-hvacdc@1` (bay:rear, config:hvac-dc) | no |
-| `juniper/mx480` | - | `juniper/mx240-psu-dc@1` (bay:rear, config:dc); `juniper/mx480-psu-ac@1` (bay:rear) | no |
-| `juniper/mx960` | - | `juniper/mx960-psu-ac@1` (bay:rear) | no |
+| `juniper/mx304` | - | `juniper/mx304-psu-dc@1` (bay:rear, config:dc) | no |
+| `juniper/mx480` | - | `juniper/mx240-psu-dc@1` (bay:rear, config:dc) | no |
 | `nokia/lmfs-f` | dc | `nokia/lpwr-f@1` (bay:front) | no |
 | `nokia/nfxs-e-bb` | - | `nokia/ngfc-h@1` (bay:front) | no |
 | `nokia/nfxs-f-bb` | - | `nokia/ngfc-g@1` (bay:front) | no |

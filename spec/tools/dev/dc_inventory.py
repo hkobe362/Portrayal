@@ -68,10 +68,11 @@ DC_ID = re.compile(r"(?:^|[-_])(terminals?|terminal-block|connector-block|batt|b
 NOT_DC_ID = re.compile(r"ground|earth|gnd|chassis-gnd|esd", re.I)
 DC_INPUT = re.compile(r"^(dc|hvdc)\b|vdc|(?<!\d)[-−–]\s?\d+\s?(to\s?[-−–]?\s?\d+\s?)?v\b|\bdc\b", re.I)
 DC_MEDIA = {"dc-terminal", "terminal-block", "two-hole-lug", "barrel", "p40"}
-DC_ROLES = {"dc-power-entry", "dc-power-supply", "hvac-dc-power-supply", "dc-emi-filter"}
+DC_ROLES = {"dc-power-entry", "dc-power-supply", "hvac-dc-power-supply"}
 SUPPLYISH = {"psu", "power", "inlet", "breaker"}
-HVDC = re.compile(r"\bhvdc\b|\b(?:180|240)\s?(?:-|to)?\s?(?:300|380)?\s?v\s?dc\b|\bmixed-mode\b|\b240\s?vdc\b", re.I)
-PROTECTOR = re.compile(r"\bTPA\b|bullet|\bDC\b|-48", re.I)
+HVDC = re.compile(r"\bhvdc\b|high[- ]voltage dc|\b\d{3}\s?(?:-|to)?\s?(?:\d{3})?\s?v\s?dc\b|\bmixed-mode\b", re.I)
+RELAY = re.compile(r"dry[- ]contact|\brelay\b", re.I)
+PROTECTOR =re.compile(r"\bTPA\b|bullet|\bDC\b|-48", re.I)
 DC_WORDS = re.compile(r"\bDC\b|[-−–]\s?48\s?V|\bbusbar\b|\bbattery\b|\bBATT\b", re.I)
 
 # a conductor, as a source words it; the label is what the source said, upper-cased
@@ -254,6 +255,8 @@ def signals_of(lib, ref, c, listed):
     cls = c.get("class")
     if cls == "ground" or (cls == "port" and c.get("mates")):
         return sig                      # a ground stud, and a lug or plug that IS a cable end
+    if RELAY.search(str(c.get("description", ""))):
+        return sig                      # a dry-contact header is a signal output, not a power end
     a = _attr_signal(c)
     if a:
         sig.append(a)
@@ -266,13 +269,14 @@ def signals_of(lib, ref, c, listed):
     for p in _listed(c.get("parts")):
         if isinstance(p, dict) and str(p.get("ref")) in listed:
             sig.append(f"part:{p.get('id')}")
-    name = ref.split("/")[1]
+    name = ref.split("/")[1].split("@")[0]
     if cls in ("psu", "power") and re.search(r"(?:^|-)dc(?:-|$)", name):
         sig.append("name:ref")
     if (cls in SUPPLYISH and not _ac_only(c) and not re.search(r"(?:^|-)ac(?:-|$)", name)
             and DC_WORDS.search(str(c.get("description", ""))) and not sig):
         sig.append("name:description")
-    if cls in ("psu", "power") and HVDC.search(" ".join([str(c.get("description", "")), str((c.get("attrs") or {}).get("input", ""))])):
+    inputs = [str(v) for k, v in (c.get("attrs") or {}).items() if str(k).startswith("input")]
+    if cls in ("psu", "power") and HVDC.search(" ".join([str(c.get("description", ""))] + inputs)):
         sig.append("hvdc:through the AC inlet")
     if cls == "breaker" and PROTECTOR.search(str(c.get("description", ""))):
         sig.append("protector:description")
@@ -299,7 +303,7 @@ def kind_of(ref, c, signals):
         return "connector-block"
     if c.get("class") == "breaker" or "fuse" in name:
         return "protector"
-    if signals and all(s.startswith("hvdc:") for s in signals):
+    if signals and all(s.startswith(("hvdc:", "attr:role=hvac")) for s in signals):
         return "supply: HVDC through the AC inlet"
     if re.search(r"plug", name):
         return "plug-fixed"             # a plug drawn already seated

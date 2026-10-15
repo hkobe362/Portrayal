@@ -40,20 +40,20 @@ Counts, 2026-10-15 (library of 1,499 component contracts and 258 devices):
 | | |
 |---|---|
 | component contracts that carry a DC end | **85** |
-| a cable lands on it today | **9 yes** (the P40 output, the three pluggable headers, the barrel jack, three terminal screws, the SR-1 pole pair), **10 through the parts it composes**, **64 no**, 2 not applicable (protectors) |
+| a cable lands on it today | **8 yes** (the P40 output, the two pluggable headers, the barrel jack, three terminal screws, the SR-1 pole pair), **12 through the parts it composes** (9 of them HVDC supplies that land on their AC inlet), **63 no**, 2 not applicable (protectors) |
 | devices that place, offer or are fed by one | **146**: 27 land a cable, 103 do not, 16 are DC builds that draw their terminals as no part at all |
-| placements of a DC end on a device face | **235**: 138 land (112 of them the P40 output), 5 through parts, 92 do not (64 are `output-terminal`) |
-| polarity stated | structured 10 parts, in a sentence only 39, nowhere 36 |
+| placements of a DC end on a device face | **225**: 128 land (112 of them the P40 output), 5 through parts, 92 do not (64 are `output-terminal`) |
+| polarity stated | structured 10 parts, in a sentence only 40, nowhere 35 |
 
-By kind: 22 supplies drawing a terminal block, 23 supplies whose DC end is not drawn at all, 6 supplies with a
-"DC inlet" of unspecified connector, 2 with a plug, 6 HVDC-capable supplies on their AC inlet, 6 terminal
-blocks, 3 screw terminals, 3 lug pairs, 3 pluggable headers, 3 plugs drawn already seated, 2 bus-bar inputs, one connector block, one
+By kind: 22 supplies drawing a terminal block, 21 supplies whose DC end is not drawn at all, 6 supplies with a
+"DC inlet" of unspecified connector, 2 with a plug, 9 HVDC-capable supplies on their AC inlet, 6 terminal
+blocks, 3 screw terminals, 3 lug pairs, 2 pluggable headers, 3 plugs drawn already seated, 2 bus-bar inputs, one connector block, one
 barrel jack, one P40 output, 2 protectors, one other.
 
-By vendor (parts): common 11, ufispace 12, nokia 10, edgecore 9, juniper 9, amphenol-ns 7, dell 6,
-telco-systems 6, cisco 5, commscope 3, casa 2, oscilloquartz 2, celestica 1, smartoptics 1, supermicro 1.
+By vendor (parts): ufispace 12, nokia 10, common 10, edgecore 9, amphenol-ns 7, cisco 7, telco-systems 7,
+dell 6, juniper 6, commscope 3, casa 2, oscilloquartz 2, celestica 1, maiaedge 1, smartoptics 1, supermicro 1.
 By vendor (devices): ufispace 43, edgecore 27, telco-systems 13, amphenol-ns 11, nokia 11, aurcore 10,
-juniper 10, cisco 5, oscilloquartz 4, then eight vendors with one to three.
+juniper 8, cisco 7, oscilloquartz 4, then eight vendors with one to three.
 
 What it found that shapes the model:
 
@@ -74,7 +74,11 @@ What it found that shapes the model:
 - **What it cannot see:** a DC terminal that a device draws as panel decor, with no part (the inventory
   lists 16 such builds with the device's own gap note where it has one), and polarity printed on a
   photograph that no sentence reports.
-- **HVDC supplies take the AC inlet** (6 parts), so they already land by a C14 or C20 and polarity does not
+- **Known limits, from a 20-part check by a reviewer:** a supply that states HVDC only in its provenance
+  (a few) is not listed; the `+ - earth` wording of a header is read as "ground" only; the 2-position
+  header is left out because its description calls it a relay output, which is a signal and not power; a
+  PoE-on-coax data port is not a power end under this definition.
+- **HVDC supplies take the AC inlet** (9 parts), so they already land by a C14 or C20 and polarity does not
   arise. They are listed and left out of the model.
 
 ## 3. How AC power is cabled today
@@ -111,7 +115,7 @@ The pattern the DC model follows, in the order a cable meets it:
 
 | AC has | DC has |
 |---|---|
-| a registered interface per receptacle, so a slot | 9 of 85 parts; the rest are art |
+| a registered interface per receptacle, so a slot | 8 of 85 parts; the rest are art or a supply that lands on its AC inlet |
 | a cord end part per interface | a ring lug, a two-hole lug, three terminal plugs, one barrel plug, one P40 plug; none for a terminal drawn as art |
 | one slot per conductor group (a cord has 3 conductors and one inlet) | one slot per SCREW; a feed lands on "the first free screw" (`cable-ends-design.md` section 3), so the end is not the terminal and a polarity cannot be asked of it |
 | a direction (`attrs.input`, `attrs.outlet`) | a direction only where `attrs.input` or the name says it; polarity as no field at all |
@@ -336,7 +340,7 @@ Sizes: S under a day of work, M a few days, L a week or more; counts are from th
 | 3. Cable types | the DC feed types, each sourced or marked estimated; `cable-types.json` | S, one PR |
 | 4. Kit 0.45.0 | `cableEndsOf` for a DC port, pole addresses, the DC free-port rows, the checks of section 6, the plug derived per pole, the assistant tools' text; every `check_rack_*` | L, one or two PRs |
 | 5. Viewers | the pole legends in 2D, the fan-out in 3D, the editor rows | M, one PR |
-| 6. Library by vendor, each terminal with its source | in this order (parts are the part's namespace; devices are those that place or offer one of those parts): **(a) amphenol-ns and common**: 18 parts, 36 devices, 231 placements; polarity already structured, the P40, headers and barrel already slots: S to M, two PRs. **(b) supermicro and nokia**: 11 parts, 10 devices, sources in hand: M. **(c) ufispace**: 12 supplies, 40 devices (+3 DC builds with no part); polarity mostly unstated, so mostly stand-ins plus a re-read of the guides: L, split by supply, the PSU-132 first because it is the S9701's. **(d) edgecore, juniper, cisco**: 23 parts, 29 devices (+4): L, three PRs. **(e) telco-systems, dell, commscope, casa, oscilloquartz, smartoptics, celestica**: 21 parts, 15 devices (+9): M to L. Each device takes a minor bump from the lock, and each PR is one vendor so its merge danger names one family. The 16 DC builds that draw their terminals as no part need a part drawn first: a separate list, S each | M to L each, about nine PRs |
+| 6. Library by vendor, each terminal with its source | in this order (parts are the part's namespace; devices are those that place or offer one of those parts): **(a) amphenol-ns and common**: 17 parts, 36 devices, 221 placements; polarity already structured, the P40, headers and barrel already slots: S to M, two PRs. **(b) supermicro and nokia**: 11 parts, 10 devices, sources in hand: M. **(c) ufispace**: 12 supplies, 40 devices (+3 DC builds with no part); polarity mostly unstated, so mostly stand-ins plus a re-read of the guides: L, split by supply, the PSU-132 first because it is the S9701's. **(d) edgecore, juniper, cisco**: 20 parts, 29 devices (+4): L, three PRs. **(e) telco-systems, dell, commscope, casa, oscilloquartz, smartoptics, celestica, maiaedge**: 16 parts, 15 devices (+9): M to L. (The 9 HVDC supplies are out, section 11.) Each device takes a minor bump from the lock, and each PR is one vendor so its merge danger names one family. The 16 DC builds that draw their terminals as no part need a part drawn first: a separate list, S each | M to L each, about nine PRs |
 | 7. A regression fixture | the failing scenario of section 1 as a synthetic rack built from library parts: a panel's A and B outputs to two loads, one crossed and one not | S |
 
 Order, not parallel: 1 before 2, 2 and 3 before 4, 4 before 6. 5 can follow 4 beside 6(a).
