@@ -1,6 +1,6 @@
 ### Fixed
 - **The FS FHD RJ45 module's jacks have a rear, and a cable end on a missing
-  side is refused when it is added** (P-0045). `@portrayal/kit` is 0.45.0.
+  side is refused when it is added** (P-0045). `@portrayal/kit` is 0.46.0.
   `fs/fhd-fapm6-rj45@1` gains a rear face, `fs/fhd-fapm6-rj45-rear@1`: each jack
   `p1` to `p6` has the punch-down (IDC) back of a keystone jack, the new
   `common/idc-termination@1`, as `b1` to `b6` on the rear (lint L112 does not
