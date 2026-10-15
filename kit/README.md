@@ -77,6 +77,7 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 | `swap.js` | swapping a component into a bay, or an occupant into a slot at the turn it takes there (`seatTurn`); the `swap=` and `turn=` location strings (`encodeSwaps`, `decodeSwaps`, `encodeTurns`, `decodeTurns`) |
 | `redirects.js` | a part the library replaced: `redirectsOf(components)` reads the `supersedes` lists of `components.json` into a resolver (`follow(ref)`, `trace(ref)`), and a rack is audited (`auditRack`) and rewritten (`rewriteRack`) against it; the rules are under "New in 0.32.0" in [Racks](#racks) |
 | `fields.js` | writing a field on a part at runtime - its text and its colour, the build's rule, for 2D and 3D alike; and what a form of a part's fields needs: its rows (`fieldRows`), whether a value is one the field takes (`fieldAccepts`), and the `fields=` location string (`encodeFields`, `decodeFields`); and a part that slides: whether a value is a position (`adjustmentAccepts`), the rows of its control (`adjustmentRows`), what a face declares (`adjustmentsOf`) and the move itself (`paintAdjustments`); see [A part that slides](#a-part-that-slides) |
+| `displays.js` | what a display shows: the rules for `{text}`, `{digits}` and `{image}` content against a display's kind, columns and rows, the text layout, the size and fit of a picture (a GIF cut to its first frame), and the painter 2D and 3D share (`paintDisplays`); see [Racks](#racks) |
 | `devsel.js` | device selection and filtering - hardware by its maker, and each NOS vendor's listings under that vendor (`listings.json`, #709) |
 | `nosnames.js` | what the chosen listing's NOS calls each port (`swp7`, `Ethernet24`, `ge100-0/0/7`), expanded by the same grammar as the DCIM export (#712) |
 | `optical.js` | where a fibre goes: an optical module's front number and far end for a path, read from `components.json` |
@@ -233,6 +234,7 @@ compared, and a difference throws ("New in 0.25.0" below).
 | `rack/route.js`, `rack/route-path.js`, `rack/cable-geometry.js` | where a cable runs: `resolveRoute`, `ownRoute`, `trunkMeasures`, `routePath`, `trayOf`, `ringMarks`, `orientMarks`, `reverseMarks`, `routedLength`, `pathLength`, pathway fill, `ringFindings`, `bodyFindings`, `bendFindings`, `coverFindings`, and the geometry under them (`throughRings`, `cornersOf`); and the colour a cable is drawn in: `COLORS`, `cableColor`, `colorOf`, `hexColor`, `agreedJacket`, `bundleColor`; and the width it is drawn at: `WIDTH`, `widthOf` |
 | `rack/solids.js` | the solid bodies a route may not pass through: `solidsOf(rack, ctx)` places every device's envelope or derived `solids` in rack coordinates; `legCrossings` tests a leg against them; `detour` takes a leg round them (with `room`, far enough out for the bends at each end); `CLEAR`, the clearance a detour keeps; `traysOf(rack, ctx)` places every device's `trays`, the floors a cable lies on; a ring's solid parts (`ring/<id>/<part>`) are met by the cable's tube |
 | `rack/bundles.js`, `rack/bundle-route.js` | cable bundles: the size and bend checks (`bundleCheck`, `bundleChecks`, `pathwaysOn`, `bendCheck`, `cornersOf`), strap positions (`straps`), the trunk worked out from the members' routes (`deriveTrunk`) and a member's route along it (`followTrunk`) |
+| `rack/displays.js` | the displays of a placed device and what they show: `displaysOf`, `displayRefusal`, `displaysFor`, `displayNotices`, `displayList` |
 | `rack/export-data.js` | the rack as rows: `bomRows`, `cableScheduleRows` and the device-import data, what the lay finds as notes (`layNotes`, `layNotesOf`), and the bundles as the exports read them (`bundleExports`, `bundleNotes`, `strapBomRows`) |
 | `rack/dcim-rules.js` | what a NetBox or Nautobot import needs of a rack: the names a type file gives its ports (`typeLists`, `resolveEnd`, and `endResolver`, which answers for every end of a rack), the modules file, the cables file (`cableImportRows`) and the README |
 | `rack/validate.js` | `validate(schema, value)`, a small JSON Schema validator, and `same` |
@@ -673,6 +675,22 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.45.0: a display in a rack shows text, digits or an image.** An item and a part beside the
+rack take `displays`, a map of the path of a display to `{text: [lines]}`, `{digits: "04"}` or
+`{image: <data URL or library asset>}`, as `states` takes a state. The rack file's version and schema do
+not change: a reader that does not know the key keeps it. `display.set` sets and clears one, and refuses
+a part that is no display (naming the ones it has) and content the display cannot take; a text cut to
+the display's columns and rows, and a picture fitted with bars, are said (`display.set`'s `findings`,
+`displayNotices`). `displays(rack, ctx, {item})` in `rack/queries.js` lists which parts are displays
+and what each shows; `inspect` of a device lists the same. `rack/displays.js` has `displaysOf`,
+`displayRefusal`, `displaysFor` (the map to hand a drawing) and `displayNotices`; `displays.js` has the
+rules (`contentRefusal`, `layoutText`, `layoutDigits`, `imageInfo`, `fitImage`, `loadDisplayImages`) and
+the one painter both halves use (`paintDisplays`). A page draws it with `shell.setDisplays(map)` and
+`viewer.setDisplays(map)`: in 3D the content is in the texture the window is painted on, flat, so the
+relief and its batches are as they were. [`docs/display-content-design.md`](../docs/display-content-design.md)
+is the design. **A page that vendors the kit hands both `displaysFor` of each entry, and changes nothing
+else.**
 
 **New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
 lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a

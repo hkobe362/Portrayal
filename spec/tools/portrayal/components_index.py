@@ -31,7 +31,7 @@ from portrayal.faces import DIRECTIONS, face_ref  # noqa: E402
 from portrayal.render import (SVG_NS, STATE_CSS, Library, instance_group,  # noqa: E402
                     seq_css_name, state_rule, component_cages, component_presents,
                     _pluggable_families, _pluggable_candidates,
-                    _connector_registry)
+                    _connector_registry, display_elements)
 from portrayal import libwalk  # noqa: E402
 from portrayal import redirects  # noqa: E402
 from portrayal import optical, optical_ports  # noqa: E402
@@ -475,6 +475,12 @@ def main():
             presents = component_presents(ref, lib, families, candidates, connectors)
             if presents:
                 entry["presents"] = presents
+            # ITS DISPLAYS a rack file can set (docs/display-content-design.md),
+            # `{<element>: {kind, characters, rows?, at, size}}`. Omitted when
+            # it has none, like `cages`.
+            shown = display_elements(data)
+            if shown:
+                entry["displays"] = shown
             # THE CARD'S OWN PORT GROUPS (#511), in the device `groups:` shape.
             # Omitted when the contract declares none, like `cages`.
             if data.get("groups"):
