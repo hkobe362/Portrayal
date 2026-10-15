@@ -284,7 +284,7 @@ A gap is never a silent pass and never a comment. It is a row in
 ```yaml
 - part: fs/fhd-fapm6-rj45@1        # a device, or a component
   code: C11
-  why: the keystone jack's rear is a punch-down the datasheet draws without a slot layout
+  why: the part's own description says its rear is a punch-down and no cable port; the order reverses that
   order: P-0045                    # the order that closes it; required
   since: 2026-10-15
 ```
@@ -397,6 +397,12 @@ on 2.
 
 ### 6.4 Time, for the budget
 
+Only the sample's report is committed. The whole-library figures here and in section 7 (89 s,
+307 s, 202 devices, the group sizes) are from local runs of the same command with `--all`,
+which anyone can repeat. Two caveats: C15 is a property of the kit, not of a part, and should be
+reported once per run (it counts on 30 of 32 parts); and a part's `clean` count is of the ends
+judged, not of those offered (12 of 49 on `evma8365x`).
+
 One node process, `nice -n 19`, under the heavy lock, on a shared host:
 
 | run | parts | configurations | seconds |
@@ -425,7 +431,7 @@ the number of devices, parts or configurations a person would open, not hours.
 | **D. Placed parts with fields** | S9 | 26 devices (DIP switches on the 300 series, fan trays, AIS) | let `field` address a placed part, not only a seated one | **1 kit change** |
 | **E. Offered but not landing** | C2 | 6 devices (`ch3000` empty slots, server risers, `xcu`) | decide: the page's list should not offer an empty slot; nested module ports need the catalogue answer | **6 devices**, 1 or 2 kit changes |
 | **F. Stand-ins** | C10, C14 | C10: 4 devices (all the angled cages); C14: 22 devices (monitor blocks, alarm cards, test points, ports of fibre panels) | write `mate.axis` in the build for a facet; declare mating points, or `stand-in` | **1 build change**; then **22 devices** |
-| **G. Display readings** | S8 | 3 devices | a command for a display's whole reading | **1 command** (P-0042 does text and digits) |
+| **G. Display readings** | S8 | 3 devices in the whole library (`asr-9901` and two fan units; one in the sample) | a command for a display's whole reading | **1 command** (P-0042 does text and digits) |
 | **H. A made-up end** | C15 | 250 devices (every one) | the kit refuses it at add time (the open P-0045 work) | **1 kit change**, closes all |
 
 Groups A, D, G, H are kit or build changes: five changes in all, three of them open. B and C
