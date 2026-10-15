@@ -242,8 +242,15 @@ def test_the_kit_ships_the_resolver():
 
 def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert pkg["version"] == "0.38.0"
-    assert "0.38.0" in (ROOT / "changelog.d/two-slot-bays.md").read_text()
+    assert pkg["version"] == "0.45.0"
+    assert "0.45.0" in (ROOT / "changelog.d/two-slot-bays.md").read_text()
+    assert "0.44.0" in (ROOT / "changelog.d/zero-u-module-ports.md").read_text()
+    assert "0.43.0" in (ROOT / "changelog.d/relief-batched.md").read_text()
+    assert "0.42.0" in (ROOT / "changelog.d/zero-u-pdu-cord-route.md").read_text()
+    assert "0.41.0" in (ROOT / "changelog.d/relief-id-lookups.md").read_text()
+    assert "0.40.0" in (ROOT / "changelog.d/estimated-duct-capacity.md").read_text()
+    assert "0.39.0" in (ROOT / "changelog.d/spare-in-ducts-fixes.md").read_text()
+    assert "0.38.0" in (ROOT / "changelog.d/zero-u-cable-ends.md").read_text()
     assert "0.37.0" in (ROOT / "changelog.d/agent-findings.md").read_text()
     assert "0.36.0" in (ROOT / "changelog.d/manager-pass-through.md").read_text()
     assert "0.35.0" in (ROOT / "changelog.d/spare-in-ducts.md").read_text()

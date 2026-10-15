@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: fhd-1ufmt-s
-version: 1.0.1
+version: 1.1.0
 maturity: modelled
 manufacturer: FS.com
 model: FHD-1UFMT-S
@@ -67,7 +67,10 @@ gaps:
     note: >-
       the drawing gives the openings and the envelope; the drawer's rails, the tilt hinge,
       the rear cable management and any printing are not located anywhere held. FS's gallery
-      for 145167 is three-quarter renders.
+      for 145167 is three-quarter renders. RE-READ when fs/fhd-fapm6-rj45@1 and
+      fs/fhd-fapm6-blank@1 joined every bay's `accepts`: two more panels seat in the same
+      108.97 x 35.05 opening, which changes nothing about the enclosure's own faces, so
+      the gap stands.
     wanted: >-
       a square-on photograph of the front and of the drawer pulled and tilted.
 groups:
@@ -127,6 +130,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -171,6 +176,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -215,6 +222,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -259,6 +268,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1

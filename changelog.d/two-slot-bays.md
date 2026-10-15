@@ -32,7 +32,7 @@
   there.
 
 ### Changed
-- **`@portrayal/kit` is 0.38.0.** `swap.js` gains `slotWidth`, `spanCovers`,
+- **`@portrayal/kit` is 0.45.0.** `swap.js` gains `slotWidth`, `spanCovers`,
   `spanBox`, `withSpan`, `spanWhy`, `coveredBy` and `markSpan`;
   `bayTransform` places a two-slot card by its span box; `acceptSwaps`
   refuses both claims on one pair and returns `why` by key. The rack's `fit`

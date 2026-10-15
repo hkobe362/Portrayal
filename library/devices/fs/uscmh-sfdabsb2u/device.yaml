@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: uscmh-sfdabsb2u
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: FS.com
 model: USCMH-SFDABSB2U
@@ -123,6 +123,18 @@ provenance:
     note: >-
       drawing - the duct on the front view is the channel between the finger walls, run
       across the rack; the pitch and the gap are the top view's 48.5 and 23.1.
+  capacity:
+    confidence: estimated
+    note: >-
+      estimated - FS states no cable capacity for USCMH-SFDABSB2U in any document held, so
+      the 186 is worked out, not read. METHOD: the channel's inside cross-section, the `duct`
+      guide height by the depth from the front face of the base to the rear face of the cover
+      on the side view of the FS Horizontal Single Sided Manager datasheet, divided by 47.7
+      mm2 a Cat6 cable. 47.7 is the median of the mm2 a cable that FS's own Cat6 counts imply
+      for CMH-SFD1U, CMH-DFD1U, CMH-SFD2U, CMH-BS-SFDS1U, CMH-BS-DFDABS2U, CMH-HD-SFDABS3U
+      and 4U and CMH-UHD-SFDABS1U, 2U and 3U (38.7 to 82.8), rounded up to 0.1; the count is
+      rounded down. CROSS-SECTION: 65.33 x 136.5 = 8917.5 mm2, and 8917.5 / 47.7 = 186.9. The
+      count is of Cat6 24AWG and is marked as an estimate (`cable-capacity-estimated`).
   attrs:
     confidence: datasheet
     note: >-
@@ -140,6 +152,14 @@ attrs:
     material: ABS
     color: Black
     mounting-hardware: M4 Floating Nut Set x4
+  performance:
+    cable-capacity: 186
+    cable-capacity-basis: >-
+      ESTIMATE, not stated by FS - Cat6 24AWG (6.1 mm). A channel cross-section of 65.33 x 136.5
+      mm (8917.5 mm2) at 47.7 mm2 a cable, the median of FS's own Cat6 counts for ten
+      horizontal finger ducts, rounded down (see provenance `capacity`)
+    cable-capacity-media: cat6
+    cable-capacity-estimated: true
   compliance:
     environment: Indoor
     rohs: RoHS Compliant
@@ -175,7 +195,8 @@ gaps:
     reason: vendor-silent
     note: >-
       FS states no cable capacity for USCMH-SFDABSB2U in any document held; the
-      CMH-SFD1U family has a Cable Capacity Reference Guide table and this line does not.
+      CMH-SFD1U family has a Cable Capacity Reference Guide table and this line does not. The
+      186 carried is an estimate (see provenance `capacity`).
     wanted: a capacity table for the USCMH finger ducts
   - what: mounting-holes
     scope: [rear]

@@ -36,6 +36,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -75,6 +77,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -114,6 +118,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -153,6 +159,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -192,6 +200,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -231,6 +241,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -270,6 +282,8 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ],
@@ -309,13 +323,16 @@
    "fs/fhd-fap6scd-os2@1",
    "fs/fhd-fap8mtp-b@1",
    "fs/fhd-fapb@1",
+   "fs/fhd-fapm6-blank@1",
+   "fs/fhd-fapm6-rj45@1",
    "fs/fhd-fapm6@1",
    "fs/fhd-splice-12-lc@3"
   ]
  },
- "composed": "96e8a7f335e2f5e2",
+ "composed": "53440a8d4fc4760b",
  "composed-refs": {
   "common/fibre-splice@1": "1.0.0+fc9da478db2a176a",
+  "common/keystone-blank@1": "1.0.0+9fac58230e7dc2a0",
   "common/keystone-clip@2": "2.0.0+5e63cac60d80c300",
   "common/lc-duplex-dust-cap@2": "2.0.1+00d73e7f3a97515b",
   "common/lc-duplex-shuttered-adapter@2": "2.0.2+8f4908f4aaeeed75",
@@ -387,12 +404,15 @@
   "fs/fhd-fap8mtp-b-rear@1": "1.0.0+eda6040f15c9d559",
   "fs/fhd-fap8mtp-b@1": "1.0.0+6d18459552742440",
   "fs/fhd-fapb@1": "1.0.0+9a096c0ba4f6a558",
+  "fs/fhd-fapm6-blank@1": "1.0.0+96611ca45ad14c50",
+  "fs/fhd-fapm6-rj45@1": "1.0.0+ffb4f6e0a087c80e",
   "fs/fhd-fapm6@1": "1.0.0+8b5494b8ab712402",
   "fs/fhd-splice-12-lc-rear@2": "2.0.0+6365c19befedc151",
   "fs/fhd-splice-12-lc@3": "3.1.0+ad07de833573a544",
   "std/lc-bulkhead-bore@1": "1.0.1+bec8fa23019b19ae",
   "std/mpo16@1": "1.0.0+b3ccddfb5cdea37a",
   "std/mpo@2": "2.0.3+dc3a2ccceb1560b5",
+  "std/rj45@2": "2.1.0+2c8fec73bdc493fb",
   "std/sc-bore@1": "1.0.0+f9b52936418ba281"
  },
  "configs": [
@@ -400,7 +420,7 @@
   "populated"
  ],
  "format": 1,
- "gaps": "a77a723d54660d70",
+ "gaps": "f499af530a033fa8",
  "groups": [
   "slots"
  ],
@@ -422,7 +442,7 @@
   "rear/cutout/back-7",
   "rear/cutout/back-8"
  ],
- "names": "10b13e9f6918cff8",
+ "names": "b9f6fd365128b3a5",
  "placement-addressing": {
   "rel-pos": {
    "front/bays/bay-1": 1,
@@ -450,5 +470,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "776e7054239ea38e",
  "surface": "6699a03209e41bcc",
- "version": "1.0.1"
+ "version": "1.1.0"
 }

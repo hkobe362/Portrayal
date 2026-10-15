@@ -1,9 +1,9 @@
 {
  "bay-accepts": {},
- "composed": "d3233514f8c30649",
+ "composed": "3186233bc13befdd",
  "composed-refs": {
   "fs/cmh-sfd1u-base@1": "1.0.0+ba67be67d9693ea1",
-  "fs/cmh-sfd1u-cover@1": "1.1.0+5fc42a877d5f2b20",
+  "fs/cmh-sfd1u-cover@1": "1.2.0+3f634ec9413eabb8",
   "fs/cmh-sfd1u-finger-end@1": "1.0.0+b2003bc9440e7cc1",
   "fs/cmh-sfd1u-finger@1": "1.0.0+917a8d668873132c"
  },
@@ -198,6 +198,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "f63d55636b2882ee",
- "surface": "e8cb8f88710959fb",
- "version": "0.1.4"
+ "surface": "63af228eff30a6e0",
+ "version": "0.1.5"
 }

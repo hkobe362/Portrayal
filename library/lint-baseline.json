@@ -1061,6 +1061,9 @@
  "components/fs/fhd-fap12mtp16-a/v1/contract.yaml": {
   "L109": 1
  },
+ "components/fs/fhd-fapm6-rj45/v1/contract.yaml": {
+  "L76": 1
+ },
  "components/hpe/fan-dl160/v1/contract.yaml": {
   "L27": 1
  },
