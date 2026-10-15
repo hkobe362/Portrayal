@@ -204,7 +204,10 @@ whose box changes counted) found four things, and each has its fix and its check
   the 8.0 (6.8 on the 16-pin headers) the earlier version spread across the face.
   The numbers are the same guesses. It starts behind the face, which the schema
   allowed only for a facet: a feature that declares `profile` or `profile-y` may
-  now have a negative `lift`. The renderer already built it.
+  now have a negative `lift`. The renderer already built it. The ramp's node
+  stands outside the skin's viewBox on all four headers (x -1.4 on the EPS12V
+  and PCIe 8-pin, y -1.4 on the 12VHPWR and 12V-2x6), so the 2D drawing no longer
+  shows it; it is 3D only, like the plug's latch arm.
 
 ## 9. Not done
 
