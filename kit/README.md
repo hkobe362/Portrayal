@@ -674,6 +674,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.45.0: a passive panel in a bay of a module in the device's bay has an end on each panel.**
+`seatedPort` answers for a holder seated in a drawer's slot (`drawer/module/slot-1/module/sc01`, front) and
+shows its back on the other panel (`.../b01`, view `rear`), as it does a panel in a bay of the device. A bay
+of a module is spoken for by its own path, since a configuration that fills a drawer's slots does not name
+the drawer. `cable.add` and `cable.update` refuse an end on a port a passive panel (class `adapter-panel`)
+does not have, on the wrong panel, or on the rear of a panel with no rear, with the loose-end sentence
+(`seatedEndReason`). `freePorts` lists the far ends of a panel in a drawer from the catalogue (`backEnds`),
+since no panel of the device draws them.
+
 **New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
 lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a
 vertical PDU's network card: `network-module/module/eth0`, `usb-0`), placed on the part by the bay's
