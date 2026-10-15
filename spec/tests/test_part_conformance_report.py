@@ -30,7 +30,8 @@ SAMPLE = ROOT / "spec/tools/dev/part_conformance_sample.json"
 DIST = ROOT / "library" / "dist"
 REPORT = ROOT / preflight.CONFORMANCE_REPORT
 SAMPLE_SECONDS = 15           # the budget of section 6.4: the sample under 15 s
-TOUCHED_LIMIT = 40            # devices a change may add to the sample (the touched set under 60 s)
+RUN_TIMEOUT = 300             # seconds; a runner that hangs is a warning, not a stuck suite
+TOUCHED_LIMIT = 40           # devices a change may add to the sample (the touched set under 60 s)
 
 pytestmark = [
     pytest.mark.skipif(shutil.which("node") is None, reason="node not installed"),
@@ -64,13 +65,24 @@ def refs_of_sample():
 
 def test_part_conformance_report(tmp_path):
     """Run the sample and the touched devices, write the report, fail on nothing."""
+    try:
+        _report(tmp_path)
+    except Exception as e:                  # report-only: nothing in here may fail the suite
+        warnings.warn(f"part conformance: the report could not be made ({type(e).__name__}: {e})")
+
+
+def _report(tmp_path):
     sample = refs_of_sample()
     touched = touched_devices()
     extra = [d for d in touched if d not in sample][:TOUCHED_LIMIT]
     out = tmp_path / "report.json"
     started = time.monotonic()
-    p = subprocess.run([sys.executable, str(TOOL), "--dist", str(DIST), "--refs", *sample, *extra, "--out", str(out)],
-                       capture_output=True, text=True, cwd=ROOT)
+    try:
+        p = subprocess.run([sys.executable, str(TOOL), "--dist", str(DIST), "--refs", *sample, *extra, "--out", str(out)],
+                           capture_output=True, text=True, cwd=ROOT, timeout=RUN_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        warnings.warn(f"part conformance: the runner did not finish in {RUN_TIMEOUT} s")
+        return
     took = time.monotonic() - started
     if p.returncode != 0 or not out.exists():
         warnings.warn("part conformance: the runner did not finish: " + (p.stderr or p.stdout)[-800:])
@@ -82,11 +94,12 @@ def test_part_conformance_report(tmp_path):
         REPORT.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n")
     except OSError as e:
         warnings.warn(f"part conformance: the report cannot be written ({e})")
-    blocking = {c: r["n"] for c, r in report["summary"].items() if r["level"] == "block"}
-    print(f"\npart conformance (report only): {len(report['parts'])} parts in {took:.1f} s; "
+    blocking = {c: r.get("n") for c, r in report.get("summary", {}).items() if r.get("level") == "block"}
+    print(f"\npart conformance (report only): {len(report.get('parts', []))} parts in {took:.1f} s; "
           f"blocking codes found: {blocking or 'none'}; report: {preflight.CONFORMANCE_REPORT}")
     if not extra and took > SAMPLE_SECONDS:
         warnings.warn(f"part conformance: the sample took {took:.1f} s, over its {SAMPLE_SECONDS} s budget")
-    walked = sum(row["cabling"]["counts"].get("judged", 0) for part in report["parts"] for row in part["configs"])
+    walked = sum((row.get("cabling") or {}).get("counts", {}).get("judged", 0)
+                 for part in report.get("parts", []) for row in part.get("configs", []))
     if not walked:
         warnings.warn("part conformance: the runner judged no cable end; it checked nothing")

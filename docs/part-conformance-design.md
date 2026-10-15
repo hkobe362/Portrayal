@@ -278,8 +278,10 @@ written by the test to a path preflight can read).
 | **gap** | S8, C12, C16 | reported with the part; counted |
 | **block** (D-0035) | C15 | a made-up end is refused at add time; an accepted one is a failure. The level is the kit's, so the report gives it once per run |
 
-C20 and C11 do not fire on a part that declares itself one-sided (a rack PDU's ground pads, a
-backplane card); the exception row names the order that declared it.
+Once built (section 8, step 3), C20 and C11 will not fire on a part that declares itself
+one-sided (a rack PDU's ground pads, a backplane card), and the exception row names the order
+that declared it. Until then the runner still reports them (C11 on `ch3000`, C20 on 5 sample
+parts), because no declaration or exception row exists yet.
 
 ### 5.3 How a known gap is declared
 
@@ -391,7 +393,7 @@ First run (before #1082, #1083, #1084, #1086) and the run on the `main` that hol
 | code | before | after |
 |---|---|---|
 | S1, S4 (lamps) | 25 parts | **0** |
-| C11 (a coupler with one side) | 3 parts | 1 (`ch3000`'s backplane card, one-sided by design: D-0035) |
+| C11 (a coupler with one side) | 3 parts | 1 (`ch3000`'s backplane card: one-sided by design, D-0035, not yet declared so, so still reported) |
 | C18 | 1 (`xcu`) | 0 |
 | C9 | 0 | 1 (`xcu`: 24 ports offered, none drawn) |
 | C2 | 3 | 2 (`ch3000`, `dl160-gen10`) |
@@ -478,9 +480,9 @@ each part is excepted by name (5.3) until its order closes, so the check can sta
 The proposal was approved (D-0034) and its three questions answered (D-0035):
 
 1. **A rack PDU's ground pads and one-sided backplane cards are one-sided by design.** They are
-   not a landing place for a cable. The part declares so (a closed or one-sided side, and an
-   exception row where the code would still fire), and C20 and C11 do not ask for a cable end
-   on them.
+   not a landing place for a cable. The part is to declare so (a closed or one-sided side, and an
+   exception row where the code would still fire), and C20 and C11 then do not ask for a cable
+   end on them. That declaration is section 8, step 3; the runner reports them until it exists.
 2. **C15, a made-up end, blocks now.** A cable to an end that does not exist is refused at add
    time, for a seated part and for any other end, and the runner fails on it.
 3. **The Rack Builder page gets no control for lamps and outlets.** A person sets them through
