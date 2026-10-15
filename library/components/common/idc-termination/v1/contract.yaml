@@ -1,0 +1,35 @@
+format: 1
+kind: component
+name: idc-termination
+version: 1.0.0
+class: port
+profile: networking
+description: >-
+  The punch-down (IDC) back of a keystone jack, seen from behind: a block of
+  eight insulation-displacement slots in which a 4-pair cable's conductors are
+  punched down. It is the end a cable is terminated on, not a socket anything
+  plugs into.
+size: {w: 16.1, h: 14.5}
+size-confidence: {w: datasheet, h: datasheet}
+size-notes: >-
+  THE JACK BODY THROUGH ITS OPENING, 14.5 x 16.1 in FS's Cat6 punchdown keystone
+  jack datasheet (p3), turned on its side as a landscape opening takes it, so
+  16.1 across and 14.5 high. The slot block is drawn inside that envelope.
+attrs: {media: idc}
+connection-points:
+  mate: {at: [8.05, 7.25], direction: front}
+provenance:
+  size: >-
+    datasheet - see size-notes.
+  face: >-
+    ESTIMATED. The jack datasheet draws the body in plan and side view and says
+    it terminates 4-pair 23-26 AWG cable by punch-down or crimping tool
+    ("Fast installation with special punch tool or crimping tool", p1); it does
+    not draw the back face-on. Drawn: a body with two rows of four slots, the
+    568A/B colour code left unpainted. Where the slots sit and how the block
+    is turned are stand-ins.
+  media: >-
+    `idc` is this part's own medium: a termination is not an RJ45 jack and
+    carries no interface speed. A cable that ends here ends by punch-down, so no
+    plug is stated for it.
+skins: [default]

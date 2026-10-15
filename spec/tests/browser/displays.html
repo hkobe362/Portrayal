@@ -1,0 +1,67 @@
+<!doctype html>
+<!--
+  A browser harness for what a display shows (P-0042, docs/display-content-design.md).
+  WebGL does not run under node, so this is driven by hand or from a browser tool:
+
+    python3 tools/serve.py 8793          # from the repository root, after ./build.sh
+    open http://localhost:8793/spec/tests/browser/displays.html?mode=2d&device=evma8365x
+    open http://localhost:8793/spec/tests/browser/displays.html?mode=3d&device=evma8365x
+
+  `mode=2d` mounts the shell and `mode=3d` the viewer. `window.harness.show(map)`
+  hands the map ({path: content}) to `shell.setDisplays` or `viewer.setDisplays`
+  and answers once it is drawn; `harness.box(path)` is the pixel box of a display
+  on the page (2D) and `harness.frame(path)` points the 3D camera at it. Verify
+  what the COMPOSITOR shows with a screenshot: a buffer read outside a frame
+  reports a correct scene as blank. The rack's `displaysFor` and
+  `loadDisplayImages` (kit/rack/displays.js, kit/displays.js) make the map.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>display content harness</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #16181c; color: #d8dce2; font: 12px/1.4 system-ui, sans-serif; }
+  #stage3d { position: absolute; inset: 0; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<script type="module">
+const params = new URLSearchParams(location.search);
+const MODE = params.get('mode') || '2d';
+const DEVICE = params.get('device') || 'evma8365x';
+const CONFIG = params.get('config') || undefined;
+const DIST = '../../../library/dist';
+const harness = window.harness = {mode: MODE, device: DEVICE, ready: false};
+
+if (MODE === '2d') {
+  const { createShell } = await import('../../../kit/shell.js');
+  const shell = createShell({title: 'display harness', dist: DIST});
+  harness.shell = shell;
+  await shell.loadDevice(DEVICE, {config: CONFIG, view: params.get('view') || undefined});
+  harness.show = async map => shell.setDisplays(map);
+  harness.box = path => {
+    const n = document.querySelector(`#stage-svg [data-path="${CSS.escape(path)}"]`);
+    if (!n) return null;
+    const r = n.getBoundingClientRect();
+    return {x: r.x, y: r.y, w: r.width, h: r.height};
+  };
+} else {
+  const { createViewer } = await import('../../../kit/viewer3d.js');
+  const stage = Object.assign(document.createElement('div'), {id: 'stage3d'});
+  document.body.append(stage);
+  const V = createViewer(stage, {dist: DIST});
+  harness.viewer = V;
+  await V.load({device: DEVICE, config: CONFIG});
+  harness.show = async map => V.setDisplays(map);
+  harness.frame = path => { V.select(path); V.select(null); };
+}
+harness.ready = true;
+</script>
+</body>
+</html>
