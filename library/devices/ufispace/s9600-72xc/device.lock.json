@@ -21,7 +21,7 @@
    "ufispace/psu-132-dc@1"
   ]
  },
- "composed": "6a34a9d8314332b9",
+ "composed": "95b47a875b70b97c",
  "composed-refs": {
   "common/compliance-sticker@1": "1.0.0+6b3c51b31c446689",
   "common/ground-symbol@1": "1.0.0+938c617ba0a96a89",
@@ -42,7 +42,7 @@
   "ufispace/lane-led-quad@1": "1.0.0+32cf79ec07a4520b",
   "ufispace/psu-132-ac@1": "1.1.0+ce45ad7b531ae933",
   "ufispace/psu-132-dc@1": "1.1.0+c20313841c209303",
-  "ufispace/seg7-status-2@1": "1.3.0+2419520ed929fa77"
+  "ufispace/seg7-status-2@1": "1.4.0+ba0c4a9d22c1f45c"
  },
  "configs": [
   "ac",
@@ -852,5 +852,5 @@
  "placement-surface": "0945871494a05cb3",
  "shape": "b502b3c3be65abed",
  "surface": "842a635eb5b9e969",
- "version": "6.0.8"
+ "version": "6.0.9"
 }

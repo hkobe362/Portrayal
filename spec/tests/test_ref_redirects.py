@@ -242,7 +242,8 @@ def test_the_kit_ships_the_resolver():
 
 def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert pkg["version"] == "0.46.0"
+    assert pkg["version"] == "0.47.0"
+    assert "0.47.0" in (ROOT / "changelog.d/display-content.md").read_text()
     assert "0.46.0" in (ROOT / "changelog.d/seated-end-refused.md").read_text()
     assert "0.45.0" in (ROOT / "changelog.d/settable-lamps.md").read_text()
     assert "0.44.0" in (ROOT / "changelog.d/zero-u-module-ports.md").read_text()

@@ -26,6 +26,7 @@ import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, stra
 import {slotEnv, slotTree, partName, partOf, resolverFor} from './slots.js';
 import {auditRack, readAsTexts, unknownTexts} from '../redirects.js';
 import {fieldRows} from '../fields.js';
+import {displayList} from './displays.js';
 
 export function fitsAt(rack, {ref, face, ru}, {chassisOf}) {
   const spot = isRackFace(chassisOf(ref)) ? placement(rack, {face, ru}, chassisOf) : {face, ru};
@@ -473,6 +474,9 @@ function itemFacts(rack, item, ctx) {
     const parts = [...tree.bays.map(b => [`${b.path}/module`, b.holds]), ...tree.cages.map(g => [`${g.path}-occupant`, g.holds])];
     out.fields = parts.flatMap(([path, ref]) => fieldRows(partOf(ctx.compByRef, ref)?.fields, item.fields?.[path])
       .map(r => ({path, key: r.key, type: r.type, value: r.value, default: r.default, ...(r.type === 'choice' ? {choices: r.options} : {})})));
+    // its displays and what each shows - what `display.set` takes
+    const shown = displayList(rack, ctx, item.id);
+    if (shown.length) out.displays = shown.map(({item: _i, ...d}) => d);
   }
   // A REF THE LIBRARY HAS REPLACED IS READ AS ITS REPLACEMENT, and a ref it no
   // longer has is kept and named (kit/redirects.js): the file is not changed
@@ -674,8 +678,16 @@ function zeroUFacts(rack, z, ctx) {
     // ITS ENDS (P-0019): each outlet a cable can end on, by type, the unit
     // it stands at and the cable on it (null when free), from the catalogue
     // and the cables on it, when there are any
-    ...zeroUEndFacts(rack, z, ctx), ...(on.length ? {cables: on} : {}), ...settableFacts(z, ctx)};
+    ...zeroUEndFacts(rack, z, ctx), ...(on.length ? {cables: on} : {}), ...settableFacts(z, ctx),
+    ...(shownOn(rack, z, ctx).length ? {displays: shownOn(rack, z, ctx)} : {})};
 }
+const shownOn = (rack, z, ctx) => displayList(rack, ctx, z.id).map(({item: _i, ...d}) => d);
+
+// WHICH PARTS ARE DISPLAYS, and what each shows: every display of every device
+// and part beside the rack (or those of `item`) that says what kind it is, as
+// {item, path, kind, columns, rows, takes, text, shows}. A device whose parts
+// list is not loaded is skipped. What `display.set` takes the path from.
+export const displays = (rack, ctx = {}, {item} = {}) => displayList(rack, ctx, item ?? null);
 function zeroUEndFacts(rack, z, ctx) {
   if (typeof ctx.slotsOf !== 'function' || typeof ctx.compByRef !== 'function') return {};
   const ends = zeroUEnds(z, ctx);

@@ -15,6 +15,8 @@ import {ownRoute, autoRoute, routedLength, pointOf, portPoint, routePath} from '
 import {fits, fitsDepth, fitsZeroU, isRackFace, isNarrow, railOf, heightOf, shrinkRack, settleZeroU, setbackOf, isZeroUPart} from './fit.js';
 import {whereText, zeroUName, fitsHang, hangingOn} from './zero-u.js';
 import {stateRefusal} from './states.js';
+import {displayRefusal, displaysOf} from './displays.js';
+import {shapeRefusal, contentNotes, contentKind} from '../displays.js';
 import {spareRefusal, amountRefusal, spareLoad, loadText, whereText as spareWhere, trayText, FORMS, mText} from './slack.js';
 import {traysOf} from './solids.js';
 import {configFacts} from './catalog.js';
@@ -544,6 +546,40 @@ function readingsSet(rack, {id, readings}, ctx) {
   if (same(readings, e.readings)) return unchanged(rack);
   const {readingsAsWritten: _w, ...rest} = e;
   return done(withEntry(rack, id, {...rest, readings: structuredClone(readings)}), `Stored the readings of ${name}.`);
+}
+
+// WHAT A DISPLAY SHOWS (docs/display-content-design.md), on a device or on a
+// part beside the rack, by the path of the display. The content is checked
+// against the display when the parts lists are loaded: a part that is no
+// display, and content the display cannot take, are refused with a sentence;
+// text longer than the display, or a picture that does not fill its window,
+// is kept and said.
+function displaySet(rack, {id, path, content}, ctx) {
+  const e = entryOf(rack, id);
+  if (!e) return {error: GONE};
+  const had = e.displays && typeof e.displays === 'object' ? e.displays : {};
+  const name = entryName(e, ctx.chassisOf);
+  if (content == null) {
+    if (!Object.hasOwn(had, path)) return unchanged(rack);
+    const {[path]: _was, ...rest} = had;
+    const {displays: _d, ...bare} = e;
+    return done(withEntry(rack, id, Object.keys(rest).length ? {...e, displays: rest} : bare), `Cleared what ${path} on ${name} shows.`);
+  }
+  const bad = shapeRefusal(content);
+  if (bad) return {error: bad};
+  const s = slotsFor(ctx, e.ref);
+  if (s?.error) return s;
+  let notes = [];
+  if (s) {
+    const no = displayRefusal({...e, label: name}, path, content, ctx);
+    if (no) return {error: no};
+    const d = displaysOf(e, ctx)?.find(x => x.path === path);
+    notes = d ? contentNotes(d, content, `${path} on ${name}`) : [];
+  }
+  if (same(had[path], content)) return unchanged(rack);
+  const shown = {text: 'text', digits: `"${content.digits}"`, image: 'an image'}[contentKind(content)];
+  return done(withEntry(rack, id, {...e, displays: {...had, [path]: structuredClone(content)}}),
+    `${path} on ${name} now shows ${shown}.${notes.length ? ` ${notes.join(' ')}` : ''}`, {findings: notes.map(note)});
 }
 
 // What a frame change did to the parts beside the rack, as sentences.
@@ -1382,6 +1418,13 @@ export const COMMANDS = {
   'readings.set': {run: readingsSet, description: 'Store readings taken from a device or a part beside the rack, with where they came from and when; null clears them.',
     args: args(['id', 'readings'], {id: ID('device or part beside the rack'),
       readings: {type: ['object', 'null'], description: '{source, at, values}: where they came from, an RFC 3339 time, and part path to {current-a, power-w, energy-kwh}; null to clear.'}})},
+  'display.set': {run: displaySet, description: 'Set what a display of a placed device or of a part beside the rack shows: text (lines, cut to its columns and rows), digits (a segment display) or an image (fitted to the window; a GIF shows its first frame); null clears it. Refused, with the displays it has, when the path is no display or the display cannot show that. The displays query lists them.',
+    args: args(['id', 'path', 'content'], {id: ID('device or part beside the rack'),
+      path: {type: 'string', minLength: 1, description: 'The display, by its path as the displays query lists it (e.g. network-module/module/lcd).'},
+      content: {type: ['object', 'null'], additionalProperties: false, description: 'One of text, digits or image; null to clear.',
+        properties: {text: {type: 'array', items: {type: 'string'}, description: 'The lines of text, for a pixel or character display.'},
+                     digits: {type: 'string', description: 'The digits of a segment display: 0 to 9, a to f, a space for blank; right-aligned.'},
+                     image: {type: 'string', minLength: 1, description: 'A data URL of an SVG, PNG, JPEG or GIF up to 512 KiB, or a library asset path.'}}}})},
   'zerou.remove': {run: zeroURemove, description: 'Take a part away from beside the rack. Its cables (the cords on a PDU\'s outlets) are kept as loose ends, or removed with it.',
     args: args(['id'], {id: ID('part beside the rack'), cables: {enum: ['keep', 'remove'], description: 'keep its cables as loose ends, or remove them; keep when left out.'}})},
   'cable.add': {run: cableAdd, description: 'Run a cable between two free ports. Refused when a port already has a cable or a device is gone.',
