@@ -125,6 +125,17 @@ test('a layered resolver sends each file to the root that holds it, and merges t
   assert.equal(comps.length, read(PUBLIC, 'components.json').components.length);
 });
 
+test('a skin only the overlay holds is fetched from the overlay', async () => {
+  clearDistCache();
+  const own = 'http://kit.test/own/';
+  synthetic[own] = {'devices.json': JSON.stringify({devices: []}),
+                    'components.json': JSON.stringify({components: [{ns: 'acme', name: 'widget', major: 'v1'}]})};
+  const distAt = distResolver([PUB, own], '../dist');
+  await distAt.ready;
+  assert.equal(distAt('components/acme--widget--v1--front.svg'), `${own}components/acme--widget--v1--front.svg`);
+  delete synthetic[own];
+});
+
 test('a layered resolver refuses an id in two roots, naming both', async () => {
   clearDistCache();
   const dup = 'http://kit.test/dup/';

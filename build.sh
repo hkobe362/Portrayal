@@ -70,7 +70,7 @@ if [ -n "$OVERLAY" ] || [ -n "$OVERLAY_OUT" ]; then
       --library "$OVERLAY" --only-root "$OVERLAY"
   fi
   # a previous overlay build is replaced; any other folder is not ours to empty
-  if [ -e "$OVERLAY_OUT" ] && [ -n "$(ls -A "$OVERLAY_OUT")" ] && [ ! -f "$OVERLAY_OUT/devices.json" ]; then
+  if [ -e "$OVERLAY_OUT" ] && [ -n "$(ls -A "$OVERLAY_OUT")" ] && [ ! -f "$OVERLAY_OUT/.overlay-build" ]; then
     echo "--overlay-out $OVERLAY_OUT is not empty and holds no earlier overlay build; refusing to empty it" >&2
     exit 2
   fi
@@ -98,6 +98,8 @@ render._pluggable_candidates(sys.argv[1:])
   for pid in "${pids[@]}"; do wait "$pid"; done
   python3 spec/tools/portrayal/rack_index.py --dist "$OVERLAY_OUT"
   cp LICENSE NOTICE "$OVERLAY_OUT"/
+  # the mark that this folder is an overlay build, so a rebuild may replace it
+  echo "built by build.sh --overlay-library" > "$OVERLAY_OUT/.overlay-build"
   echo "built overlay $OVERLAY: $(ls "$OVERLAY_OUT" | wc -l | tr -d ' ') files -> $OVERLAY_OUT"
   exit 0
 fi

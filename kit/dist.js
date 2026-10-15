@@ -125,7 +125,8 @@ export function layeredDist(roots) {
         device.set(d.name, i);
       }
       for (const c of components) {
-        const k = `${c.ns}--${c.name}--${String(c.major).replace(/^v/, '')}`;
+        // as a skin file spells it: components.json's `major` is `v1`
+        const k = `${c.ns}--${c.name}--${c.major}`;
         if (part.has(k)) throw clash('component', `${c.ns}/${c.name}@${String(c.major).replace(/^v/, '')}`, names[part.get(k)], names[i]);
         part.set(k, i);
       }

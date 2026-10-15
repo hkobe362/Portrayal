@@ -175,6 +175,17 @@ def test_the_3d_viewer_reads_its_indexes_through_the_layered_reader():
     assert "readIndex(distAt, 'devices.json')" in shell and "readIndex(distAt, 'components.json')" in shell
 
 
+def test_an_out_folder_that_is_not_an_earlier_overlay_build_is_not_emptied(tmp_path):
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "devices.json").write_text("{}")      # a public-style dist is not an overlay build
+    r = subprocess.run(["bash", str(ROOT / "build.sh"), "--overlay-library", str(FIXTURE),
+                        "--overlay-out", str(out)], capture_output=True, text=True,
+                       cwd=ROOT, env={**os.environ, "NO_LINT": "1"})
+    assert r.returncode != 0 and "refusing to empty" in r.stderr, r.stdout + r.stderr
+    assert (out / "devices.json").read_text() == "{}"
+
+
 def test_a_device_naming_a_public_component_that_does_not_exist_is_refused(tmp_path):
     overlay = copy_overlay(tmp_path)
     f = device_file(overlay)
