@@ -676,6 +676,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.48.0: a passive panel in a bay of a module in the device's bay has an end on each panel.**
+`seatedPort` answers for a holder seated in a drawer's slot (`drawer/module/slot-1/module/sc01`, front) and
+shows its back on the other panel (`.../b01`, view `rear`), as it does a panel in a bay of the device. A bay
+of a module is spoken for by its own path, since a configuration that fills a drawer's slots does not name
+the drawer. `cable.add` and `cable.update` refuse an end on a port a passive panel (class `adapter-panel`)
+does not have, on the wrong panel, or on the rear of a panel with no rear, with the loose-end sentence
+(`seatedEndReason`). `freePorts` lists the far ends of a panel in a drawer from the catalogue (`backEnds`),
+since no panel of the device draws them.
+
 **New in 0.47.0: a display in a rack shows text, digits or an image.** An item and a part beside the
 rack take `displays`, a map of the path of a display to `{text: [lines]}`, `{digits: "04"}` or
 `{image: <data URL or library asset>}`, as `states` takes a state. The rack file's version and schema do
