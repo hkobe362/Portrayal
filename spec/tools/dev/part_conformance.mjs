@@ -528,7 +528,7 @@ export async function checkCabling(W, ref, cfgName, opts = {}) {
         const itm = add.rack.items.find(i => i.id === id);
         const settled = settleEnd(add.rack, add.rack.cables[0].a, factsFor(W, add.rack, itm, cfg, add.rack.cables[0].a, slots), base);
         flag('C15', settled?.reason ? 'a made-up end is accepted at add time and only flagged loose afterwards' : 'a made-up end is accepted at add time and is not flagged as loose',
-          1, {level: settled?.reason ? 'warn' : undefined});
+          1);
       }
     }
   }

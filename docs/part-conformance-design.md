@@ -1,8 +1,10 @@
 # Part conformance: every new part is tried, at ingest, for its cable ends and its settings
 
-Status: **proposal for approval**, 2026-10-15 (P-0049, request R-0027). Nothing here is
-built except a prototype runner, `spec/tools/dev/part_conformance.py` with its node half, and
-a test for it. No rule, skill, schema or workflow changes until this is approved.
+Status: **approved** (D-0034), 2026-10-15 (P-0049, request R-0027); the open questions are
+answered in section 9 (D-0035). Built so far: the runner,
+`spec/tools/dev/part_conformance.py` with its node half, its test, and the report-only test over
+`library/dist` (section 8, step 1). The rule, skill, schema and workflow changes follow section
+8's order.
 
 The request, in its own words:
 
@@ -274,7 +276,10 @@ written by the test to a path preflight can read).
 | **block** | S1 to S7, S9, C1 to C9, C11, C13, C18, C19, C20 and any check that throws (C0, S0) | the test fails |
 | **stand-in** | C10, C14 | reported with the part; counted; the count may not rise on a PR |
 | **gap** | S8, C12, C16 | reported with the part; counted |
-| **warn** | C15 | reported; becomes **block** the day the kit refuses a made-up end at add time (the open work for P-0045) |
+| **block** (D-0035) | C15 | a made-up end is refused at add time; an accepted one is a failure. The level is the kit's, so the report gives it once per run |
+
+C20 and C11 do not fire on a part that declares itself one-sided (a rack PDU's ground pads, a
+backplane card); the exception row names the order that declared it.
 
 ### 5.3 How a known gap is declared
 
@@ -347,8 +352,9 @@ See section 7: the failures found, grouped, with sizes.
   the same sample, add the same cables through the page's own editor, and compare the
   painted line's end with the end's box. This is where "a device's setback is not drawn in
   the side views" would be caught for sure.
-- **A rack-document control for lamps and outlets**, or a statement that there is none by
-  design: today the Explorer's chips are not kept, and only the agent writes `states`.
+- **No rack-document control for lamps and outlets, by design (D-0035).** A person sets them
+  through the Explorer opened from the frame tab, an agent through its tools; the settings
+  parity is between those two paths, and the Rack Builder page needs no third.
 - **A tool-description check:** the agent's tool descriptions list what each command takes, and
   the build's `settable` (P-0041) should reach the tool text, so an agent learns what a device
   can be set to without a refusal.
@@ -369,21 +375,32 @@ side-pane geometry (read-only).
 
 | fault | caught? | by | note |
 |---|---|---|---|
-| P-0045 keystone panel's rear | **yes** | C11 on `FHD-FAPM6-RJ45` in `fhd-1ube` | the part has ends on its front and a `faces.rear` of none |
-| P-0047 fibre unit's rear adapters | **yes** | C18 and C2 on `xcu` (24 back ends the catalogue has and the host does not draw); the same on two FHD enclosures | **not** caught: "the body is solid in 3D" (C13 passes, because no route is laid to a point that does not exist). It needs the 3D scene's own solids |
+| P-0045 keystone panel's rear | **yes on the first run; fixed on `main` now** | C11 on `FHD-FAPM6-RJ45` in `fhd-1ube` | #1084 gave the panel a rear (`fs/fhd-fapm6-rj45-rear`); the runner no longer reports `fhd-1ube` |
+| P-0047 fibre unit's rear adapters | **yes; the coupler fix is on `main`, the host's rear is not** | first run: C18 and C2 on `xcu` (24 back ends the catalogue has and the host does not draw), the same on two FHD enclosures. Now: C9 on `xcu` (24 ports offered, none drawn) and C18 on `fhd-1ufmt-n` and one more FHD enclosure | **not** caught: "the body is solid in 3D" (C13 passes, because no route is laid to a point that does not exist). It needs the 3D scene's own solids |
 | #1080 PDU network card | control: clean | C1/C2 on `evma8365x` pass | the check does not cry wolf on a fixed fault |
 | P-0046 DC terminals | **yes** | C19 on 9 of the sample's parts (the DC configurations of `s9700-53dx`, `mx204`, `s9510-28dc`, `lmfs-f`, ...); C20 on `sr-1-dc`'s DC input and `300cb08`'s feed studs | |
 | P-0048 angled cage, plug short of an optic | **partly** | C10 reports the six ports on a 36 degree facet of `nfxs-e-bb` with no axis (a stand-in) | the shortfall itself needs the seated optic's relief: not judged in node |
 | P-0048 setback in the side views | **not reproduced** | C7 compares the kit's panel depth with the site's side-pane geometry (`origin/main`): it agrees, with and without a 30 mm setback, on `dinrail2u` and the rest | either the site already draws it on `main` or the fault is in painting, which only a browser can see |
-| P-0041 LEDs, digits, lamps, breakers | **yes** | S1, S4: 25 of the sample's 32 parts, 202 of 258 devices; `evma8365x`: 98 of its 140 drawn states refused | the P-0041 change is not on `main` yet; the runner is the test it would have had |
+| P-0041 LEDs, digits, lamps, breakers | **yes on the first run; fixed on `main` now** | S1, S4 were on 25 of the sample's 32 parts and 202 of 258 devices (`evma8365x`: 98 of its 140 drawn states refused). #1082 writes `configs.json` `states` from the drawings: **0 on the sample, 0 on the whole library** | the runner is the test the change would have had, and now holds it |
 | P-0042 display readings | **yes, as a gap** | S8 on `asr-9901` (a four-character display with eight readings) and two FS fan units; no command sets a reading | |
 
 ### 6.2 What else it found, on the sample of 32
 
-`C19` on 9 parts, `C20` on 5, `C11` on 3 devices, `C18` on 1, `C2` on 3, `S9` on 1 (`300cb08`:
-the DIP switches `dip-a`, `dip-b` are placed parts with fields, and `field` answers "Nothing is
-seated at dip-a"; the Explorer sets them), `C15` on 30 of the 32, and stand-ins: `C14` on 6, `C10`
-on 2.
+First run (before #1082, #1083, #1084, #1086) and the run on the `main` that holds them:
+
+| code | before | after |
+|---|---|---|
+| S1, S4 (lamps) | 25 parts | **0** |
+| C11 (a coupler with one side) | 3 parts | 1 (`ch3000`'s backplane card, one-sided by design: D-0035) |
+| C18 | 1 (`xcu`) | 0 |
+| C9 | 0 | 1 (`xcu`: 24 ports offered, none drawn) |
+| C2 | 3 | 2 (`ch3000`, `dl160-gen10`) |
+| C19 | 9 | 9 |
+| C20 | 5 | 5 |
+| S9 | 1 (`300cb08`: `dip-a`, `dip-b` are placed parts with fields, and `field` answers "Nothing is seated at dip-a"; the Explorer sets them) | 1 |
+| S8 | 1 | 1 (three findings) |
+| C15 | 30 of 32, a warning | 30 of 32, **blocking** (D-0035) |
+| C14, C10 (stand-ins) | 6, 2 | 6, 2 |
 
 ### 6.3 What the runner is not
 
@@ -397,9 +414,11 @@ on 2.
 
 ### 6.4 Time, for the budget
 
-Only the sample's report is committed. The whole-library figures here and in section 7 (89 s,
-307 s, 202 devices, the group sizes) are from local runs of the same command with `--all`,
-which anyone can repeat. Two caveats: C15 is a property of the kit, not of a part, and should be
+Only the sample's report is committed. The whole-library figures here and in section 7 are
+from local runs of the same command with `--all`, which anyone can repeat. The first run
+(89 s, 307 s every end, 202 devices on S1/S4) is the one the "before" column of section 7
+quotes; the run on the new `main` took **69.5 s** (258 devices, 495 configurations judged, the
+default three configurations per device) and the sample **11.3 s**. Two caveats: C15 is a property of the kit, not of a part, and should be
 reported once per run (it counts on 30 of 32 parts); and a part's `clean` count is of the ends
 judged, not of those offered (12 of 49 on `evma8365x`).
 
@@ -423,18 +442,23 @@ run under 10**; a test that exceeds it names its reason or is split.
 What the whole-library run finds, grouped by the thing to do, with the size of each. A size is
 the number of devices, parts or configurations a person would open, not hours.
 
-| group | codes | found | what closes it | size |
-|---|---|---|---|---|
-| **A. The agent's catalogue of states** | S1, S4 | 202 devices, 570 configurations; 40 000 declared states, 49 000 refused | the build writes `configs.json` `states` from the drawings (the open P-0041 change); then the check passes by construction | **one change, already open**; re-run to confirm 0 |
-| **B. Supplies and terminals with no cable end** | C19, C20 | C19: 120 devices over 46 supply models (most DC); C20: 29 devices (feed studs of the 300 series, ground pads and straps, `sr-1-dc`'s DC input) | give each supply model its inlet or terminals as connector slots (the DC terminal design already exists); decide which ground pads are lug points | **46 supply parts**, then **29 devices**; the biggest group |
-| **C. Couplers with one side** | C11, C18 | 11 coupler models on 8 devices; 3 devices (204 back ends) with no point to draw | write the `faces.rear` for the FHD panels and the keystone panel; decide the 7 CH3000 backplane cards (declare one-sided); the nested-bay back of the fibre units needs the kit | **11 models**; **1 kit change** (nested-bay backs) |
-| **D. Placed parts with fields** | S9 | 26 devices (DIP switches on the 300 series, fan trays, AIS) | let `field` address a placed part, not only a seated one | **1 kit change** |
-| **E. Offered but not landing** | C2 | 6 devices (`ch3000` empty slots, server risers, `xcu`) | decide: the page's list should not offer an empty slot; nested module ports need the catalogue answer | **6 devices**, 1 or 2 kit changes |
-| **F. Stand-ins** | C10, C14 | C10: 4 devices (all the angled cages); C14: 22 devices (monitor blocks, alarm cards, test points, ports of fibre panels) | write `mate.axis` in the build for a facet; declare mating points, or `stand-in` | **1 build change**; then **22 devices** |
-| **G. Display readings** | S8 | 3 devices in the whole library (`asr-9901` and two fan units; one in the sample) | a command for a display's whole reading | **1 command** (P-0042 does text and digits) |
-| **H. A made-up end** | C15 | 250 devices (every one) | the kit refuses it at add time (the open P-0045 work) | **1 kit change**, closes all |
+Counts are devices (or parts), first run and then the run on the `main` that holds #1082,
+#1083, #1084 and #1086 (258 devices, default of three configurations each).
 
-Groups A, D, G, H are kit or build changes: five changes in all, three of them open. B and C
+| group | codes | first run | now | what closes it | size |
+|---|---|---|---|---|---|
+| **A. The agent's catalogue of states** | S1, S4 | 202 devices, 570 configurations | **0** (closed by #1082) | the build writes `configs.json` `states` from the drawings | **done** |
+| **B. Supplies and terminals with no cable end** | C19, C20 | C19: 120 devices over 46 supply models (most DC); C20: 29 devices (feed studs of the 300 series, ground pads and straps, `sr-1-dc`'s DC input) | C19: 120 devices (163 configurations); C20: 29 devices (56) | give each supply model its inlet or terminals as connector slots (the DC terminal design already exists); decide which ground pads are lug points | **46 supply parts**, then **29 devices**; the biggest group |
+| **C. Couplers with one side** | C11, C18 | 11 coupler models on 8 devices; 3 devices (204 back ends) with no point to draw | C11: 3 devices (the keystone panel and the Fibrain couplers are closed by #1084 and #1086; what is left is `ch3000`'s backplane cards, to be declared one-sided: D-0035); C18: 2 devices (two FHD enclosures); C9: `xcu` (24 ports offered, none drawn) | write the `faces.rear` for the remaining FHD panels; declare the CH3000 backplane cards one-sided; the host `xcu` must draw its rear for the cassettes | **3 + 2 devices**; the `xcu` rear |
+| **D. Placed parts with fields** | S9 | 26 devices (DIP switches on the 300 series, fan trays, AIS) | 26 devices (47 configurations) | let `field` address a placed part, not only a seated one | **1 kit change** |
+| **E. Offered but not landing** | C2 | 6 devices (`ch3000` empty slots, server risers, `xcu`) | 8 devices (31 configurations; the count rose because `xcu` and the FHD enclosures now show a rear that is offered and does not land) | decide: the page's list should not offer an empty slot; nested module ports need the catalogue answer | **6 devices**, 1 or 2 kit changes |
+| **F. Stand-ins** | C10, C14 | C10: 4 devices (all the angled cages); C14: 22 devices (monitor blocks, alarm cards, test points, ports of fibre panels) | C10: 3 devices; C14: 22 devices | write `mate.axis` in the build for a facet; declare mating points, or `stand-in` | **1 build change**; then **22 devices** |
+| **G. Display readings** | S8 | 3 devices in the whole library (`asr-9901` and two fan units; one in the sample) | 3 devices | a command for a display's whole reading | **1 command** (P-0042 does text and digits) |
+| **H. A made-up end** | C15 | 250 devices (every one) | 250 devices: **not closed**. #1084 refuses an end on a side a seated part lacks, not a made-up port of any other part. A blocking code since D-0035 | the kit refuses a made-up end at add time for every part | **1 kit change**, closes all |
+
+Group A is closed; the C couplers are down to three devices and `xcu`'s rear; H (C15) did not
+fall, because the kit still accepts a made-up end on a plain port. Groups D, G, H are kit or
+build changes, all open. B and C
 are modelling, and are most of the work. Nothing in F or B has to wait for the whole library:
 each part is excepted by name (5.3) until its order closes, so the check can start blocking on
 **new** parts at once and the old ones burn down.
@@ -449,11 +473,16 @@ each part is excepted by name (5.3) until its order closes, so the check can sta
 5. The nightly run and its issue.
 6. The site harness (5.6), which closes the two things node cannot judge.
 
-## 9. Open questions
+## 9. Decisions (D-0035)
 
-- Is a rack PDU's outlet row (C20 ground pads, C11 backplanes) wanted as a landing place, or is
-  "one-sided by design" the answer for them?
-- Should C15 block now? It means refusing at add time, which the open P-0045 work does only for a
-  seated part.
-- Should the Rack Builder page gain a control for lamps and outlets (5.6), or is the agent
-  meant to be the only way to write `states` into a rack?
+The proposal was approved (D-0034) and its three questions answered (D-0035):
+
+1. **A rack PDU's ground pads and one-sided backplane cards are one-sided by design.** They are
+   not a landing place for a cable. The part declares so (a closed or one-sided side, and an
+   exception row where the code would still fire), and C20 and C11 do not ask for a cable end
+   on them.
+2. **C15, a made-up end, blocks now.** A cable to an end that does not exist is refused at add
+   time, for a seated part and for any other end, and the runner fails on it.
+3. **The Rack Builder page gets no control for lamps and outlets.** A person sets them through
+   the Explorer, opened from the frame tab; an agent sets them through its tools (`state.set`).
+   The settings parity the runner checks is between those two paths.

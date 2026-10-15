@@ -109,7 +109,7 @@ def node():
 
 
 def blocking(codes):
-    return sorted(c for c in codes if c not in ("C15", "C14"))
+    return sorted(c for c in codes if c not in ("C15", "C14"))   # C15 is the kit's, not the part's: asserted apart
 
 
 def test_a_good_part_is_clean(tmp_path):
@@ -153,7 +153,7 @@ def test_an_end_with_no_mating_point_is_a_stand_in(tmp_path):
 def test_a_made_up_end_is_not_silently_accepted(tmp_path):
     report, codes = run(build(tmp_path), tmp_path)
     assert "C15" in codes, "a cable to a port that does not exist was accepted and nothing said so"
-    assert report["summary"]["C15"]["level"] == "warn"
+    assert report["summary"]["C15"]["level"] == "block", "D-0035: a made-up end is a blocking code"
 
 
 def test_the_report_is_written_to_out_and_names_its_timing(tmp_path):

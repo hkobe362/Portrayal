@@ -58,7 +58,7 @@ CODES = {
     "C12": ("cabling", "gap", "no matching far end or optic to test this end with"),
     "C13": ("cabling", "block", "the plug's first leg runs inside its own device"),
     "C14": ("cabling", "standin", "an end declares no mating point"),
-    "C15": ("cabling", "warn", "a made-up end is accepted at add time"),
+    "C15": ("cabling", "block", "a made-up end is accepted at add time"),
     "C18": ("cabling", "block", "the back of a seated part has ends the host draws no point for"),
     "C19": ("cabling", "block", "a powered part presents no power end an agent is offered"),
     "C20": ("cabling", "block", "a drawn inlet, terminal or stud is not a place a cord or lug can land"),

@@ -10,7 +10,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -18,7 +17,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -46,7 +44,6 @@
        "drawn": 60,
        "judged": 24,
        "offered": 60,
-       "sidePanes": 2,
        "standins": 12,
        "supplies": 0
       },
@@ -448,12 +445,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.295
+      "seconds": 0.284
      },
      "cfg": "panels",
      "settings": {
@@ -476,21 +472,12 @@
     "counts": {
      "bays": 4,
      "cages": 0,
-     "ends": 129,
+     "ends": 131,
      "occupants": 39,
      "optics": 0
     },
-    "found": [
-     {
-      "code": "C11",
-      "examples": [
-       "bay-1: fs/fhd-fapm6-rj45@1"
-      ],
-      "n": 1,
-      "text": "FHD-FAPM6-RJ45 (a coupler) has cable ends on its front and none on its rear: two sides of one path need both"
-     }
-    ],
-    "seconds": 0.029
+    "found": [],
+    "seconds": 0.042
    },
    "ref": "fhd-1ube",
    "why": "an enclosure whose bay holds the Cat6 keystone panel: the panel's rear jacks (P-0045)"
@@ -504,7 +491,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -512,7 +498,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -540,7 +525,6 @@
        "drawn": 60,
        "judged": 24,
        "offered": 60,
-       "sidePanes": 2,
        "standins": 12,
        "supplies": 0
       },
@@ -942,12 +926,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.197
+      "seconds": 0.201
      },
      "cfg": "panels",
      "settings": {
@@ -960,7 +943,7 @@
        "set": 0
       },
       "found": [],
-      "seconds": 0.004
+      "seconds": 0.003
      }
     },
     {
@@ -970,7 +953,6 @@
        "drawn": 28,
        "judged": 24,
        "offered": 28,
-       "sidePanes": 2,
        "standins": 4,
        "supplies": 0
       },
@@ -1324,12 +1306,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.186
+      "seconds": 0.181
      },
      "cfg": "populated",
      "settings": {
@@ -1352,21 +1333,12 @@
     "counts": {
      "bays": 4,
      "cages": 0,
-     "ends": 129,
+     "ends": 131,
      "occupants": 39,
      "optics": 0
     },
-    "found": [
-     {
-      "code": "C11",
-      "examples": [
-       "bay-1: fs/fhd-fapm6-rj45@1"
-      ],
-      "n": 1,
-      "text": "FHD-FAPM6-RJ45 (a coupler) has cable ends on its front and none on its rear: two sides of one path need both"
-     }
-    ],
-    "seconds": 0.016
+    "found": [],
+    "seconds": 0.027
    },
    "ref": "fhd-1ufce",
    "why": "the same family with fibre panels: a coupler's two sides"
@@ -1380,7 +1352,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -1388,7 +1359,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -1412,11 +1382,10 @@
     {
      "cabling": {
       "counts": {
-       "clean": 12,
+       "clean": 24,
        "drawn": 24,
        "judged": 24,
        "offered": 48,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -1501,98 +1470,68 @@
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b02",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-2/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b06",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-4/module/b06",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
@@ -1675,128 +1614,90 @@
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b02",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-2/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b06",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-4/module/b06",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        }
       ],
       "found": [
        {
-        "code": "C18",
+        "code": "C9",
         "examples": [
          "rear:drawer/module/slot-1/module/b01",
          "rear:drawer/module/slot-1/module/b02",
-         "rear:drawer/module/slot-1/module/b03"
+         "rear:drawer/module/slot-1/module/b03",
+         "rear:drawer/module/slot-1/module/b04"
         ],
         "n": 24,
-        "text": "24 ends on the back of seated parts are in the catalogue and not on the host's rear drawing: a cable is accepted there and has no point to be drawn to"
-       },
-       {
-        "code": "C2",
-        "examples": [
-         "front rail: rear:drawer/module/slot-1/module/b01"
-        ],
-        "n": 12,
-        "text": "a loose end: drawer is empty"
+        "text": "24 ports the agent is offered have no drawing on that panel"
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.196
+      "seconds": 0.199
      },
      "cfg": "xcu10-21ic",
      "settings": {
@@ -1815,11 +1716,10 @@
     {
      "cabling": {
       "counts": {
-       "clean": 12,
+       "clean": 24,
        "drawn": 24,
        "judged": 24,
        "offered": 48,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -1904,98 +1804,68 @@
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b02",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-2/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b01",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b06",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-4/module/b06",
         "variant": "front rail",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
@@ -2078,128 +1948,90 @@
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-1/module/b02",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-2/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b01",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-3/module/b06",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        },
        {
         "kind": "data",
-        "media": "",
+        "media": "os2",
         "notes": [
          "no drawn element at this path"
         ],
         "path": "drawer/module/slot-4/module/b06",
         "variant": "rear rail, 30 mm setback",
-        "verdict": [
-         {
-          "code": "C2",
-          "text": "a loose end: drawer is empty"
-         }
-        ],
+        "verdict": [],
         "view": "rear"
        }
       ],
       "found": [
        {
-        "code": "C18",
+        "code": "C9",
         "examples": [
          "rear:drawer/module/slot-1/module/b01",
          "rear:drawer/module/slot-1/module/b02",
-         "rear:drawer/module/slot-1/module/b03"
+         "rear:drawer/module/slot-1/module/b03",
+         "rear:drawer/module/slot-1/module/b04"
         ],
         "n": 24,
-        "text": "24 ends on the back of seated parts are in the catalogue and not on the host's rear drawing: a cable is accepted there and has no point to be drawn to"
-       },
-       {
-        "code": "C2",
-        "examples": [
-         "front rail: rear:drawer/module/slot-1/module/b01"
-        ],
-        "n": 12,
-        "text": "a loose end: drawer is empty"
+        "text": "24 ports the agent is offered have no drawing on that panel"
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.182
+      "seconds": 0.188
      },
      "cfg": "xcu10-31ic",
      "settings": {
@@ -2241,7 +2073,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -2249,7 +2080,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -2277,7 +2107,6 @@
        "drawn": 192,
        "judged": 24,
        "offered": 192,
-       "sidePanes": 2,
        "standins": 12,
        "supplies": 0
       },
@@ -2679,12 +2508,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.506
+      "seconds": 0.52
      },
      "cfg": "lc-duplex-192",
      "settings": {
@@ -2697,7 +2525,7 @@
        "set": 0
       },
       "found": [],
-      "seconds": 0.007
+      "seconds": 0.006
      }
     },
     {
@@ -2707,7 +2535,6 @@
        "drawn": 144,
        "judged": 24,
        "offered": 144,
-       "sidePanes": 2,
        "standins": 12,
        "supplies": 0
       },
@@ -3109,12 +2936,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.339
+      "seconds": 0.334
      },
      "cfg": "mixed",
      "settings": {
@@ -3142,7 +2968,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.009
+    "seconds": 0.018
    },
    "ref": "xpu",
    "why": "the sibling fibre unit"
@@ -3298,37 +3124,15 @@
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 42,
+       "declared": 140,
        "drawn": 140,
        "fields": 0,
        "messages": 0,
-       "refused": 105,
-       "set": 43
+       "refused": 0,
+       "set": 148
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "breaker-a/rocker (on/off)",
-         "breaker-b/rocker (on/off)",
-         "breaker-c/rocker (on/off)",
-         "breaker-d/rocker (on/off)"
-        ],
-        "n": 98,
-        "of": 140,
-        "text": "98 of 140 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "breaker-a/rocker=on: breaker-a/rocker on EVMA8365X cannot be set: it declares no state.",
-         "breaker-b/rocker=on: breaker-b/rocker on EVMA8365X cannot be set: it declares no state."
-        ],
-        "n": 105,
-        "text": "the agent's state.set refuses 105 of 148 states the drawings declare"
-       }
-      ],
-      "seconds": 0.007
+      "found": [],
+      "seconds": 0.008
      }
     }
    ],
@@ -3357,7 +3161,6 @@
        "drawn": 16,
        "judged": 24,
        "offered": 16,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -3634,44 +3437,23 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.205
+      "seconds": 0.193
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 2,
        "drawn": 2,
        "fields": 0,
        "messages": 0,
-       "refused": 3,
-       "set": 0
+       "refused": 0,
+       "set": 3
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "breaker-1/plunger (on/off)",
-         "breaker-2/plunger (on/off)"
-        ],
-        "n": 2,
-        "of": 2,
-        "text": "2 of 2 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "breaker-1/plunger=on: breaker-1/plunger on pdu12iec cannot be set: it declares no state.",
-         "breaker-1/plunger=off: breaker-1/plunger on pdu12iec cannot be set: it declares no state."
-        ],
-        "n": 3,
-        "text": "the agent's state.set refuses 3 of 3 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.001
      }
     }
@@ -3838,41 +3620,19 @@
        }
       ],
       "found": [],
-      "seconds": 0.166
+      "seconds": 0.167
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 11,
        "drawn": 11,
        "fields": 0,
        "messages": 0,
-       "refused": 19,
-       "set": 0
+       "refused": 0,
+       "set": 19
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "breaker-a/rocker (on/off)",
-         "breaker-b/rocker (on/off)",
-         "breaker-c/rocker (on/off)",
-         "network-module/module/pdu-plus-1/led-a (off/powered-by-peer)"
-        ],
-        "n": 11,
-        "of": 11,
-        "text": "11 of 11 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "breaker-a/rocker=on: breaker-a/rocker on EVMI2130X cannot be set: it declares no state.",
-         "breaker-a/rocker=off: breaker-a/rocker on EVMI2130X cannot be set: it declares no state."
-        ],
-        "n": 19,
-        "text": "the agent's state.set refuses 19 of 19 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     }
@@ -3902,7 +3662,6 @@
        "drawn": 20,
        "judged": 24,
        "offered": 20,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -4191,47 +3950,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.156
+      "seconds": 0.151
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 16,
+       "declared": 53,
        "drawn": 53,
        "fields": 0,
        "messages": 0,
-       "refused": 51,
-       "set": 17
+       "refused": 0,
+       "set": 68
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-8 (on/off)",
-         "led-8/lamp (on/off)",
-         "led-7 (on/off)",
-         "led-7/lamp (on/off)"
-        ],
-        "n": 37,
-        "of": 53,
-        "text": "37 of 53 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-8=on: led-8 on pdumh20net cannot be set: it declares no state.",
-         "led-8/lamp=on: led-8/lamp on pdumh20net cannot be set: it declares no state."
-        ],
-        "n": 51,
-        "text": "the agent's state.set refuses 51 of 68 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     }
    ],
@@ -4260,7 +3996,6 @@
        "drawn": 8,
        "judged": 16,
        "offered": 8,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -4485,46 +4220,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.062
+      "seconds": 0.06
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 35,
        "drawn": 35,
        "fields": 0,
        "messages": 0,
-       "refused": 60,
-       "set": 0
+       "refused": 0,
+       "set": 60
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-stat (off/booting/on)",
-         "led-stat/lamp (off/booting/on)",
-         "led-pwr (off/on)",
-         "led-pwr/lamp (off/on)"
-        ],
-        "n": 35,
-        "of": 35,
-        "text": "35 of 35 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-stat=off: led-stat on sr-1-dc cannot be set: it declares no state.",
-         "led-stat=booting: led-stat on sr-1-dc cannot be set: it declares no state."
-        ],
-        "n": 60,
-        "text": "the agent's state.set refuses 60 of 60 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.003
      }
     }
@@ -4540,7 +4252,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.01
+    "seconds": 0.015
    },
    "ref": "sr-1-dc",
    "why": "a router with DC terminal blocks (P-0046)"
@@ -4554,7 +4266,6 @@
        "drawn": 10,
        "judged": 20,
        "offered": 10,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -4815,7 +4526,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -4825,37 +4535,15 @@
      "cfg": "dual-psu",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 36,
        "drawn": 36,
        "fields": 0,
        "messages": 0,
-       "refused": 63,
-       "set": 0
+       "refused": 0,
+       "set": 63
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-stat (off/booting/on)",
-         "led-stat/lamp (off/booting/on)",
-         "led-pwr (off/on)",
-         "led-pwr/lamp (off/on)"
-        ],
-        "n": 36,
-        "of": 36,
-        "text": "36 of 36 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-stat=off: led-stat on sr-1-ac cannot be set: it declares no state.",
-         "led-stat=booting: led-stat on sr-1-ac cannot be set: it declares no state."
-        ],
-        "n": 63,
-        "text": "the agent's state.set refuses 63 of 63 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -4865,7 +4553,6 @@
        "drawn": 9,
        "judged": 18,
        "offered": 9,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 1
       },
@@ -5104,46 +4791,23 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.096
+      "seconds": 0.106
      },
      "cfg": "shipped-bundle",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 35,
        "drawn": 35,
        "fields": 0,
        "messages": 0,
-       "refused": 62,
-       "set": 0
+       "refused": 0,
+       "set": 62
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-stat (off/booting/on)",
-         "led-stat/lamp (off/booting/on)",
-         "led-pwr (off/on)",
-         "led-pwr/lamp (off/on)"
-        ],
-        "n": 35,
-        "of": 35,
-        "text": "35 of 35 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-stat=off: led-stat on sr-1-ac cannot be set: it declares no state.",
-         "led-stat=booting: led-stat on sr-1-ac cannot be set: it declares no state."
-        ],
-        "n": 62,
-        "text": "the agent's state.set refuses 62 of 62 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     }
@@ -5159,7 +4823,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.008
+    "seconds": 0.011
    },
    "ref": "sr-1-ac",
    "why": "the AC sibling: inlets as cable ends"
@@ -5173,7 +4837,6 @@
        "drawn": 13,
        "judged": 26,
        "offered": 13,
-       "sidePanes": 2,
        "standins": 4,
        "supplies": 0
       },
@@ -5563,47 +5226,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.134
+      "seconds": 0.118
      },
      "cfg": "fant-h-simplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 22,
        "drawn": 22,
        "fields": 0,
        "messages": 0,
-       "refused": 36,
-       "set": 0
+       "refused": 0,
+       "set": 36
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "fan/module/led-status/lamp (off/starting/on)",
-         "nt-a/module/eth/led-a (off/link)",
-         "nt-a/module/eth/led-b (off/activity)",
-         "nt-a/module/led-alm/lamp (off/alarm)"
-        ],
-        "n": 22,
-        "of": 22,
-        "text": "22 of 22 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "fan/module/led-status/lamp=off: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state.",
-         "fan/module/led-status/lamp=starting: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state."
-        ],
-        "n": 36,
-        "text": "the agent's state.set refuses 36 of 36 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -5613,7 +5253,6 @@
        "drawn": 13,
        "judged": 26,
        "offered": 13,
-       "sidePanes": 2,
        "standins": 4,
        "supplies": 0
       },
@@ -6003,46 +5642,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.116
+      "seconds": 0.117
      },
      "cfg": "fant-h-bc-simplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 22,
        "drawn": 22,
        "fields": 0,
        "messages": 0,
-       "refused": 36,
-       "set": 0
+       "refused": 0,
+       "set": 36
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "fan/module/led-status/lamp (off/starting/on)",
-         "nt-a/module/eth/led-a (off/link)",
-         "nt-a/module/eth/led-b (off/activity)",
-         "nt-a/module/led-alm/lamp (off/alarm)"
-        ],
-        "n": 22,
-        "of": 22,
-        "text": "22 of 22 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "fan/module/led-status/lamp=off: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state.",
-         "fan/module/led-status/lamp=starting: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state."
-        ],
-        "n": 36,
-        "text": "the agent's state.set refuses 36 of 36 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     },
@@ -6053,7 +5669,6 @@
        "drawn": 23,
        "judged": 34,
        "offered": 23,
-       "sidePanes": 2,
        "standins": 4,
        "supplies": 0
       },
@@ -6547,7 +6162,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -6557,37 +6171,15 @@
      "cfg": "fant-h-duplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 37,
        "drawn": 37,
        "fields": 0,
        "messages": 0,
-       "refused": 51,
-       "set": 0
+       "refused": 0,
+       "set": 51
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "fan/module/led-status/lamp (off/starting/on)",
-         "nt-b/module/eth/led-a (off/link)",
-         "nt-b/module/eth/led-b (off/activity)",
-         "nt-b/module/led-alm/lamp (off/alarm)"
-        ],
-        "n": 37,
-        "of": 37,
-        "text": "37 of 37 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "fan/module/led-status/lamp=off: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state.",
-         "fan/module/led-status/lamp=starting: fan/module/led-status/lamp on nfxs-e-bb cannot be set: it declares no state."
-        ],
-        "n": 51,
-        "text": "the agent's state.set refuses 51 of 51 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     }
    ],
@@ -6616,7 +6208,6 @@
        "drawn": 12,
        "judged": 24,
        "offered": 12,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -6947,47 +6538,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.119
+      "seconds": 0.121
      },
      "cfg": "fant-h-simplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 23,
        "drawn": 23,
        "fields": 0,
        "messages": 0,
-       "refused": 38,
-       "set": 0
+       "refused": 0,
+       "set": 38
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "critical/lamp (red/off)",
-         "major/lamp (red/off)",
-         "minor/lamp (amber/off)",
-         "bat-a/lamp (green/off)"
-        ],
-        "n": 23,
-        "of": 23,
-        "text": "23 of 23 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "critical/lamp=red: critical/lamp on nfxs-d-ba cannot be set: it declares no state.",
-         "critical/lamp=off: critical/lamp on nfxs-d-ba cannot be set: it declares no state."
-        ],
-        "n": 38,
-        "text": "the agent's state.set refuses 38 of 38 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -6997,7 +6565,6 @@
        "drawn": 22,
        "judged": 30,
        "offered": 22,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -7406,47 +6973,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.165
+      "seconds": 0.166
      },
      "cfg": "fant-h-duplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 38,
        "drawn": 38,
        "fields": 0,
        "messages": 0,
-       "refused": 53,
-       "set": 0
+       "refused": 0,
+       "set": 53
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "critical/lamp (red/off)",
-         "major/lamp (red/off)",
-         "minor/lamp (amber/off)",
-         "bat-a/lamp (green/off)"
-        ],
-        "n": 38,
-        "of": 38,
-        "text": "38 of 38 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "critical/lamp=red: critical/lamp on nfxs-d-ba cannot be set: it declares no state.",
-         "critical/lamp=off: critical/lamp on nfxs-d-ba cannot be set: it declares no state."
-        ],
-        "n": 53,
-        "text": "the agent's state.set refuses 53 of 53 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -7456,7 +7000,6 @@
        "drawn": 22,
        "judged": 30,
        "offered": 22,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -7865,47 +7408,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.176
+      "seconds": 0.182
      },
      "cfg": "fant-m-duplex",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 38,
        "drawn": 38,
        "fields": 0,
        "messages": 0,
-       "refused": 53,
-       "set": 0
+       "refused": 0,
+       "set": 53
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "critical/lamp (red/off)",
-         "major/lamp (red/off)",
-         "minor/lamp (amber/off)",
-         "bat-a/lamp (green/off)"
-        ],
-        "n": 38,
-        "of": 38,
-        "text": "38 of 38 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "critical/lamp=red: critical/lamp on nfxs-d-ba cannot be set: it declares no state.",
-         "critical/lamp=off: critical/lamp on nfxs-d-ba cannot be set: it declares no state."
-        ],
-        "n": 53,
-        "text": "the agent's state.set refuses 53 of 53 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     }
    ],
@@ -7920,7 +7440,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.023
+    "seconds": 0.026
    },
    "ref": "nfxs-d-ba",
    "why": "a second angled-cage card cage"
@@ -7934,7 +7454,6 @@
        "drawn": 14,
        "judged": 24,
        "offered": 14,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -8260,47 +7779,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.111
+      "seconds": 0.103
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 10,
        "drawn": 10,
        "fields": 2,
        "messages": 0,
-       "refused": 22,
-       "set": 0
+       "refused": 0,
+       "set": 22
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "alm/module/led-pwr/lamp (off/on)",
-         "alm/module/led-aco/lamp (off/cut-off)",
-         "alm/module/led-alm/lamp (off/alarm)",
-         "alm/module/led-min/lamp (off/minor)"
-        ],
-        "n": 10,
-        "of": 10,
-        "text": "10 of 10 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "alm/module/led-pwr/lamp=off: alm/module/led-pwr/lamp on lmfs-f cannot be set: it declares no state.",
-         "alm/module/led-pwr/lamp=on: alm/module/led-pwr/lamp on lmfs-f cannot be set: it declares no state."
-        ],
-        "n": 22,
-        "text": "the agent's state.set refuses 22 of 22 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -8310,7 +7806,6 @@
        "drawn": 1,
        "judged": 2,
        "offered": 1,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -8350,7 +7845,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -8378,7 +7872,6 @@
        "drawn": 14,
        "judged": 24,
        "offered": 14,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -8713,47 +8206,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.115
+      "seconds": 0.096
      },
      "cfg": "front-cover",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 10,
        "drawn": 10,
        "fields": 2,
        "messages": 0,
-       "refused": 22,
-       "set": 0
+       "refused": 0,
+       "set": 22
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "alm/module/led-pwr/lamp (off/on)",
-         "alm/module/led-aco/lamp (off/cut-off)",
-         "alm/module/led-alm/lamp (off/alarm)",
-         "alm/module/led-min/lamp (off/minor)"
-        ],
-        "n": 10,
-        "of": 10,
-        "text": "10 of 10 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "alm/module/led-pwr/lamp=off: alm/module/led-pwr/lamp on lmfs-f cannot be set: it declares no state.",
-         "alm/module/led-pwr/lamp=on: alm/module/led-pwr/lamp on lmfs-f cannot be set: it declares no state."
-        ],
-        "n": 22,
-        "text": "the agent's state.set refuses 22 of 22 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.002
      }
     }
    ],
@@ -8768,7 +8238,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.002
+    "seconds": 0.004
    },
    "ref": "lmfs-f",
    "why": "a chassis with tilted housings and PSUs hung on its side"
@@ -8782,7 +8252,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -8799,7 +8268,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -8809,36 +8277,14 @@
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 15,
        "drawn": 15,
        "fields": 2,
        "messages": 0,
-       "refused": 19,
-       "set": 0
+       "refused": 0,
+       "set": 19
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "fan-l/module/hs (off/high-speed)",
-         "fan-l/module/alarm (off/alarm)",
-         "fan-l/module/ok (off/ok)",
-         "fan-c/module/hs (off/high-speed)"
-        ],
-        "n": 15,
-        "of": 15,
-        "text": "15 of 15 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "fan-l/module/hs=off: fan-l/module/hs on c100g cannot be set: it declares no state.",
-         "fan-l/module/hs=high-speed: fan-l/module/hs on c100g cannot be set: it declares no state."
-        ],
-        "n": 19,
-        "text": "the agent's state.set refuses 19 of 19 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     },
@@ -8849,7 +8295,6 @@
        "drawn": 224,
        "judged": 24,
        "offered": 224,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -9179,47 +8624,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.39
+      "seconds": 0.406
      },
      "cfg": "bdm2m-11plus1",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 61,
        "drawn": 61,
        "fields": 2,
        "messages": 0,
-       "refused": 68,
-       "set": 0
+       "refused": 0,
+       "set": 68
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "front-0/module/status (off/ok)",
-         "front-0/module/alarm (off/alarm)",
-         "front-0/module/active (off/active)",
-         "front-1/module/status (off/ok)"
-        ],
-        "n": 61,
-        "of": 61,
-        "text": "61 of 61 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "front-0/module/status=off: front-0/module/status on c100g cannot be set: it declares no state.",
-         "front-0/module/status=ok: front-0/module/status on c100g cannot be set: it declares no state."
-        ],
-        "n": 68,
-        "text": "the agent's state.set refuses 68 of 68 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.005
      }
     },
     {
@@ -9229,7 +8651,6 @@
        "drawn": 206,
        "judged": 24,
        "offered": 206,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -9559,47 +8980,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.346
+      "seconds": 0.362
      },
      "cfg": "docsis-classic",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 61,
        "drawn": 61,
        "fields": 2,
        "messages": 0,
-       "refused": 68,
-       "set": 0
+       "refused": 0,
+       "set": 68
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "front-0/module/status (off/ok)",
-         "front-0/module/alarm (off/alarm)",
-         "front-0/module/active (off/active)",
-         "front-1/module/status (off/ok)"
-        ],
-        "n": 61,
-        "of": 61,
-        "text": "61 of 61 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "front-0/module/status=off: front-0/module/status on c100g cannot be set: it declares no state.",
-         "front-0/module/status=ok: front-0/module/status on c100g cannot be set: it declares no state."
-        ],
-        "n": 68,
-        "text": "the agent's state.set refuses 68 of 68 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -9614,7 +9012,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.009
+    "seconds": 0.014
    },
    "ref": "c100g",
    "why": "a modular chassis whose ports live on seated modules"
@@ -9628,7 +9026,6 @@
        "drawn": 61,
        "judged": 24,
        "offered": 61,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -9941,47 +9338,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.164
+      "seconds": 0.178
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 71,
        "drawn": 71,
        "fields": 0,
        "messages": 0,
-       "refused": 105,
-       "set": 0
+       "refused": 0,
+       "set": 105
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "oob/led-a (off/link-1g/activity-1g)",
-         "oob/led-b (off/link-10-100m/activity-10-100m)",
-         "status-display/digit-1 (0/1/2)",
-         "status-display/digit-2 (0/1/2)"
-        ],
-        "n": 71,
-        "of": 71,
-        "text": "71 of 71 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "oob/led-a=off: oob/led-a on s9700-53dx cannot be set: it declares no state.",
-         "oob/led-a=link-1g: oob/led-a on s9700-53dx cannot be set: it declares no state."
-        ],
-        "n": 105,
-        "text": "the agent's state.set refuses 105 of 105 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.005
      }
     },
     {
@@ -9991,7 +9365,6 @@
        "drawn": 59,
        "judged": 24,
        "offered": 59,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -10321,47 +9694,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.15
+      "seconds": 0.158
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 71,
        "drawn": 71,
        "fields": 0,
        "messages": 0,
-       "refused": 105,
-       "set": 0
+       "refused": 0,
+       "set": 105
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "oob/led-a (off/link-1g/activity-1g)",
-         "oob/led-b (off/link-10-100m/activity-10-100m)",
-         "status-display/digit-1 (0/1/2)",
-         "status-display/digit-2 (0/1/2)"
-        ],
-        "n": 71,
-        "of": 71,
-        "text": "71 of 71 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "oob/led-a=off: oob/led-a on s9700-53dx cannot be set: it declares no state.",
-         "oob/led-a=link-1g: oob/led-a on s9700-53dx cannot be set: it declares no state."
-        ],
-        "n": 105,
-        "text": "the agent's state.set refuses 105 of 105 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -10390,7 +9740,6 @@
        "drawn": 56,
        "judged": 24,
        "offered": 56,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -10703,47 +10052,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.157
+      "seconds": 0.179
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 68,
        "drawn": 68,
        "fields": 0,
        "messages": 0,
-       "refused": 102,
-       "set": 0
+       "refused": 0,
+       "set": 102
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-0/lamp (off/on)",
-         "led-port-1/lamp (off/on)",
-         "led-port-2/lamp (off/on)",
-         "led-port-3/lamp (off/on)"
-        ],
-        "n": 68,
-        "of": 68,
-        "text": "68 of 68 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-0/lamp=off: led-port-0/lamp on s9705-48d cannot be set: it declares no state.",
-         "led-port-0/lamp=on: led-port-0/lamp on s9705-48d cannot be set: it declares no state."
-        ],
-        "n": 102,
-        "text": "the agent's state.set refuses 102 of 102 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.007
      }
     },
     {
@@ -10753,7 +10079,6 @@
        "drawn": 56,
        "judged": 24,
        "offered": 56,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -11066,47 +10391,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.157
+      "seconds": 0.16
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 68,
        "drawn": 68,
        "fields": 0,
        "messages": 0,
-       "refused": 102,
-       "set": 0
+       "refused": 0,
+       "set": 102
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-0/lamp (off/on)",
-         "led-port-1/lamp (off/on)",
-         "led-port-2/lamp (off/on)",
-         "led-port-3/lamp (off/on)"
-        ],
-        "n": 68,
-        "of": 68,
-        "text": "68 of 68 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-0/lamp=off: led-port-0/lamp on s9705-48d cannot be set: it declares no state.",
-         "led-port-0/lamp=on: led-port-0/lamp on s9705-48d cannot be set: it declares no state."
-        ],
-        "n": 102,
-        "text": "the agent's state.set refuses 102 of 102 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.004
      }
     },
     {
@@ -11116,7 +10418,6 @@
        "drawn": 54,
        "judged": 24,
        "offered": 54,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -11446,47 +10747,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.152
+      "seconds": 0.14
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 68,
        "drawn": 68,
        "fields": 0,
        "messages": 0,
-       "refused": 102,
-       "set": 0
+       "refused": 0,
+       "set": 102
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-0/lamp (off/on)",
-         "led-port-1/lamp (off/on)",
-         "led-port-2/lamp (off/on)",
-         "led-port-3/lamp (off/on)"
-        ],
-        "n": 68,
-        "of": 68,
-        "text": "68 of 68 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-0/lamp=off: led-port-0/lamp on s9705-48d cannot be set: it declares no state.",
-         "led-port-0/lamp=on: led-port-0/lamp on s9705-48d cannot be set: it declares no state."
-        ],
-        "n": 102,
-        "text": "the agent's state.set refuses 102 of 102 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -11501,7 +10779,7 @@
      "optics": 11
     },
     "found": [],
-    "seconds": 0.01
+    "seconds": 0.011
    },
    "ref": "s9705-48d",
    "why": "a beacon display of two digits"
@@ -11515,7 +10793,6 @@
        "drawn": 113,
        "judged": 30,
        "offered": 113,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -11923,47 +11200,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.252
+      "seconds": 0.257
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 142,
        "drawn": 142,
        "fields": 0,
        "messages": 0,
-       "refused": 159,
-       "set": 0
+       "refused": 0,
+       "set": 159
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "mgmt/led-a (off/link/activity)",
-         "mgmt/led-b (off/link/activity)",
-         "led-sync (off/locked/synce)",
-         "led-sync/lamp (off/locked/synce)"
-        ],
-        "n": 142,
-        "of": 142,
-        "text": "142 of 142 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "mgmt/led-a=off: mgmt/led-a on s9601-102xc cannot be set: it declares no state.",
-         "mgmt/led-a=link: mgmt/led-a on s9601-102xc cannot be set: it declares no state."
-        ],
-        "n": 159,
-        "text": "the agent's state.set refuses 159 of 159 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.006
      }
     },
     {
@@ -11973,7 +11227,6 @@
        "drawn": 115,
        "judged": 34,
        "offered": 115,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -12416,47 +11669,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.31
+      "seconds": 0.318
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 142,
        "drawn": 142,
        "fields": 0,
        "messages": 0,
-       "refused": 159,
-       "set": 0
+       "refused": 0,
+       "set": 159
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "mgmt/led-a (off/link/activity)",
-         "mgmt/led-b (off/link/activity)",
-         "led-sync (off/locked/synce)",
-         "led-sync/lamp (off/locked/synce)"
-        ],
-        "n": 142,
-        "of": 142,
-        "text": "142 of 142 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "mgmt/led-a=off: mgmt/led-a on s9601-102xc cannot be set: it declares no state.",
-         "mgmt/led-a=link: mgmt/led-a on s9601-102xc cannot be set: it declares no state."
-        ],
-        "n": 159,
-        "text": "the agent's state.set refuses 159 of 159 states the drawings declare"
-       }
-      ],
-      "seconds": 0.005
+      "found": [],
+      "seconds": 0.007
      }
     }
    ],
@@ -12485,7 +11715,6 @@
        "drawn": 36,
        "judged": 28,
        "offered": 36,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -12867,47 +12096,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.122
+      "seconds": 0.154
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 55,
        "drawn": 55,
        "fields": 0,
        "messages": 0,
-       "refused": 81,
-       "set": 0
+       "refused": 0,
+       "set": 81
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-gnss (off/survey-complete/learning)",
-         "led-gnss/lamp (off/survey-complete/learning)",
-         "led-sync (off/synced/synce)",
-         "led-sync/lamp (off/synced/synce)"
-        ],
-        "n": 55,
-        "of": 55,
-        "text": "55 of 55 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-gnss=off: led-gnss on s9510-28dc cannot be set: it declares no state.",
-         "led-gnss=survey-complete: led-gnss on s9510-28dc cannot be set: it declares no state."
-        ],
-        "n": 81,
-        "text": "the agent's state.set refuses 81 of 81 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.004
      }
     },
     {
@@ -12917,7 +12123,6 @@
        "drawn": 38,
        "judged": 32,
        "offered": 38,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -13334,47 +12539,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.16
+      "seconds": 0.165
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 55,
        "drawn": 55,
        "fields": 0,
        "messages": 0,
-       "refused": 81,
-       "set": 0
+       "refused": 0,
+       "set": 81
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-gnss (off/survey-complete/learning)",
-         "led-gnss/lamp (off/survey-complete/learning)",
-         "led-sync (off/synced/synce)",
-         "led-sync/lamp (off/synced/synce)"
-        ],
-        "n": 55,
-        "of": 55,
-        "text": "55 of 55 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-gnss=off: led-gnss on s9510-28dc cannot be set: it declares no state.",
-         "led-gnss=survey-complete: led-gnss on s9510-28dc cannot be set: it declares no state."
-        ],
-        "n": 81,
-        "text": "the agent's state.set refuses 81 of 81 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -13389,7 +12571,7 @@
      "optics": 16
     },
     "found": [],
-    "seconds": 0.011
+    "seconds": 0.012
    },
    "ref": "s9510-28dc",
    "why": "a DC-powered switch"
@@ -13403,7 +12585,6 @@
        "drawn": 60,
        "judged": 24,
        "offered": 60,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -13716,47 +12897,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.172
+      "seconds": 0.156
      },
      "cfg": "ac-port-side-intake",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 134,
        "drawn": 134,
        "fields": 0,
        "messages": 0,
-       "refused": 142,
-       "set": 0
+       "refused": 0,
+       "set": 142
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1 (off/on)",
-         "led-port-1/lamp (off/on)",
-         "led-port-2 (off/on)",
-         "led-port-2/lamp (off/on)"
-        ],
-        "n": 134,
-        "of": 134,
-        "text": "134 of 134 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1=off: led-port-1 on n9k-c93180yc-ex cannot be set: it declares no state.",
-         "led-port-1=on: led-port-1 on n9k-c93180yc-ex cannot be set: it declares no state."
-        ],
-        "n": 142,
-        "text": "the agent's state.set refuses 142 of 142 states the drawings declare"
-       }
-      ],
-      "seconds": 0.005
+      "found": [],
+      "seconds": 0.004
      }
     },
     {
@@ -13766,7 +12924,6 @@
        "drawn": 60,
        "judged": 24,
        "offered": 60,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -14079,47 +13236,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.154
+      "seconds": 0.158
      },
      "cfg": "ac-port-side-exhaust",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 134,
        "drawn": 134,
        "fields": 0,
        "messages": 0,
-       "refused": 142,
-       "set": 0
+       "refused": 0,
+       "set": 142
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1 (off/on)",
-         "led-port-1/lamp (off/on)",
-         "led-port-2 (off/on)",
-         "led-port-2/lamp (off/on)"
-        ],
-        "n": 134,
-        "of": 134,
-        "text": "134 of 134 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1=off: led-port-1 on n9k-c93180yc-ex cannot be set: it declares no state.",
-         "led-port-1=on: led-port-1 on n9k-c93180yc-ex cannot be set: it declares no state."
-        ],
-        "n": 142,
-        "text": "the agent's state.set refuses 142 of 142 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -14134,7 +13268,7 @@
      "optics": 27
     },
     "found": [],
-    "seconds": 0.024
+    "seconds": 0.026
    },
    "ref": "n9k-c93180yc-ex",
    "why": "a fixed switch with two supplies"
@@ -14148,7 +13282,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 3
       },
@@ -14166,7 +13299,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -14176,36 +13308,14 @@
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 11,
        "drawn": 11,
        "fields": 0,
        "messages": 0,
-       "refused": 17,
-       "set": 0
+       "refused": 0,
+       "set": 17
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ft-0/module/status (green/yellow/red)",
-         "ft-1/module/status (green/yellow/red)",
-         "pm-0/module/input (off/on/blinking)",
-         "pm-0/module/output (off/on/blinking)"
-        ],
-        "n": 11,
-        "of": 11,
-        "text": "11 of 11 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ft-0/module/status=green: ft-0/module/status on asr-9006 cannot be set: it declares no state.",
-         "ft-0/module/status=yellow: ft-0/module/status on asr-9006 cannot be set: it declares no state."
-        ],
-        "n": 17,
-        "text": "the agent's state.set refuses 17 of 17 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.001
      }
     },
@@ -14216,7 +13326,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 3
       },
@@ -14234,7 +13343,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -14244,36 +13352,14 @@
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 11,
        "drawn": 11,
        "fields": 0,
        "messages": 0,
-       "refused": 17,
-       "set": 0
+       "refused": 0,
+       "set": 17
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ft-0/module/status (green/yellow/red)",
-         "ft-1/module/status (green/yellow/red)",
-         "pm-0/module/input (off/on/blinking)",
-         "pm-0/module/output (off/on/blinking)"
-        ],
-        "n": 11,
-        "of": 11,
-        "text": "11 of 11 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ft-0/module/status=green: ft-0/module/status on asr-9006 cannot be set: it declares no state.",
-         "ft-0/module/status=yellow: ft-0/module/status on asr-9006 cannot be set: it declares no state."
-        ],
-        "n": 17,
-        "text": "the agent's state.set refuses 17 of 17 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.001
      }
     },
@@ -14284,7 +13370,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 3
       },
@@ -14302,7 +13387,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -14312,36 +13396,14 @@
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 11,
        "drawn": 11,
        "fields": 0,
        "messages": 0,
-       "refused": 17,
-       "set": 0
+       "refused": 0,
+       "set": 17
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ft-0/module/status (green/yellow/red)",
-         "ft-1/module/status (green/yellow/red)",
-         "pm-0/module/input (off/on/blinking)",
-         "pm-0/module/output (off/on/blinking)"
-        ],
-        "n": 11,
-        "of": 11,
-        "text": "11 of 11 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ft-0/module/status=green: ft-0/module/status on asr-9006 cannot be set: it declares no state.",
-         "ft-0/module/status=yellow: ft-0/module/status on asr-9006 cannot be set: it declares no state."
-        ],
-        "n": 17,
-        "text": "the agent's state.set refuses 17 of 17 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.001
      }
     }
@@ -14357,7 +13419,7 @@
      "optics": 0
     },
     "found": [],
-    "seconds": 0.008
+    "seconds": 0.012
    },
    "ref": "asr-9006",
    "why": "a modular router with line cards and nested bays"
@@ -14371,7 +13433,6 @@
        "drawn": 56,
        "judged": 36,
        "offered": 56,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -14848,45 +13909,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.236
+      "seconds": 0.222
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 22,
        "drawn": 22,
        "fields": 0,
        "messages": 1,
-       "refused": 31,
-       "set": 0
+       "refused": 0,
+       "set": 31
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ieee1588-link/led-a (off/link)",
-         "ieee1588-link/led-b (off/activity)",
-         "mgt-lan-1/led-a (off/link)",
-         "mgt-lan-1/led-b (off/activity)"
-        ],
-        "n": 22,
-        "of": 22,
-        "text": "22 of 22 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ieee1588-link/led-a=off: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state.",
-         "ieee1588-link/led-a=link: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state."
-        ],
-        "n": 31,
-        "text": "the agent's state.set refuses 31 of 31 states the drawings declare"
-       },
        {
         "code": "S8",
         "examples": [
@@ -14907,7 +13946,6 @@
        "drawn": 56,
        "judged": 36,
        "offered": 56,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -15384,45 +14422,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.216
+      "seconds": 0.218
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 22,
        "drawn": 22,
        "fields": 0,
        "messages": 1,
-       "refused": 31,
-       "set": 0
+       "refused": 0,
+       "set": 31
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ieee1588-link/led-a (off/link)",
-         "ieee1588-link/led-b (off/activity)",
-         "mgt-lan-1/led-a (off/link)",
-         "mgt-lan-1/led-b (off/activity)"
-        ],
-        "n": 22,
-        "of": 22,
-        "text": "22 of 22 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ieee1588-link/led-a=off: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state.",
-         "ieee1588-link/led-a=link: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state."
-        ],
-        "n": 31,
-        "text": "the agent's state.set refuses 31 of 31 states the drawings declare"
-       },
        {
         "code": "S8",
         "examples": [
@@ -15443,7 +14459,6 @@
        "drawn": 54,
        "judged": 32,
        "offered": 54,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -15885,45 +14900,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.17
+      "seconds": 0.171
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 22,
        "drawn": 22,
        "fields": 0,
        "messages": 1,
-       "refused": 31,
-       "set": 0
+       "refused": 0,
+       "set": 31
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "ieee1588-link/led-a (off/link)",
-         "ieee1588-link/led-b (off/activity)",
-         "mgt-lan-1/led-a (off/link)",
-         "mgt-lan-1/led-b (off/activity)"
-        ],
-        "n": 22,
-        "of": 22,
-        "text": "22 of 22 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "ieee1588-link/led-a=off: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state.",
-         "ieee1588-link/led-a=link: ieee1588-link/led-a on asr-9901 cannot be set: it declares no state."
-        ],
-        "n": 31,
-        "text": "the agent's state.set refuses 31 of 31 states the drawings declare"
-       },
        {
         "code": "S8",
         "examples": [
@@ -15963,7 +14956,6 @@
        "drawn": 56,
        "judged": 24,
        "offered": 56,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -16276,47 +15268,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.148
+      "seconds": 0.167
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 121,
        "drawn": 121,
        "fields": 2,
        "messages": 0,
-       "refused": 131,
-       "set": 0
+       "refused": 0,
+       "set": 131
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1 (off/link/disabled)",
-         "led-port-1/lamp (off/link/disabled)",
-         "led-port-2 (off/link/disabled)",
-         "led-port-2/lamp (off/link/disabled)"
-        ],
-        "n": 121,
-        "of": 121,
-        "text": "121 of 121 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1=off: led-port-1 on ws-c4948e cannot be set: it declares no state.",
-         "led-port-1=link: led-port-1 on ws-c4948e cannot be set: it declares no state."
-        ],
-        "n": 131,
-        "text": "the agent's state.set refuses 131 of 131 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.004
      }
     }
    ],
@@ -16345,7 +15314,6 @@
        "drawn": 15,
        "judged": 24,
        "offered": 15,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -16658,46 +15626,23 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.188
+      "seconds": 0.19
      },
      "cfg": "sff24-rc5-1b2a3a",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 25,
        "drawn": 25,
        "fields": 0,
        "messages": 0,
-       "refused": 50,
-       "set": 0
+       "refused": 0,
+       "set": 50
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "power-btn/lamp (off/on)",
-         "idrac-direct-led (off/connected/recognised)",
-         "idrac-direct-led/lamp (off/connected/recognised)",
-         "panel-left/module/lamp-drive (off/fault)"
-        ],
-        "n": 25,
-        "of": 25,
-        "text": "25 of 25 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "power-btn/lamp=off: power-btn/lamp on r740xd cannot be set: it declares no state.",
-         "power-btn/lamp=on: power-btn/lamp on r740xd cannot be set: it declares no state."
-        ],
-        "n": 50,
-        "text": "the agent's state.set refuses 50 of 50 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.004
      }
     },
@@ -16708,7 +15653,6 @@
        "drawn": 15,
        "judged": 24,
        "offered": 15,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -17021,47 +15965,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.198
+      "seconds": 0.177
      },
      "cfg": "lff12-mlff4-rlff2-rc0-noriser",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 29,
        "drawn": 29,
        "fields": 6,
        "messages": 0,
-       "refused": 57,
-       "set": 0
+       "refused": 0,
+       "set": 57
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "power-btn/lamp (off/on)",
-         "idrac-direct-led (off/connected/recognised)",
-         "idrac-direct-led/lamp (off/connected/recognised)",
-         "panel-left/module/lamp-drive (off/fault)"
-        ],
-        "n": 29,
-        "of": 29,
-        "text": "29 of 29 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "power-btn/lamp=off: power-btn/lamp on r740xd cannot be set: it declares no state.",
-         "power-btn/lamp=on: power-btn/lamp on r740xd cannot be set: it declares no state."
-        ],
-        "n": 57,
-        "text": "the agent's state.set refuses 57 of 57 states the drawings declare"
-       }
-      ],
-      "seconds": 0.005
+      "found": [],
+      "seconds": 0.007
      }
     },
     {
@@ -17071,7 +15992,6 @@
        "drawn": 15,
        "judged": 24,
        "offered": 15,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -17384,47 +16304,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.172
+      "seconds": 0.176
      },
      "cfg": "lff12-mlff4-rlff2-rc1-1b2b",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 29,
        "drawn": 29,
        "fields": 6,
        "messages": 0,
-       "refused": 57,
-       "set": 0
+       "refused": 0,
+       "set": 57
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "power-btn/lamp (off/on)",
-         "idrac-direct-led (off/connected/recognised)",
-         "idrac-direct-led/lamp (off/connected/recognised)",
-         "panel-left/module/lamp-drive (off/fault)"
-        ],
-        "n": 29,
-        "of": 29,
-        "text": "29 of 29 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "power-btn/lamp=off: power-btn/lamp on r740xd cannot be set: it declares no state.",
-         "power-btn/lamp=on: power-btn/lamp on r740xd cannot be set: it declares no state."
-        ],
-        "n": 57,
-        "text": "the agent's state.set refuses 57 of 57 states the drawings declare"
-       }
-      ],
-      "seconds": 0.005
+      "found": [],
+      "seconds": 0.007
      }
     }
    ],
@@ -17453,7 +16350,6 @@
        "drawn": 9,
        "judged": 18,
        "offered": 9,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 1
       },
@@ -17692,46 +16588,23 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.074
+      "seconds": 0.073
      },
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 12,
        "drawn": 12,
        "fields": 0,
        "messages": 0,
-       "refused": 26,
-       "set": 0
+       "refused": 0,
+       "set": 26
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "btn-uid/lamp (off/green/green-flashing)",
-         "led-nic/lamp (off/green/green-flashing)",
-         "led-health/lamp (off/green/green-flashing)",
-         "btn-power/lamp (off/green/green-flashing)"
-        ],
-        "n": 12,
-        "of": 12,
-        "text": "12 of 12 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "btn-uid/lamp=off: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state.",
-         "btn-uid/lamp=green: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state."
-        ],
-        "n": 26,
-        "text": "the agent's state.set refuses 26 of 26 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     },
@@ -17742,7 +16615,6 @@
        "drawn": 9,
        "judged": 18,
        "offered": 9,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 1
       },
@@ -17981,47 +16853,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.078
+      "seconds": 0.076
      },
      "cfg": "lff4",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 16,
        "drawn": 16,
        "fields": 2,
        "messages": 0,
-       "refused": 37,
-       "set": 0
+       "refused": 0,
+       "set": 37
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "btn-uid/lamp (off/green/green-flashing)",
-         "led-nic/lamp (off/green/green-flashing)",
-         "led-health/lamp (off/green/green-flashing)",
-         "btn-power/lamp (off/green/green-flashing)"
-        ],
-        "n": 16,
-        "of": 16,
-        "text": "16 of 16 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "btn-uid/lamp=off: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state.",
-         "btn-uid/lamp=green: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state."
-        ],
-        "n": 37,
-        "text": "the agent's state.set refuses 37 of 37 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -18031,7 +16880,6 @@
        "drawn": 13,
        "judged": 24,
        "offered": 13,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 1
       },
@@ -18402,7 +17250,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -18412,36 +17259,14 @@
      "cfg": "lff4-flom",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 18,
        "drawn": 18,
        "fields": 0,
        "messages": 0,
-       "refused": 36,
-       "set": 0
+       "refused": 0,
+       "set": 36
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "btn-uid/lamp (off/green/green-flashing)",
-         "led-nic/lamp (off/green/green-flashing)",
-         "led-health/lamp (off/green/green-flashing)",
-         "btn-power/lamp (off/green/green-flashing)"
-        ],
-        "n": 18,
-        "of": 18,
-        "text": "18 of 18 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "btn-uid/lamp=off: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state.",
-         "btn-uid/lamp=green: btn-uid/lamp on dl160-gen10 cannot be set: it declares no state."
-        ],
-        "n": 36,
-        "text": "the agent's state.set refuses 36 of 36 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.002
      }
     }
@@ -18471,7 +17296,6 @@
        "drawn": 2,
        "judged": 8,
        "offered": 4,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 1
       },
@@ -18608,12 +17432,11 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.062
+      "seconds": 0.052
      },
      "cfg": "base",
      "settings": {
@@ -18636,7 +17459,6 @@
        "drawn": 72,
        "judged": 26,
        "offered": 74,
-       "sidePanes": 2,
        "standins": 8,
        "supplies": 1
       },
@@ -19072,47 +17894,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.516
+      "seconds": 0.49
      },
      "cfg": "ar3002e-x14",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 56,
        "drawn": 56,
        "fields": 0,
        "messages": 0,
-       "refused": 57,
-       "set": 0
+       "refused": 0,
+       "set": 57
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "slot-3/module/led-status-1/lamp (off/on)",
-         "slot-3/module/led-status-2/lamp (off/on)",
-         "slot-3/module/led-status-3/lamp (off/on)",
-         "slot-3/module/led-access/lamp (off/on)"
-        ],
-        "n": 56,
-        "of": 56,
-        "text": "56 of 56 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "slot-3/module/led-status-1/lamp=off: slot-3/module/led-status-1/lamp on ch3000 cannot be set: it declares no state.",
-         "slot-3/module/led-status-1/lamp=on: slot-3/module/led-status-1/lamp on ch3000 cannot be set: it declares no state."
-        ],
-        "n": 57,
-        "text": "the agent's state.set refuses 57 of 57 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -19122,7 +17921,6 @@
        "drawn": 5,
        "judged": 14,
        "offered": 7,
-       "sidePanes": 2,
        "standins": 2,
        "supplies": 1
       },
@@ -19362,46 +18160,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.243
+      "seconds": 0.268
      },
      "cfg": "dc-power",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 8,
        "drawn": 8,
        "fields": 0,
        "messages": 0,
-       "refused": 11,
-       "set": 0
+       "refused": 0,
+       "set": 11
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "rear-1-2/module/comms/module/eth-out/led-a (off/link)",
-         "rear-1-2/module/comms/module/eth-out/led-b (off/activity)",
-         "rear-1-2/module/comms/module/eth-in/led-a (off/link)",
-         "rear-1-2/module/comms/module/eth-in/led-b (off/activity)"
-        ],
-        "n": 8,
-        "of": 8,
-        "text": "8 of 8 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "rear-1-2/module/comms/module/eth-out/led-a=off: rear-1-2/module/comms/module/eth-out/led-a on ch3000 cannot be set: it declares no state.",
-         "rear-1-2/module/comms/module/eth-out/led-a=link: rear-1-2/module/comms/module/eth-out/led-a on ch3000 cannot be set: it declares no state."
-        ],
-        "n": 11,
-        "text": "the agent's state.set refuses 11 of 11 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.001
      }
     }
@@ -19474,7 +18249,7 @@
       "text": "BD31A8-100-H10F-0-AL (a coupler) has cable ends on its front and none on its rear: two sides of one path need both"
      }
     ],
-    "seconds": 0.031
+    "seconds": 0.074
    },
    "ref": "ch3000",
    "why": "a high-density fibre patch panel"
@@ -19488,7 +18263,6 @@
        "drawn": 1,
        "judged": 2,
        "offered": 1,
-       "sidePanes": 2,
        "standins": 2,
        "supplies": 0
       },
@@ -19553,7 +18327,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -19563,35 +18336,14 @@
      "cfg": "base",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 8,
        "drawn": 8,
        "fields": 2,
        "messages": 0,
-       "refused": 10,
-       "set": 0
+       "refused": 0,
+       "set": 10
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-a-pwr (off/ok)",
-         "led-a-pwr/lamp (off/ok)",
-         "led-a-alm (off/fault)",
-         "led-a-alm/lamp (off/fault)"
-        ],
-        "n": 8,
-        "of": 8,
-        "text": "8 of 8 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-a-pwr=off: led-a-pwr on 300cb08 cannot be set: it declares no state.",
-         "led-a-pwr=ok: led-a-pwr on 300cb08 cannot be set: it declares no state."
-        ],
-        "n": 10,
-        "text": "the agent's state.set refuses 10 of 10 states the drawings declare"
-       },
        {
         "code": "S9",
         "examples": [
@@ -19612,7 +18364,6 @@
        "drawn": 1,
        "judged": 2,
        "offered": 1,
-       "sidePanes": 2,
        "standins": 2,
        "supplies": 0
       },
@@ -19677,45 +18428,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.017
+      "seconds": 0.018
      },
      "cfg": "populated",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 8,
        "drawn": 8,
        "fields": 18,
        "messages": 0,
-       "refused": 10,
-       "set": 0
+       "refused": 0,
+       "set": 10
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-a-pwr (off/ok)",
-         "led-a-pwr/lamp (off/ok)",
-         "led-a-alm (off/fault)",
-         "led-a-alm/lamp (off/fault)"
-        ],
-        "n": 8,
-        "of": 8,
-        "text": "8 of 8 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-a-pwr=off: led-a-pwr on 300cb08 cannot be set: it declares no state.",
-         "led-a-pwr=ok: led-a-pwr on 300cb08 cannot be set: it declares no state."
-        ],
-        "n": 10,
-        "text": "the agent's state.set refuses 10 of 10 states the drawings declare"
-       },
        {
         "code": "S9",
         "examples": [
@@ -19736,7 +18465,6 @@
        "drawn": 1,
        "judged": 2,
        "offered": 1,
-       "sidePanes": 2,
        "standins": 2,
        "supplies": 0
       },
@@ -19801,7 +18529,6 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -19811,35 +18538,14 @@
      "cfg": "with-fuses",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 8,
        "drawn": 8,
        "fields": 18,
        "messages": 0,
-       "refused": 10,
-       "set": 0
+       "refused": 0,
+       "set": 10
       },
       "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-a-pwr (off/ok)",
-         "led-a-pwr/lamp (off/ok)",
-         "led-a-alm (off/fault)",
-         "led-a-alm/lamp (off/fault)"
-        ],
-        "n": 8,
-        "of": 8,
-        "text": "8 of 8 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-a-pwr=off: led-a-pwr on 300cb08 cannot be set: it declares no state.",
-         "led-a-pwr=ok: led-a-pwr on 300cb08 cannot be set: it declares no state."
-        ],
-        "n": 10,
-        "text": "the agent's state.set refuses 10 of 10 states the drawings declare"
-       },
        {
         "code": "S9",
         "examples": [
@@ -19879,7 +18585,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -19887,12 +18592,11 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.002
+      "seconds": 0.001
      },
      "cfg": "base",
      "settings": {
@@ -19905,7 +18609,7 @@
        "set": 0
       },
       "found": [],
-      "seconds": 0.001
+      "seconds": 0
      }
     }
    ],
@@ -19934,7 +18638,6 @@
        "drawn": 0,
        "judged": 0,
        "offered": 0,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 0
       },
@@ -19942,7 +18645,6 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
@@ -19996,12 +18698,11 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.004
+      "seconds": 0.001
      },
      "cfg": "base",
      "settings": {
@@ -20043,7 +18744,6 @@
        "drawn": 25,
        "judged": 30,
        "offered": 25,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -20434,47 +19134,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.133
+      "seconds": 0.129
      },
      "cfg": "ac",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 43,
        "drawn": 43,
        "fields": 0,
        "messages": 0,
-       "refused": 66,
-       "set": 0
+       "refused": 0,
+       "set": 66
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-gm-ptp-0/lamp (off/on)",
-         "led-gm-ptp-1/lamp (off/on)",
-         "led-port-4/lamp (off/on)",
-         "led-port-5/lamp (off/on)"
-        ],
-        "n": 43,
-        "of": 43,
-        "text": "43 of 43 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-gm-ptp-0/lamp=off: led-gm-ptp-0/lamp on mx204 cannot be set: it declares no state.",
-         "led-gm-ptp-0/lamp=on: led-gm-ptp-0/lamp on mx204 cannot be set: it declares no state."
-        ],
-        "n": 66,
-        "text": "the agent's state.set refuses 66 of 66 states the drawings declare"
-       }
-      ],
-      "seconds": 0.002
+      "found": [],
+      "seconds": 0.003
      }
     },
     {
@@ -20484,7 +19161,6 @@
        "drawn": 23,
        "judged": 26,
        "offered": 23,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -20840,46 +19516,23 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.097
+      "seconds": 0.093
      },
      "cfg": "dc",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 43,
        "drawn": 43,
        "fields": 0,
        "messages": 0,
-       "refused": 66,
-       "set": 0
+       "refused": 0,
+       "set": 66
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-gm-ptp-0/lamp (off/on)",
-         "led-gm-ptp-1/lamp (off/on)",
-         "led-port-4/lamp (off/on)",
-         "led-port-5/lamp (off/on)"
-        ],
-        "n": 43,
-        "of": 43,
-        "text": "43 of 43 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-gm-ptp-0/lamp=off: led-gm-ptp-0/lamp on mx204 cannot be set: it declares no state.",
-         "led-gm-ptp-0/lamp=on: led-gm-ptp-0/lamp on mx204 cannot be set: it declares no state."
-        ],
-        "n": 66,
-        "text": "the agent's state.set refuses 66 of 66 states the drawings declare"
-       }
-      ],
+      "found": [],
       "seconds": 0.003
      }
     }
@@ -20895,7 +19548,7 @@
      "optics": 20
     },
     "found": [],
-    "seconds": 0.011
+    "seconds": 0.015
    },
    "ref": "mx204",
    "why": "a router whose DC supply is a seated module"
@@ -20909,7 +19562,6 @@
        "drawn": 41,
        "judged": 24,
        "offered": 41,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -21222,47 +19874,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.143
+      "seconds": 0.128
      },
      "cfg": "ac-f2b",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 145,
        "drawn": 145,
        "fields": 0,
        "messages": 0,
-       "refused": 155,
-       "set": 0
+       "refused": 0,
+       "set": 155
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "port-1/led-1 (off/link-100g/link-40g)",
-         "port-1/led-2 (off/link-100g/link-40g)",
-         "port-1/led-3 (off/link-100g/link-40g)",
-         "port-1/led-4 (off/link-100g/link-40g)"
-        ],
-        "n": 145,
-        "of": 145,
-        "text": "145 of 145 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "port-1/led-1=off: port-1/led-1 on as7726-32x cannot be set: it declares no state.",
-         "port-1/led-1=link-100g: port-1/led-1 on as7726-32x cannot be set: it declares no state."
-        ],
-        "n": 155,
-        "text": "the agent's state.set refuses 155 of 155 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.005
      }
     },
     {
@@ -21272,7 +19901,6 @@
        "drawn": 41,
        "judged": 24,
        "offered": 41,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -21585,47 +20213,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.125
+      "seconds": 0.126
      },
      "cfg": "ac-b2f",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 145,
        "drawn": 145,
        "fields": 0,
        "messages": 0,
-       "refused": 155,
-       "set": 0
+       "refused": 0,
+       "set": 155
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "port-1/led-1 (off/link-100g/link-40g)",
-         "port-1/led-2 (off/link-100g/link-40g)",
-         "port-1/led-3 (off/link-100g/link-40g)",
-         "port-1/led-4 (off/link-100g/link-40g)"
-        ],
-        "n": 145,
-        "of": 145,
-        "text": "145 of 145 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "port-1/led-1=off: port-1/led-1 on as7726-32x cannot be set: it declares no state.",
-         "port-1/led-1=link-100g: port-1/led-1 on as7726-32x cannot be set: it declares no state."
-        ],
-        "n": 155,
-        "text": "the agent's state.set refuses 155 of 155 states the drawings declare"
-       }
-      ],
-      "seconds": 0.004
+      "found": [],
+      "seconds": 0.005
      }
     },
     {
@@ -21635,7 +20240,6 @@
        "drawn": 39,
        "judged": 24,
        "offered": 39,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -21965,47 +20569,24 @@
        },
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.107
+      "seconds": 0.111
      },
      "cfg": "dc-b2f",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 145,
        "drawn": 145,
        "fields": 0,
        "messages": 0,
-       "refused": 155,
-       "set": 0
+       "refused": 0,
+       "set": 155
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "port-1/led-1 (off/link-100g/link-40g)",
-         "port-1/led-2 (off/link-100g/link-40g)",
-         "port-1/led-3 (off/link-100g/link-40g)",
-         "port-1/led-4 (off/link-100g/link-40g)"
-        ],
-        "n": 145,
-        "of": 145,
-        "text": "145 of 145 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "port-1/led-1=off: port-1/led-1 on as7726-32x cannot be set: it declares no state.",
-         "port-1/led-1=link-100g: port-1/led-1 on as7726-32x cannot be set: it declares no state."
-        ],
-        "n": 155,
-        "text": "the agent's state.set refuses 155 of 155 states the drawings declare"
-       }
-      ],
-      "seconds": 0.003
+      "found": [],
+      "seconds": 0.005
      }
     }
    ],
@@ -22020,7 +20601,7 @@
      "optics": 21
     },
     "found": [],
-    "seconds": 0.018
+    "seconds": 0.016
    },
    "ref": "as7726-32x",
    "why": "a white-box switch"
@@ -22034,7 +20615,6 @@
        "drawn": 38,
        "judged": 24,
        "offered": 38,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -22347,47 +20927,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.155
+      "seconds": 0.161
      },
      "cfg": "f2b",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 281,
        "drawn": 281,
        "fields": 0,
        "messages": 0,
-       "refused": 300,
-       "set": 0
+       "refused": 0,
+       "set": 300
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1-1 (off/blue/green)",
-         "led-port-1-1/lamp (off/blue/green)",
-         "led-port-1-2 (off/blue/green)",
-         "led-port-1-2/lamp (off/blue/green)"
-        ],
-        "n": 281,
-        "of": 281,
-        "text": "281 of 281 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1-1=off: led-port-1-1 on ds4000 cannot be set: it declares no state.",
-         "led-port-1-1=blue: led-port-1-1 on ds4000 cannot be set: it declares no state."
-        ],
-        "n": 300,
-        "text": "the agent's state.set refuses 300 of 300 states the drawings declare"
-       }
-      ],
-      "seconds": 0.005
+      "found": [],
+      "seconds": 0.01
      }
     },
     {
@@ -22397,7 +20954,6 @@
        "drawn": 38,
        "judged": 24,
        "offered": 38,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -22710,47 +21266,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.155
+      "seconds": 0.161
      },
      "cfg": "b2f",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 281,
        "drawn": 281,
        "fields": 0,
        "messages": 0,
-       "refused": 300,
-       "set": 0
+       "refused": 0,
+       "set": 300
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1-1 (off/blue/green)",
-         "led-port-1-1/lamp (off/blue/green)",
-         "led-port-1-2 (off/blue/green)",
-         "led-port-1-2/lamp (off/blue/green)"
-        ],
-        "n": 281,
-        "of": 281,
-        "text": "281 of 281 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1-1=off: led-port-1-1 on ds4000 cannot be set: it declares no state.",
-         "led-port-1-1=blue: led-port-1-1 on ds4000 cannot be set: it declares no state."
-        ],
-        "n": 300,
-        "text": "the agent's state.set refuses 300 of 300 states the drawings declare"
-       }
-      ],
-      "seconds": 0.006
+      "found": [],
+      "seconds": 0.011
      }
     },
     {
@@ -22760,7 +21293,6 @@
        "drawn": 38,
        "judged": 24,
        "offered": 38,
-       "sidePanes": 2,
        "standins": 0,
        "supplies": 2
       },
@@ -23073,47 +21605,24 @@
       "found": [
        {
         "code": "C15",
-        "level": "warn",
         "n": 2,
         "text": "a made-up end is accepted at add time and only flagged loose afterwards"
        }
       ],
-      "seconds": 0.155
+      "seconds": 0.184
      },
      "cfg": "b2f-2x16g-128g",
      "settings": {
       "counts": {
-       "declared": 0,
+       "declared": 281,
        "drawn": 281,
        "fields": 0,
        "messages": 0,
-       "refused": 300,
-       "set": 0
+       "refused": 0,
+       "set": 300
       },
-      "found": [
-       {
-        "code": "S1",
-        "examples": [
-         "led-port-1-1 (off/blue/green)",
-         "led-port-1-1/lamp (off/blue/green)",
-         "led-port-1-2 (off/blue/green)",
-         "led-port-1-2/lamp (off/blue/green)"
-        ],
-        "n": 281,
-        "of": 281,
-        "text": "281 of 281 states the drawings declare are not in the agent's catalogue (configs.json states)"
-       },
-       {
-        "code": "S4",
-        "examples": [
-         "led-port-1-1=off: led-port-1-1 on ds4000 cannot be set: it declares no state.",
-         "led-port-1-1=blue: led-port-1-1 on ds4000 cannot be set: it declares no state."
-        ],
-        "n": 300,
-        "text": "the agent's state.set refuses 300 of 300 states the drawings declare"
-       }
-      ],
-      "seconds": 0.008
+      "found": [],
+      "seconds": 0.009
      }
     }
    ],
@@ -23128,13 +21637,13 @@
      "optics": 11
     },
     "found": [],
-    "seconds": 0.013
+    "seconds": 0.015
    },
    "ref": "ds4000",
    "why": "a second white-box vendor"
   }
  ],
- "seconds": 11.08,
+ "seconds": 11.28,
  "summary": {
   "C10": {
    "configs": 6,
@@ -23147,13 +21656,11 @@
    "says": "a port on an angled facet declares no axis"
   },
   "C11": {
-   "configs": 10,
+   "configs": 8,
    "level": "block",
-   "n": 23,
+   "n": 21,
    "parts": [
-    "ch3000",
-    "fhd-1ube",
-    "fhd-1ufce"
+    "ch3000"
    ],
    "says": "a coupler has cable ends on one side only"
   },
@@ -23173,7 +21680,7 @@
   },
   "C15": {
    "configs": 69,
-   "level": "warn",
+   "level": "block",
    "n": 138,
    "parts": [
     "300cb08",
@@ -23209,15 +21716,6 @@
    ],
    "says": "a made-up end is accepted at add time"
   },
-  "C18": {
-   "configs": 2,
-   "level": "block",
-   "n": 48,
-   "parts": [
-    "xcu"
-   ],
-   "says": "the back of a seated part has ends the host draws no point for"
-  },
   "C19": {
    "configs": 13,
    "level": "block",
@@ -23236,13 +21734,12 @@
    "says": "a powered part presents no power end an agent is offered"
   },
   "C2": {
-   "configs": 11,
+   "configs": 9,
    "level": "block",
-   "n": 42,
+   "n": 18,
    "parts": [
     "ch3000",
-    "dl160-gen10",
-    "xcu"
+    "dl160-gen10"
    ],
    "says": "an accepted cable is a loose end"
   },
@@ -23259,71 +21756,14 @@
    ],
    "says": "a drawn inlet, terminal or stud is not a place a cord or lug can land"
   },
-  "S1": {
-   "configs": 55,
+  "C9": {
+   "configs": 2,
    "level": "block",
-   "n": 3400,
+   "n": 48,
    "parts": [
-    "300cb08",
-    "as7726-32x",
-    "asr-9006",
-    "asr-9901",
-    "c100g",
-    "ch3000",
-    "dl160-gen10",
-    "ds4000",
-    "evma8365x",
-    "evmi2130x",
-    "lmfs-f",
-    "mx204",
-    "n9k-c93180yc-ex",
-    "nfxs-d-ba",
-    "nfxs-e-bb",
-    "pdu12iec",
-    "pdumh20net",
-    "r740xd",
-    "s9510-28dc",
-    "s9601-102xc",
-    "s9700-53dx",
-    "s9705-48d",
-    "sr-1-ac",
-    "sr-1-dc",
-    "ws-c4948e"
+    "xcu"
    ],
-   "says": "a state the drawings declare is unknown to the agent's catalogue"
-  },
-  "S4": {
-   "configs": 55,
-   "level": "block",
-   "n": 4242,
-   "parts": [
-    "300cb08",
-    "as7726-32x",
-    "asr-9006",
-    "asr-9901",
-    "c100g",
-    "ch3000",
-    "dl160-gen10",
-    "ds4000",
-    "evma8365x",
-    "evmi2130x",
-    "lmfs-f",
-    "mx204",
-    "n9k-c93180yc-ex",
-    "nfxs-d-ba",
-    "nfxs-e-bb",
-    "pdu12iec",
-    "pdumh20net",
-    "r740xd",
-    "s9510-28dc",
-    "s9601-102xc",
-    "s9700-53dx",
-    "s9705-48d",
-    "sr-1-ac",
-    "sr-1-dc",
-    "ws-c4948e"
-   ],
-   "says": "state.set refuses a state the drawings declare"
+   "says": "an offered port has no drawing"
   },
   "S8": {
    "configs": 3,
@@ -23345,9 +21785,9 @@
   }
  },
  "timing": {
-  "cabling": 10.24,
+  "cabling": 10.31,
   "configs": 71,
-  "occupants": 0.36,
-  "settings": 0.2
+  "occupants": 0.46,
+  "settings": 0.25
  }
 }
