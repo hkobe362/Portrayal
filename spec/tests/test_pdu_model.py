@@ -429,10 +429,34 @@ def test_the_built_configs_json_carries_slots_and_states():
             assert isinstance(c.get("names"), dict) and set(c["names"]) <= set(c["states"]), f.name
             assert all(isinstance(v, str) and v and v != k for k, v in c["names"].items()), f.name
     evma = json.loads((dist / "evma8365x.configs.json").read_text())["configs"][0]
-    assert len(evma["states"]) == 42 and evma["states"]["outlet-a1"] == ["on", "off"] and evma["slots"] == []
+    outlets = {k: v for k, v in evma["states"].items() if k.startswith("outlet-")}
+    assert len(outlets) == 42 and outlets["outlet-a1"] == ["on", "off"] and evma["slots"] == []
+    # the lamps beside the outlets are listed too, by their own path (P-0041)
+    assert "led-a1" in evma["states"] and "led-f42" in evma["states"]
     assert len(evma["names"]) == 42 and evma["names"]["outlet-a2"] == "A2"
     evmi = json.loads((dist / "evmi2130x.configs.json").read_text())
-    assert evmi["configs"][0]["states"] == {} and evmi["pdu-class"] == "metered-branch"
-    # and the key is small: no lamp vocabulary rides in it
-    total = sum(len(json.dumps(c["states"])) for f in files for c in json.loads(f.read_text())["configs"])
-    assert total < 40_000, total
+    assert evmi["pdu-class"] == "metered-branch"
+    assert not any(k.startswith("outlet-") for k in evmi["configs"][0]["states"])
+    # and the key stays small enough to fetch with the parts list
+    biggest = max(len(json.dumps(c["states"])) for f in files for c in json.loads(f.read_text())["configs"])
+    assert biggest < 30_000, biggest
+
+
+def _face(*rows):
+    return {"elements": [dict(zip(("path", "states"), r)) for r in rows]}
+
+
+def test_drawn_states_adds_every_lamp_the_drawing_declares_and_keeps_the_placements_own():
+    """P-0041: a lamp, a seated module's lamp and a port's lamp are
+    `data-states` on a `data-path` of the face, and a placement's own answer
+    for its path wins."""
+    placed = {"outlet-a1": ["on", "off"]}
+    got = render.drawn_states(placed, [
+        _face(("outlet-a1", ["off", "on", "x"]), ("led-sys", ["off", "ok"]), ("rear/psu-0/status", ["off", "ok", "fail"]),
+              ("chassis", None), ("", ["off"])),
+        _face(("led-sys", ["off", "fault"]), ("led-port-0", ["off", "up"]))])
+    assert got == {"led-port-0": ["off", "up"], "led-sys": ["off", "ok", "fault"], "outlet-a1": ["on", "off"],
+                   "rear/psu-0/status": ["off", "ok", "fail"]}
+    assert list(got) == sorted(got)
+    assert placed == {"outlet-a1": ["on", "off"]}, "the argument is not changed"
+    assert render.drawn_states({}, []) == {}

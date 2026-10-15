@@ -1,0 +1,45 @@
+{
+  "format": "portrayal-rack",
+  "version": 4,
+  "id": "doc-lamps-fixture",
+  "racks": [
+    {
+      "id": "r1",
+      "name": "Lamps test",
+      "frame": {"kind": "four-post", "heightRU": 42, "numbering": "bottom-up",
+                "holes": {"style": "square", "thread": null}, "railDepth": 740, "usableDepth": 1000, "ref": null},
+      "items": [
+        {"id": "i1", "ref": "s9700-53dx", "cfg": "ac", "label": "spine-1", "ru": 30, "face": "front", "turned": false, "swaps": {}, "fields": {},
+         "states": {"led-sys": "ok", "led-fan": "ok", "led-ps0": "ok", "led-ps1": "fail", "led-port-0/lamp": "on", "led-port-1/lamp": "on",
+                    "psu-0/module/status-led": "ok", "psu-1/module/status-led": "input-lost", "fan-0/module/status-led": "ok",
+                    "status-display/digit-1": "0", "status-display/digit-2": "1"}},
+        {"id": "i2", "ref": "s9705-48d", "cfg": "ac", "label": "spine-2", "ru": 24, "face": "front", "turned": false, "swaps": {}, "fields": {},
+         "states": {"led-sys": "boot-failed", "led-port-0/lamp": "on", "psu-0/module/status-led": "ok", "psu-1/module/status-led": "standby",
+                    "beacon/digit-1": "0", "beacon/digit-2": "2"}},
+        {"id": "i3", "ref": "s9601-102xc", "cfg": "ac", "label": "leaf-1", "ru": 18, "face": "front", "turned": false, "swaps": {}, "fields": {},
+         "states": {"led-sys": "boot-complete", "led-id": "beacon", "led-sync": "locked", "led-port-0/lamp": "on", "led-port-100/lane-1": "on",
+                    "psu-0/module/status-led": "ok", "psu-1/module/status-led": "ok", "mgmt/led-a": "link"}}
+      ],
+      "zeroU": [
+        {"id": "z1", "ref": "evma8365x", "cfg": "", "label": "PDU A", "at": "left-rear", "offsetMm": 133.35, "swaps": {}, "fields": {},
+         "states": {"outlet-a1": "on", "outlet-a2": "on", "outlet-b8": "off", "led-a1": "on", "breaker-a/rocker": "on", "breaker-b/rocker": "off"}},
+        {"id": "z2", "ref": "evma8365x", "cfg": "", "label": "PDU B", "at": "right-rear", "offsetMm": 133.35, "swaps": {}, "fields": {},
+         "states": {"outlet-a1": "on", "outlet-a2": "off", "outlet-b8": "on", "breaker-a/rocker": "on"}}
+      ],
+      "cables": [
+        {"id": "c1", "a": {"item": "i1", "path": "oob", "view": "front"}, "b": {"item": "i3", "path": "mgmt", "view": "front"},
+         "media": "cat6a", "purpose": "management", "label": "", "route": []},
+        {"id": "c2", "a": {"item": "i2", "path": "oob", "view": "front"}, "b": {"item": "i3", "path": "mport-0", "view": "front"},
+         "media": "cat6a", "purpose": "management", "label": "", "route": []},
+        {"id": "c3", "a": {"item": "i1", "path": "psu-0/module/inlet", "view": "rear"}, "b": {"item": "z1", "path": "outlet-a1", "view": "front"},
+         "media": "power", "purpose": "power", "label": "", "route": []},
+        {"id": "c4", "a": {"item": "i1", "path": "psu-1/module/inlet", "view": "rear"}, "b": {"item": "z2", "path": "outlet-a1", "view": "front"},
+         "media": "power", "purpose": "power", "label": "", "route": []},
+        {"id": "c5", "a": {"item": "i2", "path": "psu-0/module/inlet", "view": "rear"}, "b": {"item": "z1", "path": "outlet-a2", "view": "front"},
+         "media": "power", "purpose": "power", "label": "", "route": []},
+        {"id": "c6", "a": {"item": "i2", "path": "psu-1/module/inlet", "view": "rear"}, "b": {"item": "z2", "path": "outlet-a2", "view": "front"},
+         "media": "power", "purpose": "power", "label": "", "route": []}
+      ]
+    }
+  ]
+}
