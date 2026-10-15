@@ -507,7 +507,7 @@ RULES = {
     "L135": ("device",     "one position, one circuit - no two placements name the same `through` bay (a warning); a fixed breaker placement feeds many outlets by design and is not counted", "correct the `through` that names the wrong position; if two outputs really are paralleled behind one breaker, waive with the document that says so",
              "Two outlets claiming one breaker position usually means one of them names the wrong position, which misleads anyone tracing which breaker cuts which circuit.",
              WARNING),
-    "L136": ("device",     "a declared pass-through (`passes:`) lies inside its face and overlaps no component - except a well that holds it whole, the plate it is cut through - and no two in a view share an id", "move the pass-through off the part, or onto the face; a window punched in a part's floor is declared over that well",
+    "L136": ("device",     "a declared pass-through (`passes:`) lies inside its face and overlaps no component - except a well that holds it whole, the plate it is cut through, and a part whose contract says `lid: true`, a hinged or removable cover that opens over it - and no two in a view share an id", "move the pass-through off the part, or onto the face; a window punched in a part's floor is declared over that well; a cover that opens over a duct says `lid: true` in its contract, only where the vendor's sources show it opening",
              "A cable cannot pass through a port or a ring, so a pass-through that sits off its face or over a part would send cable routing through solid hardware.",
              ERROR),
     "L137": ("device",     "a pass-through whose `cover` is `brush` has a `pattern: brush` decor drawn over the whole of it, and a brush drawn over a pass-through belongs to one whose cover is `brush`", "draw the brush over the opening, or change `cover` to say what the picture shows",
@@ -8408,6 +8408,11 @@ def lint_device_passes(path, data, lib_roots):
     rule that reported that would be reporting the hole as an obstacle to
     itself. A pass only partly over a well is still reported; so is one over
     any part that is not a well.
+    The other is a LID: a part whose contract says `lid: true`, a hinged or
+    removable cover that opens over the duct (the finger duct's cover clips
+    off its finger tips). A cable crosses once it is open, so a pass may lie
+    under it, wholly or in part. A cover whose sources do not show it opening
+    is not a lid; it is a solid body and is reported like any other.
 
     L137 - THE PICTURE AND THE DECLARATION AGREE. A pass whose cover is `brush`
     has a brush decor drawn over the whole of it; and a brush drawn where a
@@ -8443,11 +8448,11 @@ def lint_device_passes(path, data, lib_roots):
             well = (bool(sz.get("d")) and c.get("kind") != "module"
                     and (c.get("behaviour") != "mounts"
                          or bool((c.get("relief") or {}).get("cavity"))))
-            parts.append((q.get("id"), (x, y, x + w, y + h), well))
+            parts.append((q.get("id"), (x, y, x + w, y + h), well, c.get("lid") is True))
         for b in vp["bays"]:
             bb = _decor_box(b)
             if bb:
-                parts.append((b.get("id"), bb, False))
+                parts.append((b.get("id"), bb, False, False))
         brushes = [(d, _decor_box(d)) for d in vp["decor"]
                    if d.get("pattern") == "brush" and _decor_box(d)]
         seen = set()
@@ -8463,16 +8468,17 @@ def lint_device_passes(path, data, lib_roots):
                 err(path, "L136", f"{vname}/{pid}: the pass-through runs off the face "
                                   f"({vw:g} x {vh:g}) - a cable cannot cross where there "
                                   "is no face")
-            for qid, qb, well in parts:
+            for qid, qb, well, lid in parts:
                 ox, oy = _box_overlap(pb, qb)
                 if ox <= 0.05 or oy <= 0.05:
                     continue
-                if well and _box_within(pb, qb):
+                if lid or (well and _box_within(pb, qb)):
                     continue
                 err(path, "L136", f"{vname}/{pid}: the pass-through overlaps {qid} by "
                                   f"{ox:.2f}x{oy:.2f}mm - a cable cannot cross where a "
                                   "part stands. Only a well that holds it whole, the "
-                                  "plate it is cut through, may lie under it")
+                                  "plate it is cut through, or a part marked `lid: true`, "
+                                  "may lie under it")
             cover = p.get("cover", "open")
             over = [(d, db) for d, db in brushes
                     if min(_box_overlap(pb, db)) > 0.05]

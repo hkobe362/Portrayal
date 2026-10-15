@@ -242,7 +242,9 @@ test('cable.slack records a place, and each refusal of the design has its senten
   assert.equal(run(more.rack, {op: 'cable.slack', id: 'c1', at: {end: 'a'}}).error,
     'c1 already has an entry that takes the rest of its spare: give this one a value.');
   // the refusals of section 3.5
-  assert.equal(run(r, {op: 'cable.slack', id: 'c12', at: TRAY}).error, 'CM-01 tray is not on the route of c12.');
+  // a place that can never hold it says where the spare can go (P-0017)
+  assert.equal(run(r, {op: 'cable.slack', id: 'c12', at: TRAY}).error, 'CM-01 tray is not on the route of c12. '
+    + 'The route of c12 has no tray or duct that holds spare, so its spare can go only at an end ({end: a} or {end: b}).');
   const held = {chassisOf: F.chassisOf, route: {...F.ctxOf(r), trayFaceOf: (cable, w) => (w.via === 'tray' ? 'underside' : null)}};
   assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: TRAY}, held).error, 'c1 lies on the held face of CM-01 tray; slack is stored on the resting face.');
   const noSlack = {chassisOf: F.chassisOf, route: {...F.ctxOf(r), chassisOf: ref => {
@@ -261,8 +263,9 @@ test('cable.slack records a place, and each refusal of the design has its senten
   assert.equal(run(b, {op: 'cable.slack', id: 'c1', at: TRAY}, {chassisOf: F.chassisOf, route: F.ctxOf(b)}).error,
     'c1 rides Bundle 2 through CM-01 tray: store its spare after it leaves the bundle.');
   // the shape of `at`, and what is not there
-  assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: {}}).error, 'cable.slack needs at as {item, via}, a tray on a device, or {end}, a or b.');
-  assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: {item: 'i9', via: 'tray'}}).error, 'i9 is not in the rack.');
+  assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: {}}).error, 'cable.slack needs at as {item, via}, a duct or a tray, or {end}, a or b.');
+  assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: {item: 'i9', via: 'tray'}}).error,
+    'i9 is not in the rack. The spare of c1 can go in CM-01 tray, or at an end ({end: a} or {end: b}).');
   assert.equal(run(r, {op: 'cable.slack', id: 'c99', at: TRAY}).error, 'That cable is no longer in the rack.');
   assert.equal(run(r, {op: 'cable.slack', id: 'c1', at: {end: 'a'}, form: 'coil'}).error, 'Spare left at an end has no form.');
   assert.deepEqual(run(r, {op: 'cable.slack', id: 'c1', at: TRAY, value: 0}), {error: 'cable.slack needs value, a number above 0.', index: 0});

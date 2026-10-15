@@ -220,6 +220,18 @@ In order of preference:
    goes through the lane beside a post, as the automatic route does today.
 
 The lane beside a zero-U part that carries none runs outboard of it (1.1).
+**A leg that lands on the outward face of a zero-U part (P-0037)** is the one
+into a PDU outlet's reach point: an end of the leg stands out in front of the
+face and over the part, and the other is inboard. It is gone round first past
+the part's side that faces the rails, in one plane at the outlet's height (the
+plane stands the bend room from the reach point), so the cord arrives at the
+outlet from beside it; the ways below are the fallbacks, and a leg that lands
+on no face keeps them as they were. The crossing finding (1.4) does not count
+the body of the part a cable ends on, at the plug leg of that end. A four-post
+offers a lane for a route by hand on the upright's centre line, `left-rear-inner`
+and its three, between a rail and such a part (`route.js` `INNER`): the automatic
+route and the detours take the four gutters alone, and the lane has no depth, so
+the turn into the plug from it is judged as it is for any lane.
 **A zero-U part is gone round on its back first**, the side that faces into
 the rack, where the side channel is; a cable from a port inboard of it turns
 the corner there (along the rack to the gap beside the part, back past it,

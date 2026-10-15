@@ -352,7 +352,9 @@ test('describe and inspect know the parts beside the rack and the rail a part is
   assert.match(describe(rackOf(), ctx), /^Rack 1 \(r1\): 0 items, 0 cables\./);
   assert.deepEqual(await inspect(r, 'z1', ctx), {kind: 'zeroU', id: 'z1', ref: DUCT, model: 'CMV-SFD45U5W', manufacturer: 'FS.com',
     label: 'vcm-1', cfg: 'base', at: 'left', ru: 1, u: 45, between: true, mount: 'rack-side', lane: 'left',
-    where: 'between racks at left, U1-U45', capacity: {count: 2745, basis: '', media: 'cat6'}});
+    where: 'between racks at left, U1-U45', capacity: {count: 2745, basis: '', media: 'cat6'},
+    // its duct, which holds spare (P-0017 issue 1); this catalogue lists no windows
+    pathways: [{via: 'duct', kind: 'duct', holds_spare: true}]});
   assert.equal((await inspect(r, 'i1', ctx)).side, 'right');
   assert.deepEqual(await inspect(r, 'z7', ctx), {error: ZERO_GONE});
 });

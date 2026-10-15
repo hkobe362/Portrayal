@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: cmh-dfd1u
-version: 0.1.4
+version: 0.1.5
 maturity: modelled
 manufacturer: FS.com
 model: CMH-DFD1U
@@ -89,8 +89,13 @@ provenance:
     confidence: drawing
     note: >-
       drawing - the two pass-through holes join the two channels through the middle of the
-      part and reach neither outer face, so no face declares a `passes:` entry; they are
-      the holes in each duct's floor.
+      part: 76.4 x 24.7 mm at x 54.2 and 302.4, the CMH-SFD1U figures, because the FS finger
+      duct datasheet (one sheet for CMH-SFD1U, CMH-SFD2U and CMH-DFD1U, sha256 below) draws
+      the CMH-DFD1U front view as the CMH-SFD1U front view line for line and its
+      specification table lists the two holes for CMH-DFD1U. Each duct's view declares them
+      as the holes in that duct's floor, under its cover; the cover is a lid
+      (`lid: true` on `fs/cmh-sfd1u-cover`, which lifts off the finger tips), so the hole
+      beneath it is where a cable crosses once it is open.
   top:
     confidence: drawing
     note: >-
@@ -224,6 +229,9 @@ views:
         - {ref: fs/cmh-sfd1u-finger@1, id: front-finger-lower-12, at: [369.95, 33.5], group: fingers, rel-pos: 25, in: front-base, under: front-cover}
         - {ref: fs/cmh-sfd1u-finger-end@1, id: front-finger-lower-13, at: [404.05, 33.5], rotate: 180, group: fingers, rel-pos: 26, in: front-base, under: front-cover}
         - {ref: fs/cmh-sfd1u-cover@1, id: front-cover, at: [0.0, 0.0], group: cover, rel-pos: 1, in: front-base}
+    passes:
+      - {id: pass-through-1, at: [54.2, 8.7], size: [76.4, 24.7], shape: rect, cover: open}
+      - {id: pass-through-2, at: [302.4, 8.7], size: [76.4, 24.7], shape: rect, cover: open}
     guides:
       - {id: front-duct, kind: duct, at: [0, 8.5], size: [433.0, 25.0], run: x, finger-pitch: 34.1, finger-gap: 16.0, confidence: drawing, source: 'FS finger duct datasheet, front view 0.98 in [25mm] and top view pitch and gap'}
   rear:
@@ -258,6 +266,9 @@ views:
         - {ref: fs/cmh-sfd1u-finger@1, id: rear-finger-lower-12, at: [369.95, 33.5], group: fingers, rel-pos: 51, in: rear-base, under: rear-cover}
         - {ref: fs/cmh-sfd1u-finger-end@1, id: rear-finger-lower-13, at: [404.05, 33.5], rotate: 180, group: fingers, rel-pos: 52, in: rear-base, under: rear-cover}
         - {ref: fs/cmh-sfd1u-cover@1, id: rear-cover, at: [0.0, 0.0], group: cover, rel-pos: 2, in: rear-base}
+    passes:
+      - {id: pass-through-1, at: [54.2, 8.7], size: [76.4, 24.7], shape: rect, cover: open}
+      - {id: pass-through-2, at: [302.4, 8.7], size: [76.4, 24.7], shape: rect, cover: open}
     guides:
       - {id: rear-duct, kind: duct, at: [0, 8.5], size: [433.0, 25.0], run: x, finger-pitch: 34.1, finger-gap: 16.0, confidence: drawing, source: 'FS finger duct datasheet, front view 0.98 in [25mm] and top view pitch and gap'}
   top:

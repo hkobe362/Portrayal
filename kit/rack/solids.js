@@ -131,6 +131,19 @@ function zeroUPlacer(rack, z, c) {
                  zFront: rear ? zc - d / 2 : zc + d / 2, outward: rear ? -1 : 1, mirror: rear, flipY: false});
 }
 
+// A POINT ON A PANEL OF A PART BESIDE THE RACK (P-0019), in rack mm: `x`
+// across its panel as drawn and `y` up from its bottom, on its front panel
+// (`view` 'front', the face it looks out of) or its back. Placed as its body
+// is, so an outlet is where the PDU drawn round it is. null for a part the
+// catalogue gives no size.
+export function zeroUPanelPoint(rack, z, c, {x, y}, view = 'front') {
+  if (!(pos(c?.w) && pos(c?.h) && pos(c?.d))) return null;
+  const back = view === 'rear';
+  // the back panel is drawn as seen from behind: its x runs the other way
+  const b = zeroUPlacer(rack, z, c)({x: back ? num(c.w) - x : x, y, z: back ? num(c.d) : 0, w: 0, h: 0, d: 0});
+  return {x: b.x0, y: b.y0, z: b.z0};
+}
+
 const memo = new WeakMap();
 
 // EVERY SOLID IN THE RACK, placed: [{item, part, box, holes: [{via, box,
@@ -326,7 +339,14 @@ export function legCrossings(a, b, solids, {diameter = 0} = {}) {
   const out = [];
   const hit = (s, span) => {
     const p = lerp(a, b, span[0]), q = lerp(a, b, span[1]);
-    const through = (s.holes || []).some(h => within(p, h.box) && within(q, h.box)
+    // A hole is judged on the stretch inside the TRUE plate. A solid met grown
+    // by the cable's radius (`met`: a zero-U part, a ring's part) has a stretch
+    // that starts and ends up to r outside the plate, so outside the depth of
+    // a hole cut through it, and no cable would pass any hole.
+    const grown = met(s, diameter) !== s.box;
+    const own = grown ? inside(a, b, s.box.x0, s.box.x1, s.box.y0, s.box.y1, s.box.z0, s.box.z1) : null;
+    const [hp, hq] = own ? [lerp(a, b, own[0]), lerp(a, b, own[1])] : [p, q];
+    const through = (s.holes || []).some(h => within(hp, h.box) && within(hq, h.box)
       && diameter <= Math.min(...h.size) + 1e-9);
     if (!through) out.push({solid: s, t0: span[0], t1: span[1], at: p});
   };
@@ -441,6 +461,33 @@ function waysRound(a, b, solid, {diameter, lanes, room = 0, rear = false}) {
   const tiers = edge === 'z' && across === 'y' ? [...(round ? [[round]] : []), [flat('z', front)], [flat('z', back)]]
     : zeroU ? [[flat('z', back), corner('z', back)]] : [both(edge)];
   tiers.push(both(end));
+  // A CORD THAT LANDS ON A ZERO-U PART'S FACE (P-0037): an end of the leg
+  // stands in front of the part's outward face (a PDU outlet's reach point),
+  // level with some part of it, and the other end is inboard. The cord is
+  // taken in past the part's side that faces the rails, at the height it is
+  // at, and so arrives at the outlet from beside it; over the top or under
+  // the foot of the part, a cord to an outlet near its end would run the
+  // whole way up and back down.
+  if (solid.zeroU === true && across === 'z' && edge === 'y') {
+    const outer = p => (solid.away === -1 ? p.z < solid.box.z0 : p.z > solid.box.z1);
+    const over = p => p.x > solid.box.x0 && p.x < solid.box.x1 && p.y > solid.box.y0 && p.y < solid.box.y1;
+    const lands = [a, b].some(p => outer(p) && over(p));
+    if (lands) {
+      const inboard = (box.x0 + box.x1) / 2 < 0 ? box.x1 + m : box.x0 - m;
+      tiers.unshift([flat('x', inboard)]);
+    }
+  }
+  // A ZERO-U PART crossed front to back with pass-through holes (a vertical
+  // duct's back): first through the nearest hole, along y to its middle on this
+  // side, across, and along y on the far side; over its top or bottom edge only
+  // when no hole clears. Horizontal managers keep the ways above.
+  if (solid.zeroU === true && across === 'z' && edge === 'y' && Array.isArray(solid.holes)) {
+    const at = (a.y + b.y) / 2;
+    const ways = solid.holes.filter(h => diameter <= Math.min(...h.size) + 1e-9)
+      .map(h => (h.box.y0 + h.box.y1) / 2).sort((p, q) => Math.abs(p - at) - Math.abs(q - at))
+      .map(v => flat('y', v, true));
+    if (ways.length) tiers.unshift(ways);
+  }
   if (opposite) tiers.push([...new Set(lanes)].map(v => flat('x', v, true)));
   if (zeroU) tiers.push([flat('z', front), corner('z', front)]);
   return tiers;
