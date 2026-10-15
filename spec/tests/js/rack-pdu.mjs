@@ -234,7 +234,7 @@ test('a state the part does not declare is kept, not applied, and named', () => 
   assert.deepEqual(ST.statesFor(pdu, facts), {'outlet-a2': 'off'}, 'only what the part declares is handed to a drawing');
   assert.deepEqual(ST.stateNotices(read.racks[0], ctx), [
     'outlet-a1 on PDU A cannot be standby: it can be on or off.',
-    'breaker-a on PDU A cannot be set: it declares no state. It declares: outlet-a1, outlet-a2 can be on or off.']);
+    'breaker-a on PDU A cannot be set: it declares no state.']);
   assert.deepEqual(JSON.parse(M.serialize(read)).racks[0].zeroU[0].states, pdu.states, 'and saved as it was');
   // with no facts nothing is checked, and nothing is applied or said
   assert.deepEqual(ST.statesFor(pdu, null), {});
@@ -244,7 +244,7 @@ test('a state the part does not declare is kept, not applied, and named', () => 
   assert.deepEqual(run(r, {op: 'state.set', id: 'z2', path: 'outlet-a2', state: 'standby'}),
     {error: 'outlet-a2 on PDU A cannot be standby: it can be on or off.', index: 0});
   assert.deepEqual(run(r, {op: 'state.set', id: 'z2', path: 'breaker-b', state: 'on'}),
-    {error: 'breaker-b on PDU A cannot be set: it declares no state. It declares: outlet-a1, outlet-a2 can be on or off.', index: 0});
+    {error: 'breaker-b on PDU A cannot be set: it declares no state.', index: 0});
   const on = run(r, {op: 'state.set', id: 'z2', path: 'outlet-a1', state: 'on'});
   assert.equal(on.summary, 'Set outlet-a1 on PDU A to on.');
   assert.equal(on.rack.zeroU[0].states['outlet-a1'], 'on');

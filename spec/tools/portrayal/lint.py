@@ -654,6 +654,9 @@ RULES = {
     "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
              "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
              ERROR),
+    "L185": ("component, device", "in Portrayal's own library a device or component states no `audience`, or states `public` (error); a project that keeps private entries beside the public library runs lint with `--allow-audience`", "delete the `audience` line, or set it to `public`; move a private entry to the library that holds private entries",
+             "The public library is published to everyone, so a part labelled for one customer or kept internal there is either a leak or a label that means nothing; the check stops the label from reaching the published library.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -3903,6 +3906,21 @@ def lint_component_supersedes(path, data, lib_roots):
         if not isinstance(c.get("from"), str) or not re.fullmatch(r"[0-9a-f]{7,40}", c["from"]):
             err(path, "L184", f"supersedes[{i}]: from {c.get('from')!r} is not the commit the signature was taken from "
                               "(7 to 40 hex digits)")
+
+
+def lint_public_audience(path, data):
+    """L185: the public library holds only `public` entries.
+
+    The schema says which labels exist. This says that in Portrayal's own
+    library none but `public` is used, with the label left out meaning the
+    same. A library for private entries runs lint with `--allow-audience`.
+    """
+    if not isinstance(data, dict):
+        return
+    audience = data.get("audience")
+    if audience is not None and audience != "public":
+        err(path, "L185", f"audience: {audience!r} - the public library has only `public` entries "
+                          "(or none stated); a private entry belongs in a library of its own")
 
 
 def _kit_ranges(depth):
@@ -13573,6 +13591,11 @@ def main():
                          "does not - what THIS change added, rather than the whole backlog")
     ap.add_argument("--update-baseline", action="store_true",
                     help="rewrite library/lint-baseline.json from this run, and exit")
+    # PORTRAYAL'S OWN LIBRARY IS PUBLIC (L185). A project that keeps private
+    # entries in a library of its own labels them with `audience` and says so.
+    ap.add_argument("--allow-audience", action="store_true",
+                    help="allow an `audience` other than `public` (L185 is off); "
+                         "for a library of private entries")
     args = ap.parse_args()
     if args.list_rules:
         if args.json:
@@ -13623,6 +13646,8 @@ def main():
                 continue
             lint_duplicate_keys(f)
             d = lint_component(f, comp_v)
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             # A KIT IS A PARTS LIST, NOT A DRAWING (#905): no size, no skin, no
             # elements, so the component rules below have nothing to read and
             # several would index the `size` a kit does not have. It takes the
@@ -13713,6 +13738,8 @@ def main():
                 continue
             lint_duplicate_keys(f)
             d = lint_device(f, dev_v, args.library); n += 1
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             if d is not None and d.get("kind") == "device":
                 lint_attrs_null(f, d)
                 lint_device_gap_scope(f, d)

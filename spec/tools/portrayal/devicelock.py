@@ -282,7 +282,7 @@ TOP_LEVEL_READ = {"version", "maturity", "aliases", "description", "profile", "l
 # Not read today. `format`, `kind` and `name` say what the file is and where it
 # lives; the rest are recorded here as unread, not as decided.
 TOP_LEVEL_UNREAD = {"format", "kind", "name", "manufacturer", "model", "part-numbers",
-                    "datasheet", "references"}
+                    "datasheet", "references", "audience"}
 
 
 # KEYS THAT NAME A SET, which the schema lets an author spell as one id or a

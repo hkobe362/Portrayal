@@ -674,12 +674,6 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.45.0: every lamp and digit a drawing declares can be set in a rack.** `configs[].states` lists
-what each configuration's faces declare (`data-states` on a `data-path`): `led-sys`, `psu-0/module/status-led`,
-`led-port-0/lamp`, `status-display/digit-1`, `breaker-a/rocker`, an outlet's lamp, as well as the outlets.
-`state.set` and `statesFor` take any of them and refuse the rest, naming what the device declares;
-`inspect` of a device gives `settable` (grouped by vocabulary) and `states` (what it is set to).
-
 **New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
 lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a
 vertical PDU's network card: `network-module/module/eth0`, `usb-0`), placed on the part by the bay's

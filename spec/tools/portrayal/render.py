@@ -4772,31 +4772,6 @@ def config_states(device, cfg_name, cfg, lib):
     return dict(sorted(out.items()))
 
 
-def drawn_states(placed, face_docs):
-    """`configs[].states` in full (P-0041): `config_states` (the parts a
-    placement declares) and every lamp or part the DRAWING declares, each by the
-    path the drawing gives it, which is the path the Explorer and a rack file
-    key by.
-
-    READ FROM THE FACES, NOT THE MANIFEST. A lamp on a seated PSU, a link lamp
-    bound to its port, a lamp the mapping form gives a jack, an optic's lamp:
-    none is a placement of this device, and each is a `data-states` on a
-    `data-path` of the drawing. `face_docs` are the elements documents of the
-    faces this configuration draws (elements.face_elements), so the file and
-    the drawing agree by construction. A placement's own answer wins for its
-    path; a path on two faces takes the union, in order. A display's readings
-    ride `data-messages`, not `data-states`, and are not listed here."""
-    out = {p: list(s) for p, s in placed.items()}
-    for doc in face_docs:
-        for row in doc.get("elements", ()):
-            path, names = row.get("path"), row.get("states")
-            if not path or not names or path in placed:
-                continue
-            have = out.setdefault(path, [])
-            have.extend(n for n in names if n not in have)
-    return dict(sorted(out.items()))
-
-
 def config_names(device, states):
     """`configs[].names` (docs/rack-file-v4-design.md section 4): the name a
     DCIM knows each settable part by, `{<path>: <name>}`, for the paths of
@@ -5836,9 +5811,6 @@ def main():
     _connectors = _connector_registry()
     _candidates = _pluggable_candidates(args.library)
     _default_occupants = (configs.get(default_cfg) or {}).get("occupants") or {}
-    cfg_states = {n: drawn_states(config_states(device, n, c, lib),
-                                  [faces[f] for f in files.get(n, {}).values() if f in faces])
-                  for n, c in configs.items()}
     cfg_index = {"device": device["name"], "model": device.get("model", ""),
                  # THE OTHER NAMES THIS BOX IS SOLD OR LISTED UNDER - an HCL's
                  # AS number, a marketing name, an OEM's name (#514). Names
@@ -5995,14 +5967,12 @@ def main():
                               # WHAT EACH PLACED PART CAN BE SET TO (#934):
                               # `{<placement id>: [state names]}`, the parts
                               # that declare any; `{}` on a device with none
-                              # AND EVERY LAMP THE DRAWING DECLARES (P-0041),
-                              # keyed by the path the drawing gives it
-                              "states": cfg_states[n],
+                              "states": config_states(device, n, c, lib),
                               # THE NAME A DCIM KNOWS EACH OF THOSE BY, where it
                               # is not the placement id: `{<placement id>:
                               # <name>}`, from the device's own `interfaces:`,
                               # as the device-type export names its outlets
-                              "names": config_names(device, cfg_states[n]),
+                              "names": config_names(device, config_states(device, n, c, lib)),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a
