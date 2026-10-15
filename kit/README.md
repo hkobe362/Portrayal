@@ -674,6 +674,13 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.45.0: a cable end on a view or port a seated part does not have is refused when it is added.**
+`cable.add` and `cable.update` (and so a dry run) refuse an end under a bay whose seated part is known and has
+no port at that path on that panel, with the sentence the loose-end finding gives (`bay-4 holds FHD-FAPM6-RJ45,
+whose port p1 is on the front panel; give view "front"`), and so does a made-up port of a passive panel
+(class `adapter-panel`) or the rear of a panel with no rear. A part's rear face is listed by `freePorts` from the
+reader of the rear panel, as for any panel. `partName` falls back to `attrs.model` before a raw ref.
+
 **New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
 lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a
 vertical PDU's network card: `network-module/module/eth0`, `usb-0`), placed on the part by the bay's
