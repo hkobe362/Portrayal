@@ -674,6 +674,11 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
+lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a
+vertical PDU's network card: `network-module/module/eth0`, `usb-0`), placed on the part by the bay's
+`at` and the slot's `mate`. `cable.add`, the route, `freePorts`, `inspect` and the exports follow.
+
 **New in 0.43.0: the 3D relief is built and drawn in batches.** `relief.js` rasterises a drawing once
 however often a face asks for it, keeping each raster by what decides its pixels (`rasterKey`; see
 `rasterSource`, `setRasterBudget`, `clearRasterCache`, `rasterStats`). Once a face is built,
