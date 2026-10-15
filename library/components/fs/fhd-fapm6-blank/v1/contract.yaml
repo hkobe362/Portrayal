@@ -1,0 +1,51 @@
+format: 1
+kind: module
+name: fhd-fapm6-blank
+version: 1.0.0
+class: adapter-panel
+behaviour: fills
+description: >-
+  FS FHD-FAPM6 multimedia modular panel with each of its six openings closed
+  by a blanking insert (FS #159373, white). No ports. A Portrayal
+  configuration of the FAPM6 (SKU 143239), not a separate FS SKU.
+size: {w: 108.97, h: 35.05, d: 9.6}
+size-confidence: {w: drawing, h: drawing, d: drawing}
+size-notes: >-
+  THE FAPM6's OWN FACE AND DEPTH, unchanged - see fs/fhd-fapm6@1.
+attrs: {media: multimedia, model: FHD-FAPM6-BLANK}
+body:
+  depth: 9.6
+  footprint: {at: [10.485, 0.125], size: [88.0, 34.8]}
+elements:
+  logo-zone: {at: [1.6, 3.2], size: [5.3, 5.0], class: label}
+parts:
+  - {id: blank1, ref: common/keystone-blank@1, at: [20.145, 18.52]}
+  - {id: blank2, ref: common/keystone-blank@1, at: [20.145, 1.62]}
+  - {id: blank3, ref: common/keystone-blank@1, at: [46.235, 18.52]}
+  - {id: blank4, ref: common/keystone-blank@1, at: [46.235, 1.62]}
+  - {id: blank5, ref: common/keystone-blank@1, at: [72.325, 18.52]}
+  - {id: blank6, ref: common/keystone-blank@1, at: [72.325, 1.62]}
+provenance:
+  size: >-
+    drawing - the FAPM6's, see size-notes.
+  parts: >-
+    SIX BLANKING INSERTS AT THE FAPM6's SIX CLIP POSITIONS. The blanking
+    insert datasheet (resource.fs.com/mall/doc/20231207141153wvi0lg.pdf) says
+    the insert fits a standard keystone opening, and names multimedia
+    copper/fibre panels among those it suits. Each fills the 16.5 x
+    14.9 opening, as the clip does; see common/keystone-blank@1 for what is
+    drawn and what is estimated.
+  ports: >-
+    NONE. An insert closes an opening and carries no connector; the panel
+    offers nothing to cable to, front or rear.
+  face-legends: >-
+    as the FAPM6: 2 over 1 left of the first column and 6 over 5 right of the
+    last; the middle pair carries no printed number.
+  knobs: >-
+    the FAPM6's, see fs/fhd-fapm6@1.
+  logo-zone: >-
+    reserved, not drawn - the library reproduces no vendor logo.
+  configuration: >-
+    NOT AN FS SKU. FS sells the FAPM6 (143239) and the inserts (#159373 and
+    others) separately; this part is the two assembled.
+skins: [default]

@@ -126,30 +126,40 @@ test('ctx.checkKept: a rack, a cable, an end or an item changed in place throws;
 // laid out flat: every solid in turn, its box grown by the cable's radius
 // for a ring's part or a zero-U part, the stretch strictly inside it, and
 // left out where that stretch lies in a hole the cable fits.
+// P-0016: a hole is judged on the stretch inside the TRUE plate, not the grown
+// one, which ends up to a radius outside a hole cut through the plate.
 function reference(a, b, solids, diameter) {
   const out = [], AX = ['x', 'y', 'z'], EPS = 1e-6;
-  for (const s of solids) {
-    let box = s.box;
-    if ((/^ring\/[^/]+\/./.test(String(s.part ?? '')) || s.zeroU === true) && diameter > 0) {
-      const r = diameter / 2;
-      box = {x0: box.x0 - r, x1: box.x1 + r, y0: box.y0 - r, y1: box.y1 + r, z0: box.z0 - r, z1: box.z1 + r};
-    }
-    let t0 = 0, t1 = 1, hit = true;
+  const stretch = (box) => {
+    let t0 = 0, t1 = 1;
     for (const k of AX) {
       const lo = box[`${k}0`] + EPS, hi = box[`${k}1`] - EPS;
-      if (!(hi > lo)) { hit = false; break; }
+      if (!(hi > lo)) return null;
       const p = a[k], dv = b[k] - a[k];
-      if (Math.abs(dv) < 1e-12) { if (p <= lo || p >= hi) { hit = false; break; } continue; }
+      if (Math.abs(dv) < 1e-12) { if (p <= lo || p >= hi) return null; continue; }
       let u = (lo - p) / dv, v = (hi - p) / dv;
       if (u > v) [u, v] = [v, u];
       t0 = Math.max(t0, u); t1 = Math.min(t1, v);
-      if (t1 - t0 <= 1e-9) { hit = false; break; }
+      if (t1 - t0 <= 1e-9) return null;
     }
-    if (!hit) continue;
+    return [t0, t1];
+  };
+  for (const s of solids) {
+    let box = s.box;
+    const grown = (/^ring\/[^/]+\/./.test(String(s.part ?? '')) || s.zeroU === true) && diameter > 0;
+    if (grown) {
+      const r = diameter / 2;
+      box = {x0: box.x0 - r, x1: box.x1 + r, y0: box.y0 - r, y1: box.y1 + r, z0: box.z0 - r, z1: box.z1 + r};
+    }
+    const span = stretch(box);
+    if (!span) continue;
+    const [t0, t1] = span;
     const at = t => ({x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t});
     const p = at(t0), q = at(t1);
+    const own = grown ? stretch(s.box) : null;
+    const [hp, hq] = own ? [at(own[0]), at(own[1])] : [p, q];
     const within = (pt, h) => AX.every(k => pt[k] >= h[`${k}0`] - EPS && pt[k] <= h[`${k}1`] + EPS);
-    if ((s.holes || []).some(h => within(p, h.box) && within(q, h.box) && diameter <= Math.min(...h.size) + 1e-9)) continue;
+    if ((s.holes || []).some(h => within(hp, h.box) && within(hq, h.box) && diameter <= Math.min(...h.size) + 1e-9)) continue;
     out.push({solid: s, t0, t1, at: p});
   }
   return out.sort((x, y) => x.t0 - y.t0);

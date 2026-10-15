@@ -224,6 +224,13 @@ The rest earns its place:
   the bottom of the envelope, its `lip`, its `run`, the tie slots cut in it
   (`ties`) and how it holds slack. Both travel with every placement of the
   part; L138 and L170 hold them inside it. See `docs/cable-lay-design.md`.
+- `lid: true` for a hinged or removable cover that opens over a duct - the
+  cover of a finger duct clips off its finger tips. A pass-through
+  (`passes:` on a device view) may lie under a lid, because a cable crosses
+  once it is open; under any other placed part L136 still refuses it. Say it
+  only where the vendor's own sources show the cover opening, and put that
+  source in `provenance`. It is not a solid body and it changes nothing in
+  the drawing.
 - `facet` on a relief feature, and `on` on a part, for connectors on a
   surface angled off the panel. See
   `docs/tilted-facets-design.md`.

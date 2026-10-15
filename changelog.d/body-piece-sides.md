@@ -27,7 +27,7 @@
   and the standoff behind the bracket below the card is drawn.
 
 ### Changed
-- **`@portrayal/kit` is 0.35.0.** `relief.js` exports `pieceFitted`,
+- **`@portrayal/kit` is 0.45.0.** `relief.js` exports `pieceFitted`,
   `shownOptions` and `SIDES`; `pieceArtCrop` takes the four sides with an
   `{at, depth}` argument; `svgCanvas` takes an optional raster density. A
   page that uses neither key draws as before.

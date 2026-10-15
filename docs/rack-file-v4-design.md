@@ -703,6 +703,20 @@ end play plus the inside ends plus the tolerance equals the stock length.
   applied to `coil` and `serpentine`, which both turn the cable on the
   floor, and not to `spool`, which is refused instead on a tray that states
   no spool.
+- **It records spare in a finger duct** (kit 0.35.0), as a technician
+  stores a service loop: the duct of a horizontal manager, of a rack-face
+  bracket, or of a vertical manager beside the rack, when the cable's route
+  uses it (names it, or runs a lane through it). Which pathway kinds hold
+  spare is one table, `SPARE_HOLDS` in `kit/rack/slack.js`: a tray and a
+  duct do; a ring (a lacer bar's too) and a pass-through do not. A ring, a
+  pass-through, a duct off the route and a name the part does not have are
+  refused, and the refusal ends with where the cable's spare can go. A loop
+  in a duct counts as one more cable for each length of the duct it takes,
+  against the cable count the part states (`capacity`, on the basis
+  `route.js capacityOver` uses), and is refused past it; a part that states
+  no count accepts it with a finding (`spare-capacity-unstated`). No
+  capacity is ever assumed; an estimated one is marked
+  (`capacity.estimated`, cable-managers-design.md section 15) and said to be one.
 - **It does not judge how much a tray holds,** and does not refuse or warn
   for a full one (decision 13).
 - **It does not place spare on its own** (decision 8). A cable with no
@@ -711,7 +725,9 @@ end play plus the inside ends plus the tolerance equals the stock length.
   says so, as a waypoint that no longer resolves is kept and reported.
 - **It marks it.** In 2D and 3D a stored entry is a tag at the tray with the
   length (the marked loop decided 2026-10-09, without a shape), and an
-  `{end}` entry a tag at that port. Nothing else is drawn, and the legend
+  `{end}` entry a tag at that port. A duct entry is tagged where
+  `spareMarks` puts it: a rack item's duct at its own point, a duct beside
+  the rack at the middle of the cable's run inside it. Nothing else is drawn, and the legend
   says "Spare cable is listed, not drawn."
 - **The finding.** A cable with more than 0.3 m to store and no `slack` key
   (`UNPLACED_WARN_M`) gives `spare-unplaced`: "c2 has 0.38 m to store and no

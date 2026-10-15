@@ -10,7 +10,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "d631323c0ba133d5",
+ "gaps": "00eb9d47adcb43e7",
  "groups": [
   "body",
   "cover",
@@ -95,6 +95,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "a018f448e79bfb67",
- "surface": "8a8c7219eb4f363d",
- "version": "0.1.2"
+ "surface": "bbf0f30900d69818",
+ "version": "0.1.3"
 }

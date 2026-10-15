@@ -674,7 +674,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.35.0: a body piece carries a side drawing, and a fitted piece follows its field.**
+**New in 0.45.0: a body piece carries a side drawing, and a fitted piece follows its field.**
 A piece in `body.boxes` that `shows: [left|right|top|bottom]` is painted on that side with the patch
 of the part's own `body-<side>.svg` it lies under (`pieceArtCrop` in `relief.js` gives the frames;
 `components.json` publishes each drawing under `body.drawings` with its viewBox origin as `at`).
@@ -683,6 +683,93 @@ of those options (`pieceFitted`, `shownOptions`), so `setFields` on the part's p
 it, and the scene is rebuilt as for any field that shows a node. `svgCanvas` takes an optional
 density, `pxmm`. A page that does neither changes nothing. `kit/component.html` opens one component
 in the 3D viewer with camera presets and its choice fields.
+
+**New in 0.44.0: a cable ends on a port of a module in a bay of a part beside the rack.** `zeroUEnds`
+lists the connector slots of the module each bay of a zero-U part holds, as `<bay>/module/<port>` (a
+vertical PDU's network card: `network-module/module/eth0`, `usb-0`), placed on the part by the bay's
+`at` and the slot's `mate`. `cable.add`, the route, `freePorts`, `inspect` and the exports follow.
+
+**New in 0.43.0: the 3D relief is built and drawn in batches.** `relief.js` rasterises a drawing once
+however often a face asks for it, keeping each raster by what decides its pixels (`rasterKey`; see
+`rasterSource`, `setRasterBudget`, `clearRasterCache`, `rasterStats`). Once a face is built,
+`batchRelief` shares equal textures and materials and merges the meshes that share a material, a part
+(`userData.portrayalPath`) and a frame. A host that styles only some parts by path names them with
+`ctx.parts(path)` to merge the rest across parts; `ctx.batch: false` builds a face as before. A USDZ
+now carries the relief boxes it used to leave out. **A page that vendors the kit changes nothing to
+keep its hover, dimming and covers; passing `parts` is optional.**
+
+**New in 0.42.0: a power cord reaches a vertical PDU's outlet from beside it.** A leg that lands on the
+outward face of a zero-U part is taken in past the side that faces the rails, at the outlet's height,
+and no longer over the top or under the foot; the crossing finding does not count the body of the part
+a cable ends on, at that end; and a four-post offers `left-rear-inner` (and `right-rear-`, `left-front-`,
+`right-front-`) between a rail and a part beside it, listed by `waypointLanesOf(frame)` and `inspect`'s
+`lanes`. The routed length of such a cord follows. **A page that vendors the kit re-vendors it, and
+changes nothing else.**
+
+**New in 0.41.0: the 3D build looks ids up from a map.** `cablePoints` and `extractRelief`
+(`relief.js`) found each cable point's feature and each cavity's node with a selector per lookup.
+Each now reads an id map (one per drawing, or per marker host), with the same results, warnings and
+first-match order; the gain is in a drawing that is not attached to the page. **A page that vendors
+the kit changes nothing.**
+
+**New in 0.40.0: an estimated duct capacity says it is an estimate.** A stored loop in a part whose
+capacity is an estimate (`attrs.performance.cable-capacity-estimated`) reads "an estimated 54 cat6
+cables' worth" in `cable.slack` and its findings (`spare-capacity-estimated` within the count), and
+`inspect` and `rack.json` carry `capacity.estimated: true`. A part that states none keeps
+`spare-capacity-unstated`. **A page that vendors the kit changes nothing.**
+
+**New in 0.39.0: fixes to spare in ducts.** `cable.slack` refuses an amount larger than the cable's
+spare (what is already stored counts toward it) and any spare on a short cable, and says how much
+spare there is or how short the cable is. A duct's cable count is the cable's own kind: a fibre cable
+is not counted against a count of Cat6, and a finding says so. A route summary names a window the
+route goes through (`windowsOf` in `rack/route.js`), and names a part beside the rack by its label
+and, where another part shares the label, its id. **A page that vendors the kit changes nothing; a
+`cable.slack` that was accepted may now be refused.**
+
+**New in 0.38.0: a cable ends on an outlet of a zero-U PDU.** An end may be `{item, path, view}`
+on a part beside the rack (`item: 'z3'`, `path: 'outlet-a2'`), on one of its own connector slots.
+The commands, `settleEnds`, the routes, `freePorts`, `inspect` and the exports find it as they find
+a port of a device. Its place is the slot's `mate` in `configs.json`, so **a route context needs
+`slotsOf` and `compByRef`** (what `loadSlots` returns) to measure a cord to it; without them the
+cord has no length, as for a port not found. `freePorts(rack, 'z3', ctx, {type: 'C39', near: 35})`
+lists the free C39 outlets nearest U35. A page that draws cords reads the plug each end takes from
+the settled facts (`info.plug`): at a slot that takes two, it pairs with the far end's plug.
+
+**New in 0.37.0: an agent is told what a person sees** (P-0018). `describe`'s `Findings:` line now counts
+the cables whose route would enter and leave a ring by one face (`2 cables enter and leave a ring by one
+face (c1, c2)`) and the cords shorter than their route needs (for example `2 cords are shorter than their route needs (the
+worst c2, 1.14 m short)`), as the Warnings panel does; `inspect` of a cable carries `route.ring_findings`, a list of
+`{item, via, text}`, from the new `ringFindingsOf(rack, cable, ctx, nameOf, path)` in `rack/route.js`
+(`ringFindings` is now one call of it for each cable); a short cord was already in its `spare_findings`.
+A bend of one turn that is at a stop of the route has `stop`, that waypoint, in `routePath`'s `bends`, in
+`bendFindingsOf` and in `inspect`'s `route.bends`, and its sentence names it before the two stops either side
+(`c1 turns 90 degrees at right-front U20, between lacer ring 1 and right-front U30, with room for ...`); a corner in a
+lead or a detour has no `stop` and reads as before. `cable.lay`, when the routes are known, refuses a
+`position` past the number of cables whose routes pass through the pathway, and one for a cable that does not
+pass through it, and says of a face on a ring or a duct that it is one. **A page that shows a bend's sentence
+shows the new wording without a change; a page that lists a cable's findings adds `route.ring_findings`; the
+text of `describe` has two new clauses, and a page or an agent that parses it adds them.**
+
+**New in 0.36.0: a cable crosses a vertical manager through its back windows** (P-0016). A cable
+routed front to rear past a full-height vertical duct used to go over the top of the duct, because
+`legCrossings` judged a window on the plate grown by the cable's radius, where no cable fits. A window
+is now judged on the true plate, so a cable at a window's height crosses straight, and `waysRound`
+tries a zero-U part's holes, nearest first, before its top or bottom edge, so a cable routed at a
+height with no window crosses at the nearest window. Horizontal managers are routed as before.
+`pointOf` also puts the duct waypoint of a narrow rack-face part on a rail (the CMV-5U3W) on the
+part, where it was at the rack's centre. **A page that vendors the kit changes nothing; the cables
+through a vertical or the 5U bracket measure shorter or longer, as they are really laid.**
+
+**New in 0.35.0: spare in a finger duct, and a part beside the rack in a route.** `cable.slack`
+stores a cable's spare in a duct its route uses, a horizontal manager's, a rack-face bracket's or a
+vertical manager's beside the rack, as well as on a tray or at an end. `SPARE_HOLDS` in
+`rack/slack.js` is the one rule for which pathway kinds hold spare. A refusal says where the spare
+can go (`whereText`). A duct is counted against the capacity its part states (`spareLoad`), and
+`spareMarks(rack, cable, ctx)` gives the point, in rack millimetres, a page draws each stored loop
+at. A route may name a zero-U part's duct (resolved as the lane run through it) or a window
+(`pass-through-N`), and a pathway by its spoken name (`pathwayId`); `routeText` takes a fourth
+argument, `ductsThrough(rack, chassisOf, nameOf)`, to say a lane run goes through a duct.
+**A page that draws stored spare calls `spareMarks`; one that does not changes nothing.**
 
 **New in 0.34.0: a power cord is drawn at its own diameter** (#1060). Every cable was drawn `WIDTH`
 (3 mm) wide, so a power cord, 7.1 mm, was a thin line going into a plug stub drawn at the cord's real
