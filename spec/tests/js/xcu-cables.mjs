@@ -221,16 +221,17 @@ test('a bay of the drawer that holds a blind cover offers no port, and is not re
   const got = add(bare, end(OLT_A, 'port-1'), end(bare.items.find(i => i.id === SC.id), `${SLOT(1)}/sc01`));
   // the catalogue does not answer for it, so the end is kept as given and the page's drawing decides
   assert.equal(got.error, undefined);
+  assert.notEqual(P.seatedPort(bare.items.find(i => i.id === SC.id), end(SC, `${SLOT(1)}/sc01`), ctx)?.port, true, 'no port is offered');
 });
 
 // ── the free ports ───────────────────────────────────────────────────────
 test('the free ports of an XCU offer the inner face of every adapter, with its view', async () => {
   const portsOf = async () => [];
-  for (const [item, n] of [[SC, 48], [LC, 24 + 12 - 6]]) {
+  for (const [item, n] of [[SC, 48], [LC, 12 + 3 * 6]]) {
     const free = await Q.freePorts(BARE, item.id, {...ctx, portsOf});
     const rear = free.filter(p => p.view === 'rear');
-    assert.ok(rear.length >= n - 12 && rear.every(p => /\/module\/b\d+$/.test(p.path)), `${item.cfg}: ${rear.length} inner ends`);
-    if (item === SC) assert.equal(rear.length, 48);
+    assert.ok(rear.every(p => /\/module\/b\d+$/.test(p.path)));
+    assert.equal(rear.length, n, `${item.cfg}: ${rear.length} inner ends`);
     assert.ok(rear.some(p => p.path === `${SLOT(1)}/b01`));
   }
   // one that has a cable is not offered
