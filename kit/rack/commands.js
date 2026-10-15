@@ -21,7 +21,7 @@ import {configFacts} from './catalog.js';
 import {placement, moveItem, managersOf} from './managers.js';
 import {canCable, withCable, updateCable, cablesOf, cableName, endName, endKey, parseColor,
         connectorOf, mediaKind, portPathOf, isElementId, elementIdReason, MEDIA, MEDIA_LABELS} from './cable-rules.js';
-import {portIdsOf, zeroUEnds, zeroUEndsText} from './ports.js';
+import {portIdsOf, zeroUEnds, zeroUEndsText, seatedEndReason} from './ports.js';
 import {validate, same} from './validate.js';
 import {withRoutedLengths, pathwaysOf, waypointLanesOf, resolveRoute, pathwaysAt, zeroUPathways, pathwayId} from './route.js';
 import {slotsFor, slotEnv, resolverFor, holdsAt, partName, partOf} from './slots.js';
@@ -659,10 +659,16 @@ function zeroUEndRefused(rack, ends, ctx) {
   }
   return null;
 }
+// AN END ON A VIEW OR PORT THAT A SEATED PART DOES NOT HAVE is refused with the
+// sentence the loose-end finding gives (ports.js seatedEndReason).
+function seatedEndRefused(rack, ends, ctx) {
+  const why = seatedEndReason(rack, ends, ctx);
+  return why ? {error: `${why}.`} : null;
+}
 function cableAdd(rack, {a, b, media = '', purpose = '', label = '', length = null, color = null}, ctx) {
   const {chassisOf} = ctx;
   if (!hasEnd(rack, a.item) || !hasEnd(rack, b.item)) return {error: NOT_ADDED};
-  const refused = endRefused([a, b]) ?? zeroUEndRefused(rack, [a, b], ctx);
+  const refused = endRefused([a, b]) ?? zeroUEndRefused(rack, [a, b], ctx) ?? seatedEndRefused(rack, [a, b], ctx);
   if (refused) return refused;
   const tint = parseColor(color);
   if (!tint.ok) return {error: tint.reason};
@@ -685,7 +691,8 @@ function cableUpdate(rack, {id, a, b, ...p}, ctx) {
   const ends = {a: a ? endOf(a) : c.a, b: b ? endOf(b) : c.b};
   const moved = ['a', 'b'].filter(k => endKey(ends[k]) !== endKey(c[k]));
   if (moved.some(k => !hasEnd(rack, ends[k].item))) return {error: GONE};
-  const refused = endRefused(moved.map(k => ends[k])) ?? zeroUEndRefused(rack, moved.map(k => ends[k]), ctx);
+  const refused = endRefused(moved.map(k => ends[k])) ?? zeroUEndRefused(rack, moved.map(k => ends[k]), ctx)
+    ?? seatedEndRefused(rack, moved.map(k => ends[k]), ctx);
   if (refused) return refused;
   const uOf = heightOf(chassisOf);
   if (moved.length) {
