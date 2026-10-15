@@ -48,7 +48,7 @@ def touched_devices():
         mbase = preflight.merge_base(ROOT, "origin/main")
         ctx = preflight.Context(ROOT, mbase, preflight.changed_files(ROOT, mbase))
         devices, _contracts, full, _majors = preflight.lint_plan(ctx)
-    except Exception as e:                         # no git, no origin/main: the sample alone
+    except (Exception, SystemExit) as e:           # no git, no origin/main (preflight exits): the sample alone
         warnings.warn(f"part conformance: the touched set is unknown ({type(e).__name__})")
         return []
     if full:
@@ -67,7 +67,7 @@ def test_part_conformance_report(tmp_path):
     """Run the sample and the touched devices, write the report, fail on nothing."""
     try:
         _report(tmp_path)
-    except Exception as e:                  # report-only: nothing in here may fail the suite
+    except (Exception, SystemExit) as e:    # report-only: nothing in here may fail the suite
         warnings.warn(f"part conformance: the report could not be made ({type(e).__name__}: {e})")
 
 
