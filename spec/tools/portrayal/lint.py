@@ -44,7 +44,7 @@ from portrayal.manifest import (view_parts, targets, split_target, presented_int
                       component_refs, load_yaml, nested_key_host, chained_occupant_ref,
                       drawn_refs, seat_point, slot_default, spanned_slots,
                       spanning_axis, _turn,
-                      occupant_spec,
+                      occupant_spec, seated_ref, slot_width, span_covers, span_clashes,
                       PANEL_KEY_ORDER, COMPONENT_KEY_ORDER, config_power, OFFERED_KINDS,
                       resolve_views)
 from jsonschema import Draft202012Validator
@@ -653,6 +653,12 @@ RULES = {
              ERROR),
     "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
              "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
+             ERROR),
+    "L185": ("component",  "a bay's `span` names other bays of the same component, each the same size, `rotate` and `mirror`, following one another along the card's component side (the bay's own +y, turned by its `rotate`, which is 0 or 180) with no gap wider than a bay and no step sideways; a bay that accepts a part `n` slots wide names at least `n - 1` of them; and a part that composes a part wider than one slot is at least that wide itself", "fix the ids or the bays' geometry; add the covered bay to `span`, or take the wide part out of `accepts`; give the composing part the `slot-width` of what it composes",
+             "A card two slots wide is drawn across its bay and the next one and covers that one, so a span that names the wrong bay, a bay in the wrong place or none at all puts the card over the wrong opening or offers it where it cannot go.",
+             ERROR),
+    "L186": ("component, device", "a card wider than one slot and a bay it covers are never both filled - by a configuration, or by what the bays ship", "empty the covered bay (`<carrier>/<bay>: \"\"` in the configuration), or seat a one-slot part; a component does not ship a two-slot default over a bay that ships one too",
+             "A two-slot card covers the opening beside its own, so a card and anything in that opening at once describes hardware that cannot exist, and the build refuses to draw it.",
              ERROR),
 }
 
@@ -4375,6 +4381,144 @@ def lint_component_slots(path, data, _lib_roots=None):
                 if want != have:
                     err(path, "L75", f"bay {bid}: slot says lanes {have[0]}, {have[1]} height, "
                                      f"{have[2]} length, processor {have[3]} but the attr reads {prose!r}")
+
+
+# How far a spanned bay may sit off the line the span runs along, and past one
+# bay's own height from the one before it, before L185 calls it a gap.
+SPAN_TOLERANCE_MM = 0.5
+
+
+def _bay_box(b):
+    sz = b.get("size")
+    w, h = (sz["w"], sz["h"]) if isinstance(sz, dict) else (sz[0], sz[1])
+    return float(b["at"][0]), float(b["at"][1]), float(w), float(h)
+
+
+def lint_component_span(path, data, lib_roots):
+    """L185: a bay's `span`, and the parts that need one
+    (docs/pcie-two-slot-bays-design.md, R1, R2 and R6).
+
+    A two-slot card is drawn in the box its bay and the bays it covers make
+    together (manifest.span_box), and that is only the right box if those bays
+    are the ones beside it, on the side the card's cooler hangs. So each id is
+    another bay of this component - a bay in another riser is not a sibling,
+    and a card across two risers would come apart - of the same size, turn and
+    hand, and each follows the last along the bay's own +y turned by its
+    `rotate`: below it at 0, above it at 180. A quarter turn is refused until a
+    riser needs one. And the two sides meet: a bay that accepts a part wider
+    than one slot names enough bays to cover, and a card that composes the
+    two-slot bracket is two slots wide itself.
+    """
+    bays = data.get("bays") or {}
+
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    for bid, b in sorted(bays.items()):
+        if not isinstance(b, dict) or not b.get("at") or not b.get("size"):
+            continue
+        span = b.get("span") or []
+        if span:
+            turn = int(b.get("rotate") or 0) % 360
+            if turn not in (0, 180):
+                err(path, "L185", f"bays/{bid}: `span` on a bay at rotate {b.get('rotate')} - "
+                    "only a bay at 0 or 180 can span, until a riser turns its slots a quarter")
+                continue
+            prev, prev_id = b, bid
+            for sid in span:
+                sib = bays.get(sid)
+                if sid == bid or not isinstance(sib, dict) or not sib.get("at") or not sib.get("size"):
+                    err(path, "L185", f"bays/{bid}: span names {sid!r}, which is not another "
+                        "bay of this component - a card spans its own carrier's bays only")
+                    break
+                bx = _bay_box(b)
+                sx = _bay_box(sib)
+                if (abs(bx[2] - sx[2]) > 0.01 or abs(bx[3] - sx[3]) > 0.01
+                        or int(sib.get("rotate") or 0) % 360 != turn
+                        or bool(sib.get("mirror")) != bool(b.get("mirror"))):
+                    err(path, "L185", f"bays/{bid}: spans {sid}, which is not the same size, "
+                        "rotate and mirror - a card covering it would not fit it")
+                    break
+                px = _bay_box(prev)
+                dx, dy = sx[0] - px[0], sx[1] - px[1]
+                along = dy if turn == 0 else -dy
+                if abs(dx) > SPAN_TOLERANCE_MM or not 0 < along <= bx[3] + SPAN_TOLERANCE_MM:
+                    side = "below" if turn == 0 else "above"
+                    err(path, "L185", f"bays/{bid}: spans {sid}, which is not the next bay "
+                        f"{side} {prev_id} - a two-slot card covers the bay on its component "
+                        f"side, here {side} it (offset {dx:g}, {dy:g})")
+                    break
+                prev, prev_id = sib, sid
+        for ref in b.get("accepts") or []:
+            c = _res(ref)
+            width = slot_width(c)
+            if width > 1 and span_covers(b, width) is None:
+                err(path, "L185", f"bays/{bid}: accepts {ref}, which is {width} slots wide, "
+                    f"and names {len(span)} bay(s) in `span` for it to cover")
+    own = slot_width(data)
+    for q in data.get("parts") or []:
+        if not isinstance(q, dict) or not q.get("ref"):
+            continue
+        width = slot_width(_res(q["ref"]))
+        if width > own:
+            err(path, "L185", f"parts/{q.get('id')}: composes {q['ref']}, which is {width} "
+                f"slots wide, and this part says it is {own} - give it `slot-width: {width}`")
+
+
+def lint_component_span_exclusion(path, data, lib_roots):
+    """L186, component side: a carrier does not SHIP a two-slot default over a
+    bay that ships one too. The device side below catches a configuration."""
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    for bid, sref, cid, held in span_clashes(data.get("bays") or {}, {}, lambda b: b, _res):
+        if cid is not None:
+            err(path, "L186", f"bays/{bid}: ships {sref}, which covers {cid}, and {cid} "
+                f"ships {held} - a carrier ships one or the other")
+
+
+def lint_device_span_exclusion(path, data, lib_roots):
+    """L186, device side: a configuration does not seat a card wider than one
+    slot over a bay that holds something (docs/pcie-two-slot-bays-design.md,
+    R2). HOLDS MEANS AFTER DEFAULTS RESOLVE, as the build reads it
+    (manifest.span_clashes): a riser bay ships a filler, so a configuration
+    that seats a two-slot card in `riser-1/slot-1` empties `riser-1/slot-2`.
+    A card in a bay that spans too few is reported too; L185 says why."""
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    dev_bays = {}
+    for _v, view in (data.get("views") or {}).items():
+        for b in view_parts(view or {})["bays"]:
+            if b.get("id"):
+                dev_bays.setdefault(b["id"], b)
+
+    def walk(cname, cfg_bays, key, ref, depth):
+        contract = _res(ref) if ref else None
+        bays = (contract or {}).get("bays") or {}
+        if not bays or depth > 3:
+            return
+        key_of = (lambda b: f"{key}/{b}")
+        for bid, sref, cid, held in span_clashes(bays, cfg_bays, key_of, _res):
+            width = slot_width(_res(sref))
+            if cid is None:
+                err(path, "L186", f"configurations/{cname}/bays: {key_of(bid)} holds {sref}, "
+                    f"which is {width} slots wide, in a bay that spans too few to cover")
+            else:
+                err(path, "L186", f"configurations/{cname}/bays: {key_of(bid)} holds {sref}, "
+                    f"which covers {key_of(cid)}, and {key_of(cid)} holds {held} - empty it "
+                    f"({key_of(cid)}: \"\")")
+        for bid, b in bays.items():
+            if isinstance(b, dict):
+                walk(cname, cfg_bays, key_of(bid), seated_ref(cfg_bays, key_of(bid), b), depth + 1)
+
+    for cname, cfg in (data.get("configurations") or {}).items():
+        cfg_bays = (cfg or {}).get("bays") or {}
+        for bid, b in dev_bays.items():
+            walk(cname, cfg_bays, bid, seated_ref(cfg_bays, bid, b), 1)
 
 
 def lint_component_states_render(path, data, lib_roots):
@@ -13700,6 +13844,8 @@ def main():
                 lint_component_cable_od(f, d)
                 lint_component_lamp_colour(f, d)
                 lint_component_slots(f, d)
+                lint_component_span(f, d, args.library)
+                lint_component_span_exclusion(f, d, args.library)
                 lint_component_rj45_lamps(f, d, args.library)
                 lint_component_groups(f, d, args.library)
                 lint_component_part_interfaces(f, d, args.library)
@@ -13742,6 +13888,7 @@ def main():
                 lint_quoted_prose(f, d)
                 lint_device_component_attrs_resolve(f, d)
                 lint_device_spanned_exclusion(f, d, args.library)
+                lint_device_span_exclusion(f, d, args.library)
                 lint_device_bevel(f, d, args.library)
                 lint_device_passes(f, d, args.library)
                 lint_device_logo_zone(f, d)
