@@ -229,6 +229,12 @@ def _placement_attrs(doc):
 #                     feed (major); stating one where there was none is the
 #                     export gaining a fact and losing nothing (minor). Since
 #                     #934 `through` may name a fixed breaker placement too.
+#   `dc`              (placement) the side, voltage, rating and pole roles a
+#                     placement sets on its part's DC ports. A feed is judged
+#                     by them, so changing or dropping one is a major and
+#                     stating one where there was none a minor, as `fed-by`.
+#                     Nothing exports them yet; they are sorted now so the
+#                     first placement to state one is not stated in silence.
 #   `lines`           (placement) the conductors a breaker, or an outlet with
 #                     no breaker, is wired across (#934). The export writes
 #                     them on each outlet's description and decides `feed_leg`
@@ -259,7 +265,7 @@ BAY_HASHED = {"id", "at", "size", "rotate", "mirror", "default", "accepts",
 PLACEMENT_GEOMETRY = {"inset", "lift", "in", "under", "only-in", "optional",
                       "interfaces", "opening", "floor", "plan", "rear"}
 PLACEMENT_ADDRESSING = {"for", "rel-pos", "interface", "fed-by", "through",
-                        "lines"}
+                        "lines", "dc"}
 PLACEMENT_SURFACE = {"states", "description", "provenance", "physical-context",
                      "frames", "positions"}
 # MEMBERSHIP - which adjustment a placed thing slides with
@@ -843,7 +849,7 @@ def _addressing_bump(old, new):
         if any(now.get(key) != value for key, value in was.items()
                if key in still_here):
             return "major"              # rebound, renumbered or unstated
-    for field in ("for", "interface", "fed-by", "through", "lines"):
+    for field in ("for", "interface", "fed-by", "through", "lines", "dc"):
         if set(now_all.get(field) or {}) - set(was_all.get(field) or {}):
             return "minor"              # bound, opened or fed where it was not
     return None
@@ -1341,7 +1347,7 @@ def check(library: pathlib.Path):
                             "plan, rear)")
             if _addressing_bump(was, now) is not None:
                 what.append("placement addressing (for, rel-pos, interface, "
-                            "fed-by, through, lines)")
+                            "fed-by, through, lines, dc)")
             if "placement-surface" in was and \
                     was["placement-surface"] != now["placement-surface"]:
                 what.append("placement surface (states, description, "
