@@ -2,6 +2,9 @@
 # Build what the tests, the linter and the viewer read: rendered device SVGs
 # and the JSON indexes. NOT the DCIM exports - see publish.sh.
 set -euo pipefail
+# the caller's folder, for the overlay paths below: they are given relative to
+# where the caller stands, and this script moves to the checkout next
+CALLER_PWD="$PWD"
 cd "$(dirname "$0")"
 # Every stage below runs a tool by path, and by path the tools import whichever
 # checkout was pip-installed, not this one. This pins them here and stops the
@@ -16,16 +19,88 @@ cd "$(dirname "$0")"
 # `--device NAME` is the edit-check loop: lint that device against only the
 # components it reaches, re-render just it, and refresh the indexes so the
 # viewer is consistent. Repeatable.
+#
+# `--overlay-library DIR --overlay-out DIR` builds an OVERLAY instead of the
+# public library: a second library, in another folder, whose devices use this
+# one's parts (spec/tools/portrayal/overlay.py says why it can only add). See
+# the overlay branch below.
 FAST=0
 DEVSEL=()
+OVERLAY=""
+OVERLAY_OUT=""
+abs() { case "$1" in /*) printf '%s\n' "${1%/}" ;; *) printf '%s\n' "${CALLER_PWD%/}/${1%/}" ;; esac; }
 while [ $# -gt 0 ]; do
   case "$1" in
     --fast|-f) FAST=1; shift ;;
     --device) DEVSEL+=("$2"); FAST=1; shift 2 ;;
+    --overlay-library) OVERLAY="$(abs "$2")"; shift 2 ;;
+    --overlay-out) OVERLAY_OUT="$(abs "$2")"; shift 2 ;;
     --) shift; break ;;
     *) break ;;
   esac
 done
+
+# THE OVERLAY BUILD REPLACES THE PUBLIC ONE, IT DOES NOT FOLLOW IT. It lints the
+# overlay (only its files; the public library has its own run), renders the
+# overlay's devices against the public parts plus the overlay's own, and writes
+# the overlay's indexes - devices.json, components.json, each device's
+# configs.json, rack.json - to --overlay-out and nowhere else. library/dist is
+# never read or written, so it is the same bytes with and without an overlay;
+# the kit reads the two dists side by side (kit/dist.js).
+if [ -n "$OVERLAY" ] || [ -n "$OVERLAY_OUT" ]; then
+  if [ -z "$OVERLAY" ] || [ -z "$OVERLAY_OUT" ]; then
+    echo "--overlay-library and --overlay-out go together" >&2; exit 2
+  fi
+  if [ $# -gt 0 ] || [ "$FAST" = 1 ]; then
+    echo "an overlay build is always whole and writes only --overlay-out: no --fast, --device or out folder" >&2
+    exit 2
+  fi
+  if [ ! -d "$OVERLAY" ]; then echo "--overlay-library $OVERLAY is not a folder" >&2; exit 2; fi
+  here="$(pwd -P)"
+  real_out="$(realpath -m "$OVERLAY_OUT")"; real_ov="$(realpath "$OVERLAY")"
+  if [ "$real_out" = "$real_ov" ] || [ "$real_out" = "$here" ] \
+     || [[ "$real_out/" == "$here/library/"* ]] || [[ "$real_ov/" == "$real_out/"* ]] \
+     || [[ "$here/" == "$real_out/"* ]]; then
+    echo "--overlay-out $OVERLAY_OUT must be a folder of its own: not the overlay, not inside library/, not a parent of either" >&2
+    exit 2
+  fi
+  python3 spec/tools/portrayal/overlay.py check --library library --overlay "$OVERLAY"
+  if [ "${NO_LINT:-0}" != 1 ]; then
+    python3 spec/tools/portrayal/lint.py --schemas spec/schemas --library library \
+      --library "$OVERLAY" --only-root "$OVERLAY"
+  fi
+  # a previous overlay build is replaced; any other folder is not ours to empty
+  if [ -e "$OVERLAY_OUT" ] && [ -n "$(ls -A "$OVERLAY_OUT")" ] && [ ! -f "$OVERLAY_OUT/devices.json" ]; then
+    echo "--overlay-out $OVERLAY_OUT is not empty and holds no earlier overlay build; refusing to empty it" >&2
+    exit 2
+  fi
+  rm -rf "$OVERLAY_OUT"
+  mkdir -p "$OVERLAY_OUT"
+  JOBS="${JOBS:-$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
+  python3 -c "
+import sys
+from portrayal import lint, render
+lint._id_corpus(sys.argv[1:])
+render._pluggable_candidates(sys.argv[1:])
+" library "$OVERLAY"
+  if compgen -G "$OVERLAY/devices/*/*/device.yaml" >/dev/null; then
+    ls "$OVERLAY"/devices/*/*/device.yaml \
+      | xargs -P "$JOBS" -I{} python3 spec/tools/portrayal/render.py {} \
+          --library library --library "$OVERLAY" --out "$OVERLAY_OUT" >/dev/null
+  fi
+  pids=()
+  python3 spec/tools/portrayal/devices_index.py --library library --library "$OVERLAY" \
+    --only-root "$OVERLAY" --out "$OVERLAY_OUT" &
+  pids+=("$!")
+  python3 spec/tools/portrayal/components_index.py --library library --library "$OVERLAY" \
+    --only-root "$OVERLAY" --out "$OVERLAY_OUT" &
+  pids+=("$!")
+  for pid in "${pids[@]}"; do wait "$pid"; done
+  python3 spec/tools/portrayal/rack_index.py --dist "$OVERLAY_OUT"
+  cp LICENSE NOTICE "$OVERLAY_OUT"/
+  echo "built overlay $OVERLAY: $(ls "$OVERLAY_OUT" | wc -l | tr -d ' ') files -> $OVERLAY_OUT"
+  exit 0
+fi
 OUT="${1:-library/dist}"
 
 # Lint first. A broken manifest used to render as an empty or partial dist that

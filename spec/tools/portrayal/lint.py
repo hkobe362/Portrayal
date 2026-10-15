@@ -13559,6 +13559,16 @@ def main():
     ap.add_argument("--device", action="append", default=[], metavar="NAME",
                     help="lint only these devices by name or path fragment; "
                          "components are still checked in full")
+    # AN OVERLAY IS LINTED ON ITS OWN, AGAINST THE LIBRARY BENEATH IT. Every root
+    # given to --library is searched for the parts a device names, but only the
+    # roots given here are walked for files to check: `--library library
+    # --library overlay --only-root overlay` holds the overlay to every rule and
+    # leaves the public library to its own run. Its rules that need the whole
+    # library (the portfolio census, the bay sizes, the lock) read these roots
+    # alone. Each must also be a --library.
+    ap.add_argument("--only-root", action="append", default=[], metavar="DIR",
+                    help="walk only these --library roots for files to lint; the others "
+                         "are searched for the parts a device names (an overlay library)")
     # WARNINGS ARE A PASS BY DEFAULT, AND A CALLER CAN SAY OTHERWISE. The census
     # rules (L24, L40, L68 and the rest) fire on the day they land and are meant
     # to shrink, so a run with warnings exits 0 and the gate stays usable. But
@@ -13616,7 +13626,17 @@ def main():
             for f in sorted(Path(root).glob("devices/**/device.yaml")):
                 if any(sel in str(f) for sel in args.device):
                     wanted |= device_dependencies(f, args.library)
-    for root in args.library:
+    walked = args.library
+    if args.only_root and args.update_baseline:
+        ap.error("--update-baseline records the first --library; it cannot be used with --only-root")
+    if args.only_root:
+        have = {str(Path(r).resolve()) for r in args.library}
+        for r in args.only_root:
+            if str(Path(r).resolve()) not in have:
+                ap.error(f"--only-root {r} is not one of the --library roots")
+        walked = [r for r in args.library
+                  if str(Path(r).resolve()) in {str(Path(o).resolve()) for o in args.only_root}]
+    for root in walked:
         root = Path(root)
         for f in sorted(root.glob("components/**/contract.yaml")):
             if wanted is not None and f not in wanted:
@@ -13784,17 +13804,19 @@ def main():
     # --device run cannot do it: `devicelock.check` walks every device, and a
     # partial check would report the unexamined ones as unchanged.
     if not args.device:
-        lint_library_comparable_facts([Path(r) for r in args.library], matrix)
+        lint_library_comparable_facts([Path(r) for r in walked], matrix)
         lint_library_aliases(matrix)
-        lint_library_listings(args.library)
+        lint_library_listings(walked)
         lint_library_bay_size_per_module(matrix + comp_matrix, args.library)
-        for root in [Path(r) for r in args.library]:
+        for root in [Path(r) for r in walked]:
             lint_vendor_registry(root)
             lint_unplaced_majors(root)
             lint_pluggable_family_interfaces(root)
             if not list(libwalk.iter_devices([root])):
                 continue
-            for slug_, kind_, msg_ in devicelock.check(root):
+            # an overlay's lock counts the parts of the libraries beneath it
+            for slug_, kind_, msg_ in devicelock.check(
+                    root, [Path(r) for r in args.library if Path(r) not in [Path(w) for w in walked]]):
                 # WARNING WHILE THE DEVICE IS STILL BEING DRAWN, ERROR ONCE IT
                 # CLAIMS TO BE FINISHED - the gate L15, L37 and L42 all use. A
                 # device at `modelled` is work in progress and should not have to
@@ -13817,7 +13839,9 @@ def main():
     else:
         print_matrix(matrix, schemas)
 
-    base = None if args.device else load_baseline(Path(args.library[0]))
+    # an overlay has no baseline of its own, and the public library's says
+    # nothing about its files
+    base = None if args.device or args.only_root else load_baseline(Path(args.library[0]))
     # WAIVED WARNINGS ARE SEPARATED, NOT HIDDEN. A rule a device has argued with
     # still fires and is still counted; what changes is that it stops competing
     # for attention with the ones nobody has looked at. The reason is printed

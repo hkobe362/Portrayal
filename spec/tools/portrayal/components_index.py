@@ -306,6 +306,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", action="append", required=True)
     ap.add_argument("--out", required=True)
+    # INDEX ONLY THESE ROOTS' PARTS (an overlay library). Every --library still
+    # answers for the parts a contract composes and the devices that seat one.
+    ap.add_argument("--only-root", action="append", default=[],
+                    help="index only the components under these --library roots")
     args = ap.parse_args()
     out = Path(args.out)
     (out / "components").mkdir(parents=True, exist_ok=True)
@@ -323,7 +327,7 @@ def main():
     in_bays = seated_in_bays(args.library)
     seats = seat_counts(args.library)
     composers = composer_counts(args.library)
-    for root in args.library:
+    for root in args.only_root or args.library:
         for cf in sorted(Path(root).glob("components/*/*/v*/contract.yaml")):
             data = load_yaml(cf)
             ns = cf.parents[2].name

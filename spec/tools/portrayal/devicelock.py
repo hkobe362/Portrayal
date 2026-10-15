@@ -443,15 +443,27 @@ def _component_digest(version_dir: pathlib.Path, contract: dict) -> str:
     return _digest({"contract": contract, "skins": skins})
 
 
-def component_versions(library: pathlib.Path):
+def component_versions(library: pathlib.Path, below=()):
     """Every component's declared version, keyed the way a ref names it.
 
     `common/rj45-port@4` addresses a MAJOR, and the file under v4 says which
     minor is actually there. That indirection is the whole point of the ref -
     and the whole reason a device could change appearance without its lock
     moving.
+
+    `below` is the libraries `library` is built on top of (an overlay library,
+    docs/CONTRIBUTING.md): a device there seats public parts, and its lock has
+    to move when one of them does, so their versions are read too. An overlay
+    never holds a ref a library below it holds (overlay.py), so no part is
+    answered twice.
     """
     out = {}
+    for root in (*below, library):
+        _collect_versions(out, pathlib.Path(root))
+    return out
+
+
+def _collect_versions(out, library: pathlib.Path):
     root = library / "components"
     if not root.is_dir():
         return out
@@ -1300,12 +1312,12 @@ def aggregate(library: pathlib.Path, out: pathlib.Path):
     return out
 
 
-def check(library: pathlib.Path):
+def check(library: pathlib.Path, below=()):
     """Returns a list of (slug, kind, message). Empty means the lock agrees."""
     lock = load_lock(library)
     known = lock.get("devices") or {}
     findings = []
-    versions = component_versions(library)
+    versions = component_versions(library, below)
     for path in device_files(library):
         name = slug(path, library)
         doc = manifest.load_yaml(path) or {}
@@ -1396,9 +1408,9 @@ def check(library: pathlib.Path):
     return findings + check_listings(library)
 
 
-def update(library: pathlib.Path):
+def update(library: pathlib.Path, below=()):
     """Re-lock the devices whose fingerprint moved, and only those."""
-    versions = component_versions(library)
+    versions = component_versions(library, below)
     known = load_lock(library)["devices"]
     live = {slug(p, library): p for p in device_files(library)}
     changed, writing = [], {}
@@ -1425,13 +1437,16 @@ def main(argv=None):
     ap.add_argument("--library", default="library", type=pathlib.Path)
     ap.add_argument("--update", action="store_true",
                     help="record the current state; run this AFTER bumping a version")
+    ap.add_argument("--below", action="append", default=[], type=pathlib.Path,
+                    help="a library --library is built on top of (an overlay library): "
+                         "its parts count toward a device's fingerprint")
     args = ap.parse_args(argv)
     if args.update:
-        changed = update(args.library)
+        changed = update(args.library, args.below)
         print(f"devicelock: {len(changed)} device(s) re-locked"
               + (": " + ", ".join(changed[:6]) if changed else ""))
         return 0
-    findings = check(args.library)
+    findings = check(args.library, args.below)
     for _, _, msg in findings:
         print(f"devicelock: {msg}")
     print(f"devicelock: {len(findings)} finding(s)")

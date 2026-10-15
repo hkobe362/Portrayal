@@ -1,0 +1,164 @@
+# A TEST FIXTURE, not a product. It is the smallest device an overlay library
+# can hold: made up, drawn only from parts the public library already has, and
+# kept here so spec/tests/test_overlay_library.py has something to build with
+# `build.sh --overlay-library`. No document describes it.
+format: 1
+kind: device
+name: overlay-switch
+version: 0.1.0
+maturity: draft
+manufacturer: Example
+model: OVERLAY-SWITCH
+portfolio:
+  line: Overlay Fixture Series
+description: >-
+  A made-up 1RU four-port 10G switch that exists only as a test fixture for
+  the overlay library build. It has four SFP+ cages, a management jack, a
+  console jack, a system lamp, two supplies and one fan.
+profile: networking
+provenance:
+  chassis:
+    confidence: estimated
+    note: >-
+      estimated - test fixture, made up for the overlay tests; the size is a
+      stock 1RU envelope and no document states it
+  front:
+    confidence: estimated
+    note: >-
+      estimated - test fixture, made up for the overlay tests; the layout is
+      invented and no drawing exists
+  rear:
+    confidence: estimated
+    note: >-
+      estimated - test fixture, made up for the overlay tests; the bays are
+      invented and no photograph exists
+  power:
+    confidence: estimated
+    note: >-
+      estimated - test fixture, made up for the overlay tests; the figure is
+      invented and no datasheet states it
+
+attrs:
+  physical:
+    weight-kg: 4.2
+  power:
+    power-max-w: 150
+  platform:
+    switch-silicon: Example ASIC 1
+  features:
+    optics-sfp-plus: 10G SFP+ SR, LR; 1G SFP SX, LX
+  lifecycle:
+    eol: none-announced
+chassis:
+  width: 440.0
+  height: 43.6
+  depth: 300.0
+  ru: 1
+  color: '#3a3d42'
+  power: ac
+gaps:
+  - what: datasheet
+    scope: [front, rear]
+    reason: vendor-silent
+    note: the device is a made-up test fixture, so no vendor document exists to read
+    wanted: nothing; it is not a product
+groups:
+  sfp-plus:
+    term: Port
+    role: traffic
+    index-origin: 1
+    description: four 10G SFP+ ports
+    attrs: {media: sfp-plus, speed: 10g}
+  port-leds:
+    term: LED
+    role: indicator
+    index-origin: 1
+    description: one link/activity lamp above each SFP+ port
+  mgmt:
+    term: Port
+    role: management
+    index-origin: 1
+    mixed: out-of-band Ethernet and the serial console
+  status:
+    term: LED
+    role: indicator
+    index-origin: 1
+    description: the system lamp
+  psus:
+    term: PSU
+    role: service
+    index-origin: 1
+    description: two hot-swap supplies
+    attrs:
+      redundancy: '1+1'
+      redundancy-note: '1+1 - test fixture, invented: either supply carries the switch alone'
+  cooling:
+    term: Fan
+    role: service
+    index-origin: 1
+    description: one fan module
+views:
+  front:
+    size: {w: 440.0, h: 43.6}
+    silkscreen:
+      - {at: [425.0, 8.0], text: OVL-SW, font-size: 2.0, anchor: middle, fill: '#e8eaec', for: chassis}
+      - {at: [27.25, 34.0], text: '1', font-size: 1.8, anchor: middle, fill: '#e8eaec', for: port-1}
+      - {at: [43.75, 34.0], text: '2', font-size: 1.8, anchor: middle, fill: '#e8eaec', for: port-2}
+      - {at: [60.25, 34.0], text: '3', font-size: 1.8, anchor: middle, fill: '#e8eaec', for: port-3}
+      - {at: [76.75, 34.0], text: '4', font-size: 1.8, anchor: middle, fill: '#e8eaec', for: port-4}
+      - {at: [387.9, 34.0], text: MGMT, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: mgmt}
+      - {at: [407.9, 34.0], text: CON, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: console}
+      - {at: [425.0, 28.0], text: SYS, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: sys}
+    components:
+      placements:
+        - {id: port-1, ref: std/sfp@1, at: [20.0, 16.0], group: sfp-plus, rel-pos: 1}
+        - {id: port-2, ref: std/sfp@1, at: [36.5, 16.0], group: sfp-plus, rel-pos: 2}
+        - {id: port-3, ref: std/sfp@1, at: [53.0, 16.0], group: sfp-plus, rel-pos: 3}
+        - {id: port-4, ref: std/sfp@1, at: [69.5, 16.0], group: sfp-plus, rel-pos: 4}
+        - {id: led-port-1, ref: common/led-dot@1, at: [26.25, 11.0], for: port-1, group: port-leds, rel-pos: 1}
+        - {id: led-port-2, ref: common/led-dot@1, at: [42.75, 11.0], for: port-2, group: port-leds, rel-pos: 2}
+        - {id: led-port-3, ref: common/led-dot@1, at: [59.25, 11.0], for: port-3, group: port-leds, rel-pos: 3}
+        - {id: led-port-4, ref: common/led-dot@1, at: [75.75, 11.0], for: port-4, group: port-leds, rel-pos: 4}
+        - {id: mgmt, ref: common/rj45-eth@1, at: [380.0, 14.0], group: mgmt, rel-pos: 1,
+           attrs: {speed: 1g}}
+        - {id: console, ref: std/rj45@2, at: [400.0, 14.0], group: mgmt, rel-pos: 2,
+           attrs: {media: rj45-serial, role: console}}
+        - {id: sys, ref: common/led-dot@1, at: [424.0, 20.0], for: chassis, attrs: {role: system}, group: status, rel-pos: 1}
+  rear:
+    size: {w: 440.0, h: 43.6}
+    silkscreen:
+      - {at: [46.75, 2.4], text: PSU 1, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: psu-1}
+      - {at: [126.75, 2.4], text: PSU 2, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: psu-2}
+      - {at: [324.3, 2.4], text: FAN, font-size: 1.6, anchor: middle, fill: '#e8eaec', for: fan-1}
+    components:
+      bays:
+        - {id: psu-1, at: [10.0, 3.0], size: {w: 73.5, h: 40.0},
+           accepts: [common/psu-550w@2], default: common/psu-550w@2, group: psus, rel-pos: 1}
+        - {id: psu-2, at: [90.0, 3.0], size: {w: 73.5, h: 40.0},
+           accepts: [common/psu-550w@2], default: common/psu-550w@2, group: psus, rel-pos: 2}
+        - {id: fan-1, at: [300.0, 3.0], size: {w: 48.6, h: 40.0},
+           accepts: [common/fan-module@1], default: common/fan-module@1, group: cooling, rel-pos: 1}
+  top:
+    size: {w: 440.0, h: 300.0}
+    empty: >-
+      looked for and not documented: a made-up test fixture, so no top view
+      exists to read
+  bottom:
+    size: {w: 440.0, h: 300.0}
+    empty: >-
+      looked for and not documented: a made-up test fixture, so no underside
+      view exists to read
+  left:
+    size: {w: 300.0, h: 43.6}
+    empty: >-
+      looked for and not documented: a made-up test fixture, so no side view
+      exists to read
+  right:
+    size: {w: 300.0, h: 43.6}
+    empty: >-
+      looked for and not documented: a made-up test fixture, so no side view
+      exists to read
+configurations:
+  base:
+    kind: base
+    description: two supplies, one fan, no transceivers fitted
