@@ -286,7 +286,7 @@ def kit_entry(ref, ns, major, data):
     consumer reads one shape. The parts stay refs; a device's configs.json is
     where a kit is resolved inline with the geometry of its parts (#907).
     """
-    return {
+    row = {
         "ref": ref, "ns": ns, "name": data["name"], "major": major,
         "version": data["version"], "kind": "kit",
         "description": data.get("description", ""),
@@ -300,6 +300,9 @@ def kit_entry(ref, ns, major, data):
         "superseded-by": data.get("superseded-by"),
         "provenance": data.get("provenance") or {},
     }
+    if data.get("audience"):
+        row["audience"] = data["audience"]
+    return row
 
 
 def main():
@@ -469,6 +472,10 @@ def main():
                 "_detail": {"provenance": data.get("provenance") or {},
                             "relief": data.get("relief") or {}},
             }
+            # WHO IT IS FOR, when the contract says (the schema's `audience`).
+            # Absent means public and is left out, so a public index is unchanged.
+            if data.get("audience"):
+                entry["audience"] = data["audience"]
             # ITS OWN CAGES, in its own frame (#484): one per part that
             # presents a pluggable interface or a connector interface (B3,
             # `kind: cage|connector`), by the same core as a device

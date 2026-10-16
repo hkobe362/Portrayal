@@ -38,6 +38,7 @@
     "kind",
     "name",
     "version",
+    "audience",
     "description",
     "provenance",
     "unplaced",
@@ -106,6 +107,11 @@
   "version": {
    "type": "string",
    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+  },
+  "audience": {
+   "type": "string",
+   "pattern": "^(public|internal|nda|customer:[a-z0-9-]+)$",
+   "description": "who this component is for. One of `public`, `internal`, `nda`, or `customer:<name>` for one named customer, the name in lower case letters, digits and hyphens. OPTIONAL: absent means `public`. A project that keeps private entries beside the public library labels them with it. Portrayal's own library only uses `public`, and lint L192 holds it to that."
   },
   "behaviour": {
    "enum": [

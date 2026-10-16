@@ -248,6 +248,10 @@ def main():
                 # where this chassis's own 3D projections came from, counted
                 "decor-confidence": decor_confidence(d),
             })
+            # WHO IT IS FOR, when the manifest says (the schema's `audience`).
+            # Absent means public and is left out, so a public index is unchanged.
+            if d.get("audience"):
+                devices[-1]["audience"] = d["audience"]
     devices.sort(key=lambda x: (x["manufacturer"], x["name"]))
 
     out = Path(args.out)

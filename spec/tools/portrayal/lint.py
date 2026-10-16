@@ -676,6 +676,9 @@ RULES = {
     "L191": ("component, device", "the voltage of a DC port carries its sign: the nominal is not zero, the limits of its range have the nominal's sign, and a port with a `batt` pole is negative", "write a negative voltage with its minus (`-48`, range `[-40.5, -57]`); correct the pole's role if the end is positive",
              "The sign is how a feed tells a battery conductor from a positive one, and an unsigned -48 V would match a +48 V end.",
              ERROR),
+    "L192": ("component, device", "in Portrayal's own library a device or component states no `audience`, or states `public` (error); a project that keeps private entries beside the public library runs lint with `--allow-audience`", "delete the `audience` line, or set it to `public`; move a private entry to the library that holds private entries",
+             "The public library is published to everyone, so a part labelled for one customer or kept internal there is either a leak or a label that means nothing; the check stops the label from reaching the published library.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -4108,6 +4111,21 @@ def lint_device_dc(path, data, lib_roots):
         err(path, "L190", f"{len(unstated)} pole(s) have an `unstated` role ({', '.join(sorted(set(unstated))[:3])}"
                           f"{', ...' if len(set(unstated)) > 3 else ''}) and the device has no `gaps` entry "
                           "with `what: dc-polarity`")
+
+
+def lint_public_audience(path, data):
+    """L192: the public library holds only `public` entries.
+
+    The schema says which labels exist. This says that in Portrayal's own
+    library none but `public` is used, with the label left out meaning the
+    same. A library for private entries runs lint with `--allow-audience`.
+    """
+    if not isinstance(data, dict):
+        return
+    audience = data.get("audience")
+    if audience is not None and audience != "public":
+        err(path, "L192", f"audience: {audience!r} - the public library has only `public` entries "
+                          "(or none stated); a private entry belongs in a library of its own")
 
 
 def _kit_ranges(depth):
@@ -13926,6 +13944,11 @@ def main():
                          "does not - what THIS change added, rather than the whole backlog")
     ap.add_argument("--update-baseline", action="store_true",
                     help="rewrite library/lint-baseline.json from this run, and exit")
+    # PORTRAYAL'S OWN LIBRARY IS PUBLIC (L192). A project that keeps private
+    # entries in a library of its own labels them with `audience` and says so.
+    ap.add_argument("--allow-audience", action="store_true",
+                    help="allow an `audience` other than `public` (L192 is off); "
+                         "for a library of private entries")
     args = ap.parse_args()
     if args.list_rules:
         if args.json:
@@ -13986,6 +14009,8 @@ def main():
                 continue
             lint_duplicate_keys(f)
             d = lint_component(f, comp_v)
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             # A KIT IS A PARTS LIST, NOT A DRAWING (#905): no size, no skin, no
             # elements, so the component rules below have nothing to read and
             # several would index the `size` a kit does not have. It takes the
@@ -14079,6 +14104,8 @@ def main():
                 continue
             lint_duplicate_keys(f)
             d = lint_device(f, dev_v, args.library); n += 1
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             if d is not None and d.get("kind") == "device":
                 lint_attrs_null(f, d)
                 lint_device_gap_scope(f, d)
