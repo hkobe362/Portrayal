@@ -101,6 +101,14 @@ def test_a_short_list_is_left_alone():
     assert dx.fit_items("Accepts: ", ["one", "two"]) == "Accepts: one, two"
 
 
+def test_a_bay_names_a_module_once_when_it_accepts_two_majors():
+    """The Accepts line drops the major, so a bay that accepts `@3` and `@4` of
+    one part named it twice (#994). The order of first mentions is kept."""
+    row = dx.bay_row("mic-1", ["acme/mic-a@1", "acme/mic-b@3", "acme/mic-b@4",
+                               "acme/mic-c@1"])
+    assert row["description"] == "Accepts: mic-a, mic-b, mic-c"
+
+
 def test_the_ellipsis_is_ascii():
     """Every byte of the two export trees is ASCII. One non-ASCII character for
     a glyph's worth of neatness would make this the file that broke that."""

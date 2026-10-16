@@ -2193,8 +2193,10 @@ def bay_row(bay_id, accepts=None):
     # goes where a person will still see it. Truncated to the 200 the
     # NetBox schema allows on a bay description.
     if accepts:
-        bay["description"] = fit_items(
-            "Accepts: ", [a.split("/")[-1].split("@")[0] for a in accepts])
+        # The name loses its major, so two majors of one part would repeat.
+        names = list(dict.fromkeys(
+            a.split("/")[-1].split("@")[0] for a in accepts))
+        bay["description"] = fit_items("Accepts: ", names)
     return bay
 
 
