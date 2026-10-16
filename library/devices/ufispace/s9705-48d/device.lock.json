@@ -21,7 +21,7 @@
    "ufispace/psu-202-dc@1"
   ]
  },
- "composed": "48289275d4fc6ff2",
+ "composed": "fecf38d0d3782e1f",
  "composed-refs": {
   "common/compliance-sticker@1": "1.0.0+6b3c51b31c446689",
   "common/ground-symbol@1": "1.0.0+938c617ba0a96a89",
@@ -40,7 +40,7 @@
   "ufispace/fan-803816-hc@1": "1.0.0+6981f295355565bc",
   "ufispace/psu-202-ac@1": "1.0.1+fb5788d303eb112e",
   "ufispace/psu-202-dc@1": "1.0.2+5d752eec7af80f08",
-  "ufispace/seg7-status-2@1": "1.3.0+2419520ed929fa77"
+  "ufispace/seg7-status-2@1": "1.4.0+ba0c4a9d22c1f45c"
  },
  "configs": [
   "ac",
@@ -655,5 +655,5 @@
  "placement-surface": "524312e959b771b7",
  "shape": "5d539cac68b09a6f",
  "surface": "bc9ec0aa123b053d",
- "version": "4.0.3"
+ "version": "4.0.4"
 }

@@ -70,7 +70,7 @@ export function configFacts(slots, cfg) {
   const c = (slots.configs || []).find(k => k.name === name);
   if (!c) return null;
   return {config: c.name, pduClass: slots['pdu-class'] ?? null, metering: meteringOf(slots['pdu-class']),
-          states: c.states || {}, names: c.names || {}, slots: c.slots || [], mountPoints: c['mount-points'] || []};
+          states: c.states || {}, names: c.names || {}, ...(c.displays ? {displays: c.displays} : {}), slots: c.slots || [], mountPoints: c['mount-points'] || []};
 }
 
 // `dist` is one root or a list of them (rootsOf). A part or a device that two
