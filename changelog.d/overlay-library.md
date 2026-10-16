@@ -18,4 +18,4 @@
   devices and parts, and an id in two roots is an error naming both, never a
   replacement. `spec/tests/fixtures/overlay-example/` is one made-up device,
   `example/overlay-switch`, built only from public parts, that the tests
-  build. `@portrayal/kit` takes the next minor version at merge time.
+  build. `@portrayal/kit` is 0.49.0.

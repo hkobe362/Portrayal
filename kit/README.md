@@ -676,6 +676,12 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
+`loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`
+and `createViewer` take a list where they took one root (`kit/dist.js` `layeredDist` and `readIndex`);
+`kit/index.html?overlay=<path>` loads one in the explorer. A later root adds devices and parts, and an id
+in two roots is an error naming both, never a replacement. A single root works as before.
+
 **New in 0.48.0: a passive panel in a bay of a module in the device's bay has an end on each panel.**
 `seatedPort` answers for a holder seated in a drawer's slot (`drawer/module/slot-1/module/sc01`, front) and
 shows its back on the other panel (`.../b01`, view `rear`), as it does a panel in a bay of the device. A bay
