@@ -8,6 +8,7 @@
 
 import {RU} from './rails.js';
 import {hexColor} from './cable-geometry.js';
+import {shapeRefusal} from '../displays.js';
 
 export const FORMAT = 'portrayal-rack';
 // Zero-U parts and `side` (#926) did not raise it: both are optional keys a
@@ -43,7 +44,7 @@ const unknownOf = (o, known) => Object.fromEntries(Object.entries(o && typeof o 
   .filter(([k]) => !known.includes(k)).map(([k, v]) => [k, structuredClone(v)]));
 const FRAME_KEYS = ['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref', 'startU', 'setback', 'width'];
 const ITEM_KEYS = ['id', 'ref', 'cfg', 'label', 'ru', 'face', 'turned', 'swaps', 'fields', 'on', 'unit', 'side', 'setback', 'roll',
-                   'states', 'readings', 'readingsAsWritten'];
+                   'states', 'readings', 'readingsAsWritten', 'displays'];
 const RACK_KEYS = ['id', 'name', 'frame', 'items', 'zeroU', 'cables', 'dcim', 'bundles'];
 const DOC_KEYS = ['format', 'version', 'id', 'racks'];
 // The rail hole styles. `round` (version 4) is an unthreaded round hole.
@@ -140,6 +141,11 @@ const bundleItems = bundles => bundleList(bundles).flatMap(b => [
   ...(Array.isArray(b.members) ? b.members : []).flatMap(m => (plainObj(m) ? [m.a, m.b] : []))])
   .filter(w => plainObj(w) && typeof w.item === 'string' && w.item).map(w => ({id: w.item}));
 export const itemIdsInUse = rack => [...rack.items, ...endItems(rack.cables), ...bundleItems(rack.bundles)];
+// A ZERO-U ID THE SAME WAY (P-0019): a cord kept when its PDU was taken away
+// still names the PDU's id, so the next part placed beside the rack is not
+// handed it.
+export const zeroUIdsInUse = rack => [...(Array.isArray(rack.zeroU) ? rack.zeroU : []).filter(z => typeof z?.id === 'string'),
+  ...endItems(rack.cables)];
 // A CABLE ID IS NEVER REUSED WHILE A BUNDLE NAMES IT: ids come one past the
 // highest, so a removed c9 could be handed to the next cable, and a bundle
 // still naming c9 would pick it up.
@@ -184,6 +190,26 @@ const plainObject = v => !!v && typeof v === 'object' && !Array.isArray(v);
 export const zeroUOf = rack => (Array.isArray(rack?.zeroU) ? rack.zeroU : []).filter(z => plainObject(z)
   && typeof z.id === 'string' && z.id && typeof z.ref === 'string' && z.ref && typeof z.at === 'string' && z.at);
 export const zeroUById = (rack, id) => zeroUOf(rack).find(z => z.id === id) ?? null;
+// WHAT A CABLE END IS ON (P-0019): a rack item, or a part beside the rack
+// whose own slots take a cable end (the outlets of a zero-U PDU). An end is
+// `{item, path, view}` either way: `item` is the id of whichever it is, and
+// `view` the part's own panel, as on an item. null when neither is there.
+export const endHostOf = (rack, id) => (rack?.items || []).find(i => i.id === id) ?? zeroUById(rack, id);
+// The face of the rack a part beside it looks out of: a rear upright carries
+// its part facing rearward (solids.js zeroUPlacer); a front upright, and
+// either upright of a two-post, facing forward. Its own rear panel looks the
+// other way.
+export const zeroUPane = (z, view = 'front') => {
+  const out = /-rear$/.test(String(z?.at)) ? 'rear' : 'front';
+  return view === 'rear' ? (out === 'rear' ? 'front' : 'rear') : out;
+};
+// The pane an end's panel faces on whatever it is on, or null when it is on nothing.
+export const endPaneIn = (rack, end) => {
+  const it = (rack?.items || []).find(i => i.id === end?.item);
+  if (it) return ((end.view === 'rear') === !!it.turned) ? it.face : (it.face === 'front' ? 'rear' : 'front');
+  const z = zeroUById(rack, end?.item);
+  return z ? zeroUPane(z, end.view === 'rear' ? 'rear' : 'front') : null;
+};
 // WHAT A ZERO-U PART HANGS ON (version 4, `heldBy: {parts: [id, ...]}`): the
 // ids of the zero-U entries that hold it, such as the two brackets of a PDU;
 // none for a part that stands on its own.
@@ -270,6 +296,21 @@ function readSettings(src, who, said) {
       said?.(`${Object.keys(dropped).join(', ')} on ${who} had a state that is not a name, so ${Object.keys(dropped).length === 1 ? 'it was' : 'they were'} dropped.`);
     if (plainRecord(src.states)) out.states = kept;
   }
+  // WHAT A DISPLAY SHOWS (docs/display-content-design.md): a map of part path
+  // to its content, read entry by entry as `states` is. An entry that is none
+  // of {text: [lines]}, {digits: text}, {image: text} is dropped and said. Whether
+  // the part is a display, and can show it, is for rack/displays.js, which can
+  // see the device.
+  if ('displays' in src) {
+    const kept = {}, dropped = [];
+    for (const [k, v] of Object.entries(plainRecord(src.displays) ? src.displays : {})) {
+      if (k && !shapeRefusal(v)) kept[k] = v; else dropped.push(k);
+    }
+    if (!plainRecord(src.displays)) said?.(`The displays of ${who} were not a map of part to what it shows, so they were dropped.`);
+    else if (dropped.length)
+      said?.(`${dropped.join(', ')} on ${who} had content that is not text, digits or an image, so ${dropped.length === 1 ? 'it was' : 'they were'} dropped.`);
+    if (plainRecord(src.displays) && Object.keys(kept).length) out.displays = structuredClone(kept);
+  }
   // `readings: null` says there are none, and is no key at all
   if (src.readings != null) {
     const r = src.readings;
@@ -310,7 +351,7 @@ function readZeroU(list, said) {
     if (typeof z.id !== 'string' || !z.id || seen.has(z.id)) z.id = nextId([...taken, ...[...seen].map(id => ({id}))], 'z');
     seen.add(z.id);
     // what it is set to is read as on an item; where it stands is kept as written
-    const {states: _s, readings: _r, readingsAsWritten: _w, ...rest} = z;
+    const {states: _s, readings: _r, readingsAsWritten: _w, displays: _d, ...rest} = z;
     return {...rest, ...readSettings(z, String(z.label ?? z.ref ?? z.id), said)};
   });
 }

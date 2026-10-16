@@ -44,13 +44,30 @@ skins: [default]
 """
 
 
+LID = """format: 1
+kind: component
+name: lid
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+lid: true
+description: a hinged cover across the whole face
+size: {w: 100, h: 40}
+elements:
+  plate: {at: [0.0, 0.0], size: [100, 40], class: bezel}
+skins: [default]
+"""
+COVER = LID.replace("name: lid", "name: cover").replace("lid: true\n", "")
+
+
 @pytest.fixture
 def lib(tmp_path):
-    for name, contract, w, h in (("well", WELL, 100, 40), ("post", POST, 10, 40)):
+    for name, contract, w, h in (("well", WELL, 100, 40), ("post", POST, 10, 40),
+                                 ("lid", LID, 100, 40), ("cover", COVER, 100, 40)):
         d = tmp_path / "components" / "t" / name / "v1"
         (d / "skins").mkdir(parents=True)
         (d / "contract.yaml").write_text(contract)
-        node = "plate" if name == "well" else "post"
+        node = "post" if name == "post" else "plate"
         (d / "skins" / "default.svg").write_text(
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}mm" height="{h}mm" '
             f'viewBox="0 0 {w} {h}"><rect id="{node}" width="{w}" height="{h}" fill="#222"/></svg>')
@@ -110,6 +127,51 @@ def test_L129_a_pass_only_partly_in_its_well(lib):
     d["views"]["front"]["components"]["placements"][1]["at"] = [65.0, 0.0]
     d["views"]["front"]["passes"] = [d["views"]["front"]["passes"][0]]
     assert findings(d, lib, "L136")
+
+
+def _under(ref, hole_at=(65, 10)):
+    """The good device with a full-face part over everything, and one hole."""
+    d = good()
+    v = d["views"]["front"]
+    v["components"]["placements"] = [
+        {"ref": "t/well@1", "id": "plate", "at": [0.0, 0.0], "group": "g", "rel-pos": 1},
+        {"ref": ref, "id": "top", "at": [0.0, 0.0], "group": "g", "rel-pos": 2, "in": "plate"}]
+    v["panel"] = {}
+    v["passes"] = [{"id": "hole", "at": list(hole_at), "size": [25, 20], "cover": "open"}]
+    return d
+
+
+def test_L136_a_pass_under_a_lid_is_allowed(lib):
+    """A lid is a hinged or removable cover: it opens over the duct, so the
+    hole beneath it is where a cable crosses once it is open."""
+    assert not findings(_under("t/lid@1"), lib, "L136")
+
+
+def test_L136_a_pass_under_a_cover_that_is_not_a_lid_is_refused(lib):
+    """The same part without `lid: true`, even `behaviour: mounts`, is a solid."""
+    f = findings(_under("t/cover@1"), lib, "L136")
+    assert f and "top" in f[0]
+
+
+def test_L136_a_pass_under_a_post_is_still_refused_beside_a_lid(lib):
+    d = _under("t/lid@1", hole_at=(40, 10))
+    d["views"]["front"]["components"]["placements"].append(
+        {"ref": "t/post@1", "id": "post", "at": [45.0, 0.0], "group": "g", "rel-pos": 3})
+    f = findings(d, lib, "L136")
+    assert f and "post" in f[0] and "top" not in f[0]
+
+
+def test_L136_a_lid_does_not_excuse_a_pass_off_its_face(lib):
+    assert findings(_under("t/lid@1", hole_at=(90, 10)), lib, "L136")
+
+
+def test_the_schema_takes_lid_as_a_boolean_only():
+    schema = json.loads((ROOT / "spec/schemas/component.schema.json").read_text())
+    doc = yaml.safe_load(LID)
+    jsonschema.validate(doc, schema)
+    for bad in ("yes", 1, ["cover"]):
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate({**doc, "lid": bad}, schema)
 
 
 def test_L129_two_passes_one_id(lib):

@@ -23,6 +23,8 @@ const SIZES = {sw: {ru: 1, d: 515}, pp: {ru: 1, d: 100},
   lacer: {...LACER, capacity: {count: 30, basis: 'Cat6 24AWG cables, theoretical', media: 'cat6'}},
   plain: {...LACER, capacity: {count: 30, basis: 'an estimate, not stated by its maker', media: null}},
   early: {...LACER, capacity: {count: 30, basis: 'Cat6 24AWG cables, theoretical'}},
+  // the maker states none: the count is an estimate (P-0027)
+  est: {...LACER, capacity: {count: 30, basis: 'ESTIMATE, not stated by its maker', media: 'cat6', estimated: true}},
   // a duct two units tall, on the rails
   duct2: {ru: 2, d: 80}};
 const chassisOf = ref => SIZES[ref] || null;
@@ -40,7 +42,7 @@ const ctxOf = rack => ({chassisOf, checkKept: true,
   },
   // a port stands under the ring its cable passes: `r1-...` under ring 1, to `r5-...` under ring 5
   portX: end => XS[Number(end.path[1]) - 1]});
-const LACERS = {lacer: 1, plain: 1, early: 1, odd: 1};
+const LACERS = {lacer: 1, plain: 1, early: 1, odd: 1, est: 1};
 // A switch at U20 with a manager on it, and a panel at U30.
 const rackOf = (manager = 'lacer') => {
   let r = add(M.newRack(), 'sw', 20, {label: 'switch'});
@@ -74,6 +76,16 @@ test('31 Cat6 through a manager that states 30 Cat6 warns, and names the kind', 
     'ring 5 on LACER-5 (U20 front): 15 cables, 112% of its fill limit; the limit is 40% of the opening.',
     'LACER-5 (U20 front): 31 cables at least as thick as Cat 6 copper through it, more than the 30 Cat 6 copper cables its maker states.']);
   // exactly the stated count is not over it
+  const even = {...r, cables: r.cables.slice(0, 30)};
+  assert.deepEqual(R.capacityOver(even, ctxOf(even)), []);
+});
+
+test('31 Cat6 through a manager whose count is an estimate warns, and says it is one (P-0027)', () => {
+  const r = {...rackOf('est'), cables: [...cables(16, 'cat6', 1), ...cables(15, 'cat6', 5)]};
+  assert.deepEqual(R.capacityOver(r, ctxOf(r)), [{item: 'i2', count: 31, through: 31, capacity: 30, media: 'cat6', diameter: 6, estimated: true}]);
+  assert.equal(notes(r).at(-1),
+    'LACER-5 (U20 front): 31 cables at least as thick as Cat 6 copper through it, more than the estimated 30 Cat 6 copper cables (its maker states none).');
+  // 30 is not over it
   const even = {...r, cables: r.cables.slice(0, 30)};
   assert.deepEqual(R.capacityOver(even, ctxOf(even)), []);
 });
@@ -235,6 +247,10 @@ test('inspect states the count as its maker does: the count, the basis and the k
   assert.deepEqual((await inspect(r, 'i4', {chassisOf})).capacity,
     {count: 30, basis: 'an estimate, not stated by its maker', media: null});
   assert.ok(!('capacity' in await inspect(r, 'i1', {chassisOf})), 'a device that states no count has none');
+  // an estimate says so (P-0027); a stated count carries no such key
+  r = add(r, 'est', 32, {label: 'LACER-5'});                           // i5
+  assert.deepEqual((await inspect(r, 'i5', {chassisOf})).capacity,
+    {count: 30, basis: 'ESTIMATE, not stated by its maker', media: 'cat6', estimated: true});
 });
 
 test('the device schema takes the kinds of cable a rack file names, and no other', () => {
@@ -245,6 +261,9 @@ test('the device schema takes the kinds of cable a rack file names, and no other
   const performance = schema.properties.attrs.properties.performance;
   assert.deepEqual(performance.properties['cable-capacity-media'].enum, C.MEDIA.filter(m => m !== 'power' && m !== 'ground'));
   assert.deepEqual(performance.dependentRequired['cable-capacity-media'], ['cable-capacity']);
+  // an estimate is marked, and only a count of a named kind can be one (P-0027)
+  assert.equal(performance.properties['cable-capacity-estimated'].type, 'boolean');
+  assert.deepEqual(performance.dependentRequired['cable-capacity-estimated'], ['cable-capacity', 'cable-capacity-media']);
   // and the kit has a diameter for each, which is what the count is compared by
   for (const m of C.MEDIA) assert.ok(R.DIAMETERS[m] > 0, m);
 });

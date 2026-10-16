@@ -356,8 +356,8 @@ python3 spec/tools/portrayal/preflight.py --base <ref> --json   # for an agent
 
 It compares the working tree, untracked files included, with the merge base and
 prints PASS or FAIL per check, with the command that fixes each failure. It
-exits non-zero if any check fails. The last check, `prose`, is advice: it
-prints PASS or WARN, and a WARN does not change the exit status.
+exits non-zero if any check fails. Two checks, `prose` and `conformance`, are
+advice: they print PASS or WARN, and a WARN does not change the exit status.
 
 | Check | Fails when |
 |---|---|
@@ -369,6 +369,7 @@ prints PASS or WARN, and a WARN does not change the exit status.
 | `lint` | lint on the devices you touched and every device that seats a component you touched, plus the library-wide rules a `--device` run skips (L89 when what reaches a component major can have changed), has an error or a warning `library/lint-baseline.json` does not carry |
 | `kit` | `kit/` changed and `npm test` fails, or a `spec/tests/*_js.py` test that names a changed kit module fails |
 | `prose` | never. It warns when a `device.yaml` or `contract.yaml` you changed has a sentence of more than 25 words that the merge base does not have, in a `description` (device, configuration or component) or a string under `attrs` |
+| `conformance` | never. It warns when a device or component file you changed has no part conformance report from this tree: `library/dist/part-conformance.json`, which `spec/tests/test_part_conformance_report.py` writes after a build, is missing or older than the change |
 
 **New prose follows Simplified Technical English.** A `description` and the
 strings under `attrs` are copied into the DCIM exports, where someone who never
@@ -412,6 +413,45 @@ fixture would answer the same thing. To see the same figures locally:
 python3 -m pytest spec/tests -q -n auto --junitxml /tmp/junit.xml
 python3 spec/tools/portrayal/suite_times.py /tmp/junit.xml
 ```
+
+## An overlay library: your own devices without a fork
+
+An overlay is a second library, kept in another folder (and another
+repository), that is built on top of this one. A downstream project that keeps
+devices of its own does not have to fork Portrayal for them. It keeps a folder
+shaped like `library/` (`devices/<vendor>/<model>/`, and `components/` for any
+part of its own), draws its devices from the public parts, and builds it with
+this checkout's tools:
+
+```sh
+./build.sh --overlay-library ../my-library --overlay-out ../my-library-dist
+```
+
+The build lints the overlay's files, renders its devices against the public
+components plus its own, and writes `devices.json`, `components.json`, each
+device's `configs.json` and faces, and `rack.json` to `--overlay-out`. It reads
+and writes nothing else: `library/dist` is the same bytes with and without an
+overlay, and the overlay's dist holds only what the overlay adds.
+
+An overlay adds and never replaces. A device name, a device folder, a part ref
+or a listing that the public library already has is refused before anything is
+drawn, with both files named. The overlay's lock (`device.lock.json`) counts
+the public parts its devices seat, so a public part that moves asks for the
+bump. `python3 spec/tools/portrayal/devicelock.py --library ../my-library
+--below library` checks it, and `--update` records it.
+
+The kit loads the two dists side by side. Give `createShell`, `createViewer`,
+`loadCatalog` and `loadSlots` a list, `[publicDist, overlayDist]`, where they
+took one: a later root adds devices and parts, and an id in two roots is an
+error naming both. In the explorer, `kit/index.html?overlay=<path to the
+overlay's dist>` does the same. The example in
+`spec/tests/fixtures/overlay-example/` is one made-up device
+(`example/overlay-switch`) and what the tests build.
+
+An overlay's own vendor folder warns L55 until `spec/schemas/vendors.yaml`
+knows it. Only the devices, components and rack indexes are written to an
+overlay's dist; the other indexes (labs, gaps, vendors, listings) and the DCIM
+exports are not built for it.
 
 ## Commits
 

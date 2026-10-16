@@ -36,7 +36,7 @@ test('cable.route refuses made-up names and says what exists', () => {
     {error: 'Waypoint 1: cm-1 has no ring, duct, pass-through or tray called ?. It has: guide-1, guide-2, window-1.'});
   assert.deepEqual(route(r, [{item: 'i9', via: 'guide-1'}]), {error: 'Waypoint 1 names i9, which is not in the rack.'});
   assert.match(route(r, [{lane: 'left-front', ru: 3}, {lane: '?', ru: 9}]).error,
-    /^Waypoint 2: there is no gutter called \?\. This rack has: left-front, right-front, left-rear, right-rear\.$/);
+    /^Waypoint 2: there is no gutter called \?\. This rack has: left-front, right-front, left-rear, right-rear, left-front-inner, right-front-inner, left-rear-inner, right-rear-inner\.$/);
   assert.deepEqual(route(r, [{lane: 'left-front', ru: 99}]), {error: 'Waypoint 1: ru 99 is not on this 42U rack, whose ru runs 1-42 from the bottom.'});
 });
 

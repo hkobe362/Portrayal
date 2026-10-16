@@ -15,8 +15,10 @@
 // (cable-rules.js isElementId).
 
 import {slotEnv, resolverFor, holdsAt, partOf, slotTree} from './slots.js';
-import {portPathOf, looseReason, isElementId, connectorOf, endKey, takesCableEnd, receptacleOf, endPlug, connectorName} from './cable-rules.js';
+import {portPathOf, looseReason, isElementId, connectorOf, endKey, takesCableEnd, receptacleOf, endPlug, connectorName,
+        couplerType, couplerRole, endKind} from './cable-rules.js';
 import {hexColor} from './cable-geometry.js';
+import {zeroUById} from './model.js';
 
 const MODULE = '/module/';
 const OTHER = {front: 'rear', rear: 'front'};
@@ -58,13 +60,32 @@ function chainIn(comp, steps, compByRef) {
   return out.length ? out : null;
 }
 
+// IS THE BACK OF A PART IN A BAY OF A MODULE REACHED FROM THE DEVICE'S OTHER
+// PANEL: only where every module the part sits in, from the device's bay down,
+// is a mechanical carrier (class `mechanical`: a drawer, a tray), which has
+// nothing of its own between the part and the back of the device. A card with
+// electronics (line card, riser) hides what its own bays hold. `bayId` is the
+// device's bay, `carrier` the path of the bay the part sits in. `R` is the
+// resolver of the item's seats.
+function carriedByMechanical(R, bayId, carrier, compByRef) {
+  if (carrier === bayId) return true;
+  const via = carrier.slice(bayId.length + MODULE.length).split(MODULE);
+  let path = bayId;
+  for (const id of via) {
+    if (partOf(compByRef, R.refAt(`${path}/module`))?.class !== 'mechanical') return false;
+    path = `${path}/module/${id}`;
+  }
+  return true;
+}
+
 // WHAT AN END THAT LANDS BY ITS SLOT IS (cable-rules.js receptacleOf), with
 // the plug the slot gives it (endPlug) and its name for a person. `comps` are
 // the components that could say what it is, the nearest first: a screw of a
 // DC terminal says nothing of itself, and the terminal it is part of does.
 function slotInfo(slot, comps, end, compByRef) {
   const said = comps.map(receptacleOf).find(i => i.family) || receptacleOf(null);
-  const {plug, note} = endPlug(slot, compByRef, end?.plug);
+  // (`farPlug`: the plug at the cord's other end, which settleEnds hands in)
+  const {plug, note} = endPlug(slot, compByRef, end?.plug, end?.farPlug);
   return {...said, plug, ...(note ? {note} : {}), connector: connectorName(slot, said)};
 }
 
@@ -107,15 +128,18 @@ export function seatedPort(item, end, ctx, {seen = false} = {}) {
   const env = slotEnv(item, slots, ctx.compByRef, ctx.redirects), swaps = item.swaps || {};
   const bay = env.bays.find(b => b.id === p.slice(0, first));
   if (!bay || !OTHER[bay.view]) return null;
+  const carrier = p.slice(0, cut), steps = p.slice(cut + MODULE.length).split('/');
   // ONLY A BAY THAT IS SPOKEN FOR: by the item's swaps, or by the
   // configuration's own list. configs.json lists every bay of the device, and
   // a device may give a bay to some configurations only (a double-width
   // power bay where another has two card slots), which it does not publish.
   // A bay nothing names reads as holding its default, and in a configuration
-  // that has no such bay the build draws nothing there.
-  if (!seen && !Object.hasOwn(swaps, bay.id) && env.built(bay.id) === undefined) return null;
+  // that has no such bay the build draws nothing there. A BAY OF A MODULE IN
+  // THE DEVICE'S BAY (a holder in a drawer's slot) is spoken for by its own
+  // path: a configuration that fills the slots does not name the drawer.
+  const named = id => Object.hasOwn(swaps, id) || env.built(id) !== undefined;
+  if (!seen && !named(bay.id) && !(carrier !== bay.id && named(carrier))) return null;
   const R = resolverFor(env, swaps);
-  const carrier = p.slice(0, cut), steps = p.slice(cut + MODULE.length).split('/');
   const ref = R.refAt(`${carrier}/module`);
   const base = {item: true, drawing: true, port: false, cage: false, occupied: false, onView: null, back: false};
   if (!ref) return R.entryAt(carrier) ? {...base, holder: {path: carrier, part: null, ref: null}} : null;
@@ -124,8 +148,12 @@ export function seatedPort(item, end, ctx, {seen = false} = {}) {
   const holder = {path: carrier, part: modelOf(comp, ref), ref: String(ref).split(':')[0]};
   const view = end.view === 'rear' ? 'rear' : 'front';
   const face = portIn(comp, steps, ctx.compByRef);
-  // only what sits in one of the device's own bays shows its back
-  const rear = carrier === bay.id ? partOf(ctx.compByRef, faceRef(comp.faces?.rear)) : null;
+  // only what sits in one of the device's own bays shows its back, and a
+  // PASSIVE PANEL in a bay of a mechanical carrier (a holder in a drawer's
+  // slot): the glass runs through the drawer, so each adapter has an end on
+  // the far panel too
+  const open = comp.class === 'adapter-panel' && carriedByMechanical(R, bay.id, carrier, ctx.compByRef);
+  const rear = carrier === bay.id || open ? partOf(ctx.compByRef, faceRef(comp.faces?.rear)) : null;
   const behind = rear ? portIn(rear, steps, ctx.compByRef) : null;
   const back = !!behind && view === OTHER[bay.view];
   const drawn = back ? behind : face && view === bay.view ? face : null;
@@ -151,6 +179,76 @@ export function seatedPort(item, end, ctx, {seen = false} = {}) {
   return {...base, port: true, onView: view, back, holder, cage: slot?.kind === 'cage',
           occupied: !!slot && holdsAt(env, swaps, p, {...slot, isCage: true}) != null,
           info: connectorOf({portMedia: drawn.attrs?.media || '', iface: slot?.interface || drawn.attrs?.connector || ''})};
+}
+
+// AN END THE CATALOGUE KNOWS TO BE LOOSE, said when the cable is made and not
+// later: a cable end under a bay whose seated part is known and has no port at
+// that path on that panel (seatedPort says `port: false` with a part held).
+// The sentence is the loose-end finding's own (looseReason), so a dry run, the
+// real add and the finding agree. An empty bay, a bay the catalogue cannot
+// answer for and an item whose parts lists are not loaded are not refused: the
+// end is kept as given and the page's drawing decides. Returns the first
+// reason, or null.
+//
+// A PORT A PASSIVE PANEL DOES NOT COMPOSE (a made-up `p9`, the rear of a panel
+// with no rear) is refused too, though seatedPort leaves it to the drawing: a
+// panel (class adapter-panel) has no port its contract does not compose, which
+// a card may (a test point only its skin draws). The panel may sit in a bay of
+// a module in the device's bay (a holder in a drawer's slot).
+export function seatedEndReason(rack, ends, ctx) {
+  for (const end of ends) {
+    const item = (rack.items || []).find(i => i.id === end.item);
+    if (!item || isElementId(end.path)) continue;
+    const own = seatedPort(item, end, ctx) ?? absentOnPanel(item, end, ctx);
+    // (a part at the path that takes no cable is the page's to call loose: a
+    // rack file may hold such an end on purpose)
+    if (!own || own.port || !own.holder?.part || own.part) continue;
+    const reason = looseReason(end, own);
+    if (reason) return reason;
+  }
+  return null;
+}
+function absentOnPanel(item, end, ctx) {
+  if (!loaded(ctx)) return null;
+  const p = portPathOf(end?.path ?? ''), first = p.indexOf(MODULE), cut = p.lastIndexOf(MODULE);
+  if (first < 0) return null;
+  const steps = p.slice(cut + MODULE.length).split('/');
+  const slots = ctx.slotsOf(item.ref);
+  if (steps.length !== 1 || !slots || slots.error) return null;
+  const env = slotEnv(item, slots, ctx.compByRef, ctx.redirects), swaps = item.swaps || {};
+  const bay = env.bays.find(b => b.id === p.slice(0, first)), carrier = p.slice(0, cut);
+  const named = id => Object.hasOwn(swaps, id) || env.built(id) !== undefined;
+  if (!bay || !OTHER[bay.view] || !(named(bay.id) || (carrier !== bay.id && named(carrier)))) return null;
+  const R = resolverFor(env, swaps), ref = R.refAt(`${carrier}/module`), comp = partOf(ctx.compByRef, ref);
+  if (!comp || comp.class !== 'adapter-panel' || portIdsOf(comp, ctx.compByRef).has(steps[0])
+      || !carriedByMechanical(R, bay.id, carrier, ctx.compByRef)) return null;
+  return {item: true, drawing: true, port: false, holder: {path: carrier, part: modelOf(comp, ref), ref: String(ref).split(':')[0]}};
+}
+
+// THE FAR END OF EVERY ADAPTER OF A PASSIVE PANEL IN A MECHANICAL CARRIER, from
+// the catalogue: a panel (class adapter-panel) seated in a bay of a drawer or a
+// tray that sits in a bay of the device has its adapters' other ends on the
+// panel opposite the bay's. A page that reads a drawing lists the backs of
+// what the device's own bays hold, where the host draws them; a holder in a
+// drawer is no bay of the device, so no panel draws its back, and this lists
+// them. [{path, view, media?}], the path `<bay>/module/<part>` of the part of
+// the panel's rear face, in natural order.
+export function backEnds(item, ctx) {
+  if (!item || !loaded(ctx)) return [];
+  const slots = ctx.slotsOf(item.ref);
+  if (!slots || slots.error) return [];
+  const env = shownEnv(item, slots, ctx.compByRef, ctx.redirects), swaps = item.swaps || {};
+  const R = resolverFor(env, swaps), out = [];
+  for (const b of slotTree(env, swaps).bays) {
+    const comp = b.holds ? partOf(ctx.compByRef, b.holds) : null;
+    if (comp?.class !== 'adapter-panel' || !OTHER[b.view] || !b.path.includes(MODULE)
+        || !carriedByMechanical(R, b.path.slice(0, b.path.indexOf(MODULE)), b.path, ctx.compByRef)) continue;
+    const rear = partOf(ctx.compByRef, faceRef(comp.faces?.rear));
+    for (const q of list(rear?.parts))
+      if (partOf(ctx.compByRef, q.ref)?.class === 'port')
+        out.push({path: `${b.path}/module/${q.id}`, view: OTHER[b.view], media: q.attrs?.media ?? partOf(ctx.compByRef, q.ref)?.attrs?.media ?? null});
+  }
+  return out.sort((a, b) => natural.compare(a.path, b.path));
 }
 
 // ── what a DCIM calls the port ─────────────────────────────────────────────
@@ -362,6 +460,101 @@ export function cableEndPaths(item, view, ctx) {
   return [...out];
 }
 
+// ── the ends of a part beside the rack (P-0019) ─────────────────────────
+// A PART BESIDE THE RACK (a zero-U PDU) is no rack item, and a page reads no
+// panel of it for its cable facts. Every end on it is one of its own
+// connector slots, which the catalogue lists with where each is on its panel
+// (`mate`, the point a plug meets, else `at`: mm from the top left of the
+// panel as drawn). So the catalogue answers for it whole: what each slot is,
+// its plug, and where it is on the part, `x` across the panel and `y` up from
+// the part's bottom. Where no part says what a slot is, the coupler it is
+// does (cable-rules.js couplerRole): a C13 is an outlet. In natural order.
+//   [{path, view, slot, type, connector, kind, plug, info, x?, y?}]
+function zeroUInfo(slot, end, compByRef) {
+  const info = slotInfo(slot, [], end, compByRef), role = couplerRole(slot.interface);
+  if (info.family || !role) return info;
+  const said = {family: 'power', mode: null, role};
+  return {...info, ...said, connector: connectorName(slot, said)};
+}
+export function zeroUEnds(z, ctx, end = null) {
+  if (!z || !loaded(ctx)) return [];
+  const slots = ctx.slotsOf(z.ref);
+  if (!slots || slots.error) return [];
+  const h = Number(ctx.chassisOf?.(z.ref)?.h) || null;
+  const env = shownEnv(z, slots, ctx.compByRef, ctx.redirects);
+  const place = (p, base = [0, 0]) => (p && h && p.every(Number.isFinite) && base.every(Number.isFinite)
+    ? {x: base[0] + p[0], y: h - (base[1] + p[1])} : {});
+  const own = env.cages
+    .filter(g => FACES.includes(g.view) && takesCableEnd(g, ctx.compByRef))
+    .map(g => {
+      const info = zeroUInfo(g, end?.path === g.id ? end : null, ctx.compByRef);
+      const p = Array.isArray(g.mate) ? g.mate : Array.isArray(g.at) ? g.at : null;
+      return {path: g.id, view: g.view, slot: g, type: couplerType(g.interface), connector: info.connector, kind: endKind(info),
+              plug: info.plug, info, ...place(p)};
+    });
+  return [...own, ...moduleEnds(z, env, ctx, end, place)]
+    .sort((a, b) => natural.compare(a.path, b.path) || natural.compare(a.view, b.view));
+}
+
+// THE PORTS OF THE MODULES IN A PART'S BAYS (P-0038): a vertical PDU's network
+// card has ports a cable ends on, as a switch's supply has its inlet. Each
+// bay of the part holds what the part's swaps put there, else what its
+// configuration builds, else what the bay ships with (the way a rack device's
+// bay is read, slots.js holdsAt), and each connector slot the held part
+// presents that takes a cable end is an end at `<bay>/module/<port>`, on the
+// bay's panel. Its place on the part is the bay's `at` plus the slot's `mate`
+// in the module's frame (else its `at`); a bay turned in its slot is not
+// placed, since its parts are then drawn turned, and the cable ends at the
+// part without a point. A port is data unless the slot is a power coupler.
+// `media` and `speed` are the placement's on the module (the sensor jack of an
+// eNMC is `rj45-telemetry`, not Ethernet).
+function moduleEnds(z, env, ctx, end, place) {
+  const swaps = z.swaps && typeof z.swaps === 'object' && !Array.isArray(z.swaps) ? z.swaps : {}, out = [];
+  for (const bay of env.bays) {
+    if (!FACES.includes(bay.view)) continue;
+    const ref = holdsAt(env, swaps, bay.id, bay), comp = partOf(ctx.compByRef, ref);
+    if (!comp) continue;
+    const turned = Number(bay.rotate) % 360 !== 0 && bay.rotate != null;
+    for (const g of list(comp.cages)) {
+      if (!takesCableEnd(g, ctx.compByRef)) continue;
+      const path = `${bay.id}${MODULE}${g.id}`, attrs = list(comp.parts).find(q => q.id === g.id)?.attrs || {};
+      let info = zeroUInfo(g, end?.path === path ? end : null, ctx.compByRef);
+      const power = info.family === 'power' || info.family === 'ground';
+      const connector = couplerType(g.interface) ? info.connector : `${String(g.interface || 'cable').toUpperCase()} port`;
+      if (!power) info = {...info, ...connectorOf({portMedia: attrs.media || '', iface: g.interface || ''}), connector};
+      const p = Array.isArray(g.mate) ? g.mate : Array.isArray(g.at) ? g.at : null;
+      out.push({path, view: bay.view, slot: g, module: true, type: couplerType(g.interface), connector: info.connector,
+                kind: power ? endKind(info) : 'data', plug: info.plug, info,
+                ...(attrs.media ? {media: attrs.media} : {}), ...(attrs.speed ? {speed: attrs.speed} : {}),
+                ...(turned || !Array.isArray(bay.at) ? {} : place(p, bay.at))});
+    }
+  }
+  return out;
+}
+// The words for the ends a part beside the rack has, by type: "C13
+// outlet-a1, outlet-a3; C39 outlet-a2", for a refusal that offers them.
+export function zeroUEndsText(ends) {
+  const by = new Map();
+  for (const e of ends) { const k = e.type || e.connector || 'other'; by.set(k, [...(by.get(k) || []), e.view === 'rear' ? `${e.path} (rear)` : e.path]); }
+  return [...by].map(([k, paths]) => `${k} ${paths.join(', ')}`).join('; ');
+}
+// One end on a part beside the rack, answered from the catalogue. null when
+// the catalogue is not loaded: the end is then not checked, never called
+// loose for want of a page that could not read it.
+function zeroUEndFacts(z, end, ctx) {
+  if (!loaded(ctx)) return null;
+  const view = end.view === 'rear' ? 'rear' : 'front', p = portPathOf(end.path);
+  const name = z.label || z.id;
+  if (isElementId(p)) return {facts: {item: true}, reason: looseReason(end, {item: true})};
+  const ends = zeroUEnds(z, ctx, end), here = ends.find(e => e.path === p && e.view === view);
+  if (here) return {facts: {item: true, drawing: true, port: true, slot: !here.module, cage: false, occupied: false, onView: view, holder: null},
+                    info: here.info, reason: null};
+  const other = ends.find(e => e.path === p);
+  const facts = {item: true, drawing: true, port: false, holder: null, ...(other ? {onView: other.view} : {})};
+  return {facts, reason: other ? `${p} is on the ${other.view} panel of ${name}; give view "${other.view}"`
+    : ends.length ? `${name} has no ${p}; it has ${zeroUEndsText(ends)}` : `${name} has nothing a cable can end on`};
+}
+
 // ── what the page read, with what the catalogue knows laid over it ──────
 // One end: `got` is the page's {facts, info, reason} for it, or nothing. An
 // element id is never an address, whatever a drawing matched it to. Where the
@@ -369,7 +562,11 @@ export function cableEndPaths(item, view, ctx) {
 // panel has no drawing at all; where it cannot, the page's does.
 export function settleEnd(rack, end, got, ctx) {
   const item = (rack.items || []).find(i => i.id === end.item) || null;
-  if (!item) return got ?? null;
+  if (!item) {
+    // a part beside the rack: the catalogue answers, over a page that found no item of that id
+    const z = zeroUById(rack, end.item);
+    return (z && zeroUEndFacts(z, end, ctx)) || (z ? null : got ?? null);
+  }
   if (isElementId(end.path)) return {...got, reason: looseReason(end, {item: true})};
   let own = seatedPort(item, end, ctx);
   // A BAY THAT ONLY ITS DEFAULT FILLS, which the catalogue alone will not
@@ -411,10 +608,21 @@ export function settleEnd(rack, end, got, ctx) {
 // them. Map(endKey -> {facts?, info?, reason}); an end neither the page nor
 // the catalogue answered for stays out of it, which reads as not checked.
 export function settleEnds(rack, ends, ctx, extra = []) {
-  const out = new Map(ends || []);
+  const page = new Map(ends || []), out = new Map(page);
   for (const end of [...(rack.cables || []).flatMap(c => [c.a, c.b]), ...extra]) {
     const k = endKey(end), got = settleEnd(rack, end, out.get(k), ctx);
-    if (got) out.set(k, got);
+    // (an end on a part beside the rack that the catalogue cannot answer is
+    // not checked: what a page said of it, which found no item, is dropped)
+    if (got) out.set(k, got); else out.delete(k);
+  }
+  // A SLOT THAT TAKES SEVERAL PLUGS, at an end that states none, takes the
+  // one that pairs with the plug at the cord's other end (cable-rules.js
+  // endPlug): settled again with that plug known.
+  for (const c of rack.cables || []) for (const [s, o] of [['a', 'b'], ['b', 'a']]) {
+    const k = endKey(c[s]), mine = out.get(k), far = out.get(endKey(c[o]))?.info?.plug;
+    if (!mine?.info?.note || c[s].plug || !far) continue;
+    const again = settleEnd(rack, {...c[s], farPlug: far}, page.get(k), ctx);
+    if (again?.info?.plug && !again.info.note) out.set(k, again);
   }
   return out;
 }

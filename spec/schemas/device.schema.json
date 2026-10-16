@@ -255,12 +255,20 @@
         "dac",
         "aoc"
        ],
-       "description": "THE KIND OF CABLE THE `cable-capacity` OF A CABLE MANAGER COUNTS, in the words a rack file gives a cable's `media`. `cable-capacity-basis` says it for a reader, with the source; this says it for a program. A maker counts with one cable: thirty Cat6 is the section of about a hundred and twenty 3 mm fibre cords, so the count means nothing against another kind. A rack tool compares the count with the cables at least as thick as this kind, and with no thinner one. Set it ONLY where the source names the cable. Leave it out where the count is an estimate, or where two sources disagree on the cable: the count is then shown as a fact and never compared"
+       "description": "THE KIND OF CABLE THE `cable-capacity` OF A CABLE MANAGER COUNTS, in the words a rack file gives a cable's `media`. `cable-capacity-basis` says it for a reader, with the source; this says it for a program. A maker counts with one cable: thirty Cat6 is the section of about a hundred and twenty 3 mm fibre cords, so the count means nothing against another kind. A rack tool compares the count with the cables at least as thick as this kind, and with no thinner one. Set it ONLY where the source names the cable, or where `cable-capacity-estimated` says the count is an estimate of that kind. Leave it out where an older estimate states no kind, or where two sources disagree on the cable: the count is then shown as a fact and never compared"
+      },
+      "cable-capacity-estimated": {
+       "type": "boolean",
+       "description": "TRUE WHERE THE MAKER STATES NO `cable-capacity` AND THE COUNT IS ESTIMATED from the channel's own drawing, at the packing the maker's own counts for its other managers imply. A rack tool counts the spare stored in the manager against it and says every time that the figure is an estimate. `cable-capacity-basis` opens with ESTIMATE and names the method, the parts it was calibrated on and the cross-section; provenance `capacity` is `estimated`. Leave it out where the maker states the count: a stated count is never marked"
       }
      },
      "dependentRequired": {
       "cable-capacity-media": [
        "cable-capacity"
+      ],
+      "cable-capacity-estimated": [
+       "cable-capacity",
+       "cable-capacity-media"
       ]
      },
      "additionalProperties": {
@@ -1759,6 +1767,63 @@
           "through": {
            "$ref": "#/$defs/segment",
            "description": "THE POSITION THIS CIRCUIT RUNS THROUGH: the id of a bay on this device, in any view, whose occupant protects it - a breaker or fuse position - OR of a placement of a part of class `breaker`, a breaker fixed to the unit (a rack PDU's branch breaker). It crosses a face (the output is on the rear, the breaker on the front), which `for:` cannot say: `for:` is a UI binding emitted as data-for that waives L13's overlap check, and these two are not near each other. The DCIM export writes it as a sentence on the outlet's description, and on a bay's, because neither target relates an outlet to a module bay; an outlet through a fixed breaker takes that breaker's `lines`. Optional; a panel with fixed, unprotected outputs has none. Stating one is a minor version, changing one a major. Lint L133 fails when it does not resolve. L135 warns when one bay position protects more than one circuit; a fixed PDU breaker feeds many outlets by design, so L135 reads bays only."
+          },
+          "dc": {
+           "type": "object",
+           "description": "WHAT THIS PLACEMENT CHANGES ABOUT THE DC PORTS OF ITS PART, keyed by the port's `id` in the part's `dc` block. The same part is the A feed in one place and the B feed in another, and a panel output takes its rating from the breaker in its bay, so the placement can set what differs and leaves the rest as the part states it. A key that names no port of the part is refused by lint. A role a placement sets needs a `source` and, where it is `unstated`, a `dc-polarity` gap on this device (L187, L190).",
+           "propertyNames": {
+            "$ref": "#/$defs/segment"
+           },
+           "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+             "side": {
+              "enum": ["a", "b"],
+              "description": "which feed of an A/B pair this placement is on"
+             },
+             "voltage": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["nominal"],
+              "description": "the voltage of this placement's end, signed: a -48 V plant is -48 (L191)",
+              "properties": {
+               "nominal": {
+                "type": "number",
+                "not": {"const": 0}
+               },
+               "range": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {"type": "number"}
+               }
+              }
+             },
+             "rating-a": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "the amperes this placement's end is good for: the breaker or fuse rating of its bay, where the part states none"
+             },
+             "poles": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "the role of a pole this placement sets, keyed by the pole's `slot` in the part's port: `{terminal-1: batt}`",
+              "propertyNames": {
+               "$ref": "#/$defs/segment"
+              },
+              "additionalProperties": {
+               "$ref": "#/$defs/segment"
+              }
+             },
+             "source": {
+              "type": "string",
+              "minLength": 1,
+              "description": "where the roles this placement sets came from, in the words the library uses: a datasheet, a guide, a drawing, a photo. Needed when `poles` is set (L187)."
+             }
+            }
+           }
           },
           "lines": {
            "type": "array",

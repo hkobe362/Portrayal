@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: fhd-1ufmt-n
-version: 1.0.1
+version: 1.1.1
 maturity: modelled
 manufacturer: FS.com
 model: FHD-1UFMT-N
@@ -83,7 +83,9 @@ gaps:
     note: >-
       the drawing locates the openings and nothing else a face carries - no rear grommet
       positions, no cover fixings, no printing. FS's gallery for 96427 is three-quarter
-      renders only.
+      renders only. RE-READ when fs/fhd-fapm6-rj45@1 and fs/fhd-fapm6-blank@1 joined every
+      bay's `accepts`: two more panels seat in the same 108.97 x 35.05 opening, which
+      changes nothing about the enclosure's own faces, so the gap stands.
     wanted: >-
       a square-on photograph of the front and rear, or a dimensioned rear view.
 groups:
@@ -139,6 +141,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -183,6 +187,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -227,6 +233,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1
@@ -271,6 +279,8 @@ views:
             - fs/fhd-fap8mtp-b@1
             - fs/fhd-fap12mtp16-a@1
             - fs/fhd-fapm6@1
+            - fs/fhd-fapm6-rj45@1
+            - fs/fhd-fapm6-blank@1
             - fs/fhd-fapb@1
             - fs/fhd-fap12lcd-apc-os2@1
             - fs/fhd-fap12lcd-om4@1

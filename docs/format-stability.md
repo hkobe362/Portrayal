@@ -276,12 +276,17 @@ reader that does not know it finds every field it read before.
   4): what each placed part of a configuration can ITSELF be set to,
   `{"outlet-a1": ["on", "off"]}`, keyed by placement id in sorted order. The
   names are the ones the part declares as a list: the placement's own
-  `states`, else its group's, else its part's. A lamp (`class: led`) is not
-  listed, since a state is set on the outlet and follows `for:` to its lamp;
-  nor is a part whose `states` is the mapping form, which names the lamps
-  inside it. A part that declares none has no entry, so an outlet that cannot
-  be switched is not listed. Always an object; `{}` on a device that
-  declares none. Additive.
+  `states`, else its group's, else its part's. Since P-0041 it also lists
+  every lamp and display the drawing declares, which a rack file keys `states`
+  by: each `data-states` on a `data-path` of the faces the configuration
+  draws, at the path the drawing gives it (`led-sys`, `psu-0/module/status-led`
+  for a seated module, `led-port-0/lamp`, `status-display/digit-1` with the
+  digit glyphs as its states, `breaker-a/rocker`, `led-a1`). A placement's own
+  answer wins for its path; a path on two faces takes the union. A part that
+  declares none has no entry, so an outlet that cannot be switched is not
+  listed, and a module the rack's own `swaps` put in a bay is not listed. A
+  display's readings (`data-messages`) are not states. Always an object; `{}`
+  on a device that declares none. Additive.
 - **`configs[].names`** beside it: the name a DCIM knows each of those parts
   by, `{"outlet-a1": "A1"}`, where that is not the placement id. It is read
   from the device's own `interfaces:` through the function that names the

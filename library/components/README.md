@@ -113,6 +113,19 @@ published, taken once from the tree at `from` with
 from the replacement at every build, which stops when they differ; L184 checks
 the shape. A major that is kept says `superseded-by` instead.
 
+**A part that takes or hands on direct current states its DC ports** in an
+optional `dc: {ports: [...]}` block. A port has an `id`, a `direction`, a
+signed `voltage`, and `poles`, one per conductor, each a `role` from
+`spec/schemas/dc.yaml` and the `slot` it lands on: the id of a composed part
+(a screw, a stud pair) or a connection point (a connector's contact), all of
+one kind (L188, L189). A stated role has a `provenance` entry that
+`source.poles` names (L187); a role no source states is `unstated`, with a
+`dc-polarity` gap on every device that places the part (L190). A negative
+voltage is written with its minus (L191). A terminal drawn only as an element
+is not a slot, so it becomes a seat part before a port can name it. A device
+placement may override the side, voltage, rating and the role of a pole with
+its own `dc`, keyed by port id. No part in the library states one yet.
+
 The bump rules, from DESIGN.md: **art is a patch** (a skin redrawn, a colour, a
 label), **additive is a minor** (a new element, a new state, a new skin),
 **geometry or ids are a major** (the size changed, an element something
@@ -224,6 +237,13 @@ The rest earns its place:
   the bottom of the envelope, its `lip`, its `run`, the tie slots cut in it
   (`ties`) and how it holds slack. Both travel with every placement of the
   part; L138 and L170 hold them inside it. See `docs/cable-lay-design.md`.
+- `lid: true` for a hinged or removable cover that opens over a duct - the
+  cover of a finger duct clips off its finger tips. A pass-through
+  (`passes:` on a device view) may lie under a lid, because a cable crosses
+  once it is open; under any other placed part L136 still refuses it. Say it
+  only where the vendor's own sources show the cover opening, and put that
+  source in `provenance`. It is not a solid body and it changes nothing in
+  the drawing.
 - `facet` on a relief feature, and `on` on a part, for connectors on a
   surface angled off the panel. See
   `docs/tilted-facets-design.md`.

@@ -11,7 +11,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "ec9cafd755f3270c",
+ "gaps": "ac729860a614a5c0",
  "groups": [
   "body",
   "cover",
@@ -297,6 +297,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "4fa5fa7953783ba4",
- "surface": "ea40da964c59b13f",
- "version": "0.1.0"
+ "surface": "b8ac2b3c2236eaae",
+ "version": "0.1.2"
 }
