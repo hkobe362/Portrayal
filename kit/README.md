@@ -676,6 +676,16 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.50.0: a bundle's bend check reads the line its cords run, and a bundle of loose cables has no straps.**
+`bendCheck` (so `bundleCheck`, `bundleChecks`, `inspect` of a bundle and the exports) takes the corners of a
+trunk from the members' routed paths, the line the straps and the length are read from, not from the straight
+lines between waypoints, so a bundle that is too tight where its cords turn round a duct is found; a corner
+between two places is said "A to B", and the tightest at one place is the place's. A leg two corners share is
+divided by what each turn needs of it, as a cable's own path is judged (`cornersOf(pts, {share: 'need'})`),
+not by halves. `straps()` gives none for a bundle with fewer than two members riding its trunk, a member whose
+device at an end is gone and the cable kept riding nothing, so the count, the sentence and the BOM agree.
+Findings and strap counts move; nothing saved does.
+
 **New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
 `loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`
 and `createViewer` take a list where they took one root (`kit/dist.js` `layeredDist` and `readIndex`);
