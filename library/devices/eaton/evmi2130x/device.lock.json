@@ -4,7 +4,7 @@
    "eaton/g4-enmc@1"
   ]
  },
- "composed": "d4608748ac377af7",
+ "composed": "c4f7b16429866416",
  "composed-refs": {
   "common/ground-screw-m6@1": "1.0.1+9f4550bbd26532c2",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -12,7 +12,7 @@
   "eaton/c39-outlet@1": "1.1.0+f510d06b181db1da",
   "eaton/g4-breaker-20a-2p@1": "1.0.0+b77e6561b6711426",
   "eaton/g4-cord-l21-30p@1": "1.0.0+da3c7c312d632db3",
-  "eaton/g4-enmc@1": "1.0.0+2f23e65ced2e99de",
+  "eaton/g4-enmc@1": "1.1.0+360b031cea18c429",
   "eaton/g4-mounting-button@1": "1.1.0+7220eed1d4739785",
   "eaton/g4-outlet-labels@1": "1.0.0+bcf9297e0c52d44d",
   "std/c13-outlet@1": "1.1.0+99d4f2c7aa898c37",
@@ -361,5 +361,5 @@
  "placement-surface": "1ff75214c566a5b0",
  "shape": "dde38e6ade0309a3",
  "surface": "185ffa8c60343d3e",
- "version": "0.3.0"
+ "version": "0.3.1"
 }

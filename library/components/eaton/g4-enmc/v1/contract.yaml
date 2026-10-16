@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: g4-enmc
-version: 1.0.0
+version: 1.1.0
 class: nic
 behaviour: fills
 profile: power
@@ -63,7 +63,9 @@ provenance:
     photo-measured - "MENU PIXEL LCD" on 9001-22301; a pixel display has no
     character cells, so `characters` records the longest line seen, 19, in
     EVMI2130X_DT5, the line giving the eth0 address. It reads upright with the PDU
-    standing.
+    standing. `kind: pixel` is the drawing's own words, MENU PIXEL LCD: a rack file
+    may draw text on it, clipped to those 19 characters, or a picture scaled into
+    its window. No row count is stated anywhere and none is recorded.
   keys: >-
     datasheet and drawing - the guide names Up, Down, Enter and Escape. The drawing
     prints them for the module lying down, so standing the < key is Down and the >
@@ -88,7 +90,7 @@ groups:
   peripheral: {term: Port, role: management, index-origin: 1, mixed: 'the module''s service connections - the PDU+1 power-redundancy link, the environmental probe and the two USB-C ports'}
   controls: {term: Button, role: management, index-origin: 1}
 elements:
-  lcd: {at: [8.95, 52.15], size: [31.1, 30.9], class: display, characters: 19}
+  lcd: {at: [8.95, 52.15], size: [31.1, 30.9], class: display, kind: pixel, characters: 19}
   key-up: {at: [10.95, 18.75], size: [12.3, 12.3], class: button}
   key-enter: {at: [25.75, 18.75], size: [12.3, 12.3], class: button}
   key-down: {at: [10.95, 33.25], size: [12.3, 12.3], class: button}

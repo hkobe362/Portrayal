@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16.1mm" height="14.5mm" viewBox="0 0 16.1 14.5">
+  <!-- The back of a keystone jack: punch-down (IDC) slots, two rows of four.
+       See the contract: the layout of the slots is estimated. -->
+  <rect id="body" x="0" y="0" width="16.1" height="14.5" rx="0.6"
+        fill="#d9d6cf" stroke="#9f9d98" stroke-width="0.15"/>
+  <g id="slots" fill="#3a3f45">
+    <rect x="2.2" y="3.0" width="2.0" height="3.2"/>
+    <rect x="5.4" y="3.0" width="2.0" height="3.2"/>
+    <rect x="8.7" y="3.0" width="2.0" height="3.2"/>
+    <rect x="11.9" y="3.0" width="2.0" height="3.2"/>
+    <rect x="2.2" y="8.3" width="2.0" height="3.2"/>
+    <rect x="5.4" y="8.3" width="2.0" height="3.2"/>
+    <rect x="8.7" y="8.3" width="2.0" height="3.2"/>
+    <rect x="11.9" y="8.3" width="2.0" height="3.2"/>
+  </g>
+</svg>
