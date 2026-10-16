@@ -10,7 +10,7 @@
 // Pure: what reads a drawing comes in on `ctx.route`, the routing context
 // route.js takes (`{chassisOf, guidesOf, portX, portY?, zeroUAperture?}`).
 
-import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers} from './model.js';
+import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers, endHostOf} from './model.js';
 import {ownRoute, resolveRoute, trunkRoute, trunkMeasures, pointOf, routePath, routeText, DIAMETERS} from './route.js';
 import {traysOf} from './solids.js';
 import {elementsOf, elementText, waypointKey, followTrunk, andList} from './bundle-route.js';
@@ -152,7 +152,9 @@ export function layoutOf(rack, b, ctx) {
       const own = ownRoute(rack, cable, rc, {gutter: trunk.length > 0 && b.members.length >= 2}).waypoints;
       const f = followTrunk(own, trunk, m, trunkMeasures(rack, cable, trunk, rc));
       const idx = w => (w ? at.get(waypointKey(w)) : undefined);
-      return {cable: m.cable, member: m, join: f.join, leave: f.leave, ji: idx(f.join), li: idx(f.leave), met: f.met, stale: f.stale, own};
+      // loose: the device at an end is gone and the cable kept (#1021)
+      const loose = !endHostOf(rack, cable.a?.item) || !endHostOf(rack, cable.b?.item);
+      return {cable: m.cable, member: m, join: f.join, leave: f.leave, ji: idx(f.join), li: idx(f.leave), met: f.met, stale: f.stale, own, loose};
     }).filter(Boolean);
     return {trunk, gone, T, members};
   } catch { return null; }
@@ -603,7 +605,9 @@ export function straps(rack, b, ctx = {}) {
   const L = layoutOf(rack, b, ctx);
   if (!L) return null;
   const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false, few: false};
-  if (b.members.length < 2 || L.trunk.length < 2) return empty;
+  // a bundle is strapped where two or more members ride its trunk, and a loose member rides nothing (#1021)
+  const rides = L.members.filter(m => m.ji != null && m.li != null && !m.loose).length;
+  if (b.members.length < 2 || rides < 2 || L.trunk.length < 2) return empty;
   const line = trunkLine(rack, b, L, ctx.route);
   if (!line) return empty;
   // `cum` is by resolved waypoint, as the stretches and the anchors below read it

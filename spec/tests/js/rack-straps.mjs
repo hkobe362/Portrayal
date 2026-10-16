@@ -464,3 +464,25 @@ test('the BOM counts each strap once by width: a bundle anchor is not counted wi
   assert.equal(widthSum(own), own.qty);
 });
 
+test('a bundle with fewer than two members riding its trunk has no straps, and the count, the sentence and the BOM agree (#1021)', () => {
+  const xs = [-450, -150, 0, 200, 450];
+  const r = along(xs, [null, null, null]);
+  const ctx = {route: routeCtx(r, xs)};
+  // a member is loose when the device at one of its ends is gone and the cable is kept
+  const looseFrom = ids => ({...r, cables: r.cables.map(c => (ids.includes(c.id) ? {...c, a: {...c.a, item: 'i99'}} : c))});
+  const readBack = rack => ({st: B.straps(rack, rack.bundles[0], ctx), totals: B.strapTotals(rack, ctx), ex: X.bundleExports(rack, ctx)[0]});
+  const whole = readBack(r);
+  assert.ok(whole.st.count > 0 && whole.totals.total > 0, 'a bundle of three that ride has straps');
+  // one loose of three: the other two still ride together, and are strapped
+  assert.equal(readBack(looseFrom(['c3'])).st.count, whole.st.count);
+  // two loose of three, and all three: fewer than two ride
+  for (const ids of [['c2', 'c3'], ['c1', 'c2', 'c3']]) {
+    const {st, totals, ex} = readBack(looseFrom(ids));
+    assert.deepEqual([st.count, st.kinds, st.straps, st.runs], [0, {spacing: 0, breakout: 0, anchor: 0}, [], []], ids.join());
+    assert.equal(totals.total, 0);
+    assert.equal(ex.straps, 0);
+    assert.ok(!X.bundleNote(ex).includes('2 straps') && /, 0 straps|no straps/.test(X.bundleNote(ex)), X.bundleNote(ex));
+    assert.deepEqual(X.strapBomRows([ex]), []);
+  }
+});
+
