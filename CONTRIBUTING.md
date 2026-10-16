@@ -414,6 +414,45 @@ python3 -m pytest spec/tests -q -n auto --junitxml /tmp/junit.xml
 python3 spec/tools/portrayal/suite_times.py /tmp/junit.xml
 ```
 
+## An overlay library: your own devices without a fork
+
+An overlay is a second library, kept in another folder (and another
+repository), that is built on top of this one. A downstream project that keeps
+devices of its own does not have to fork Portrayal for them. It keeps a folder
+shaped like `library/` (`devices/<vendor>/<model>/`, and `components/` for any
+part of its own), draws its devices from the public parts, and builds it with
+this checkout's tools:
+
+```sh
+./build.sh --overlay-library ../my-library --overlay-out ../my-library-dist
+```
+
+The build lints the overlay's files, renders its devices against the public
+components plus its own, and writes `devices.json`, `components.json`, each
+device's `configs.json` and faces, and `rack.json` to `--overlay-out`. It reads
+and writes nothing else: `library/dist` is the same bytes with and without an
+overlay, and the overlay's dist holds only what the overlay adds.
+
+An overlay adds and never replaces. A device name, a device folder, a part ref
+or a listing that the public library already has is refused before anything is
+drawn, with both files named. The overlay's lock (`device.lock.json`) counts
+the public parts its devices seat, so a public part that moves asks for the
+bump. `python3 spec/tools/portrayal/devicelock.py --library ../my-library
+--below library` checks it, and `--update` records it.
+
+The kit loads the two dists side by side. Give `createShell`, `createViewer`,
+`loadCatalog` and `loadSlots` a list, `[publicDist, overlayDist]`, where they
+took one: a later root adds devices and parts, and an id in two roots is an
+error naming both. In the explorer, `kit/index.html?overlay=<path to the
+overlay's dist>` does the same. The example in
+`spec/tests/fixtures/overlay-example/` is one made-up device
+(`example/overlay-switch`) and what the tests build.
+
+An overlay's own vendor folder warns L55 until `spec/schemas/vendors.yaml`
+knows it. Only the devices, components and rack indexes are written to an
+overlay's dist; the other indexes (labs, gaps, vendors, listings) and the DCIM
+exports are not built for it.
+
 ## Commits
 
 One sentence that says what is true after the change, optionally prefixed with

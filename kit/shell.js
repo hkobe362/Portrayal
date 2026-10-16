@@ -24,7 +24,7 @@ import { nestedBays, applyOverrides, applyOccupantOverrides, applyRearOverrides,
          freshBaysUnder, seatFace, faceQueue, swapOverrides, faceEntries, faceTree, ownerPath,
          builtTurns, turnOverrides, acceptTurns, decodeTurns, seatTurn, turnable,
          slotOptions, slotResolver } from './swap.js';
-import { jdist, faceFile, distResolver } from './dist.js';
+import { jdist, faceFile, distResolver, readIndex } from './dist.js';
 import { paintFields, unpaintFields, fieldRows, fieldAccepts, decodeFields, drawnField,
          adjustmentsOf, adjustmentAccepts, paintAdjustments } from './fields.js';
 import { paintDisplays } from './displays.js';
@@ -1911,8 +1911,10 @@ export function createShell(opts = {}) {
   addEventListener('resize', fit);
 
   const ready = (async () => {
-    DEVICES = DEVICES.length ? DEVICES : (await j('devices.json')).devices;
-    COMPONENTS = COMPONENTS.length ? COMPONENTS : (await j('components.json')).components;
+    // readIndex, not `j`: over a list of dist roots (an overlay library) these
+    // two are every root's joined
+    DEVICES = DEVICES.length ? DEVICES : (await readIndex(distAt, 'devices.json')).devices;
+    COMPONENTS = COMPONENTS.length ? COMPONENTS : (await readIndex(distAt, 'components.json')).components;
     // OPTIONAL, for a build from before listings (#677): without the file the
     // picker offers the hardware alone, which is what it always did.
     try { LISTINGS = (await j('listings.json')).listings || {}; } catch { LISTINGS = {}; }
