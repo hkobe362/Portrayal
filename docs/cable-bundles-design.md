@@ -680,20 +680,20 @@ with the length and with every view.
    neighbouring corner on each side, through any straight passes, or to the
    trunk's end where there is no further corner. Peel and join points do not
    cut a leg: they do not change the trunk's shape.
-5. **The share of a leg.** A leg between two corners is shared, so each corner
-   may use half of it: `a = L / 2`. A leg that ends at the trunk's end has no
-   other bend of the bundle on it (the members' turns there are their leads'),
-   so the corner may use all of it: `a = L`.
+5. **The share of a leg.** A leg between two corners is shared, and is
+   divided by what each turn needs of it (#984, `share: 'need'`): a bend of
+   radius `r` uses `r * tan(θ / 2)` of each leg, so the largest radius both
+   corners of a leg `L` can take is `L / (tan(θ₁ / 2) + tan(θ₂ / 2))`. A leg
+   whose other corner doubles back is halved, so one fold does not take all the
+   room of its neighbours. A leg that ends at the trunk's end has no other bend
+   of the bundle on it (the members' turns there are their leads'), so the
+   corner may use all of it. This is the rule a cable's own path is judged by.
 
-The largest radius that fits is:
-
-```
-r_max = min(a_in, a_out) / tan(θ / 2)
-```
-
-A bend of radius `r` uses `r * tan(θ / 2)` of each leg. A right angle with
-120 mm to the next corner on each side allows 60 mm: half of 120, over
-tan 45° = 1. As θ approaches 180 degrees, `tan(θ / 2)` grows without bound and
+The largest radius that fits is the smaller of the two legs' figures: for a
+leg to the end, `L / tan(θ / 2)`, and for a shared leg the figure above. For a
+polyline that is all right angles, a shared leg of 120 mm allows 60 mm, as
+halves would. A right angle beside a 15° turn at r = 25 needs 28.3 mm of the
+leg between them, where halves asked for 50. As θ approaches 180 degrees, `tan(θ / 2)` grows without bound and
 `r_max` falls to 0, so a trunk that doubles back on itself is always reported:
 a bundle cannot fold back at a point. The front-to-rear crossing at the top of
 a four-post rack is two corners in depth, and is checked the same way.
@@ -723,8 +723,8 @@ was the per-cable bend warning #919 left to a follow-up; since #973 (kit
 0.17.0) the kit judges each cable's own path, with the same corners and a
 leg shared by what each corner needs of it, not by halves
 ([cable-lay-design.md](cable-lay-design.md) section 3.4). The bundle check
-and its error bound are as they were: a trunk is a sketch through waypoint
-centres, and the halves stay.
+shares a leg the same way since #984. Its error bound is as it was: a trunk is
+a sketch through waypoint centres.
 
 ### 5.3 What an agent reads
 

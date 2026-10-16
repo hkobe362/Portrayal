@@ -305,7 +305,9 @@ const an = t => (/^(8|1[18](\.|$))/.test(t) ? 'an' : 'a');
 // - each corner of the trunk, between the straight lines from one resolved
 //   waypoint to the next (pointOf at each; not the members' routed paths,
 //   which the straps and the length are measured along), the room r_max
-//   from its legs (cornersOf). That is the rack's own sketch of where things
+//   from its legs (cornersOf), a leg two corners share divided by what each
+//   turn needs of it (`share: 'need'`, #984), the rule a cable's own path is
+//   judged by. That is the rack's own sketch of where things
 //   are, not a measured bend, so it is `source: 'legs'`, `estimated: true`.
 //   A corner on a pathway that states a radius is the pathway's.
 // A point is checked against the members present that have a radius. One
@@ -354,7 +356,7 @@ export function bendCheck(rack, b, L, pathways, ctx = {}) {
   const elAt = new Map();
   L.T.forEach((e, i) => { if (e.kind !== 's' && e.t === 0 && !elAt.has(e.seg)) elAt.set(e.seg, i); });
   const pts = L.trunk.map(w => pointOf(rack, w, ctx.route));
-  for (const c of cornersOf(pts)) {
+  for (const c of cornersOf(pts, {share: 'need'})) {
     const i = elAt.get(c.k);
     if (i == null || stated.has(i)) continue;
     judge(i, {kind: 'corner', at: txt(L.T[i]), waypoint: L.trunk[c.k], angle_deg: c.angle_deg, legs_mm: c.legs_mm,

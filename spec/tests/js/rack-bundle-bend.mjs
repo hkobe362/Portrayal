@@ -38,7 +38,7 @@ const routeCtx = (rack, extra = {}) => ({chassisOf, portX: () => -150,
   guidesOf: id => {
     const it = rack.items.find(i => i.id === id);
     if (it?.ref !== 'tray') return [];
-    const x0 = it.label === 'mgr-1' ? LANE + TIGHT : LANE + GENTLE;
+    const x0 = extra.x?.[it.label] ?? (it.label === 'mgr-1' ? LANE + TIGHT : LANE + GENTLE);
     return RINGS.map((via, k) => ({via, kind: 'ring', face: 'front', x: x0 + k * 100, box: {x: 0, y: 0, w: 40, h: 30},
                                    aperture: null, ...(extra.radius?.[`${it.label}:${via}`] ? {radius: extra.radius[`${it.label}:${via}`]} : {})}));
   }});
@@ -133,6 +133,27 @@ test('a bundle command and inspect carry the bend warning; describe counts it', 
   assert.ok(said.includes('b1 uplinks: 2 cables (c1-c2), about 8 mm, straps every 12 in, 1 warning.'), said);
   // without the routes nothing is measured, and bend is null rather than a pass
   assert.equal((await inspect(r, 'b1', {chassisOf, bendOf})).bend, null);
+});
+
+test('two corners sharing a leg divide it by what each turn needs, as a cable path does (#984)', () => {
+  // a right angle at U10, 44.45 mm of lane to U11, then a 15 degree turn toward a ring 12 mm off the lane.
+  // At 25 mm each turn takes 25 + 25 tan(7.5) = 28.3 mm of the shared leg; halves would give each 22.2.
+  const route = RT('i2:guide-1', ['left-front', 10], ['left-front', 11], 'i4:guide-1');
+  let r = M.newRack({name: 'Rack 1'});
+  r = M.withItem(r, {ref: 'sw', cfg: 'x', ru: 10, label: 'sw-1'}).rack;
+  r = M.withItem(r, {ref: 'tray', cfg: 'x', ru: 10, label: 'mgr-1', on: 'i1', unit: 1}).rack;
+  r = M.withItem(r, {ref: 'pp', cfg: 'x', ru: 12, label: 'pp-1'}).rack;
+  r = M.withItem(r, {ref: 'tray', cfg: 'x', ru: 12, label: 'mgr-3', on: 'i3', unit: 1}).rack;
+  ['om4', 'cat6'].forEach((m, k) => {
+    r = withCable(r, {a: end('i1', `p${k + 1}`), b: end('i3', `q${k + 1}`), media: m}).rack;
+    r = {...r, cables: r.cables.map(c => (c.id === `c${k + 1}` ? {...c, route, routeEdited: true} : c))};
+  });
+  r = apply(r, {op: 'bundle.create', cables: ['c1', 'c2'], route}, {chassisOf}).rack;
+  const c = check(r, {x: {'mgr-1': LANE + 40, 'mgr-3': LANE + 12}});
+  assert.deepEqual(c.bend.points.map(p => [p.at, p.angle_deg, p.legs_mm, p.room_mm, p.ok]), [
+    ['left-front U10', 90, [40, 44.4], 39.2, true],
+    ['left-front U11', 15.1, [44.4, 46], 39.2, true]]);
+  assert.deepEqual(c.warnings, []);
 });
 
 test('a member at its own join or peel point makes its own turn there and does not count in the bend', () => {
