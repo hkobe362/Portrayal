@@ -1,0 +1,34 @@
+format: 1
+kind: component
+name: xcu-side
+version: 1.0.0
+class: mechanical
+profile: optical
+description: >-
+  One side wall of the Fibrain XCU10's shell, seen from above. A sheet on edge
+  beside the drawer, as deep and as high as the shell's well; a line in plan.
+size: {w: 1.0, h: 283.0}
+size-confidence: {w: estimated, h: estimated}
+elements:
+  wall: {at: [0.0, 0.0], size: [1.0, 283.0], class: bezel}
+relief:
+  features:
+    - node: wall
+      out: 20.2
+      color: '#1b1e21'
+      confidence: estimated
+      source: 'the shell is closed along its sides on every render of the XCU, from the floor to the top; the sheet is taken as the 1.0 the well already allows, and the wall as high as the well is deep'
+provenance:
+  size: >-
+    estimated - the shell between its side walls is the 429.35 wide well of
+    fibrain/xcu-interior@1 inside a body 431.35 wide, so each wall is 1.0 of
+    sheet, and it runs the 283.0 of that well from the front opening to where
+    the rear would be. No document states the sheet's thickness: the XPU00
+    frame's top sheet and floor are 0.8 on its drawing, and a whole millimetre is
+    the figure the XCU interior already assumes.
+  relief: >-
+    estimated - a wall from the floor of the well to the top sheet. The
+    datasheet gives the 284 depth and the 0.5U height and no section.
+  color: >-
+    photo - powder-painted black steel on the vendor renders, as the shell's top.
+skins: [default]

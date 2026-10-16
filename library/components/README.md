@@ -113,6 +113,19 @@ published, taken once from the tree at `from` with
 from the replacement at every build, which stops when they differ; L184 checks
 the shape. A major that is kept says `superseded-by` instead.
 
+**A part that takes or hands on direct current states its DC ports** in an
+optional `dc: {ports: [...]}` block. A port has an `id`, a `direction`, a
+signed `voltage`, and `poles`, one per conductor, each a `role` from
+`spec/schemas/dc.yaml` and the `slot` it lands on: the id of a composed part
+(a screw, a stud pair) or a connection point (a connector's contact), all of
+one kind (L188, L189). A stated role has a `provenance` entry that
+`source.poles` names (L187); a role no source states is `unstated`, with a
+`dc-polarity` gap on every device that places the part (L190). A negative
+voltage is written with its minus (L191). A terminal drawn only as an element
+is not a slot, so it becomes a seat part before a port can name it. A device
+placement may override the side, voltage, rating and the role of a pole with
+its own `dc`, keyed by port id. No part in the library states one yet.
+
 The bump rules, from DESIGN.md: **art is a patch** (a skin redrawn, a colour, a
 label), **additive is a minor** (a new element, a new state, a new skin),
 **geometry or ids are a major** (the size changed, an element something
