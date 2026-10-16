@@ -169,6 +169,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", action="append", required=True)
     ap.add_argument("--out", required=True)
+    # LIST ONLY THESE ROOTS' DEVICES. Every --library still answers for the
+    # parts and listings a device names; an overlay's index holds the overlay's
+    # own devices, and the public one is read from the public dist beside it.
+    ap.add_argument("--only-root", action="append", default=[],
+                    help="index only the devices under these --library roots")
     args = ap.parse_args()
 
     # THE LISTINGS, INVERTED. A listing names its hardware and the hardware does
@@ -185,7 +190,7 @@ def main():
                  "manufacturer": (vendors.get(ns) or {}).get("display") or ns})
 
     devices = []
-    for root in args.library:
+    for root in args.only_root or args.library:
         for man in libwalk.iter_devices([root]):
             d = load_yaml(man)
             if d.get("kind") != "device":
@@ -243,6 +248,10 @@ def main():
                 # where this chassis's own 3D projections came from, counted
                 "decor-confidence": decor_confidence(d),
             })
+            # WHO IT IS FOR, when the manifest says (the schema's `audience`).
+            # Absent means public and is left out, so a public index is unchanged.
+            if d.get("audience"):
+                devices[-1]["audience"] = d["audience"]
     devices.sort(key=lambda x: (x["manufacturer"], x["name"]))
 
     out = Path(args.out)

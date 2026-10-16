@@ -31,7 +31,7 @@ from portrayal.faces import DIRECTIONS, face_ref  # noqa: E402
 from portrayal.render import (SVG_NS, STATE_CSS, Library, instance_group,  # noqa: E402
                     seq_css_name, state_rule, component_cages, component_presents,
                     _pluggable_families, _pluggable_candidates,
-                    _connector_registry)
+                    _connector_registry, display_elements)
 from portrayal import libwalk  # noqa: E402
 from portrayal import redirects  # noqa: E402
 from portrayal import optical, optical_ports  # noqa: E402
@@ -286,7 +286,7 @@ def kit_entry(ref, ns, major, data):
     consumer reads one shape. The parts stay refs; a device's configs.json is
     where a kit is resolved inline with the geometry of its parts (#907).
     """
-    return {
+    row = {
         "ref": ref, "ns": ns, "name": data["name"], "major": major,
         "version": data["version"], "kind": "kit",
         "description": data.get("description", ""),
@@ -300,12 +300,19 @@ def kit_entry(ref, ns, major, data):
         "superseded-by": data.get("superseded-by"),
         "provenance": data.get("provenance") or {},
     }
+    if data.get("audience"):
+        row["audience"] = data["audience"]
+    return row
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", action="append", required=True)
     ap.add_argument("--out", required=True)
+    # INDEX ONLY THESE ROOTS' PARTS (an overlay library). Every --library still
+    # answers for the parts a contract composes and the devices that seat one.
+    ap.add_argument("--only-root", action="append", default=[],
+                    help="index only the components under these --library roots")
     args = ap.parse_args()
     out = Path(args.out)
     (out / "components").mkdir(parents=True, exist_ok=True)
@@ -323,7 +330,7 @@ def main():
     in_bays = seated_in_bays(args.library)
     seats = seat_counts(args.library)
     composers = composer_counts(args.library)
-    for root in args.library:
+    for root in args.only_root or args.library:
         for cf in sorted(Path(root).glob("components/*/*/v*/contract.yaml")):
             data = load_yaml(cf)
             ns = cf.parents[2].name
@@ -416,9 +423,19 @@ def main():
                                # renderer; without it here a consumer placing a card by
                                # this index lands its ports off the face's by up to
                                # 90 mm.
-                               **({"rotate": b["rotate"]} if b.get("rotate") is not None else {})}
+                               **({"rotate": b["rotate"]} if b.get("rotate") is not None else {}),
+                               # THE SIBLINGS A CARD WIDER THAN ONE SLOT COVERS
+                               # here (docs/pcie-two-slot-bays-design.md, R1):
+                               # what the kit refuses a seat by and draws the
+                               # card's span box from.
+                               **({"span": list(b["span"])} if b.get("span") else {})}
                          for bid, b in sorted((data.get("bays") or {}).items())
                          if isinstance(b, dict)},
+                # HOW MANY SLOTS THE PART TAKES IN A BAY, published only when it
+                # is more than one: a two-slot card covers the bay its bay's
+                # `span` names.
+                **({"slot-width": data["slot-width"]}
+                   if isinstance(data.get("slot-width"), int) and data["slot-width"] > 1 else {}),
                 # REF AND ID, not the ref alone. A consumer that has to say
                 # what a card's ports ARE needs the id - `d0` is a downstream
                 # port and `u0` an upstream one, and the ref they share says
@@ -455,6 +472,10 @@ def main():
                 "_detail": {"provenance": data.get("provenance") or {},
                             "relief": data.get("relief") or {}},
             }
+            # WHO IT IS FOR, when the contract says (the schema's `audience`).
+            # Absent means public and is left out, so a public index is unchanged.
+            if data.get("audience"):
+                entry["audience"] = data["audience"]
             # ITS OWN CAGES, in its own frame (#484): one per part that
             # presents a pluggable interface or a connector interface (B3,
             # `kind: cage|connector`), by the same core as a device
@@ -475,6 +496,12 @@ def main():
             presents = component_presents(ref, lib, families, candidates, connectors)
             if presents:
                 entry["presents"] = presents
+            # ITS DISPLAYS a rack file can set (docs/display-content-design.md),
+            # `{<element>: {kind, characters, rows?, at, size}}`. Omitted when
+            # it has none, like `cages`.
+            shown = display_elements(data)
+            if shown:
+                entry["displays"] = shown
             # THE CARD'S OWN PORT GROUPS (#511), in the device `groups:` shape.
             # Omitted when the contract declares none, like `cages`.
             if data.get("groups"):

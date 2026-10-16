@@ -37,6 +37,7 @@ from portrayal.manifest import (presented_point, back_hosts, back_parts, key_on_
                       presented_interface, forwarded_part, seat_point, _turn,
                       load_yaml, resolve_views, slot_key_prefix,
                       seated_ref, occupants_under, occupant_local_id,
+                      slot_width, span_box, span_seats, span_clashes,
                       occupant_spec, nested_key_host, slot_default, drawn_refs,
                       spanned_slots, spanning_axis, summed_rotate, presented_turn,
                       allowed_turns, text_extent, alias_names, config_airflow,
@@ -509,6 +510,19 @@ def rewrite_ids(el, prefix, contract, path_prefix, skip=None, in_port=False):
             if spec.get("messages"):
                 node.set("data-messages",
                          " ".join(str(m["text"]) for m in spec["messages"]))
+            # WHAT A RACK FILE CAN PUT ON IT (docs/display-content-design.md):
+            # the kind (`data-display-kind`; `data-kind` is the decor's and
+            # `data-display` a device attr), the rows of a character display
+            # and the window, which is the element's own box in the frame of
+            # its part. A display with no `kind` publishes none of them and
+            # cannot be set.
+            if spec.get("kind") and spec.get("class") == "display":
+                node.set("data-display-kind", spec["kind"])
+                if spec.get("rows"):
+                    node.set("data-display-rows", str(spec["rows"]))
+                if spec.get("at") and spec.get("size"):
+                    node.set("data-display-window", " ".join(
+                        f"{float(v):g}" for v in (*spec["at"], *spec["size"])))
             if spec.get("description"):
                 node.set("data-description", spec["description"])
     for node in el.iter():
@@ -2320,7 +2334,46 @@ def instance_group(lib, ref, inst_id, at, label, attrs, group, rel_pos, skin_nam
     #
     # The skin already draws the opening (a <rect id="bay-0">), so this does not
     # add a second one; it makes the existing rect addressable and seats over it.
-    for bay_id, bay in sorted((contract.get("bays") or {}).items()):
+    #
+    # A CARD WIDER THAN ONE SLOT covers the siblings its bay's `span` names
+    # (docs/pcie-two-slot-bays-design.md). Decided for the whole carrier before
+    # anything is drawn: a covered bay must hold nothing, and the card is drawn
+    # in the box its bays make together rather than in its own bay's.
+    carrier_bays = contract.get("bays") or {}
+
+    def bay_key(bid):
+        return f"{path}/{bid}".replace("/module/", "/") if path else bid
+
+    def contract_of(r):
+        try:
+            return lib.resolve(r)[0]
+        except (FileNotFoundError, ValueError, KeyError):
+            return None
+
+    spans = (span_seats(carrier_bays, seated, bay_key, contract_of)
+             if depth < MAX_BAY_DEPTH else {})
+    for bid, (sref, covers) in spans.items():
+        for cid in covers or []:
+            if cid not in carrier_bays or cid == bid:
+                raise ValueError(
+                    f"bays/{bay_key(bid)}: {sref} covers {cid!r}, which is not "
+                    f"another bay of {ref} - `span` names sibling bays only")
+    for bid, sref, cid, held in span_clashes(carrier_bays, seated, bay_key,
+                                             contract_of):
+        width = slot_width(contract_of(sref))
+        if cid is None:
+            raise ValueError(
+                f"bays/{bay_key(bid)}: {sref} is {width} slots wide, and bay "
+                f"{bid} of {ref} names fewer than {width - 1} bays in `span` "
+                "for it to cover - seat it in a bay that spans")
+        raise ValueError(
+            f"bays/{bay_key(bid)}: {sref} is {width} slots wide and covers "
+            f"{bay_key(cid)}, which holds {held}. A covered bay holds nothing: "
+            f"empty it ({bay_key(cid)}: \"\") to seat the card")
+    covered_by = {cid: bid for bid, (_r, covers) in spans.items()
+                  for cid in covers or []}
+    bay_groups = {}
+    for bay_id, bay in sorted(carrier_bays.items()):
         if not isinstance(bay, dict) or not bay.get("at"):
             continue
         want = f"{inst_id}--{bay_id}"
@@ -2381,6 +2434,10 @@ def instance_group(lib, ref, inst_id, at, label, attrs, group, rel_pos, skin_nam
             parent_of.remove(opening)
             opening.set("id", f"{want}--opening")
             bay_g.append(opening)
+            bay_groups[bay_id] = bay_g
+            if bay_id in covered_by:
+                bay_g.set("data-covered-by", f"{path}/{covered_by[bay_id]}"
+                          if path else covered_by[bay_id])
         else:
             # L48 reports a bay whose id names nothing in the skin; without an
             # anchor there is no place in the drawing to put the group, so the
@@ -2399,6 +2456,8 @@ def instance_group(lib, ref, inst_id, at, label, attrs, group, rel_pos, skin_nam
         refuse_bay_module_default(lib, occupant, f"{path}/{bay_id}")
         bw, bh = bay_size(bay)
         b_at = bay["at"]
+        if spans.get(bay_id, (None, None))[1]:
+            b_at, (bw, bh) = span_box(bay, carrier_bays, spans[bay_id][1])
         if bay.get("rotate") in (90, 270):
             d = (bw - bh) / 2.0
             b_at = [b_at[0] + d, b_at[1] - d]
@@ -2449,6 +2508,22 @@ def instance_group(lib, ref, inst_id, at, label, attrs, group, rel_pos, skin_nam
             behind_at += 1
         else:
             g.append(sub)
+    # THE CARD PAINTS OVER THE OPENINGS IT COVERS. A covered bay keeps its group
+    # and its opening, empty and `data-covered-by` its card, so the tree still
+    # lists it; the spanning bay's group moves after the last one it covers, or
+    # a later sibling's opening would paint over the card's lower half.
+    for bid, (_r, covers) in spans.items():
+        mine = bay_groups.get(bid)
+        last = [bay_groups[c] for c in covers or [] if c in bay_groups]
+        if mine is None or not last:
+            continue
+        for holder in g.iter():
+            kids = list(holder)
+            if mine in kids and all(c in kids for c in last):
+                holder.remove(mine)
+                kids = list(holder)
+                holder.insert(max(kids.index(c) for c in last) + 1, mine)
+                break
     # AN OPTIC IN A CAGE ON A SEATED CARD (#484, R2). A configuration's
     # `occupants:` keys such a cage by the MODULE-LESS path - `front-6/xg0` -
     # the convention its nested `bays:` keys already use (bay_path above), and
@@ -4772,6 +4847,76 @@ def config_states(device, cfg_name, cfg, lib):
     return dict(sorted(out.items()))
 
 
+def display_elements(contract):
+    """The displays of one contract a rack file can set, `{<element>: {kind,
+    characters, rows?, at, size}}` (docs/display-content-design.md).
+
+    ONLY AN ELEMENT THAT SAYS WHAT IT IS. A `class: display` element with a
+    `kind` and a box is a window the drawing shows; one without either is left
+    out, and a rack file cannot set it. `rows` is published only where the
+    contract states it. `{}` for a part with none."""
+    out = {}
+    for eid, spec in sorted((contract.get("elements") or {}).items()):
+        if not isinstance(spec, dict) or spec.get("class") != "display":
+            continue
+        if not spec.get("kind") or not spec.get("at") or not spec.get("size"):
+            continue
+        out[eid] = {"kind": spec["kind"], "characters": spec.get("characters"),
+                    **({"rows": spec["rows"]} if spec.get("rows") else {}),
+                    # a segment cell's glyphs, the states a digit string lights
+                    **({"glyphs": state_names(spec["states"])}
+                       if spec["kind"] == "segment" and spec.get("states") else {}),
+                    "at": [float(v) for v in spec["at"]],
+                    "size": [float(v) for v in spec["size"]]}
+    return out
+
+
+def config_displays(device, cfg_name, cfg, lib):
+    """`configs[].displays`: the displays each part one configuration places
+    carries, `{<placement id>: {<element>: {...}}}`, as `display_elements`
+    reads them off the part's contract.
+
+    A PLACEMENT'S, NOT A BAY'S. What a bay holds is a swap, and the kit reads
+    that part's own `displays` from components.json; this lists only the parts
+    the device itself places, read over the views and placements this
+    configuration draws. `{}` on a device with none."""
+    out = {}
+    for _face, (_name, view) in resolve_views(device, cfg).items():
+        for p in view_parts(view)["placements"]:
+            if not p.get("id") or (p.get("only-in") and cfg_name not in p["only-in"]):
+                continue
+            contract, _ = lib.resolve(p["ref"])
+            shown = display_elements(contract)
+            if shown:
+                out[p["id"]] = shown
+    return dict(sorted(out.items()))
+
+
+def drawn_states(placed, face_docs):
+    """`configs[].states` in full (P-0041): `config_states` (the parts a
+    placement declares) and every lamp or part the DRAWING declares, each by the
+    path the drawing gives it, which is the path the Explorer and a rack file
+    key by.
+
+    READ FROM THE FACES, NOT THE MANIFEST. A lamp on a seated PSU, a link lamp
+    bound to its port, a lamp the mapping form gives a jack, an optic's lamp:
+    none is a placement of this device, and each is a `data-states` on a
+    `data-path` of the drawing. `face_docs` are the elements documents of the
+    faces this configuration draws (elements.face_elements), so the file and
+    the drawing agree by construction. A placement's own answer wins for its
+    path; a path on two faces takes the union, in order. A display's readings
+    ride `data-messages`, not `data-states`, and are not listed here."""
+    out = {p: list(s) for p, s in placed.items()}
+    for doc in face_docs:
+        for row in doc.get("elements", ()):
+            path, names = row.get("path"), row.get("states")
+            if not path or not names or path in placed:
+                continue
+            have = out.setdefault(path, [])
+            have.extend(n for n in names if n not in have)
+    return dict(sorted(out.items()))
+
+
 def config_names(device, states):
     """`configs[].names` (docs/rack-file-v4-design.md section 4): the name a
     DCIM knows each settable part by, `{<path>: <name>}`, for the paths of
@@ -5811,6 +5956,9 @@ def main():
     _connectors = _connector_registry()
     _candidates = _pluggable_candidates(args.library)
     _default_occupants = (configs.get(default_cfg) or {}).get("occupants") or {}
+    cfg_states = {n: drawn_states(config_states(device, n, c, lib),
+                                  [faces[f] for f in files.get(n, {}).values() if f in faces])
+                  for n, c in configs.items()}
     cfg_index = {"device": device["name"], "model": device.get("model", ""),
                  # THE OTHER NAMES THIS BOX IS SOLD OR LISTED UNDER - an HCL's
                  # AS number, a marketing name, an OEM's name (#514). Names
@@ -5967,12 +6115,20 @@ def main():
                               # WHAT EACH PLACED PART CAN BE SET TO (#934):
                               # `{<placement id>: [state names]}`, the parts
                               # that declare any; `{}` on a device with none
-                              "states": config_states(device, n, c, lib),
+                              # AND EVERY LAMP THE DRAWING DECLARES (P-0041),
+                              # keyed by the path the drawing gives it
+                              "states": cfg_states[n],
                               # THE NAME A DCIM KNOWS EACH OF THOSE BY, where it
                               # is not the placement id: `{<placement id>:
                               # <name>}`, from the device's own `interfaces:`,
                               # as the device-type export names its outlets
-                              "names": config_names(device, config_states(device, n, c, lib)),
+                              "names": config_names(device, cfg_states[n]),
+                              # THE DISPLAYS THE DEVICE PLACES (docs/display-
+                              # content-design.md): `{<placement id>: {<element>:
+                              # {kind, characters, rows?, at, size}}}`. Only on a
+                              # configuration that places one.
+                              **({"displays": shown}
+                                 if (shown := config_displays(device, n, c, lib)) else {}),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a

@@ -157,6 +157,7 @@ also draws is that part's row. Each row may carry:
 | `states` | `data-states` | list: the lamp vocabulary |
 | `for` | `data-for` | list: the owners, local paths or device-absolute `/<view>/<path>` |
 | `inner` | `data-inner` | `true` for a port inside another port's housing |
+| `covered-by` | `data-covered-by` | on a bay a card wider than one slot covers: the path of the bay the card is seated in ([pcie-two-slot-bays-design.md](pcie-two-slot-bays-design.md)) |
 | `connection-points` | `data-cp`, `data-cp-at`, `data-cp-dir`, `data-cp-on` on the part's markers | `{name: {at, face, dir?, on?}}`: `at` as written, in the part's own frame; `face`, the same point in the face's frame |
 | `seat` | the path | the bay or cage this row's part is seated in, innermost first; absent on the chassis's own rows |
 | `moves-with`, `moves-by` | `data-moves-with`, `data-moves-by` on the row's element, or on the nearest element it sits inside | the adjustment that moves this row's box, and `[dx, dy, dz]`: the mm it moves for each mm of position (see [A part that slides](#a-part-that-slides)); absent on a row nothing moves |
@@ -275,12 +276,17 @@ reader that does not know it finds every field it read before.
   4): what each placed part of a configuration can ITSELF be set to,
   `{"outlet-a1": ["on", "off"]}`, keyed by placement id in sorted order. The
   names are the ones the part declares as a list: the placement's own
-  `states`, else its group's, else its part's. A lamp (`class: led`) is not
-  listed, since a state is set on the outlet and follows `for:` to its lamp;
-  nor is a part whose `states` is the mapping form, which names the lamps
-  inside it. A part that declares none has no entry, so an outlet that cannot
-  be switched is not listed. Always an object; `{}` on a device that
-  declares none. Additive.
+  `states`, else its group's, else its part's. Since P-0041 it also lists
+  every lamp and display the drawing declares, which a rack file keys `states`
+  by: each `data-states` on a `data-path` of the faces the configuration
+  draws, at the path the drawing gives it (`led-sys`, `psu-0/module/status-led`
+  for a seated module, `led-port-0/lamp`, `status-display/digit-1` with the
+  digit glyphs as its states, `breaker-a/rocker`, `led-a1`). A placement's own
+  answer wins for its path; a path on two faces takes the union. A part that
+  declares none has no entry, so an outlet that cannot be switched is not
+  listed, and a module the rack's own `swaps` put in a bay is not listed. A
+  display's readings (`data-messages`) are not states. Always an object; `{}`
+  on a device that declares none. Additive.
 - **`configs[].names`** beside it: the name a DCIM knows each of those parts
   by, `{"outlet-a1": "A1"}`, where that is not the placement id. It is read
   from the device's own `interfaces:` through the function that names the

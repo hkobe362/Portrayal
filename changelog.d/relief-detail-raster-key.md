@@ -1,6 +1,6 @@
 ### Changed
 - **The relief detail pass asks for each raster once** (`kit/relief.js`,
-  P-0039). `@portrayal/kit` is 0.45.0. A node's text carries the face's whole
+  P-0039). `@portrayal/kit` is 0.51.0. A node's text carries the face's whole
   `<style>` and `<defs>` (tens of kilobytes, up to a megabyte), and
   `rasterKey` rewrote all of it, and every kept raster held it as a key, on
   each ask. The shared prefix before `<!--art-->` is now rewritten once, found

@@ -1,0 +1,54 @@
+# spec/schemas/dc.yaml
+# The conductors of a DC circuit, as a part's `dc` block names them, and which
+# of them a feed may join. Vocabulary like connectors.yaml: lint reads it (L187
+# refuses a role that is not under `roles`), so the list and the rule that
+# enforces it cannot drift, and the build reads it for the end-to-end check.
+#
+# A POLE is one conductor's landing on a part: a screw, a stud, a stud pair a
+# two-hole lug spans, a contact in a connector. Its ROLE says which conductor of
+# the circuit lands there. The role is never a voltage; the sign is the voltage
+# of the port the pole belongs to.
+#
+# `roles`    role -> {written-as, note}. `written-as` is how a source prints it,
+#            for the reader who has to turn a legend into a role.
+# `matches`  the pairs a feed may join, each with the source that says so.
+#            A pair is unordered. `when: negative-voltage` limits it to an end
+#            whose stated voltage is negative: the pairing is of a battery
+#            plant's conductors with the signs a source prints, and it does
+#            not hold for a positive supply, whose `neg` is its own return.
+#            A pair that is absent is not a match, so `batt` against `rtn` is a
+#            crossed feed.
+format: 1
+roles:
+  batt:
+    written-as: [BATT, BAT, -48V, negative (battery), NEG]
+    note: the supply-side conductor of a negative-ground plant, at the voltage the end states
+  rtn:
+    written-as: [RTN, RET, return, +Return, positive (battery return)]
+    note: the return conductor of that plant
+  pos:
+    written-as: ['+']
+    note: the positive conductor of a circuit with no battery wording (a 12 V or 24 V supply, a barrel jack)
+  neg:
+    written-as: ['-']
+    note: the negative conductor of such a circuit
+  gnd:
+    written-as: [earth symbol, PE]
+    note: a bonding conductor. It stays a `media - ground` cable and is not a pole of a feed, so it matches nothing here
+  unstated:
+    written-as: []
+    note: the source does not say. The device carries a `dc-polarity` gap, the pole is checked by position, and no feed is called crossed on it
+
+matches:
+  - {a: batt, b: batt, source: the same conductor named twice}
+  - {a: rtn, b: rtn, source: the same conductor named twice}
+  - {a: pos, b: pos, source: the same conductor named twice}
+  - {a: neg, b: neg, source: the same conductor named twice}
+  - a: batt
+    b: neg
+    when: negative-voltage
+    source: 'Supermicro MNL-2570 section 2.8 names the -48 Vdc terminal "negative terminal (battery)"'
+  - a: rtn
+    b: pos
+    when: negative-voltage
+    source: 'Supermicro MNL-2570 section 2.8 names the return terminal "+Return positive terminal"'

@@ -18,7 +18,7 @@ JS = ROOT / "spec/tests/js/fapm6-cables.mjs"
 def test_the_loaded_fapm6_panels_against_the_rack_kit():
     if shutil.which("node") is None:
         pytest.skip("node not installed")
-    if not (DIST / "components.json").exists() or not (DIST / "fhd-1ube.configs.json").exists():
+    if not all((DIST / f).exists() for f in ("components.json", "fhd-1ube.configs.json", "evma8365x.configs.json")):
         pytest.skip("library/dist not built - run ./build.sh")
     p = subprocess.run(["node", "--test", str(JS)], capture_output=True, text=True, cwd=str(JS.parent),
                        env={**os.environ, "PORTRAYAL_DIST": str(DIST)})

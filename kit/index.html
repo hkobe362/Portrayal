@@ -135,11 +135,17 @@ import { drawEars, clearEars, earPlan, faceSize, frontWidthOfText } from './ears
 // WHERE THE FILES COME FROM. The build directory by default; the npm packages
 // (#528) on `?dist=packages` (a local npm_packages.py run) or `?dist=cdn`.
 const page = new URLSearchParams(location.search);
-const DIST = page.get('dist') === 'packages'
+const PUBLIC_DIST = page.get('dist') === 'packages'
   ? await packageDist({at: name => `../library/packages/${name.split('/')[1]}/`})
   : page.get('dist') === 'cdn'
     ? await packageDist({index: page.get('index') || 'latest'})
     : flatDist('../library/dist');
+// AN OVERLAY LIBRARY beside the public one (`build.sh --overlay-library`):
+// `?overlay=<path to its dist>` adds its devices and parts, and an id in both is
+// an error. A path on this site only: the faces it names are parsed as markup,
+// so another origin is not taken from a link.
+const OVERLAY = page.get('overlay');
+const DIST = OVERLAY && /^(?!\/\/)[A-Za-z0-9._\/-]+$/.test(OVERLAY) ? [PUBLIC_DIST, OVERLAY] : PUBLIC_DIST;
 const shell = createShell({ title: 'Portrayal explorer', dist: DIST });
 const state = shell.state;
 

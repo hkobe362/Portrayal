@@ -33,6 +33,7 @@ from portrayal import libwalk
 from portrayal import capability
 from portrayal import dcim_export
 from portrayal import devicelock
+from portrayal import dc as dc_registry
 from portrayal import ears as ears_mod
 from portrayal import manifest as _manifest
 from portrayal import optical
@@ -44,7 +45,7 @@ from portrayal.manifest import (view_parts, targets, split_target, presented_int
                       component_refs, load_yaml, nested_key_host, chained_occupant_ref,
                       drawn_refs, seat_point, slot_default, spanned_slots,
                       spanning_axis, _turn,
-                      occupant_spec,
+                      occupant_spec, seated_ref, slot_width, span_covers, span_clashes,
                       PANEL_KEY_ORDER, COMPONENT_KEY_ORDER, config_power, OFFERED_KINDS,
                       resolve_views)
 from jsonschema import Draft202012Validator
@@ -394,7 +395,7 @@ RULES = {
             "A dimension with no confidence reads exactly like a measured one to anything that has only the number, so an estimated size passes for a measured one.",
             WARNING),
     "L98": ("component",  "a character display says how wide it is, and every reading fits", "add `characters:` to the `class: display` element, and keep each `messages[].text` inside it",
-            "A display with no character width cannot have its readings checked, so a reading too long for the display survives as a silent transcription error.",
+            "A display with no character width cannot have its readings checked, so a reading too long for the display survives as a silent transcription error. Its `kind` decides what a rack file may put on it, so a kind its numbers contradict would be believed.",
             MIXED),
     "L99": ("component",  "a generic stays generic - no rate, reach, wavelength or wattage under generic/", "move the figure to the vendor wrapper's attrs; a generic/ part stands for every module of its kind",
             "A generic part stands for every module of its kind, so a rate, reach or wattage on it would make one product's figure look like a property of the whole family.",
@@ -653,6 +654,30 @@ RULES = {
              ERROR),
     "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
              "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
+             ERROR),
+    "L185": ("component",  "a bay's `span` names other bays of the same component, each the same size, `rotate` and `mirror`, following one another along the card's component side (the bay's own +y, turned by its `rotate`, which is 0 or 180) with no gap wider than a bay and no step sideways; a bay that accepts a part `n` slots wide names at least `n - 1` of them; and a part that composes a part wider than one slot is at least that wide itself", "fix the ids or the bays' geometry; add the covered bay to `span`, or take the wide part out of `accepts`; give the composing part the `slot-width` of what it composes",
+             "A card two slots wide is drawn across its bay and the next one and covers that one, so a span that names the wrong bay, a bay in the wrong place or none at all puts the card over the wrong opening or offers it where it cannot go.",
+             ERROR),
+    "L186": ("component, device", "a card wider than one slot and a bay it covers are never both filled - by a configuration, or by what the bays ship", "empty the covered bay (`<carrier>/<bay>: \"\"` in the configuration), or seat a one-slot part; a component does not ship a two-slot default over a bay that ships one too",
+             "A two-slot card covers the opening beside its own, so a card and anything in that opening at once describes hardware that cannot exist, and the build refuses to draw it.",
+             ERROR),
+    "L187": ("component, device", "a pole's `role` in a `dc` block is one of the roles in spec/schemas/dc.yaml, and a role other than `unstated` has a source: the port's `source.poles` names an entry under the part's `provenance`, and a placement that sets a role states a `source`; every other key of a port's `source` names a `provenance` entry too", "use a role from dc.yaml, or `unstated` where no source says; add the `provenance` entry and name it in `source.poles`",
+             "A polarity is the fact a crossed feed is judged by, and a role that nothing sourced reads as a fact the library does not hold.",
+             ERROR),
+    "L188": ("component, device", "a DC port's id is unique on its part, each pole's `slot` resolves to a composed part (`parts`) or a connection point of the part, and no slot carries two poles of a port; a placement's `dc` names ports of its part and poles of that port", "name a `parts` id or a connection point; draw a terminal that is only art as a seat part first; correct the id the placement's `dc` names",
+             "A pole that names nothing is a conductor a cable cannot land on, and a feed would be checked against a terminal that is not there.",
+             ERROR),
+    "L189": ("component", "the poles of one DC port are all slots (composed parts) or all connection points, never some of each", "make the poles one kind: seat parts for screws and studs, or the points of one pluggable connector",
+             "A feed lands on a port's poles together, and the rule for landing differs between a slot and a point, so a port of both has no one rule.",
+             ERROR),
+    "L190": ("device", "a pole whose role is `unstated` on a part the device presents (a placement, a bay's default or a configuration's occupant), after the placement's own roles are applied, has a `gaps` entry on the device with `what: dc-polarity`", "state the role from a source in the part or in the placement's `dc`, or add a gap `what: dc-polarity` with the reason and what is wanted",
+             "A polarity nobody stated has to be declared as unknown, or it reads as one that is known and a feed on it is judged by a guess.",
+             ERROR),
+    "L191": ("component, device", "the voltage of a DC port carries its sign: the nominal is not zero, the limits of its range have the nominal's sign, and a port with a `batt` pole is negative", "write a negative voltage with its minus (`-48`, range `[-40.5, -57]`); correct the pole's role if the end is positive",
+             "The sign is how a feed tells a battery conductor from a positive one, and an unsigned -48 V would match a +48 V end.",
+             ERROR),
+    "L192": ("component, device", "in Portrayal's own library a device or component states no `audience`, or states `public` (error); a project that keeps private entries beside the public library runs lint with `--allow-audience`", "delete the `audience` line, or set it to `public`; move a private entry to the library that holds private entries",
+             "The public library is published to everyone, so a part labelled for one customer or kept internal there is either a leak or a label that means nothing; the check stops the label from reaching the published library.",
              ERROR),
 }
 
@@ -2122,8 +2147,24 @@ def lint_component_display(path, data, _lib_roots=None):
                              f"{cls!r}. A message vocabulary is what a DISPLAY "
                              f"reads; a lamp's vocabulary is `states`")
             continue
+        kind = spec.get("kind")
+        if (kind or spec.get("rows")) and cls != "display":
+            err(path, "L98", f"element {eid} carries `kind` or `rows` and is "
+                             f"class {cls!r}. Only a display has a window a "
+                             f"rack file can set")
+            continue
         if cls != "display":
             continue
+        # WHAT A RACK FILE MAY PUT ON IT depends on the kind (kit/displays.js),
+        # so the kind has to be one the numbers agree with.
+        if spec.get("rows") and kind != "character":
+            err(path, "L98", f"display {eid} has `rows` and is kind {kind!r}. "
+                             f"Only a character display has rows; a pixel "
+                             f"display has none and a segment cell is one")
+        if kind == "segment" and cells != 1:
+            err(path, "L98", f"display {eid} is kind 'segment' and shows "
+                             f"{cells!r} characters. A segment cell is one "
+                             f"digit, `characters: 1`")
         if not cells:
             warn(path, "L98", f"display {eid} does not say how many characters "
                               f"it shows. Add `characters:` - it is what a "
@@ -3905,6 +3946,188 @@ def lint_component_supersedes(path, data, lib_roots):
                               "(7 to 40 hex digits)")
 
 
+def _dc_ports(data):
+    """The well-formed ports of a contract's `dc` block, as dicts. The schema
+    says the shape; this only keeps a rule from tripping on a bad one."""
+    block = data.get("dc") if isinstance(data, dict) else None
+    ports = block.get("ports") if isinstance(block, dict) else None
+    return [p for p in ports or [] if isinstance(p, dict)]
+
+
+def _dc_poles(port):
+    return [q for q in port.get("poles") or [] if isinstance(q, dict)]
+
+
+def _dc_sign_problems(voltage, roles):
+    """What is wrong with the signs of one end: its voltage as the end states
+    it and the roles of its poles. Empty when the voltage is absent, because
+    then no sign is stated to be wrong."""
+    out = []
+    if not isinstance(voltage, dict):
+        return out
+    nominal = voltage.get("nominal")
+    if not isinstance(nominal, (int, float)) or isinstance(nominal, bool):
+        return out
+    if nominal == 0:
+        return ["nominal is 0 - a DC end states the voltage it works at, with its sign"]
+    rng = voltage.get("range")
+    for lim in rng if isinstance(rng, list) else []:
+        if isinstance(lim, (int, float)) and not isinstance(lim, bool) and (lim == 0 or (lim < 0) != (nominal < 0)):
+            out.append(f"range limit {lim:g} does not have the sign of the nominal {nominal:g} - "
+                       "write every limit of a negative end with its minus")
+    if nominal > 0 and "batt" in roles:
+        out.append(f"a `batt` pole on a nominal of +{nominal:g} V - `batt` is the negative conductor "
+                   "of a negative plant, so the voltage is written with its minus (-48, not 48)")
+    return out
+
+
+def lint_component_dc(path, data):
+    """L187 to L189 and L191 on a component's `dc` block (the roles come from
+    spec/schemas/dc.yaml).
+
+    The schema checks the shape. This checks what it cannot: that a role is in
+    the vocabulary and sourced (L187), that every pole's slot is something the
+    part has (L188), that a port's poles are one kind of thing (L189) and that
+    the signs of one end agree (L191).
+    """
+    if not isinstance(data, dict) or not data.get("dc"):
+        return
+    vocab = dc_registry.roles()
+    parts = {q.get("id") for q in data.get("parts") or [] if isinstance(q, dict)}
+    points = set((data.get("connection-points") or {}))
+    prov = data.get("provenance") if isinstance(data.get("provenance"), dict) else {}
+    seen_ports = set()
+    for port in _dc_ports(data):
+        pid = port.get("id")
+        where = f"dc/ports/{pid}"
+        if pid in seen_ports:
+            err(path, "L188", f"{where}: the port id is used twice on this part")
+        seen_ports.add(pid)
+        source = port.get("source") if isinstance(port.get("source"), dict) else {}
+        for key, entry in source.items():
+            if not (isinstance(entry, str) and isinstance(prov.get(entry), str) and prov[entry].strip()):
+                err(path, "L187", f"{where}: source.{key} names {entry!r}, which is not an entry "
+                                  "under `provenance` with a note")
+        kinds, used = set(), set()
+        for q in _dc_poles(port):
+            role, slot = q.get("role"), q.get("slot")
+            if role not in vocab:
+                err(path, "L187", f"{where}: pole {slot}: role {role!r} is not in dc.yaml "
+                                  f"({', '.join(sorted(vocab))})")
+            elif role != dc_registry.UNSTATED and "poles" not in source:
+                err(path, "L187", f"{where}: pole {slot}: role {role} has no source - add "
+                                  "`source: {poles: <provenance key>}` and the entry that says it")
+            if slot in used:
+                err(path, "L188", f"{where}: two poles land on {slot}")
+            used.add(slot)
+            if slot in parts:
+                kinds.add("slot")
+            elif slot in points:
+                kinds.add("point")
+            else:
+                err(path, "L188", f"{where}: pole {slot} is no `parts` id and no connection point of this "
+                                  "part - a terminal drawn only as an element or art has to become a seat part first")
+        if len(kinds) > 1:
+            err(path, "L189", f"{where}: the poles are some slots and some connection points - "
+                              "a port's poles are all one kind")
+        roles = {q.get("role") for q in _dc_poles(port)}
+        for msg in _dc_sign_problems(port.get("voltage"), roles):
+            err(path, "L191", f"{where}: {msg}")
+
+
+def _device_dc_refs(data):
+    """[(placement id or None, ref)] of every part a device presents: its
+    placements, the default of each bay, and the occupants a configuration
+    names. Only a placement can carry a `dc` override."""
+    out = []
+    for view in (data.get("views") or {}).values():
+        vp = view_parts(view or {})
+        out += [(p.get("id"), p["ref"]) for p in vp["placements"] if isinstance(p, dict) and p.get("ref")]
+        out += [(None, b["default"]) for b in vp["bays"] if isinstance(b, dict) and isinstance(b.get("default"), str)]
+    for cfg in (data.get("configurations") or {}).values():
+        for occupant in ((cfg or {}).get("bays") or {}).values() if isinstance(cfg, dict) else []:
+            ref = occupant.get("ref") if isinstance(occupant, dict) else occupant
+            if isinstance(ref, str) and "@" in ref:
+                out.append((None, ref))
+    return out
+
+
+def lint_device_dc(path, data, lib_roots):
+    """L187, L188, L190 and L191 on a device: the `dc` override of a placement,
+    and the gap a pole with no stated role has to be declared in.
+
+    An override sets what differs from the part (side, voltage, rating, the role
+    of a pole), keyed by port id. Its roles are as much a claim as the part's,
+    so they are in the vocabulary and carry a `source` (L187); its keys name a
+    port and a pole the part has (L188); its voltage has its sign (L191). L190
+    applies the overrides to the part's poles and asks for the `dc-polarity` gap
+    of any that are left `unstated`.
+    """
+    vocab = dc_registry.roles()
+    gap = any(isinstance(g, dict) and g.get("what") == "dc-polarity" for g in data.get("gaps") or [])
+    unstated = []
+    for pid, ref in _device_dc_refs(data):
+        contract = _contract(ref.split(":")[0], lib_roots)
+        ports = {p.get("id"): p for p in _dc_ports(contract)}
+        placement = None
+        if pid is not None:
+            for view in (data.get("views") or {}).values():
+                for p in view_parts(view or {})["placements"]:
+                    if isinstance(p, dict) and p.get("id") == pid and p.get("ref") == ref:
+                        placement = p
+        override = placement.get("dc") if isinstance(placement, dict) and isinstance(placement.get("dc"), dict) else {}
+        for port_id, o in override.items():
+            where = f"{pid}/dc/{port_id}"
+            if port_id not in ports:
+                err(path, "L188", f"{where}: {ref} has no DC port {port_id!r}"
+                                  + (f" (it has {', '.join(sorted(map(str, ports)))})" if ports else " - it states no `dc` block"))
+                continue
+            if not isinstance(o, dict):
+                continue
+            poles = o.get("poles") if isinstance(o.get("poles"), dict) else {}
+            slots = {q.get("slot") for q in _dc_poles(ports[port_id])}
+            for slot, role in poles.items():
+                if slot not in slots:
+                    err(path, "L188", f"{where}: pole {slot!r} is not a pole of the port ({', '.join(sorted(map(str, slots)))})")
+                if role not in vocab:
+                    err(path, "L187", f"{where}: pole {slot}: role {role!r} is not in dc.yaml "
+                                      f"({', '.join(sorted(vocab))})")
+            if poles and not (isinstance(o.get("source"), str) and o["source"].strip()):
+                err(path, "L187", f"{where}: sets the role of {', '.join(map(str, poles))} and states no `source`")
+        for port_id, port in ports.items():
+            o = override.get(port_id) if isinstance(override.get(port_id), dict) else {}
+            roles = {q.get("slot"): q.get("role") for q in _dc_poles(port)}
+            if isinstance(o.get("poles"), dict):
+                roles.update({s: r for s, r in o["poles"].items() if s in roles})
+            for slot, role in roles.items():
+                if role == dc_registry.UNSTATED:
+                    unstated.append(f"{pid or ref}/{port_id}/{slot}")
+            if o.get("voltage") is None and not o.get("poles"):
+                continue    # nothing the placement changed; the part's own signs are the part's L191
+            voltage = o.get("voltage") if "voltage" in o else port.get("voltage")
+            for msg in _dc_sign_problems(voltage, set(roles.values())):
+                err(path, "L191", f"{pid or ref}/{port_id}: {msg}")
+    if unstated and not gap:
+        err(path, "L190", f"{len(unstated)} pole(s) have an `unstated` role ({', '.join(sorted(set(unstated))[:3])}"
+                          f"{', ...' if len(set(unstated)) > 3 else ''}) and the device has no `gaps` entry "
+                          "with `what: dc-polarity`")
+
+
+def lint_public_audience(path, data):
+    """L192: the public library holds only `public` entries.
+
+    The schema says which labels exist. This says that in Portrayal's own
+    library none but `public` is used, with the label left out meaning the
+    same. A library for private entries runs lint with `--allow-audience`.
+    """
+    if not isinstance(data, dict):
+        return
+    audience = data.get("audience")
+    if audience is not None and audience != "public":
+        err(path, "L192", f"audience: {audience!r} - the public library has only `public` entries "
+                          "(or none stated); a private entry belongs in a library of its own")
+
+
 def _kit_ranges(depth):
     """(label, [min, max]) for each range of a configuration's `depth`: the one
     range, or one per hole type. The schema has already said each is a pair of
@@ -4375,6 +4598,144 @@ def lint_component_slots(path, data, _lib_roots=None):
                 if want != have:
                     err(path, "L75", f"bay {bid}: slot says lanes {have[0]}, {have[1]} height, "
                                      f"{have[2]} length, processor {have[3]} but the attr reads {prose!r}")
+
+
+# How far a spanned bay may sit off the line the span runs along, and past one
+# bay's own height from the one before it, before L185 calls it a gap.
+SPAN_TOLERANCE_MM = 0.5
+
+
+def _bay_box(b):
+    sz = b.get("size")
+    w, h = (sz["w"], sz["h"]) if isinstance(sz, dict) else (sz[0], sz[1])
+    return float(b["at"][0]), float(b["at"][1]), float(w), float(h)
+
+
+def lint_component_span(path, data, lib_roots):
+    """L185: a bay's `span`, and the parts that need one
+    (docs/pcie-two-slot-bays-design.md, R1, R2 and R6).
+
+    A two-slot card is drawn in the box its bay and the bays it covers make
+    together (manifest.span_box), and that is only the right box if those bays
+    are the ones beside it, on the side the card's cooler hangs. So each id is
+    another bay of this component - a bay in another riser is not a sibling,
+    and a card across two risers would come apart - of the same size, turn and
+    hand, and each follows the last along the bay's own +y turned by its
+    `rotate`: below it at 0, above it at 180. A quarter turn is refused until a
+    riser needs one. And the two sides meet: a bay that accepts a part wider
+    than one slot names enough bays to cover, and a card that composes the
+    two-slot bracket is two slots wide itself.
+    """
+    bays = data.get("bays") or {}
+
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    for bid, b in sorted(bays.items()):
+        if not isinstance(b, dict) or not b.get("at") or not b.get("size"):
+            continue
+        span = b.get("span") or []
+        if span:
+            turn = int(b.get("rotate") or 0) % 360
+            if turn not in (0, 180):
+                err(path, "L185", f"bays/{bid}: `span` on a bay at rotate {b.get('rotate')} - "
+                    "only a bay at 0 or 180 can span, until a riser turns its slots a quarter")
+                continue
+            prev, prev_id = b, bid
+            for sid in span:
+                sib = bays.get(sid)
+                if sid == bid or not isinstance(sib, dict) or not sib.get("at") or not sib.get("size"):
+                    err(path, "L185", f"bays/{bid}: span names {sid!r}, which is not another "
+                        "bay of this component - a card spans its own carrier's bays only")
+                    break
+                bx = _bay_box(b)
+                sx = _bay_box(sib)
+                if (abs(bx[2] - sx[2]) > 0.01 or abs(bx[3] - sx[3]) > 0.01
+                        or int(sib.get("rotate") or 0) % 360 != turn
+                        or bool(sib.get("mirror")) != bool(b.get("mirror"))):
+                    err(path, "L185", f"bays/{bid}: spans {sid}, which is not the same size, "
+                        "rotate and mirror - a card covering it would not fit it")
+                    break
+                px = _bay_box(prev)
+                dx, dy = sx[0] - px[0], sx[1] - px[1]
+                along = dy if turn == 0 else -dy
+                if abs(dx) > SPAN_TOLERANCE_MM or not 0 < along <= bx[3] + SPAN_TOLERANCE_MM:
+                    side = "below" if turn == 0 else "above"
+                    err(path, "L185", f"bays/{bid}: spans {sid}, which is not the next bay "
+                        f"{side} {prev_id} - a two-slot card covers the bay on its component "
+                        f"side, here {side} it (offset {dx:g}, {dy:g})")
+                    break
+                prev, prev_id = sib, sid
+        for ref in b.get("accepts") or []:
+            c = _res(ref)
+            width = slot_width(c)
+            if width > 1 and span_covers(b, width) is None:
+                err(path, "L185", f"bays/{bid}: accepts {ref}, which is {width} slots wide, "
+                    f"and names {len(span)} bay(s) in `span` for it to cover")
+    own = slot_width(data)
+    for q in data.get("parts") or []:
+        if not isinstance(q, dict) or not q.get("ref"):
+            continue
+        width = slot_width(_res(q["ref"]))
+        if width > own:
+            err(path, "L185", f"parts/{q.get('id')}: composes {q['ref']}, which is {width} "
+                f"slots wide, and this part says it is {own} - give it `slot-width: {width}`")
+
+
+def lint_component_span_exclusion(path, data, lib_roots):
+    """L186, component side: a carrier does not SHIP a two-slot default over a
+    bay that ships one too. The device side below catches a configuration."""
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    for bid, sref, cid, held in span_clashes(data.get("bays") or {}, {}, lambda b: b, _res):
+        if cid is not None:
+            err(path, "L186", f"bays/{bid}: ships {sref}, which covers {cid}, and {cid} "
+                f"ships {held} - a carrier ships one or the other")
+
+
+def lint_device_span_exclusion(path, data, lib_roots):
+    """L186, device side: a configuration does not seat a card wider than one
+    slot over a bay that holds something (docs/pcie-two-slot-bays-design.md,
+    R2). HOLDS MEANS AFTER DEFAULTS RESOLVE, as the build reads it
+    (manifest.span_clashes): a riser bay ships a filler, so a configuration
+    that seats a two-slot card in `riser-1/slot-1` empties `riser-1/slot-2`.
+    A card in a bay that spans too few is reported too; L185 says why."""
+    def _res(ref):
+        q = resolve_component(ref, lib_roots)
+        return load_yaml(q) if q else None
+
+    dev_bays = {}
+    for _v, view in (data.get("views") or {}).items():
+        for b in view_parts(view or {})["bays"]:
+            if b.get("id"):
+                dev_bays.setdefault(b["id"], b)
+
+    def walk(cname, cfg_bays, key, ref, depth):
+        contract = _res(ref) if ref else None
+        bays = (contract or {}).get("bays") or {}
+        if not bays or depth > 3:
+            return
+        key_of = (lambda b: f"{key}/{b}")
+        for bid, sref, cid, held in span_clashes(bays, cfg_bays, key_of, _res):
+            width = slot_width(_res(sref))
+            if cid is None:
+                err(path, "L186", f"configurations/{cname}/bays: {key_of(bid)} holds {sref}, "
+                    f"which is {width} slots wide, in a bay that spans too few to cover")
+            else:
+                err(path, "L186", f"configurations/{cname}/bays: {key_of(bid)} holds {sref}, "
+                    f"which covers {key_of(cid)}, and {key_of(cid)} holds {held} - empty it "
+                    f"({key_of(cid)}: \"\")")
+        for bid, b in bays.items():
+            if isinstance(b, dict):
+                walk(cname, cfg_bays, key_of(bid), seated_ref(cfg_bays, key_of(bid), b), depth + 1)
+
+    for cname, cfg in (data.get("configurations") or {}).items():
+        cfg_bays = (cfg or {}).get("bays") or {}
+        for bid, b in dev_bays.items():
+            walk(cname, cfg_bays, bid, seated_ref(cfg_bays, bid, b), 1)
 
 
 def lint_component_states_render(path, data, lib_roots):
@@ -13559,6 +13920,16 @@ def main():
     ap.add_argument("--device", action="append", default=[], metavar="NAME",
                     help="lint only these devices by name or path fragment; "
                          "components are still checked in full")
+    # AN OVERLAY IS LINTED ON ITS OWN, AGAINST THE LIBRARY BENEATH IT. Every root
+    # given to --library is searched for the parts a device names, but only the
+    # roots given here are walked for files to check: `--library library
+    # --library overlay --only-root overlay` holds the overlay to every rule and
+    # leaves the public library to its own run. Its rules that need the whole
+    # library (the portfolio census, the bay sizes, the lock) read these roots
+    # alone. Each must also be a --library.
+    ap.add_argument("--only-root", action="append", default=[], metavar="DIR",
+                    help="walk only these --library roots for files to lint; the others "
+                         "are searched for the parts a device names (an overlay library)")
     # WARNINGS ARE A PASS BY DEFAULT, AND A CALLER CAN SAY OTHERWISE. The census
     # rules (L24, L40, L68 and the rest) fire on the day they land and are meant
     # to shrink, so a run with warnings exits 0 and the gate stays usable. But
@@ -13573,6 +13944,11 @@ def main():
                          "does not - what THIS change added, rather than the whole backlog")
     ap.add_argument("--update-baseline", action="store_true",
                     help="rewrite library/lint-baseline.json from this run, and exit")
+    # PORTRAYAL'S OWN LIBRARY IS PUBLIC (L192). A project that keeps private
+    # entries in a library of its own labels them with `audience` and says so.
+    ap.add_argument("--allow-audience", action="store_true",
+                    help="allow an `audience` other than `public` (L192 is off); "
+                         "for a library of private entries")
     args = ap.parse_args()
     if args.list_rules:
         if args.json:
@@ -13616,13 +13992,25 @@ def main():
             for f in sorted(Path(root).glob("devices/**/device.yaml")):
                 if any(sel in str(f) for sel in args.device):
                     wanted |= device_dependencies(f, args.library)
-    for root in args.library:
+    walked = args.library
+    if args.only_root and args.update_baseline:
+        ap.error("--update-baseline records the first --library; it cannot be used with --only-root")
+    if args.only_root:
+        have = {str(Path(r).resolve()) for r in args.library}
+        for r in args.only_root:
+            if str(Path(r).resolve()) not in have:
+                ap.error(f"--only-root {r} is not one of the --library roots")
+        walked = [r for r in args.library
+                  if str(Path(r).resolve()) in {str(Path(o).resolve()) for o in args.only_root}]
+    for root in walked:
         root = Path(root)
         for f in sorted(root.glob("components/**/contract.yaml")):
             if wanted is not None and f not in wanted:
                 continue
             lint_duplicate_keys(f)
             d = lint_component(f, comp_v)
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             # A KIT IS A PARTS LIST, NOT A DRAWING (#905): no size, no skin, no
             # elements, so the component rules below have nothing to read and
             # several would index the `size` a kit does not have. It takes the
@@ -13680,6 +14068,7 @@ def main():
                     f"{f.parents[2].name}/{d.get('name')}@{f.parent.name[1:]}")
                 lint_component_superseded_by(f, d, args.library)
                 lint_component_supersedes(f, d, args.library)
+                lint_component_dc(f, d)
                 lint_component_pluggable_rate(f, d)
                 lint_component_optical_endpoints(f, d, args.library)
                 lint_component_optical_faces(f, d)
@@ -13700,6 +14089,8 @@ def main():
                 lint_component_cable_od(f, d)
                 lint_component_lamp_colour(f, d)
                 lint_component_slots(f, d)
+                lint_component_span(f, d, args.library)
+                lint_component_span_exclusion(f, d, args.library)
                 lint_component_rj45_lamps(f, d, args.library)
                 lint_component_groups(f, d, args.library)
                 lint_component_part_interfaces(f, d, args.library)
@@ -13713,6 +14104,8 @@ def main():
                 continue
             lint_duplicate_keys(f)
             d = lint_device(f, dev_v, args.library); n += 1
+            if not args.allow_audience:
+                lint_public_audience(f, d)
             if d is not None and d.get("kind") == "device":
                 lint_attrs_null(f, d)
                 lint_device_gap_scope(f, d)
@@ -13734,6 +14127,7 @@ def main():
                 lint_rack_side_portrait(f, d)
                 lint_device_shell(f, d)
                 lint_device_power_outlets(f, d, args.library)
+                lint_device_dc(f, d, args.library)
                 lint_device_pdu_capability(f, d)
                 lint_device_input_rating(f, d)
                 lint_device_lines(f, d, args.library)
@@ -13742,6 +14136,7 @@ def main():
                 lint_quoted_prose(f, d)
                 lint_device_component_attrs_resolve(f, d)
                 lint_device_spanned_exclusion(f, d, args.library)
+                lint_device_span_exclusion(f, d, args.library)
                 lint_device_bevel(f, d, args.library)
                 lint_device_passes(f, d, args.library)
                 lint_device_logo_zone(f, d)
@@ -13784,17 +14179,19 @@ def main():
     # --device run cannot do it: `devicelock.check` walks every device, and a
     # partial check would report the unexamined ones as unchanged.
     if not args.device:
-        lint_library_comparable_facts([Path(r) for r in args.library], matrix)
+        lint_library_comparable_facts([Path(r) for r in walked], matrix)
         lint_library_aliases(matrix)
-        lint_library_listings(args.library)
+        lint_library_listings(walked)
         lint_library_bay_size_per_module(matrix + comp_matrix, args.library)
-        for root in [Path(r) for r in args.library]:
+        for root in [Path(r) for r in walked]:
             lint_vendor_registry(root)
             lint_unplaced_majors(root)
             lint_pluggable_family_interfaces(root)
             if not list(libwalk.iter_devices([root])):
                 continue
-            for slug_, kind_, msg_ in devicelock.check(root):
+            # an overlay's lock counts the parts of the libraries beneath it
+            for slug_, kind_, msg_ in devicelock.check(
+                    root, [Path(r) for r in args.library if Path(r) not in [Path(w) for w in walked]]):
                 # WARNING WHILE THE DEVICE IS STILL BEING DRAWN, ERROR ONCE IT
                 # CLAIMS TO BE FINISHED - the gate L15, L37 and L42 all use. A
                 # device at `modelled` is work in progress and should not have to
@@ -13817,7 +14214,9 @@ def main():
     else:
         print_matrix(matrix, schemas)
 
-    base = None if args.device else load_baseline(Path(args.library[0]))
+    # an overlay has no baseline of its own, and the public library's says
+    # nothing about its files
+    base = None if args.device or args.only_root else load_baseline(Path(args.library[0]))
     # WAIVED WARNINGS ARE SEPARATED, NOT HIDDEN. A rule a device has argued with
     # still fires and is still counted; what changes is that it stops competing
     # for attention with the ones nobody has looked at. The reason is printed
