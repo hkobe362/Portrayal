@@ -136,8 +136,8 @@ test('a bundle command and inspect carry the bend warning; describe counts it', 
 });
 
 test('two corners sharing a leg divide it by what each turn needs, as a cable path does (#984)', () => {
-  // a right angle at U10, 44.45 mm of lane to U11, then a 15 degree turn toward a ring 12 mm off the lane.
-  // At 25 mm each turn takes 25 + 25 tan(7.5) = 28.3 mm of the shared leg; halves would give each 22.2.
+  // a right angle at U10, 44.45 mm of lane to U11, then a slight turn toward a ring 12 mm off the lane.
+  // At 25 mm the right angle takes 25 mm of the shared leg and the slight turn under 2 more; halves would give each 22.2.
   const route = RT('i2:guide-1', ['left-front', 10], ['left-front', 11], 'i4:guide-1');
   let r = M.newRack({name: 'Rack 1'});
   r = M.withItem(r, {ref: 'sw', cfg: 'x', ru: 10, label: 'sw-1'}).rack;
@@ -151,8 +151,8 @@ test('two corners sharing a leg divide it by what each turn needs, as a cable pa
   r = apply(r, {op: 'bundle.create', cables: ['c1', 'c2'], route}, {chassisOf}).rack;
   const c = check(r, {x: {'mgr-1': LANE + 40, 'mgr-3': LANE + 12}});
   assert.deepEqual(c.bend.points.map(p => [p.at, p.angle_deg, p.legs_mm, p.room_mm, p.ok]), [
-    ['left-front U10', 90, [40, 44.4], 39.2, true],
-    ['left-front U11', 15.1, [44.4, 46], 39.2, true]]);
+    ['left-front U10', 90, [40, 44.4], 40, true],
+    ['left-front U11', 9, [44.4, 45], 41.2, true]]);
   assert.deepEqual(c.warnings, []);
 });
 

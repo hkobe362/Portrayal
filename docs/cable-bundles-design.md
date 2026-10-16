@@ -666,7 +666,9 @@ without changing the check.
 does, in rack coordinates (`route.js pointOf` on `ctx.route`), so it agrees
 with the length and with every view.
 
-1. **The polyline** is the trunk's waypoints, in order, as points.
+1. **The polyline** is the trunk's own line (see "Which line" below): the
+   points of the members' paths from one place on the trunk to the next, in
+   order. Where no path can be read it is the trunk's waypoints, in order.
 2. **Straight passes are merged.** Walking the polyline, a waypoint is a
    straight pass, not a corner, when the next segment's direction is within 1
    degree of the leg's direction: the direction from the last corner (or the
@@ -725,6 +727,15 @@ leg shared by what each corner needs of it, not by halves
 ([cable-lay-design.md](cable-lay-design.md) section 3.4). The bundle check
 shares a leg the same way since #984. Its error bound is as it was: a trunk is
 a sketch through waypoint centres.
+
+**Which line.** The corners are read from the trunk's own line, the one the
+straps and the length are measured along (section 6, #1034): the members'
+routed paths, not the straight lines between waypoints (#1037). A cable that
+goes round a duct turns where the straight line does not, and a bundle too
+tight there is found. A corner within a ring's depth along the line of a
+waypoint is that waypoint's; one between two places is reported as "A to B",
+and of several at one place the tightest is reported. Where no member's path
+can be read the straight lines stand in.
 
 ### 5.3 What an agent reads
 
@@ -859,7 +870,7 @@ reading `ctx.route`:
   names; members that lie like it are there too; one that hangs otherwise is
   off it by the difference of the two hangs. Laying a pack as one body is
   not done here.
-  The bend check (section 5.2) still reads the straight lines.
+  The bend check (section 5.2) reads this line's corners too (#1037).
 
 Each strap comes back as `{segment, t, along_mm, point, dir, on}`. `point` is
 where it is, in rack coordinates, `dir` the way the trunk runs there (a unit
