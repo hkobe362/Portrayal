@@ -51,11 +51,7 @@ import sys
 
 import yaml
 
-try:
-    from portrayal import libwalk
-except ImportError:  # run as a script from a checkout
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-    from portrayal import libwalk
+from portrayal import libwalk
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 
