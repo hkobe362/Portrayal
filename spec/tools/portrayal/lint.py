@@ -33,6 +33,7 @@ from portrayal import libwalk
 from portrayal import capability
 from portrayal import dcim_export
 from portrayal import devicelock
+from portrayal import dc as dc_registry
 from portrayal import ears as ears_mod
 from portrayal import manifest as _manifest
 from portrayal import optical
@@ -654,6 +655,21 @@ RULES = {
     "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
              "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
              ERROR),
+    "L187": ("component, device", "a pole's `role` in a `dc` block is one of the roles in spec/schemas/dc.yaml, and a role other than `unstated` has a source: the port's `source.poles` names an entry under the part's `provenance`, and a placement that sets a role states a `source`; every other key of a port's `source` names a `provenance` entry too", "use a role from dc.yaml, or `unstated` where no source says; add the `provenance` entry and name it in `source.poles`",
+             "A polarity is the fact a crossed feed is judged by, and a role that nothing sourced reads as a fact the library does not hold.",
+             ERROR),
+    "L188": ("component, device", "a DC port's id is unique on its part, each pole's `slot` resolves to a composed part (`parts`) or a connection point of the part, and no slot carries two poles of a port; a placement's `dc` names ports of its part and poles of that port", "name a `parts` id or a connection point; draw a terminal that is only art as a seat part first; correct the id the placement's `dc` names",
+             "A pole that names nothing is a conductor a cable cannot land on, and a feed would be checked against a terminal that is not there.",
+             ERROR),
+    "L189": ("component", "the poles of one DC port are all slots (composed parts) or all connection points, never some of each", "make the poles one kind: seat parts for screws and studs, or the points of one pluggable connector",
+             "A feed lands on a port's poles together, and the rule for landing differs between a slot and a point, so a port of both has no one rule.",
+             ERROR),
+    "L190": ("device", "a pole whose role is `unstated` on a part the device presents (a placement, a bay's default or a configuration's occupant), after the placement's own roles are applied, has a `gaps` entry on the device with `what: dc-polarity`", "state the role from a source in the part or in the placement's `dc`, or add a gap `what: dc-polarity` with the reason and what is wanted",
+             "A polarity nobody stated has to be declared as unknown, or it reads as one that is known and a feed on it is judged by a guess.",
+             ERROR),
+    "L191": ("component, device", "the voltage of a DC port carries its sign: the nominal is not zero, the limits of its range have the nominal's sign, and a port with a `batt` pole is negative", "write a negative voltage with its minus (`-48`, range `[-40.5, -57]`); correct the pole's role if the end is positive",
+             "The sign is how a feed tells a battery conductor from a positive one, and an unsigned -48 V would match a +48 V end.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -662,6 +678,8 @@ RULES = {
 # counts these as present, and fails once a reserved code is also in RULES -
 # whichever branch lands second deletes its line.
 RESERVED = {
+    "L185": "a bay's span and a part wider than one slot (roc-ops/Portrayal#1075)",
+    "L186": "a wide card and the bay it covers are not both filled (roc-ops/Portrayal#1075)",
 }
 
 # A CODE THAT NAMED A RULE WHICH IS GONE. A device manifest waives a rule by its
@@ -3919,6 +3937,173 @@ def lint_component_supersedes(path, data, lib_roots):
         if not isinstance(c.get("from"), str) or not re.fullmatch(r"[0-9a-f]{7,40}", c["from"]):
             err(path, "L184", f"supersedes[{i}]: from {c.get('from')!r} is not the commit the signature was taken from "
                               "(7 to 40 hex digits)")
+
+
+def _dc_ports(data):
+    """The well-formed ports of a contract's `dc` block, as dicts. The schema
+    says the shape; this only keeps a rule from tripping on a bad one."""
+    block = data.get("dc") if isinstance(data, dict) else None
+    ports = block.get("ports") if isinstance(block, dict) else None
+    return [p for p in ports or [] if isinstance(p, dict)]
+
+
+def _dc_poles(port):
+    return [q for q in port.get("poles") or [] if isinstance(q, dict)]
+
+
+def _dc_sign_problems(voltage, roles):
+    """What is wrong with the signs of one end: its voltage as the end states
+    it and the roles of its poles. Empty when the voltage is absent, because
+    then no sign is stated to be wrong."""
+    out = []
+    if not isinstance(voltage, dict):
+        return out
+    nominal = voltage.get("nominal")
+    if not isinstance(nominal, (int, float)) or isinstance(nominal, bool):
+        return out
+    if nominal == 0:
+        return ["nominal is 0 - a DC end states the voltage it works at, with its sign"]
+    rng = voltage.get("range")
+    for lim in rng if isinstance(rng, list) else []:
+        if isinstance(lim, (int, float)) and not isinstance(lim, bool) and (lim == 0 or (lim < 0) != (nominal < 0)):
+            out.append(f"range limit {lim:g} does not have the sign of the nominal {nominal:g} - "
+                       "write every limit of a negative end with its minus")
+    if nominal > 0 and "batt" in roles:
+        out.append(f"a `batt` pole on a nominal of +{nominal:g} V - `batt` is the negative conductor "
+                   "of a negative plant, so the voltage is written with its minus (-48, not 48)")
+    return out
+
+
+def lint_component_dc(path, data):
+    """L187 to L189 and L191 on a component's `dc` block (the roles come from
+    spec/schemas/dc.yaml).
+
+    The schema checks the shape. This checks what it cannot: that a role is in
+    the vocabulary and sourced (L187), that every pole's slot is something the
+    part has (L188), that a port's poles are one kind of thing (L189) and that
+    the signs of one end agree (L191).
+    """
+    if not isinstance(data, dict) or not data.get("dc"):
+        return
+    vocab = dc_registry.roles()
+    parts = {q.get("id") for q in data.get("parts") or [] if isinstance(q, dict)}
+    points = set((data.get("connection-points") or {}))
+    prov = data.get("provenance") if isinstance(data.get("provenance"), dict) else {}
+    seen_ports = set()
+    for port in _dc_ports(data):
+        pid = port.get("id")
+        where = f"dc/ports/{pid}"
+        if pid in seen_ports:
+            err(path, "L188", f"{where}: the port id is used twice on this part")
+        seen_ports.add(pid)
+        source = port.get("source") if isinstance(port.get("source"), dict) else {}
+        for key, entry in source.items():
+            if not (isinstance(entry, str) and isinstance(prov.get(entry), str) and prov[entry].strip()):
+                err(path, "L187", f"{where}: source.{key} names {entry!r}, which is not an entry "
+                                  "under `provenance` with a note")
+        kinds, used = set(), set()
+        for q in _dc_poles(port):
+            role, slot = q.get("role"), q.get("slot")
+            if role not in vocab:
+                err(path, "L187", f"{where}: pole {slot}: role {role!r} is not in dc.yaml "
+                                  f"({', '.join(sorted(vocab))})")
+            elif role != dc_registry.UNSTATED and "poles" not in source:
+                err(path, "L187", f"{where}: pole {slot}: role {role} has no source - add "
+                                  "`source: {poles: <provenance key>}` and the entry that says it")
+            if slot in used:
+                err(path, "L188", f"{where}: two poles land on {slot}")
+            used.add(slot)
+            if slot in parts:
+                kinds.add("slot")
+            elif slot in points:
+                kinds.add("point")
+            else:
+                err(path, "L188", f"{where}: pole {slot} is no `parts` id and no connection point of this "
+                                  "part - a terminal drawn only as an element or art has to become a seat part first")
+        if len(kinds) > 1:
+            err(path, "L189", f"{where}: the poles are some slots and some connection points - "
+                              "a port's poles are all one kind")
+        roles = {q.get("role") for q in _dc_poles(port)}
+        for msg in _dc_sign_problems(port.get("voltage"), roles):
+            err(path, "L191", f"{where}: {msg}")
+
+
+def _device_dc_refs(data):
+    """[(placement id or None, ref)] of every part a device presents: its
+    placements, the default of each bay, and the occupants a configuration
+    names. Only a placement can carry a `dc` override."""
+    out = []
+    for view in (data.get("views") or {}).values():
+        vp = view_parts(view or {})
+        out += [(p.get("id"), p["ref"]) for p in vp["placements"] if isinstance(p, dict) and p.get("ref")]
+        out += [(None, b["default"]) for b in vp["bays"] if isinstance(b, dict) and isinstance(b.get("default"), str)]
+    for cfg in (data.get("configurations") or {}).values():
+        for occupant in ((cfg or {}).get("bays") or {}).values() if isinstance(cfg, dict) else []:
+            ref = occupant.get("ref") if isinstance(occupant, dict) else occupant
+            if isinstance(ref, str) and "@" in ref:
+                out.append((None, ref))
+    return out
+
+
+def lint_device_dc(path, data, lib_roots):
+    """L187, L188, L190 and L191 on a device: the `dc` override of a placement,
+    and the gap a pole with no stated role has to be declared in.
+
+    An override sets what differs from the part (side, voltage, rating, the role
+    of a pole), keyed by port id. Its roles are as much a claim as the part's,
+    so they are in the vocabulary and carry a `source` (L187); its keys name a
+    port and a pole the part has (L188); its voltage has its sign (L191). L190
+    applies the overrides to the part's poles and asks for the `dc-polarity` gap
+    of any that are left `unstated`.
+    """
+    vocab = dc_registry.roles()
+    gap = any(isinstance(g, dict) and g.get("what") == "dc-polarity" for g in data.get("gaps") or [])
+    unstated = []
+    for pid, ref in _device_dc_refs(data):
+        contract = _contract(ref.split(":")[0], lib_roots)
+        ports = {p.get("id"): p for p in _dc_ports(contract)}
+        placement = None
+        if pid is not None:
+            for view in (data.get("views") or {}).values():
+                for p in view_parts(view or {})["placements"]:
+                    if isinstance(p, dict) and p.get("id") == pid and p.get("ref") == ref:
+                        placement = p
+        override = placement.get("dc") if isinstance(placement, dict) and isinstance(placement.get("dc"), dict) else {}
+        for port_id, o in override.items():
+            where = f"{pid}/dc/{port_id}"
+            if port_id not in ports:
+                err(path, "L188", f"{where}: {ref} has no DC port {port_id!r}"
+                                  + (f" (it has {', '.join(sorted(map(str, ports)))})" if ports else " - it states no `dc` block"))
+                continue
+            if not isinstance(o, dict):
+                continue
+            poles = o.get("poles") if isinstance(o.get("poles"), dict) else {}
+            slots = {q.get("slot") for q in _dc_poles(ports[port_id])}
+            for slot, role in poles.items():
+                if slot not in slots:
+                    err(path, "L188", f"{where}: pole {slot!r} is not a pole of the port ({', '.join(sorted(map(str, slots)))})")
+                if role not in vocab:
+                    err(path, "L187", f"{where}: pole {slot}: role {role!r} is not in dc.yaml "
+                                      f"({', '.join(sorted(vocab))})")
+            if poles and not (isinstance(o.get("source"), str) and o["source"].strip()):
+                err(path, "L187", f"{where}: sets the role of {', '.join(map(str, poles))} and states no `source`")
+        for port_id, port in ports.items():
+            o = override.get(port_id) if isinstance(override.get(port_id), dict) else {}
+            roles = {q.get("slot"): q.get("role") for q in _dc_poles(port)}
+            if isinstance(o.get("poles"), dict):
+                roles.update({s: r for s, r in o["poles"].items() if s in roles})
+            for slot, role in roles.items():
+                if role == dc_registry.UNSTATED:
+                    unstated.append(f"{pid or ref}/{port_id}/{slot}")
+            if o.get("voltage") is None and not o.get("poles"):
+                continue    # nothing the placement changed; the part's own signs are the part's L191
+            voltage = o.get("voltage") if "voltage" in o else port.get("voltage")
+            for msg in _dc_sign_problems(voltage, set(roles.values())):
+                err(path, "L191", f"{pid or ref}/{port_id}: {msg}")
+    if unstated and not gap:
+        err(path, "L190", f"{len(unstated)} pole(s) have an `unstated` role ({', '.join(sorted(set(unstated))[:3])}"
+                          f"{', ...' if len(set(unstated)) > 3 else ''}) and the device has no `gaps` entry "
+                          "with `what: dc-polarity`")
 
 
 def _kit_ranges(depth):
@@ -13696,6 +13881,7 @@ def main():
                     f"{f.parents[2].name}/{d.get('name')}@{f.parent.name[1:]}")
                 lint_component_superseded_by(f, d, args.library)
                 lint_component_supersedes(f, d, args.library)
+                lint_component_dc(f, d)
                 lint_component_pluggable_rate(f, d)
                 lint_component_optical_endpoints(f, d, args.library)
                 lint_component_optical_faces(f, d)
@@ -13750,6 +13936,7 @@ def main():
                 lint_rack_side_portrait(f, d)
                 lint_device_shell(f, d)
                 lint_device_power_outlets(f, d, args.library)
+                lint_device_dc(f, d, args.library)
                 lint_device_pdu_capability(f, d)
                 lint_device_input_rating(f, d)
                 lint_device_lines(f, d, args.library)

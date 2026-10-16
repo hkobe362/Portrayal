@@ -1,0 +1,24 @@
+format: 1
+kind: component
+name: dc-header
+version: 1.0.0
+class: power
+description: >-
+  A synthetic 24 V output on a two-contact pluggable header for the DC lint
+  tests: its poles are the connection points of one connector, not slots.
+size: {w: 20, h: 12}
+connection-points:
+  wire-1: {at: [5, 6]}
+  wire-2: {at: [15, 6]}
+provenance:
+  size: invented for a test
+  contacts: invented for a test
+dc:
+  ports:
+  - id: output
+    direction: output
+    voltage: {nominal: 24}
+    poles:
+    - {role: pos, slot: wire-1}
+    - {role: neg, slot: wire-2}
+    source: {poles: contacts}
