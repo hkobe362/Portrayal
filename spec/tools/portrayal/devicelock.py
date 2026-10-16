@@ -229,6 +229,12 @@ def _placement_attrs(doc):
 #                     feed (major); stating one where there was none is the
 #                     export gaining a fact and losing nothing (minor). Since
 #                     #934 `through` may name a fixed breaker placement too.
+#   `dc`              (placement) the side, voltage, rating and pole roles a
+#                     placement sets on its part's DC ports. A feed is judged
+#                     by them, so changing or dropping one is a major and
+#                     stating one where there was none a minor, as `fed-by`.
+#                     Nothing exports them yet; they are sorted now so the
+#                     first placement to state one is not stated in silence.
 #   `lines`           (placement) the conductors a breaker, or an outlet with
 #                     no breaker, is wired across (#934). The export writes
 #                     them on each outlet's description and decides `feed_leg`
@@ -259,7 +265,7 @@ BAY_HASHED = {"id", "at", "size", "rotate", "mirror", "default", "accepts",
 PLACEMENT_GEOMETRY = {"inset", "lift", "in", "under", "only-in", "optional",
                       "interfaces", "opening", "floor", "plan", "rear"}
 PLACEMENT_ADDRESSING = {"for", "rel-pos", "interface", "fed-by", "through",
-                        "lines"}
+                        "lines", "dc"}
 PLACEMENT_SURFACE = {"states", "description", "provenance", "physical-context",
                      "frames", "positions"}
 # MEMBERSHIP - which adjustment a placed thing slides with
@@ -282,7 +288,7 @@ TOP_LEVEL_READ = {"version", "maturity", "aliases", "description", "profile", "l
 # Not read today. `format`, `kind` and `name` say what the file is and where it
 # lives; the rest are recorded here as unread, not as decided.
 TOP_LEVEL_UNREAD = {"format", "kind", "name", "manufacturer", "model", "part-numbers",
-                    "datasheet", "references"}
+                    "datasheet", "references", "audience"}
 
 
 # KEYS THAT NAME A SET, which the schema lets an author spell as one id or a
@@ -443,15 +449,27 @@ def _component_digest(version_dir: pathlib.Path, contract: dict) -> str:
     return _digest({"contract": contract, "skins": skins})
 
 
-def component_versions(library: pathlib.Path):
+def component_versions(library: pathlib.Path, below=()):
     """Every component's declared version, keyed the way a ref names it.
 
     `common/rj45-port@4` addresses a MAJOR, and the file under v4 says which
     minor is actually there. That indirection is the whole point of the ref -
     and the whole reason a device could change appearance without its lock
     moving.
+
+    `below` is the libraries `library` is built on top of (an overlay library,
+    docs/CONTRIBUTING.md): a device there seats public parts, and its lock has
+    to move when one of them does, so their versions are read too. An overlay
+    never holds a ref a library below it holds (overlay.py), so no part is
+    answered twice.
     """
     out = {}
+    for root in (*below, library):
+        _collect_versions(out, pathlib.Path(root))
+    return out
+
+
+def _collect_versions(out, library: pathlib.Path):
     root = library / "components"
     if not root.is_dir():
         return out
@@ -843,7 +861,7 @@ def _addressing_bump(old, new):
         if any(now.get(key) != value for key, value in was.items()
                if key in still_here):
             return "major"              # rebound, renumbered or unstated
-    for field in ("for", "interface", "fed-by", "through", "lines"):
+    for field in ("for", "interface", "fed-by", "through", "lines", "dc"):
         if set(now_all.get(field) or {}) - set(was_all.get(field) or {}):
             return "minor"              # bound, opened or fed where it was not
     return None
@@ -1300,12 +1318,12 @@ def aggregate(library: pathlib.Path, out: pathlib.Path):
     return out
 
 
-def check(library: pathlib.Path):
+def check(library: pathlib.Path, below=()):
     """Returns a list of (slug, kind, message). Empty means the lock agrees."""
     lock = load_lock(library)
     known = lock.get("devices") or {}
     findings = []
-    versions = component_versions(library)
+    versions = component_versions(library, below)
     for path in device_files(library):
         name = slug(path, library)
         doc = manifest.load_yaml(path) or {}
@@ -1341,7 +1359,7 @@ def check(library: pathlib.Path):
                             "plan, rear)")
             if _addressing_bump(was, now) is not None:
                 what.append("placement addressing (for, rel-pos, interface, "
-                            "fed-by, through, lines)")
+                            "fed-by, through, lines, dc)")
             if "placement-surface" in was and \
                     was["placement-surface"] != now["placement-surface"]:
                 what.append("placement surface (states, description, "
@@ -1396,9 +1414,9 @@ def check(library: pathlib.Path):
     return findings + check_listings(library)
 
 
-def update(library: pathlib.Path):
+def update(library: pathlib.Path, below=()):
     """Re-lock the devices whose fingerprint moved, and only those."""
-    versions = component_versions(library)
+    versions = component_versions(library, below)
     known = load_lock(library)["devices"]
     live = {slug(p, library): p for p in device_files(library)}
     changed, writing = [], {}
@@ -1425,13 +1443,16 @@ def main(argv=None):
     ap.add_argument("--library", default="library", type=pathlib.Path)
     ap.add_argument("--update", action="store_true",
                     help="record the current state; run this AFTER bumping a version")
+    ap.add_argument("--below", action="append", default=[], type=pathlib.Path,
+                    help="a library --library is built on top of (an overlay library): "
+                         "its parts count toward a device's fingerprint")
     args = ap.parse_args(argv)
     if args.update:
-        changed = update(args.library)
+        changed = update(args.library, args.below)
         print(f"devicelock: {len(changed)} device(s) re-locked"
               + (": " + ", ".join(changed[:6]) if changed else ""))
         return 0
-    findings = check(args.library)
+    findings = check(args.library, args.below)
     for _, _, msg in findings:
         print(f"devicelock: {msg}")
     print(f"devicelock: {len(findings)} finding(s)")
