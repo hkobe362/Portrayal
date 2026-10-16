@@ -356,8 +356,8 @@ python3 spec/tools/portrayal/preflight.py --base <ref> --json   # for an agent
 
 It compares the working tree, untracked files included, with the merge base and
 prints PASS or FAIL per check, with the command that fixes each failure. It
-exits non-zero if any check fails. The last check, `prose`, is advice: it
-prints PASS or WARN, and a WARN does not change the exit status.
+exits non-zero if any check fails. Two checks, `prose` and `conformance`, are
+advice: they print PASS or WARN, and a WARN does not change the exit status.
 
 | Check | Fails when |
 |---|---|
@@ -369,6 +369,7 @@ prints PASS or WARN, and a WARN does not change the exit status.
 | `lint` | lint on the devices you touched and every device that seats a component you touched, plus the library-wide rules a `--device` run skips (L89 when what reaches a component major can have changed), has an error or a warning `library/lint-baseline.json` does not carry |
 | `kit` | `kit/` changed and `npm test` fails, or a `spec/tests/*_js.py` test that names a changed kit module fails |
 | `prose` | never. It warns when a `device.yaml` or `contract.yaml` you changed has a sentence of more than 25 words that the merge base does not have, in a `description` (device, configuration or component) or a string under `attrs` |
+| `conformance` | never. It warns when a device or component file you changed has no part conformance report from this tree: `library/dist/part-conformance.json`, which `spec/tests/test_part_conformance_report.py` writes after a build, is missing or older than the change |
 
 **New prose follows Simplified Technical English.** A `description` and the
 strings under `attrs` are copied into the DCIM exports, where someone who never

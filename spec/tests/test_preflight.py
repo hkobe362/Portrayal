@@ -19,6 +19,7 @@ tracked, and test_no_internal_hosts sweeps every tracked file for exactly the
 patterns these tests need to plant.
 """
 import json
+import os
 import shutil
 import subprocess
 import textwrap
@@ -604,3 +605,43 @@ def test_a_warn_shows_in_the_report_and_leaves_the_exit_status_alone(tmp_path, c
     text = capsys.readouterr().out
     assert "WARN  prose" in text and "fix: split each" in text
     assert text.splitlines()[-1].startswith("preflight: PASS, with advice (prose)")
+
+
+# ---------------------------------------------------------------- conformance ---
+# WARN only: a device or component changed and the part conformance report is
+# missing or older than the change (docs/part-conformance-design.md, 5.1).
+
+def _changed_device_repo(tmp_path):
+    base = make_repo(tmp_path, {PROSE_DEVICE: "model: a\n"})
+    (tmp_path / PROSE_DEVICE).write_text("model: b\n")
+    return base
+
+
+def test_conformance_warns_when_a_device_changed_and_no_report_was_run(tmp_path):
+    res = preflight.check_conformance(ctx_of(tmp_path, _changed_device_repo(tmp_path)))
+    assert res.as_dict()["status"] == "WARN" and "test_part_conformance_report" in res.fix
+
+
+def test_conformance_passes_on_a_report_newer_than_the_change(tmp_path):
+    base = _changed_device_repo(tmp_path)
+    report = tmp_path / preflight.CONFORMANCE_REPORT
+    report.parent.mkdir(parents=True)
+    report.write_text(json.dumps({"summary": {"C15": {"level": "block", "n": 3}}}))
+    res = preflight.check_conformance(ctx_of(tmp_path, base))
+    assert res.as_dict()["status"] == "PASS" and "C15 x3" in res.summary
+
+
+def test_conformance_warns_on_a_report_older_than_the_change(tmp_path):
+    base = _changed_device_repo(tmp_path)
+    report = tmp_path / preflight.CONFORMANCE_REPORT
+    report.parent.mkdir(parents=True)
+    report.write_text("{}")
+    os.utime(report, (1, 1))
+    res = preflight.check_conformance(ctx_of(tmp_path, base))
+    assert res.as_dict()["status"] == "WARN" and "older" in res.summary
+
+
+def test_conformance_is_silent_when_no_device_or_component_changed(tmp_path):
+    base = make_repo(tmp_path, {"README.md": "a\n"})
+    (tmp_path / "README.md").write_text("b\n")
+    assert preflight.check_conformance(ctx_of(tmp_path, base)).as_dict()["status"] == "PASS"

@@ -9,8 +9,8 @@ exports not regenerated after a device change, a new skip reason missing from
 `spec/allowed-skips.txt`, a local path in committed text. Each one is a line
 a tool could have printed, and each round re-ran a full suite and a publish on
 a shared machine. This runs the cheap half of those gates against the diff and
-says PASS or FAIL per check, with the command that fixes it. One check, `prose`,
-is advice and says PASS or WARN: a WARN never changes the exit status.
+says PASS or FAIL per check, with the command that fixes it. Two checks, `prose`
+and `conformance`, are advice and say PASS or WARN: a WARN never changes the exit status.
 
 WHAT IT IS NOT. It runs no build and no suite. It is the step before asking for
 review; CI is still the gate.
@@ -62,6 +62,10 @@ THE CHECKS
              the merge base already has, word for word, is never reported,
              so the text that was there before the rule is left alone. A
              vendor's quoted words are not counted.
+  conformance WARN ONLY (D-0034). A device or component file changed and
+             `library/dist/part-conformance.json`, which
+             `spec/tests/test_part_conformance_report.py` writes, is missing or
+             older than the change. It runs nothing: it reads the report.
 
 Exit status is 1 when any check fails. A WARN is not a failure. `--json` prints one document for an
 agent to read instead of the table.
@@ -87,7 +91,7 @@ TOOLS_ROOT = TOOLS.parents[1]          # the checkout this file belongs to
 SCHEMAS = TOOLS_ROOT / "spec" / "schemas"
 
 CHECKS = ("exports", "skips", "private", "changelog", "devicelock", "lint", "kit",
-          "prose")
+          "prose", "conformance")
 
 
 def _pin_toolchain():
@@ -1033,12 +1037,46 @@ def check_kit(ctx):
                   skips)
 
 
+# ------------------------------------------------------------- conformance ---
+
+# Where spec/tests/test_part_conformance_report.py writes what the part
+# conformance runner found (docs/part-conformance-design.md, section 5.1).
+CONFORMANCE_REPORT = Path("library") / "dist" / "part-conformance.json"
+CONFORMANCE_PART = re.compile(r"^library/(?:devices|components)/.+\.(?:yaml|svg)$")
+
+
+def check_conformance(ctx):
+    """WARN ONLY. A device or component changed and no conformance report from
+    this tree is there to read. The test writes it; this reads, runs nothing."""
+    name = "conformance"
+    changed = [p for p in ctx.changed if CONFORMANCE_PART.match(p) and (ctx.root / p).exists()]
+    if not changed:
+        return passed(name, "no device or component changed")
+    fix = "./build.sh, then python3 -m pytest spec/tests/test_part_conformance_report.py -q"
+    report = ctx.root / CONFORMANCE_REPORT
+    if not report.exists():
+        return warned(name, f"{len(changed)} device or component file(s) changed and no part "
+                            "conformance report was run on this tree", [], fix)
+    newest = max((ctx.root / p).stat().st_mtime for p in changed)
+    if report.stat().st_mtime < newest:
+        return warned(name, "the part conformance report is older than the device or component "
+                            "you changed", [str(CONFORMANCE_REPORT)], fix)
+    try:
+        summary = json.loads(report.read_text(encoding="utf-8")).get("summary", {})
+    except ValueError:
+        return warned(name, "the part conformance report cannot be read", [str(CONFORMANCE_REPORT)], fix)
+    blocking = {c: r["n"] for c, r in summary.items() if r.get("level") == "block"}
+    return passed(name, "a part conformance report was run on this tree"
+                        + (f"; blocking codes it found (report only): {', '.join(f'{c} x{n}' for c, n in sorted(blocking.items()))}"
+                           if blocking else "; no blocking code"))
+
+
 # -------------------------------------------------------------------- main ---
 
 RUNNERS = {"exports": check_exports, "skips": check_skips, "private": check_private,
            "changelog": check_changelog, "devicelock": check_devicelock,
            "lint": check_lint, "kit": check_kit,
-           "prose": check_prose}
+           "prose": check_prose, "conformance": check_conformance}
 
 
 def run(ctx, only=CHECKS):
