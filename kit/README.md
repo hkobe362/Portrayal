@@ -676,7 +676,7 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.50.0: a bundle's bend check reads the line its cords run, and a bundle of loose cables has no straps.**
+**New in 0.51.0: a bundle's bend check reads the line its cords run, and a bundle of loose cables has no straps.**
 `bendCheck` (so `bundleCheck`, `bundleChecks`, `inspect` of a bundle and the exports) takes the corners of a
 trunk from the members' routed paths, the line the straps and the length are read from, not from the straight
 lines between waypoints, so a bundle that is too tight where its cords turn round a duct is found; a corner
@@ -685,6 +685,18 @@ divided by what each turn needs of it, as a cable's own path is judged (`corners
 not by halves. `straps()` gives none for a bundle with fewer than two members riding its trunk, a member whose
 device at an end is gone and the cable kept riding nothing, so the count, the sentence and the BOM agree.
 Findings and strap counts move; nothing saved does.
+
+**New in 0.50.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
+part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card
+`n` slots wide seats only in a bay whose `span` names `n - 1` bays, and only while each of them holds
+nothing; it is drawn in the box those bays make together (`spanBox`, which `bayTransform` now uses),
+and the bay it covers is marked `data-covered-by` its bay on the face (`markSpan`). `spanWhy(path,
+ref, {holds, comp})` gives the sentence a refusal says, and `coveredBy` the card's bay. `acceptSwaps`
+refuses both claims on one pair and returns `why`, by key; the rack's `fit` says which bay to empty;
+`slotTree` lists `covers` on the card's bay and `covered-by` on the covered one; and the explorer's
+inspector disables a covered bay's select and a two-slot option over a full bay. **A rack file does
+not change**: a two-slot card is a swap in its bay and `""` in the bay it covers, so an older kit
+reads it, centres the card on its own bay and does not refuse a fill of the covered one.
 
 **New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
 `loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`
