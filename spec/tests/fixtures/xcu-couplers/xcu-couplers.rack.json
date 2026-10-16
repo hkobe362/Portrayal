@@ -1,0 +1,45 @@
+{
+  "format": "portrayal-rack",
+  "version": 1,
+  "id": "xcu-couplers",
+  "racks": [
+    {
+      "id": "r1",
+      "name": "xcu-coupler-test",
+      "frame": {
+        "kind": "four-post",
+        "heightRU": 24,
+        "numbering": "bottom-up",
+        "holes": {"style": "square", "thread": null},
+        "railDepth": 740,
+        "usableDepth": 1000,
+        "ref": null
+      },
+      "items": [
+        {"id": "i1", "ref": "as5912-54x", "cfg": "ac-f2b", "label": "olt-a", "ru": 20, "face": "rear", "turned": false,
+         "swaps": {"port-1": "generic/sfp-sc@1", "port-2": "generic/sfp-sc@1"}, "fields": {}},
+        {"id": "i2", "ref": "as5912-54x", "cfg": "ac-f2b", "label": "olt-b", "ru": 22, "face": "rear", "turned": false,
+         "swaps": {"port-1": "generic/sfp-sc@1", "port-2": "generic/sfp-sc@1"}, "fields": {}},
+        {"id": "i3", "ref": "xcu", "cfg": "xcu10-51id", "label": "xcu-sc", "ru": 10, "face": "rear", "turned": false,
+         "swaps": {}, "fields": {}},
+        {"id": "i4", "ref": "xcu", "cfg": "xcu10-21ic", "label": "xcu-lc", "ru": 12, "face": "rear", "turned": false,
+         "swaps": {"drawer/module/slot-1": "fibrain/xmn1021gb@1"}, "fields": {}}
+      ],
+      "zeroU": [],
+      "cables": [
+        {"id": "c1", "a": {"item": "i1", "path": "port-1", "view": "front"},
+         "b": {"item": "i3", "path": "drawer/module/slot-1/module/sc01", "view": "front"},
+         "media": "os2", "purpose": "uplink", "label": "PON-A", "length": {"value": 3, "unit": "m", "source": "entered"}, "route": []},
+        {"id": "c2", "a": {"item": "i2", "path": "port-1", "view": "front"},
+         "b": {"item": "i3", "path": "drawer/module/slot-1/module/b01", "view": "rear"},
+         "media": "os2", "purpose": "uplink", "label": "PON-B", "length": {"value": 5, "unit": "m", "source": "entered"}, "route": []},
+        {"id": "c3", "a": {"item": "i1", "path": "port-2", "view": "front"},
+         "b": {"item": "i4", "path": "drawer/module/slot-1/module/lc01", "view": "front"},
+         "media": "os2", "purpose": "uplink", "label": "PON-C", "length": {"value": 3, "unit": "m", "source": "entered"}, "route": []},
+        {"id": "c4", "a": {"item": "i2", "path": "port-2", "view": "front"},
+         "b": {"item": "i4", "path": "drawer/module/slot-1/module/b01", "view": "rear"},
+         "media": "os2", "purpose": "uplink", "label": "PON-D", "length": {"value": 5, "unit": "m", "source": "entered"}, "route": []}
+      ]
+    }
+  ]
+}

@@ -17,7 +17,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = json.loads((ROOT / "spec/schemas/rack.schema.json").read_text())
-FIXTURES = sorted((ROOT / "spec/tests/fixtures/racks").glob("*.json"))
+FIXTURES = sorted((ROOT / "spec/tests/fixtures/racks").glob("*.json")) \
+    + sorted((ROOT / "spec/tests/fixtures/xcu-couplers").glob("*.json"))
 
 pytestmark = pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
 

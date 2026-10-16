@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: seg7-status-2
-version: 1.3.0
+version: 1.4.0
 class: display
 profile: networking
 description: Two-digit seven-segment status display in a dark bezel - the numeric
@@ -31,6 +31,10 @@ provenance:
     figure draws '88', which is the all-segments-lit lamp test every vendor renders
     rather than a value; this draws '0' on each digit, which is a readout a reader can
     believe, and the lamp test remains available as the state '8'.
+  kind: >-
+    drawing - the two blue digit windows of HIG Figure 8 are seven-segment cells (the
+    vendor draws them as '88'), so each is `kind: segment` and a rack file sets them
+    as the digits of this part, left to right. The part has no decimal points.
   colour: >-
     drawing - the digits are drawn in a light blue on near-black; sampled off the same
     figure. UfiSpace's own front render in the datasheet draws them the same way.
@@ -39,6 +43,7 @@ elements:
     at: [1.75, 1.5]
     size: [5.7, 6.9]
     class: display
+    kind: segment
     characters: 1
     description: >-
       the left digit. Its states are the characters a seven-segment cell can form,
@@ -68,6 +73,7 @@ elements:
     at: [9.75, 1.5]
     size: [5.7, 6.9]
     class: display
+    kind: segment
     characters: 1
     description: the right digit, with the same sixteen characters as digit-1
     states: *digit-states

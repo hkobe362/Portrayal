@@ -31,7 +31,7 @@ from portrayal.faces import DIRECTIONS, face_ref  # noqa: E402
 from portrayal.render import (SVG_NS, STATE_CSS, Library, instance_group,  # noqa: E402
                     seq_css_name, state_rule, component_cages, component_presents,
                     _pluggable_families, _pluggable_candidates,
-                    _connector_registry)
+                    _connector_registry, display_elements)
 from portrayal import libwalk  # noqa: E402
 from portrayal import redirects  # noqa: E402
 from portrayal import optical, optical_ports  # noqa: E402
@@ -309,6 +309,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", action="append", required=True)
     ap.add_argument("--out", required=True)
+    # INDEX ONLY THESE ROOTS' PARTS (an overlay library). Every --library still
+    # answers for the parts a contract composes and the devices that seat one.
+    ap.add_argument("--only-root", action="append", default=[],
+                    help="index only the components under these --library roots")
     args = ap.parse_args()
     out = Path(args.out)
     (out / "components").mkdir(parents=True, exist_ok=True)
@@ -326,7 +330,7 @@ def main():
     in_bays = seated_in_bays(args.library)
     seats = seat_counts(args.library)
     composers = composer_counts(args.library)
-    for root in args.library:
+    for root in args.only_root or args.library:
         for cf in sorted(Path(root).glob("components/*/*/v*/contract.yaml")):
             data = load_yaml(cf)
             ns = cf.parents[2].name
@@ -482,6 +486,12 @@ def main():
             presents = component_presents(ref, lib, families, candidates, connectors)
             if presents:
                 entry["presents"] = presents
+            # ITS DISPLAYS a rack file can set (docs/display-content-design.md),
+            # `{<element>: {kind, characters, rows?, at, size}}`. Omitted when
+            # it has none, like `cages`.
+            shown = display_elements(data)
+            if shown:
+                entry["displays"] = shown
             # THE CARD'S OWN PORT GROUPS (#511), in the device `groups:` shape.
             # Omitted when the contract declares none, like `cages`.
             if data.get("groups"):

@@ -7,8 +7,8 @@ parts at the clip positions, no cage and no nesting.
 - each panel has the FAPM6's face and size, and its six parts sit in the six
   openings the FAPM6 punches;
 - the RJ45 panel's parts are `p1` to `p6`, `std/rj45@2`, a port a cable lands
-  on, and it declares no rear face and no optical block: the back is a
-  punch-down termination and takes no cable;
+  on, and it declares a rear face, `bN` behind `pN`, each a punch-down (IDC)
+  termination a cable ends on, and no optical block;
 - the blank panel composes a blanking insert in each opening and no part of
   class `port`;
 - every enclosure that accepts the FAPM6 accepts both.
@@ -77,11 +77,19 @@ def test_the_rj45_panel_numbers_its_ports_as_fs_prints_them():
     assert xs == sorted(xs) and len(set(xs)) == 3
 
 
-def test_the_rj45_panel_has_no_rear_port():
+def test_the_rj45_panel_has_a_punch_down_rear_for_each_jack():
     doc = _load("fs/fhd-fapm6-rj45@1")
-    assert "faces" not in doc and "optical" not in doc and "cages" not in doc and "bays" not in doc
+    assert "optical" not in doc and "cages" not in doc and "bays" not in doc
+    assert doc["faces"] == {"rear": {"ref": "fs/fhd-fapm6-rj45-rear@1"}}
+    rear = _load("fs/fhd-fapm6-rj45-rear@1")
+    assert [p["id"] for p in rear["parts"]] == [f"b{n}" for n in range(1, 7)], "bN behind pN"
+    for p in rear["parts"]:
+        assert p["ref"] == "common/idc-termination@1", p
+    term = _load("common/idc-termination@1")
+    assert term["class"] == "port" and term["attrs"]["media"] == "idc"
     text = " ".join(str(v) for v in (doc["description"], *doc["provenance"].values())).lower()
     assert "punch-down" in text and "idc" in text, "the part must say the rear is an IDC termination"
+    assert "estimated" in text, "the match of #72818 to the punch-down jack is declared"
 
 
 def test_the_blank_panel_closes_every_opening_and_offers_no_port():

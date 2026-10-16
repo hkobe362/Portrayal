@@ -92,7 +92,7 @@ COMP_PATH = pathlib.Path("library/components/acme/part/v1/contract.yaml")
 def run(doc, path=DEV_PATH):
     with lint.collecting() as got:
         lint.lint_public_audience(path, doc)
-        return [e for e in got.errors if "[L185]" in e]
+        return [e for e in got.errors if "[L192]" in e]
 
 
 @pytest.mark.parametrize("path", [DEV_PATH, COMP_PATH], ids=["device", "component"])
@@ -108,7 +108,7 @@ def test_absent_or_public_passes(doc):
 
 
 def test_the_rule_is_in_the_table_and_the_library_passes_it():
-    assert "L185" in lint.RULES
+    assert "L192" in lint.RULES
     bad = []
     for f in sorted(LIB.glob("devices/**/device.yaml")) + sorted(LIB.glob("components/**/contract.yaml")):
         d = load_yaml(f)

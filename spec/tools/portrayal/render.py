@@ -509,6 +509,19 @@ def rewrite_ids(el, prefix, contract, path_prefix, skip=None, in_port=False):
             if spec.get("messages"):
                 node.set("data-messages",
                          " ".join(str(m["text"]) for m in spec["messages"]))
+            # WHAT A RACK FILE CAN PUT ON IT (docs/display-content-design.md):
+            # the kind (`data-display-kind`; `data-kind` is the decor's and
+            # `data-display` a device attr), the rows of a character display
+            # and the window, which is the element's own box in the frame of
+            # its part. A display with no `kind` publishes none of them and
+            # cannot be set.
+            if spec.get("kind") and spec.get("class") == "display":
+                node.set("data-display-kind", spec["kind"])
+                if spec.get("rows"):
+                    node.set("data-display-rows", str(spec["rows"]))
+                if spec.get("at") and spec.get("size"):
+                    node.set("data-display-window", " ".join(
+                        f"{float(v):g}" for v in (*spec["at"], *spec["size"])))
             if spec.get("description"):
                 node.set("data-description", spec["description"])
     for node in el.iter():
@@ -4772,6 +4785,51 @@ def config_states(device, cfg_name, cfg, lib):
     return dict(sorted(out.items()))
 
 
+def display_elements(contract):
+    """The displays of one contract a rack file can set, `{<element>: {kind,
+    characters, rows?, at, size}}` (docs/display-content-design.md).
+
+    ONLY AN ELEMENT THAT SAYS WHAT IT IS. A `class: display` element with a
+    `kind` and a box is a window the drawing shows; one without either is left
+    out, and a rack file cannot set it. `rows` is published only where the
+    contract states it. `{}` for a part with none."""
+    out = {}
+    for eid, spec in sorted((contract.get("elements") or {}).items()):
+        if not isinstance(spec, dict) or spec.get("class") != "display":
+            continue
+        if not spec.get("kind") or not spec.get("at") or not spec.get("size"):
+            continue
+        out[eid] = {"kind": spec["kind"], "characters": spec.get("characters"),
+                    **({"rows": spec["rows"]} if spec.get("rows") else {}),
+                    # a segment cell's glyphs, the states a digit string lights
+                    **({"glyphs": state_names(spec["states"])}
+                       if spec["kind"] == "segment" and spec.get("states") else {}),
+                    "at": [float(v) for v in spec["at"]],
+                    "size": [float(v) for v in spec["size"]]}
+    return out
+
+
+def config_displays(device, cfg_name, cfg, lib):
+    """`configs[].displays`: the displays each part one configuration places
+    carries, `{<placement id>: {<element>: {...}}}`, as `display_elements`
+    reads them off the part's contract.
+
+    A PLACEMENT'S, NOT A BAY'S. What a bay holds is a swap, and the kit reads
+    that part's own `displays` from components.json; this lists only the parts
+    the device itself places, read over the views and placements this
+    configuration draws. `{}` on a device with none."""
+    out = {}
+    for _face, (_name, view) in resolve_views(device, cfg).items():
+        for p in view_parts(view)["placements"]:
+            if not p.get("id") or (p.get("only-in") and cfg_name not in p["only-in"]):
+                continue
+            contract, _ = lib.resolve(p["ref"])
+            shown = display_elements(contract)
+            if shown:
+                out[p["id"]] = shown
+    return dict(sorted(out.items()))
+
+
 def drawn_states(placed, face_docs):
     """`configs[].states` in full (P-0041): `config_states` (the parts a
     placement declares) and every lamp or part the DRAWING declares, each by the
@@ -6003,6 +6061,12 @@ def main():
                               # <name>}`, from the device's own `interfaces:`,
                               # as the device-type export names its outlets
                               "names": config_names(device, cfg_states[n]),
+                              # THE DISPLAYS THE DEVICE PLACES (docs/display-
+                              # content-design.md): `{<placement id>: {<element>:
+                              # {kind, characters, rows?, at, size}}}`. Only on a
+                              # configuration that places one.
+                              **({"displays": shown}
+                                 if (shown := config_displays(device, n, c, lib)) else {}),
                               # THE POSITIONS THIS CONFIGURATION SETS, in mm,
                               # by adjustment id; {} for one that sets none,
                               # which is drawn at each default. Only on a

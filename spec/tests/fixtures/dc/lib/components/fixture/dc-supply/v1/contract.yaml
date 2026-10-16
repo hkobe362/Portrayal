@@ -1,0 +1,28 @@
+format: 1
+kind: module
+name: dc-supply
+version: 1.0.0
+class: psu
+description: >-
+  A synthetic -48 V supply for the DC lint tests: a two-post terminal block whose
+  posts are composed seat parts, with every pole's role sourced.
+size: {w: 50, h: 40}
+parts:
+- {ref: fixture/dc-post@1, id: terminal-rtn, at: [10, 20]}
+- {ref: fixture/dc-post@1, id: terminal-48v, at: [30, 20]}
+provenance:
+  size: invented for a test
+  terminals: invented for a test; the return post is on the left and the battery post on the right
+  input-figures: invented for a test
+dc:
+  ports:
+  - id: input
+    direction: input
+    voltage: {nominal: -48, range: [-44, -65]}
+    rating-a: 18
+    awg: [12]
+    side: a
+    poles:
+    - {role: rtn, slot: terminal-rtn}
+    - {role: batt, slot: terminal-48v}
+    source: {poles: terminals, voltage: input-figures, rating-a: input-figures, awg: input-figures}
