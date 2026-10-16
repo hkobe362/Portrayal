@@ -676,6 +676,10 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.50.0: `moduleTypePath(paths, model, name)` falls back to the contract name.**
+A module with no `attrs.model` is filed under its contract name by the exporter, so a page that looks
+a type up by part number now tries the name second. Three FS adapter panels were not found before.
+
 **New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
 `loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`
 and `createViewer` take a list where they took one root (`kit/dist.js` `layeredDist` and `readIndex`);
