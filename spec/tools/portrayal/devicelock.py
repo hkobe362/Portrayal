@@ -1247,6 +1247,152 @@ def update_listings(library: pathlib.Path):
     return changed
 
 
+# ---- racks ---------------------------------------------------------------------
+#
+# A RACK PRODUCT IS VERSIONED BY WHAT A SAVED RACK FILE COPIES (#935). The Rack
+# Builder copies a product's numbers into its frame and keeps the ref, so the
+# same major always has to mean the same numbers (docs/rack-products-design.md
+# section 1). Four buckets:
+#
+#   `frame`    form, ru, numbering, width, holes, rails, max-device-depth - what
+#              a saved rack copies or positions against. Any change is major.
+#              An absent `width` is 19, so stating 19 is no change.
+#   `geometry` hole-centres and opening, figures a source may print later. Stated
+#              where there were none: minor. Changed or removed: major.
+#   `stated`   outer, weight-kg and each load rating, one entry apiece. Stated
+#              where there was none: minor. A corrected figure: patch. Gone:
+#              major, since a figure that goes away is not an addition.
+#   `surface`  everything else - names, prose, provenance, gaps. A patch.
+
+RACK_LOCK_NAME = "rack.lock.json"
+RACK_FRAME = ("form", "ru", "numbering", "holes", "rails", "max-device-depth")
+RACK_GEOMETRY = ("hole-centres", "opening")
+RACK_STATED = ("outer", "weight-kg", "load.static-kg", "load.rolling-kg")
+
+
+def _rack_stated(doc):
+    out = {}
+    for k in RACK_STATED:
+        top, _, sub = k.partition(".")
+        v = (doc.get(top) or {}).get(sub) if sub else doc.get(top)
+        if v is not None:
+            out[k] = _digest(v)
+    return out
+
+
+def rack_entry(doc):
+    frame = {k: doc.get(k) for k in RACK_FRAME}
+    frame["width"] = doc.get("width", 19)
+    held = set(RACK_FRAME) | set(RACK_GEOMETRY) | {"width", "version", "load", "outer",
+                                                   "weight-kg"}
+    return {"version": str(doc.get("version") or ""),
+            "frame": _digest(frame),
+            "geometry": {k: _digest(doc[k]) for k in RACK_GEOMETRY if k in doc},
+            "stated": _rack_stated(doc),
+            "surface": _digest({k: v for k, v in doc.items() if k not in held})}
+
+
+def rack_bump(old, new):
+    """The smallest bump a rack change allows, or None if nothing moved."""
+    if old is None:
+        return None
+    needs = []
+    if old.get("frame") != new["frame"]:
+        needs.append("major")
+    was, now = old.get("geometry") or {}, new["geometry"]
+    if any(k not in now or now[k] != v for k, v in was.items()):
+        needs.append("major")
+    if set(now) - set(was):
+        needs.append("minor")
+    was, now = old.get("stated") or {}, new["stated"]
+    if set(was) - set(now):
+        needs.append("major")
+    if set(now) - set(was):
+        needs.append("minor")
+    if any(k in now and now[k] != v for k, v in was.items()) \
+            or old.get("surface") != new["surface"]:
+        needs.append("patch")
+    return max(needs, key=RANK.get) if needs else None
+
+
+def rack_files(library: pathlib.Path):
+    return list(libwalk.iter_racks([library]))
+
+
+def rack_lock_path(library: pathlib.Path, key: str):
+    return library / "racks" / key / RACK_LOCK_NAME
+
+
+def load_rack_locks(library: pathlib.Path):
+    out = {}
+    for path in rack_files(library):
+        key = libwalk.rack_key(path)
+        f = rack_lock_path(library, key)
+        if f.exists():
+            out[key] = json.loads(f.read_text())
+    return out
+
+
+def orphan_rack_locks(library: pathlib.Path):
+    """rack.lock.json files whose rack is gone."""
+    return sorted(f for f in (library / "racks").glob(f"*/*/{RACK_LOCK_NAME}")
+                  if not (f.parent / "rack.yaml").exists())
+
+
+def check_racks(library: pathlib.Path):
+    findings = []
+    # A DELETED RACK TAKES A REF OUT FROM UNDER EVERY SAVED RACK FILE, and the
+    # walk below cannot see it: its lock is the only trace.
+    for f in orphan_rack_locks(library):
+        key = f"{f.parent.parent.name}/{f.parent.name}"
+        findings.append((key, "removed",
+                         f"rack {key} is gone but its {RACK_LOCK_NAME} is not. A saved rack "
+                         "file names the rack by this ref; if the removal is intended, run "
+                         "devicelock.py --update to drop the lock"))
+    known = load_rack_locks(library)
+    for path in rack_files(library):
+        key = libwalk.rack_key(path)
+        now = rack_entry(manifest.load_yaml(path) or {})
+        was = known.get(key)
+        if was is None:
+            findings.append((key, "unlocked",
+                             f"rack {key} has no {RACK_LOCK_NAME}. Run devicelock.py "
+                             "--update to record it"))
+            continue
+        need = rack_bump(was, now)
+        took = bump_taken(was.get("version"), now["version"])
+        if took == "backwards":
+            findings.append((key, "backwards",
+                             f"rack {key} version went from {was.get('version')} to "
+                             f"{now['version']}. A version is a promise, and it only counts up"))
+        elif not sufficient(took, need):
+            findings.append((key, "unbumped",
+                             f"rack {key} changed since version {was.get('version')} "
+                             "and the version "
+                             + (f"is still {now['version']}" if took is None
+                                else f"only took a {took} bump")
+                             + f". This change needs at least a {need} bump"
+                             + (" - a saved rack file copies these numbers"
+                                if need == "major" else "")))
+    return findings
+
+
+def update_racks(library: pathlib.Path):
+    changed = []
+    for f in orphan_rack_locks(library):
+        f.unlink()
+        changed.append(f"rack {f.parent.parent.name}/{f.parent.name} (removed)")
+    known = load_rack_locks(library)
+    for path in rack_files(library):
+        key = libwalk.rack_key(path)
+        now = rack_entry(manifest.load_yaml(path) or {})
+        if {k: v for k, v in (known.get(key) or {}).items() if k != "format"} != now:
+            rack_lock_path(library, key).write_text(
+                json.dumps({"format": FORMAT, **now}, indent=1, sort_keys=True) + "\n")
+            changed.append(f"rack {key}")
+    return changed
+
+
 def device_files(library: pathlib.Path):
     return list(libwalk.iter_devices([library]))
 
@@ -1314,6 +1460,7 @@ def aggregate(library: pathlib.Path, out: pathlib.Path):
     """
     body = load_lock(library)
     body["listings"] = load_listing_locks(library)
+    body["racks"] = load_rack_locks(library)
     out.write_text(json.dumps(body, indent=1, sort_keys=True) + "\n")
     return out
 
@@ -1411,7 +1558,7 @@ def check(library: pathlib.Path, below=()):
                              "must go, a gap the change opened must be added, and a gap "
                              "still true is fine - but it has to be the third one on "
                              "purpose rather than by omission"))
-    return findings + check_listings(library)
+    return findings + check_listings(library) + check_racks(library)
 
 
 def update(library: pathlib.Path, below=()):
@@ -1435,7 +1582,7 @@ def update(library: pathlib.Path, below=()):
     for name in sorted(set(known) - set(live)):
         lock_path(library, name).unlink(missing_ok=True)
         changed.append(f"{name} (removed)")
-    return changed + update_listings(library)
+    return changed + update_listings(library) + update_racks(library)
 
 
 def main(argv=None):

@@ -1,0 +1,109 @@
+format: 1
+kind: rack
+name: ar201
+version: 1.0.0
+maturity: modelled
+manufacturer: APC
+model: AR201
+part-numbers:
+  AR201: APC NetShelter Open Frame Rack, 2 Post, 45U, 12-24 Threaded Holes, Black
+description: >-
+  The APC NetShelter two-post open frame rack, 45U, with tapped #12-24 holes.
+  Equipment is mounted on the front rails only, to a depth of 1048 mm.
+form: 2-post-frame
+ru: 45
+numbering:
+  direction: bottom-up
+  start: 1
+width: 19
+holes:
+  style: tapped
+  thread: 12-24
+hole-centres: 465.1
+opening: 450.85
+rails:
+  - id: front
+max-device-depth: 1048
+outer:
+  w: 513
+  h: 2136
+  d: 376
+weight-kg: 11.82
+load:
+  static-kg: 340.2
+datasheet:
+  title: APC NetShelter Open Frame Rack, 2 Post, 45U, 12-24 Threaded Holes, Black (AR201), product data sheet
+  url: https://www.se.com/us/en/product/download-pdf/AR201?filename=Schneider+Electric_APC-NetShelter-Open-Frame-Racks_AR201.pdf
+references:
+  - title: Open Frame 2-Post NetShelter Rack Installation (AR200, AR201)
+provenance:
+  ru:
+    confidence: datasheet
+    note: '"Number of rack unit 45U" in the product data sheet, whose title also says 2 Post.'
+  form:
+    confidence: datasheet
+    note: >-
+      The data sheet title and the installation sheet both say 2-post: two
+      upright rails joined by a top angle and a bottom angle at each end. The
+      mounting location is "Front" only.
+  width:
+    confidence: datasheet
+    note: '"Rack Width 19 in" in the data sheet.'
+  holes:
+    confidence: datasheet
+    note: >-
+      The data sheet title and its provided equipment (24 pilot screws,
+      #12-24 x 0.5 inch) give tapped #12-24 holes. No hole size is printed.
+  rails:
+    confidence: datasheet
+    note: >-
+      A two-post frame has the front rail alone: the data sheet lists the mounting
+      location as Front, with no rear rail and no minimum mounting depth.
+  max-device-depth:
+    confidence: datasheet
+    note: '"Maximum Mounting Depth 41.3 in (1048 mm)" in the data sheet.'
+  outer:
+    confidence: datasheet
+    note: >-
+      Height 84.09 in (2136 mm), width 20.2 in (513 mm), depth 14.8 in (376 mm) in
+      the data sheet. The depth is the footprint of the base, not the depth
+      equipment may have.
+  weight-kg:
+    confidence: datasheet
+    note: 'Net weight 26.06 lb (11.82 kg) in the data sheet.'
+  load:
+    confidence: datasheet
+    note: >-
+      "Permanent permissible load 750 lb (340.2 kg) static" in the data sheet. No
+      rolling rating is stated.
+  numbering:
+    confidence: estimated
+    note: >-
+      A stand-in. No document read says which way the labels run. Bottom-up from
+      1 is the default of the rack file.
+  hole-centres:
+    confidence: estimated
+    note: >-
+      A stand-in for the EIA-310 figure, 465.1 mm between hole lines (18.312
+      in). The data sheet states EIA-310E and prints no hole spacing.
+  opening:
+    confidence: estimated
+    note: >-
+      A stand-in for the EIA-310 minimum clear opening between the rails, 450.85
+      mm (17.75 in). The data sheet prints no figure for it.
+gaps:
+  - what: numbering
+    reason: vendor-silent
+    note: The data sheet does not describe the U labels, and the installation sheet shows none.
+    wanted: The direction the labels run on the rail, from a photograph or a dimensioned drawing.
+  - what: hole-centres
+    reason: needs-drawing
+    note: >-
+      The installation sheet has a dimensions figure (mounting hole width and
+      minimum inside equipment clearance width) whose numbers were not read
+      from the text of the sheet.
+    wanted: The figures on the installation sheet's dimensions drawing.
+  - what: opening
+    reason: needs-drawing
+    note: The same dimensions figure on the installation sheet.
+    wanted: The figures on the installation sheet's dimensions drawing.

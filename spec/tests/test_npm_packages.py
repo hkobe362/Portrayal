@@ -167,7 +167,8 @@ def test_every_device_in_the_library_fits_in_a_package(tmp_path):
     devices = json.loads((DIST / "devices.json").read_text())["devices"]
     namespaces = {p.name.split("--")[0] for p in (DIST / "components").iterdir()}
     assert len(namespaces) > 10, "measured almost no skins; the build is not the library"
-    assert len(state) == len(devices) + len(namespaces) + 1
+    racks = json.loads((DIST / "rack-products.json").read_text())["racks"]
+    assert len(state) == len(devices) + len(namespaces) + len(racks) + 1
     assert max(sizes.values()) < P.LIMIT_MB * 1e6
 
 

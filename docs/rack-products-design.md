@@ -1,6 +1,8 @@
 # Rack and cabinet products: the library format
 
-Status: proposed 2026-10-09, nothing built. Issue #935. Each section's
+Status: proposed 2026-10-09. Issue #935. Built so far: the kind, its schema and
+lock, the open frames AR203A and AR201, and their npm packages (section 11, step
+2). Everything else is still a proposal. Each section's
 decision is a recommendation; the five questions the note left open were
 decided as it recommended on 2026-10-09, and are listed at the end of section
 11.
@@ -52,9 +54,11 @@ building blocks first, with shelves, drawers and DIN rail able to hold things.
   `module`, published in `kits.json`; `chassis.kits` and `chassis.ears` on a
   device, with named ear positions and their `at`. `rack.json` does not yet
   carry a device's default ear position (#908, open).
-- **The faceplate setback** is 30 mm for every device in the Rack Builder, its
-  3D scene's showcase default. A per-item and per-frame `setback` was built in
-  the site and paused unmerged (portrayal-site#139, part 3).
+- **The faceplate setback** is flush today: the Rack Builder sets every device on
+  the rail plane (it draws cables through the kit's points, portrayal-site#166).
+  The 30 mm showcase default the 3D scene once had is gone. A per-item and
+  per-frame `setback` was built in the site and paused unmerged
+  (portrayal-site#139, part 3).
 - **`rack.json`** (`format: 1`) is the one-fetch catalogue of placeable devices.
   It has no racks in it.
 - **The DCIMs.** NetBox has a rack type (`RackType`, manufacturer, model and
@@ -637,6 +641,19 @@ cabinets, wall and vertical, and desktop.
    lint, `rack.json` `frames`, the rack type export (decision 5), and the open frames
    AR203A and AR201, which fit rack file version 3 through `frame.ref`. The
    Rack Builder's frame picker follows in the site.
+
+   **Built (#935):** `library/racks/<vendor>/<name>/rack.yaml` and
+   `rack.lock.json`, `spec/schemas/rack-product.schema.json`, lint rule L193,
+   and `apc/ar203a` and `apc/ar201`. The schema holds the frame only; channels,
+   doors, the base and baying are additive keys that arrive with the cabinets.
+   A rack is walked by `libwalk.iter_racks` and locked by `devicelock.py`
+   beside devices and listings. The build writes `rack-products.json` (one row
+   per product, with its ref `<vendor>/<name>@<major>`) and
+   `racks/<vendor>--<name>.rack.json` beside the schema, through
+   `registry_index.py`. `npm_packages.py` ships each product as
+   `@portrayal/racks-<vendor>-<name>`, named in the `racks` table of the index's
+   `packages.json`, and the kit's `readRack` loads one by its ref. `rack.json`
+   and the rack file are unchanged: `frames` in `rack.json` is step 3.
 3. **Hosting.** `hosts:` on devices, `chassis.ears.holes`, and rack file
    version 4 with all of section 9's keys at once; setback (#908 and the
    paused site design) lands in the same version. Fit, describe, inspect and

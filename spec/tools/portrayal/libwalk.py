@@ -114,6 +114,22 @@ def listing_key(listing_file):
     return f"{p.parent.parent.name}/{p.parent.name}"
 
 
+def iter_racks(roots):
+    """Every rack.yaml under every root, sorted, as paths. A LIST.
+
+    A rack product sits in `racks/<vendor>/<name>/`, a tree of its own, so no
+    walk that means "the metal" or "a part" ever meets one (#935).
+    """
+    return [f for r in _roots(roots)
+            for f in sorted(Path(r).glob("racks/*/*/rack.yaml"))]
+
+
+def rack_key(rack_file):
+    """`racks/apc/ar203a/rack.yaml` -> `apc/ar203a`."""
+    p = Path(rack_file)
+    return f"{p.parent.parent.name}/{p.parent.name}"
+
+
 def iter_labs(roots):
     """Every lab.yaml under every root, sorted, as paths. A LIST.
 
