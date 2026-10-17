@@ -299,7 +299,7 @@ test('the modules file names a bay by its name, found by its position; what it c
     'core-1 slot-2/module/mic-0: FAN-F is not in the modules file. The module it sits in, at slot-2, is not in the modules file.']);
 });
 
-test('the modules file writes a module in a bay of another module after the one it sits in; Nautobot cannot name that bay (#1024)', () => {
+test('the modules file writes a module in a bay of another module after the one it sits in; Nautobot in a file a depth (#1024, #1127)', () => {
   const drawer = {manufacturer: 'Fibrain', model: 'XCU10', lists: null}, holder = {manufacturer: 'Fibrain', model: 'XMI1051GA', lists: null};
   const names = new Map([['i1', {name: 'xcu-1'}]]);
   // the nested part is listed BEFORE its drawer: the order of the rows does not follow the order of the parts
@@ -315,10 +315,11 @@ test('the modules file writes a module in a bay of another module after the one 
         [['drawer', 'XCU10'], ['drawer/slot-2', 'XMI1051GA'], ['drawer/slot-1', 'XMI1051GA']]);
       assert.deepEqual(got.left, []);
     } else {
+      // a section a depth (#1127): the drawer in the device's bay here, the holders in a file of their own
       assert.deepEqual(got.rows.map(r => [r.parent_module_bay__name, r.module_type__model]), [['drawer', 'XCU10']]);
-      assert.deepEqual(got.left, [
-        "xcu-1 drawer/module/slot-2: XMI1051GA is not in the modules file. It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay slot-2 of the module at drawer.",
-        "xcu-1 drawer/module/slot-1: XMI1051GA is not in the modules file. It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay slot-1 of the module at drawer."]);
+      assert.deepEqual(got.deeper.map(s => [s.depth, s.rows.map(r => [r.parent_module_bay__name, r.module_type__model])]),
+        [[1, [['slot-2', 'XMI1051GA'], ['slot-1', 'XMI1051GA']]]]);
+      assert.deepEqual(got.left, []);
     }
   }
   // the module it sits in must be a row of the file, else the bay is not there to install it in
