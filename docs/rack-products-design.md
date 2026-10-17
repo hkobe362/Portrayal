@@ -654,6 +654,19 @@ cabinets, wall and vertical, and desktop.
    `@portrayal/racks-<vendor>-<name>`, named in the `racks` table of the index's
    `packages.json`, and the kit's `readRack` loads one by its ref. `rack.json`
    and the rack file are unchanged: `frames` in `rack.json` is step 3.
+
+   **Built (#1105):** the generic shapes `generic/2-post-frame`,
+   `generic/4-post-frame` and `generic/4-post-cabinet`, each the Rack Builder's
+   default frame plus `hole-centres: 465` and `opening: 450`. Both figures were
+   read from an IBM rack-requirements page and Wikipedia (they differ a little:
+   Wikipedia has 464.2 to 465.8 and 450.85); the EIA-310 text was not read, so
+   each is `estimated` with a `gaps` entry, and no 23-inch figure is stated. The
+   rail depth is left out of the generic four-post shapes: no page sets one. The
+   hole pattern (sets of three holes, 15.9, 15.9 and 12.7 mm, 44.45 mm a set)
+   is in the `holes` provenance note, because the schema has no key for it.
+   The rack types are exported by `dcim_export.py --racks` to
+   `library/exports/netbox/rack-types/<Manufacturer>/<model>.yaml`, with the
+   Nautobot rack fields under `library/exports/nautobot/rack-types/`.
 3. **Hosting.** `hosts:` on devices, `chassis.ears.holes`, and rack file
    version 4 with all of section 9's keys at once; setback (#908 and the
    paused site design) lands in the same version. Fit, describe, inspect and

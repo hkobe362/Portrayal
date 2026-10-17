@@ -1,0 +1,115 @@
+format: 1
+kind: rack
+name: 4-post-frame
+version: 1.0.0
+maturity: modelled
+manufacturer: Generic
+model: 4-post-frame
+description: >-
+  A generic four-post open frame: front and rear rails, with the rail depth set
+  where a frame is built. Its numbers are the Rack Builder's generic four-post
+  frame, with the hole centres and opening a 19-inch rail has.
+form: 4-post-frame
+ru: 42
+numbering:
+  direction: bottom-up
+  start: 1
+width: 19
+holes:
+  style: square
+hole-centres: 465
+opening: 450
+rails:
+  - id: front
+  - id: rear
+references:
+  - title: Rack installation specifications for racks that are not purchased from IBM (IBM Documentation, POWER9)
+    url: https://www.ibm.com/docs/POWER9/p9had/p9had_oemrack.htm
+  - title: 19-inch rack (Wikipedia)
+    url: https://en.wikipedia.org/wiki/19-inch_rack
+provenance:
+  ru:
+    confidence: estimated
+    note: >-
+      A stand-in: 42 is the height the Rack Builder gives a new generic frame.
+      Neither page sets a height.
+  numbering:
+    confidence: estimated
+    note: >-
+      A stand-in: the Rack Builder's default, bottom-up from 1. Neither page
+      says which way the labels run.
+  width:
+    confidence: estimated
+    note: >-
+      The IBM page and Wikipedia both describe the 19-inch rail. Read from those
+      two pages, not from the standard.
+  holes:
+    confidence: estimated
+    note: >-
+      The style is a stand-in, the Rack Builder's default (square), and no
+      thread is stated. The vertical pattern is sets of three holes spaced 15.9,
+      15.9 and 12.7 mm on centre, 44.45 mm (1.75 in) per set, from the IBM page.
+      Wikipedia lists the same three gaps as 12.70, 15.88 and 15.88 mm and the
+      same 1.75 in unit.
+  hole-centres:
+    confidence: estimated
+    note: >-
+      465 mm between the hole lines of a rail pair, plus or minus 1.6 mm, as the
+      IBM page states for racks it does not sell. Wikipedia gives 464.2 to 465.8
+      mm for the same distance. The maker sheet recorded in
+      docs/rack-products-design.md section 2 for a four-post frame (the
+      FS-OR4P-45U datasheet) gives 465 mm.
+  opening:
+    confidence: estimated
+    note: >-
+      450 mm minimum clear opening between the rails, as the IBM page states.
+      Wikipedia gives 450.85 mm (17.75 in). The FS-OR4P-45U datasheet, as
+      recorded in docs/rack-products-design.md section 2, gives 450 mm.
+gaps:
+  - what: hole-centres
+    reason: needs-drawing
+    note: >-
+      Read from a secondary source, the IBM page, with Wikipedia beside it. The
+      EIA-310 text was not read, so the figure and its tolerance are not
+      confirmed against the standard. The maker sheet was not read for this
+      shape either.
+    wanted: The EIA-310 text, or the maker sheet's dimension drawing.
+  - what: opening
+    reason: needs-drawing
+    note: >-
+      Read from a secondary source, the IBM page, with Wikipedia beside it. The
+      EIA-310 text was not read. IBM calls 450 mm a minimum and Wikipedia gives
+      450.85 mm, so a real frame's opening varies.
+    wanted: The EIA-310 text, or the maker sheet's dimension drawing.
+  - what: width
+    reason: needs-drawing
+    note: >-
+      19 in is read from the IBM page and Wikipedia. The EIA-310 text was not read.
+    wanted: The EIA-310 text.
+  - what: width-23-in
+    reason: vendor-silent
+    note: >-
+      The hole spacing and the opening of a 23-inch frame were not found, so
+      this shape carries no 23-inch figure.
+    wanted: A document that prints the hole centres and opening of a 23-inch rail.
+  - what: ru
+    reason: vendor-silent
+    note: A generic frame has no height of its own; 42 is the Rack Builder's default.
+    wanted: Nothing; a frame set from this shape takes the height it is given.
+  - what: numbering
+    reason: vendor-silent
+    note: No page read says which way a generic frame's labels run.
+    wanted: Nothing; a frame set from this shape takes the numbering it is given.
+  - what: holes
+    reason: vendor-silent
+    note: >-
+      The hole style is the Rack Builder's default. EIA-310 text was not read to
+      see which styles it allows.
+    wanted: The EIA-310 text.
+  - what: rail-depth
+    reason: vendor-silent
+    note: >-
+      Neither page sets a rail depth, fixed or adjustable, so the rear rail
+      states none and the shape states no `max-device-depth`. The Rack Builder's
+      own default (740 mm) is not carried as a sourced number.
+    wanted: Nothing; the depth is the frame's, set where a frame is built.
