@@ -336,6 +336,16 @@ strap goes through. A page draws a
 band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
 {anchors})` so that single cables count.
 
+A bundle whose stored trunk is one waypoint, with two or more cables, is a
+**tie**: the cables share that point and nothing else, so it has no length and
+is held by one strap round the pack there. `straps()` gives that strap the
+`kind` `tie`, counted in `kinds.tie`, a key only a tie has; it is as wide as any
+other strap (19 mm, or 25 mm for a pack 25 mm across or more). It is there when
+two or more members ride the tie; with fewer there is no strap, and `notes`
+says so. `strapTotals(rack, ctx)` adds the strap to `total` and gives `tie`,
+how many there are, when there is one. `trunkLength` returns `{metres: 0, tie:
+true}` for a tie, which is not a length of 0 m.
+
 The exports take what the routes know from the page. `cableScheduleRows`
 fills `spare` and `stored` from `{spare: spareExports(rack, ctx)}` and its
 last column, `straps`, from `{straps: strapTexts(rack, ctx)}`, a Map of
@@ -1629,7 +1639,10 @@ name, members, drawn, checked, length_m, straight, few, every, straps, size_mm, 
 limit_at, limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes }`.
 `name` is what a tag prints (the label, else "Bundle N"), and `number` and
 `label` are there on their own for label software. `straps` is the count the
-BOM buys, and null when the route could not be read: never a guess.
+BOM buys, and null when the route could not be read: never a guess. A tie (see
+`straps()` above) has `length_m: null`, and the record adds `tie: true` and
+`tie_at`, the waypoint it is held at ("mgr-1 ring 3"); `strap_kinds.tie` is 1.
+`bundleNotes` reads it "tied at mgr-1 ring 3, 1 strap" where it would give a length.
 `bundleNotes(bundles)` is one line per bundle, its members, length, straps,
 size and bend ("Bundle 2 (b1): 12 cables (c1-c12), 2.4 m, 8 straps every
 12 in; ..."), followed by its warnings and notes.

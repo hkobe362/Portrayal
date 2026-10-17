@@ -576,6 +576,36 @@ It is kept, listed, not drawn, and has no straps. Each command that leaves it
 so says "Bundle 2 now holds one cable." `describe` and `inspect` show it
 (decision 5).
 
+### 4.5a A trunk of one waypoint is a tie (#1017)
+
+Decided 2026-10-16. A bundle of two or more cables whose stored trunk is one
+waypoint (cables that share one ring and nothing else) is **a tie at that
+point**. `bundle.create` still accepts a one-waypoint route and a saved rack
+that holds one loads unchanged. `bundles.js` `isTie(b)` names it. It has:
+
+- **one strap**, round the pack at the waypoint (`kind: 'tie'`), when two or
+  more members ride it, and none otherwise (#1021): `bundleCheck` then says
+  "Bundle 1 is a tie at mgr-1 ring 3, and only one cable rides there, so it has
+  no strap." A bundle set to no straps has none, as a longer trunk has none of
+  any kind. A spacing plays no part: there is no length to space along;
+- **riding** as on a longer trunk: the members that join and leave at the
+  waypoint (one whose route misses it runs to it, as to a longer trunk's
+  nearest element), and not a loose member;
+- **its width** as any strap's: the wide one for a pack 25 mm across or more,
+  else the base one; it is not moved off the ring, and not narrowed for peel
+  points, which are all at this one place;
+- **its place** on the path of the middle one by id of the members that have a
+  path there, with the way that path runs; the waypoint itself where none has;
+  `along_mm`, `segment` and `t` are 0;
+- **no length**: `trunkLength` gives `{metres: 0, tie: true}`, and the exports
+  give `length_m: null` with `tie: true` and `tie_at`, so a list says "tied at
+  mgr-1 ring 3" and not "0 m". The envelope on hover is the size check's, at
+  the ring.
+
+The strap count, the BOM and the schedule's bundle note carry the one strap;
+`kinds` gains `tie` only for a tie. The rack JSON has no field to change, and
+NetBox, Nautobot and draw.io carry membership only, so none says "a tie".
+
 ### 4.6 Edge cases
 
 - **A stale peel point,** one no longer on the trunk (from a hand-edited file,
