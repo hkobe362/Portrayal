@@ -32,7 +32,8 @@ const PATHS = Object.fromEntries(['netbox', 'nautobot'].map(t => [t,
   fs.readdirSync(new URL(`${t}/`, EXPORTS), {recursive: true}).filter(p => p.endsWith('.yaml')).sort().map(p => `${t}/${p}`)]));
 const lists = path => D.typeLists(fs.readFileSync(new URL(path, EXPORTS), 'utf8'));
 const moduleLists = (target, ref) => {
-  const path = X.moduleTypePath(PATHS[target], X.partNumber(compByRef(ref)));
+  const comp = compByRef(ref);
+  const path = X.moduleTypePath(PATHS[target], X.partNumber(comp), comp?.name);
   return path ? lists(path) : null;
 };
 
@@ -58,14 +59,13 @@ const resolverFor = (rack, ctx, target, held) => D.endResolver({rack, ctx,
   moduleAt: (id, bayId) => (rack.items.find(i => i.id === id).ref === 'fhd-1ufce' && held[bayId] ? moduleLists(target, held[bayId]) : null)});
 
 // ── the sweep: every module type whose glass the exporter projects ───────
-// WHAT IT REACHES, of the 63 modules that publish ports (2026-10-11):
-//   - 3 have no type file the kit can find, on either target: FS panels with
-//     no attrs.model, whose file is named for the contract while the kit looks
-//     for the part number (#1025). They are not measured here.
-//   - NetBox: the other 60 are measured. 4 are DCMs, whose one adapter is a
+// WHAT IT REACHES, of the 63 modules that publish ports:
+//   - Every one has a type file the kit finds: by its part number, or, for a
+//     module with no attrs.model, by its contract name, as the exporter files it.
+//   - NetBox: 4 are DCMs, whose one adapter is a
 //     front and a rear port at once and is left out by its reason; every port
-//     of the other 56 resolves.
-//   - Nautobot: of the 60, 4 types carry no glass (two couplers and two
+//     of the other 59 resolves.
+//   - Nautobot: 4 types carry no glass (two couplers and two
 //     add/drop filters: a split has no Nautobot spelling), and the 4 DCMs
 //     name their ports by a bay chain, {module.parent}/{module}/x, which the
 //     kit does not read (#1024). Those 8 are left out by a reason, which is
@@ -91,7 +91,7 @@ for (const target of ['netbox', 'nautobot']) {
     for (const comp of FIBRE) {
       const ref = refOf(comp), held = {'bay-1': ref}, ctx = ctxFor(held);
       const type = moduleLists(target, ref);
-      if (!type) { unfound.push(`${comp.ns}/${comp.name}`); continue; }   // no file under its part number (#1025)
+      if (!type) { unfound.push(`${comp.ns}/${comp.name}`); continue; }
       modules++;
       const rack = {name: 'sweep', frame: M.normalizeFrame({heightRU: 12}), zeroU: [], cables: [],
                     items: [{id: 'i1', ref: 'fhd-1ufce', cfg: 'seated', label: 'pp', ru: 2, u: 1, face: 'front', turned: false}]};
@@ -136,7 +136,7 @@ for (const target of ['netbox', 'nautobot']) {
           for (const name of type.sections[section])
             assert.ok(named.has(`${section} ${name}`), `${ref}: no cable end reaches ${name} of the ${target} type ${type.model}`);
     }
-    assert.deepEqual(unfound, ['fs/fhd-fap12lcd-om5', 'fs/fhd-fap12mtp-b', 'fs/fhd-fap12mtp16-a'], 'the modules with no type file under their part number (#1025)');
+    assert.deepEqual(unfound, [], 'every module that publishes ports has a type file the kit finds');
     const partly = new Set(odd.map(o => o.split(' ')[0].split('@')[0]));
     assert.equal(whole.length + partly.size, modules);
     if (target === 'netbox') {

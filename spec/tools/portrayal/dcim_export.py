@@ -2227,8 +2227,10 @@ def bay_row(bay_id, accepts=None, span=None):
     spans = (f"Spans {', '.join(span)} for a card {len(span) + 1} slots wide. "
              if span else "")
     if accepts:
-        bay["description"] = fit_items(
-            spans + "Accepts: ", [a.split("/")[-1].split("@")[0] for a in accepts])
+        # The name loses its major, so two majors of one part would repeat.
+        names = list(dict.fromkeys(
+            a.split("/")[-1].split("@")[0] for a in accepts))
+        bay["description"] = fit_items(spans + "Accepts: ", names)
     elif spans:
         bay["description"] = spans.strip()
     return bay

@@ -688,6 +688,10 @@ inspector disables a covered bay's select and a two-slot option over a full bay.
 not change**: a two-slot card is a swap in its bay and `""` in the bay it covers, so an older kit
 reads it, centres the card on its own bay and does not refuse a fill of the covered one.
 
+**New in 0.50.0: `moduleTypePath(paths, model, name)` falls back to the contract name.**
+A module with no `attrs.model` is filed under its contract name by the exporter, so a page that looks
+a type up by part number now tries the name second. Three FS adapter panels were not found before.
+
 **New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
 `loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`
 and `createViewer` take a list where they took one root (`kit/dist.js` `layeredDist` and `readIndex`);

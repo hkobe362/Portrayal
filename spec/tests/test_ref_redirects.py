@@ -244,6 +244,7 @@ def test_the_kit_version_is_the_one_the_changelog_names():
     pkg = json.loads((ROOT / "kit/package.json").read_text())
     assert pkg["version"] == "0.50.0"
     assert "0.50.0" in (ROOT / "changelog.d/two-slot-bays.md").read_text()
+    assert "0.50.0" in (ROOT / "changelog.d/dcim-export-fixes.md").read_text()
     assert "0.49.0" in (ROOT / "changelog.d/overlay-library.md").read_text()
     assert "0.48.0" in (ROOT / "changelog.d/xcu-couplers.md").read_text()
     assert "0.47.0" in (ROOT / "changelog.d/display-content.md").read_text()
