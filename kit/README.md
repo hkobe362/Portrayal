@@ -676,6 +676,11 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.51.0: the relief detail pass asks for each raster once.** `rasterKey` rewrites a face's
+shared `<style>` and `<defs>` once and keys a node by that and its own art (`rasterKeyText` is the
+whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on
+a copy (`rasterize`), never on it.
+
 **New in 0.50.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
 part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card
 `n` slots wide seats only in a bay whose `span` names `n - 1` bays, and only while each of them holds
@@ -687,10 +692,6 @@ refuses both claims on one pair and returns `why`, by key; the rack's `fit` says
 inspector disables a covered bay's select and a two-slot option over a full bay. **A rack file does
 not change**: a two-slot card is a swap in its bay and `""` in the bay it covers, so an older kit
 reads it, centres the card on its own bay and does not refuse a fill of the covered one.
-
-**New in 0.50.0: `moduleTypePath(paths, model, name)` falls back to the contract name.**
-A module with no `attrs.model` is filed under its contract name by the exporter, so a page that looks
-a type up by part number now tries the name second. Three FS adapter panels were not found before.
 
 **New in 0.49.0: the kit reads a list of dist roots, so an overlay library sits on top of Portrayal's own.**
 `loadSlots([publicDist, overlayDist], refs)`, `loadCatalog([...])`, and `dist: [...]` for `createShell`

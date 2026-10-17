@@ -110,6 +110,12 @@ def _bay_modules():
 
     def walk(o, key=None):
         if isinstance(o, dict):
+            # a card writes its bays as a mapping by name (#796)
+            if key == "bays":
+                for v in o.values():
+                    if isinstance(v, dict):
+                        found.update(v.get("accepts") or [])
+                        found.add(v.get("default"))
             for k, v in o.items():
                 walk(v, k)
         elif isinstance(o, list):

@@ -235,7 +235,7 @@ RULES = {
     "L44": ("device",     "panel decor agrees with the face: a patterned field is not buried under parts, printing does not run off the edge, no decor lies wholly off the face", "move or trim the decor",
             "Decor that is buried under parts, runs off the face, or lies wholly off it shows vents or printing the real panel does not have, and usually means something was mismeasured.",
             WARNING),
-    "L45": ("device",     "a face of a device at `modelled` or above draws something, unless a gap's `scope` names the face", "draw the face's content, estimated and marked where it must be, or open a gap whose `scope` names it; an `empty:` sentence records where you looked and does not clear this",
+    "L45": ("device",     "a face of a device at `modelled` or above draws something, unless the view carries an `empty:` sentence or a gap's `scope` names the face", "draw the face's content, estimated and marked where it must be, or record where you looked in the view's `empty:` sentence, or open a gap whose `scope` names it; none of these makes the face count as drawn",
             "A face that only declares a size is not drawn, so the device would claim more than it shows unless the author records why the face stays empty.",
             WARNING),
     "L46": ("component",  "composed parts do not collide inside the part", "move a part, or say in provenance that the layering is deliberate",
@@ -6914,8 +6914,17 @@ def lint_device_empty_views(path, data):
     declared = set()
     for g in (data.get("gaps") or []):
         declared.update(g.get("scope") or [])
+    #
+    # A FACE THAT CARRIES AN `empty:` SENTENCE IS EXEMPT TOO. That is the field
+    # the paragraph above said did not exist; it records where the author looked
+    # and found nothing, and L60 checks the face is then actually bare. The gap
+    # exemption stays beside it: a gap also covers a face whose content is known
+    # to be missing for a reason that is not "nothing was published". Neither
+    # clears the capability level - an empty face still does not count as drawn.
     for vname, view in (data.get("views") or {}).items():
         if vname in declared:
+            continue
+        if str((view or {}).get("empty") or "").strip():
             continue
         vp = view_parts(view or {})
         if any(vp[k] for k in ("decor", "cutouts", "silkscreen",
@@ -6926,7 +6935,8 @@ def lint_device_empty_views(path, data):
         warn(path, "L45", f"{vname}: the face declares a size and nothing else, so "
              "it does not count as drawn and will not carry this device to "
              "`solid`. Give it its honest content - a rail, a label, a vent "
-             "field, estimated and marked - or record why it stays empty")
+             "field, estimated and marked - or record why it stays empty in "
+             "the view's `empty:` sentence")
 
 
 def lint_device_silkscreen_owner(path, data):
@@ -7478,13 +7488,9 @@ def lint_device_empty_declaration(path, data):
     the feature gets drawn, and the sentence saying nobody could find one stays
     behind and quietly contradicts the drawing above it.
 
-    NOTE FOR L45, which is about the same faces from the other side. Its comment
-    records that it over-exempts on purpose - it takes any gap NAMING a view as
-    covering it, because "nothing in a gap says 'this is why the face is empty',
-    so telling the two apart needs a field that does not exist". That field now
-    exists and is this one. Tightening L45 to exempt on `empty` rather than on
-    gap scope is deliberately NOT done here: it would start warning on every face
-    currently covered by a scope, which is a change worth making on its own.
+    L45 is about the same faces from the other side, and exempts a face that
+    carries this sentence - so a claim of emptiness is the only thing standing
+    between an undrawn face and that warning, which is why this guard matters.
     """
     for vname, view in (data.get("views") or {}).items():
         view = view or {}
