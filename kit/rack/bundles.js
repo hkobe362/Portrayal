@@ -47,6 +47,16 @@ export const bundleOfCable = (rack, cableId) => bundlesOf(rack).find(b => b.memb
 export const strapSpacing = b => (b.straps && 'every' in b.straps ? b.straps.every : DEFAULT_STRAPS);
 export const strapEveryMm = b => { const e = strapSpacing(b); return e ? e.value * MM[e.unit] : null; };
 export const spacingText = e => (e ? `straps every ${e.value} ${e.unit}` : 'no straps');
+// A TIE (#1017): a bundle of two or more cables whose stored trunk is ONE
+// waypoint, so the cables share a single point and nothing else. It has no
+// length, and it is held by one strap round the pack at that point.
+export const isTie = b => (b.members?.length ?? 0) >= 2 && (b.route || []).length === 1;
+// A member is loose when the device at one of its ends is gone and the cable
+// kept (#1021): it rides nothing, so it is not strapped with the others.
+const isLoose = (rack, id) => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
+// The members of a laid-out bundle that ride its trunk: they join and leave it
+// and are not loose.
+const ridersOf = (rack, L) => L.members.filter(m => m.ji != null && m.li != null && !isLoose(rack, m.cable));
 // WHICH KINDS OF STRAP A BUNDLE HAS (rack file version 4,
 // docs/rack-file-v4-design.md section 3.10): beside the spacing straps,
 // BREAKOUT straps, one beside each point where a cable joins or leaves, and
@@ -241,6 +251,11 @@ export function bundleCheck(rack, b, ctx = {}) {
     notes.push(`${m.cable} does not meet ${name}'s route, so it runs straight to it: ${!j || !l ? 'it rides all of it'
       : j === l ? `it joins and leaves at ${j}, the point nearest its ports`
       : `it joins at ${j} and leaves at ${l}, the points nearest its ports`}.`);
+  }
+  // a tie held by no strap says why (#1017), as a bundle of fewer than two says it is not drawn
+  if (isTie(b) && L.trunk.length === 1 && ridersOf(rack, L).length < 2) {
+    const n = ridersOf(rack, L).length;
+    notes.push(`${name} is a tie at ${waypointText(rack, b.route[0])}, and ${n === 1 ? 'only one cable rides' : 'no cable rides'} there, so it has no strap.`);
   }
   if (b.members.length < 2 || !L.T.length) return {checked: true, size: null, bend: null, warnings, notes, gone: L.gone, layout: L};
   const byId = new Map((rack.cables || []).map(c => [c.id, c]));
@@ -667,11 +682,12 @@ export function straps(rack, b, ctx = {}) {
   const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false, few: false};
   // a bundle is strapped where two or more members ride its trunk, and a loose member rides nothing (#1021)
   // (loose: the device at an end is gone and the cable kept)
-  const loose = id => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
-  const rides = L.members.filter(m => m.ji != null && m.li != null && !loose(m.cable)).length;
-  if (b.members.length < 2 || rides < 2 || L.trunk.length < 2) return empty;
+  const rides = ridersOf(rack, L).length;
+  const tie = isTie(b) && L.trunk.length === 1;
+  if (b.members.length < 2 || rides < 2 || (L.trunk.length < 2 && !tie)) return empty;
   const line = trunkLine(rack, b, L, ctx.route);
   if (!line) return empty;
+  if (tie) return tieStraps(rack, b, L, line, ctx, {every, mm, want, empty});
   // `cum` is by resolved waypoint, as the stretches and the anchors below read it
   const pts = line.pts, cum = line.wcum, alongAt = i => line.cum[i];
   // runs: where two or more members ride together
@@ -781,6 +797,44 @@ export function straps(rack, b, ctx = {}) {
           // where riders have no path the trunk is the straight line there: said, since the count is then an estimate
           straight: line.straight, few: line.few,
           notes: [...misfits, ...(line.straight ? [straightText(bundleName(b))] : []), ...(line.few ? [fewText(bundleName(b))] : [])]};
+}
+
+// A TIE (#1017, decided 2026-10-16): the bundle's trunk is one waypoint, so it
+// has no run to space straps along and no peel points to strap before. It has
+// ONE strap, round the pack at that waypoint, and nothing else:
+// - RIDING: the members that join and leave at the waypoint, which is what
+//   riding a longer trunk means (a member whose route misses it runs to it, as
+//   it does to a longer trunk's nearest element, and a loose member rides
+//   nothing). Fewer than two riding: no strap (#1021), and bundleCheck says so.
+// - WIDTH: as for any strap, by the pack there: STRAP_WIDE_MM for a pack
+//   WIDE_PACK_MM across or more, else STRAP_BASE_MM. It is not moved off a ring
+//   (the ring is where the cables are tied) and is not narrowed for peel points
+//   (all of them are at this one place).
+// - PLACE: on the path of the middle one by id of the members that have a path
+//   through the waypoint (as the middle one sets a longer trunk's pieces), `dir`
+//   the way that path runs there; the waypoint itself, with no `dir`, where
+//   none has. `along_mm` is 0 and `segment` 0, `t` 0: the trunk has no length.
+// - STRAPS SET TO NONE (`every: null` with no `breakout` or `anchors`) has none,
+//   as a longer trunk has none of any kind. A spacing does not matter: there is
+//   no length to space along.
+// It is counted as its own kind, `tie`, in `kinds`, which gains that key only
+// for a tie; a trunk of two or more nodes returns exactly what it did.
+function tieStraps(rack, b, L, line, ctx, {every, mm, want, empty}) {
+  if (mm == null && !want.breakout && !want.anchors) return empty;
+  const riding = ridersOf(rack, L), T0 = L.T.find(e => e.kind !== 's');
+  const ds = riding.map(m => diameter((rack.cables || []).find(x => x.id === m.cable), ctx.route)[0]);
+  const width = bundleDiameter(ds) >= WIDE_PACK_MM ? STRAP_WIDE_MM : STRAP_BASE_MM;
+  const ids = riding.map(m => m.cable).sort(byNumber);
+  const lines = ids.map(id => memberLine(rack, b, id, ctx.route)).map((l, k) => ({id: ids[k], l, s: l?.pos.get(T0.key)})).filter(x => x.s != null);
+  const mid = lines.length ? lines[Math.floor((lines.length - 1) / 2)] : null;
+  const r2 = v => Math.round(v * 100) / 100 || 0, r4 = v => Math.round(v * 1e4) / 1e4 || 0;
+  const at = mid ? onLine(mid.l.P, mid.l.arc, mid.s, 1) : {point: line.pts[0], dir: null};
+  const w = L.trunk[0];
+  const one = {kind: 'tie', segment: 0, t: 0, along_mm: 0, point: {x: r2(at.point.x), y: r2(at.point.y), z: r2(at.point.z)},
+               dir: at.dir ? {x: r4(at.dir.x), y: r4(at.dir.y), z: r4(at.dir.z)} : null, on: mid ? mid.id : null, width_mm: width,
+               ...(w.lane ? {lane: w.lane, ru: w.ru} : {item: w.item, via: w.via})};
+  return {every, count: 1, kinds: {spacing: 0, breakout: 0, anchor: 0, tie: 1}, widths: widthCounts([width]), straps: [one], runs: [],
+          straight: false, few: false, tie: true, notes: []};
 }
 
 // What is said of a bundle measured, in part or whole, along the straight
@@ -929,18 +983,19 @@ export function strapTexts(rack, ctx = {}, nameOf = null) {
 // then, the result also has `unread`, how many such bundles there are, and
 // `unreadBundles`, their ids: a caller that shows the total can say so.
 export function strapTotals(rack, ctx = {}) {
-  let spacing = 0, breakout = 0;
+  let spacing = 0, breakout = 0, tie = 0;
   const ws = [], unread = [];
   for (const b of bundlesOf(rack)) {
     let st = null;
     try { st = straps(rack, b, ctx); } catch { st = null; }
     if (!st && b.members.length >= 2) unread.push(b.id);
-    spacing += st?.kinds.spacing ?? 0; breakout += st?.kinds.breakout ?? 0;
+    spacing += st?.kinds.spacing ?? 0; breakout += st?.kinds.breakout ?? 0; tie += st?.kinds.tie ?? 0;
     for (const x of st?.straps || []) if (x.kind !== 'anchor') ws.push(x.width_mm);
   }
   const slots = anchorsOf(rack, ctx);
   for (const x of slots) ws.push(x.width_mm);
-  return {spacing, breakout, anchor: slots.length, total: spacing + breakout + slots.length, widths: widthCounts(ws),
+  // `tie` (#1017) is there only when a rack has one
+  return {spacing, breakout, anchor: slots.length, ...(tie ? {tie} : {}), total: spacing + breakout + tie + slots.length, widths: widthCounts(ws),
           ...(unread.length ? {unread: unread.length, unreadBundles: unread} : {})};
 }
 
@@ -952,6 +1007,8 @@ export function strapTotals(rack, ctx = {}) {
 // of a stretch's riders had one: the figure is then an estimate.
 export function trunkLength(rack, b, ctx = {}) {
   const L = layoutOf(rack, b, ctx);
+  // a tie (#1017) has a trunk of no length: `tie: true`, so a list says "a tie" and not "0 m"
+  if (L && isTie(b) && L.trunk.length === 1) return trunkLine(rack, b, L, ctx.route) ? {metres: 0, tie: true} : null;
   if (!L || L.trunk.length < 2) return null;
   const line = trunkLine(rack, b, L, ctx.route);
   return line ? {metres: Math.round(line.length / 10) / 100, ...(line.straight ? {straight: true} : {}), ...(line.few ? {few: true} : {})} : null;
