@@ -21,5 +21,5 @@
   ports it cannot find until the module is there.
 - `moduleImportRows` and `resolveEnd` take the module type seated at a nested
   bay by its path (`drawer/module/slot-1`); a host that answers `moduleAt` for
-  a device's bay ids only gets the old reason, "what is seated in ... has no
-  module type", for a nested one. `renderName(template, positions)` is new.
+  a device's bay ids only gets "what is seated in drawer/module/slot-1 has no
+  module type" for a nested one. `renderName(template, positions)` is new.

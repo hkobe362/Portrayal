@@ -247,7 +247,8 @@ export function resolveEnd({path, device, moduleAt = () => null, consoles = [], 
 // end's fibre ports: what a page hands cableImportRows as `resolve`.
 //   ctx        {slotsOf, compByRef}, what `catalog.js` loadSlots returns
 //   deviceOf   item id -> typeLists of its device type, or null
-//   moduleAt   (item id, bay id) -> typeLists of the module type seated there
+//   moduleAt   (item id, bay path) -> typeLists of the module type seated there; the path
+//              of a bay of a module is the drawing's (`drawer/module/slot-1`)
 //   consolesOf item id -> the paths of the console ports its drawing has
 export function endResolver({rack, ctx = null, deviceOf, moduleAt = () => null, consolesOf = () => []}) {
   const items = new Map((rack?.items || []).map(i => [i.id, i]));
