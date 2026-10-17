@@ -17,7 +17,7 @@ const keepDcim = (rack, from) => {
   return 'dcim' in from ? {...bare, dcim: from.dcim} : bare;
 };
 
-// `frameOf` looks a rack product up by its ref (catalog.js); a page that loads
+// `frameOf` looks a rack product up by its ref (`catalog.js`); a page that loads
 // no catalogue of products passes none, and a frame set from one is drawn from
 // its own numbers and edited as a generic one.
 export function createRackEditor({doc, chassisOf, frameOf, cap = 100}) {
