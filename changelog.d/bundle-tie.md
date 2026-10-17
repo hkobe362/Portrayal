@@ -18,4 +18,6 @@
   counts it ("1 round a bundle tied at one point"). **A rack with a one-waypoint
   bundle of two or more cables riding it buys one more strap than before.** The
   rack JSON, the NetBox and Nautobot files and draw.io have no field for a tie
-  and are unchanged.
+  and are unchanged. `describe` says "fewer than two cables ride it" of a tie
+  only when fewer than two do, not whenever the strap count is 0 (a bundle set
+  to no straps has none for another reason), and `ridersOf` is exported.

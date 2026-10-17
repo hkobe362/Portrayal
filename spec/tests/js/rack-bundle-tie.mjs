@@ -96,6 +96,30 @@ test('a tie with fewer than two cables riding has no strap, and the list says wh
   assert.equal(everything(bundled(4, ONE, {every: null})).straps.count, 0);
 });
 
+test('the list gives "fewer than two ride it" for the riders, not for any tie with no strap (#1017)', async () => {
+  // four ride but the bundle is set to no straps: the reason is not the riders
+  const off = bundled(4, ONE, {every: null}), offLine = await Q.describe(off, {chassisOf, route: routeCtx(off)});
+  assert.match(offLine, /a tie at mgr-1 ring 3/);
+  assert.doesNotMatch(offLine, /fewer than two cables ride it/);
+  // one rides: it is said
+  const one = looseFrom(bundled(4, ONE), ['c2', 'c3', 'c4']);
+  assert.match(await Q.describe(one, {chassisOf, route: routeCtx(one)}), /fewer than two cables ride it/);
+});
+
+test('a member whose route misses the waypoint still rides the tie, and a loose one is not in its width (#1017)', () => {
+  const r = bundled(4, ONE), ctx = {route: routeCtx(r)};
+  // c4 keeps its own route, which never meets the ring: it runs straight to the tie's point and rides
+  const away = {...r, cables: r.cables.map(c => (c.id === 'c4' ? {...c, route: RT('i2:guide-1')} : c))};
+  const L = B.bundleCheck(away, away.bundles[0], ctx).layout;
+  assert.equal(L.members.find(m => m.cable === 'c4').met, false);
+  assert.equal(B.ridersOf(away, L).length, 4);
+  assert.equal(B.straps(away, away.bundles[0], ctx).count, 1);
+  // a loose member leaves the pack the strap is sized to: 20 cables are wide, 20 with 15 loose are not
+  const wide = bundled(20, ONE), many = looseFrom(wide, wide.cables.slice(0, 15).map(c => c.id));
+  assert.equal(B.straps(wide, wide.bundles[0], {route: routeCtx(wide)}).straps[0].width_mm, B.STRAP_WIDE_MM);
+  assert.equal(B.straps(many, many.bundles[0], {route: routeCtx(many)}).straps[0].width_mm, 19);
+});
+
 test('the envelope is at the ring and the members are packed through it (#1017)', () => {
   const r = bundled(4, ONE), rc = routeCtx(r);
   // the envelope on hover: the bundle's size at the ring, and the strap is as wide as its pack

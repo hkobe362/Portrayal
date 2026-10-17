@@ -56,7 +56,7 @@ export const isTie = b => (b.members?.length ?? 0) >= 2 && (b.route || []).lengt
 const isLoose = (rack, id) => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
 // The members of a laid-out bundle that ride its trunk: they join and leave it
 // and are not loose.
-const ridersOf = (rack, L) => L.members.filter(m => m.ji != null && m.li != null && !isLoose(rack, m.cable));
+export const ridersOf = (rack, L) => L.members.filter(m => m.ji != null && m.li != null && !isLoose(rack, m.cable));
 // WHICH KINDS OF STRAP A BUNDLE HAS (rack file version 4,
 // docs/rack-file-v4-design.md section 3.10): beside the spacing straps,
 // BREAKOUT straps, one beside each point where a cable joins or leaves, and
