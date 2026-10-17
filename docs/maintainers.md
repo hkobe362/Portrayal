@@ -125,6 +125,15 @@ npm deprecate @portrayal/components "split by namespace: see @portrayal/componen
 
 `@portrayal/kit` is not part of this. It is published by hand from `kit/`.
 
+**Do not bump the kit version in a pull request; add a changelog fragment. The
+version is bumped when the kit is published.** To publish:
+
+1. Set `version` in `kit/package.json`, and write the matching "New in X" note
+   in `kit/README.md`, in one commit.
+2. Run `python3 spec/tools/portrayal/kitrelease.py --publish`. It fails unless
+   the README's newest "New in" note names the `package.json` version.
+3. Run `npm publish` from `kit/`.
+
 ## Cutting a version: the changelog
 
 Pull requests record their changes in `changelog.d/`, one file each, and do not
