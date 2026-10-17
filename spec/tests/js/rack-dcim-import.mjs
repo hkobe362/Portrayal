@@ -9,8 +9,10 @@ import * as M from '../../../kit/rack/model.js';
 const EXPORTS = new URL('../../../library/exports/', import.meta.url);
 const yaml = path => fs.readFileSync(new URL(path, EXPORTS), 'utf8');
 // Upstream has no files.json (the site writes one when it vendors the tree): the same listing, read off the tree.
+// Only device and module types: a rack type is a rack's own shape, with no name lists, bays or model line to read.
 const filesOf = () => Object.fromEntries(['netbox', 'nautobot'].map(target => [target,
-  fs.readdirSync(new URL(`${target}/`, EXPORTS), {recursive: true}).filter(p => p.endsWith('.yaml')).sort()
+  fs.readdirSync(new URL(`${target}/`, EXPORTS), {recursive: true})
+    .filter(p => p.endsWith('.yaml') && !p.startsWith('rack-types/')).sort()
     .map(p => `${target}/${p}`)]));
 const lists = path => D.typeLists(yaml(path));
 const ASR = 'netbox/device-types/Cisco/ASR-9006-AC-V2.yaml', LEAF = 'netbox/device-types/Edgecore/7726-32X-O-AC-F.yaml',
