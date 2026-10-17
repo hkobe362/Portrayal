@@ -1749,7 +1749,6 @@
   "L29": 1,
   "L40": 1,
   "L42": 1,
-  "L45": 4,
   "L57": 1
  },
  "devices/celestica/ds6001/device.yaml": {
@@ -1884,7 +1883,6 @@
  "devices/edgecore/agr560/device.yaml": {
   "L144": 1,
   "L29": 1,
-  "L45": 4,
   "L61": 12
  },
  "devices/edgecore/ais800-32d/device.yaml": {
@@ -2006,8 +2004,7 @@
  },
  "devices/edgecore/dcs520/device.yaml": {
   "L29": 1,
-  "L39": 64,
-  "L45": 4
+  "L39": 64
  },
  "devices/edgecore/ecs4120-28fv2-i/device.yaml": {
   "L144": 1,
@@ -2020,25 +2017,16 @@
   "L76": 1
  },
  "devices/edgecore/eps112/device.yaml": {
-  "L45": 4,
   "L61": 1
  },
- "devices/edgecore/eps121/device.yaml": {
-  "L45": 4
- },
- "devices/edgecore/eps122/device.yaml": {
-  "L45": 4
- },
  "devices/edgecore/eps201/device.yaml": {
-  "L29": 1,
-  "L45": 4
+  "L29": 1
  },
  "devices/edgecore/eps202/device.yaml": {
   "L29": 1
  },
  "devices/edgecore/eps203/device.yaml": {
-  "L29": 1,
-  "L45": 4
+  "L29": 1
  },
  "devices/edgecore/exp100-32x/device.yaml": {
   "L29": 1,
@@ -2062,8 +2050,7 @@
  },
  "devices/hpe/dl160-gen10/device.yaml": {
   "L21": 6,
-  "L29": 11,
-  "L45": 3
+  "L29": 11
  },
  "devices/juniper/mx10003/device.yaml": {
   "L119": 1,
@@ -2187,13 +2174,11 @@
   "L119": 1,
   "L21": 2,
   "L29": 1,
-  "L45": 3,
   "L76": 1
  },
  "devices/nokia/sr-1-dc/device.yaml": {
   "L21": 2,
   "L29": 1,
-  "L45": 3,
   "L76": 1
  },
  "devices/nokia/sr-1e/device.yaml": {
@@ -2256,22 +2241,18 @@
  },
  "devices/supermicro/sys-111e-fdwtr/device.yaml": {
   "L29": 5,
-  "L45": 3,
   "L69": 1
  },
  "devices/supermicro/sys-111e-fwtr/device.yaml": {
   "L29": 5,
-  "L45": 3,
   "L69": 1
  },
  "devices/supermicro/sys-111e-wr/device.yaml": {
   "L29": 5,
-  "L45": 3,
   "L69": 1
  },
  "devices/supermicro/sys-511e-wr/device.yaml": {
   "L29": 5,
-  "L45": 3,
   "L69": 1
  },
  "devices/telco-systems/tm-280/device.yaml": {
@@ -2323,13 +2304,11 @@
  },
  "devices/ufispace/s6301-56st/device.yaml": {
   "L29": 1,
-  "L45": 1,
   "L93": 1
  },
  "devices/ufispace/s6301-56stp/device.yaml": {
   "L21": 8,
   "L29": 1,
-  "L45": 1,
   "L93": 1
  },
  "devices/ufispace/s7801-54xs/device.yaml": {
@@ -2347,7 +2326,6 @@
  "devices/ufispace/s9110-32x/device.yaml": {
   "L21": 10,
   "L29": 1,
-  "L45": 1,
   "L54": 1,
   "L57": 1,
   "L93": 1
@@ -2375,7 +2353,6 @@
  },
  "devices/ufispace/s9321-64e/device.yaml": {
   "L29": 1,
-  "L45": 1,
   "L61": 1,
   "L93": 1
  },
@@ -2423,7 +2400,6 @@
  },
  "devices/ufispace/s9510-30xc/device.yaml": {
   "L29": 1,
-  "L45": 1,
   "L61": 3,
   "L93": 1
  },
