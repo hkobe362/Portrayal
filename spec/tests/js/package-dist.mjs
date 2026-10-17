@@ -28,7 +28,7 @@ globalThis.fetch = async url => {
   return { ok: true, json: async () => JSON.parse(body), text: async () => body };
 };
 
-const { packageDist, flatDist, distResolver, safeIndex } = await import('../../../kit/dist.js');
+const { packageDist, flatDist, distResolver, safeIndex, readRack, rackFile } = await import('../../../kit/dist.js');
 const at = (name, version) => `${PREFIX}${name}@${version}/`;
 const distAt = await packageDist({ at });
 
@@ -44,6 +44,19 @@ const comps = JSON.parse(readFileSync(join(PKGS, 'index', 'components.json'), 'u
 for (const c of comps) {
   wanted.push(...Object.values(c.files || {}));
   wanted.push(...Object.values(c.body?.sides || {}));
+}
+// a rack product is read from its own package, by the ref a saved rack file
+// carries: `<vendor>/<name>@<major>`
+const racks = {};
+for (const [key, row] of Object.entries(pk.racks || {})) {
+  const ref = `${key}@${row.major}`;
+  const doc = await readRack(distAt, ref);
+  racks[ref] = {
+    name: doc.name, version: doc.version, kind: doc.kind,
+    package: distAt(rackFile(ref)).startsWith(at(row.package, row.version)),
+    held: existsSync(join(PKGS, row.package.split('/')[1], rackFile(ref).split('/')[1])),
+    wrongMajor: await readRack(distAt, `${key}@${row.major + 1}`).then(() => 'loaded', e => String(e.message)),
+  };
 }
 const unresolved = [];
 for (const path of new Set(wanted)) {
@@ -62,6 +75,11 @@ console.log(JSON.stringify({
   skinPackages: new Set(Object.values(pk.components).map(r => r.package)).size,
   inherited: [distAt('components/constructor--x--v1--default.svg'), distAt('constructor.configs.json'),
               distAt('components/__proto__--x--v1--default.svg')],
+  racks,
+  rackRefs: ['apc/ar203a@1', 'apc/ar203a', 'apc/ar203a@x', '../x/y@1', 'apc/ar203a@1/../x', '']
+    .map(r => [r, (() => { try { return rackFile(r); } catch (e) { return String(e.message).slice(0, 24); } })()]),
+  rackInherited: [distAt('racks/constructor--x.rack.json'), distAt('racks/__proto__--x.rack.json')],
+  rackPackages: Object.keys(pk.racks || {}).length,
   firstAsked: asked.slice(0, 2),
   indexVersion: JSON.parse(readFileSync(join(PKGS, 'index', 'package.json'), 'utf8')).version,
   checked: new Set(wanted).size,

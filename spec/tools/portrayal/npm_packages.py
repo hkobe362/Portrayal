@@ -17,10 +17,15 @@ by itself. So:
   which every device shares. One package for all of them had no ceiling: it
   was the largest package and grew with every component added, and it moved,
   whole, with any one skin. A namespace is bounded by its vendor.
+- `@portrayal/racks-<vendor>-<name>` - one rack product (`kind: rack`, #935):
+  the compiled product and the schema it was checked against. A rack is bounded
+  by itself, as a device is. Every new one counts against npm's quota of new
+  packages (see RATE_LIMIT_WAITS).
 - `@portrayal/index` - the portfolio: the library-wide JSON (`devices.json`,
-  `components.json` and the rest) and `packages.json`, which says which package
-  and version holds each device, and a vendor -> family -> device tree to browse
-  by. The vendor and family are how a reader finds a device, not how it ships.
+  `components.json`, `rack-products.json` and the rest) and `packages.json`,
+  which says which package and version holds each device, component namespace
+  and rack, and a vendor -> family -> device tree to browse by. The vendor and
+  family are how a reader finds a device, not how it ships.
 
 EACH PACKAGE HAS ITS OWN VERSION, NOT THE DEVICE'S. devicelock deliberately does
 not hash rendered output, so a toolchain change moves every face of every
@@ -67,6 +72,8 @@ LICENCE_FILES = ("LICENSE", "NOTICE")
 LIMIT_MB = 50
 WARN_MB = 25
 FIRST = "0.1.0"
+# the `portrayal` keys that carry the version of the one thing a package holds
+VERSION_KEYS = ("device-version", "rack-version")
 # the npm name rules a generated name has to meet (lowercase, url-safe, <=214)
 _NPM_NAME = re.compile(r"^@portrayal/[a-z0-9][a-z0-9._-]*$")
 
@@ -109,11 +116,13 @@ _RANK = {"fix": 0, "additive": 1, "breaking": 2}
 _BY_LEVEL = {"major": "breaking", "minor": "additive", "patch": "fix", None: "fix"}
 
 
-def next_version(prev, digest, contract, device_version=None, first=FIRST):
+def next_version(prev, digest, contract, device_version=None, first=FIRST,
+                 key="device-version"):
     """(version, changed) for a package against what it last published.
 
     `prev` is that package's entry in the previous state, or None if it has
-    never been published.
+    never been published. `device_version` is the version of the one thing the
+    package holds - a device's, or a rack's (`key` is `rack-version` then).
     """
     if not prev:
         return (device_version or first), True
@@ -122,8 +131,8 @@ def next_version(prev, digest, contract, device_version=None, first=FIRST):
     change = "fix"
     if prev.get("contract") != contract:
         change = "breaking"
-    if device_version and prev.get("device-version"):
-        dev = _BY_LEVEL[moved(prev["device-version"], device_version)]
+    if device_version and prev.get(key):
+        dev = _BY_LEVEL[moved(prev[key], device_version)]
         change = max(change, dev, key=_RANK.get)
     return bump(prev["version"], change), True
 
@@ -179,6 +188,29 @@ def components_files(dist):
 
 def components_package(ns):
     return package_name("components", ns)
+
+
+def rack_rows(dist):
+    """The rack products of a build (`rack-products.json`), or none for a build
+    that predates them."""
+    f = Path(dist) / "rack-products.json"
+    return json.loads(f.read_text())["racks"] if f.exists() else []
+
+
+def rack_files(dist, row):
+    """{published path: source} for one rack's package: the compiled product and
+    the schema it was checked against."""
+    own = Path(dist) / row["file"]
+    schema = Path(dist) / "racks" / "rack-product.schema.json"
+    out = {own.name: own, schema.name: schema}
+    missing = [k for k, v in out.items() if not v.exists()]
+    if missing:
+        raise SystemExit(f"{row['ref']}: rack-products.json names files dist does not have: {missing}")
+    return out
+
+
+def rack_package(row):
+    return package_name("racks", f"{row['vendor']}-{row['name']}")
 
 
 def index_files(dist, device_names):
@@ -248,8 +280,7 @@ def build(dist, out, root, published=None, limit_mb=LIMIT_MB):
         d, size = _write(out, name, version, description, files, meta, readme)
         state[name] = {"version": version, "digest": dg, "contract": contract,
                        "changed": changed, "first": name not in published,
-                       **({"device-version": meta["device-version"]}
-                          if "device-version" in meta else {})}
+                       **{k: meta[k] for k in VERSION_KEYS if k in meta}}
         sizes[name] = size
         return version
 
@@ -290,6 +321,30 @@ def build(dist, out, root, published=None, limit_mb=LIMIT_MB):
                     "`components.json` in `@portrayal/index` describes each."))
         components[ns] = {"package": pkg, "version": version}
 
+    # ONE PACKAGE PER RACK PRODUCT (#935), for the reason a device has one: a
+    # rack is bounded by itself. Each new rack package counts against npm's
+    # quota of new packages (see RATE_LIMIT_WAITS).
+    racks = {}
+    for row in sorted(rack_rows(dist), key=lambda r: r["ref"]):
+        pkg = rack_package(row)
+        key = f"{row['vendor']}/{row['name']}"
+        version = add(
+            pkg,
+            lambda prev, dg, v=row["version"]: next_version(prev, dg, contract, v,
+                                                            key="rack-version"),
+            f"Portrayal rack product: the {row['manufacturer']} {row['model']}, "
+            f"as the library models it, with the schema it is checked against.",
+            rack_files(dist, row),
+            {"rack": key, "vendor": row["vendor"], "rack-version": row["version"]},
+            _readme(f"{row['manufacturer']} {row['model']} - Portrayal rack product",
+                    f"`{row['vendor']}--{row['name']}.rack.json` is the product "
+                    f"(`kind: rack`, ref `{row['ref']}`); `rack-product.schema.json` is the "
+                    f"schema it is checked against."))
+        racks[key] = {"package": pkg, "version": version, "vendor": row["vendor"],
+                      "manufacturer": row["manufacturer"], "model": row["model"],
+                      "form": row["form"], "ru": row["ru"],
+                      "rack-version": row["version"], "major": row["major"]}
+
     staging = out / ".index"
     staging.mkdir(exist_ok=True)
     (staging / "packages.json").write_text(json.dumps({
@@ -297,6 +352,8 @@ def build(dist, out, root, published=None, limit_mb=LIMIT_MB):
         # namespace -> the package and version holding its skins
         "components": components,
         "devices": entries,
+        # `<vendor>/<name>` -> the package and version holding the rack product
+        "racks": racks,
         # vendor -> family -> devices; "" is a device whose manifest names none
         "tree": {v: {f: sorted(ds) for f, ds in sorted(fams.items())}
                  for v, fams in sorted(tree.items())},
@@ -329,7 +386,8 @@ def package_names(dist):
     """Every package a build of `dist` would write, without writing any."""
     devices = json.loads((Path(dist) / "devices.json").read_text())["devices"]
     return [package_name(d["ns"], d["name"]) for d in devices] + \
-        [components_package(ns) for ns in components_files(dist)] + [f"{SCOPE}/index"]
+        [components_package(ns) for ns in components_files(dist)] + \
+        sorted(rack_package(r) for r in rack_rows(dist)) + [f"{SCOPE}/index"]
 
 
 def registry_state(names, run=subprocess.run, workers=8):
@@ -356,8 +414,9 @@ def registry_state(names, run=subprocess.run, workers=8):
             raise SystemExit(f"{name}@{pkg.get('version')} on npm carries no portrayal digest")
         entry = {"version": pkg["version"], "digest": meta["digest"],
                  "contract": meta.get("contract")}
-        if meta.get("device-version"):
-            entry["device-version"] = meta["device-version"]
+        for k in VERSION_KEYS:
+            if meta.get(k):
+                entry[k] = meta[k]
         return name, entry
     with ThreadPoolExecutor(workers) as pool:
         return {n: e for n, e in pool.map(one, names) if e}
