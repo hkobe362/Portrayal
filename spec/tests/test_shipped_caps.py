@@ -41,6 +41,7 @@ WHAT IS CHECKED, ON REAL BUILDS:
 Each census is proved non-vacuous by a tmp copy of the adapter with its default
 removed, which the same census has to fail.
 """
+import json
 import re
 import shutil
 import xml.etree.ElementTree as ET
@@ -49,6 +50,7 @@ from collections import defaultdict
 import pytest
 import yaml
 
+import onebuild
 from test_nested_occupants import LIB
 from test_slot_defaults import _copy, build, run
 
@@ -576,9 +578,9 @@ DCMS = ["smartoptics/ppm-dcm-10@2", "smartoptics/ppm-dcm-20@2",
 
 def test_a_seated_dcm_shows_its_forwarded_adapters_two_bore_caps(tmp_path):
     """ppm-dcm-40 in ppm-1 and ppm-dcm-10 in ppm-2: each module composes ONE
-    Smartoptics adapter (`dcm`) and forwards its `lc-duplex`, publishing no
-    slot of its own - and each ships two simplex caps, one per bore, drawn in
-    the module at `<bay>/module/dcm/1|2`, the adapter's own slot empty."""
+    Smartoptics adapter (`dcm`), which the module publishes as its one slot -
+    and each ships two simplex caps, one per bore, drawn in the module at
+    `<bay>/module/dcm/1|2`, the adapter's own slot empty."""
     out = build(_dcp2(tmp_path, {"slot-1/ppm-1": DCMS[2], "slot-1/ppm-2": DCMS[0]}),
                 tmp_path / "o", LIB)
     root = ET.parse(out / "dcp-2.ila-node.front.svg").getroot()
@@ -590,10 +592,25 @@ def test_a_seated_dcm_shows_its_forwarded_adapters_two_bore_caps(tmp_path):
         assert held.get(dcm, []) == []
 
 
+@pytest.mark.parametrize("ref", DCMS)
+def test_a_dcm_publishes_its_adapter_slot(ref):
+    """INTENDED STATE: each module is seated in a bay of the A22 card, so its one
+    lone receptacle - the LC duplex adapter `dcm` - is a slot of the module, as
+    any receptacle a cable plugs into is (#796). It was once held unpublished
+    because the indexer did not read a card's `bays:` mapping and took the
+    module for a placed wrapper forwarding its adapter; a consumer of
+    components.json now sees the slot."""
+    comps = json.loads((onebuild.components_index() / "components.json").read_text())
+    entry = next(e for e in comps["components"]
+                 if f"{e['ns']}/{e['name']}@{e['major'][1:]}" == ref)
+    slots = [c for c in entry.get("cages") or [] if c["id"] == "dcm"]
+    assert len(slots) == 1, entry.get("cages")
+    assert slots[0]["interface"] == "lc-duplex", slots[0]
+
+
 def test_a_dcms_bore_cap_is_still_keyed_by_a_configuration(tmp_path):
-    """The build can reach a DCM's bores by their deep key, although the kit
-    cannot offer them (the module publishes no slot): `""` empties one, and a
-    plug replaces the other."""
+    """The build reaches a DCM's bores by their deep key: `""` empties one,
+    and a plug replaces the other."""
     out = build(_dcp2(tmp_path, {"slot-1/ppm-1": DCMS[2]},
                       {"slot-1/ppm-1/dcm/1": "", "slot-1/ppm-1/dcm/2": LC}),
                 tmp_path / "o", LIB)

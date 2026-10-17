@@ -81,7 +81,11 @@ function bundleLine(rack, b, ctx) {
   if (!ctx?.route) return `${head}, ${spacing}, not checked.`;
   const r = bundleCheck(rack, b, ctx);
   if (!r.checked) return `${head}, ${spacing}, not checked.`;
-  if (isTie(b) && r.layout && ridersOf(rack, r.layout).length < 2) spacing +=' with no strap, since fewer than two cables ride it';
+  // fewer than two riding: no strap (#1021), said after a tie's place and in place of a trunk's spacing
+  if (r.layout && ridersOf(rack, r.layout).length < 2) {
+    if (isTie(b)) spacing += ' with no strap, since fewer than two cables ride it';
+    else if (spacing !== 'no straps') spacing = 'no strap, since fewer than two cables ride it';
+  }
   const size = r.size ? `about ${Math.round(r.size.max_mm)} mm, ` : '';
   return `${head}, ${size}${spacing}, ${r.warnings.length ? count(r.warnings.length, 'warning') : 'no warnings'}.`;
 }

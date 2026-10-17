@@ -240,26 +240,10 @@ def test_the_kit_ships_the_resolver():
     assert "| `redirects.js` |" in (ROOT / "kit/README.md").read_text()
 
 
-def test_the_kit_version_is_the_one_the_changelog_names():
-    pkg = json.loads((ROOT / "kit/package.json").read_text())
-    assert pkg["version"] == "0.51.0"
-    assert "0.51.0" in (ROOT / "changelog.d/kit-0-51-0.md").read_text()
-    assert "0.50.0" in (ROOT / "changelog.d/two-slot-bays.md").read_text()
-    assert "0.49.0" in (ROOT / "changelog.d/overlay-library.md").read_text()
-    assert "0.48.0" in (ROOT / "changelog.d/xcu-couplers.md").read_text()
-    assert "0.47.0" in (ROOT / "changelog.d/display-content.md").read_text()
-    assert "0.46.0" in (ROOT / "changelog.d/seated-end-refused.md").read_text()
-    assert "0.45.0" in (ROOT / "changelog.d/settable-lamps.md").read_text()
-    assert "0.44.0" in (ROOT / "changelog.d/zero-u-module-ports.md").read_text()
-    assert "0.43.0" in (ROOT / "changelog.d/relief-batched.md").read_text()
-    assert "0.42.0" in (ROOT / "changelog.d/zero-u-pdu-cord-route.md").read_text()
-    assert "0.41.0" in (ROOT / "changelog.d/relief-id-lookups.md").read_text()
-    assert "0.40.0" in (ROOT / "changelog.d/estimated-duct-capacity.md").read_text()
-    assert "0.39.0" in (ROOT / "changelog.d/spare-in-ducts-fixes.md").read_text()
-    assert "0.38.0" in (ROOT / "changelog.d/zero-u-cable-ends.md").read_text()
-    assert "0.37.0" in (ROOT / "changelog.d/agent-findings.md").read_text()
-    assert "0.36.0" in (ROOT / "changelog.d/manager-pass-through.md").read_text()
-    assert "0.35.0" in (ROOT / "changelog.d/spare-in-ducts.md").read_text()
+def test_the_kit_version_is_well_formed():
+    """The version moves at publish, not in a pull request (kitrelease.py)."""
+    from portrayal import kitrelease
+    assert kitrelease.problems(ROOT) == []
 
 
 # --- the device lock ------------------------------------------------------

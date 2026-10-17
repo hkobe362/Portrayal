@@ -218,6 +218,22 @@ def test_a_face_the_device_has_declared_unknown_is_not_nagged_about():
     assert caught("L45", lint.lint_device_empty_views, P, two)
 
 
+def test_a_face_that_records_why_it_is_empty_is_not_nagged_about():
+    """The warning says "or record why it stays empty", the schema says `empty:`
+    is that record. An author who does it must be able to clear the warning."""
+    said = {"maturity": "modelled",
+            "views": {"top": {"size": {"w": 100.0, "h": 50.0},
+                              "empty": "No photograph or drawing of the top was published."}}}
+    assert not caught("L45", lint.lint_device_empty_views, P, said)
+    # per face: the next face, without a sentence, still fires
+    said["views"]["bottom"] = {"size": {"w": 100.0, "h": 50.0}}
+    assert caught("L45", lint.lint_device_empty_views, P, said)
+    # a blank sentence records nothing
+    blank = {"maturity": "modelled",
+             "views": {"top": {"size": {"w": 100.0, "h": 50.0}, "empty": "  "}}}
+    assert caught("L45", lint.lint_device_empty_views, P, blank)
+
+
 def test_a_face_with_any_content_at_all_is_enough():
     ok = {"maturity": "modelled",
           "views": {"top": {"size": {"w": 100.0, "h": 50.0},

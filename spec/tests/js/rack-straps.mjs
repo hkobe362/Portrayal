@@ -486,3 +486,18 @@ test('a bundle with fewer than two members riding its trunk has no straps, and t
   }
 });
 
+test('describe says a longer trunk with fewer than two riders has no strap, and not "straps every 12 in" (#1021)', () => {
+  const xs = [-450, -150, 0, 200, 450];
+  const r = along(xs, [null, null, null]);
+  const ctx = {chassisOf, route: routeCtx(r, xs)};
+  const looseFrom = ids => ({...r, cables: r.cables.map(c => (ids.includes(c.id) ? {...c, a: {...c.a, item: 'i99'}} : c))});
+  const line = rack => Q.describe(rack, ctx).split('\n').find(l => l.startsWith('b1 '));
+  assert.match(line(r), /straps every 12 in/);
+  assert.match(line(looseFrom(['c3'])), /straps every 12 in/);
+  for (const ids of [['c2', 'c3'], ['c1', 'c2', 'c3']]) {
+    const text = line(looseFrom(ids));
+    assert.match(text, /no strap, since fewer than two cables ride it/, text);
+    assert.doesNotMatch(text, /straps every/, text);
+  }
+});
+
