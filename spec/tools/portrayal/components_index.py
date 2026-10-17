@@ -254,16 +254,25 @@ def seated_in_bays(roots):
     """
     found = set()
 
+    def take(bay):
+        found.update(r for r in bay.get("accepts") or [] if isinstance(r, str))
+        if isinstance(bay.get("default"), str):
+            found.add(bay["default"])
+
     def walk(o, key=None):
         if isinstance(o, dict):
+            # A CARD WRITES ITS BAYS AS A MAPPING BY NAME, a device view as a
+            # list; a configuration's `bays:` maps names to refs (strings).
+            if key == "bays":
+                for v in o.values():
+                    if isinstance(v, dict):
+                        take(v)
             for k, v in o.items():
                 walk(v, k)
         elif isinstance(o, list):
             for v in o:
                 if key == "bays" and isinstance(v, dict):
-                    found.update(r for r in v.get("accepts") or [] if isinstance(r, str))
-                    if isinstance(v.get("default"), str):
-                        found.add(v["default"])
+                    take(v)
                 walk(v, key)
 
     for f in libwalk.iter_devices(roots) + libwalk.iter_components(roots):
@@ -423,9 +432,19 @@ def main():
                                # renderer; without it here a consumer placing a card by
                                # this index lands its ports off the face's by up to
                                # 90 mm.
-                               **({"rotate": b["rotate"]} if b.get("rotate") is not None else {})}
+                               **({"rotate": b["rotate"]} if b.get("rotate") is not None else {}),
+                               # THE SIBLINGS A CARD WIDER THAN ONE SLOT COVERS
+                               # here (docs/pcie-two-slot-bays-design.md, R1):
+                               # what the kit refuses a seat by and draws the
+                               # card's span box from.
+                               **({"span": list(b["span"])} if b.get("span") else {})}
                          for bid, b in sorted((data.get("bays") or {}).items())
                          if isinstance(b, dict)},
+                # HOW MANY SLOTS THE PART TAKES IN A BAY, published only when it
+                # is more than one: a two-slot card covers the bay its bay's
+                # `span` names.
+                **({"slot-width": data["slot-width"]}
+                   if isinstance(data.get("slot-width"), int) and data["slot-width"] > 1 else {}),
                 # REF AND ID, not the ref alone. A consumer that has to say
                 # what a card's ports ARE needs the id - `d0` is a downstream
                 # port and `u0` an upstream one, and the ref they share says

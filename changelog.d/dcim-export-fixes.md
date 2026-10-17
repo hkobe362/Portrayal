@@ -9,4 +9,4 @@
   only for the part number, so a cable on one of three FS adapter panels
   (`fhd-fap12lcd-om5`, `fhd-fap12mtp-b`, `fhd-fap12mtp16-a`) was left out of
   the cables file. `moduleTypePath(paths, model, name)` tries the name second.
-  No type file is renamed or rewritten; `@portrayal/kit` is 0.50.0.
+  No type file is renamed or rewritten.
