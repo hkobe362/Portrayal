@@ -148,6 +148,11 @@ test('applying is refused for a product the catalogue lacks, a page with no cata
   assert.match(run('frame.apply', M.newRack(), {ref: 'test/wide@1'}).error, /Test Wide has 23 in rails, which this rack file cannot hold yet/);
 });
 
+test('a frame counting from another first unit is not given a product that counts from U1', () => {
+  const r = run('frame.apply', M.withFrame(M.newRack(), {startU: 5}), {ref: 'apc/ar203a@1'});
+  assert.equal(r.error, 'APC AR203A counts from U1, and this frame counts from U5; set the first unit to 1 first.');
+});
+
 test('a lower product height packs the devices down like a lower frame height, and the ref lands with it', () => {
   let rack = M.withItem(M.newRack(), {ref: 'sw', cfg: 'base', ru: 30, label: 'top'}).rack;
   rack = M.withItem(rack, {ref: 'sw', cfg: 'base', ru: 5, label: 'low'}).rack;

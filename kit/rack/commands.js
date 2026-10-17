@@ -625,6 +625,11 @@ function frameApply(rack, {ref}, ctx) {
   if (!row) return {error: `There is no rack product ${ref}.`};
   const no = unholdable(row);
   if (no) return {error: no};
+  // the first unit is the file's own (startU) and is never written here, so a
+  // frame not counting from the product's would stay out of step with it
+  const start = row.numbering?.start ?? 1;
+  if (firstU(rack.frame) !== start)
+    return {error: `${row.manufacturer} ${row.model} counts from U${start}, and this frame counts from U${firstU(rack.frame)}; set the first unit to ${start} first.`};
   const next = appliedFrame(rack.frame, row);
   const patch = Object.fromEntries(['kind', 'heightRU', 'numbering', 'holes', 'railDepth', 'usableDepth', 'ref']
     .filter(k => !same(next[k], rack.frame[k])).map(k => [k, next[k]]));
