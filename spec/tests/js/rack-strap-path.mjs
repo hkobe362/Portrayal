@@ -495,3 +495,19 @@ test('where no member has a path, a trunk is the straight lines between its wayp
   assert.equal(s1.straight, false);
   assert.ok(B.trunkLength(longer, longer.bundles[0], {route: ctxOf(longer)}).metres > 0.5);
 });
+
+test('the bend check reads a bundle\'s corners from the line its straps are read from, not the chords between its waypoints (#1037)', () => {
+  const ctx = ctxOf(), b6 = bundle('b6');
+  // the straight lines from waypoint to waypoint: the room of the tightest corner is over 100 mm
+  const L = B.layoutOf(RACK, b6, {route: ctx});
+  const chords = B.cornersOf(L.trunk.map(w => R.pointOf(RACK, w, ctx)), {share: 'need'});
+  assert.ok(Math.min(...chords.map(c => c.room_mm)) > 100, JSON.stringify(chords));
+  // the cords turn 79.9 degrees at the mouth of the rear ring, 135.3 mm from the one before and 50 mm from
+  // the next, which has 56.5 mm of room, shared with a 5.3 degree turn after it
+  const check = B.bundleCheck(RACK, b6, {route: ctx, bendOf: () => 60});
+  const tight = check.bend.violations.find(v => v.angle_deg === 79.9);
+  assert.deepEqual([tight?.legs_mm, tight?.room_mm, tight?.short_mm], [[135.3, 50], 56.5, 3.5]);
+  assert.ok(check.warnings.some(w => w.includes('with room for a 56.5 mm bend') && w.includes('3.5 mm short')), check.warnings.join('\n'));
+  // a radius the tightest corner has room for passes it
+  assert.deepEqual(B.bundleCheck(RACK, b6, {route: ctx, bendOf: () => 50}).bend.violations.filter(v => v.angle_deg === 79.9), []);
+});

@@ -22,7 +22,7 @@ import {slackOf, slackFindings, sparePlaces, holdsSpare, spareExports, trayText,
 import {GONE, CABLE_GONE, ZERO_GONE, BUNDLE_GONE} from './commands.js';
 import {bundlesOf, bundleName} from './model.js';
 import {bundleCheck, bundleOfCable, membersText, spacingText, strapSpacing, straps as strapsOf, trunkLength, straightText, fewText,
-        layoutOf} from './bundles.js';
+        layoutOf, ridersOf} from './bundles.js';
 import {slotEnv, slotTree, partName, partOf, resolverFor} from './slots.js';
 import {auditRack, readAsTexts, unknownTexts} from '../redirects.js';
 import {fieldRows} from '../fields.js';
@@ -74,11 +74,13 @@ const sideOf = e => `${e.item}/${e.path}${e.view === 'rear' ? ' (rear)' : ''}`;
 function bundleLine(rack, b, ctx) {
   const ids = b.members.map(m => m.cable);
   const head = `${b.id} ${bundleName(b)}: ${count(ids.length, 'cable')}${ids.length ? ` (${membersText(ids)})` : ''}`;
-  const spacing = spacingText(strapSpacing(b));
+  let spacing = spacingText(strapSpacing(b));
   if (ids.length < 2) return `${head}, not drawn.`;
   if (!ctx?.route) return `${head}, ${spacing}, not checked.`;
   const r = bundleCheck(rack, b, ctx);
   if (!r.checked) return `${head}, ${spacing}, not checked.`;
+  // fewer than two riding a trunk: no strap (#1021), and the line does not give a spacing
+  if (r.layout && spacing !== 'no straps' && ridersOf(rack, r.layout).length < 2) spacing = 'no strap, since fewer than two cables ride it';
   const size = r.size ? `about ${Math.round(r.size.max_mm)} mm, ` : '';
   return `${head}, ${size}${spacing}, ${r.warnings.length ? count(r.warnings.length, 'warning') : 'no warnings'}.`;
 }

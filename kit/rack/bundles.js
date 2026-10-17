@@ -10,7 +10,7 @@
 // Pure: what reads a drawing comes in on `ctx.route`, the routing context
 // route.js takes (`{chassisOf, guidesOf, portX, portY?, zeroUAperture?}`).
 
-import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers} from './model.js';
+import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers, endHostOf} from './model.js';
 import {ownRoute, resolveRoute, trunkRoute, trunkMeasures, pointOf, routePath, routeText, DIAMETERS} from './route.js';
 import {traysOf} from './solids.js';
 import {elementsOf, elementText, waypointKey, followTrunk, andList} from './bundle-route.js';
@@ -47,6 +47,12 @@ export const bundleOfCable = (rack, cableId) => bundlesOf(rack).find(b => b.memb
 export const strapSpacing = b => (b.straps && 'every' in b.straps ? b.straps.every : DEFAULT_STRAPS);
 export const strapEveryMm = b => { const e = strapSpacing(b); return e ? e.value * MM[e.unit] : null; };
 export const spacingText = e => (e ? `straps every ${e.value} ${e.unit}` : 'no straps');
+// A member is loose when the device at one of its ends is gone and the cable
+// kept (#1021): it rides nothing, so it is not strapped with the others.
+const isLoose = (rack, id) => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
+// The members of a laid-out bundle that ride its trunk: they join and leave it
+// and are not loose.
+export const ridersOf = (rack, L) => L.members.filter(m => m.ji != null && m.li != null && !isLoose(rack, m.cable));
 // WHICH KINDS OF STRAP A BUNDLE HAS (rack file version 4,
 // docs/rack-file-v4-design.md section 3.10): beside the spacing straps,
 // BREAKOUT straps, one beside each point where a cable joins or leaves, and
@@ -300,11 +306,18 @@ const an = t => (/^(8|1[18](\.|$))/.test(t) ? 'an' : 'a');
 //   pathwaysOn): it holds the bundle to that radius, so that is the room, and
 //   it is the part's own figure (`source: 'guide'`). No guide states one yet
 //   (decision 8);
-// - each corner of the trunk, between the straight lines from one resolved
-//   waypoint to the next (pointOf at each; not the members' routed paths,
-//   which the straps and the length are measured along), the room r_max
-//   from its legs (cornersOf). That is the rack's own sketch of where things
+// - each corner of the trunk's own line (trunkLine, #1037): the members'
+//   routed paths, which the straps and the length are measured along, so a
+//   turn a path makes where the straight line between two waypoints does not
+//   (round a duct) is found. The room r_max is from its legs (cornersOf), a
+//   leg two corners share divided by what each turn needs of it (`share:
+//   'need'`, #984), the rule a cable's own path is judged by. A corner within
+//   CORNER_AT_MM along the line of a waypoint is that waypoint's, `at` it;
+//   one between two places is said so ("A to B"); of several at one place the
+//   tightest is the place's. That is the rack's own sketch of where things
 //   are, not a measured bend, so it is `source: 'legs'`, `estimated: true`.
+//   Where the line cannot be read, the straight lines from one resolved
+//   waypoint to the next (pointOf at each) stand in.
 //   A corner on a pathway that states a radius is the pathway's.
 // A point is checked against the members present that have a radius. One
 // where none has is unchecked (`ok: null`), never a pass; the members with no
@@ -331,14 +344,16 @@ export function bendCheck(rack, b, L, pathways, ctx = {}) {
   };
   const all = needOf(riding);
   const points = [];
-  const judge = (i, head) => {
-    if (present(L, i).length < 2) return;
-    const ms = present(L, i, {bend: true});
+  const judgeOn = (ms, head) => {
     if (!ms.length) return;
     const {need, by, unchecked} = needOf(ms);
     const ok = need == null ? null : need <= head.room_mm + 1e-9;
     points.push({...head, need_mm: need, by, members: ms.map(m => m.cable), unchecked, ok,
                  short_mm: ok === false ? round1(need - head.room_mm) : 0});
+  };
+  const judge = (i, head) => {
+    if (present(L, i).length < 2) return;
+    judgeOn(present(L, i, {bend: true}), head);
   };
   // the pathways that state a radius
   const stated = new Set();
@@ -351,11 +366,39 @@ export function bendCheck(rack, b, L, pathways, ctx = {}) {
   // the corners: each at a resolved trunk waypoint, element `seg` with t 0
   const elAt = new Map();
   L.T.forEach((e, i) => { if (e.kind !== 's' && e.t === 0 && !elAt.has(e.seg)) elAt.set(e.seg, i); });
-  const pts = L.trunk.map(w => pointOf(rack, w, ctx.route));
-  for (const c of cornersOf(pts)) {
-    const i = elAt.get(c.k);
+  // read along the trunk's own line (#1037), the members' routed paths, so a turn a
+  // path makes where the straight line does not is found; a line that cannot be
+  // read leaves the straight lines between the waypoints
+  let line = null;
+  try { line = trunkLine(rack, b, L, ctx.route); } catch { line = null; }
+  const found = [];
+  if (line) {
+    const poly = line.polyline(), wps = [...elAt.values()];
+    for (const c of cornersOf(poly, {share: 'need'})) {
+      const a = poly[c.k].a;
+      // at a waypoint when it is within a ring's depth of one, else between the two places it falls between
+      const i = wps.find(x => Math.abs(line.cum[x] - a) <= CORNER_AT_MM);
+      const piece = i == null ? line.pieces.find(x => a >= x.from - 1e-9 && a <= x.to + 1e-9) : null;
+      if (i == null && !piece) continue;
+      found.push({c, i, piece, key: i ?? `${piece.i}-${piece.j}`});
+    }
+  } else {
+    const pts = L.trunk.map(w => pointOf(rack, w, ctx.route));
+    for (const c of cornersOf(pts, {share: 'need'})) found.push({c, i: elAt.get(c.k), piece: null, key: elAt.get(c.k)});
+  }
+  // the tightest of the corners at one place is the place's
+  const tightest = new Map();
+  for (const f of found) if (!tightest.has(f.key) || f.c.room_mm < tightest.get(f.key).c.room_mm) tightest.set(f.key, f);
+  for (const {c, i, piece} of tightest.values()) {
+    if (piece) {
+      // a turn between two places is the whole pack's: every member that rides the piece
+      const ms = L.members.filter(m => m.ji != null && m.li != null && Math.min(m.ji, m.li) <= piece.i && Math.max(m.ji, m.li) >= piece.j);
+      if (ms.length >= 2) judgeOn(ms, {kind: 'corner', at: `${txt(L.T[piece.i])} to ${txt(L.T[piece.j])}`, waypoint: L.trunk[L.T[piece.i].seg], angle_deg: c.angle_deg,
+                   legs_mm: c.legs_mm, room_mm: c.room_mm, source: 'legs', estimated: true});
+      continue;
+    }
     if (i == null || stated.has(i)) continue;
-    judge(i, {kind: 'corner', at: txt(L.T[i]), waypoint: L.trunk[c.k], angle_deg: c.angle_deg, legs_mm: c.legs_mm,
+    judge(i, {kind: 'corner', at: txt(L.T[i]), waypoint: L.trunk[L.T[i].seg], angle_deg: c.angle_deg, legs_mm: c.legs_mm,
               room_mm: c.room_mm, source: 'legs', estimated: true});
   }
   const violations = points.filter(p => p.ok === false);
@@ -538,7 +581,7 @@ function trunkLine(rack, b, L, rc) {
     if (best && 2 * read.length < ridden) few = true;
     const p = chordAt(T[i]), q = chordAt(T[j]);
     const len = best ? best.len : dist(p, q);
-    pieces.push({from: cum[i], to: cum[i] + len, ...(best ?? {}), p, q});
+    pieces.push({from: cum[i], to: cum[i] + len, ...(best ?? {}), p, q, i, j});
     cum[j] = cum[i] + len;
     // a lane segment between two units is half way
     for (let k = i + 1; k < j; k++) cum[k] = cum[i] + len / 2;
@@ -555,8 +598,33 @@ function trunkLine(rack, b, L, rc) {
     return {point: {x: c.p.x + f * (c.q.x - c.p.x), y: c.p.y + f * (c.q.y - c.p.y), z: c.p.z + f * (c.q.z - c.p.z)},
             dir: d > 1e-9 ? {x: (c.q.x - c.p.x) / d, y: (c.q.y - c.p.y) / d, z: (c.q.z - c.p.z) / d} : null, on: null};
   };
-  return {pts, cum, wcum, length, straight, few, pointAt};
+  // THE LINE AS A POLYLINE, to read its corners from (#1037): the points of each
+  // piece's path between its two places, then those of the next, each point
+  // with `a`, how far along the trunk it is. A piece with no path is the straight line.
+  // Where the next piece starts within JOG_MM of where the last ended (the members
+  // change at a ring, a few millimetres apart) it is taken to start there.
+  const polyline = () => {
+    const out = [];
+    for (const c of pieces) {
+      let seq;
+      if (c.line) {
+        const {P, arc} = c.line, lo = Math.min(c.s0, c.s1), hi = Math.max(c.s0, c.s1);
+        const mid = [];
+        for (let k = 0; k < P.length; k++) if (arc[k] > lo + 1e-9 && arc[k] < hi - 1e-9) mid.push({...P[k], a: c.from + Math.abs(arc[k] - c.s0)});
+        if (c.s1 < c.s0) mid.reverse();
+        seq = [{...onLine(P, arc, c.s0, 1).point, a: c.from}, ...mid, {...onLine(P, arc, c.s1, 1).point, a: c.to}];
+      } else seq = [{...c.p, a: c.from}, {...c.q, a: c.to}];
+      if (out.length && dist(out.at(-1), seq[0]) <= JOG_MM) seq.shift();
+      out.push(...seq);
+    }
+    return out;
+  };
+  return {pts, cum, wcum, length, straight, few, pointAt, pieces, polyline};
 }
+const JOG_MM = 25;
+// A corner of the line this close along it to a waypoint is that waypoint's: a path turns
+// at the mouth of a ring, not at the middle of it.
+const CORNER_AT_MM = 15;
 
 // ── straps (section 6; docs/rack-file-v4-design.md section 3.10) ─────────
 // Three kinds, each entry with its `kind`:
@@ -603,7 +671,10 @@ export function straps(rack, b, ctx = {}) {
   const L = layoutOf(rack, b, ctx);
   if (!L) return null;
   const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false, few: false};
-  if (b.members.length < 2 || L.trunk.length < 2) return empty;
+  // a bundle is strapped where two or more members ride its trunk, and a loose member rides nothing (#1021)
+  // (loose: the device at an end is gone and the cable kept)
+  const rides = ridersOf(rack, L).length;
+  if (b.members.length < 2 || rides < 2 || L.trunk.length < 2) return empty;
   const line = trunkLine(rack, b, L, ctx.route);
   if (!line) return empty;
   // `cum` is by resolved waypoint, as the stretches and the anchors below read it
