@@ -1,6 +1,6 @@
 ### Changed
-- **`@portrayal/kit` is 0.51.0: a bundle's bend check reads the line its
-  cords run, and shares a leg by what each turn needs** (#1037, #984). The
+- **A bundle's bend check reads the line its cords run, and shares a leg by
+  what each turn needs** (#1037, #984). The
   corners of a trunk came from the straight lines between its waypoints; they
   now come from the members' routed paths, the line the straps and the length
   are read from, so a bundle that is too tight where its cords turn round a
@@ -16,4 +16,5 @@
   A member whose device at an end is gone, the cable kept, rides nothing; a
   bundle of such cables was still counted two straps every 12 in, and the BOM
   bought them. `straps()` now gives none, and the count, the sentence, the BOM
-  and the drawings agree.
+  and the drawings agree; `describe` says "no strap, since fewer than two
+  cables ride it" and not "straps every 12 in".

@@ -47,6 +47,12 @@ export const bundleOfCable = (rack, cableId) => bundlesOf(rack).find(b => b.memb
 export const strapSpacing = b => (b.straps && 'every' in b.straps ? b.straps.every : DEFAULT_STRAPS);
 export const strapEveryMm = b => { const e = strapSpacing(b); return e ? e.value * MM[e.unit] : null; };
 export const spacingText = e => (e ? `straps every ${e.value} ${e.unit}` : 'no straps');
+// A member is loose when the device at one of its ends is gone and the cable
+// kept (#1021): it rides nothing, so it is not strapped with the others.
+const isLoose = (rack, id) => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
+// The members of a laid-out bundle that ride its trunk: they join and leave it
+// and are not loose.
+export const ridersOf = (rack, L) => L.members.filter(m => m.ji != null && m.li != null && !isLoose(rack, m.cable));
 // WHICH KINDS OF STRAP A BUNDLE HAS (rack file version 4,
 // docs/rack-file-v4-design.md section 3.10): beside the spacing straps,
 // BREAKOUT straps, one beside each point where a cable joins or leaves, and
@@ -667,8 +673,7 @@ export function straps(rack, b, ctx = {}) {
   const empty = {every, count: 0, kinds: {spacing: 0, breakout: 0, anchor: 0}, widths: {}, straps: [], runs: [], straight: false, few: false};
   // a bundle is strapped where two or more members ride its trunk, and a loose member rides nothing (#1021)
   // (loose: the device at an end is gone and the cable kept)
-  const loose = id => { const c = (rack.cables || []).find(x => x.id === id); return !c || !endHostOf(rack, c.a?.item) || !endHostOf(rack, c.b?.item); };
-  const rides = L.members.filter(m => m.ji != null && m.li != null && !loose(m.cable)).length;
+  const rides = ridersOf(rack, L).length;
   if (b.members.length < 2 || rides < 2 || L.trunk.length < 2) return empty;
   const line = trunkLine(rack, b, L, ctx.route);
   if (!line) return empty;

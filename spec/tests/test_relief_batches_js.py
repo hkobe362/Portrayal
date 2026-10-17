@@ -62,6 +62,18 @@ def test_a_failure_is_not_kept_and_the_budget_is_pixels(out):
     assert out["statsShape"]
 
 
+def test_the_key_of_a_shared_prefix_tells_apart_what_the_whole_text_does(out):
+    # kit 0.45.0: the face's style and defs are rewritten once, and a key is
+    # still equal exactly when the whole-text rewrite (`rasterKeyText`) is
+    assert out["keyPartition"]
+    assert out["keyIsShort"], "a key is no longer the whole text"
+    assert out["keyStable"]
+
+
+def test_a_face_raster_is_the_kept_one(out):
+    assert out["svgCanvasShared"], "svgCanvas hands back the kept raster, which its callers only read"
+
+
 def test_merged_pieces_keep_their_geometry(out):
     assert out["identity"] == {"pos": [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0], "nrm": [0, 0, 1] * 4,
                                "uv": [0, 0, 1, 0, 1, 1, 0, 1], "index": [0, 1, 2, 0, 2, 3]}

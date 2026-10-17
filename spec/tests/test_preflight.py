@@ -172,6 +172,52 @@ def test_changelog_fails_on_a_malformed_fragment(tmp_path):
     assert not res.ok and "Improved" in res.details[0]
 
 
+FRAGMENT = "### Fixed\n- The thing is fixed\n  and it says so (#1).\n"
+RELEASE_BASE = {**CHANGELOG_BASE,
+                "CHANGELOG.md": "# Changelog\n\n## Unreleased\n\n## 0.1.0\n\n### Added\n- Old.\n",
+                "changelog.d/topic.md": FRAGMENT}
+RELEASED = ("# Changelog\n\n## Unreleased\n\n## 0.2.0\n\n### Fixed\n"
+            "- The thing is fixed\n  and it says so (#1).\n\n## 0.1.0\n\n### Added\n- Old.\n")
+
+
+def _release(tmp_path, changelog=RELEASED, delete=True):
+    base = make_repo(tmp_path, RELEASE_BASE)
+    (tmp_path / "library/x.yaml").write_text("a: 2\n")      # the release carries library changes
+    (tmp_path / "CHANGELOG.md").write_text(changelog)
+    if delete:
+        (tmp_path / "changelog.d/topic.md").unlink()
+    return base
+
+
+def test_changelog_accepts_a_release_diff_that_folds_the_fragments_in(tmp_path):
+    base = _release(tmp_path)
+    res = preflight.check_changelog(ctx_of(tmp_path, base))
+    assert res.ok and "0.2.0" in res.summary
+
+
+def test_changelog_still_fails_without_a_fragment_when_the_diff_is_not_a_release(tmp_path):
+    # nothing folded: the fragment stays and the library changes in a branch of its own
+    base = make_repo(tmp_path, RELEASE_BASE)
+    (tmp_path / "changelog.d/topic.md").unlink()
+    (tmp_path / "library/x.yaml").write_text("a: 2\n")
+    assert not preflight.check_changelog(ctx_of(tmp_path, base)).ok
+    # a deleted fragment with no version heading is a lost entry, not a release
+    base = _release(tmp_path / "b", changelog=RELEASE_BASE["CHANGELOG.md"])
+    assert not preflight.check_changelog(ctx_of(tmp_path / "b", base)).ok
+    # a heading added with the fragment still on disk and unfolded
+    base = _release(tmp_path / "c", delete=False)
+    assert not preflight.check_changelog(ctx_of(tmp_path / "c", base)).ok
+
+
+def test_changelog_fails_a_release_that_leaves_unreleased_entries_or_drops_one(tmp_path):
+    left = RELEASED.replace("## Unreleased\n", "## Unreleased\n\n### Fixed\n- Left behind.\n")
+    base = _release(tmp_path / "a", changelog=left)
+    assert not preflight.check_changelog(ctx_of(tmp_path / "a", base)).ok
+    dropped = RELEASED.replace("- The thing is fixed\n  and it says so (#1).\n", "- Another.\n")
+    base = _release(tmp_path / "b", changelog=dropped)
+    assert not preflight.check_changelog(ctx_of(tmp_path / "b", base)).ok
+
+
 def test_changelog_wants_no_fragment_for_docs(tmp_path):
     base = make_repo(tmp_path, CHANGELOG_BASE)
     (tmp_path / "docs/x.md").write_text("more doc\n")

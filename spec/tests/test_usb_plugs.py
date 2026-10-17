@@ -165,25 +165,25 @@ def test_a_card_with_two_receptacles_publishes_both(comps):
     assert all(c["accepts"] == [C] for c in slots.values())
 
 
-def test_a_card_seated_in_another_card_does_not_publish_its_lone_receptacle(comps):
-    """THE ONE KNOWN GAP, held here so it cannot widen and so closing it fails
-    this test. commscope/cc3008@1 seats in the `cc` bay of a CA3008 carrier,
-    which is itself a card, and composes one interface-bearing part: its
-    Micro-USB jack. A card writes its bays as a mapping, the indexer's
-    `seated_in_bays` reads only a device view's list, so the CC3008 is taken
-    for a placed wrapper that forwards its one aperture and components.json
-    lists no slot for it. The BUILD still seats a plug there by its deep key
-    (SEATS below). docs/connectors-usb-design.md section 3."""
+def test_a_card_seated_in_another_card_publishes_its_lone_receptacle(comps):
+    """commscope/cc3008@1 seats in the `cc` bay of a CA3008 carrier, which is
+    itself a card, and composes one interface-bearing part: its Micro-USB
+    jack. A card writes its bays as a mapping, and `seated_in_bays` reads that
+    mapping as it reads a device view's list, so the CC3008 is a bay-seated
+    card and not a placed wrapper: its jack is a slot of its own, the one the
+    build seats a plug at by its deep key (SEATS below).
+    docs/connectors-usb-design.md section 3."""
     carrier = _contract("commscope/ca3008@1")
     assert isinstance(carrier["bays"], dict)
     assert "commscope/cc3008@1" in carrier["bays"]["cc"]["accepts"]
-    assert "commscope/cc3008@1" not in components_index.seated_in_bays([str(LIB)])
+    assert "commscope/cc3008@1" in components_index.seated_in_bays([str(LIB)])
     cc = _contract("commscope/cc3008@1")
     assert cc["kind"] == "module"
     assert [p["id"] for p in cc["parts"] if p["ref"] == "std/micro-usb@1"] == ["usb"]
-    got, _at, _lift = presented_interface(cc, lambda r: _contract(r))
-    assert got == "micro-usb-b" and "interface" not in cc
-    assert not comps["commscope/cc3008@1"].get("cages")
+    slot = _card_slot(comps, "commscope/cc3008@1", "usb")
+    assert slot["kind"] == "connector" and slot["interface"] == "micro-usb-b", slot
+    assert slot["accepts"] == [PAIRS["micro-usb-b"][1]], slot
+    assert slot["lift"] == 0.0, slot
 
 
 @pytest.mark.parametrize("ref", WRAPPERS)
@@ -231,11 +231,9 @@ def test_every_composed_usb_receptacle_is_a_slot_or_is_forwarded(comps):
     # vertical twins in #261 (the MX960's SCB seats juniper/re-s-1300@1 now)
     assert seen["usb-a"] >= 31 and seen["micro-usb-b"] >= 18 and seen["usb-c"] >= 2, seen
     # A forwarded receptacle is published where its composer is PLACED, so
-    # its composer has to be a part a face places: the two bezels. The third
-    # is a card a card holds, which nothing places - the known gap the test
-    # above describes, named here and nowhere waived.
-    assert sorted(forwarded) == sorted([(w, "component") for w in WRAPPERS]
-                                       + [("commscope/cc3008@1", "module")])
+    # its composer has to be a part a face places: the two bezels. A card a
+    # card holds is bay-seated and publishes its jack as a slot.
+    assert sorted(forwarded) == sorted((w, "component") for w in WRAPPERS)
 
 
 def test_every_usb_receptacle_a_device_places_is_one_of_these_parts():

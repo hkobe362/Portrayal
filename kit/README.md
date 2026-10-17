@@ -676,15 +676,10 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
-**New in 0.51.0: a bundle's bend check reads the line its cords run, and a bundle of loose cables has no straps.**
-`bendCheck` (so `bundleCheck`, `bundleChecks`, `inspect` of a bundle and the exports) takes the corners of a
-trunk from the members' routed paths, the line the straps and the length are read from, not from the straight
-lines between waypoints, so a bundle that is too tight where its cords turn round a duct is found; a corner
-between two places is said "A to B", and the tightest at one place is the place's. A leg two corners share is
-divided by what each turn needs of it, as a cable's own path is judged (`cornersOf(pts, {share: 'need'})`),
-not by halves. `straps()` gives none for a bundle with fewer than two members riding its trunk, a member whose
-device at an end is gone and the cable kept riding nothing, so the count, the sentence and the BOM agree.
-Findings and strap counts move; nothing saved does.
+**New in 0.51.0: the relief detail pass asks for each raster once.** `rasterKey` rewrites a face's
+shared `<style>` and `<defs>` once and keys a node by that and its own art (`rasterKeyText` is the
+whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on
+a copy (`rasterize`), never on it.
 
 **New in 0.50.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
 part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card

@@ -371,6 +371,11 @@ advice: they print PASS or WARN, and a WARN does not change the exit status.
 | `prose` | never. It warns when a `device.yaml` or `contract.yaml` you changed has a sentence of more than 25 words that the merge base does not have, in a `description` (device, configuration or component) or a string under `attrs` |
 | `conformance` | never. It warns when a device or component file you changed has no part conformance report from this tree: `library/dist/part-conformance.json`, which `spec/tests/test_part_conformance_report.py` writes after a build, is missing or older than the change |
 
+**Do not bump the kit version in a pull request; add a changelog fragment. The
+version is bumped when the kit is published.** Parallel pull requests that each
+bumped `kit/package.json` collided on the same line. `docs/maintainers.md`
+says how the publish bumps it.
+
 **New prose follows Simplified Technical English.** A `description` and the
 strings under `attrs` are copied into the DCIM exports, where someone who never
 saw the drawing reads them. Write new and changed text in the manner of
