@@ -151,11 +151,11 @@ const listedAs = (listed, name) => listed.find(t => t.endsWith(`/${name}`) && HE
 // module in it, to any depth. Each level's bay is found in the type file of
 // the module installed one level up, and its position is worked out as the DCIM
 // works it out: NetBox puts the parent's position in for `{module}`, Nautobot
-// copies the position as written. Returns {ok: true, bay, positions, module},
-// the bay of the last level, every level's position and the module type seated
-// at the last, or {ok: false, reason}.
+// copies the position as written. Returns {ok: true, bay, positions, names,
+// module}, the bay of the last level, every level's position and bay name and
+// the module type seated at the last, or {ok: false, reason}.
 function seatChain(bayPath, device, moduleAt) {
-  const ids = bayPath.split(MODULE), positions = [];
+  const ids = bayPath.split(MODULE), positions = [], names = [];
   let lists = device, bay = null, path = '';
   for (const [k, id] of ids.entries()) {
     if (k) {
@@ -165,11 +165,12 @@ function seatChain(bayPath, device, moduleAt) {
     bay = k ? nestedBayAt(lists, id) : bayAt(lists, id);
     if (!bay) return {ok: false, reason: `the ${k ? 'module' : 'device'} type ${lists.model} has no module bay at position ${id}`};
     positions.push(k ? bay.position.replaceAll('{module}', positions[k - 1]) : bay.position);
+    names.push(bay.name);
     path = k ? `${path}${MODULE}${id}` : id;
   }
   const module = moduleAt(bayPath);
   if (!module) return {ok: false, reason: `what is seated in ${bayPath} has no module type`};
-  return {ok: true, bay, positions, module};
+  return {ok: true, bay, positions, names, module};
 }
 
 // WHAT A CABLE END IS CALLED IN THE DCIM, and which kind of component it is.
@@ -267,6 +268,15 @@ export const MODULE_COLUMNS = {
   nautobot: ['module_type__manufacturer__name', 'module_type__model', 'parent_module_bay__parent_device__name',
              'parent_module_bay__name', 'status__name']};
 
+// The columns of a Nautobot module that sits `depth` modules down: the bay it
+// is in is `parent_module_bay__name`, the bay of the module above it is
+// reached through `parent_module`, and so on up to the device.
+const UP = 'parent_module_bay__parent_module__';
+const nautobotDeviceColumn = depth => `${UP.repeat(depth)}parent_module_bay__parent_device__name`;
+const nautobotBayColumn = (depth, level) => `${UP.repeat(depth - level)}parent_module_bay__name`;
+const nautobotModuleColumns = depth => ['module_type__manufacturer__name', 'module_type__model', nautobotDeviceColumn(depth),
+  ...Array.from({length: depth + 1}, (_, level) => nautobotBayColumn(depth, level)), 'status__name'];
+
 // One row per part seated in a BAY (its path ends "/module") that has a module
 // type, on a device the devices file holds, in a bay the device type has at
 // that position. A part seated in a cage (an optic, a plug) is not a module:
@@ -277,18 +287,25 @@ export const MODULE_COLUMNS = {
 // ports that exist only once it is installed, and a cables file is taken whole
 // or not at all. Its `module_bay` is the bay's name as NetBox installs it
 // (`drawer/slot-1`, the parent's position put in for `{module}`), which is
-// unique on the device. Nautobot's module import names a bay by its device
-// (parent_module_bay__parent_device__name), and a bay of a module is on no
-// device, so such a module is left out with the bay to put it in; its cables
-// are still written, and import_cables.py says which ports it cannot find
-// until the module is installed.
+// unique on the device.
+//
+// Nautobot's module import names a bay of a module by lookups down through the
+// parent module (#1127): the device and the bay of the outermost module, then
+// the bay of each module below it, one `parent_module_bay__parent_module__`
+// more for each level, so a module two levels down reads
+// `parent_module_bay__parent_module__parent_module_bay__parent_module__parent_module_bay__parent_device__name`.
+// A CSV has one header and rows of different depths name different columns,
+// so the file is one SECTION PER DEPTH, each its own CSV: `columns` and `rows`
+// are the modules in the device's bays, as before, and `deeper` is
+// [{depth, columns, rows}] for depth 1 and below, outermost first. They are
+// imported in that order, so a module is installed after the one it sits in.
 //   parts     [{itemId, path, ref}], what each device has seated (exports.js)
 //   names     uniqueNames(items); kept: the ids of the devices in the devices file
 //   deviceOf  item id -> typeLists of its device type, or null
 //   moduleOf  part ref -> {manufacturer, model, lists} of its module type, or null
 // `left` holds one sentence for each thing the file does not carry.
 export function moduleImportRows({target = 'netbox', parts, names, kept, deviceOf, moduleOf}) {
-  const rows = [], left = [], said = new Set(), inside = [], written = new Set();
+  const rows = [], left = [], said = new Set(), inside = [], written = new Set(), sections = [];
   const seated = new Map(parts.map(q => [`${q.itemId}\0${q.path}`, q]));
   for (const p of parts) {
     if (!String(p.path).endsWith('/module')) continue;
@@ -327,14 +344,21 @@ export function moduleImportRows({target = 'netbox', parts, names, kept, deviceO
     const typeAt = path => { const q = seated.get(`${p.itemId}\0${path}/module`); return q ? moduleOf(q.ref)?.lists ?? null : null; };
     const at = seatChain(bayId, deviceOf(p.itemId), typeAt);
     if (!at.ok) { left.push(`${lead} ${at.reason[0].toUpperCase()}${at.reason.slice(1)}.`); continue; }
+    written.add(`${p.itemId}\0${p.path}`);
     if (target === 'nautobot') {
-      left.push(`${lead} It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay ${at.bay.name} of the module at ${above}.`);
+      const d = at.names.length - 1;
+      sections[d] ??= {depth: d, columns: nautobotModuleColumns(d), rows: []};
+      const row = {module_type__manufacturer__name: type.manufacturer, module_type__model: type.model};
+      row[nautobotDeviceColumn(d)] = device;
+      at.names.forEach((name, j) => { row[nautobotBayColumn(d, j)] = name; });
+      row.status__name = 'Planned';
+      sections[d].rows.push(row);
       continue;
     }
-    written.add(`${p.itemId}\0${p.path}`);
     rows.push({device, module_bay: at.bay.name.replaceAll('{module}', at.positions.at(-2)), module_type: type.model, status: 'planned'});
   }
-  return {columns: MODULE_COLUMNS[target === 'nautobot' ? 'nautobot' : 'netbox'], rows, left};
+  if (target === 'nautobot') return {columns: MODULE_COLUMNS.nautobot, rows, left, deeper: sections.filter(Boolean)};
+  return {columns: MODULE_COLUMNS.netbox, rows, left};
 }
 
 // ── the cables file ─────────────────────────────────────────────────────
@@ -569,7 +593,9 @@ export function cableImportRows({rack, target = 'netbox', names, kept, resolve, 
 // What to do with each file, in order; what must already exist; and
 // everything the kit could not carry. It replaces NOTES.txt and keeps its
 // content (`notes`).
-//   rows      how many rows each CSV holds: {rack, devices, modules, cables}
+//   rows      how many rows each CSV holds: {rack, devices, modules, cables}, and
+//             for Nautobot `modulesIn`, the rows of each deeper modules file
+//             (depth 1 first, from moduleImportRows' `deeper`)
 //   typeFiles how many YAML files are under types/
 //   left      a sentence for each device, module and cable the files leave out
 //   notes     what the types and the written rows need said (a best-guess type,
@@ -585,6 +611,8 @@ export function cableImportRows({rack, target = 'netbox', names, kept, resolve, 
 export const KIT_FILES = {
   netbox: {rack: '1-rack.csv', devices: '2-devices.csv', modules: '3-modules.csv', cables: '4-cables.csv'},
   nautobot: {devices: '1-devices.csv', modules: '2-modules.csv', cables: '3-cables.csv'}};
+// The Nautobot modules in a bay of a module, a file for each depth (1 and below), imported after 2-modules.csv in order.
+export const nautobotModuleFile = depth => (depth ? `2b-modules-depth-${depth}.csv` : KIT_FILES.nautobot.modules);
 export const KIT_SCRIPT = 'import_cables.py';
 const rowsText = n => (n ? `${n} ${n === 1 ? 'row' : 'rows'}` : 'no rows: it holds its header only, so skip it');
 
@@ -651,6 +679,10 @@ export function kitReadme({target = 'netbox', rack, date, dcim = {}, typeFiles =
     step(2, `${F.devices} (${rowsText(rows.devices)}): Devices > Import, or POST it to /api/dcim/devices/ as text/csv. Every device is planned.`);
     step(3, `${F.modules} (${rowsText(rows.modules)}): Modules > Import, or POST it to /api/dcim/modules/ as text/csv. ` +
             "This creates each card's ports, so it comes before the cables.");
+    // A module in a bay of another module is a file of its own for each depth: one header cannot name rows of two depths (#1127).
+    (rows.modulesIn ?? []).forEach((n, k) => {
+      if (n) sub(`Then ${nautobotModuleFile(k + 1)} (${rowsText(n)}), the same way: ${k ? 'modules in a bay of a module of the file before' : 'modules in a bay of a module of that file'}.`);
+    });
     // With no cable rows there is nothing to run: no commands, and no warning about a file nobody will use.
     if (!rows.cables) step(4, `${F.cables} (${rowsText(rows.cables)}).`);
     else {
