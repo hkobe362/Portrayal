@@ -331,7 +331,7 @@ def regenerate_exports(root, out):
                 "--images", "--no-raster"]
         runs = [subprocess.Popen(base + extra, cwd=root, env=_env(),
                                  stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-                for extra in ([], ["--modules"])]
+                for extra in ([], ["--modules"], ["--racks"])]
         for p in runs:
             _, err = p.communicate()
             if p.returncode:
