@@ -83,6 +83,11 @@ test('a module type is found by its part number, slashes as dashes', () => {
   assert.equal(X.moduleTypePath(paths, 'A/B'), paths[2]);
   assert.equal(X.moduleTypePath(paths, 'X'), null);
   assert.equal(X.moduleTypePath(paths, ''), null);
+  // a contract with no part number is filed under its name, as the exporter does (#1025)
+  assert.equal(X.moduleTypePath(paths, '203945', 'A9K Slot Cover'), paths[0]);
+  assert.equal(X.moduleTypePath(paths, 'A/B', 'X'), paths[2]);
+  assert.equal(X.moduleTypePath(paths, '', 'A/B'), paths[2]);
+  assert.equal(X.moduleTypePath(paths, '203945', 'X'), null);
   assert.equal(X.partNumber({attrs: {model: 'A9K-3KW-AC'}}), 'A9K-3KW-AC');
   assert.equal(X.partNumber({attrs: {'part-number': 'P1'}}), 'P1');
   assert.equal(X.partNumber(null), '');

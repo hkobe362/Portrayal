@@ -799,11 +799,17 @@ export function yamlHead(text) {
 }
 
 // A module type's file is named for the part number (attrs.model), a "/"
-// in it written "-" (exporter.html reads it the same way).
-export function moduleTypePath(paths, model) {
-  if (!model) return null;
-  const want = [model, model.replace(/\//g, '-')];
-  return paths.find(p => p.includes('/module-types/') && want.includes(stemOf(p))) ?? null;
+// in it written "-" (exporter.html reads it the same way). A contract with no
+// attrs.model is filed under its name, which is why `name` is the second try.
+export function moduleTypePath(paths, model, name) {
+  const files = paths.filter(p => p.includes('/module-types/'));
+  for (const key of [model, name]) {
+    if (!key) continue;
+    const want = [key, key.replace(/\//g, '-')];
+    const hit = files.find(p => want.includes(stemOf(p)));
+    if (hit) return hit;
+  }
+  return null;
 }
 export const partNumber = comp => comp?.attrs?.model ?? comp?.attrs?.part ?? comp?.attrs?.['part-number']
   ?? comp?.attrs?.['vendor-sku'] ?? '';
