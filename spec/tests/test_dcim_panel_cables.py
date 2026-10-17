@@ -18,6 +18,11 @@ name; on NetBox they resolve, less the one adapter of each of 4 DCMs; on
 Nautobot, less the 4 DCMs, 4 types carry no glass there and the rest resolve
 whole. This file finds a type by its model OR its contract name, as the kit
 does, so it compares the names of all 63.
+
+A MODULE IN A BAY OF ANOTHER MODULE (#1024) is reached too: 28 of the 63 (the
+20 Fibrain holders in the XCU10 drawer, the 8 Smartoptics modules in the
+DCP-F-A22), named through the carrier's bay. The node sweep seats each and
+checks every name against the committed type files of both targets.
 """
 import json
 import os
