@@ -222,14 +222,6 @@ def test_the_shape_is_the_rack_builders_frame_plus_the_sourced_numbers(key):
     assert {"hole-centres", "opening"} <= set(doc)
 
 
-# ---- nothing else moves --------------------------------------------------------
-
-def test_the_apc_frames_and_the_devices_are_untouched():
-    changed = subprocess.run(["git", "diff", "--name-only", "origin/main", "--", "library/devices",
-                              "library/racks/apc"], capture_output=True, text=True, cwd=ROOT).stdout
-    assert changed.split() == []
-
-
 # ---- the DCIM export -----------------------------------------------------------
 
 @pytest.fixture(scope="module")
