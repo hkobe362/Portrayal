@@ -667,6 +667,24 @@ cabinets, wall and vertical, and desktop.
    The rack types are exported by `dcim_export.py --racks` to
    `library/exports/netbox/rack-types/<Manufacturer>/<model>.yaml`, with the
    Nautobot rack fields under `library/exports/nautobot/rack-types/`.
+   **Built (#935, `frames`):** `rack.json` gains `frames`, one row per product
+   keyed by its ref, written by `rack_index.py` from the compiled products. A row
+   holds the identity (`ref`, `vendor`, `name`, `version`, `major`,
+   `manufacturer`, `model`, `maturity`, `part-numbers`, `aliases`, `description`)
+   and the numbers the product states (`form`, `ru`, `numbering`, `width`,
+   `hole-centres`, `opening`, `holes`, `rails`, `max-device-depth`, `outer`,
+   `weight-kg`, `load`); a key the product lacks is absent. `points`,
+   `channels`, `enclosure`, `options` and `base` are not in the product schema
+   yet and arrive with the cabinets. The kit applies a product with
+   `frame.apply` and frees a frame with `frame.customise` (`kit/rack/frames.js`).
+   Applying writes `ref` and the frame keys the rack file already had, and
+   refuses a product that needs `width`, `numbering.start` or round holes, which
+   come with the rack file keys of section 9. While `ref` is set, a number the
+   product states is not edited (a product that states a number fixes it, the
+   generic shapes' stand-ins included); the rail depth is edited within its
+   range and step. A ref the catalogue lacks, or whose fixed numbers no longer
+   match, loads with a note and is drawn from the file's numbers.
+
 3. **Hosting.** `hosts:` on devices, `chassis.ears.holes`, and rack file
    version 4 with all of section 9's keys at once; setback (#908 and the
    paused site design) lands in the same version. Fit, describe, inspect and
