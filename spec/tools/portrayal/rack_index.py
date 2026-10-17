@@ -6,7 +6,8 @@ depth, how it mounts, whether its body is sheet, the cable capacity its vendor
 states, the ids a cable route can pass through on each view of its default
 configuration, where a device is not simply its envelope, the `solids` a
 cable may not pass through (rack_solids.py, docs/cable-lay-design.md section
-1.1), and the `trays` a cable lies on (section 2.1). The kit's rack/catalog.js reads it through `dist`, so a rack is
+1.1), and the `trays` a cable lies on (section 2.1). It also carries `frames`, the rack
+products a frame can be set from (docs/rack-products-design.md section 9). The kit's rack/catalog.js reads it through `dist`, so a rack is
 checked against the same numbers wherever it is built.
 
 Run by build.sh after the compiled faces and the indexes it reads exist.
@@ -92,6 +93,36 @@ def face_file(idx, name, config, view):
             if f:
                 return f
     return f"{name}.{config}.{view}.svg"
+
+
+# THE RACK PRODUCTS (`frames`, docs/rack-products-design.md section 9): one row
+# per product in library/racks/, keyed by its ref, for the Rack Builder to apply
+# to a frame. A row is the product's identity and its numbers as the product
+# states them: a key the product does not hold is absent from its row, never a
+# zero or a guess. Sources (datasheet, references, provenance, gaps) stay in the
+# product's own file. The rows are read from what racks_index.py compiled, so a
+# dist built without products has none.
+FRAME_ROW = ["ref", "vendor", "name", "version", "major", "manufacturer", "model", "maturity"]  # rack-products.json's row
+FRAME_LISTED = ["part-numbers", "description"]  # what a search finds a product by
+FRAME_NUMBERS = ["form", "ru", "numbering", "width", "hole-centres", "opening", "holes", "rails",
+                 "max-device-depth", "outer", "weight-kg", "load"]
+
+
+def frames(dist):
+    dist = Path(dist)
+    index = dist / "rack-products.json"
+    if not index.is_file():
+        return {}
+    out = {}
+    for r in sorted(json.loads(index.read_text())["racks"], key=lambda r: r["ref"]):
+        doc = json.loads((dist / r["file"]).read_text())
+        row = {k: r[k] for k in FRAME_ROW}
+        row.update({k: doc[k] for k in FRAME_LISTED if k in doc})
+        if r.get("aliases"):
+            row["aliases"] = r["aliases"]
+        row.update({k: doc[k] for k in FRAME_NUMBERS if k in doc})
+        out[r["ref"]] = row
+    return out
 
 
 def build(dist):
@@ -181,8 +212,8 @@ def build(dist):
                 entry["rings"] = depths
         out[d["name"]] = entry
     return {"format": FORMAT,
-            "generated-from": "devices.json and <name>.configs.json, by rack_index.py",
-            "devices": out}
+            "generated-from": "devices.json, <name>.configs.json and rack-products.json, by rack_index.py",
+            "devices": out, "frames": frames(dist)}
 
 
 def main() -> int:

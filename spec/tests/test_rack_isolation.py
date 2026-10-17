@@ -3,8 +3,8 @@
 `kind: rack` is additive. A device is still a thing placed in a rack, the
 Rack Builder's generic frames are still the only frames it offers, and the
 rack file (`rack.schema.json`, version 3) is byte for byte what it was: a rack
-product reaches the Rack Builder in a later step, as rack file version 4 with
-`frames` in `rack.json` (docs/rack-products-design.md sections 9 and 11).
+product reaches the Rack Builder through `frames` in `rack.json`, the one key
+`rack.json` gained, and `frame.ref` (docs/rack-products-design.md sections 9 and 11).
 
 The golden values below are the state before racks existed. A change to one of
 them is not a failure of this file but a decision, and belongs to the pull
@@ -70,11 +70,15 @@ def test_devices_json_lists_the_devices_and_no_rack(dist):
     assert not (racks & listed)
 
 
-def test_the_rack_builders_catalogue_has_no_product_frames_yet(dist):
+def test_the_rack_builders_catalogue_gains_frames_and_nothing_else(dist):
+    """`frames` (step 2 of the build order) is the one key rack.json gained for
+    rack products: the format stays 1 and the keys it had are the keys it has."""
     cat = json.loads((dist / "rack.json").read_text())
     assert cat["format"] == 1
-    assert "frames" not in cat, "product frames are step 3 of the build order, rack file version 4"
+    assert set(cat) == {"format", "generated-from", "devices", "frames"}
     assert "racks" not in cat
+    assert sorted(cat["frames"]) == sorted(
+        f"{libwalk.rack_key(p)}@1" for p in libwalk.iter_racks([LIB]))
 
 
 def test_components_json_lists_no_rack(dist):
