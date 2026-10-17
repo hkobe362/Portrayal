@@ -156,6 +156,12 @@ version and open a new empty `## Unreleased` above it, in the same pull
 request. The npm release above does not read the changelog and does not need
 this step.
 
+`preflight.py` is expected to pass on the release branch. Its `changelog` check
+takes the diff as a release when it deletes fragments, adds one `## <version>`
+heading to `CHANGELOG.md` carrying every deleted entry, and leaves
+`## Unreleased` empty. A branch that touches `library/`, `spec/` or `kit/` and
+is neither that nor adds a fragment still fails.
+
 **The strings that move at a release.** Four places name the version, and the
 release pull request moves them together:
 
