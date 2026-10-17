@@ -115,12 +115,71 @@ function findName(lists, name) {
 export const bayAt = (lists, position) => lists?.bays.find(b => b.position === position) ?? null;
 
 const MODULE = '/module/';
+
+// A MODULE'S BAY BY THE ID A DRAWING GIVES IT. The id is the last step of the
+// position a type file writes: NetBox `{module}/slot-1`, Nautobot `drawer/slot-1`
+// or a plain `mic0`. A bay with a blank position (Nautobot's pass-through) is
+// found by its name.
+const nestedBayAt = (lists, id) =>
+  lists?.bays.find(b => b.position.split('/').pop() === id && b.position !== '')
+  ?? lists?.bays.find(b => b.position === '' && b.name === id) ?? null;
+
+// A NAME A TYPE FILE WRITES, with its tokens filled in. `{module}` is the
+// position of the bay the module sits in, `{module.parent}` the position of the
+// bay the module above it sits in, and so on up. `positions` are the bays'
+// positions from the device's bay down, as they are installed; a blank one is
+// skipped, as Nautobot skips it when it names a port (#917). Null when a token
+// reaches above the device's bay.
+const TOKEN = /\{module((?:\.parent)*)\}/g;
+export function renderName(template, positions) {
+  const kept = positions.filter(Boolean);
+  let above = false;
+  const name = String(template).replace(TOKEN, (_, up) => {
+    const at = kept.length - 1 - up.length / '.parent'.length;
+    if (at < 0) above = true;
+    return kept[at] ?? '';
+  });
+  return above ? null : name;
+}
+// The name a type file lists for a port called `name` on the module, whatever
+// chain of tokens it puts in front: `{module}/1`, `{module.parent}/{module}/1`.
+const HEAD = /^(?:\{module(?:\.parent)*\}\/)+$/;
+const listedAs = (listed, name) => listed.find(t => t.endsWith(`/${name}`) && HEAD.test(t.slice(0, -name.length)));
+
+// WHAT IS SEATED AT A BAY PATH, level by level (#1024). `bayPath` is
+// `<bay>` for a bay of the device and `<bay>/module/<bay>` for a bay of the
+// module in it, to any depth. Each level's bay is found in the type file of
+// the module installed one level up, and its position is worked out as the DCIM
+// works it out: NetBox puts the parent's position in for `{module}`, Nautobot
+// copies the position as written. Returns {ok: true, bay, positions, module},
+// the bay of the last level, every level's position and the module type seated
+// at the last, or {ok: false, reason}.
+function seatChain(bayPath, device, moduleAt) {
+  const ids = bayPath.split(MODULE), positions = [];
+  let lists = device, bay = null, path = '';
+  for (const [k, id] of ids.entries()) {
+    if (k) {
+      lists = moduleAt(path);
+      if (!lists) return {ok: false, reason: `what is seated in ${path} has no module type`};
+    }
+    bay = k ? nestedBayAt(lists, id) : bayAt(lists, id);
+    if (!bay) return {ok: false, reason: `the ${k ? 'module' : 'device'} type ${lists.model} has no module bay at position ${id}`};
+    positions.push(k ? bay.position.replaceAll('{module}', positions[k - 1]) : bay.position);
+    path = k ? `${path}${MODULE}${id}` : id;
+  }
+  const module = moduleAt(bayPath);
+  if (!module) return {ok: false, reason: `what is seated in ${bayPath} has no module type`};
+  return {ok: true, bay, positions, module};
+}
+
 // WHAT A CABLE END IS CALLED IN THE DCIM, and which kind of component it is.
 // Never built by convention alone: the name must be in the matched type
 // file's own lists, and the list it is in gives the type.
 //   path      the end's port path on the drawing ("port-1", "slot-2/module/p0")
 //   device    typeLists of the item's device type, or null when it has none
-//   moduleAt  bay id -> typeLists of the module type seated there, or null
+//   moduleAt  bay path -> typeLists of the module type seated there, or null:
+//             the path of a bay of the device is its id (`drawer`), that of a
+//             bay of a module in it the drawing's own (`drawer/module/slot-1`)
 //   consoles  the paths of the console ports the device's drawing has
 //   ports     ports.js fibrePorts for the end, or null: the fibre ports the
 //             part at the path is in its module's type (below)
@@ -136,6 +195,13 @@ const MODULE = '/module/';
 // reason. Such an end answers `names` too: every port it lands on, in
 // position order, `name` being the first. An end with no `ports` (a cage, a
 // jack, a part the build published nothing for) is looked up by its own id.
+//
+// A MODULE INSIDE A MODULE (#1024) is named through every level. Its bay is
+// found in the type file of the module one level up, its position is worked
+// out as the DCIM works it out (seatChain), and the type file's own name for
+// the port has its `{module}` and `{module.parent}` filled in (renderName): a
+// Fibrain panel in the XCU10 drawer's slot-1, the drawer in the bay `drawer`,
+// has its adapter's port `drawer/slot-1/1` on both targets.
 export function resolveEnd({path, device, moduleAt = () => null, consoles = [], ports = null}) {
   if (!device) return {ok: false, reason: 'its device has no device type'};
   const p = String(path), at = p.indexOf(MODULE);
@@ -150,25 +216,31 @@ export function resolveEnd({path, device, moduleAt = () => null, consoles = [], 
     }
     return {ok: false, reason: `the device type ${device.model} lists no port named ${p}`};
   }
-  const bayId = p.slice(0, at), leaf = p.slice(at + MODULE.length);
-  if (leaf.includes(MODULE))
-    return {ok: false, reason: 'it is a port of a module inside a card, and the card has no module bay to import that module into'};
-  const bay = bayAt(device, bayId);
-  if (!bay) return {ok: false, reason: `the device type ${device.model} has no module bay at position ${bayId}`};
-  const module = moduleAt(bayId);
-  if (!module) return {ok: false, reason: `what is seated in ${bayId} has no module type`};
+  // THE LAST `/module/` ENDS THE BAY: a module inside a module is reached
+  // through each level's installed module (#1024), not left out.
+  const cut = p.lastIndexOf(MODULE), bayPath = p.slice(0, cut), leaf = p.slice(cut + MODULE.length);
+  const seat = seatChain(bayPath, device, moduleAt);
+  if (!seat.ok) return seat;
+  const {bay, positions, module} = seat;
+  // the name a port has once installed: the type file's own, its tokens filled in
+  const named = (section, port) => {
+    const listed = listedAs(module.sections[section], port);
+    return listed == null ? null : renderName(listed, positions);
+  };
   if (ports?.sections?.length) {
     if (ports.sections.length > 1)
       return {ok: false, reason: `${leaf} is ${andList(ports.sections.map(([s]) => KIND[TYPE_OF[s]] ?? s))} in the module type ${module.model}, and one end of a cable is one kind of port`};
     const [section, own] = ports.sections[0], type = TYPE_OF[section];
-    const gone = type ? own.find(n => !module.sections[section].includes(`{module}/${n}`)) : own[0];
+    const gone = type ? own.find(n => named(section, n) == null) : own[0];
     if (gone != null) return {ok: false, reason: `the module type ${module.model} lists no ${KIND[type] ? KIND[type].replace(/^an? /, '') : 'port'} named {module}/${gone}`};
-    const names = own.map(n => `${bay.position}/${n}`);
+    const names = own.map(n => named(section, n));
     return {ok: true, name: names[0], names, type, bay};
   }
-  const hit = findName(module, `{module}/${leaf}`);
-  if (!hit) return {ok: false, reason: `the module type ${module.model} lists no port named {module}/${leaf}`};
-  return {ok: true, name: `${bay.position}/${leaf}`, type: hit.type, bay};
+  for (const [section, type] of SECTIONS) {
+    const name = named(section, leaf);
+    if (name != null) return {ok: true, name, type, bay};
+  }
+  return {ok: false, reason: `the module type ${module.model} lists no port named {module}/${leaf}`};
 }
 
 // resolveEnd FOR EVERY END OF ONE RACK, with the catalogue asked for each
@@ -197,15 +269,26 @@ export const MODULE_COLUMNS = {
 // One row per part seated in a BAY (its path ends "/module") that has a module
 // type, on a device the devices file holds, in a bay the device type has at
 // that position. A part seated in a cage (an optic, a plug) is not a module:
-// the cage is the interface. A module inside a card is not written: no module
-// type here has a module bay of its own to import it into.
+// the cage is the interface.
+//
+// A MODULE IN A BAY OF ANOTHER MODULE (#1024) is written after the modules in
+// the device's bays, parents first, for NetBox: the cables on its ports name
+// ports that exist only once it is installed, and a cables file is taken whole
+// or not at all. Its `module_bay` is the bay's name as NetBox installs it
+// (`drawer/slot-1`, the parent's position put in for `{module}`), which is
+// unique on the device. Nautobot's module import names a bay by its device
+// (parent_module_bay__parent_device__name), and a bay of a module is on no
+// device, so such a module is left out with the bay to put it in; its cables
+// are still written, and import_cables.py says which ports it cannot find
+// until the module is installed.
 //   parts     [{itemId, path, ref}], what each device has seated (exports.js)
 //   names     uniqueNames(items); kept: the ids of the devices in the devices file
 //   deviceOf  item id -> typeLists of its device type, or null
 //   moduleOf  part ref -> {manufacturer, model, lists} of its module type, or null
 // `left` holds one sentence for each thing the file does not carry.
 export function moduleImportRows({target = 'netbox', parts, names, kept, deviceOf, moduleOf}) {
-  const rows = [], left = [], said = new Set();
+  const rows = [], left = [], said = new Set(), inside = [], written = new Set();
+  const seated = new Map(parts.map(q => [`${q.itemId}\0${q.path}`, q]));
   for (const p of parts) {
     if (!String(p.path).endsWith('/module')) continue;
     const type = moduleOf(p.ref);
@@ -217,10 +300,7 @@ export function moduleImportRows({target = 'netbox', parts, names, kept, deviceO
       said.add(p.itemId);
       continue;
     }
-    if (bayId.includes(MODULE)) {
-      left.push(`${device} ${bayId}: ${type.model} is not in the modules file. It is a module inside a card, and no module type here has a module bay to import it into.`);
-      continue;
-    }
+    if (bayId.includes(MODULE)) { inside.push({p, type, device, bayId}); continue; }
     const lists = deviceOf(p.itemId), bay = bayAt(lists, bayId);
     if (!bay) {
       left.push(`${device} ${bayId}: ${type.model} is not in the modules file. ` + (lists
@@ -228,10 +308,30 @@ export function moduleImportRows({target = 'netbox', parts, names, kept, deviceO
         : `${device} has no device type, so it has no module bays.`));
       continue;
     }
+    written.add(`${p.itemId}\0${p.path}`);
     rows.push(target === 'nautobot'
       ? {module_type__manufacturer__name: type.manufacturer, module_type__model: type.model,
          parent_module_bay__parent_device__name: device, parent_module_bay__name: bay.name, status__name: 'Planned'}
       : {device, module_bay: bay.name, module_type: type.model, status: 'planned'});
+  }
+  // outermost first, so that a module is installed before what sits in it
+  const depth = x => x.bayId.split(MODULE).length;
+  for (const {p, type, device, bayId} of inside.sort((a, b) => depth(a) - depth(b))) {
+    const lead = `${device} ${bayId}: ${type.model} is not in the modules file.`;
+    const above = bayId.slice(0, bayId.lastIndexOf(MODULE));
+    if (!written.has(`${p.itemId}\0${above}/module`)) {
+      left.push(`${lead} The module it sits in, at ${above}, is not in the modules file.`);
+      continue;
+    }
+    const typeAt = path => { const q = seated.get(`${p.itemId}\0${path}/module`); return q ? moduleOf(q.ref)?.lists ?? null : null; };
+    const at = seatChain(bayId, deviceOf(p.itemId), typeAt);
+    if (!at.ok) { left.push(`${lead} ${at.reason[0].toUpperCase()}${at.reason.slice(1)}.`); continue; }
+    if (target === 'nautobot') {
+      left.push(`${lead} It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay ${at.bay.name} of the module at ${above}.`);
+      continue;
+    }
+    written.add(`${p.itemId}\0${p.path}`);
+    rows.push({device, module_bay: at.bay.name.replaceAll('{module}', at.positions.at(-2)), module_type: type.model, status: 'planned'});
   }
   return {columns: MODULE_COLUMNS[target === 'nautobot' ? 'nautobot' : 'netbox'], rows, left};
 }

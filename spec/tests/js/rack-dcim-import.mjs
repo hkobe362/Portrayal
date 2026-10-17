@@ -86,11 +86,66 @@ test('an end that does not resolve says why, and gets no name', () => {
   assert.equal(why({path: 'slot-2/module/p0', device: asr}), 'what is seated in slot-2 has no module type');
   assert.equal(why({path: 'slot-2/module/p99', device: asr, moduleAt: () => card}),
     'the module type A9K-16X100GE-TR lists no port named {module}/p99');
+  // a module inside a module is reached through each level's module (#1024), and says which level fails
   assert.equal(why({path: 'slot-2/module/mic-0/module/p0', device: asr, moduleAt: () => card}),
-    'it is a port of a module inside a card, and the card has no module bay to import that module into');
+    'the module type A9K-16X100GE-TR has no module bay at position mic-0');
+  const carrier = D.typeLists('model: MPC\nmodule-bays:\n  - name: MIC 0\n    position: mic-0\n');
+  assert.equal(why({path: 'slot-2/module/mic-0/module/p0', device: asr, moduleAt: bay => (bay === 'slot-2' ? carrier : null)}),
+    'what is seated in slot-2/module/mic-0 has no module type');
+  assert.equal(why({path: 'slot-2/module/mic-0/module/p0', device: asr}), 'what is seated in slot-2 has no module type');
   // The Edgecore AS7326-56X draws port-57 where its type file lists "57": no convention bridges that.
   assert.equal(why({path: 'port-57', device: lists('netbox/device-types/Edgecore/7326-56X-O-48V-B.yaml')}),
     'the device type 7326-56X-O-48V-B lists no port named port-57');
+});
+
+// ── a module inside a module (#1024) ─────────────────────────────────────
+// The drawer of a Fibrain XCU10 sits in the device's bay `drawer`, and a holder in its slot-1. NetBox's type
+// files say `{module}/slot-1` for the bay and Nautobot's `drawer/slot-1`; both name the holder's port 3
+// `drawer/slot-1/3`.
+const XCU = target => ({device: lists(`${target}/device-types/Fibrain/XCU10-21IC.yaml`),
+  drawer: lists(`${target}/module-types/Fibrain/XCU10.yaml`), panel: lists(`${target}/module-types/Fibrain/XMI1051GA.yaml`)});
+
+for (const target of ['netbox', 'nautobot']) {
+  test(`${target}: a cable end on a module in a bay of a module is named through the drawer's bay and the holder's`, () => {
+    const {device, drawer, panel} = XCU(target);
+    const moduleAt = bay => ({'drawer': drawer, 'drawer/module/slot-1': panel, 'drawer/module/slot-3': panel}[bay] ?? null);
+    const at = (path, ports = null) => D.resolveEnd({path, device, moduleAt, ports});
+    const sc = at('drawer/module/slot-1/module/sc03', {part: 'sc03', back: false, sections: [['front-ports', ['3']]]});
+    assert.deepEqual([sc.ok, sc.name, sc.names, sc.type], [true, 'drawer/slot-1/3', ['drawer/slot-1/3'], 'dcim.frontport']);
+    assert.equal(sc.bay.position, target === 'netbox' ? '{module}/slot-1' : 'drawer/slot-1');
+    const back = at('drawer/module/slot-3/module/b01', {part: 'b01', back: true, sections: [['rear-ports', ['B01-1']]]});
+    assert.deepEqual([back.ok, back.name, back.type], [true, 'drawer/slot-3/B01-1', 'dcim.rearport']);
+    // an end with no published ports is looked up by its own id, as one level down
+    assert.deepEqual(at('drawer/module/slot-1/module/6'), {ok: true, name: 'drawer/slot-1/6', type: 'dcim.frontport', bay: sc.bay});
+  });
+
+  test(`${target}: the reason is the level that fails, never "the card has no module bay"`, () => {
+    const {device, drawer, panel} = XCU(target);
+    const why = (path, held) => { const r = D.resolveEnd({path, device, moduleAt: bay => held[bay] ?? null}); assert.equal(r.ok, false); return r.reason; };
+    assert.equal(why('drawer/module/slot-1/module/sc03', {}), 'what is seated in drawer has no module type');
+    assert.equal(why('drawer/module/slot-1/module/sc03', {drawer}), 'what is seated in drawer/module/slot-1 has no module type');
+    assert.equal(why('drawer/module/slot-9/module/sc03', {drawer, 'drawer/module/slot-9': panel}),
+      'the module type XCU10 has no module bay at position slot-9');
+    assert.equal(why('drawer/module/slot-1/module/sc99', {drawer, 'drawer/module/slot-1': panel}),
+      'the module type XMI1051GA lists no port named {module}/sc99');
+  });
+}
+
+test('a module inside a module is named by the bay chain Nautobot renders, and by the position NetBox renders', () => {
+  // A Smartoptics line card in the bay slot-3 of a chassis holds a DCM in its ppm-1. NetBox's card has the
+  // bay `{module}/ppm-1` and the DCM `{module}/x`; Nautobot's has `ppm-1` and the DCM `{module.parent}/{module}/x`.
+  const chassis = D.typeLists('model: DCP-404\nmodule-bays:\n  - name: Slot 3\n    position: slot-3\n');
+  for (const target of ['netbox', 'nautobot']) {
+    const card = lists(`${target}/module-types/Smartoptics/DCP-F-A22.yaml`), dcm = lists(`${target}/module-types/Smartoptics/PPM-DCM10-100GHz.yaml`);
+    const r = D.resolveEnd({path: 'slot-3/module/ppm-1/module/dcm', device: chassis, moduleAt: bay => ({'slot-3': card, 'slot-3/module/ppm-1': dcm}[bay] ?? null),
+                            ports: {part: 'dcm', back: false, sections: [['front-ports', ['1']]]}});
+    assert.deepEqual([r.ok, r.names], [true, ['slot-3/ppm-1/1']], target);
+  }
+  // a token that reaches above the device's bay names nothing
+  assert.equal(D.renderName('{module.parent}/{module}/x', ['slot-3']), null);
+  assert.equal(D.renderName('{module.parent}/{module}/x', ['slot-3', 'ppm-1']), 'slot-3/ppm-1/x');
+  assert.equal(D.renderName('{module}/x', ['slot-3', '', 'ppm-1']), 'ppm-1/x', 'a blank position is skipped, as Nautobot skips it');
+  assert.equal(D.renderName('{module.parent}/{module}/x', ['slot-3', '', 'ppm-1']), 'slot-3/ppm-1/x');
 });
 
 test('the list a name is in gives the end its type: a cassette has front and rear ports, not interfaces', () => {
@@ -239,8 +294,37 @@ test('the modules file names a bay by its name, found by its position; what it c
   assert.deepEqual(got.rows, [{device: 'leaf-1', module_bay: 'Fan 1', module_type: 'FAN-F', status: 'planned'}]);
   assert.deepEqual(got.left, [
     'leaf-1 nowhere: FAN-F is not in the modules file. The device type 7726-32X-O-AC-F has no module bay at position nowhere.',
-    'core-1 slot-2/module/mic-0: FAN-F is not in the modules file. It is a module inside a card, and no module type here has a module bay to import it into.',
-    'The modules of demarc-i3 are not in the modules file: demarc-i3 is not in the devices file.']);
+    'The modules of demarc-i3 are not in the modules file: demarc-i3 is not in the devices file.',
+    // a module in a module is written once the module it sits in is (#1024); here that one is not a part of the rack
+    'core-1 slot-2/module/mic-0: FAN-F is not in the modules file. The module it sits in, at slot-2, is not in the modules file.']);
+});
+
+test('the modules file writes a module in a bay of another module after the one it sits in; Nautobot cannot name that bay (#1024)', () => {
+  const drawer = {manufacturer: 'Fibrain', model: 'XCU10', lists: null}, holder = {manufacturer: 'Fibrain', model: 'XMI1051GA', lists: null};
+  const names = new Map([['i1', {name: 'xcu-1'}]]);
+  // the nested part is listed BEFORE its drawer: the order of the rows does not follow the order of the parts
+  const parts = [{itemId: 'i1', path: 'drawer/module/slot-2/module', ref: 'holder'}, {itemId: 'i1', path: 'drawer/module/slot-1/module', ref: 'holder'},
+                 {itemId: 'i1', path: 'drawer/module', ref: 'drawer'}, {itemId: 'i1', path: 'drawer/module/slot-1/module/sc01-occupant', ref: 'plug'}];
+  for (const target of ['netbox', 'nautobot']) {
+    const types = {drawer: {...drawer, lists: lists(`${target}/module-types/Fibrain/XCU10.yaml`)},
+                   holder: {...holder, lists: lists(`${target}/module-types/Fibrain/XMI1051GA.yaml`)}};
+    const got = D.moduleImportRows({target, parts, names, kept: new Set(['i1']),
+      deviceOf: () => lists(`${target}/device-types/Fibrain/XCU10-21IC.yaml`), moduleOf: ref => types[ref] ?? null});
+    if (target === 'netbox') {
+      assert.deepEqual(got.rows.map(r => [r.module_bay, r.module_type]),
+        [['drawer', 'XCU10'], ['drawer/slot-2', 'XMI1051GA'], ['drawer/slot-1', 'XMI1051GA']]);
+      assert.deepEqual(got.left, []);
+    } else {
+      assert.deepEqual(got.rows.map(r => [r.parent_module_bay__name, r.module_type__model]), [['drawer', 'XCU10']]);
+      assert.deepEqual(got.left, [
+        "xcu-1 drawer/module/slot-2: XMI1051GA is not in the modules file. It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay slot-2 of the module at drawer.",
+        "xcu-1 drawer/module/slot-1: XMI1051GA is not in the modules file. It sits in a bay of another module, which Nautobot's module import cannot name: install it in the module bay slot-1 of the module at drawer."]);
+    }
+  }
+  // the module it sits in must be a row of the file, else the bay is not there to install it in
+  const lonely = D.moduleImportRows({target: 'netbox', parts: parts.slice(0, 2), names, kept: new Set(['i1']),
+    deviceOf: () => lists('netbox/device-types/Fibrain/XCU10-21IC.yaml'), moduleOf: () => ({...holder, lists: null})});
+  assert.deepEqual([lonely.rows, lonely.left.length], [[], 2]);
 });
 
 test('media become cable types both targets accepted; anything else is blank', () => {
