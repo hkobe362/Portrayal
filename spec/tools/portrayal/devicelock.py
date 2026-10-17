@@ -1342,7 +1342,9 @@ def orphan_rack_locks(library: pathlib.Path):
 def check_racks(library: pathlib.Path):
     findings = []
     # A DELETED RACK TAKES A REF OUT FROM UNDER EVERY SAVED RACK FILE, and the
-    # walk below cannot see it: its lock is the only trace.
+    # walk below cannot see it: its lock is the only trace. PARTIAL: the lock
+    # lives in the rack's directory, so this sees a rack whose manifest alone
+    # was removed; a whole directory removed is a deletion in the diff.
     for f in orphan_rack_locks(library):
         key = f"{f.parent.parent.name}/{f.parent.name}"
         findings.append((key, "removed",

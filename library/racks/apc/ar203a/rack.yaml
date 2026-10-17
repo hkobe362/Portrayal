@@ -77,8 +77,8 @@ provenance:
     confidence: datasheet
     note: >-
       "Maximum Mounting Depth 29.1 in (739.9 mm)" in the data sheet, with the
-      same rounding as the rail depth. The FS-authored sheet for the same rack
-      says 740 mm.
+      same rounding as the rail depth; 740 mm is the length of the side frame
+      brackets in the user guide.
   outer:
     confidence: datasheet
     note: >-
