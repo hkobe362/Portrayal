@@ -72,7 +72,8 @@ the sources show). The user loads `base/organization.yml`, `base/location.yml`,
 `base/dcim.yml` (and `base/ipam.yml`, since `dcim.yml` names `IpamIPAddress` as
 a peer), then `extensions/location_site` (a `LocationSite`, which the rack
 needs as its parent), `extensions/rack`, `extensions/cable`,
-`extensions/device_module` and `extensions/patch_panel`. They also load one small
+`extensions/device_module`, `extensions/module_port` (the only file that defines
+`DcimModulePort`) and `extensions/patch_panel`. They also load one small
 Portrayal overlay (section 3.9) for facts no library node has.
 
 | Portrayal holds | A | B | C |
@@ -84,7 +85,7 @@ Portrayal overlay (section 3.9) for facts no library node has.
 | Racks with U positions | position and face on `DcimPhysicalDevice`; the rack is ours | unknown | yes (`LocationRack`, `height`; device `position`, `rack_face`, `location`) |
 | Cables | ours | unknown | yes (`DcimCable`) |
 | Patch panels | ours | unknown | yes (`DcimPatchPanel`, front and rear interfaces) |
-| What the user loads first | `base/*` plus our file | their own | `base/*`, five extensions, our overlay |
+| What the user loads first | `base/*` plus our file | their own | `base/*`, six extensions, our overlay |
 | Risk | drift from the library | exporter not testable | the library is experimental and can change |
 
 ## 3. The mapping, for choice C
@@ -146,7 +147,7 @@ A placed device is `DcimDevice`, which inherits `DcimPhysicalDevice`.
 |---|---|---|
 | device name | `DcimDevice.name` (unique) | Unique across the whole instance, not per rack. |
 | the device's type | `device_type` (relationship to `DcimDeviceType`, optional) | Written by name. |
-| lowest U, bottom-up | `position` (`Number`, "Lowest unit") | The NetBox rows floor a half-unit position; so would this. |
+| lowest U, bottom-up | `position` (`Number`, "Lowest unit") | The Nautobot rows floor a half-unit position; the NetBox rows write it as is. `Number` cannot hold a half, so this floors too. |
 | `face` | `rack_face` (`front` or `rear`, required, default `front`) | One to one. |
 | the rack | `location`: a relationship to `LocationHosting`, written as `kind: LocationRack` plus the rack's name and site | There is no `rack` field. The rack *is* the location. |
 | zero-U, DIN rail, wall boxes | `position` left empty | As in the NetBox rows (`position: ''`). |
@@ -244,7 +245,7 @@ The extension `device_module` gives:
 | `type` (`CABLE_TYPE`) | `cable_type` | `smf-os2`, `mmf-om3`, `mmf-om4`, `mmf-om5`, `cat6`, `cat6a`, `dac-passive`, `aoc` become `smf_os2`, `mmf_om3`, `mmf_om4`, `mmf_om5`, `cat6`, `cat6a`, `dac_passive`, `aoc`. All eight exist in the dropdown. |
 | `status` (`planned`) | `status` (`connected`, `planned`) | One to one. |
 | `label` | `label` (unique) | Two cables with one label collide, so the export must check labels are unique. |
-| `color` (six hex digits) | `color` (a dropdown of 26 named colours) | Written only when the hex equals one of the dropdown's own values; otherwise left out. |
+| `color` (six hex digits) | `color` (a dropdown of 26 named colours) | The dropdown's values are names (`red`, `dark_green`); each choice carries a hex in its own `color` field. The name is written only when the cable's hex equals a choice's hex; otherwise it is left out. |
 | `length`, `length_unit` (m or ft) | `length` ("Length (in cm)", `Number`) | Converted to centimetres and rounded up, as `importLength` already rounds up. |
 | `description`, bundle name | no field | Left out. The cable schedule still lists bundles. |
 
@@ -296,22 +297,23 @@ instance-from-type case; its docs were not read.
 ## 4. Recommendation (a proposal; the owner picks at merge)
 
 **Target choice C: the library's DCIM schema with its own `rack`, `cable`,
-`device_module`, `patch_panel` and `location_site` extensions, plus the
+`device_module`, `module_port`, `patch_panel` and `location_site` extensions, plus the
 two-attribute Portrayal overlay.**
 
 Reasons:
 
-1. It takes three of the four things with no schema work of ours: racks with U
-   positions (`LocationRack`, `position`, `rack_face`), cables (`DcimCable`)
-   and module bays. Choice A would rewrite those files and drift from them.
+1. It takes racks with U positions (`LocationRack`, `position`, `rack_face`),
+   cables (`DcimCable`) and the device types' bays and modules with no schema
+   work of ours. Choice A would rewrite those files and drift from them.
 2. It is one schema, so the export has one set of node names and can be tested.
    Choice B cannot be, and every user's mapping would differ.
 3. The vocabulary the export needs has a precedent in the library itself
    (`DcimModulePort.port_type`, a `Text` holding the NetBox slug). The type
    gap is closed with an attribute, not a re-design.
-4. It is the only choice that follows what #1115 asks: "Done when device
-   types, placed devices and interfaces ... load into an Infrahub instance
-   with the chosen schema".
+4. It meets #1115's "Done when" (device types, placed devices and interfaces
+   load into an Infrahub instance with the chosen schema) with a schema whose
+   node names are fixed and checkable. A and B meet it too, with less to test
+   against.
 
 Risks: the library says it is experimental, so names can change; and a user
 who already runs their own schema must either add these extensions or
