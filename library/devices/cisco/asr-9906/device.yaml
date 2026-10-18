@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: asr-9906
-version: 1.1.0
+version: 1.2.0
 maturity: modelled
 manufacturer: Cisco
 model: ASR 9906
@@ -222,6 +222,16 @@ provenance:
       fabric with the ASR 9910 and 9906 fabric cards. The RSP440 and RSP-8G are not here:
       their datasheets (c78-674143 Table 3, c78-500699 Table 3) name only the ASR 9904, 9010
       and 9006. Added for roc-ops/Portrayal#262
+  modular-line-card-support:
+    confidence: datasheet
+    note: >-
+      datasheet - the four line card slots, 1 to 4, take the ASR 9000 400G and 200G modular line
+      cards (A9K-MOD400-SE, -TR and A9K-MOD200-SE, -TR). The data sheet c78-735809 names this
+      chassis twice: p4, Features and benefits, and p6, Table 2, Chassis compatibility, which
+      lists the ASR 9906 among seven routers. Table 2 (p7) gives the ASR 9906 a maximum of 4 of
+      these cards, and this chassis has 4 line card slots. The two RSP slots, 0 and 5, do not take
+      them. The A9K-MOD80 and A9K-MOD160 are not in that data sheet and are not added here. Added
+      for roc-ops/Portrayal#885
   card-orientation:
     confidence: datasheet
     note: >-
@@ -542,10 +552,10 @@ views:
     components:
       bays:
         - {id: slot-0, at: [72.605, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a9k-rsp880-lt-se@2', 'cisco/a9k-rsp880-lt-tr@2', 'cisco/a99-rsp-se@2', 'cisco/a9k-rsp5-se@2', 'cisco/a9k-rsp5-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 0, default: cisco/a9k-slot-cover@1}
-        - {id: slot-1, at: [116.025, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 1, default: cisco/a9k-slot-cover@1}
-        - {id: slot-2, at: [159.445, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 2, default: cisco/a9k-slot-cover@1}
-        - {id: slot-3, at: [202.885, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 3, default: cisco/a9k-slot-cover@1}
-        - {id: slot-4, at: [246.285, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 4, default: cisco/a9k-slot-cover@1}
+        - {id: slot-1, at: [116.025, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-mod200-se@2', 'cisco/a9k-mod200-tr@2', 'cisco/a9k-mod400-se@2', 'cisco/a9k-mod400-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 1, default: cisco/a9k-slot-cover@1}
+        - {id: slot-2, at: [159.445, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-mod200-se@2', 'cisco/a9k-mod200-tr@2', 'cisco/a9k-mod400-se@2', 'cisco/a9k-mod400-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 2, default: cisco/a9k-slot-cover@1}
+        - {id: slot-3, at: [202.885, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-mod200-se@2', 'cisco/a9k-mod200-tr@2', 'cisco/a9k-mod400-se@2', 'cisco/a9k-mod400-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 3, default: cisco/a9k-slot-cover@1}
+        - {id: slot-4, at: [246.285, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a99-10x400ge-x-se@2', 'cisco/a99-10x400ge-x-tr@2', 'cisco/a99-32x100ge-tr@1', 'cisco/a99-32x100ge-x-se@1', 'cisco/a99-32x100ge-x-tr@1', 'cisco/a99-4hg-flex-se@2', 'cisco/a99-4hg-flex-tr@2', 'cisco/a9k-16x100ge-tr@1', 'cisco/a9k-20hg-flex-se@1', 'cisco/a9k-20hg-flex-tr@1', 'cisco/a9k-24x10ge-1g-se@1', 'cisco/a9k-48x10ge-1g-se@1', 'cisco/a9k-4hg-flex-se@2', 'cisco/a9k-4hg-flex-tr@2', 'cisco/a9k-4x100ge@1', 'cisco/a9k-8hg-flex-se@1', 'cisco/a9k-8hg-flex-tr@1', 'cisco/a9k-mod200-se@2', 'cisco/a9k-mod200-tr@2', 'cisco/a9k-mod400-se@2', 'cisco/a9k-mod400-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 4, default: cisco/a9k-slot-cover@1}
         - {id: slot-5, at: [289.705, 78.4], size: {w: 41.4, h: 395.7}, opening: {w: 41.4, h: 355.6}, accepts: ['cisco/a9k-rsp880-lt-se@2', 'cisco/a9k-rsp880-lt-tr@2', 'cisco/a99-rsp-se@2', 'cisco/a9k-rsp5-se@2', 'cisco/a9k-rsp5-tr@2', 'cisco/a9k-slot-cover@1'], group: slots, rel-pos: 5, default: cisco/a9k-slot-cover@1}
       placements:
         - {id: esd-jack, ref: common/esd-jack@1, at: [351.5, 511.5], for: chassis, group: grounding, rel-pos: 0}
