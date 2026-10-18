@@ -1023,10 +1023,7 @@ module bay, a guard seat and a slot that accepts nothing do not land
   nothing is guessed. **How a page names a part**, in the `holder.part` of an
   end's facts: by its `attrs.model`, else its ref's name in capitals
   (`celestica/psu-r3059-f8001@1` is `PSU-R3059-F8001`), exactly as the kit
-  does. For a supply in a bay that only its default fills, the kit hears the
-  page only where that name is the part the bay ships with; a page that hands
-  in a ref for a part with no model is not heard, and the end stays loose.
-  **A page supplies `drawnAt` before it offers power
+  does. **A page supplies `drawnAt` before it offers power
   cabling**: without it an outlet-to-outlet or inlet-to-inlet cord between
   two devices' own slots gets no warning.
 - **The DCIM cables file** leaves a ground wire out by name, and a power
