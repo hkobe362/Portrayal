@@ -1121,9 +1121,39 @@ kinds:
 - **A lane has no depth.** It runs on the rail plane, so a cable from a plug
   to a lane turns back toward the rail. The run-out gives that turn its
   leg; it does not put the lane where a gutter's cables are.
-- **A plug is a leg.** The measure gives a corner at a plug's end the whole
-  reach to bend in, as the bundle check gives a leg to a trunk's end. A boot
-  bends, a plug body does not, and the kit does not tell them apart.
+- **A plug is a leg, except where it is known to be rigid (#985).** A plug
+  body does not bend and a boot does, and the kit tells them apart only
+  where a cited drawing gives the split (`PLUG_SPLIT`, beside `PLUG_REACH`
+  in `kit/rack/route.js`):
+  - **DAC and AOC: all rigid.** Amphenol C-NDAAFR-0099, view RADIUS FROM END
+    OF DIECAST, gives 45 MIN required to bend the cable, measured from the
+    diecast rear and *including the boot*. The head stands 19.8 out of the
+    cage (`generic/qsfp-cable@1`) and 19.8 + 45 is the 64.8 mm reach, so the
+    whole reach is rigid and the boot adds none. The reach point is flagged
+    `rigid_mm: 64.8`; a corner at it has no leg in the plug and no room, and
+    `cornersOf` measures the first leg from where the rigid part ends. So
+    the cable runs on straight past the reach point to a lead point (the
+    run-out of 3.4, half a radius to three for a rigid plug) and turns
+    there. Where no run-out gives the turn its room, the corner at the reach
+    point is a finding with no room (`room_mm` 0).
+  - **LC, copper RJ45 and power: not split yet**, so the whole reach is a
+    leg, as before. LC: the boot's 15.1 mm is from SENKO DS-LC-000023 A
+    p.3, but the plug's 12.5 mm is an estimate (bracketed 11.6 to 13.4 by
+    DS-LC-000004), and no cited drawing gives a boot bend radius. Copper:
+    the boot's 26.4 mm is from EASE J0072 A, the plug's 13.0 mm is an
+    estimate, and no cited drawing gives a boot bend radius. Power: no cited
+    drawing gives a boot figure. A split needs the boot's length and
+    bend radius from a drawing, and the plug's rigid length from one too.
+    No figure here is estimated, and no boot bend radius is written.
+  - **A reach the page gives as a number** (`ctx.plugReachOf`, from the
+    part's `cablePoints`) cannot say how much of it is rigid, so it is
+    measured as before: the whole of it a leg. A page that gives the reach of
+    a DAC or an AOC measures it as before until the part can say.
+
+  A turn at a DAC's or an AOC's plug end that the old measure passed on the
+  plug's 64.8 mm now needs a lead point, or is a finding, on every saved
+  rack with such a cord: routed lengths, stock sizes and bend findings change
+  at the next measure (#985, one-way).
 - **A tray stretch** (2.1) keeps its rings' approach points at the radius
   and `CLEAR`: a cable along a tray passes its rings straight, and rises
   onto each sill by a drop's tangent points. A stretch pinned to the held
@@ -2361,9 +2391,9 @@ published file or a saved rack file uses it.
 | the ranking of `managerOf` (hosted, then a standalone manager, with its tie-break by port row, then a manager on a neighbour, then a neighbour with guides) | kit | automatic routes of saved racks follow it, and their routed lengths with them |
 | the version-4 table of the rack products note gaining `states`, `readings`, the PDU bracket key, `slack`, `lay` and `roll` | `docs/rack-products-design.md` section 9, rack file version 4 | one bump carries them all; a key left out needs a version 5 |
 | the stored slack counting in the routed length | kit | a saved routed length and stock size depend on it |
-| routed lengths changing on saved racks: detours, the plug's reach (1.5), cables resting at the floor and at the ring sill, ring passes from approach points and solid rings and zero-U parts met by the tube (3.3), room for the bends (3.4), the end allowance by media (1.6), positions in the lay, the face of each tray, slack | kit | stored routed lengths and stock sizes move on the next measure; an ordered stock length may no longer match |
+| routed lengths changing on saved racks: detours, the plug's reach (1.5) and a DAC's or an AOC's plug taken as rigid (1.5, #985), cables resting at the floor and at the ring sill, ring passes from approach points and solid rings and zero-U parts met by the tube (3.3), room for the bends (3.4), the end allowance by media (1.6), positions in the lay, the face of each tray, slack | kit | stored routed lengths and stock sizes move on the next measure; an ordered stock length may no longer match |
 | the lane moving outboard of a zero-U part that stands in the gutter and carries no lane (a zero-U PDU), and routed lengths changing beside one | kit (`laneXAt`), drawings | every route on that lane is longer, and a saved length moves on the next measure; a drawing that places lanes itself must follow |
-| the reach point (`at: 'reach'` with `end`) in `routePath`, `ctx.plugReachOf` and `PLUG_REACH` (the helpers that compute them stay internal), with the plug outside the face in the path (1.5) | kit API | a page passes `plugReachOf` and reads the points by these names; moving the plug into the allowance later would change every length again |
+| the reach point (`at: 'reach'` with `end`, and `rigid_mm` on a DAC's or an AOC's, #985) in `routePath`, `ctx.plugReachOf`, `PLUG_REACH` and `PLUG_SPLIT` (the helpers that compute them stay internal), with the plug outside the face in the path (1.5) | kit API | a page passes `plugReachOf` and reads the points by these names; moving the plug into the allowance later would change every length again |
 | the end allowance by media, `END_ALLOWANCE_BY_MEDIA` (the table: the plug inside the port and the maker's short tolerance, never slack), `endAllowance(cable)` and the path's `allowance` (what a length adds an end: the table's figure and, until #949 step 4, the temporary dressing allowance of 0.1 m, which is not exported) (1.6); `END_ALLOWANCE_M` is gone | kit API | a page reads the table by these names, and every routed length and stock size depends on the figures; removing the dressing allowance shortens every routed length by 0.2 m |
 | `crosses-body` (with `part` and, for a held-face stack, `face`), `unheld` and the tray findings, `bodyFindings` | kit API, agent output | agents and pages read the kinds |
 | the public subpath `@portrayal/kit/rack/solids` (`solidsOf`, `legCrossings`, `detour` with its `room`, `CLEAR`) | kit package exports | a consumer imports it by that path and those names; a rename or removal is a breaking kit release |

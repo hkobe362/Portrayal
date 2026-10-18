@@ -575,6 +575,17 @@ into a dog-leg rather than adding the plug again. **Routed lengths change in
 0.13.0** on every routed cable, almost all longer: by what the dog-leg out of each plug adds,
 and by far more where the reach puts a leg over a tray floor.
 
+**A DAC's or an AOC's plug is rigid (#985).** `PLUG_SPLIT`, beside
+`PLUG_REACH`, gives a media's reach as a rigid length and a boot length;
+only a DAC and an AOC are split (all 64.8 rigid, Amphenol C-NDAAFR-0099: 45
+MIN required to bend, boot included), and LC, copper and power are `null`,
+"not split yet", and measured whole as before. The reach point of a rigid
+plug has `rigid_mm`, and `cornersOf` takes the leg into the first corner
+from where the rigid part ends, so a turn at the reach point has no room and
+the cable runs on to a lead point before it turns. A reach the page gives as
+a number is measured whole as before. **Routed lengths, stock sizes and bend
+findings change for DAC and AOC cords** at the next measure.
+
 A routed length is the path plus an **end allowance** at each end, by the
 cable's media (#962, docs/cable-lay-design.md section 1.6).
 `END_ALLOWANCE_BY_MEDIA` is the sourced table, in metres an end (its name

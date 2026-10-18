@@ -38,6 +38,11 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // record gained `straight` and `few`, a trunk is measured along its members'
 // paths, and a place half way between two tenths of a millimetre always
 // rounds up (bundles.js mm1).
+// RECORDED AGAIN FOR #985, which moves the answers of a DAC's or an AOC's
+// cord wherever the page gives no number for its reach (a plug that cannot
+// bend, PLUG_SPLIT): the generated racks of bend-room-sample (`sample-N`), and
+// only they, since every other rack here is LC, or gives the reach as a number
+// as speed-fixture does. 1,259 of the 3,094 answers moved.
 test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);
