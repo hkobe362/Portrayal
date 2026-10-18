@@ -116,10 +116,12 @@ OLD_SHIFT = {"stud-tr": (0.0, 0.0), "stud-bl": (-15.3, 15.3), "stud-br": (0.0, 1
 # face, 3 -> 4 on 3 -> 4 devices: the grounding stud its spec sheet calls the
 # rear-panel grounding lug, one threaded stud under a hex nut and no pair, so
 # a single stud is the part and a ring lug lands on it.
+# The seven ReadyLinks GL-x siblings (#763) each place the GL-12xB-240D's rear
+# stud again, 4 -> 11 on 4 -> 11 devices.
 CENSUS = {
     "common/ground-lug@1": (35, 23),
     "common/ground-screw@1": (10, 4),
-    "common/ground-stud@1": (4, 4),
+    "common/ground-stud@1": (11, 11),
     CASA: (1, 1),
 }
 # juniper/mx-ground-stud@1 IS PLACED BY NO DEVICE SINCE #828: the five MX
@@ -398,8 +400,8 @@ def test_the_census_of_ground_stud_placements(placed):
     got = {ref: (n, len(devs)) for ref, (n, devs) in counts.items()}
     assert got == CENSUS
     assert all(n > 0 and d > 0 for n, d in got.values())
-    assert sum(n for n, _ in got.values()) == 50
-    assert len({where for where, _, _ in placed}) == 32
+    assert sum(n for n, _ in got.values()) == 57
+    assert len({where for where, _, _ in placed}) == 39
     # the MX stud is still a part, composed twice by each MX pair host, and no
     # device places it straight on a face any more
     assert "juniper/mx-ground-stud@1" not in got
@@ -441,7 +443,7 @@ def test_every_single_stud_placement_is_a_slot_of_its_device_offering_the_lug(pl
         assert c["mate"] == pytest.approx(want, abs=EPS)
         seen += 1
     # every placement of the census but the Casa terminal's one
-    assert seen == 49
+    assert seen == 56
 
 
 def test_the_only_turned_placements_are_turned_90(placed):
