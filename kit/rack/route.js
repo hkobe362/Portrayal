@@ -165,7 +165,7 @@ function through(m, pane, portX, side, crossing, ctx, room = null) {
 // between when its centre is, the ends included: not the half-depth reach of
 // `through`, which takes a ring whose centre is just behind a port on the way
 // out to a gutter. Here the cable turns toward the other port at once, and a
-// ring behind it is a step back the patch does not need (on the owner's rack
+// ring behind it is a step back the patch does not need (on the reference rack of #949
 // of #949, a leaf port 3.1 mm short of a ring's centre, cabled away from it,
 // measured 5.5 cm longer through it, and a stock size). A ring outside the
 // stretch is left alone; with no ring between, the cord goes through the one
@@ -190,7 +190,7 @@ function along(m, pane, ax, bx, ctx, passes = null, room = null, pick = null) {
       const lo = Math.max(0, i), hi = j < 0 ? between.length - 1 : j;
       return (lo <= hi ? between.slice(lo, hi + 1) : between).map(g => ({item: m.id, via: g.via}));
     }
-    // NO RING BETWEEN (owner's decision, 2026-10-09): a ring holds the cord
+    // NO RING BETWEEN (decided 2026-10-09): a ring holds the cord
     // even where it does not turn it, so the route is never direct: the ring
     // nearest the middle of the two ports, of two as near the one on end a's
     // side. A ring outside the stretch can be one the cord would enter and
@@ -454,19 +454,19 @@ function leadInputs(rack, cable, end, m, g, s, ctx) {
   if (!port || !c || !ring || ring.run !== 'x') return null;
   const diameter = cableDiameter(cable, ctx), r = diameter / 2;
   const need = bendOf(cable, ctx);
-  const mm = plugReach(cable, end, ctx);
+  const {mm, rigid} = plugOf(cable, end, ctx);
   const p = mm > 0 ? reachPoint(rack, end, port, mm) : port;
   // the ring where the cable lies in it: on its sill, as layInputs puts it
   const open = ringOpening(rack, w, ctx);
   if (open) c = {...c, y: open.box.y0 + r, z: railSide(open.box.z0, open.box.z1, railZOf(rack, w.item), r)};
   const others = open ? traysOf(rack, ctx).filter(t => t.item === m.id).flatMap(t => t.rings).filter(o => o.via !== g.via && o.run === 'x') : [];
-  const key = {port: {x: port.x, y: port.y, z: port.z}, p: {x: p.x, y: p.y, z: p.z}, mm, diameter, need, c: {x: c.x, y: c.y, z: c.z}, depth: ring.depth,
+  const key = {port: {x: port.x, y: port.y, z: port.z}, p: {x: p.x, y: p.y, z: p.z}, mm, ...(rigid > 0 ? {rigid} : {}), diameter, need, c: {x: c.x, y: c.y, z: c.z}, depth: ring.depth,
     open: !!open, s, item: m.id, via: g.via};
   return {...key, key, others};
 }
 // The test itself, from leadInputs' answer and the world.
 function leadFrom(inp, world) {
-  const {port, p, mm, diameter, need, c, depth, open, s, others} = inp, r = diameter / 2, base = r + CLEAR;
+  const {port, p, mm, rigid = 0, diameter, need, c, depth, open, s, others} = inp, r = diameter / 2, base = r + CLEAR;
   const bend = Math.min(need, ROOM_MAX);
   const half = depth / 2, entry = {...c, x: c.x - s * half}, exit = {...c, x: c.x + s * half};
   // the bodies a lead can meet: those that reach into the heights it runs
@@ -489,7 +489,12 @@ function leadFrom(inp, world) {
     const from = run > 0 ? {...p, z: p.z + Math.sign(p.z - port.z) * run} : p;
     // a run-out goes through nothing: a ring's leg just past the plug's end stops it
     if (run > 0 && legCrossings(p, from, solids, {diameter}).length) return null;
-    const stops = [from, ...mid, entry], out = mm > 0 ? [port, from] : [from], round = [];
+    // (a rigid plug's reach point is a point of the lead, flagged, so that a
+    // turn at it or just past it is measured from where the rigid part ends)
+    const reach = rigid > 0 ? {...p, rigid_mm: rigid} : p;
+    const stops = [from, ...mid, entry], round = [];
+    const out = mm > 0 ? (rigid > 0 ? (run > 0 ? [port, reach, from] : [port, reach]) : [port, from]) : [from];
+    if (rigid > 0 && run <= 0) stops[0] = reach;
     for (let k = 1; k < stops.length; k++) {
       // A LEAD GOES ROUND A TRAY'S FLOOR AND ROUND NOTHING ELSE. The detour
       // rules will take a leg over the top of a ring that stands in its
@@ -521,7 +526,7 @@ function leadFrom(inp, world) {
     const L = laid(mid);
     if (ok(L)) return true;
     // (a lead a ring's leg stops at the plug's end may clear it run out: through the ring's opening)
-    if (mm > 0 && mid.length < 2 && (!L || tight(L).some(k => k.k === 1)) && [0.5, 1, 1.5].some(n => ok(laid(mid, n * bend)))) return true;
+    if (mm > 0 && mid.length < 2 && (!L || tight(L).some(k => k.k === 1)) && (rigid > 0 ? RIGID_RUNS : PLUG_RUNS).some(n => ok(laid(mid, n * bend)))) return true;
     if (!L) return false;
     // only toward a ring that stands ahead: a lead is not taken up over a
     // ring it stands under and back down behind it, however much room that has
@@ -1119,11 +1124,47 @@ const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y, p.z - q.z);
 //     figure of its own and takes the unset one.
 export const PLUG_REACH = {os2: 27.6, om3: 27.6, om4: 27.6, om5: 27.6, cat6: 39.4, cat6a: 39.4, dac: 64.8, aoc: 64.8, power: 77.0};
 const UNSET_REACH = 39.4;
-function plugReach(cable, end, ctx) {
+// WHAT OF THE REACH CANNOT BEND (#985, docs/cable-lay-design.md section 1.5).
+// A rigid plug is not a leg a bend may use: the cable's first turn starts
+// after the rigid part, so the route gives a turn at the reach point a lead
+// point (route-path.js cornersOf, `rigid_mm`). Each media's reach is its
+// rigid length and its boot's, in mm, the two adding to PLUG_REACH; `null` is
+// "not split yet", which is treated as before: the whole reach a leg. No
+// figure here is estimated, and no boot bend radius is written (the reserved
+// `boot-bend` key stays unwritten): a media is split only where a cited
+// drawing gives the split.
+//   - DAC and AOC: the whole 64.8 is rigid and the boot 0. Amphenol
+//     C-NDAAFR-0099, view RADIUS FROM END OF DIECAST, gives 45 MIN required to
+//     bend the cable, measured from the diecast rear and including the boot
+//     (generic/qsfp-cable@1 provenance `stub`): the head's 19.8 out of the cage
+//     and the 45 are the 64.8 PLUG_REACH reads, so the boot is inside the
+//     rigid length and no part of the reach may bend.
+//   - LC fibre (os2, om3, om4, om5): not split yet. The boot's 15.1 is from
+//     SENKO DS-LC-000023 A p.3, but the plug's 12.5 is an estimate (bracketed
+//     11.6 to 13.4 by DS-LC-000004), and no cited drawing gives a boot bend
+//     radius.
+//   - copper (cat6, cat6a): not split yet. The boot's 26.4 is from EASE
+//     J0072 A, the plug's 13.0 is an estimate, and no cited drawing gives a
+//     boot bend radius.
+//   - power: not split yet. No cited drawing gives a boot figure, so the
+//     plug's 47.0 and the 30 of stub (above) are not told apart.
+// A cable whose media is not set, or not here, is not split.
+export const PLUG_SPLIT = {
+  os2: null, om3: null, om4: null, om5: null, cat6: null, cat6a: null, power: null,
+  dac: {rigid: 64.8, boot: 0}, aoc: {rigid: 64.8, boot: 0},
+};
+// The plug's reach in mm, and how much of it is rigid (0: all of it a leg, as
+// before). A number the page gives (`ctx.plugReachOf`) wins, and does not say
+// how much of it is rigid, so none is; else PLUG_REACH, and PLUG_SPLIT says.
+// (The page is asked once.)
+function plugOf(cable, end, ctx) {
   let v = null;
   try { v = typeof ctx?.plugReachOf === 'function' ? ctx.plugReachOf(end, cable) : null; } catch { v = null; }
-  if (typeof v === 'number' && Number.isFinite(v) && v >= 0) return v;
-  return (typeof cable?.media === 'string' && Object.hasOwn(PLUG_REACH, cable.media)) ? PLUG_REACH[cable.media] : UNSET_REACH;
+  if (typeof v === 'number' && Number.isFinite(v) && v >= 0) return {mm: v, rigid: 0};
+  const media = typeof cable?.media === 'string' ? cable.media : null;
+  const mm = media !== null && Object.hasOwn(PLUG_REACH, media) ? PLUG_REACH[media] : UNSET_REACH;
+  const split = media !== null && Object.hasOwn(PLUG_SPLIT, media) ? PLUG_SPLIT[media] : null;
+  return {mm, rigid: split ? Math.min(split.rigid, mm) : 0};
 }
 // The reach point of an end whose port is at `p`: out of the face its port is
 // seen from, +z for the front, -z for the rear, by the plug's reach.
@@ -1139,6 +1180,13 @@ function reachPoint(rack, end, p, mm) {
 // cable that needs more is laid as one of this radius, and every corner
 // short of its own radius is still in `bends`.
 const ROOM_MAX = 100;
+// HOW FAR A CABLE RUNS ON STRAIGHT OUT OF ITS PLUG before it turns (ROOM AT A
+// PLUG, layFrom), in bend radii past the reach point: half, one, one and a
+// half. A rigid plug (PLUG_SPLIT) has no leg of its own to turn in, so the
+// run is the whole leg, and a turn wider than a right angle takes more: it is
+// also offered two, two and a half and three (#985).
+const PLUG_RUNS = [0.5, 1, 1.5];
+const RIGID_RUNS = [0.5, 1, 1.5, 2, 2.5, 3];
 
 export const STOCK_M = [0.5, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30];
 // THE END ALLOWANCE (#962, docs/cable-lay-design.md section 1.6). This
@@ -1264,7 +1312,8 @@ export const stockLength = (need, {values = 0} = {}) => chooseStock(() => need, 
 //   {points: [{x, y, z, at, item?, via?}], rings, findings, marks}
 // - `at` is 'a' or 'b' (a port), 'reach' (the far end of that port's plug,
 //   with `end` 'a' or 'b', section 1.5: the route's first and last legs start
-//   there), 'entry', 'exit' or 'face' (a ring), 'approach' (outside a ring
+//   there; with `rigid_mm` where the plug's whole reach is rigid, PLUG_SPLIT:
+//   the cable bends only past it, #985), 'entry', 'exit' or 'face' (a ring), 'approach' (outside a ring
 //   whose opening is placed, where a pass starts and ends, #968),
 //   'lead' (a point a turn is given its room at, #973: beside a ring's
 //   approach point, with the ring's `item` and `via`, where the cable is led
@@ -1716,9 +1765,9 @@ function layInputs(rack, cable, ctx, given, plain = false) {
   // each port, then its plug's reach point (section 1.5): the first and last
   // legs of the route start there; a plug of no reach adds no point. The leg
   // from a port to its reach point is the plug: straight, and not a span.
-  const ra = plugReach(cable, cable.a, ctx), rb = plugReach(cable, cable.b, ctx);
+  const {mm: ra, rigid: ga} = plugOf(cable, cable.a, ctx), {mm: rb, rigid: gb} = plugOf(cable, cable.b, ctx);
   const stops = [{p: a, at: 'a'}];
-  if (ra > 0) stops.push({p: reachPoint(rack, cable.a, a, ra), at: 'reach', end: 'a', hold: true});
+  if (ra > 0) stops.push({p: reachPoint(rack, cable.a, a, ra), at: 'reach', end: 'a', hold: true, ...(ga > 0 ? {rigid: ga} : {})});
   const wps = given ?? routeOf(rack, cable, ctx).waypoints;
   const rests = [];
   const rested = restedIn(rests);
@@ -1746,7 +1795,7 @@ function layInputs(rack, cable, ctx, given, plain = false) {
     const others = open ? traysOf(rack, ctx).filter(t => t.item === w.item).flatMap(t => t.rings).filter(o => o.via !== w.via && o.run === ring.run) : null;
     stops.push({p, w, i, ring, ...(open ? {open, others} : {}), ...(w.lane ? {lane: true} : {})});
   });
-  if (rb > 0) stops.push({p: reachPoint(rack, cable.b, b, rb), at: 'reach', end: 'b'});
+  if (rb > 0) stops.push({p: reachPoint(rack, cable.b, b, rb), at: 'reach', end: 'b', ...(gb > 0 ? {rigid: gb} : {})});
   stops.push({p: b, at: 'b', hold: rb > 0});
   // A TRAY a route names is laid along its run between its neighbours (section
   // 2.1): from where the point before it comes onto the tray to where the
@@ -1860,7 +1909,7 @@ function layFrom(inp, world) {
     const out = [], rings = [], findings = [], from = [], marks = wps.map(() => null);
     let n = 0;
     stops.forEach((s, k) => {
-      const tag = s.w ? (s.w.lane ? {at: 'lane'} : {item: s.w.item, via: s.w.via}) : {at: s.at, ...(s.end ? {end: s.end} : {})};
+      const tag = s.w ? (s.w.lane ? {at: 'lane'} : {item: s.w.item, via: s.w.via}) : {at: s.at, ...(s.end ? {end: s.end} : {}), ...(s.rigid ? {rigid_mm: s.rigid} : {})};
       const hold = s.hold === true || (s.lane && stops[k - 1]?.lane === true);
       if (!s.ring) {
         // a RUN-OUT (#973, below): the cable goes on straight out of its plug
@@ -2099,7 +2148,10 @@ function layFrom(inp, world) {
       for (const end of ['a', 'b']) {
         const region = T => { const t = tightOf(T.taut); return T.taut.some((p, i) => p.end === end && (p.at === 'reach' || p.at === 'lead') && t.some(c => c.k === i)); };
         if (!L.taut.some((p, i) => p.end === end && (p.at === 'reach' || p.at === 'lead') && tight.some(c => c.k === i))) continue;
-        for (const m of [0.5, 1, 1.5]) if (m * bend > (runs[end] ?? 0) + 1e-9) list.push({r: {...runs, [end]: m * bend}, region});
+        // (a rigid plug has no leg of its own for the turn, so a wider turn
+        // than a fibre cord's takes a longer run: up to three radii, #985)
+        const rigid = stops.some(s => s.at === 'reach' && s.end === end && s.rigid > 0);
+        for (const m of rigid ? RIGID_RUNS : PLUG_RUNS) if (m * bend > (runs[end] ?? 0) + 1e-9) list.push({r: {...runs, [end]: m * bend}, region});
       }
       // ROOM ROUND A BODY. A detour's planes stand two bend radii from each
       // end, the share of two right angles; where a detour is pulled taut its
