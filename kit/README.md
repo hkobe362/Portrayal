@@ -225,7 +225,7 @@ compared, and a difference throws ("New in 0.25.0" below).
 |---|---|
 | `rack/catalog.js` | `loadCatalog(dist)`: the rack catalogue, and the `chassisOf(ref)` lookup everything else takes; `loadSlots(dist, refs)`: the bays, cages and parts the commands check against |
 | `rack/model.js` | the rack file: `newDoc`, `parseDoc`, `serialize`, and an edit of an item, frame or name that returns a new rack |
-| `rack/frames.js` | rack products applied to a frame (`rack.json` `frames`): `appliedFrame` copies a product's numbers and ref, `editRefusal` holds a frame to what its product fixes, `customisedFrame` drops the ref, `frameState` says whether the catalogue still agrees with the file, and `frameProducts` lists what can be chosen; the commands are `frame.apply` and `frame.customise` |
+| `rack/frames.js` | rack products applied to a frame (`rack.json` `frames`): `appliedFrame` copies a product's numbers and ref, `editRefusal` holds a frame to what its product fixes, `customisedFrame` drops the ref, `frameState` says whether the catalogue still agrees with the file, `frameProducts` lists what can be chosen, and `frameName` is the name a product is shown by (maker and model, else the ref); the commands are `frame.apply` and `frame.customise` |
 | `rack/rails.js` | the rack's rails: unit height, opening and where a device sits between them |
 | `rack/fit.js` | whether a device fits at a unit, on a face and (a narrow part) on one rail; whether a zero-U part fits beside the rack (`fitsZeroU`); how a shrink trims a rack |
 | `rack/zero-u.js` | the parts beside the rack: where each stands, as words (`whereText`) and as x (`zeroUX`), whether the lane beside its upright runs through it, and each placeable entry (`zeroUEntries`) |
