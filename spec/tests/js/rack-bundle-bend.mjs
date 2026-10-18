@@ -220,6 +220,16 @@ test('a cable with no cable type alone gets the default radius, and the finding 
   assert.ok(typed.text.includes('the cable (cat6) needs 24 mm,'), typed.text);
 });
 
+test('a cable whose type states no radius says so, not that it has no type (#1132)', () => {
+  const r0 = rackWith(['', '']);
+  const r = {...r0, cables: r0.cables.map(c => (c.id === 'c1' ? {...c, type: 'mystery'} : c))};
+  const ctx = {...routeCtx(r, {x: {'mgr-1': LANE + 20}}), bendOf};
+  assert.ok(R.bendFindingsOf(r, r.cables[0], ctx)[0].text.includes('(mystery) needs 24 mm (the default, its type states no bend radius)'));
+  const c = check(r, {x: {'mgr-1': LANE + 20}});
+  assert.deepEqual(bendNotes(c), ["Bundle 1's bend is checked at 24 mm for c1 and c2, the default for a cable with no known bend radius."]);
+  assert.ok(c.warnings[0].includes('c1 (mystery) needs 24 mm (the default, its type states no bend radius)'), c.warnings);
+});
+
 test('typed cables are checked as before, alone and in a bundle (#1132)', () => {
   const r = rackWith(['cat6', 'om4']);
   const c = check(r, {x: {'mgr-1': LANE + 20}});

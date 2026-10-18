@@ -20,7 +20,7 @@ import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF, sideOfAt} from './zero-u.js';
 import {isZeroUPart, zeroUTouched, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, railOf, isQuarter, unitsOf} from './fit.js';
 import {solidsOf, traysOf, detour, legCrossings, CLEAR, zeroUPanelPoint} from './solids.js';
-import {surfacesOf, hang, heldStretch, drapeOf, bendOf, bendIsDefault, newCrossing} from './resting.js';
+import {surfacesOf, hang, heldStretch, drapeOf, bendOf, bendIsDefault, defaultBecause, newCrossing} from './resting.js';
 
 export const LANE_GAP = 40;          // mm: a lane runs in the middle of a 40 mm gutter outside each rail
 const SHORT = 2;                     // U: a jumper this close, with no manager, just hangs
@@ -2603,7 +2603,7 @@ export function bendFindingsOf(rack, c, ctx, nameOf = id => id, path = pathOf(ra
     const where = named ? `at ${turn}, between ${a} and ${b}` : a === b ? `at ${a}` : `between ${a} and ${b}`;
     const kind = c.type || c.media;
     // A cable with no type is judged by the default radius (#1132), and says so.
-    const needs = `${kind ? `the cable (${kind})` : 'the cable'} needs ${f.need_mm} mm${bendIsDefault(c, ctx) ? ' (the default, it has no cable type)' : ''}`;
+    const needs = `${kind ? `the cable (${kind})` : 'the cable'} needs ${f.need_mm} mm${bendIsDefault(c, ctx) ? ` (the default, ${defaultBecause(c)})` : ''}`;
     // A LEAD LEFT IN A RING IT HAS NO ROOM TO TURN INTO (#1026): no ring on
     // its way left room, so the nearest stands and the finding says what
     // would give it room (closeRing, below). IN A FIELD OF ITS OWN, `advice`:

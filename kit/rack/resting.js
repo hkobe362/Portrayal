@@ -74,6 +74,9 @@ export function bendOf(cable, ctx) {
 // stated and no media of the table's. The messages say so (#1132).
 export const bendIsDefault = (cable, ctx) =>
   statedBend(cable, ctx) == null && !(typeof cable?.media === 'string' && Object.hasOwn(BEND, cable.media));
+// Why, for a cable bendIsDefault is true of: it names no type, or the type it
+// names states no radius.
+export const defaultBecause = cable => (cable?.type ? 'its type states no bend radius' : 'it has no cable type');
 
 // THE SHAPE OF A SPAN: the catenary of cable-geometry.js, f(t) = (cosh(K(2t-1))
 // - cosh K) / (cosh K - 1), 0 at the ends and -1 mid-way.

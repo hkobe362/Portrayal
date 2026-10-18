@@ -13,7 +13,7 @@
 import {bundlesOf, bundleName, isWaypoint, uLabel, withoutMembers, endHostOf} from './model.js';
 import {ownRoute, resolveRoute, trunkRoute, trunkMeasures, pointOf, routePath, routeText, DIAMETERS} from './route.js';
 import {traysOf} from './solids.js';
-import {bendOf, bendIsDefault} from './resting.js';
+import {bendOf, bendIsDefault, defaultBecause} from './resting.js';
 import {elementsOf, elementText, waypointKey, followTrunk, andList} from './bundle-route.js';
 import {zeroUOnLane, carriesLane} from './zero-u.js';
 import {cornersOf, STRAIGHT_DEG} from './route-path.js';
@@ -414,7 +414,7 @@ export function bendCheck(rack, b, L, pathways, ctx = {}) {
   const violations = points.filter(p => p.ok === false);
   const kind = id => { const c = byId.get(id); const t = c?.type || c?.media; return t ? `${id} (${t})` : id; };
   const warnings = violations.map(p => {
-    const needs = `${kind(p.by)} needs ${round1(p.need_mm)} mm${defaulted.includes(p.by) ? ' (the default, it has no cable type)' : ''}`;
+    const needs = `${kind(p.by)} needs ${round1(p.need_mm)} mm${defaulted.includes(p.by) ? ` (the default, ${defaultBecause(byId.get(p.by))})` : ''}`;
     if (p.kind === 'pathway')
       return `${name} passes ${p.at}, which holds it to ${an(String(p.room_mm))} ${p.room_mm} mm bend; ${needs}, ${p.short_mm} mm short.`;
     if (p.room_mm === 0) return `${name} doubles back at ${p.at}, with no room for a bend; ${needs}.`;
@@ -422,7 +422,7 @@ export function bendCheck(rack, b, L, pathways, ctx = {}) {
   });
   const notes = [];
   if (!loaded && riding.length) notes.push(`${name}'s bend is not checked: the cable types are not loaded.`);
-  else if (defaulted.length) notes.push(`${name}'s bend is checked at ${round1(rOf.get(defaulted[0]))} mm for ${andList(defaulted)}, the default for a cable with no cable type.`);
+  else if (defaulted.length) notes.push(`${name}'s bend is checked at ${round1(rOf.get(defaulted[0]))} mm for ${andList(defaulted)}, the default for a cable with ${defaulted.some(id => byId.get(id)?.type) ? 'no known bend radius' : 'no cable type'}.`);
   return {bend: {radius_mm: all.need, by: all.by, unchecked: all.unchecked, defaulted, points, violations}, warnings, notes};
 }
 
