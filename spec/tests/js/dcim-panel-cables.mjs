@@ -32,7 +32,8 @@ const PATHS = Object.fromEntries(['netbox', 'nautobot'].map(t => [t,
   fs.readdirSync(new URL(`${t}/`, EXPORTS), {recursive: true}).filter(p => p.endsWith('.yaml')).sort().map(p => `${t}/${p}`)]));
 const lists = path => D.typeLists(fs.readFileSync(new URL(path, EXPORTS), 'utf8'));
 const moduleLists = (target, ref) => {
-  const path = X.moduleTypePath(PATHS[target], X.partNumber(compByRef(ref)));
+  const comp = compByRef(ref);
+  const path = X.moduleTypePath(PATHS[target], X.partNumber(comp), comp?.name);
   return path ? lists(path) : null;
 };
 
@@ -58,23 +59,23 @@ const resolverFor = (rack, ctx, target, held) => D.endResolver({rack, ctx,
   moduleAt: (id, bayId) => (rack.items.find(i => i.id === id).ref === 'fhd-1ufce' && held[bayId] ? moduleLists(target, held[bayId]) : null)});
 
 // ── the sweep: every module type whose glass the exporter projects ───────
-// WHAT IT REACHES, of the 63 modules that publish ports (2026-10-11):
-//   - 3 have no type file the kit can find, on either target: FS panels with
-//     no attrs.model, whose file is named for the contract while the kit looks
-//     for the part number (#1025). They are not measured here.
-//   - NetBox: the other 60 are measured. 4 are DCMs, whose one adapter is a
+// WHAT IT REACHES, of the 63 modules that publish ports:
+//   - Every one has a type file the kit finds: by its part number, or, for a
+//     module with no attrs.model, by its contract name, as the exporter files it.
+//   - NetBox: 4 are DCMs, whose one adapter is a
 //     front and a rear port at once and is left out by its reason; every port
-//     of the other 56 resolves.
-//   - Nautobot: of the 60, 4 types carry no glass (two couplers and two
+//     of the other 59 resolves.
+//   - Nautobot: 4 types carry no glass (two couplers and two
 //     add/drop filters: a split has no Nautobot spelling), and the 4 DCMs
-//     name their ports by a bay chain, {module.parent}/{module}/x, which the
-//     kit does not read (#1024). Those 8 are left out by a reason, which is
-//     checked. The others resolve whole. The 20 Fibrain holders were among
-//     the bay-chain ones until #1040: they name their ports {module}/x now,
-//     the XCU10 drawer's slots carrying `drawer/` in their own position.
-// The sweep seats each module straight in a device bay, which is how a
-// Fibrain holder sits in the 1U frame fibrain/xpu; in the XCU10 it sits in
-// the drawer, a bay deeper, which this sweep does not seat.
+//     name their ports by a bay chain, {module.parent}/{module}/x. Those 8 are
+//     left out by a reason, which is checked. The others resolve whole. The 20
+//     Fibrain holders were among the bay-chain ones until #1040: they name
+//     their ports {module}/x now, the XCU10 drawer's slots carrying `drawer/`
+//     in their own position.
+// The sweep below seats each module straight in a device bay, which is how a
+// Fibrain holder sits in the 1U frame fibrain/xpu. In the XCU10 it sits in the
+// drawer, a bay deeper; the sweep after it seats every module that a bay of
+// another module accepts (#1024) in that bay.
 const FIBRE = COMPONENTS.filter(c => c.kind === 'module' && c.optical?.ports && !c['superseded-by']);
 
 test('the build publishes the ports of a part where it publishes the fibre graph of a projected module', () => {
@@ -91,7 +92,7 @@ for (const target of ['netbox', 'nautobot']) {
     for (const comp of FIBRE) {
       const ref = refOf(comp), held = {'bay-1': ref}, ctx = ctxFor(held);
       const type = moduleLists(target, ref);
-      if (!type) { unfound.push(`${comp.ns}/${comp.name}`); continue; }   // no file under its part number (#1025)
+      if (!type) { unfound.push(`${comp.ns}/${comp.name}`); continue; }
       modules++;
       const rack = {name: 'sweep', frame: M.normalizeFrame({heightRU: 12}), zeroU: [], cables: [],
                     items: [{id: 'i1', ref: 'fhd-1ufce', cfg: 'seated', label: 'pp', ru: 2, u: 1, face: 'front', turned: false}]};
@@ -136,7 +137,7 @@ for (const target of ['netbox', 'nautobot']) {
           for (const name of type.sections[section])
             assert.ok(named.has(`${section} ${name}`), `${ref}: no cable end reaches ${name} of the ${target} type ${type.model}`);
     }
-    assert.deepEqual(unfound, ['fs/fhd-fap12lcd-om5', 'fs/fhd-fap12mtp-b', 'fs/fhd-fap12mtp16-a'], 'the modules with no type file under their part number (#1025)');
+    assert.deepEqual(unfound, [], 'every module that publishes ports has a type file the kit finds');
     const partly = new Set(odd.map(o => o.split(' ')[0].split('@')[0]));
     assert.equal(whole.length + partly.size, modules);
     if (target === 'netbox') {
@@ -152,6 +153,89 @@ for (const target of ['netbox', 'nautobot']) {
       assert.deepEqual(bare.sort(), ['smartoptics/ppm-ad1-1510', 'smartoptics/ppm-ad1-1625', 'smartoptics/ppm-ocu-50-50', 'smartoptics/ppm-ocu-97-3']);
       assert.ok(modules >= 60 && whole.length >= 32 && written >= 750, `measured too little: ${modules} modules, ${whole.length} whole, ${written} names`);
     }
+  });
+}
+
+// ── the sweep over every module that sits in a bay of another module (#1024) ──
+// A module is NESTED when a bay of some module type accepts it. Of the 63 modules that publish ports, 28 are:
+// the 20 Fibrain holders (the XCU10 drawer's four slots) and the 8 Smartoptics pluggable modules (the DCP-F-A22
+// amplifier's two ppm bays). Each is seated in the bay of its carrier, the carrier in a bay of a device, and
+// every port a cable can land on is resolved from the type files alone. What a name must be is worked out here
+// from the position the device bay, the carrier's bay and the type file's own port name give, not by the kit's
+// renderName: the device bay's id, the carrier's bay id, the port.
+const parentsOf = new Map();
+for (const parent of COMPONENTS.filter(c => c.kind === 'module' && !c['superseded-by'] && c.bays))
+  for (const [bayId, b] of Object.entries(parent.bays))
+    for (const accepted of b.accepts ?? []) parentsOf.set(accepted, [...(parentsOf.get(accepted) ?? []), {parent, bayId}]);
+const NESTED = FIBRE.filter(c => parentsOf.has(refOf(c)));
+// the drawer sits only in a bay named drawer; any other carrier in any bay
+const DEVICE_BAY = {'fibrain/xcu-drawer': 'drawer'};
+const bareName = n => n.slice(n.lastIndexOf('}/') + 2);
+
+test('28 of the 63 modules with fibre ports sit in a bay of another module: 20 Fibrain holders and 8 Smartoptics modules', () => {
+  const by = ns => NESTED.filter(c => c.ns === ns).length;
+  assert.deepEqual([FIBRE.length, NESTED.length, by('fibrain'), by('smartoptics')], [63, 28, 20, 8]);
+  // every simplex adapter in the library is among them
+  assert.ok(NESTED.some(c => c.name === 'xmi1051ga') && NESTED.some(c => c.name === 'xmn1051gb'));
+});
+
+for (const target of ['netbox', 'nautobot']) {
+  test(`${target}: every port of every nested module is named through the carrier's bay as the committed type files name it`, () => {
+    let ends = 0, resolved = 0;
+    const leftOut = new Set();
+    for (const comp of NESTED) {
+      const ref = refOf(comp), type = moduleLists(target, ref);
+      assert.ok(type, `${ref} has a ${target} type file`);
+      for (const {parent, bayId} of parentsOf.get(ref)) {
+        const carrierRef = refOf(parent), carrier = moduleLists(target, carrierRef);
+        assert.ok(carrier, `${carrierRef} has a ${target} type file`);
+        const devBay = DEVICE_BAY[`${parent.ns}/${parent.name}`] ?? 'slot-1';
+        const carrierBay = carrier.bays.find(b => b.position.split('/').pop() === bayId || b.name === bayId);
+        assert.ok(carrierBay, `${carrierRef}: no module bay ${bayId} in the ${target} file`);
+        const device = D.typeLists(`model: Host\nmodule-bays:\n  - name: ${devBay}\n    position: ${devBay}\n`);
+        const held = {[devBay]: carrierRef, [`${devBay}/module/${bayId}`]: ref};
+        // a bay of a module is filled by the rack's swaps, by its own path
+        const item = {id: 'i1', ref: 'host', cfg: 'seated', label: 'host', ru: 2, u: 1, face: 'front', turned: false, swaps: held};
+        const slots = {host: {default: 'seated', 'pdu-class': null, cages: {front: [], rear: []},
+          bays: {front: [bay(devBay, [carrierRef])], rear: []}, configs: [{name: 'seated', description: '', airflow: 'passive', bays: {}, occupants: {}}]}};
+        const ctx = {slotsOf: r => slots[r] ?? null, compByRef};
+        const rack = {name: 'nested', frame: M.normalizeFrame({heightRU: 4}), zeroU: [], cables: [], items: [item]};
+        const resolve = D.endResolver({rack, ctx, deviceOf: () => device,
+          moduleAt: (id, path) => (held[path] ? moduleLists(target, held[path]) : null)});
+        for (const key of Object.keys(comp.optical.ports)) {
+          const back = key.startsWith('rear:');
+          const port = {path: `${devBay}/module/${bayId}/module/${back ? key.slice('rear:'.length) : key}`, view: back ? 'rear' : 'front'};
+          assert.equal(P.seatedPort(item, {item: 'i1', ...port}, ctx)?.port, true, `${ref} ${key} is a port of what is seated in ${carrierRef}`);
+          ends++;
+          const r = resolve({item: 'i1', ...port});
+          // the old reason is never given: the carrier has a module bay, and the module is seated in it
+          assert.doesNotMatch(r.reason ?? '', /no module bay to import|module inside a card/, `${ref} ${key} on ${target}`);
+          if (!r.ok) {
+            // the same two ways out as one level down: a part that is two kinds of port, a type with no glass on this target
+            assert.match(r.reason, /one end of a cable is one kind of port$|^the module type .* lists no (front|rear) port named \{module\}\//, `${ref} ${key}`);
+            leftOut.add(ref);
+            continue;
+          }
+          resolved++;
+          const section = r.type === 'dcim.frontport' ? 'front-ports' : 'rear-ports';
+          for (const name of r.names) {
+            const bare = name.slice(name.lastIndexOf('/') + 1);
+            // the name is the device's bay, the carrier's bay and the port the type file lists, in that order
+            assert.equal(name, `${devBay}/${bayId}/${bare}`, `${ref}: ${name}`);
+            assert.ok(type.sections[section].some(n => bareName(n) === bare), `${ref}: ${name} is not a ${section} of the committed ${target} type ${type.model}`);
+          }
+        }
+      }
+    }
+    assert.equal(ends, NESTED.reduce((n, c) => n + Object.keys(c.optical.ports).length * parentsOf.get(refOf(c)).length, 0));
+    // what the old branch said of every one of these ends is not said of any now
+    assert.ok(resolved > 400, `only ${resolved} ends resolved`);
+    // all 20 Fibrain holders resolve whole on both targets. Of the 8 Smartoptics modules the same ends are left out as
+    // one level down, by the same reasons: the 4 DCMs, whose one adapter is a front and a rear port at once, and on
+    // Nautobot the 4 add/drop filters and couplers that carry no glass there.
+    const dcm = ['smartoptics/ppm-dcm-10@2', 'smartoptics/ppm-dcm-20@2', 'smartoptics/ppm-dcm-40@2', 'smartoptics/ppm-dcm-80@2'];
+    const bare = ['smartoptics/ppm-ad1-1510@2', 'smartoptics/ppm-ad1-1625@2', 'smartoptics/ppm-ocu-50-50@2', 'smartoptics/ppm-ocu-97-3@2'];
+    assert.deepEqual([...leftOut].sort(), (target === 'netbox' ? dcm : [...bare, ...dcm]).sort());
   });
 }
 
@@ -190,6 +274,62 @@ for (const target of ['netbox', 'nautobot']) {
     assert.equal(text, fs.readFileSync(golden(target), 'utf8'));
   });
 }
+
+// ── a rack with two XCU10 drawers: cables on holders nested in the drawers (#1024) ──
+// The drawer is in the device's bay `drawer`; slot-1 holds a simplex holder, slot-2 a duplex one. A cable has an end on
+// a nested holder at one end or at both. The panel seated directly in a bay (above) is the golden file it was.
+const SIMPLEX = latest('fibrain/xmi1051ga'), DUPLEX = latest('fibrain/xmi1021ca'), DRAWER = latest('fibrain/xcu-drawer');
+const XCU_DEVICE = {netbox: 'netbox/device-types/Fibrain/XCU10-21IC.yaml', nautobot: 'nautobot/device-types/Fibrain/XCU10-21IC.yaml'};
+const SWAPS = {drawer: DRAWER, 'drawer/module/slot-1': SIMPLEX, 'drawer/module/slot-2': DUPLEX};
+const XCU_SLOTS = {'xcu-21ic': {default: 'seated', 'pdu-class': null, cages: {front: [], rear: []},
+  bays: {front: [bay('drawer', [DRAWER])], rear: []}, configs: [{name: 'seated', description: '', airflow: 'passive', bays: {}, occupants: {}}]},
+  'as7726-32x': slotsFor({})['as7726-32x']};
+const NCTX = {slotsOf: ref => XCU_SLOTS[ref] ?? null, compByRef};
+const NITEMS = [item('i1', 'as7726-32x', 'sw-1', 20, optics),
+                {...item('i2', 'xcu-21ic', 'xcu-1', 30), swaps: SWAPS}, {...item('i3', 'xcu-21ic', 'xcu-2', 32), swaps: SWAPS}];
+NITEMS[1].cfg = NITEMS[2].cfg = 'seated';
+const NCABLES = [
+  cable('n1', end('i1', 'port-1'), end('i2', 'drawer/module/slot-1/module/sc03')),                       // an optic to a nested holder
+  cable('n2', end('i2', 'drawer/module/slot-1/module/sc04'), end('i3', 'drawer/module/slot-1/module/sc01')),  // a nested holder at both ends
+  cable('n3', end('i2', 'drawer/module/slot-2/module/lc01'), end('i3', 'drawer/module/slot-2/module/lc01')), // two fibres at each end
+  cable('n4', end('i2', 'drawer/module/slot-1/module/b01', 'rear'), end('i1', 'port-2'))];               // a nested holder's back
+const NRACK = {name: 'Drawer cables', frame: M.normalizeFrame({heightRU: 42}), zeroU: [], items: NITEMS, cables: NCABLES};
+const NENDS = P.settleEnds(NRACK, new Map(NCABLES.flatMap(c => [c.a, c.b]).map(e => [CR.endKey(e), {info: null, reason: null}])), NCTX);
+const NNAMES = X.uniqueNames(NITEMS), NKEPT = new Set(NITEMS.map(i => i.id));
+const nestedFile = target => D.cableImportRows({rack: NRACK, target, names: NNAMES, kept: NKEPT, ends: NENDS, uOf: () => 1,
+  resolve: D.endResolver({rack: NRACK, ctx: NCTX,
+    deviceOf: id => lists(id === 'i1' ? SWITCH[target] : XCU_DEVICE[target]),
+    moduleAt: (id, path) => (SWAPS[path] && id !== 'i1' ? moduleLists(target, SWAPS[path]) : null)})});
+const nestedGolden = target => new URL(`../fixtures/rack-exports/drawer-cables.${target}.cables.csv`, import.meta.url);
+
+for (const target of ['netbox', 'nautobot']) {
+  test(`${target}: the cables file of a rack cabled through holders in a drawer is the golden file`, () => {
+    const got = nestedFile(target);
+    assert.deepEqual(got.left, [], 'no cable on a nested holder is left out');
+    const text = X.toCsv(got.columns, got.rows);
+    if (process.env.PORTRAYAL_WRITE_GOLDEN) fs.writeFileSync(nestedGolden(target), text);
+    assert.equal(text, fs.readFileSync(nestedGolden(target), 'utf8'));
+  });
+}
+
+test('NetBox: a cable on a nested holder names it through the drawer bay and the holder bay, one cell for both fibres', () => {
+  const got = nestedFile('netbox'), row = id => got.rows.find(r => r.label === id);
+  const sides = r => [r.side_a_device, r.side_a_type, r.side_a_name, r.side_b_device, r.side_b_type, r.side_b_name];
+  assert.deepEqual(sides(row('N1')), ['sw-1', 'dcim.interface', 'port-1', 'xcu-1', 'dcim.frontport', 'drawer/slot-1/3']);
+  assert.deepEqual(sides(row('N2')), ['xcu-1', 'dcim.frontport', 'drawer/slot-1/4', 'xcu-2', 'dcim.frontport', 'drawer/slot-1/1']);
+  assert.deepEqual(sides(row('N3')), ['xcu-1', 'dcim.frontport', 'drawer/slot-2/1,drawer/slot-2/2', 'xcu-2', 'dcim.frontport', 'drawer/slot-2/1,drawer/slot-2/2']);
+  assert.deepEqual(sides(row('N4')), ['xcu-1', 'dcim.rearport', 'drawer/slot-1/B01-1', 'sw-1', 'dcim.interface', 'port-2']);
+});
+
+test('Nautobot: a cable on a nested holder is named as NetBox names it, a row for each fibre', () => {
+  const got = nestedFile('nautobot');
+  assert.deepEqual(got.rows.map(r => [r.label, r.a_device, r.a_type, r.a_name, r.b_device, r.b_type, r.b_name]), [
+    ['N1', 'sw-1', 'dcim.interface', 'port-1', 'xcu-1', 'dcim.frontport', 'drawer/slot-1/3'],
+    ['N2', 'xcu-1', 'dcim.frontport', 'drawer/slot-1/4', 'xcu-2', 'dcim.frontport', 'drawer/slot-1/1'],
+    ['N3 (1/2)', 'xcu-1', 'dcim.frontport', 'drawer/slot-2/1', 'xcu-2', 'dcim.frontport', 'drawer/slot-2/1'],
+    ['N3 (2/2)', 'xcu-1', 'dcim.frontport', 'drawer/slot-2/2', 'xcu-2', 'dcim.frontport', 'drawer/slot-2/2'],
+    ['N4', 'xcu-1', 'dcim.rearport', 'drawer/slot-1/B01-1', 'sw-1', 'dcim.interface', 'port-2']]);
+});
 
 test('NetBox: one row a cord, with both fibre ports of an adapter in one cell and one kind of port a side', () => {
   const got = file('netbox'), row = id => got.rows.find(r => r.label === id);

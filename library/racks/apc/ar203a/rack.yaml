@@ -1,0 +1,134 @@
+format: 1
+kind: rack
+name: ar203a
+version: 1.0.0
+maturity: modelled
+manufacturer: APC
+model: AR203A
+part-numbers:
+  AR203A: APC NetShelter Open Frame Rack, 4 Post, 44U, Square Holes
+description: >-
+  The APC NetShelter four-post open frame rack, 44U, with 9.5 mm square holes
+  for M6 cage nuts. Rail depth is fixed by its side frame brackets. Rated for a
+  static load only. The AR204A is the same frame with tapped #12-24 holes.
+form: 4-post-frame
+ru: 44
+numbering:
+  direction: bottom-up
+  start: 1
+width: 19
+holes:
+  style: square
+  size: 9.5
+  fixing: M6
+hole-centres: 465.1
+opening: 450.85
+rails:
+  - id: front
+  - id: rear
+    depth:
+      fixed: 740
+max-device-depth: 740
+outer:
+  w: 600
+  h: 2130
+  d: 747
+weight-kg: 40.32
+load:
+  static-kg: 907.2
+datasheet:
+  title: APC NetShelter Open Frame Rack, 4 Post, 44U, Square Holes (AR203A), product data sheet
+  url: https://www.se.com/us/en/product/download-pdf/AR203A?filename=Schneider+Electric_APC-NetShelter-Open-Frame-Racks_AR203A.pdf
+references:
+  - title: NetShelter Four-Post Rack, Unpacking, Installation, and Customization (AR203A, AR204A)
+    url: https://download.se.com/files?p_enDocType=User+guide&p_File_Name=JKUR-7NVM6S_R1_EN.pdf&p_Doc_Ref=SPD_JKUR-7NVM6S_EN
+provenance:
+  ru:
+    confidence: datasheet
+    note: >-
+      "Number of rack unit 44U" in the product data sheet; "Rack mounting height
+      44 U" in the user guide, which defines one U as 44.4 mm (1.75 in).
+  form:
+    confidence: datasheet
+    note: >-
+      The data sheet names it a 4 Post rack, and the user guide a Four-Post
+      Rack: two left and two right vertical frame posts joined by side frame
+      brackets and horizontal frame brackets. Open frame, no doors or panels.
+  width:
+    confidence: datasheet
+    note: >-
+      "Rack Width 19 in" in the data sheet; the user guide gives the rack mounting
+      width as 482 mm (19 in) and the external width as 600 mm.
+  holes:
+    confidence: datasheet
+    note: >-
+      The user guide table gives the mounting holes of the AR203A as "Square 9.5
+      mm", and ships 60 M6 x 16 screws with 60 cage nuts for them. The AR204A in
+      the same guide has tapped #12-24 holes. Every third hole on a flange is
+      numbered and marks the middle of a U.
+  rails:
+    confidence: datasheet
+    note: >-
+      The data sheet gives the minimum and the maximum mounting depth as one
+      figure, 29.1 in (739.9 mm), so the rear rail is fixed. The user guide
+      lists the four side frame brackets as 740 mm, the figure written here.
+      The 739.9 mm is that length in inches, rounded and converted back.
+  max-device-depth:
+    confidence: datasheet
+    note: >-
+      "Maximum Mounting Depth 29.1 in (739.9 mm)" in the data sheet, with the
+      same rounding as the rail depth; 740 mm is the length of the side frame
+      brackets in the user guide.
+  outer:
+    confidence: datasheet
+    note: >-
+      Height 83.9 in (2130 mm), width 23.6 in (600 mm), depth 29.4 in (747 mm)
+      in the data sheet; the user guide gives 2130.40, 600 and 747 mm.
+  weight-kg:
+    confidence: datasheet
+    note: >-
+      Net weight 40.32 kg (88.90 lb) in the user guide. The data sheet says
+      89.09 lb (40.41 kg); the gap below records both.
+  load:
+    confidence: datasheet
+    note: >-
+      "Permanent permissible load 2000 lb (907.2 kg) static" in the data sheet;
+      the user guide gives a weight capacity of 907.18 kg. No rolling rating is
+      stated, because the rack has no casters.
+  numbering:
+    confidence: estimated
+    note: >-
+      A stand-in. Both documents say the U-spacing is numbered (every third
+      hole), and neither says whether the labels run up or down. Bottom-up from
+      1 is the default of the rack file.
+  hole-centres:
+    confidence: estimated
+    note: >-
+      A stand-in for the EIA-310 figure, 465.1 mm between hole lines (18.312
+      in). The sheets state the rack as EIA-310E and print no hole spacing.
+  opening:
+    confidence: estimated
+    note: >-
+      A stand-in for the EIA-310 minimum clear opening between the rails, 450.85
+      mm (17.75 in). The sheets print no figure for it.
+gaps:
+  - what: numbering
+    reason: vendor-silent
+    note: >-
+      The data sheet and the user guide both say the U-space is numbered and
+      show the labels only in figures.
+    wanted: The direction the labels run on the flange, from a photograph of the rail or a dimensioned drawing.
+  - what: hole-centres
+    reason: vendor-silent
+    note: Neither document prints the horizontal spacing of the hole lines.
+    wanted: A dimensioned front view of the vertical mounting flanges.
+  - what: opening
+    reason: vendor-silent
+    note: Neither document prints the clear opening between the rails.
+    wanted: A dimensioned front view, or a measurement between the flanges.
+  - what: weight-kg
+    reason: sources-disagree
+    note: >-
+      The user guide gives a net weight of 40.32 kg (88.90 lb); the data sheet
+      gives 89.09 lb (40.41 kg). The user guide is written here.
+    wanted: Which of the two is the current product, from the maker.

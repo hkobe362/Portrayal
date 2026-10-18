@@ -26,6 +26,7 @@ from pathlib import Path
 import yaml
 
 from portrayal import libwalk
+from portrayal import racks_index
 from portrayal.manifest import load_yaml
 
 SCHEMAS = Path(__file__).resolve().parents[2] / "schemas"
@@ -65,8 +66,15 @@ def main() -> int:
     (out / "listings.json").write_text(json.dumps({
         "format": 1, "listings": listings}, indent=1, sort_keys=True))
 
+    # THE RACK PRODUCTS (#935) ship whole too, and for the same reason: they are
+    # source-tree files, read by a consumer that has no checkout. racks_index.py
+    # writes them; this is where the build already walks the library for such
+    # files, so the build script is unchanged.
+    racks = racks_index.build([Path(r) for r in args.library], out, args.schemas)
+
     print(f"compiled {len(vendors)} vendor(s) -> {out}/vendors.json"
-          f" and {len(listings)} listing(s) -> {out}/listings.json")
+          f", {len(listings)} listing(s) -> {out}/listings.json"
+          f" and {len(racks)} rack product(s) -> {out}/rack-products.json")
     return 0
 
 

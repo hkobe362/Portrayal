@@ -44,6 +44,7 @@ nautobot/devicetype-library#24).
 """
 import argparse
 import copy
+import json
 import math
 import re
 import pathlib
@@ -2227,8 +2228,10 @@ def bay_row(bay_id, accepts=None, span=None):
     spans = (f"Spans {', '.join(span)} for a card {len(span) + 1} slots wide. "
              if span else "")
     if accepts:
-        bay["description"] = fit_items(
-            spans + "Accepts: ", [a.split("/")[-1].split("@")[0] for a in accepts])
+        # The name loses its major, so two majors of one part would repeat.
+        names = list(dict.fromkeys(
+            a.split("/")[-1].split("@")[0] for a in accepts))
+        bay["description"] = fit_items(spans + "Accepts: ", names)
     elif spans:
         bay["description"] = spans.strip()
     return bay
@@ -2946,6 +2949,111 @@ class Indented(yaml.SafeDumper):              # match the library's list indenta
         return super().increase_indent(flow, False)
 
 
+# ---- rack types (#935, #1105) -----------------------------------------------------
+#
+# A rack product (`kind: rack`) is a NetBox rack type. Nautobot has no rack type,
+# so its file is the fields of a rack it does have, and the facts it has no field
+# for go in `comments`, one line each, as a device's do. Nothing here is a custom
+# field: that would need setting up on every instance first.
+
+# `desktop-frame` is neither DCIM's: it is a two-post frame, said so in a comment.
+RACK_FORM = {"desktop-frame": "2-post-frame"}
+RACK_UNITS = "mm"
+
+
+def _rack_facts(doc):
+    """The lines of a rack's comments: what no field of the rack type carries."""
+    prov = doc.get("provenance") or {}
+    holes = doc.get("holes") or {}
+    lines = []
+    if doc.get("form") in RACK_FORM:
+        lines.append("A desktop rack: the DCIM has no such form, and a two-post frame is what it is.")
+    if holes.get("style"):
+        thread = f", thread {holes['thread']}" if holes.get("thread") else ""
+        lines.append(f"holes: {holes['style']}{thread}")
+    for key, label in (("hole-centres", "hole-centres"), ("opening", "opening")):
+        if doc.get(key) is None:
+            continue
+        stand_in = (prov.get(key) or {}).get("confidence") == "estimated"
+        lines.append(f"{label} {doc[key]:g} mm"
+                     + (" (a stand-in, not confirmed against the standard or a maker's sheet)"
+                        if stand_in else ""))
+    return lines
+
+
+def rack_type(doc, target):
+    """One rack product as a NetBox rack type, or as the fields of a Nautobot rack."""
+    form = RACK_FORM.get(doc["form"], doc["form"])
+    numbering = doc.get("numbering") or {}
+    outer = doc.get("outer") or {}
+    rails = {r["id"]: r for r in doc.get("rails") or []}
+    fixed = ((rails.get("rear") or {}).get("depth") or {}).get("fixed")
+    lines = _rack_facts(doc)
+    out = {}
+    if target == "netbox":
+        out.update({"manufacturer": doc["manufacturer"], "model": doc["model"],
+                    "slug": slugify(f"{doc['manufacturer']}-{doc['model']}"),
+                    "form_factor": form})
+    else:
+        out.update({"name": f"{doc['manufacturer']} {doc['model']}", "type": form})
+    out.update({"width": doc.get("width", 19), "u_height": doc["ru"]})
+    if target == "netbox":
+        out["starting_unit"] = numbering.get("start", 1)
+    out["desc_units"] = numbering.get("direction") == "top-down"
+    if outer:
+        out["outer_width"] = outer["w"]
+        if target == "netbox":
+            out["outer_height"] = outer["h"]
+        out["outer_depth"] = outer["d"]
+        out["outer_unit"] = RACK_UNITS
+    if target == "netbox":
+        if fixed is not None:
+            out["mounting_depth"] = fixed
+        if doc.get("weight-kg") is not None:
+            out["weight"] = doc["weight-kg"]
+            out["weight_unit"] = "kg"
+        load = doc.get("load") or {}
+        if load.get("static-kg") is not None:
+            out["max_weight"] = load["static-kg"]
+            out.setdefault("weight_unit", "kg")
+        # the cooling fields are left out: no source gives them
+    else:
+        # what Nautobot has no field for
+        if numbering.get("start", 1) != 1:
+            lines.append(f"starting unit {numbering['start']}")
+        if outer:
+            lines.append(f"outer height {outer['h']:g} mm")
+        if fixed is not None:
+            lines.append(f"mounting depth {fixed:g} mm")
+        if doc.get("weight-kg") is not None:
+            lines.append(f"weight {doc['weight-kg']:g} kg")
+        for key, label in (("static-kg", "static load"), ("rolling-kg", "rolling load")):
+            if (doc.get("load") or {}).get(key) is not None:
+                lines.append(f"{label} {doc['load'][key]:g} kg")
+    if lines:
+        out["comments"] = "\n".join(lines)
+    return out
+
+
+def export_racks(dist, out_root):
+    """Write a rack type per rack product of a build, for each target. Returns the files."""
+    dist = Path(dist)
+    f = dist / "rack-products.json"
+    rows = json.loads(f.read_text())["racks"] if f.exists() else []
+    wrote = []
+    for row in rows:
+        doc = json.loads((dist / row["file"]).read_text())
+        for target in TARGETS:
+            d = Path(out_root) / target / "rack-types" / manufacturer_dir(doc["manufacturer"])
+            d.mkdir(parents=True, exist_ok=True)
+            p = d / (str(doc["model"]).replace("/", "-") + ".yaml")
+            p.write_text("---\n" + yaml.dump(rack_type(doc, target), Dumper=Indented,
+                                             sort_keys=False, width=100,
+                                             default_flow_style=False))
+            wrote.append(p)
+    return wrote
+
+
 def _listing_sku(pns):
     """The SKU a listing's own `part-numbers` names the type after - the
     cordless one first, as `build` chooses for the hardware."""
@@ -3552,6 +3660,8 @@ def main():
     ap.add_argument("--out", required=True, help="root of the exports tree")
     ap.add_argument("--device", help="one device by name; default is every device")
     ap.add_argument("--modules", action="store_true", help="export module types instead")
+    ap.add_argument("--racks", action="store_true",
+                    help="export rack types (kind: rack products) instead")
     ap.add_argument("--no-raster", action="store_true",
                     help="write the image booleans but skip rendering the PNGs "
                          "behind them. What CI wants: the YAML is tracked, the "
@@ -3560,6 +3670,10 @@ def main():
                     help="rasterise elevations and module faces from the same build")
     args = ap.parse_args()
 
+    if args.racks:                  # reads rack-products.json alone, so no devices.json
+        for f in export_racks(args.dist, args.out):
+            print(f)
+        return
     dist = Dist(args.dist)
     global RASTER
     RASTER = not args.no_raster

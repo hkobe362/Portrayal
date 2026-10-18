@@ -81,6 +81,35 @@ def test_a_skin_is_read_from_its_own_namespaces_package(result):
     assert result["skinPackages"] > 10, "the skins are not split by namespace"
 
 
+def test_a_rack_is_read_from_its_own_package_by_the_ref_a_saved_rack_carries(result):
+    """#935: `readRack(distAt, 'apc/ar203a@1')` fetches the product from the
+    `@portrayal/racks-<vendor>-<name>` package `packages.json` names."""
+    assert result["rackPackages"] >= 2, "the library has no rack packages"
+    got = result["racks"]["apc/ar203a@1"]
+    assert got["kind"] == "rack" and got["name"] == "ar203a"
+    assert got["package"] and got["held"]
+    assert all(r["package"] and r["held"] for r in result["racks"].values())
+
+
+def test_a_rack_at_a_major_the_library_does_not_hold_says_so(result):
+    """A saved file names `@1`; the library holds `@2` only. The product is
+    not substituted: the page is told, and offers the product again."""
+    assert "the library holds" in result["racks"]["apc/ar203a@1"]["wrongMajor"]
+
+
+def test_a_rack_ref_is_checked_before_it_is_part_of_a_url(result):
+    refs = dict(result["rackRefs"])
+    assert refs["apc/ar203a@1"] == "racks/apc--ar203a.rack.json"
+    for bad in ("apc/ar203a", "apc/ar203a@x", "../x/y@1", "apc/ar203a@1/../x", ""):
+        assert refs[bad].startswith("not a rack ref"), bad
+
+
+def test_a_rack_name_every_object_inherits_is_nobodys_package(result):
+    index = f"https://cdn.test/npm/@portrayal/index@{result['indexVersion']}/"
+    assert result["rackInherited"] == [index + "racks/constructor--x.rack.json",
+                                       index + "racks/__proto__--x.rack.json"]
+
+
 def test_a_name_every_object_inherits_is_nobodys_package(result):
     """`pk.devices["constructor"]` is a function, and truthy: without the
     own-key test the URL was built from its `package` and `version`, both

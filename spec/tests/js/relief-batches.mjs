@@ -139,4 +139,44 @@ out.range = {vertices: half.pos.length / 3, index: half.index};
 const bare = m.mergePieces([{...quad, matrix: I}], {normals: false, uvs: false});
 out.bare = {nrm: bare.nrm, uv: bare.uv};
 
+// ── rasterKey keeps the partition rasterKeyText makes (kit 0.45.0) ──────────
+// A face's `<style>` and `<defs>` come first, then `<!--art-->` and the node's
+// own art. The key rewrites that prefix once; it must still tell apart exactly
+// the texts the whole-text rewrite tells apart, including an id of the prefix
+// that only the art refers to.
+const face = (defs, style) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 9">${style}<defs>${defs}</defs>`;
+const faceA = face('<linearGradient id="g1"/><linearGradient id="g2"/><rect id="unused" data-k="1"/>', sheet);
+const faceB = face('<linearGradient id="g1"/><linearGradient id="g2"/><rect id="other" data-k="2"/>', sheet);
+const faceC = face('<linearGradient id="g1"/>', sheet.replace('red', 'blue'));
+const node = (p, body) => `${p}<!--art--><g>${body}</g></svg>`;
+const bodies = ['<rect id="n1" data-path="a"/>', '<rect id="n2" data-path="b"/>', '<rect fill="url(#g1)"/>',
+                '<rect fill="url(#g2)"/>', '<use href="#g1"/>', '<rect fill="url(#nowhere)"/>', '<title>x</title><rect/>',
+                '<title>y</title><rect/>', '<rect id="led-sys"/>', '<style>.a{}</style><rect/>', '<rect/>'];
+const texts = [];
+for (const p of [faceA, faceB, faceC]) for (const b of bodies) texts.push(node(p, b));
+// an id only the art names, held by another element of an otherwise equal prefix
+const swapA = '<svg><defs><g id="foo"><rect width="1"/></g><g id="x"><rect width="2"/></g></defs>';
+const swapB = '<svg><defs><g id="x"><rect width="1"/></g><g id="foo"><rect width="2"/></g></defs>';
+for (const p of [swapA, swapB]) for (const b of ['<use href="#foo"/>', '<use href="#x"/>', '<rect/>']) texts.push(node(p, b));
+// a prefix with a stylesheet the cut leaves open, an open tag at the cut, a stylesheet in the art
+texts.push('<svg><style>.a{}<!--art--></style><g/></svg>', '<svg><style>.a{}<!--art--></style><g/></svg>'.replace('.a', '.b'),
+           '<svg><g id="q" <!--art--> data-x="1"/></svg>', '<svg><g id="r" <!--art--> data-x="1"/></svg>',
+           node(faceA, '<style>#n1{fill:red}</style><rect id="n1"/>'), node(faceA, '<style>#n1{fill:red}</style><rect id="n2"/>'));
+texts.push('<svg>no marker</svg>', '<svg>no marker</svg>', '', node('<svg><style>', 'x'), node(sheet + '<g ', 'x'));
+const ks = texts.map(t => m.rasterKey(t)), fs = texts.map(t => m.rasterKeyText(t));
+let partition = true;
+for (let i = 0; i < texts.length; i++)
+  for (let j = i; j < texts.length; j++) if ((ks[i] === ks[j]) !== (fs[i] === fs[j])) partition = false;
+out.keyPartition = partition;
+out.keyIsShort = ks[0].length < fs[0].length / 2 + 40;
+out.keyStable = m.rasterKey(texts[2]) === ks[2];
+// a face's raster is the kept one, not a copy of it
+m.setRasterBudget(32e6);
+m.clearRasterCache();
+globalThis.fetch = async () => ({ ok: true, text: async () => node(faceA, bodies[0]) });
+const scope = m.createReliefScope({PXMM: 4});
+const sc1 = await m.svgCanvas('x.svg', 10, 5, false, false, scope),
+      sc2 = await m.svgCanvas('x.svg', 10, 5, false, false, scope);
+out.svgCanvasShared = sc1 === sc2;
+
 console.log(JSON.stringify(out));

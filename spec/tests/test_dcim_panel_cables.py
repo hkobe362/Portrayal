@@ -12,13 +12,17 @@ projection's two views (`ports`, `part_ports`) are one walk. And the kit's own
 rows, by its node tests, against the committed files and two golden CSVs.
 
 WHAT A CABLES FILE REACHES is narrower than what agrees here, and the node
-sweep states it: of the 63 modules that publish ports, 3 FS panels have no
-`attrs.model` and the kit finds no type file for them (#1025); on NetBox the
-other 60 resolve, less the one adapter of each of 4 DCMs; on Nautobot 36 of
-the 63 are named `{module}/x`, and less the 4 DCMs 32 resolve whole, since 4
-types carry no glass there and 20 Fibrain panels are named by a bay chain,
-which the kit does not read (#1024). This file finds a type by its model OR
-its contract name, so it compares the names of all 63.
+sweep states it: of the 63 modules that publish ports, the kit finds a type
+file for all, by the part number or, with no `attrs.model`, by the contract
+name; on NetBox they resolve, less the one adapter of each of 4 DCMs; on
+Nautobot, less the 4 DCMs, 4 types carry no glass there and the rest resolve
+whole. This file finds a type by its model OR its contract name, as the kit
+does, so it compares the names of all 63.
+
+A MODULE IN A BAY OF ANOTHER MODULE (#1024) is reached too: 28 of the 63 (the
+20 Fibrain holders in the XCU10 drawer, the 8 Smartoptics modules in the
+DCP-F-A22), named through the carrier's bay. The node sweep seats each and
+checks every name against the committed type files of both targets.
 """
 import json
 import os
@@ -47,9 +51,8 @@ def _index():
 def _type_file(target, entry):
     """The committed module type a contract is written as, or None: by its
     model, else by its contract name, which is how the exporter names the file
-    (`dcim_export.build_module`). NOT as the kit finds one: the kit looks for
-    the part number (export-data.js partNumber, then moduleTypePath) and
-    misses a module with no `attrs.model` (#1025)."""
+    (`dcim_export.build_module`); the kit looks for the part number
+    (export-data.js partNumber, then moduleTypePath), then the name (#1025)."""
     model = str((entry.get("attrs") or {}).get("model") or entry["name"]).replace("/", "-")
     hits = sorted((EXPORTS / target / "module-types").glob(f"*/{model}.yaml"))
     return yaml.safe_load(hits[0].read_text()) if hits else None

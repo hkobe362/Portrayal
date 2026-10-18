@@ -1,6 +1,8 @@
 # Rack and cabinet products: the library format
 
-Status: proposed 2026-10-09, nothing built. Issue #935. Each section's
+Status: proposed 2026-10-09. Issue #935. Built so far: the kind, its schema and
+lock, the open frames AR203A and AR201, and their npm packages (section 11, step
+2). Everything else is still a proposal. Each section's
 decision is a recommendation; the five questions the note left open were
 decided as it recommended on 2026-10-09, and are listed at the end of section
 11.
@@ -52,9 +54,11 @@ building blocks first, with shelves, drawers and DIN rail able to hold things.
   `module`, published in `kits.json`; `chassis.kits` and `chassis.ears` on a
   device, with named ear positions and their `at`. `rack.json` does not yet
   carry a device's default ear position (#908, open).
-- **The faceplate setback** is 30 mm for every device in the Rack Builder, its
-  3D scene's showcase default. A per-item and per-frame `setback` was built in
-  the site and paused unmerged (portrayal-site#139, part 3).
+- **The faceplate setback** is flush today: the Rack Builder sets every device on
+  the rail plane (it draws cables through the kit's points, portrayal-site#166).
+  The 30 mm showcase default the 3D scene once had is gone. A per-item and
+  per-frame `setback` was built in the site and paused unmerged
+  (portrayal-site#139, part 3).
 - **`rack.json`** (`format: 1`) is the one-fetch catalogue of placeable devices.
   It has no racks in it.
 - **The DCIMs.** NetBox has a rack type (`RackType`, manufacturer, model and
@@ -637,6 +641,50 @@ cabinets, wall and vertical, and desktop.
    lint, `rack.json` `frames`, the rack type export (decision 5), and the open frames
    AR203A and AR201, which fit rack file version 3 through `frame.ref`. The
    Rack Builder's frame picker follows in the site.
+
+   **Built (#935):** `library/racks/<vendor>/<name>/rack.yaml` and
+   `rack.lock.json`, `spec/schemas/rack-product.schema.json`, lint rule L193,
+   and `apc/ar203a` and `apc/ar201`. The schema holds the frame only; channels,
+   doors, the base and baying are additive keys that arrive with the cabinets.
+   A rack is walked by `libwalk.iter_racks` and locked by `devicelock.py`
+   beside devices and listings. The build writes `rack-products.json` (one row
+   per product, with its ref `<vendor>/<name>@<major>`) and
+   `racks/<vendor>--<name>.rack.json` beside the schema, through
+   `registry_index.py`. `npm_packages.py` ships each product as
+   `@portrayal/racks-<vendor>-<name>`, named in the `racks` table of the index's
+   `packages.json`, and the kit's `readRack` loads one by its ref. `rack.json`
+   and the rack file are unchanged: `frames` in `rack.json` is step 3.
+
+   **Built (#1105):** the generic shapes `generic/2-post-frame`,
+   `generic/4-post-frame` and `generic/4-post-cabinet`, each the Rack Builder's
+   default frame plus `hole-centres: 465` and `opening: 450`. Both figures were
+   read from an IBM rack-requirements page and Wikipedia (they differ a little:
+   Wikipedia has 464.2 to 465.8 and 450.85); the EIA-310 text was not read, so
+   each is `estimated` with a `gaps` entry, and no 23-inch figure is stated. The
+   rail depth is left out of the generic four-post shapes: no page sets one. The
+   hole pattern (sets of three holes, 15.9, 15.9 and 12.7 mm, 44.45 mm a set)
+   is in the `holes` provenance note, because the schema has no key for it.
+   The rack types are exported by `dcim_export.py --racks` to
+   `library/exports/netbox/rack-types/<Manufacturer>/<model>.yaml`, with the
+   Nautobot rack fields under `library/exports/nautobot/rack-types/`.
+   **Built (#935, `frames`):** `rack.json` gains `frames`, one row per product
+   keyed by its ref, written by `rack_index.py` from the compiled products. A row
+   holds the identity (`ref`, `vendor`, `name`, `version`, `major`,
+   `manufacturer`, `model`, `maturity`, `part-numbers`, `aliases`, `description`)
+   and the numbers the product states (`form`, `ru`, `numbering`, `width`,
+   `hole-centres`, `opening`, `holes`, `rails`, `max-device-depth`, `outer`,
+   `weight-kg`, `load`); a key the product lacks is absent. `points`,
+   `channels`, `enclosure`, `options` and `base` are not in the product schema
+   yet and arrive with the cabinets. The kit applies a product with
+   `frame.apply` and frees a frame with `frame.customise` (`kit/rack/frames.js`).
+   Applying writes `ref` and the frame keys the rack file already had, and
+   refuses a product that needs `width`, `numbering.start` or round holes, which
+   come with the rack file keys of section 9. While `ref` is set, a number the
+   product states is not edited (a product that states a number fixes it, the
+   generic shapes' stand-ins included); the rail depth is edited within its
+   range and step. A ref the catalogue lacks, or whose fixed numbers no longer
+   match, loads with a note and is drawn from the file's numbers.
+
 3. **Hosting.** `hosts:` on devices, `chassis.ears.holes`, and rack file
    version 4 with all of section 9's keys at once; setback (#908 and the
    paused site design) lands in the same version. Fit, describe, inspect and

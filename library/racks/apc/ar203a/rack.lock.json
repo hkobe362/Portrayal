@@ -1,0 +1,15 @@
+{
+ "format": 1,
+ "frame": "3b5b38fe46378dd6",
+ "geometry": {
+  "hole-centres": "43166a0a815fd29b",
+  "opening": "8369089668254fa3"
+ },
+ "stated": {
+  "load.static-kg": "1652019fcdd80cbd",
+  "outer": "f2ecb7a86062c303",
+  "weight-kg": "eeed15d7713a9ad9"
+ },
+ "surface": "ff653e416acad272",
+ "version": "1.0.0"
+}

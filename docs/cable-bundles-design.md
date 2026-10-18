@@ -576,6 +576,36 @@ It is kept, listed, not drawn, and has no straps. Each command that leaves it
 so says "Bundle 2 now holds one cable." `describe` and `inspect` show it
 (decision 5).
 
+### 4.5a A trunk of one waypoint is a tie (#1017)
+
+Decided 2026-10-16. A bundle of two or more cables whose stored trunk is one
+waypoint (cables that share one ring and nothing else) is **a tie at that
+point**. `bundle.create` still accepts a one-waypoint route and a saved rack
+that holds one loads unchanged. `bundles.js` `isTie(b)` names it. It has:
+
+- **one strap**, round the pack at the waypoint (`kind: 'tie'`), when two or
+  more members ride it, and none otherwise (#1021): `bundleCheck` then says
+  "Bundle 1 is a tie at mgr-1 ring 3, and only one cable rides there, so it has
+  no strap." A bundle set to no straps has none, as a longer trunk has none of
+  any kind. A spacing plays no part: there is no length to space along;
+- **riding** as on a longer trunk: the members that join and leave at the
+  waypoint (one whose route misses it runs to it, as to a longer trunk's
+  nearest element), and not a loose member;
+- **its width** as any strap's: the wide one for a pack 25 mm across or more,
+  else the base one; it is not moved off the ring, and not narrowed for peel
+  points, which are all at this one place;
+- **its place** on the path of the middle one by id of the members that have a
+  path there, with the way that path runs; the waypoint itself where none has;
+  `along_mm`, `segment` and `t` are 0;
+- **no length**: `trunkLength` gives `{metres: 0, tie: true}`, and the exports
+  give `length_m: null` with `tie: true` and `tie_at`, so a list says "tied at
+  mgr-1 ring 3" and not "0 m". The envelope on hover is the size check's, at
+  the ring.
+
+The strap count, the BOM and the schedule's bundle note carry the one strap;
+`kinds` gains `tie` only for a tie. The rack JSON has no field to change, and
+NetBox, Nautobot and draw.io carry membership only, so none says "a tie".
+
 ### 4.6 Edge cases
 
 - **A stale peel point,** one no longer on the trunk (from a hand-edited file,
@@ -666,7 +696,9 @@ without changing the check.
 does, in rack coordinates (`route.js pointOf` on `ctx.route`), so it agrees
 with the length and with every view.
 
-1. **The polyline** is the trunk's waypoints, in order, as points.
+1. **The polyline** is the trunk's own line (see "Which line" below): the
+   points of the members' paths from one place on the trunk to the next, in
+   order. Where no path can be read it is the trunk's waypoints, in order.
 2. **Straight passes are merged.** Walking the polyline, a waypoint is a
    straight pass, not a corner, when the next segment's direction is within 1
    degree of the leg's direction: the direction from the last corner (or the
@@ -680,20 +712,20 @@ with the length and with every view.
    neighbouring corner on each side, through any straight passes, or to the
    trunk's end where there is no further corner. Peel and join points do not
    cut a leg: they do not change the trunk's shape.
-5. **The share of a leg.** A leg between two corners is shared, so each corner
-   may use half of it: `a = L / 2`. A leg that ends at the trunk's end has no
-   other bend of the bundle on it (the members' turns there are their leads'),
-   so the corner may use all of it: `a = L`.
+5. **The share of a leg.** A leg between two corners is shared, and is
+   divided by what each turn needs of it (#984, `share: 'need'`): a bend of
+   radius `r` uses `r * tan(θ / 2)` of each leg, so the largest radius both
+   corners of a leg `L` can take is `L / (tan(θ₁ / 2) + tan(θ₂ / 2))`. A leg
+   whose other corner doubles back is halved, so one fold does not take all the
+   room of its neighbours. A leg that ends at the trunk's end has no other bend
+   of the bundle on it (the members' turns there are their leads'), so the
+   corner may use all of it. This is the rule a cable's own path is judged by.
 
-The largest radius that fits is:
-
-```
-r_max = min(a_in, a_out) / tan(θ / 2)
-```
-
-A bend of radius `r` uses `r * tan(θ / 2)` of each leg. A right angle with
-120 mm to the next corner on each side allows 60 mm: half of 120, over
-tan 45° = 1. As θ approaches 180 degrees, `tan(θ / 2)` grows without bound and
+The largest radius that fits is the smaller of the two legs' figures: for a
+leg to the end, `L / tan(θ / 2)`, and for a shared leg the figure above. For a
+polyline that is all right angles, a shared leg of 120 mm allows 60 mm, as
+halves would. A right angle beside a 15° turn at r = 25 needs 28.3 mm of the
+leg between them, where halves asked for 50. As θ approaches 180 degrees, `tan(θ / 2)` grows without bound and
 `r_max` falls to 0, so a trunk that doubles back on itself is always reported:
 a bundle cannot fold back at a point. The front-to-rear crossing at the top of
 a four-post rack is two corners in depth, and is checked the same way.
@@ -706,13 +738,15 @@ also checked: a radius a bundle must keep through it, such as a waterfall or
 bend-radius fingers. No guide states one today; the hook is there for when
 one does (decision 8).
 
-**Unknown types are unchecked, not passed.** At each point:
-
-- every member present has a radius: checked;
-- some have one: checked against those, and the result lists the rest as
-  unchecked: "Bundle 2's bend is not checked for c5 and c9, which have no
-  cable type.";
-- none has one: the point is unchecked, never reported as passing.
+**A cable with no type is checked at the default (#1132).** A member with no
+cable type is given the radius a cable alone is given (`bendOf` in
+`kit/rack/resting.js`, 24 mm), so a bundle and its members agree. At each
+point every member present is checked at its own radius, and the result lists
+those at the default in `defaulted`: "Bundle 2's bend is checked at 24 mm for
+c5 and c9, the default for a cable with no cable type." A warning that such a
+member sets says so: "c5 needs 24 mm (the default, it has no cable type)".
+Only where no cable types are loaded is the bend unchecked, never reported as
+passing.
 
 A finding: "Bundle 2 turns at mgr-1 ring 1 with room for an 18 mm bend; c7
 (OM4) needs 25 mm, 7 mm short." Each violation gives the location, the radius
@@ -723,8 +757,17 @@ was the per-cable bend warning #919 left to a follow-up; since #973 (kit
 0.17.0) the kit judges each cable's own path, with the same corners and a
 leg shared by what each corner needs of it, not by halves
 ([cable-lay-design.md](cable-lay-design.md) section 3.4). The bundle check
-and its error bound are as they were: a trunk is a sketch through waypoint
-centres, and the halves stay.
+shares a leg the same way since #984. Its error bound is as it was: a trunk is
+a sketch through waypoint centres.
+
+**Which line.** The corners are read from the trunk's own line, the one the
+straps and the length are measured along (section 6, #1034): the members'
+routed paths, not the straight lines between waypoints (#1037). A cable that
+goes round a duct turns where the straight line does not, and a bundle too
+tight there is found. A corner within a ring's depth along the line of a
+waypoint is that waypoint's; one between two places is reported as "A to B",
+and of several at one place the tightest is reported. Where no member's path
+can be read the straight lines stand in.
 
 ### 5.3 What an agent reads
 
@@ -859,7 +902,7 @@ reading `ctx.route`:
   names; members that lie like it are there too; one that hangs otherwise is
   off it by the difference of the two hangs. Laying a pack as one body is
   not done here.
-  The bend check (section 5.2) still reads the straight lines.
+  The bend check (section 5.2) reads this line's corners too (#1037).
 
 Each strap comes back as `{segment, t, along_mm, point, dir, on}`. `point` is
 where it is, in rack coordinates, `dir` the way the trunk runs there (a unit
@@ -1043,10 +1086,10 @@ What the bend check settled that section 5.2 leaves to it:
 - **Rounding.** Angles, legs and room are given to 0.1 (mm or degree), and a
   point passes when its need is at most its room as given, so a reader who
   compares the two numbers it is shown agrees with the verdict.
-- **The unchecked note** says "no cable type with a bend radius", not "no cable
-  type": `ctx.bendOf` is null for a type that states no radius too. Every type
-  #919 publishes states one, so today the two are the same. Without
-  `ctx.bendOf` the note is "the cable types are not loaded" (section 3.1).
+- **The default note** says "no cable type": `ctx.bendOf` is null for a type
+  that states no radius too, and that cable is checked at its media's radius,
+  else the default. Without `ctx.bendOf` the note is "the cable types are not
+  loaded" (section 3.1).
 - **A trunk that doubles back** has no room. Its warning says so rather than
   giving a shortfall: "Bundle 2 doubles back at mgr-2 ring 2, with no room for
   a bend; c1 (dac) needs 23 mm." The member is named with its type id, as the

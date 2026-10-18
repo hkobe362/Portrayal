@@ -235,7 +235,7 @@ RULES = {
     "L44": ("device",     "panel decor agrees with the face: a patterned field is not buried under parts, printing does not run off the edge, no decor lies wholly off the face", "move or trim the decor",
             "Decor that is buried under parts, runs off the face, or lies wholly off it shows vents or printing the real panel does not have, and usually means something was mismeasured.",
             WARNING),
-    "L45": ("device",     "a face of a device at `modelled` or above draws something, unless a gap's `scope` names the face", "draw the face's content, estimated and marked where it must be, or open a gap whose `scope` names it; an `empty:` sentence records where you looked and does not clear this",
+    "L45": ("device",     "a face of a device at `modelled` or above draws something, unless the view carries an `empty:` sentence or a gap's `scope` names the face", "draw the face's content, estimated and marked where it must be, or record where you looked in the view's `empty:` sentence, or open a gap whose `scope` names it; none of these makes the face count as drawn",
             "A face that only declares a size is not drawn, so the device would claim more than it shows unless the author records why the face stays empty.",
             WARNING),
     "L46": ("component",  "composed parts do not collide inside the part", "move a part, or say in provenance that the layering is deliberate",
@@ -678,6 +678,9 @@ RULES = {
              ERROR),
     "L192": ("component, device", "in Portrayal's own library a device or component states no `audience`, or states `public` (error); a project that keeps private entries beside the public library runs lint with `--allow-audience`", "delete the `audience` line, or set it to `public`; move a private entry to the library that holds private entries",
              "The public library is published to everyone, so a part labelled for one customer or kept internal there is either a leak or a label that means nothing; the check stops the label from reaching the published library.",
+             ERROR),
+    "L193": ("rack", "a rack product is what its place says it is: its directory is its `name`, no device or listing of its vendor has that name, a four-post form lists a `front` and a `rear` rail and every other form the `front` alone, only the `rear` rail has a `depth`, a depth range runs from less to more with its `factory` inside it, every `provenance` key is a key the rack states, and a figure whose confidence is `estimated` has a `gaps` entry of its own name (error)", "rename the directory or the `name`; list the rails the form has; write the range as `min` below `max`; give each provenance entry the key of the figure it covers; declare every stand-in in `gaps` with what would close it",
+             "A rack is referenced as `<vendor>/<name>@<major>` without its kind, so the name has to be free among the vendor's devices, and a saved rack file copies a product's rails and depth; a stand-in that is not declared reads as a printed figure.",
              ERROR),
 }
 
@@ -7049,8 +7052,17 @@ def lint_device_empty_views(path, data):
     declared = set()
     for g in (data.get("gaps") or []):
         declared.update(g.get("scope") or [])
+    #
+    # A FACE THAT CARRIES AN `empty:` SENTENCE IS EXEMPT TOO. That is the field
+    # the paragraph above said did not exist; it records where the author looked
+    # and found nothing, and L60 checks the face is then actually bare. The gap
+    # exemption stays beside it: a gap also covers a face whose content is known
+    # to be missing for a reason that is not "nothing was published". Neither
+    # clears the capability level - an empty face still does not count as drawn.
     for vname, view in (data.get("views") or {}).items():
         if vname in declared:
+            continue
+        if str((view or {}).get("empty") or "").strip():
             continue
         vp = view_parts(view or {})
         if any(vp[k] for k in ("decor", "cutouts", "silkscreen",
@@ -7061,7 +7073,8 @@ def lint_device_empty_views(path, data):
         warn(path, "L45", f"{vname}: the face declares a size and nothing else, so "
              "it does not count as drawn and will not carry this device to "
              "`solid`. Give it its honest content - a rail, a label, a vent "
-             "field, estimated and marked - or record why it stays empty")
+             "field, estimated and marked - or record why it stays empty in "
+             "the view's `empty:` sentence")
 
 
 def lint_device_silkscreen_owner(path, data):
@@ -7613,13 +7626,9 @@ def lint_device_empty_declaration(path, data):
     the feature gets drawn, and the sentence saying nobody could find one stays
     behind and quietly contradicts the drawing above it.
 
-    NOTE FOR L45, which is about the same faces from the other side. Its comment
-    records that it over-exempts on purpose - it takes any gap NAMING a view as
-    covering it, because "nothing in a gap says 'this is why the face is empty',
-    so telling the two apart needs a field that does not exist". That field now
-    exists and is this one. Tightening L45 to exempt on `empty` rather than on
-    gap scope is deliberately NOT done here: it would start warning on every face
-    currently covered by a scope, which is a change worth making on its own.
+    L45 is about the same faces from the other side, and exempts a face that
+    carries this sentence - so a claim of emptiness is the only thing standing
+    between an undrawn face and that warning, which is why this guard matters.
     """
     for vname, view in (data.get("views") or {}).items():
         view = view or {}
@@ -7830,6 +7839,52 @@ def _listing_targets(rules, field):
             yield pat, dcim_export._expand(pat, n)
 
 
+FOUR_POST_FORMS = {"4-post-frame", "4-post-cabinet"}
+
+
+def lint_rack(path, data, roots):
+    """L193: a rack product is what its place says it is (#935).
+
+    The schema holds the shape of every key; this holds what it cannot say
+    across keys and across the library. A rack is referenced as
+    `<vendor>/<name>@<major>` and resolves without its kind, so its name is
+    free among the vendor's devices and listings as well as its racks.
+    """
+    p = Path(path)
+    name, vendor = data.get("name"), p.parent.parent.name
+    if p.parent.name != name:
+        err(path, "L193", f"the directory {p.parent.name!r} is not the rack's name {name!r}")
+    for r in roots:
+        for taken in (Path(r) / "devices" / vendor / str(name) / "device.yaml",
+                      Path(r) / "devices" / vendor / str(name) / "listing.yaml"):
+            if taken.exists():
+                err(path, "L193", f"{vendor}/{name} is also a {taken.stem} of the vendor; a ref "
+                    "resolves without its kind, so a rack's name is unique across racks and devices")
+    ids = [r.get("id") for r in data.get("rails") or [] if isinstance(r, dict)]
+    want = ["front", "rear"] if data.get("form") in FOUR_POST_FORMS else ["front"]
+    if sorted(ids) != sorted(want):
+        err(path, "L193", f"form {data.get('form')!r} has the rails {want}, and the rack lists {ids}")
+    for rail in data.get("rails") or []:
+        depth = (rail or {}).get("depth")
+        if not depth:
+            continue
+        if rail.get("id") == "front":
+            err(path, "L193", "the front rail has no `depth`: depth is measured from it to the rear rail")
+        lo, hi = depth.get("min"), depth.get("max")
+        if lo is not None and hi is not None and not lo < hi:
+            err(path, "L193", f"the depth range runs from {lo} to {hi} mm; min must be below max")
+        f = depth.get("factory")
+        if f is not None and lo is not None and hi is not None and not lo <= f <= hi:
+            err(path, "L193", f"the factory depth {f} mm is outside the range {lo} to {hi}")
+    gaps = {g.get("what") for g in data.get("gaps") or [] if isinstance(g, dict)}
+    for key, prov in (data.get("provenance") or {}).items():
+        if str(key).split(".")[0] not in data:
+            err(path, "L193", f"provenance for {key!r}, a key the rack does not state")
+        if isinstance(prov, dict) and prov.get("confidence") == "estimated" and key not in gaps:
+            err(path, "L193", f"{key} is an estimate and has no `gaps` entry of that name; "
+                "say what is missing and what would close it")
+
+
 def lint_listing(path, data, roots):
     """L56: a listing lives under a NOS vendor and lists hardware that exists.
 
@@ -8013,7 +8068,7 @@ def lint_vendor_registry(root):
     repository owns, and needs no document to fix.
     """
     seen = set()
-    for base in ("components", "devices"):
+    for base in ("components", "devices", "racks"):
         d = root / base
         if not d.is_dir():
             continue
@@ -14112,6 +14167,7 @@ def main():
     comp_v = load_schema(schemas, "component.schema.json")
     dev_v = load_schema(schemas, "device.schema.json")
     lst_v = load_schema(schemas, "listing.schema.json")
+    rack_v = load_schema(schemas, "rack-product.schema.json")
 
     n = 0
     matrix = []
@@ -14292,6 +14348,15 @@ def main():
             if isinstance(data, dict):
                 lint_listing(f, data, args.library)
                 lint_part_number_keys(f, data)
+                lint_quoted_prose(f, data)
+            n += 1
+        for f in libwalk.iter_racks([root]):
+            lint_duplicate_keys(f)
+            data = load_yaml(f)
+            for e in rack_v.iter_errors(data):
+                err(f, "L1", f"{'/'.join(str(p) for p in e.path)}: {e.message}")
+            if isinstance(data, dict):
+                lint_rack(f, data, args.library)
                 lint_quoted_prose(f, data)
             n += 1
         for f in libwalk.iter_labs([root]):

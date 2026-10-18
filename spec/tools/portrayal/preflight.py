@@ -41,6 +41,8 @@ THE CHECKS
              `spec/tests/test_no_internal_hosts.py`, imported from it.
   changelog  A fragment under `changelog.d/` when `library/`, `spec/` or `kit/`
              changed, and every fragment well formed (`changelog.py --check`).
+             A release diff passes without one: fragments deleted, their
+             entries under a new `## <version>`, `## Unreleased` empty.
   devicelock `devicelock.py --library library` reports nothing; and a device
              whose lock the diff re-recorded is also checked against the lock
              at the merge base, which catches `--update` run before the bump.
@@ -329,7 +331,7 @@ def regenerate_exports(root, out):
                 "--images", "--no-raster"]
         runs = [subprocess.Popen(base + extra, cwd=root, env=_env(),
                                  stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-                for extra in ([], ["--modules"])]
+                for extra in ([], ["--modules"], ["--racks"])]
         for p in runs:
             _, err = p.communicate()
             if p.returncode:
@@ -545,6 +547,44 @@ def check_private(ctx):
 
 # --------------------------------------------------------------- changelog ---
 
+def _release_version(ctx):
+    """The version a release diff folds the fragments into, else None.
+
+    `changelog.py --assemble` deletes every fragment and writes their entries
+    under a new `## <version>` heading, leaving `## Unreleased` empty, so on a
+    release branch the check cannot ask for a fragment on disk. The diff is a
+    release when it deletes fragments, adds such a heading, leaves Unreleased
+    empty and finds every deleted entry in CHANGELOG.md. A branch that only
+    deletes a fragment, or adds a heading without the entries, is not one.
+    """
+    from portrayal import changelog
+    gone = [p for p in ctx.changed
+            if re.fullmatch(r"changelog\.d/[^/]+\.md", p) and p != "changelog.d/README.md"
+            and p in ctx.base_files and not (ctx.root / p).is_file()]
+    text_path = ctx.root / "CHANGELOG.md"
+    if not gone or not text_path.is_file():
+        return None
+    text = text_path.read_text(encoding="utf-8")
+    headings = [l.strip()[3:].strip() for l in ctx.added.get("CHANGELOG.md", {}).values()
+                if re.fullmatch(r"## \d+\.\d+\.\d+\S*", l.strip())]
+    if len(headings) != 1:
+        return None
+    lines = text.split("\n")
+    try:
+        start, end = changelog._unreleased_span(lines)
+    except ValueError:
+        return None
+    if any(l.strip() for l in lines[start:end]):
+        return None
+    for rel in gone:
+        sections, _ = changelog.parse(git(ctx.root, "show", f"{ctx.mbase}:{rel}"))
+        for entries in sections.values():
+            for entry in entries:
+                if "\n".join(entry) not in text:
+                    return None
+    return headings[0]
+
+
 def check_changelog(ctx):
     from portrayal import changelog
     name = "changelog"
@@ -558,6 +598,10 @@ def check_changelog(ctx):
              if re.fullmatch(r"changelog\.d/[^/]+\.md", p) and p != "changelog.d/README.md"
              and (ctx.root / p).is_file()]
     if not frags:
+        version = _release_version(ctx)
+        if version:
+            return passed(name, f"a release diff: the fragments are folded into "
+                                f"CHANGELOG.md under ## {version}")
         return failed(name, "library/, spec/ or kit/ changed and no changelog.d/ fragment "
                             "was added", [],
                       "add changelog.d/<branch-or-topic>.md (changelog.d/README.md says "

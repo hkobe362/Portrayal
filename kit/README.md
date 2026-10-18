@@ -225,6 +225,7 @@ compared, and a difference throws ("New in 0.25.0" below).
 |---|---|
 | `rack/catalog.js` | `loadCatalog(dist)`: the rack catalogue, and the `chassisOf(ref)` lookup everything else takes; `loadSlots(dist, refs)`: the bays, cages and parts the commands check against |
 | `rack/model.js` | the rack file: `newDoc`, `parseDoc`, `serialize`, and an edit of an item, frame or name that returns a new rack |
+| `rack/frames.js` | rack products applied to a frame (`rack.json` `frames`): `appliedFrame` copies a product's numbers and ref, `editRefusal` holds a frame to what its product fixes, `customisedFrame` drops the ref, `frameState` says whether the catalogue still agrees with the file, `frameProducts` lists what can be chosen, and `frameName` is the name a product is shown by (maker and model, else the ref); the commands are `frame.apply` and `frame.customise` |
 | `rack/rails.js` | the rack's rails: unit height, opening and where a device sits between them |
 | `rack/fit.js` | whether a device fits at a unit, on a face and (a narrow part) on one rail; whether a zero-U part fits beside the rack (`fitsZeroU`); how a shrink trims a rack |
 | `rack/zero-u.js` | the parts beside the rack: where each stands, as words (`whereText`) and as x (`zeroUX`), whether the lane beside its upright runs through it, and each placeable entry (`zeroUEntries`) |
@@ -335,6 +336,16 @@ is long. `straps()` also returns `notes`, a sentence for each tie slot no
 strap goes through. A page draws a
 band at each slot of `anchorsOf`, and hands the list to `strapBomRows(bundles,
 {anchors})` so that single cables count.
+
+A bundle whose stored trunk is one waypoint, with two or more cables, is a
+**tie**: the cables share that point and nothing else, so it has no length and
+is held by one strap round the pack there. `straps()` gives that strap the
+`kind` `tie`, counted in `kinds.tie`, a key only a tie has; it is as wide as any
+other strap (19 mm, or 25 mm for a pack 25 mm across or more). It is there when
+two or more members ride the tie; with fewer there is no strap, and `notes`
+says so. `strapTotals(rack, ctx)` adds the strap to `total` and gives `tie`,
+how many there are, when there is one. `trunkLength` returns `{metres: 0, tie:
+true}` for a tie, which is not a length of 0 m.
 
 The exports take what the routes know from the page. `cableScheduleRows`
 fills `spare` and `stored` from `{spare: spareExports(rack, ctx)}` and its
@@ -675,6 +686,11 @@ cables that have one on its `Findings:` line and names the worst, and
 cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
+
+**New in 0.51.0: the relief detail pass asks for each raster once.** `rasterKey` rewrites a face's
+shared `<style>` and `<defs>` once and keys a node by that and its own art (`rasterKeyText` is the
+whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on
+a copy (`rasterize`), never on it.
 
 **Also in 0.50.0: a body piece carries a side drawing, and a fitted piece follows its field.**
 A piece in `body.boxes` that `shows: [left|right|top|bottom]` is painted on that side with the patch
@@ -1634,7 +1650,10 @@ name, members, drawn, checked, length_m, straight, few, every, straps, size_mm, 
 limit_at, limit_estimated, bend_mm, bend_by, bend_checked, warnings, notes }`.
 `name` is what a tag prints (the label, else "Bundle N"), and `number` and
 `label` are there on their own for label software. `straps` is the count the
-BOM buys, and null when the route could not be read: never a guess.
+BOM buys, and null when the route could not be read: never a guess. A tie (see
+`straps()` above) has `length_m: null`, and the record adds `tie: true` and
+`tie_at`, the waypoint it is held at ("mgr-1 ring 3"); `strap_kinds.tie` is 1.
+`bundleNotes` reads it "tied at mgr-1 ring 3, 1 strap" where it would give a length.
 `bundleNotes(bundles)` is one line per bundle, its members, length, straps,
 size and bend ("Bundle 2 (b1): 12 cables (c1-c12), 2.4 m, 8 straps every
 12 in; ..."), followed by its warnings and notes.
