@@ -1,0 +1,79 @@
+format: 1
+kind: component
+name: 49253-1cv
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+description: >-
+  The Leviton 49253-1CV 1RU metal cover for the 49253 five-ring horizontal managers, seen
+  from the front - a plate 442.7 mm wide whose two ends fold back into pockets that hook
+  over the outer two rings and slide down until the cover is seated. Sold separately from
+  the manager.
+provenance:
+  size: >-
+    drawing - Leviton's 49253-1CV dimensional drawing (DXF, linked on the product page as
+    49253-1CV.DXF): 17.4296 in [442.7mm] wide by 1.72 in [43.7mm] high, the specification
+    sheet's page 2 giving the same 442.7 mm [17.43 in] and 43.7 mm [1.72 in]. It is as
+    tall as the 1RU panel and 1.8 mm narrower than the 444.5 between the panel's folds.
+    The drawing's title block names the part 49253-2CV and its note "2RU METAL COVER";
+    the dimensions are 1RU's, 43.7 high, and the 1CV file is taken as the 1RU cover.
+  relief: >-
+    drawing - the top view and right-end view of the same drawing, read at millimetres: the
+    plate is 1.22 mm thick (the arcs' 1.98 and 0.76 radii) and stands 6.24 mm [0.2456 in]
+    deep with its ends. Each end folds back over a rectangle 37.0 mm long (18.44 to 55.47
+    on the drawing) and 26.9 mm high, centred on the height, into a pocket 3.81 mm across
+    between the plate and a back tab 1.22 thick. A ring's leg 3.175 thick fits that pocket,
+    and the instruction sheet (Horizontal Patch Cord Organizers and Covers, step 3) says to
+    "align left and right side of the covers to outside split rings and slide downward
+    until cover is fully seated". The pocket's ends are drawn as square folds where the
+    drawing shows a radius, and the small notches in the tab's edge are not drawn.
+  placement: >-
+    estimated - the reference of this part is the back of the tab. A placement lifts it by
+    the ring depth of its manager less 6.25, so the plate's front face is flush with the
+    ring tips and the manager's own depth holds. The drawing does not dimension how the
+    pocket sits on a ring leg, and a plate in front of the tips would stand 1.22 mm
+    outside the manager's envelope; this keeps the cover inside it, which puts the plate
+    1.22 mm nearer the panel than that.
+  color: >-
+    datasheet - "16-gauge steel with a black powder-coat finish" for the managers and "Metal
+    covers" in the same sheet; the product page for the manager says "Color: Black". The
+    drawing is line work, so the shade is this library's render, a little lighter than
+    the manager so the two read apart.
+size: {w: 442.7, h: 43.7}
+size-confidence: {w: drawing, h: drawing}
+attrs: {material: steel, finish: black powder coat}
+elements:
+  hook-left: {at: [0.0, 8.4], size: [37.03, 26.9], class: bezel}
+  hook-right: {at: [405.67, 8.4], size: [37.03, 26.9], class: bezel}
+  fold-left: {at: [0.0, 8.4], size: [1.22, 26.9], class: bezel}
+  fold-right: {at: [441.48, 8.4], size: [1.22, 26.9], class: bezel}
+  plate: {at: [0.0, 0.0], size: [442.7, 43.7], class: bezel}
+relief:
+  features:
+    - node: hook-left
+      out: 1.22
+      color: '#25272a'
+      confidence: drawing
+      source: the top view of the 49253-1CV drawing, the back tab 1.22 thick at the far side of the pocket
+    - node: hook-right
+      out: 1.22
+      color: '#25272a'
+      confidence: drawing
+      source: the top view of the 49253-1CV drawing, the same tab at the other end
+    - node: fold-left
+      out: 6.25
+      color: '#25272a'
+      confidence: drawing
+      source: the top view of the 49253-1CV drawing, the end fold joining plate and tab, 6.24 mm overall
+    - node: fold-right
+      out: 6.25
+      color: '#25272a'
+      confidence: drawing
+      source: the top view of the 49253-1CV drawing, the same fold at the other end
+    - node: plate
+      lift: 5.03
+      out: 6.25
+      color: '#2a2c2f'
+      confidence: drawing
+      source: the top view of the 49253-1CV drawing, the plate 1.22 thick with its back face 3.81 in front of the tab
+skins: [default]

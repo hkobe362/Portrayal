@@ -1,0 +1,58 @@
+format: 1
+kind: component
+name: versi-duct-front-fingers
+version: 1.0.0
+class: mechanical
+description: >-
+  One wall of fingers of a Leviton VERSI-DUCT horizontal duct's front channel seen from the
+  front - the PVC wall along the top or bottom of the channel, ten fingers end-on with a
+  slot a patch cord is laid in through between each pair. The same part on the 491RU-HFR,
+  492RU-HFR and 492RU-HFO, at the top and at the bottom of the channel.
+provenance:
+  size: >-
+    drawing - the top view of Leviton's 492RU-HFR dimensional drawing (DXF): nine slots 22.45
+    mm wide on a 49.375 mm pitch, the first from 32.65 to 55.10 on the drawing and the last
+    from 427.65 to 450.10, symmetric about the middle of the 444.5 mm between the plate's
+    folds (19.15 to 463.65), so the fingers between them are 26.925 wide and the two end
+    fingers 13.5 and 13.55 to the duct's ends. The 491RU-HFR's top view draws the same nine
+    slots at the same places. The wall is 2.54 mm [0.1 in] thick: the side view's wall
+    lines (6.03 to 8.57 and 79.69 to 82.23 on the 492RU-HFR, 4.91 to 7.45 and 40.47 to 43.01
+    on the 491RU-HFR).
+  relief: >-
+    drawing - the top view: the slots run from the tips of the fingers, 24.15 mm from the
+    front of the duct (on the 492RU-HFR, the 491RU-HFR's are 0.48 nearer the front with its
+    plate), back to the mounting plate, where each ends in a rounded root; a finger
+    therefore stands from the plate's face to 57.25 mm out of it on the 492RU-HFR, whose
+    plate's front face is 81.4 from the front. Built as plates with square corners where the
+    drawing shows the tip flared to take the cover and the slots rounded at the root.
+  color: >-
+    datasheet - "PVC rated for 94V-0" for the material (Versi-Duct specification sheet); the
+    ducts are sold "with black covers". Every drawing is line work, so the shade is this
+    library's render of black PVC.
+size: {w: 444.5, h: 2.54}
+size-confidence: {w: drawing, h: drawing}
+attrs: {material: PVC, flammability: UL 94V-0}
+elements:
+  f0: {at: [0.0, 0.0], size: [13.5, 2.54], class: bezel}
+  f1: {at: [35.95, 0.0], size: [26.925, 2.54], class: bezel}
+  f2: {at: [85.325, 0.0], size: [26.925, 2.54], class: bezel}
+  f3: {at: [134.7, 0.0], size: [26.925, 2.54], class: bezel}
+  f4: {at: [184.075, 0.0], size: [26.925, 2.54], class: bezel}
+  f5: {at: [233.45, 0.0], size: [26.925, 2.54], class: bezel}
+  f6: {at: [282.825, 0.0], size: [26.925, 2.54], class: bezel}
+  f7: {at: [332.2, 0.0], size: [26.925, 2.54], class: bezel}
+  f8: {at: [381.575, 0.0], size: [26.925, 2.54], class: bezel}
+  f9: {at: [430.95, 0.0], size: [13.55, 2.54], class: bezel}
+relief:
+  features:
+    - {node: f0, out: 57.25, color: '#26282a', confidence: drawing, source: 'the top view of the 492RU-HFR drawing, a finger from the plate to its tip 24.15 mm from the front'}
+    - {node: f1, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f2, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f3, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f4, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f5, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f6, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f7, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f8, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f9, out: 57.25, color: '#26282a', confidence: drawing, source: 'the same view'}
+skins: [default]

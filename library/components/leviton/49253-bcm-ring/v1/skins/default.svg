@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="9.5mm" height="76.2mm" viewBox="0 0 9.5 76.2">
+  <!-- one ring from the front, end-on: the loop's bars along the top and
+       bottom, and at the front the two overlapping legs, the inner hanging from
+       the top bar and the outer rising from the bottom bar, with the slit a cord
+       is laid in through between them -->
+  <rect id="back" x="0" y="0" width="9.5" height="76.2" rx="1.2" fill="#111315"/>
+  <rect id="bar-top" x="0" y="0" width="9.5" height="3.175" rx="1.2" fill="#0d0f10"/>
+  <rect id="bar-bottom" x="0" y="73.025" width="9.5" height="3.175" rx="1.2" fill="#0d0f10"/>
+  <rect id="leg-inner" x="0" y="0" width="9.5" height="44.45" rx="1.2" fill="#0d0f10"/>
+  <rect id="leg-outer" x="0" y="31.75" width="9.5" height="44.45" rx="1.2" fill="#101214"/>
+</svg>

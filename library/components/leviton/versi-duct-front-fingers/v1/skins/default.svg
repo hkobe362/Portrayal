@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="444.5mm" height="2.54mm" viewBox="0 0 444.5 2.54">
+  <!-- one wall of the front channel from the front: ten fingers end-on, the
+       slots between them left open -->
+  <rect id="f0" x="0" y="0" width="13.5" height="2.54" fill="#26282a"/>
+  <rect id="f1" x="35.95" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f2" x="85.325" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f3" x="134.7" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f4" x="184.075" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f5" x="233.45" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f6" x="282.825" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f7" x="332.2" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f8" x="381.575" y="0" width="26.925" height="2.54" fill="#26282a"/>
+  <rect id="f9" x="430.95" y="0" width="13.55" height="2.54" fill="#26282a"/>
+</svg>

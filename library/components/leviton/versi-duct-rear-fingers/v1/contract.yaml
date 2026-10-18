@@ -1,0 +1,54 @@
+format: 1
+kind: component
+name: versi-duct-rear-fingers
+version: 1.0.0
+class: mechanical
+description: >-
+  One wall of fingers of a Leviton VERSI-DUCT front-and-rear duct's rear channel seen from
+  behind - the PVC wall along the top or bottom of the channel, ten fingers end-on with a
+  slot a cable is laid in through between each pair. The same part on the 491RU-HFR and
+  492RU-HFR, at the top and at the bottom of the channel.
+provenance:
+  size: >-
+    drawing - the top view of Leviton's 492RU-HFR dimensional drawing (DXF): the rear
+    channel's slots are the front channel's, nine of 22.45 mm on a 49.375 mm pitch, the
+    same vertical lines running through both in the drawing, so the fingers are 26.925
+    wide and the two end fingers 13.5 and 13.55. The wall is 2.54 mm [0.1 in] thick: the
+    side view's wall lines (18.75 to 21.29 and 67.01 to 69.55 on the 492RU-HFR; 4.91 to
+    7.45 and 40.47 to 43.01 on the 491RU-HFR).
+  relief: >-
+    drawing - the top view: the rear slots run from the tips of the fingers, 23.1 mm from the
+    rear end of the duct (231.5 from its front), forward to the base of the channel, which
+    the top view ends 162.45 from the front; the channel's floor is 95.25 mm [3.75 in] from
+    the rear end, the application note's depth for the rear channel, so a finger stands 72.15
+    mm out of it. Built as plates with square corners.
+  color: >-
+    datasheet - "PVC rated for 94V-0"; the drawing is line work, so the shade is this
+    library's render of black PVC.
+size: {w: 444.5, h: 2.54}
+size-confidence: {w: drawing, h: drawing}
+attrs: {material: PVC, flammability: UL 94V-0}
+elements:
+  f0: {at: [0.0, 0.0], size: [13.5, 2.54], class: bezel}
+  f1: {at: [35.95, 0.0], size: [26.925, 2.54], class: bezel}
+  f2: {at: [85.325, 0.0], size: [26.925, 2.54], class: bezel}
+  f3: {at: [134.7, 0.0], size: [26.925, 2.54], class: bezel}
+  f4: {at: [184.075, 0.0], size: [26.925, 2.54], class: bezel}
+  f5: {at: [233.45, 0.0], size: [26.925, 2.54], class: bezel}
+  f6: {at: [282.825, 0.0], size: [26.925, 2.54], class: bezel}
+  f7: {at: [332.2, 0.0], size: [26.925, 2.54], class: bezel}
+  f8: {at: [381.575, 0.0], size: [26.925, 2.54], class: bezel}
+  f9: {at: [430.95, 0.0], size: [13.55, 2.54], class: bezel}
+relief:
+  features:
+    - {node: f0, out: 72.15, color: '#26282a', confidence: drawing, source: 'the top view of the 492RU-HFR drawing, a rear finger from the channel floor to its tip 23.1 mm from the rear end'}
+    - {node: f1, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f2, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f3, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f4, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f5, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f6, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f7, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f8, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+    - {node: f9, out: 72.15, color: '#26282a', confidence: drawing, source: 'the same view'}
+skins: [default]

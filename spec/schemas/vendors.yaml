@@ -91,6 +91,17 @@ vendors:
       Resellers list these racks under their own part numbers; that is a
       listing, not a second product.
 
+  leviton:
+    display: Leviton
+    aka: [Leviton Network Solutions, Leviton Manufacturing Co., Inc.]
+    role: hardware
+    source: >-
+      the name on the product specification sheets, instruction sheets and dimensional
+      drawings of the 49253 five-ring horizontal managers and the VERSI-DUCT horizontal
+      ducts ("Leviton Manufacturing Co., Inc.", "LEVITON Network Solutions"), and on
+      leviton.com/en/products. The directory is `leviton` because the part numbers,
+      drawings and pages say Leviton. No corporate lineage is known or claimed.
+
   fs:
     display: FS.com
     role: hardware
