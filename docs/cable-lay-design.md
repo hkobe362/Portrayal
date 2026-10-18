@@ -158,6 +158,10 @@ A cable crosses a solid only through:
 - **a duct**, into its channel and out through a finger gap;
 - **a pass-through**, along z, when the diameter of the cable (or of the
   bundle, at that point) is no larger than the smaller side of its `size`.
+  On a zero-U part (#992) the tube must also fit: the hole's box is taken
+  less the cable's radius across the hole, so a centre line 2 mm inside the
+  edge is a crossing for a 6 mm cable. The box is not shortened along the way
+  through the plate.
 
 A pass-through is the one opening kind for a hole in a plate. A slot that is
 big enough to take a cable is declared as one, with its size, and the check
@@ -178,7 +182,9 @@ pinned to the held face whose next waypoint is above the tray) passes
 through the plate and is a finding, unless the detours of 1.3 take it round
 the front edge first. A point of the tube exactly on a face of the plate is
 not inside it; the browser check of 1.4 tests the inside with the same
-tolerance it uses for every surface a cable rests on.
+tolerance it uses for every surface a cable rests on. The tube touching a
+plate the cable rests on is contact, not a fault (1.4); a plate it does not
+rest on is left to the lay work (#986).
 
 ### 1.3 Going around
 
@@ -288,6 +294,15 @@ samples the tube of every routed cable and fails on a point inside a solid,
 so a corner that cuts metal is a drawing fault to fix, not a finding. For a
 routed cable `clearOf` then has nothing to do, and a test holds it to that;
 it stays for the unrouted hangs, which section 3 also brings to rest.
+
+**Contact is not a fault where the cable rests (#992).** A tube that touches
+a plate the cable rests on is contact, and the check does not fail on it: a
+tray floor's resting face, where the cable lies on the plate, and its held
+face, where it lies against it from below (2.3). That is the same contact
+1.2 calls lying against a plate. A tube inside a plate it is not resting on
+is not accepted by this rule: whether the lay should keep it clear is the
+question of #986, and nothing here settles it. The check lives outside this
+repository; this note is the rule it is held to.
 
 ### 1.5 The plug's reach
 
@@ -2372,6 +2387,7 @@ published file or a saved rack file uses it.
 | the lane moving outboard of a zero-U part that stands in the gutter and carries no lane (a zero-U PDU), and routed lengths changing beside one | kit (`laneXAt`), drawings | every route on that lane is longer, and a saved length moves on the next measure; a drawing that places lanes itself must follow |
 | the reach point (`at: 'reach'` with `end`) in `routePath`, `ctx.plugReachOf` and `PLUG_REACH` (the helpers that compute them stay internal), with the plug outside the face in the path (1.5) | kit API | a page passes `plugReachOf` and reads the points by these names; moving the plug into the allowance later would change every length again |
 | the end allowance by media, `END_ALLOWANCE_BY_MEDIA` (the table: the plug inside the port and the maker's short tolerance, never slack), `endAllowance(cable)` and the path's `allowance` (what a length adds an end: the table's figure and, until #949 step 4, the temporary dressing allowance of 0.1 m, which is not exported) (1.6); `END_ALLOWANCE_M` is gone | kit API | a page reads the table by these names, and every routed length and stock size depends on the figures; removing the dressing allowance shortens every routed length by 0.2 m |
+| a zero-U part's pass-through hole judged on the tube (1.2, #992) | kit | a route through a pass-through hole, and its length, can change on saved racks |
 | `crosses-body` (with `part` and, for a held-face stack, `face`), `unheld` and the tray findings, `bodyFindings` | kit API, agent output | agents and pages read the kinds |
 | the public subpath `@portrayal/kit/rack/solids` (`solidsOf`, `legCrossings`, `detour` with its `room`, `CLEAR`) | kit package exports | a consumer imports it by that path and those names; a rename or removal is a breaking kit release |
 | `cable.slack`, `cable.slack.clear`, `cable.lay` (with `face`), and `roll` on `patch` | kit commands, offered to agents | agent sessions and saved prompts call them by name |
