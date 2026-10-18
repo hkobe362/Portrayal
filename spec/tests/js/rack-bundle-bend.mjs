@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as M from '../../../kit/rack/model.js';
 import * as B from '../../../kit/rack/bundles.js';
+import * as R from '../../../kit/rack/route.js';
 import {laneX} from '../../../kit/rack/route.js';
 import {bendLookup} from '../../../kit/rack/cable-types.js';
 import {apply} from '../../../kit/rack/commands.js';
@@ -58,6 +59,7 @@ function rackWith(media, route = TRUNK) {
   });
   return apply(r, {op: 'bundle.create', cables: r.cables.map(c => c.id), route}, {chassisOf}).rack;
 }
+const bendNotes = c => c.notes.filter(n => n.includes('bend'));
 const check = (r, ctx = {}) => B.bundleCheck(r, r.bundles[0], {route: routeCtx(r, ctx), bendOf, ...ctx});
 
 // ── the corners of a polyline ────────────────────────────────────────────
@@ -126,7 +128,7 @@ test('a bundle command and inspect carry the bend warning; describe counts it', 
     text: 'uplinks turns at left-front U10 with room for a 24.5 mm bend; c2 (os2) needs 25 mm, 0.5 mm short.'}]);
   r = res.rack;
   const f = await inspect(r, 'b1', {chassisOf, ...ctx});
-  assert.deepEqual(Object.keys(f.bend).sort(), ['by', 'points', 'radius_mm', 'unchecked', 'violations']);
+  assert.deepEqual(Object.keys(f.bend).sort(), ['by', 'defaulted', 'points', 'radius_mm', 'unchecked', 'violations']);
   assert.deepEqual([f.bend.radius_mm, f.bend.by, f.bend.violations.length], [25, 'c2', 1]);
   assert.deepEqual(f.warnings, [res.findings[0].text]);
   const said = describe(r, {chassisOf, ...ctx});
@@ -169,30 +171,74 @@ test('a member at its own join or peel point makes its own turn there and does n
   assert.deepEqual(c.bend.points.find(p => p.at === 'left-front U30').by, 'c3');
 });
 
-test('a member of no known type is unchecked, never passed', () => {
-  // one unknown: the others are checked, and it is named
+test('a member with no cable type is checked at the default radius, and the note says it is a default (#1132)', () => {
+  // one untyped: the others are checked as they were, and it is checked at the default
   const some = check(rackWith(['cat6', '', 'cat6']));
-  assert.deepEqual(some.bend.unchecked, ['c2']);
-  assert.deepEqual(some.bend.points.map(p => [p.ok, p.unchecked]), [[true, ['c2']], [true, ['c2']]]);
-  assert.ok(some.notes.includes("Bundle 1's bend is not checked for c2, which has no cable type with a bend radius."), some.notes);
-  // every one unknown: no point is said to pass, and none fails
+  assert.deepEqual(some.bend.unchecked, []);
+  assert.deepEqual(some.bend.defaulted, ['c2']);
+  assert.deepEqual(some.bend.points.map(p => [p.ok, p.need_mm, p.unchecked]), [[true, 24, []], [true, 24, []]]);
+  assert.deepEqual(bendNotes(some), ["Bundle 1's bend is checked at 24 mm for c2, the default for a cable with no cable type."]);
+  // every one untyped: each point is judged at the default, and nothing is "not checked"
   const none = check(rackWith(['', '']));
-  assert.deepEqual(none.bend.points.map(p => p.ok), [null, null]);
-  assert.deepEqual([none.bend.radius_mm, none.bend.by, none.bend.violations, none.warnings], [null, null, [], []]);
-  assert.ok(none.notes.includes("Bundle 1's bend is not checked: c1 and c2 have no cable type with a bend radius."), none.notes);
-  // an unknown fibre at the tight corner hides nothing: the Cat 6 pass is
-  // what is reported, with the fibre named as unchecked there
-  const hidden = check(rackWith(['cat6', 'om9']));
-  assert.deepEqual(hidden.bend.points[0].unchecked, ['c2']);
-  assert.equal(hidden.bend.points[0].need_mm, 24);
+  assert.deepEqual(none.bend.points.map(p => [p.ok, p.need_mm]), [[true, 24], [true, 24]]);
+  assert.deepEqual([none.bend.radius_mm, none.bend.by, none.bend.unchecked, none.bend.defaulted, none.warnings], [24, 'c1', [], ['c1', 'c2'], []]);
+  assert.deepEqual(bendNotes(none), ["Bundle 1's bend is checked at 24 mm for c1 and c2, the default for a cable with no cable type."]);
+  // a cable of no type fails a corner too tight for the default, and the warning says the figure is a default
+  const tight = check(rackWith(['', '']), {x: {'mgr-1': LANE + 20}});
+  assert.deepEqual(tight.warnings, ['Bundle 1 turns at left-front U10 with room for a 20 mm bend; c1 needs 24 mm (the default, it has no cable type), 4 mm short.']);
+  assert.equal(tight.bend.violations.length, 1);
+  // typed and untyped together: each at its own radius, the untyped at the default
+  const mixed = check(rackWith(['om4', '', 'cat6']));
+  assert.deepEqual([mixed.bend.radius_mm, mixed.bend.by, mixed.bend.defaulted], [25, 'c1', ['c2']]);
+  assert.deepEqual(mixed.warnings, ['Bundle 1 turns at left-front U10 with room for a 24.5 mm bend; c1 (om4) needs 25 mm, 0.5 mm short.']);
+  assert.deepEqual(bendNotes(mixed), ["Bundle 1's bend is checked at 24 mm for c2, the default for a cable with no cable type."]);
+  // the default is the one a cable alone gets, not a copy of it
+  const stiff = check(rackWith(['cat6', '']), {x: {'mgr-1': LANE + 23}});
+  assert.deepEqual(stiff.warnings, ['Bundle 1 turns at left-front U10 with room for a 23 mm bend; c1 (cat6) needs 24 mm, 1 mm short.']);
+  // a type the table does not know is a cable with no type the table can use: the default, too
+  const unknown = check(rackWith(['cat6', 'om9']));
+  assert.deepEqual([unknown.bend.unchecked, unknown.bend.defaulted, unknown.bend.points[0].need_mm], [[], ['c2'], 24]);
   // no type table loaded: every member unchecked, said once
   const r = rackWith(['cat6', 'om4']);
   const bare = B.bundleCheck(r, r.bundles[0], {route: routeCtx(r)});
-  assert.deepEqual([bare.bend.unchecked, bare.bend.violations, bare.warnings], [['c1', 'c2'], [], []]);
+  assert.deepEqual([bare.bend.unchecked, bare.bend.defaulted, bare.bend.violations, bare.warnings], [['c1', 'c2'], [], [], []]);
   assert.ok(bare.notes.includes("Bundle 1's bend is not checked: the cable types are not loaded."), bare.notes);
-  // a type table that throws counts as no radius, never an error
+  // a type table that throws gives no radius, never an error: the cables are checked at their media's
   const thrown = B.bundleCheck(r, r.bundles[0], {route: routeCtx(r), bendOf: () => { throw new Error('x'); }});
-  assert.deepEqual(thrown.bend.unchecked, ['c1', 'c2']);
+  assert.deepEqual([thrown.bend.unchecked, thrown.bend.defaulted, thrown.bend.radius_mm], [[], [], 25]);
+});
+
+test('a cable with no cable type alone gets the default radius, and the finding says so (#1132)', () => {
+  const r = rackWith(['', 'cat6'], undefined);
+  const ctx = {...routeCtx(r, {x: {'mgr-1': LANE + 20}}), bendOf};
+  const [untyped] = R.bendFindingsOf(r, r.cables[0], ctx);
+  assert.equal(untyped.need_mm, 24);
+  assert.ok(untyped.text.includes('the cable needs 24 mm (the default, it has no cable type)'), untyped.text);
+  // a cable with a type is said as it was
+  const [typed] = R.bendFindingsOf(r, r.cables[1], ctx);
+  assert.equal(typed.need_mm, 24);
+  assert.ok(typed.text.includes('the cable (cat6) needs 24 mm,'), typed.text);
+});
+
+test('a cable whose type states no radius says so, not that it has no type (#1132)', () => {
+  const r0 = rackWith(['', '']);
+  const r = {...r0, cables: r0.cables.map(c => (c.id === 'c1' ? {...c, type: 'mystery'} : c))};
+  const ctx = {...routeCtx(r, {x: {'mgr-1': LANE + 20}}), bendOf};
+  assert.ok(R.bendFindingsOf(r, r.cables[0], ctx)[0].text.includes('(mystery) needs 24 mm (the default, its type states no bend radius)'));
+  const c = check(r, {x: {'mgr-1': LANE + 20}});
+  assert.deepEqual(bendNotes(c), ["Bundle 1's bend is checked at 24 mm for c1 and c2, the default for a cable with no known bend radius."]);
+  assert.ok(c.warnings[0].includes('c1 (mystery) needs 24 mm (the default, its type states no bend radius)'), c.warnings);
+});
+
+test('typed cables are checked as before, alone and in a bundle (#1132)', () => {
+  const r = rackWith(['cat6', 'om4']);
+  const c = check(r, {x: {'mgr-1': LANE + 20}});
+  assert.deepEqual(c.bend.defaulted, []);
+  assert.deepEqual(bendNotes(c), []);
+  assert.deepEqual(c.warnings, ['Bundle 1 turns at left-front U10 with room for a 20 mm bend; c2 (om4) needs 25 mm, 5 mm short.']);
+  const ctx = {...routeCtx(r, {x: {'mgr-1': LANE + 20}}), bendOf};
+  const alone = R.bendFindingsOf(r, r.cables[1], ctx)[0].text;
+  assert.ok(alone.includes('the cable (om4) needs 25 mm,') && !alone.includes('default'), alone);
 });
 
 test('a pathway that states a radius holds the bundle to it, straight through it too', () => {

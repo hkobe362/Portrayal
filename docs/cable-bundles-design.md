@@ -738,13 +738,15 @@ also checked: a radius a bundle must keep through it, such as a waterfall or
 bend-radius fingers. No guide states one today; the hook is there for when
 one does (decision 8).
 
-**Unknown types are unchecked, not passed.** At each point:
-
-- every member present has a radius: checked;
-- some have one: checked against those, and the result lists the rest as
-  unchecked: "Bundle 2's bend is not checked for c5 and c9, which have no
-  cable type.";
-- none has one: the point is unchecked, never reported as passing.
+**A cable with no type is checked at the default (#1132).** A member with no
+cable type is given the radius a cable alone is given (`bendOf` in
+`kit/rack/resting.js`, 24 mm), so a bundle and its members agree. At each
+point every member present is checked at its own radius, and the result lists
+those at the default in `defaulted`: "Bundle 2's bend is checked at 24 mm for
+c5 and c9, the default for a cable with no cable type." A warning that such a
+member sets says so: "c5 needs 24 mm (the default, it has no cable type)".
+Only where no cable types are loaded is the bend unchecked, never reported as
+passing.
 
 A finding: "Bundle 2 turns at mgr-1 ring 1 with room for an 18 mm bend; c7
 (OM4) needs 25 mm, 7 mm short." Each violation gives the location, the radius
@@ -1084,10 +1086,10 @@ What the bend check settled that section 5.2 leaves to it:
 - **Rounding.** Angles, legs and room are given to 0.1 (mm or degree), and a
   point passes when its need is at most its room as given, so a reader who
   compares the two numbers it is shown agrees with the verdict.
-- **The unchecked note** says "no cable type with a bend radius", not "no cable
-  type": `ctx.bendOf` is null for a type that states no radius too. Every type
-  #919 publishes states one, so today the two are the same. Without
-  `ctx.bendOf` the note is "the cable types are not loaded" (section 3.1).
+- **The default note** says "no cable type": `ctx.bendOf` is null for a type
+  that states no radius too, and that cable is checked at its media's radius,
+  else the default. Without `ctx.bendOf` the note is "the cable types are not
+  loaded" (section 3.1).
 - **A trunk that doubles back** has no room. Its warning says so rather than
   giving a shortfall: "Bundle 2 doubles back at mgr-2 ring 2, with no room for
   a bend; c1 (dac) needs 23 mm." The member is named with its type id, as the
