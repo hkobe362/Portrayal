@@ -4957,7 +4957,10 @@ def published_kits(kits, lib):
     THE OVERRIDE IS APPLIED. A device's `depth: {config, range}` replaces the
     `depth` of the configuration it names (#906, L163), so `configurations`
     here are what this device can do; the row's `depth` still says that one was
-    overridden. The kit's own figure stays in kits.json.
+    overridden. The kit's own figure stays in kits.json. A configuration that
+    states a `preset` and no `depth` is copied as it is, with no `depth` key:
+    the range is unknown, and only a device's override, from its own source,
+    gives it one.
 
     THE SAME REFS AS THE LOCK. Every ref read here - the kit, its parts and its
     accessories - is one devicelock's `composed` follows from `chassis.kits`,

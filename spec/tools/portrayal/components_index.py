@@ -294,6 +294,11 @@ def kit_entry(ref, ns, major, data):
     EVERY KEY ON EVERY ROW, null or empty where the contract says nothing, so a
     consumer reads one shape. The parts stay refs; a device's configs.json is
     where a kit is resolved inline with the geometry of its parts (#907).
+
+    A CONFIGURATION IS PUBLISHED AS THE CONTRACT WRITES IT. One that states a
+    `preset` and no `depth` ("factory setting known, range unknown") has no
+    `depth` key here: never null, never `[preset, preset]`. The `gaps` row says
+    the range is unknown.
     """
     row = {
         "ref": ref, "ns": ns, "name": data["name"], "major": major,
@@ -308,6 +313,7 @@ def kit_entry(ref, ns, major, data):
         "accessories": data.get("accessories") or [],
         "superseded-by": data.get("superseded-by"),
         "provenance": data.get("provenance") or {},
+        "gaps": data.get("gaps") or [],
     }
     if data.get("audience"):
         row["audience"] = data["audience"]

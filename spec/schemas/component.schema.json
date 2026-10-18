@@ -48,7 +48,8 @@
     "install",
     "parts",
     "configurations",
-    "accessories"
+    "accessories",
+    "gaps"
    ]
   },
   "properties": {
@@ -80,6 +81,7 @@
    "install": false,
    "configurations": false,
    "accessories": false,
+   "gaps": false,
    "parts": {
     "items": {
      "properties": {
@@ -1087,9 +1089,30 @@
     "required": [
      "id",
      "racks",
-     "parts",
-     "depth"
+     "parts"
     ],
+    "$comment": "AT LEAST ONE OF `depth` AND `preset` (roc-ops/Portrayal#904, decided 2026-10-18). A source can print a factory setting and no range (the COR550 rail's 630, the first Smartoptics band's 600), and a range written as `[630, 630]` would invent one. `if`/`then` rather than `anyOf` so that the message for a configuration with neither names both keys: `anyOf` would say only that the configuration is not valid under any of the given schemas.",
+    "if": {
+     "not": {
+      "anyOf": [
+       {
+        "required": [
+         "depth"
+        ]
+       },
+       {
+        "required": [
+         "preset"
+        ]
+       }
+      ]
+     }
+    },
+    "then": {
+     "required": [
+      "depth or preset"
+     ]
+    },
     "additionalProperties": false,
     "properties": {
      "id": {
@@ -1119,12 +1142,13 @@
       "description": "the parts this configuration uses, each the `id` of one of the kit's own `parts` (L156)"
      },
      "depth": {
-      "$ref": "#/$defs/kit-depth"
+      "$ref": "#/$defs/kit-depth",
+      "description": "the rack depth this configuration fits, front flange to rear flange, in mm. OPTIONAL WHEN `preset` IS STATED, and one of the two is required: a source that prints a factory setting and no range leaves `depth` out, and the range is then unknown (a `gaps` entry says so, L157). Never `[preset, preset]`."
      },
      "preset": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "a factory setting the kit ships at, in mm of rack depth (the COR550 rail's 630)"
+      "description": "a factory setting the kit ships at, in mm of rack depth (the COR550 rail's 630). It may stand alone: a configuration with a `preset` and no `depth` reads as 'factory setting known, range unknown', and nothing derives a range from it. A telescoping kit states one on at least one of its configurations (L158)."
      },
      "tolerance": {
       "type": "number",
@@ -1177,6 +1201,51 @@
        ]
       },
       "description": "the sides of the rack, seen from the front, the accessory can be fitted on"
+     }
+    }
+   }
+  },
+  "gaps": {
+   "type": "array",
+   "description": "A KIT ONLY: what the sources do not say, in the shape a device's `gaps` has. Lint L157 asks for an entry `what: depth` whose `scope` lists every configuration that states a `preset` and no `depth`: the factory setting is known and the range is not.",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "what",
+     "reason",
+     "wanted"
+    ],
+    "properties": {
+     "what": {
+      "$ref": "#/$defs/segment",
+      "description": "the missing knowledge, as a token: `depth`"
+     },
+     "scope": {
+      "type": "array",
+      "description": "what it applies to: the `id` of each configuration",
+      "items": {
+       "type": "string"
+      }
+     },
+     "reason": {
+      "description": "why it is missing, because that decides who can close it",
+      "enum": [
+       "vendor-silent",
+       "sources-disagree",
+       "nos-dependent",
+       "needs-hardware",
+       "needs-photo",
+       "needs-drawing"
+      ]
+     },
+     "note": {
+      "type": "string",
+      "description": "what was looked at and what it did not say. Cite the section, so the next reader does not repeat the search"
+     },
+     "wanted": {
+      "type": "string",
+      "description": "what would close it, as a request someone can act on"
      }
     }
    }
