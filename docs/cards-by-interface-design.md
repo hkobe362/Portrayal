@@ -25,7 +25,7 @@ named by hand in every riser that takes it. Riser 1A's slot 1 alone lists 24
 refs. The list is the failure #43 named: it asserts something no vendor
 published, and a card that is not in it cannot be seated. The DCIM export cuts
 the same list at the 200 characters a bay description allows (`fit_items`), so a
-person installing a card reads about half of it.
+person installing a card reads 9 of slot 1's 24 names and 13 of slot 3's 23.
 
 ## What is on `main`
 
@@ -79,10 +79,10 @@ Reasons:
 
 - **Two PCIe keys, by bracket height.** The library already models a card's
   full-height and low-profile variants as two parts (`mcx4111a-fh`,
-  `mcx4111a-lp`), and the CEM calls for a stiffening flange when a low-profile
-  card takes a full-height bracket, so they are two forms. Length is not keyed:
-  riser 1A's full-length slot 1 and half-length slot 3 take the same list today,
-  and `slot.length` already records the difference.
+  `mcx4111a-lp`), and the two brackets are two registry entries with different
+  outlines, so they are two forms. Length is not keyed: riser 1A's full-length
+  slot 1 and half-length slot 3 take lists that differ only by the two-slot
+  bracket (24 refs and 23), and `slot.length` already records the difference.
 - **Spelled `pcie-fh`, not `pcie-bracket-fh`.** The standards key names the
   bracket, a part. The interface names the slot it plugs into, as `sfp` names a
   cage and not the optic. The registry entry's `standard:` links the two, so a
@@ -103,8 +103,8 @@ Reasons:
   one OCP bay. The keys are left as a question until the specification is held.
   Nothing is invented from the vendor datasheets that call a card "TSFF".
 - **EDSFF.** `std/drive-e3s@1` conforms to a held entry, so `e3s` has a source.
-  The R660's 16 distinct E3.S bay ids (30 bay entries across its views and
-  configurations) accept Dell's carrier, Dell's blank and the bare drive. The
+  The R660's 16 distinct E3.S bay ids (30 bay entries, in its two front views; a 31st, `e3s-filler-14`, takes a
+  filler only) accept Dell's carrier, Dell's blank and the bare drive. The
   carrier is a vendor part and the drive is everybody's, so the open relation is
   drive-in-carrier, and the chassis bay stays a vendor list. That is why `e3s`
   waits for a later slice.
@@ -133,10 +133,14 @@ offers(bay, lib) = bay.accepts + every library part p with takes(bay, p), sorted
 ```
 
 `_mate_check` says why: "a second copy would be one bad afternoon away from
-disagreeing with the first". The 39 lines in the Python tools that read a bay's
-`accepts` (lint 16, `dcim_export` 9, `devicelock` 4, `render` 3, `components_index`
-2, `redirects` 2, and one each in `manifest`, `devices_index` and
-`components_catalogue`) read `offers` instead, and the build publishes `offers`
+disagreeing with the first". The lines in the build tools that read a bay's
+`accepts` (counted by a search for `get("accepts")` and `["accepts"]` in
+`spec/tools/portrayal`: lint about 14 to 16, `dcim_export` 9, `devicelock` 4,
+`render` 3, `components_index` 2, `redirects` 2, and one each in `manifest`,
+`devices_index` and `components_catalogue`), and the helper scripts that take
+`accepts[0]` or list it (`render_standards.py`, `audit_standards.py`,
+`dc_inventory.py`, `benchgt.py`; list order matters to the first), read `offers`
+instead, and the build publishes `offers`
 as `accepts` in `components.json` and `<device>.configs.json`, beside a new
 `interface`. The kit reads only those published lists, as it does for cages, so it
 does not change and a saved rack still seats.
@@ -166,9 +170,9 @@ count, so an up-plug is admitted with no statement. The opposite, an x16 card in
 an x8 connector, is not refused by the key. The facts are data on both sides
 (`slot.connector`, `attrs.pcie-connector`), and a warning that reads the two, as
 L75 reads `slot` against its prose, is possible without a new key. Open-ended
-connectors have no field and no held source. The gap is not new: the lists of those two
-HPE bays offer `nvidia/mcx516a-lp@1` and `nvidia/mcx75310-lp@1`, both x16, today, and
-their `slot.connector` is x8. This slice says nothing more and the
+connectors have no field and no held source. The gap is not new: the two HPE bays
+whose `slot.connector` is x8 (slot 2 of the primary and of the FlexibleLOM riser)
+each list 17 low-profile cards today, 11 of them x16. This slice says nothing more and the
 question stays open (open question 5).
 
 ## With `slot-width` and `span`
@@ -238,10 +242,10 @@ current format only, every breaking change announced in `CHANGELOG.md`).
 | 5 | Width is part of the seat predicate; L185 clause 3 narrows to explicit lists | 1 rule | yes | allowed |
 | 6 | Published `accepts` in `components.json` and `configs.json` becomes derived, and `interface` is published | same key, new source | yes: a list is no longer authored, and a project library that adds a card changes a public riser's list | allowed; additive, so `contract` does not rise |
 | 7 | Cards and brackets gain `mates` | 42 contracts (36 ConnectX, N3100-4C, `common/pcie-card-fh`, `-lp`, three `std/` brackets) | yes, with item 2 | allowed; a minor each |
-| 8 | Riser bays state `interface` and drop the card entries | 49 bays in the carriers that list cards; 1,056 entries; the 5 filler-only bays stay | yes: an `accepts` that loses a ref is a major for a device bay | allowed; component locks do not ask a bump |
+| 8 | Riser bays state `interface` and drop the card entries | 49 bays in the carriers that list cards; 1,056 entries; the 5 filler-only bays stay | yes: CONTRIBUTING calls "a bay stops accepting a ref" one-way. The authored list shrinks, but what the bay takes does not (`offers` is a superset of the old list), so the note relies on that reading; if the lock reads the authored list and asks a major, the item is one-way on that rule too | allowed; confirm with `devicelock.py` |
 | 9 | DCIM bay descriptions | 30 module types in each of NetBox and Nautobot, 60 files | a description of an imported bay template | allowed; bay names and positions do not change, so not marked BREAKING (open question 9) |
 | 10 | Lint | one new code, never reused; L11, L6, L8, L89, L123, L33 read through the predicate; a warning for a redundant `accepts` entry; `docs/lint-rules.md` | yes: codes are never renumbered | allowed |
-| 11 | Device locks | 7 devices; `devicelock._children` and `_composed` must follow `offers`, or a card edit stops reaching the lock of a device whose configurations draw it | expected to ask nothing | confirm by running `devicelock.py` against `main`'s lock before `--update` |
+| 11 | Device locks | 7 devices; `devicelock._children` and `_composed` must follow `offers`, or a card edit stops reaching the lock of a device whose configurations draw it | expected to ask nothing for devices; the component versions are about 72 bumps (30 risers and 42 cards, a minor each by the usual rule) | confirm by running `devicelock.py` against `main`'s lock before `--update` |
 | 12 | L89 and the catalogue's "seated by" | 42 cards; at most 31 are named by no device or configuration and would read as unplaced | no | allowed |
 | 13 | Kit, rack file, saved racks | kit unchanged and no version change; the rack file is unchanged; a swap is a ref and the published list still contains it | no | not checked against saved racks (none are held in the repository, as far as `git` shows) |
 | 14 | `docs/format-stability.md`, `CHANGELOG.md` fragment, `docs/lint-rules.md` | 3 files | no | required |
@@ -292,7 +296,7 @@ seats exactly what it did before.
 4. **Fillers.** Kept in `accepts` as vendor parts (proposed), or made to `mate` the
    key. The second offers Dell's filler in an HPE riser.
 5. **x16 card in an x8 connector, and open-ended slots.** Left to a later warning
-   (proposed). It changes whether the two HPE x8 bays keep offering two x16 cards.
+   (proposed). It changes whether the two HPE x8 bays keep offering the 11 x16 cards each lists.
    No source for open-ended connectors is held.
 6. **`mates` stated on each composing card** (proposed, 42 edits) or inherited from
    the composed bracket (no edits, but a card's key is then silent).
