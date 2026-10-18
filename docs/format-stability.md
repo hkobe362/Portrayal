@@ -287,6 +287,16 @@ reader that does not know it finds every field it read before.
   listed, and a module the rack's own `swaps` put in a bay is not listed. A
   display's readings (`data-messages`) are not states. Always an object; `{}`
   on a device that declares none. Additive.
+- **`bays[view][].only-in`** and **`cages[view][].only-in`** in
+  `<device>.configs.json` (#1022): the configurations that have this bay or
+  cage, a list of configuration names exactly as `device.yaml` states it on the
+  bay or the placement. Absent where the device states none, which is a bay
+  of every configuration; an empty list is never written. A configuration not
+  in the list has no such bay: the drawing leaves it out, and a reader must
+  not take it for a bay holding its `default`. (`configs[].bays` need not list
+  a bay the configuration has, which then holds its `default`, and may name
+  one it lacks.) The kit reads it so (`slotEnv`, `holdsAt`). Additive:
+  `contract` is still 2.
 - **`configs[].names`** beside it: the name a DCIM knows each of those parts
   by, `{"outlet-a1": "A1"}`, where that is not the placement id. It is read
   from the device's own `interfaces:` through the function that names the

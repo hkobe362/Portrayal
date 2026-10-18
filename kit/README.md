@@ -1023,10 +1023,7 @@ module bay, a guard seat and a slot that accepts nothing do not land
   nothing is guessed. **How a page names a part**, in the `holder.part` of an
   end's facts: by its `attrs.model`, else its ref's name in capitals
   (`celestica/psu-r3059-f8001@1` is `PSU-R3059-F8001`), exactly as the kit
-  does. For a supply in a bay that only its default fills, the kit hears the
-  page only where that name is the part the bay ships with; a page that hands
-  in a ref for a part with no model is not heard, and the end stays loose.
-  **A page supplies `drawnAt` before it offers power
+  does. **A page supplies `drawnAt` before it offers power
   cabling**: without it an outlet-to-outlet or inlet-to-inlet cord between
   two devices' own slots gets no warning.
 - **The DCIM cables file** leaves a ground wire out by name, and a power
@@ -1523,10 +1520,10 @@ it cannot be sure:
 
 - only for a port the part composes. A port drawn by a skin alone, and every
   port of the device itself, is the page's to read off the drawing.
-- only for a bay the item's swaps or its configuration names. A device may
-  give a bay to some configurations only, and `configs.json` lists every bay
-  without saying which; a bay nothing names reads as holding its default,
-  which the build does not draw in a configuration that has no such bay.
+- only for a bay the item's configuration has. A device may give a bay to
+  some configurations only (`only-in` on its entry in `configs.json`); that
+  bay is no bay in another configuration, and nothing is answered for it. A
+  bay the configuration has and does not list holds its default.
 - it does not say whether a bay shows the back of what it holds. An enclosure
   with a closed rear has the rear adapters of its panels all the same: a
   cable on one lands, and is not drawn there. The front and the rear port of
