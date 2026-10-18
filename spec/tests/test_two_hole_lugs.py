@@ -64,6 +64,7 @@ AXIS = {"juniper/mx304-ground-plate@2": 90}
 # screw -> (head diameter, head height) from the standard each cites
 SCREWS = {"common/ground-screw-m6@1": (12.0, 4.6),
           "common/ground-screw-m4@1": (8.0, 3.1),
+          "common/ground-screw-m5@1": (9.5, 3.7),
           "common/ground-screw-1-4@1": (12.5, 3.66),
           "common/ground-screw-10-32@1": (9.47, 2.79)}
 # lug -> (tongue width, overall length without the stub, tab thickness, barrel OD)

@@ -90,6 +90,12 @@ PAIRS.update({f"ufispace/{m}": {(view, "ground-screws"): (H58_M4, None, c, "M4")
                                  ("s9510-30xc", "right", (16.2, 22.0)),
                                  ("s9511-20ct", "right", (16.4, 21.8)),
                                  ("s9601-104bc", "left", (16.4, 37.2)))})
+# #918: the S9501-18SMT's two locations, each a two-hole landing: its own HIG
+# Figure 22 reads the holes 9.4 and 25.2 mm and 193.3 and 209.0 mm from the front
+# (15.8 and 15.7 apart), so the hosts are centred at 17.3 and 201.15, at the
+# height the lug placements had (21.8).
+PAIRS["ufispace/s9501-18smt"] = {("right", "ground-screws-1"): (H58_M4, None, (17.3, 21.8), "M4"),
+                                 ("right", "ground-screws-2"): (H58_M4, None, (201.15, 21.8), "M4")}
 CASES = [(d, v, i) for d, pairs in sorted(PAIRS.items()) for (v, i) in sorted(pairs)]
 
 
@@ -203,6 +209,7 @@ def test_each_ufispace_pair_records_its_reading_and_its_gap():
 # is device silkscreen where the chassis prints it (provenance ground-pair).
 # device -> (rotate, {id: stud axis}, stud-size, {mark centre: the ids it is for})
 PLAIN = "common/ground-screw@1"
+SIZED_M5 = "common/ground-screw-m5@1"
 TWO_SCREW = {
     "edgecore/dcs500": ({"ground-1": 90, "ground-0": 90},
                         {"ground-1": (49.85, 32.7), "ground-1b": (67.05, 32.7),
@@ -222,12 +229,14 @@ def test_a_two_hole_plate_draws_both_screws_and_its_printed_mark(device):
     rots, studs, size, marks = TWO_SCREW[device]
     rear = _device(device)["views"]["rear"]
     placed = {p["id"]: p for p in rear["components"]["placements"]
-              if p["ref"] in (PLAIN, "common/ground-lug@1")}
+              if p["ref"] in (PLAIN, SIZED_M5, "common/ground-lug@1")}
     assert set(placed) == set(studs)
-    c = _contract(PLAIN)
+    # #918: the DCS500's M5 screws are the sized M5 screw; the unsized three keep the plain one
+    part = SIZED_M5 if device == "edgecore/dcs500" else PLAIN
+    c = _contract(part)
     for pid, axis in studs.items():
         p = placed[pid]
-        assert p["ref"] == PLAIN, pid
+        assert p["ref"] == part, pid
         assert p.get("rotate") == rots.get(pid), pid
         assert (p.get("attrs") or {}).get("stud-size") == size
         seat = render_mod.seat_point(p["at"], c["size"], p.get("rotate"),
