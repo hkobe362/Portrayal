@@ -193,7 +193,7 @@ RULES = {
     "L30": ("device",     "a card whose figure covers its paired module does not sit beside a module that also states its own", "decide which figure carries the pair and say so",
             "When a card's figure already includes its paired module and that module states its own, a sum over the bays counts the pair twice and gives a plausible over-count.",
             WARNING),
-    "L31": ("device",     "a distance a side or top view's region label states along the depth (\"5.73 in from the front\") lands on something drawn there", "correct the distance in the label, or the depth of what it points at",
+    "L31": ("device",     "a distance a side, top or bottom view's region label states along the depth (\"5.73 in from the front\") lands on something drawn there", "correct the distance in the label, or the depth of what it points at",
             "A region label that disagrees with what the drawing puts there tells a reader a part is somewhere it is not.",
             WARNING),
     "L32": ("any yaml",   "no mapping declares the same key twice", "remove the duplicate; YAML keeps the last silently",
