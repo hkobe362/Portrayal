@@ -1376,7 +1376,7 @@ one-way.
 5. **The stock break (#983): `BREAK_TOL_M` is 0.01 m.** A cord up to 10 mm
    short of full end play is still chosen. It is one twentieth of the end
    play and covers the spread of the LC plug depth estimate at two ends
-   (1.8 mm each). Considered: no tolerance; another figure. One-way: on a
+   (1.8 mm each). The 10 mm figure was confirmed 2026-10-18. Considered: no tolerance; another figure. One-way: on a
    saved rack, each cord within 10 mm over a break drops a stock size at its
    next measure. The end play itself (0.2 m) and the copper floor (50 mm)
    keep the figures of before and move nothing.

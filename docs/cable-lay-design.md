@@ -465,6 +465,13 @@ it, so each of those still has 0.2 m and more over its path and plugs; when
 step 4 takes the allowance away, what is spare is what a tray is given to
 hold.
 
+A cord up to 10 mm short of full end play keeps its stock size
+(`BREAK_TOL_M`, 0.01 m): one twentieth of the end play, and more than the
+spread of the LC plug depth estimate at two ends (1.8 mm each). Its source
+and the figure's confirmation, 2026-10-18, are in decision 5 of
+`rack-file-v4-design.md`; the rule is written against end play, not the
+dressing allowance, in the same note's section on lengths.
+
 ### 1.7 A span in front of other ports (#1013)
 
 With no horizontal manager, a cable runs from its side lane to its port as a
