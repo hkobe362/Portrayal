@@ -44,12 +44,12 @@ or commit and the file that shows it. #1045 is the issue and its comment of
 | W3 | `power` media, a power family for the mismatch check, plug rows, diameters, colours, end allowance | **done** | `MEDIA` and `mediaKind` (`kit/rack/cable-rules.js:225`), `DIAMETERS`, `PLUG_REACH`, `END_ALLOWANCE_BY_MEDIA` (`kit/rack/route.js:1125, 1245, 2803`); the `ground` figures are estimates and say so |
 | W4 | A page uses the kit's predicate | **partly**: the kit half is done (`ctx.drawnAt`, `freePorts`, `cableEndPaths`); the page is in another repository and was not read | `kit/README.md` "New in 0.30.0" |
 | W5 | DCIM: outlet path to printed name; a power cable type; proven against NetBox and Nautobot imports | **partly**: a power cable whose two ends resolve is written, with a blank type; `CABLE_TYPE` has no `power` row; no path-to-name mapping for an outlet; no import was run | `kit/rack/dcim-rules.js:367-373, 497-498`; `resolveEnd` `:206-218` looks up the path itself |
-| W6 | Library: interfaces for 5-15R, 5-20R, C39; `mates` as one or a list; 5-15P and 5-20P cord ends; `interface` on the outlets that lack one | **partly**: `nema-5-20r` and `eaton-c39` present and landable, `mates` a list, both cord ends exist (as `-cord`, not `-plug`); `nema-5-15r` is registered and no part presents it; the Amphenol outputs and inputs, and the rest of 7.8, have no `interface` | PR #1050; `spec/schemas/connectors.yaml:60-62`; `library/components/generic/nema-5-15p-cord/v1/contract.yaml`, `nema-5-20p-cord`; `amphenol-ns/output-terminal` states none |
-| W7 | A zero-U part as a cable end | **done** | kit 0.38.0 (80a3040e3) and 0.44.0; `kit/README.md` "New in 0.38.0", `zeroUEnds` in `kit/rack/ports.js` |
+| W6 | Library: interfaces for 5-15R, 5-20R, C39; `mates` as one or a list; 5-15P and 5-20P cord ends; `interface` on the outlets that lack one | **partly**: `nema-5-20r` and `eaton-c39` present and landable, `mates` a list, both cord ends exist (as `-cord`, not `-plug`); `nema-5-15r` is registered and no part presents it; `amphenol-ns/output-terminal` and the three input parts (`input-feed-studs`, `input-stud-pair`, `input-feed-busbar`) state no `interface` (`output-p40` states `p40`) | PR #1050; `spec/schemas/connectors.yaml:60-62`; `library/components/generic/nema-5-15p-cord/v1/contract.yaml`, `nema-5-20p-cord` |
+| W7 | A zero-U part as a cable end | **done** | kit 0.38.0 and 0.44.0; `kit/README.md` "New in 0.38.0", `zeroUEnds` in `kit/rack/ports.js` |
 | W8 | Cord types with two named ends, stock lengths, bill-of-materials lines | **not started** | `power-c13` and `power-c19` name a `conductor` and no plug (`spec/schemas/cable-types.yaml:294-315`); `cable_types_index.py` refuses an unknown key; `STOCK_M` is one list (`kit/rack/route.js:1191`); `cableBomRows` keys a line on media, length and connector family (`kit/rack/export-data.js:1274-1288`) |
-| A9 | Lug seats on the Amphenol output terminals and input studs; DC wire and ground wire cable types | **not started** | none of the four Amphenol parts states an `interface`; `cable-types.yaml` has two `power` types and no DC or ground type; `cable_types_index.py` `FAMILIES` has no ground |
+| A9 | Lug seats on the Amphenol output terminals and input studs; DC wire and ground wire cable types | **not started** | `output-terminal` and the three input parts state no `interface` (no lug seat); `cable-types.yaml` has two `power` types and no DC or ground type; `cable_types_index.py` `FAMILIES` has no ground |
 | A10 | The DC terminal as a part on `psu-132-dc`, `pws-601s-1r`, `lpwr-f` | **not started** | none of the three states an `interface` |
-| A11 | DCIM: each end publishes the name its type file prints | **partly**: `configs[].names` exists for the paths of `states` only (a switchable outlet) and only `configFacts` reads it; the cables file does not | `render.py` `config_names` (`:4920`); `docs/format-stability.md:300`; `kit/rack/catalog.js:77` |
+| A11 | DCIM: each end publishes the name its type file prints | **partly**: `configs[].names` exists for the paths of `states` only (a switchable outlet) and only `configFacts` reads it; the cables file does not | `render.py` `config_names` (`:4922`); `docs/format-stability.md:300`; `kit/rack/catalog.js:77` |
 | A12 | Later: side and bottom views as an end's view; a load's draw against its breaker | **not started** | a side-view end is still refused (`kit/rack/cable-rules.js:498`); a breaker has a `rating`, nothing records a draw |
 
 ### 2.2 Section 7 of cable-ends-design.md: eight later steps
@@ -69,13 +69,13 @@ or commit and the file that shows it. #1045 is the issue and its comment of
 
 | # | item | state | evidence |
 |---|---|---|---|
-| 8.1 | Interfaces to register, each with the part that presents it | **partly**: `nema-5-20r` and `eaton-c39` done; `nema-5-15r` registered, presented by nothing; no lug seat on the four Amphenol parts | PR #1050 |
+| 8.1 | Interfaces to register, each with the part that presents it | **partly**: `nema-5-20r` and `eaton-c39` done; `nema-5-15r` registered, presented by nothing; no lug seat on `output-terminal` or the three input parts (`output-p40` presents `p40`) | PR #1050 |
 | 8.2 | `mates` as one interface or a list, and every reader | **done** | PR #1050; `manifest.mates_of`; `fitsHang` in `kit/rack/zero-u.js` |
 | 8.3 | Cord ends `nema-5-15p` and a slot-seating 5-20P, class `port` | **done**, named `generic/nema-5-15p-cord@1` and `generic/nema-5-20p-cord@1`, each with `rating-a` | PR #1050 |
 | 8.4 | `attrs.outlet` and `attrs.input` on every part that hands power on or takes it | **partly**: the four AC outlets state `outlet` and `media: ac`; `amphenol-ns/output-p40` and `output-terminal` state neither | their contracts |
 | 8.5 | Cable types: NEMA cords, DC feed pairs, ground wires | **not started** | `cable-types.yaml` |
 | 8.6 | Three supplies compose a part that presents a lug or plug interface | **not started** | as A10 |
-| 8.7 | Nested slots of a part fixed to a chassis | **not started**: `cage_entries` publishes one entry for each placement of the device (`render.py:5611`), and no commit names the nested case. Not run on a build. | |
+| 8.7 | Nested slots of a part fixed to a chassis | **not started**: `cage_entries` publishes one entry for each placement of the device (`render.py:5613`), and no commit names the nested case. Not run on a build. | |
 | 8.8 | The power and ground ends still refused | **partly**: the `std/nema-5-20r` (16) and `eaton/c39-outlet` (36) placements now land; every other part in the list is unchanged | PR #1050 |
 | 8.9 | The name each end prints, published beside its path | **partly** | as A11 |
 
@@ -127,7 +127,7 @@ Read in the code, and cited again where used.
   comment says a name is never built by convention alone.
 - **The type files print other names than the paths.** `PDUMH20NET` lists its
   outlets `1` to 16 and the drawing's paths are `outlet-1` to `outlet-16`
-  (`library/devices/eaton/pdumh20net/device.yaml:447` is the rule
+  (`library/devices/eaton/pdumh20net/device.yaml:448` is the rule
   `outlet-{n}` to `{n}`). `LPWR-F` and `PSU-132-DESR` list a module port
   `{module}/Inlet`, where the drawing's element is `connector-block` and
   `terminal-block`. A module port that is named as its path resolves today:
