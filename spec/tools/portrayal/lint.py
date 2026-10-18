@@ -682,6 +682,9 @@ RULES = {
     "L193": ("rack", "a rack product is what its place says it is: its directory is its `name`, no device or listing of its vendor has that name, a four-post form lists a `front` and a `rear` rail and every other form the `front` alone, only the `rear` rail has a `depth`, a depth range runs from less to more with its `factory` inside it, every `provenance` key is a key the rack states, and a figure whose confidence is `estimated` has a `gaps` entry of its own name (error)", "rename the directory or the `name`; list the rails the form has; write the range as `min` below `max`; give each provenance entry the key of the figure it covers; declare every stand-in in `gaps` with what would close it",
              "A rack is referenced as `<vendor>/<name>@<major>` without its kind, so the name has to be free among the vendor's devices, and a saved rack file copies a product's rails and depth; a stand-in that is not declared reads as a printed figure.",
              ERROR),
+    "L194": ("device", "every id in a placement's `hides` names another placement or a bay on the same face, and the cover's box overlaps that part's box (error)", "name the part by its id on this face, or move the cover over it; a part on another face is that face's cover to name",
+             "`hides` becomes `data-hides`, which a consumer reads as \"remove this cover to see these\". An id that names nothing, or a part elsewhere on the face, makes the consumer hide a part the cover does not cover.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -6721,6 +6724,50 @@ def lint_device_overhang(path, data, lib_roots):
             warn(path, "L151", f"`chassis.overhang.{side}` is {stated[side]:g} mm and no "
                                f"part reaches past {max(reach[side], 0):g} on that side. "
                                "The figure is stale or overstated")
+
+
+def lint_device_hides(path, data, lib_roots):
+    """L194: a cover's `hides` names parts on its own face that it lies over.
+
+    `hides` is written as `data-hides` on the cover's group, and a consumer
+    that lifts the cover off shows what the list names. An id that names
+    nothing, or a part on another face, would show a part the cover never
+    covered, and a part the cover does not overlap is not behind it. The
+    ids are the face's own placements and bays; a part on another face is
+    that face's cover to name, so it is reported as such.
+    """
+    views = data.get("views") or {}
+    ids = {vn: {x.get("id") for k in ("placements", "bays") for x in view_parts(v)[k]}
+           for vn, v in views.items()}
+    for vname, view in views.items():
+        vp = view_parts(view or {})
+        boxes = {}
+        for q in vp["placements"]:
+            sz = contract_size(q["ref"], lib_roots) if q.get("ref") else None
+            if q.get("at") and sz and "w" in sz and "h" in sz:
+                x, y, w, h = q["at"][0], q["at"][1], float(sz["w"]), float(sz["h"])
+                if q.get("rotate") in (90, 270, -90):
+                    cx, cy = x + w / 2, y + h / 2
+                    x, y, w, h = cx - h / 2, cy - w / 2, h, w
+                boxes[q["id"]] = (x, y, x + w, y + h)
+        for b in vp["bays"]:
+            if _decor_box(b):
+                boxes[b["id"]] = _decor_box(b)
+        for q in vp["placements"]:
+            for hid in q.get("hides") or []:
+                where = f"{vname}: {q['id']} hides {hid!r}"
+                if hid == q["id"] or hid not in ids[vname]:
+                    elsewhere = sorted(vn for vn, s in ids.items() if vn != vname and hid in s)
+                    err(path, "L194", f"{where}, which is "
+                        + ("itself" if hid == q["id"] else
+                           f"on {', '.join(elsewhere)}, not on this face; that face's "
+                           "cover names it" if elsewhere else
+                           "not a placement or a bay on this face"))
+                elif q["id"] in boxes and hid in boxes:
+                    ox, oy = _box_overlap(boxes[q["id"]], boxes[hid])
+                    if ox <= 0 or oy <= 0:
+                        err(path, "L194", f"{where}, which the cover does not overlap; "
+                            "move the cover over it or drop the id")
 
 
 def _decor_box(d):
@@ -12805,6 +12852,7 @@ def lint_device(path, validator, lib_roots):
     lint_device_kits(path, data, lib_roots)
     lint_device_ear_span(path, data)
     lint_device_overhang(path, data, lib_roots)
+    lint_device_hides(path, data, lib_roots)
     lint_device_bay_pitch(path, data)
     lint_device_empty_views(path, data)
     lint_device_occupants(path, data, lib_roots)

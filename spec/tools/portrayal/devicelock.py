@@ -242,6 +242,11 @@ def _placement_attrs(doc):
 #                     stating them is a minor, changing or dropping a major.
 #                     Kept in the order written, not sorted as a set: the
 #                     description spells them in that order.
+#   `hides`           (placement) the parts a cover hides, published as
+#                     `data-hides`. A consumer lifts the cover off to show them,
+#                     so changing or dropping one is a major and stating one
+#                     where there was none a minor, as `for`. A set: spelling
+#                     the ids in another order is not a change.
 # SURFACE - what a reader sees and nothing computes a coordinate or an address
 # from. Patch.
 #   `states`, `description`  what a lamp's colours mean, and the vendor's words
@@ -265,7 +270,7 @@ BAY_HASHED = {"id", "at", "size", "rotate", "mirror", "default", "accepts",
 PLACEMENT_GEOMETRY = {"inset", "lift", "in", "under", "only-in", "optional",
                       "interfaces", "opening", "floor", "plan", "rear"}
 PLACEMENT_ADDRESSING = {"for", "rel-pos", "interface", "fed-by", "through",
-                        "lines", "dc"}
+                        "lines", "dc", "hides"}
 PLACEMENT_SURFACE = {"states", "description", "provenance", "physical-context",
                      "frames", "positions"}
 # MEMBERSHIP - which adjustment a placed thing slides with
@@ -298,7 +303,7 @@ TOP_LEVEL_UNREAD = {"format", "kind", "name", "manufacturer", "model", "part-num
 # module's first rule is that a change of spelling is not a change.
 # `interfaces` is NOT here: the DCIM export emits them in the order written.
 # A bay's `plan:` carries an `under` of its own, which is the same set.
-_SET_VALUED = {"for", "under", "frames", "only-in"}
+_SET_VALUED = {"for", "under", "frames", "only-in", "hides"}
 
 
 def _spelled_once(key, value):
@@ -861,7 +866,7 @@ def _addressing_bump(old, new):
         if any(now.get(key) != value for key, value in was.items()
                if key in still_here):
             return "major"              # rebound, renumbered or unstated
-    for field in ("for", "interface", "fed-by", "through", "lines", "dc"):
+    for field in ("for", "interface", "fed-by", "through", "lines", "dc", "hides"):
         if set(now_all.get(field) or {}) - set(was_all.get(field) or {}):
             return "minor"              # bound, opened or fed where it was not
     return None
@@ -1508,7 +1513,7 @@ def check(library: pathlib.Path, below=()):
                             "plan, rear)")
             if _addressing_bump(was, now) is not None:
                 what.append("placement addressing (for, rel-pos, interface, "
-                            "fed-by, through, lines, dc)")
+                            "fed-by, through, lines, dc, hides)")
             if "placement-surface" in was and \
                     was["placement-surface"] != now["placement-surface"]:
                 what.append("placement surface (states, description, "

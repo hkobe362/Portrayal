@@ -1765,6 +1765,15 @@
             }
            ]
           },
+          "hides": {
+           "type": "array",
+           "minItems": 1,
+           "uniqueItems": true,
+           "items": {
+            "$ref": "#/$defs/segment"
+           },
+           "description": "THIS PART IS A COVER, and these are the ids it hides: placements and bays on the SAME face that the cover overlaps. A cover is a removable part that hides others - a bezel over drives, a filter cover over PSUs. Emitted as data-hides on the cover's group, space-separated; each token is the data-path of a placement or bay in the same drawing, the way data-covered-by holds one. Written beside `for`, which keeps its meaning (the kit reads it for a mounted cover). On a device placement only, because the ids are the device's own and one cover component serves devices with different bays. Lint L194 checks every id."
+          },
           "fed-by": {
            "$ref": "#/$defs/segment",
            "description": "THE POWER INPUT THIS OUTPUT HANDS ON, for a power outlet on a distribution panel: the id of a placement on this device, in any view, whose part exports a power port. The DCIM export writes it as the outlet's `power_port`, which both NetBox and Nautobot import by name within the same device type. Stated on each placement and never inferred from an `-a`/`-b` in a name. Lint L132 fails when it does not resolve. L134 reports an outlet that states none: a warning at `draft` and `modelled`, an error at `verified`. Stating one is a minor version; changing one re-files an imported outlet's feed and is a major."
