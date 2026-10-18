@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: csr440
-version: 1.1.2
+version: 2.0.0
 maturity: modelled
 manufacturer: Edgecore
 model: AS7535-28XB
@@ -211,7 +211,8 @@ gaps:
     - the size and place of a lamp, immediately left of the word and above the jack - and the quick start's
     LED table does not list an alarm-jack lamp among the seven groups it does list. It is drawn as a lamp
     with an `off`/`alarm` vocabulary borrowed from the ALARM system lamp the table DOES name, and both
-    the borrow and the doubt are recorded here.
+    the borrow and the doubt are recorded here. The BITS jack's two corner lamps are not in doubt: the
+    quick start names them ("BITS/ToD LEDs") and the jack draws them integrated.
 - what: qsfp-bezel-content
   scope:
   - front
