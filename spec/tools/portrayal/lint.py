@@ -328,8 +328,8 @@ RULES = {
     "L75": ("component",  "a slot's structured facts agree with its prose, and lanes fit the connector", "fix `lanes`/`connector` or the description",
             "A slot's prose and its structured facts would drift apart, so a reader and the card-fit check would see different slots, and a lane count wider than the connector is a typo, not a slot.",
             ERROR),
-    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps", "use std/rj45@2 with the lamp parts, or say in provenance the jack is bare",
-            "Every Ethernet jack has to answer whether it has link lamps the same way, or a drawing can leave out lamps the hardware has, or add them to a console jack, and the viewer cannot light them consistently.",
+    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps, and the lamped cell that makes no Ethernet claim holds no Ethernet jack", "put an Ethernet jack on common/rj45-eth@1 or common/rj45-ganged-eth@1; a console or timing jack takes std/rj45@2 or std/rj45-ganged@2, or common/rj45-ganged-lamped@1 when its housing shows lamps",
+            "Every Ethernet jack has to answer whether it has link lamps the same way, or a drawing can leave out lamps the hardware has, or add them to a console jack, and the viewer cannot light them consistently. The lamped cell that claims no media suits a timing jack with lamps and would call an Ethernet jack something the part does not say.",
             WARNING),
     "L77": ("component",  "a `sink` sits in a cavity, because that is what it measures from", "use `pocket` for a recess in an otherwise solid face",
             "A sink with no cavity above it has no floor to measure from, so the recess is declared but never built in 3D, and nothing reports it.",
@@ -11843,6 +11843,11 @@ RJ45_BARE = re.compile(
 RJ45_LAMPED_REFS = {"common/rj45-eth@1", "common/rj45-eth-pinside@1", "common/rj45-ganged-eth@1",
                     "common/rj45-ganged-link@1"}
 RJ45_BARE_REFS = {"std/rj45@2", "std/rj45-ganged@2"}
+# The ganged cell with the two lamps and no Ethernet claim (#370): a timing,
+# BITS, ToD or console jack whose housing shows lamps. It is a lamped part
+# that takes the bare part's roles, and an Ethernet jack on it is sent to
+# common/rj45-ganged-eth@1, which says what the jack is.
+RJ45_NEUTRAL_REFS = {"common/rj45-ganged-lamped@1"}
 # A carrier that draws nothing and exists to attach one vendor's meanings
 # (dell/rj45-port-14g) is the family member it composes, for census purposes;
 # and the family's own members compose each other by definition, so a contract
@@ -11851,13 +11856,16 @@ RJ45_FAMILY_DIRS = {("std", "rj45"), ("std", "rj45-ganged"),
                     ("common", "rj45-eth"), ("common", "rj45-eth-pinside"),
                     ("common", "rj45-ganged-eth"),
                     ("common", "rj45-ganged-link"),
+                    ("common", "rj45-ganged-lamped"),
                     ("dell", "rj45-port-14g")}
 
 
 def rj45_class(ref, lib_roots, depth=0):
-    """'lamped', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
+    """'lamped', 'neutral', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
     if ref in RJ45_LAMPED_REFS:
         return "lamped"
+    if ref in RJ45_NEUTRAL_REFS:
+        return "neutral"
     if ref in RJ45_BARE_REFS:
         return "bare"
     if depth > 2:
@@ -11903,7 +11911,7 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
     path (a contract's `parts:`), because 368 of the library's 762 RJ45 placements
     sit inside component contracts and the census that could not see them is how
     C1 got in (#125 review I5)."""
-    unlamped_eth = lamped_bare = retired = 0
+    unlamped_eth = lamped_bare = retired = neutral_eth = 0
     # A jack on a bare ref is not "on a part with no lamps" if this view
     # draws a `class: led` placement `for:` it beside the jack instead of
     # inside it - sweep_rj45.py leaves such a jack bare on purpose
@@ -11945,18 +11953,29 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
             retired += 1
             continue
         if rj45_wants_lamps(q, groups, name):
-            if cls != "lamped" and str(q.get("id")) not in lamped_for:
+            if cls == "neutral":
+                neutral_eth += 1
+            elif cls != "lamped" and str(q.get("id")) not in lamped_for:
                 unlamped_eth += 1
-        elif cls != "bare":
+        elif cls == "lamped":
             lamped_bare += 1
-    return unlamped_eth, lamped_bare, retired
+    return unlamped_eth, lamped_bare, retired, neutral_eth
 
 
 RJ45_CENSUS_MSG = ("An Ethernet jack is common/rj45-eth@1 or common/rj45-ganged-eth@1 "
                    "(common/rj45-ganged-link@1 where it has one lamp, "
                    "common/rj45-eth-pinside@1 where the lamps are opposite the keyway); "
-                   "a console or timing jack is std/rj45@2 or std/rj45-ganged@2 "
+                   "a console or timing jack is std/rj45@2 or std/rj45-ganged@2, or "
+                   "common/rj45-ganged-lamped@1 where its housing shows lamps "
                    "(docs/rj45-family-design.md; spec/tools/sweeps/sweep_rj45.py)")
+
+
+def _rj45_census_counts(unlamped_eth, lamped_bare, retired, neutral_eth):
+    """The census sentence, shared by the device and component paths."""
+    return (f"{unlamped_eth} Ethernet jack(s) on a part with no lamps, "
+            f"{neutral_eth} Ethernet jack(s) on the media-neutral lamped part "
+            f"(use the -eth part), {lamped_bare} console/timing jack(s) on a "
+            f"lamped part, {retired} on a retired RJ45 part. ")
 
 
 def lint_device_rj45_lamps(path, data, lib_roots):
@@ -11965,17 +11984,16 @@ def lint_device_rj45_lamps(path, data, lib_roots):
     lands and shrinks to zero as the sweeps go through; what it stops is the
     sixth way arriving quietly."""
     groups = data.get("groups") or {}
-    unlamped_eth = lamped_bare = retired = 0
+    unlamped_eth = lamped_bare = retired = neutral_eth = 0
     per_view = {vn: (((view or {}).get("components") or {}).get("placements") or [])
                 for vn, view in (data.get("views") or {}).items()}
     for vn, placements in per_view.items():
         elsewhere = [q for on, other in per_view.items() if on != vn for q in other]
-        a, b, c = _rj45_census(placements, groups, lib_roots, elsewhere=elsewhere, view=vn)
-        unlamped_eth += a; lamped_bare += b; retired += c
-    if unlamped_eth or lamped_bare or retired:
-        warn(path, "L76", f"RJ45 family: {unlamped_eth} Ethernet jack(s) on a part with no "
-                          f"lamps, {lamped_bare} console/timing jack(s) on a lamped part, "
-                          f"{retired} on a retired RJ45 part. " + RJ45_CENSUS_MSG)
+        a, b, c, d = _rj45_census(placements, groups, lib_roots, elsewhere=elsewhere, view=vn)
+        unlamped_eth += a; lamped_bare += b; retired += c; neutral_eth += d
+    if unlamped_eth or lamped_bare or retired or neutral_eth:
+        warn(path, "L76", "RJ45 family: " + _rj45_census_counts(
+            unlamped_eth, lamped_bare, retired, neutral_eth) + RJ45_CENSUS_MSG)
 
 
 def lint_component_rj45_lamps(path, data, lib_roots):
@@ -11999,13 +12017,12 @@ def lint_component_rj45_lamps(path, data, lib_roots):
             return
     except (ValueError, IndexError):
         pass
-    unlamped_eth, lamped_bare, retired = _rj45_census(
+    unlamped_eth, lamped_bare, retired, neutral_eth = _rj45_census(
         data.get("parts") or [], {}, lib_roots, data.get("name"))
-    if unlamped_eth or lamped_bare or retired:
-        warn(path, "L76", f"RJ45 family: {data.get('name')} parts: carry {unlamped_eth} "
-                          f"Ethernet jack(s) on a part with no lamps, {lamped_bare} "
-                          f"console/timing jack(s) on a lamped part, {retired} on a "
-                          f"retired RJ45 part. " + RJ45_CENSUS_MSG)
+    if unlamped_eth or lamped_bare or retired or neutral_eth:
+        warn(path, "L76", f"RJ45 family: {data.get('name')} parts: carry "
+             + _rj45_census_counts(unlamped_eth, lamped_bare, retired, neutral_eth)
+             + RJ45_CENSUS_MSG)
 
 
 def lint_device_id_convention(path, data, lib_roots):
