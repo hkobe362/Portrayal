@@ -29,13 +29,17 @@ export function hexColor(v) {
   return `#${h.toLowerCase()}`;
 }
 
+// The multimode aqua: OM3 and OM4 jackets, and an AOC's, which is multimode
+// fibre in a cable of its own (#1028). One value, so the three cannot drift.
+const MULTIMODE = '#2bb3c8';
+
 // OS2 jackets are yellow; copper is coloured by what it is for.
 export const COLORS = {os2: '#e8c547', copper: {server: '#5aa7ff', management: '#9aa3ad'},
   // The Rack Builder's media (cable-rules.js MEDIA), beside the showcase's
-  // two: OM3 and OM4 aqua, OM5 lime green, Cat 6 and 6A blue, a DAC black, an
-  // AOC dark grey, and a neutral grey for a cable whose media is not set.
-  om3: '#2bb3c8', om4: '#2bb3c8', om5: '#9acd32', cat6: '#5aa7ff', cat6a: '#5aa7ff',
-  dac: '#15171a', aoc: '#3a3f45', unset: '#9aa3ad',
+  // two: OM3, OM4 and an AOC aqua, OM5 lime green, Cat 6 and 6A blue, a DAC
+  // black, and a neutral grey for a cable whose media is not set.
+  om3: MULTIMODE, om4: MULTIMODE, om5: '#9acd32', cat6: '#5aa7ff', cat6a: '#5aa7ff',
+  dac: '#15171a', aoc: MULTIMODE, unset: '#9aa3ad',
   // A power cable is the black every cord end of the library is drawn in
   // (`jacket-color`, #1c1c1c), so the cable carries on from its plug's stub.
   // A ground wire is green; the shade is an estimate, no source is held.
@@ -90,10 +94,8 @@ export function bundleColor(colors) {
 // whose links name a jacket and no media: multimode fibre, single-mode, a
 // twinax DAC, a copper patch lead. Each is an entry of `COLORS` and no colour
 // is written here, so the two cannot drift.
-// AN OPEN QUESTION, NOT SETTLED HERE: the hero draws an AOC with the `mm`
-// jacket, aqua, as multimode fibre; `COLORS` draws the media `aoc` dark grey.
-// Both are drawn as they were. A reading that an AOC is aqua belongs in
-// `COLORS.aoc`, and changes every drawing of one.
+// An AOC is aqua in both tables: the hero draws one with the `mm` jacket, and
+// `COLORS.aoc` is the multimode aqua (decided on #1028).
 export const JACKETS = {mm: COLORS.om4, sm: COLORS.os2, dac: COLORS.dac, cu: COLORS.copper.server};
 export const colorOfJacket = j => JACKETS[j] || JACKETS.sm;
 
