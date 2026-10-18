@@ -94,10 +94,9 @@ into a machine-readable matrix. Only then does modelling start.
 
 Two rules the table carries:
 
-- **A module reference is a catalogue, not a power source.** Check: the
-  power figure of a module is read from the chassis guide's FRU power table
-  (see "Power figures" below), and the module reference is cited only for what
-  it states.
+- **A module reference is a catalogue, not a power source.** It is often
+  silent on watts. Check: before a module's power is recorded as absent, the
+  chassis guides' FRU power tables are searched (see "Power figures" below).
 - **Where a vendor has no public image library, the guides' own renders are
   the elevation source.** Check: before writing "thin photo coverage", count
   the front and rear views in the converted guides.
@@ -376,16 +375,15 @@ For a modular platform, the module reference's support tables ARE the
 `accepts:` lists. Parse them into TSV/JSON **before** modelling - models x
 chassis, module x carrier compatibility, per-model power - and hand-correct
 the rows the PDF table-wrapping mangles. Check: each corrected row is
-verified against the per-model sections. A catalogue wired from the vendor's
-table is wired by what the table says, not by what was photographed; do the
-parse first so the choice is made on purpose (the MX module catalogue shipped
-wired-by-vendor-table for want of it). Docling wraps model numbers with stray
+verified against the per-model sections. *Illustration.* The MX module
+catalogue shipped wired-by-vendor-table instead of wired-by-what-was-photographed
+because this happened first. Docling wraps model numbers with stray
 spaces (`MPC4E-3 D- 32XGE- SFPP`); normalise by stripping whitespace, and
 treat a release number in a cell as "supported", `-` as not.
 
 ## Power figures: which book, and which rung
 
-Two traps, each of which has already cost a re-do across a vendor corpus.
+Two traps, both of which have already cost a re-do across the Juniper corpus.
 
 **The module reference is not where the watts are.** It is the obvious place to
 look and it is often silent, while the FRU power tables sit in the CHASSIS
@@ -401,8 +399,8 @@ sentence was true of the book it named and false of the corpus, and it reads
 as the second.
 
 **A vendor power figure is a ladder, not a scalar.** The same part is printed
-at several ambient temperatures, and the rungs differ by enough to matter.
-Some guides print the lowest rung bare, with no temperature anywhere near it,
+at 25 C, 40 C and 55 C, and the rungs differ by enough to matter.
+Some guides print the 25 C figure bare, with no temperature anywhere near it,
 so an extractor that takes the first watts it sees reads low and looks right.
 **Take the maximum rung and record the ambient in `provenance.power`** - lint
 L52 asks for that record. Two more things the row itself says and the number
