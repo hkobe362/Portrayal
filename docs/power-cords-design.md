@@ -1,6 +1,6 @@
 # Power cords: what #1045 still wants
 
-Status: **proposed, 2026-10-18, for the owner to accept. Nothing here is built.** A
+Status: **proposed, 2026-10-18, to be accepted at merge. Nothing here is built.** A
 design note only: no code, no library part, no schema, no export changes with it.
 The start of this note was decided 2026-10-18. Every recommendation below is a
 **proposal**, and every choice that would be one-way when built says so.
@@ -516,7 +516,7 @@ In order; each is its own pull request.
    DC cable types; then 5.5's one row.
 6. **Side views, and load** (A12, section 8).
 
-## 12. Open questions for the owner
+## 12. Open questions
 
 1. **Is the first slice the right one, and should it wait for #1159?** Answering no
    to the wait changes only the merge order and the conflicts in `dcim-rules.js`.
@@ -533,7 +533,7 @@ In order; each is its own pull request.
    single-supply server.
 7. **Who proves the import?** The slice needs a NetBox 4.7.x and a Nautobot 3.2.x,
    and the Nautobot script. If the author of the slice has no instance, the pull
-   request says it was not proved, and the owner or a reviewer runs step 4.
+   request says it was not proved, and whoever has an instance runs step 4.
 8. **Power-cord stock lengths (4.4):** which maker's list should the first type that
    states one cite? None is held.
 
