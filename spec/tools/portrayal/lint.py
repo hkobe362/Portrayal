@@ -11918,8 +11918,8 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
     # (edgecore/as5912-54x mgmt-eth: two lamps drawn beside the bezel, not
     # composed into it), and the census must not re-flag what the sweep
     # deliberately left alone. The same exemption covers a BARE timing jack
-    # whose vendor draws lamps for it (juniper/mx204's bits): the family has
-    # no bare-with-lamps member, so the lamps stay separate placements.
+    # whose vendor draws lamps for it (juniper/mx204's bits, still to move to
+    # common/rj45-ganged-lamped@1): its lamps stay separate placements.
     #
     # THE LAMP MAY BE ON ANOTHER FACE. A desktop ONT puts its jack on the back
     # edge and the jack's one lamp on the top (nokia/xs-010x-r: DATA,

@@ -242,11 +242,13 @@ flagged: the latch slot height (2.6, conventional) and the housing top wall
    comments, not the code.
 3. **Two of the 556 in-jack lamps were not lifted.** 554 were. The MX204's
    `led-bits-act` and `led-bits-link` sit inside its BITS jack, which is a timing
-   role - bare part, by decision 3 - that nonetheless has lamps, and the family
-   has no bare-with-lamps member. They stay as separate placements naming the
-   jack with `for:`, the shape as5912-54x already uses, and the device carries a
-   `bits-lamps` provenance entry saying so. One jack does not earn a fifth
-   member; if a second arrives, the family gains one.
+   role - bare part, by decision 3 - that nonetheless has lamps. At the sweep the
+   family had no bare-with-lamps member, so they stayed as separate placements
+   naming the jack with `for:`, the shape as5912-54x already uses, and the device
+   carries a `bits-lamps` provenance entry saying so. The family has one now:
+   `common/rj45-ganged-lamped@1`, added for the CSR440's BITS jack (#370). The
+   MX204's BITS jack is a follow-up candidate for it and is not moved by that
+   change.
 4. **The two lamps split link and activity.** The lamped parts shipped at 1.0.0
    with `off / link / activity` on BOTH lamps, as the retired `common/rj45-port@4`
    had. Review of the merged result found that unreadable - a jack whose two lamps
@@ -255,7 +257,9 @@ flagged: the latch slot height (2.6, conventional) and the housing top wall
    own mapping; three that had copied the both-on-each default were split.
 
 **The version rule the sweep answered two ways:** a composed-part swap that
-removes no id is a minor bump.
+removes no id is a minor bump. That held for the sweep, which kept every `ref`
+the lock hashes. A swap that changes a placement's `ref` (`PLACEMENT_HASHED` in
+`devicelock`) asks for a major, as the CSR440's BITS part swap did.
 
 ## Addendum: a third lamped member, lamps on the pin side
 
