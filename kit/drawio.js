@@ -43,14 +43,16 @@ const RACK_FACE_MM = 482.6;
  *  declares its face (`data-face-w`, written when the drawing is bigger than
  *  the face) has the face at 0 in its own millimetres, so what stands outside
  *  it hangs out over the opening by the viewBox's offset. One that does not
- *  declare one IS its face, and starts at the opening's left edge. */
+ *  declare one IS its face, with no ears of its own, and is centred between
+ *  the rails (a face as wide as the opening fills it, so it starts at 0). */
 function rackFit(svgText, vb) {
   const k = RACK.width / RACK_FACE_MM;
   // relief.js's faceDeclared reads the same attribute, but that file wants a
   // browser to load and this one runs without a document
   const root = /<svg\b[^>]*>/.exec(svgText || '');
   const declared = !!root && /\sdata-face-w="[\d.eE+-]+"/.test(root[0]);
-  return {x: declared ? vb[0] * k : 0, w: vb[2] * k};
+  const w = vb[2] * k;
+  return {x: declared ? vb[0] * k : (RACK.width - w) / 2, w};
 }
 
 const esc = s => String(s)

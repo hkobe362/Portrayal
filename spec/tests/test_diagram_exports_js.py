@@ -135,10 +135,11 @@ def test_a_face_as_wide_as_the_opening_is_drawn_as_it_was(out):
     assert _g(out, "full")["full-g0r0-front"] == pytest.approx([33, 21, 138, 14.8], **APPROX)
 
 
-def test_a_narrow_face_is_drawn_at_its_width_at_the_rail(out):
+def test_a_narrow_face_with_no_ears_is_centred_between_the_rails(out):
     g = _g(out, "narrow")
-    # 221 mm, not the opening: it starts where the opening does and stops short
-    assert g["narrow-g0r0-front"] == pytest.approx([33, 21, 221 * K, 14.8], **APPROX)
+    # 221 mm, not the opening: it is centred, with rail showing on both sides
+    assert g["narrow-g0r0-front"] == pytest.approx(
+        [33 + (138 - 221 * K) / 2, 21, 221 * K, 14.8], **APPROX)
     assert g["narrow-g0r0-front-face"] == pytest.approx([0, 0, 221 * K, 14.8], **APPROX)
 
 
@@ -151,11 +152,13 @@ def test_a_drawing_wider_than_its_face_overhangs_the_opening(out):
 
 
 def test_a_port_is_on_its_port_at_every_width(out):
-    # the port at x=100 mm is 100 mm from the opening's left edge, in all three
+    # the port at x=100 mm is 100 mm from the face's left edge: the opening's
+    # for the full and the ringed face, the centred face's for the narrow one
     for kind in ("full", "narrow", "ringed"):
         g = _g(out, kind)
         gx, px = g[f"{kind}-g0r0-front"][0], g[f"{kind}-g0r0-front-p0"]
-        assert gx + px[0] == pytest.approx(33 + 100 * K, **APPROX), kind
+        left = 33 + (138 - 221 * K) / 2 if kind == "narrow" else 33
+        assert gx + px[0] == pytest.approx(left + 100 * K, **APPROX), kind
         assert px[2:] == pytest.approx([20 * K, 10 * 14.8 / 44], **APPROX), kind
     # and the one on the ring stands 30 mm outside the opening
     g = _g(out, "ringed")
