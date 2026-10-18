@@ -1,0 +1,65 @@
+format: 1
+kind: component
+name: hm-ring-2u
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+description: >-
+  One wire ring of a Hubbell M-Series 2 RU horizontal cable manager, seen from the front.
+  It is a rectangular loop of 0.225 in steel wire that stands out of the centre plate.
+  A top wire, a bottom wire and a post at the free end hold the cables laid along the manager.
+provenance:
+  size: >-
+    datasheet - the sheet's "Wire Diameter 0.225 in", 5.715 mm: the loop seen end-on is a
+    band that wide. Its height is the plate's, A, 3.5 in (89 mm), because the figure draws
+    the top wire at the top of the plate and the bottom wire at its foot.
+  relief: >-
+    estimated - the loop stands C, 4 in (102 mm), out of the plate (the sheet's C): a wire
+    along the top, one along the bottom and a post joining them at the free end, drawn as
+    square-section bars where the real wire is round. The figure shows hooks bent at the
+    post tops and a bend where each wire leaves the plate; neither is drawn, because the
+    figure dimensions neither.
+  guide: >-
+    estimated - the clear opening inside the loop, looking along the manager, which is the
+    run: `w` the height of the opening, A less a wire at the top and one at the bottom
+    (88.9 - 11.43 = 77.47), and `h` the depth, C less the post and the plate-side wire (101.6
+    - 11.43 = 90.17). The wire diameter is the sheet's; the loop's proportions are read on
+    the figure.
+  guide-depth: >-
+    datasheet - the band of the loop along the run is the wire's diameter, 5.715 mm, so a
+    cable passing it enters and leaves that far apart.
+  not-drawn: >-
+    known-wrong - the figure and the photograph show the posts of alternate rings with a
+    hook, and rings that curve where they leave the plate; the loop here is straight and
+    square.
+  material: >-
+    datasheet - "Material: Steel", "Finish: Black Powder Coated".
+  color: >-
+    datasheet - "Finish: Black Powder Coated"; drawn as the library's black steel.
+size: {w: 5.715, h: 88.9}
+size-confidence: {w: datasheet, h: datasheet}
+attrs: {material: Steel}
+guide: {kind: ring, aperture: {w: 77.47, h: 90.17}, run: x, depth: 5.715}
+elements:
+  top: {at: [0.0, 0.0], size: [5.715, 5.715], class: bezel}
+  bottom: {at: [0.0, 83.185], size: [5.715, 5.715], class: bezel}
+  post: {at: [0.0, 0.0], size: [5.715, 88.9], class: bezel}
+relief:
+  features:
+    - node: top
+      out: 101.6
+      color: '#3a3f45'
+      confidence: estimated
+      source: the loop stands C, 4 in (102 mm), out of the plate (HM24C sheet, dimension C); the figure draws the top wire the full length
+    - node: bottom
+      out: 101.6
+      color: '#3a3f45'
+      confidence: estimated
+      source: the loop stands C, 4 in (102 mm), out of the plate (HM24C sheet, dimension C); the figure draws the bottom wire the full length
+    - node: post
+      lift: 95.885
+      out: 101.6
+      color: '#33373c'
+      confidence: estimated
+      source: the figure draws a post at the free end joining the two wires, one wire thick
+skins: [default]

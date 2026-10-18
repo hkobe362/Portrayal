@@ -1,0 +1,76 @@
+{
+ "bay-accepts": {},
+ "composed": "0d589f76e51df0bb",
+ "composed-refs": {
+  "hubbell/hs23c-finger@1": "1.0.0+5270bc96862c0a34",
+  "hubbell/hs23c-floor@1": "1.0.0+612a38d11c17bc23",
+  "hubbell/hs23c-plate@1": "1.0.0+4a65debec65312df",
+  "hubbell/hs23c-tab@1": "1.0.0+747751e7dc792809",
+  "hubbell/hs2c@1": "1.0.0+e9852664f0be60b6"
+ },
+ "configs": [
+  "base",
+  "cover-off"
+ ],
+ "format": 1,
+ "gaps": "d05eed7b7cf90c57",
+ "groups": [
+  "body",
+  "cover",
+  "fingers"
+ ],
+ "ids": [
+  "front/placements/cover",
+  "front/placements/finger-1",
+  "front/placements/finger-2",
+  "front/placements/finger-3",
+  "front/placements/finger-4",
+  "front/placements/finger-5",
+  "front/placements/floor",
+  "front/placements/plate",
+  "front/placements/tab-1",
+  "front/placements/tab-2",
+  "front/placements/tab-3",
+  "front/placements/tab-4",
+  "front/placements/tab-5"
+ ],
+ "names": "400980724ecde311",
+ "placement-addressing": {
+  "rel-pos": {
+   "front/placements/cover": 1,
+   "front/placements/finger-1": 1,
+   "front/placements/finger-2": 2,
+   "front/placements/finger-3": 3,
+   "front/placements/finger-4": 4,
+   "front/placements/finger-5": 5,
+   "front/placements/floor": 2,
+   "front/placements/plate": 1,
+   "front/placements/tab-1": 6,
+   "front/placements/tab-2": 7,
+   "front/placements/tab-3": 8,
+   "front/placements/tab-4": 9,
+   "front/placements/tab-5": 10
+  }
+ },
+ "placement-attrs": "44136fa355b3678a",
+ "placement-geometry": "c38836f3a02d7d9b",
+ "placement-groups": {
+  "front/placements/cover": "cover",
+  "front/placements/finger-1": "fingers",
+  "front/placements/finger-2": "fingers",
+  "front/placements/finger-3": "fingers",
+  "front/placements/finger-4": "fingers",
+  "front/placements/finger-5": "fingers",
+  "front/placements/floor": "body",
+  "front/placements/plate": "body",
+  "front/placements/tab-1": "fingers",
+  "front/placements/tab-2": "fingers",
+  "front/placements/tab-3": "fingers",
+  "front/placements/tab-4": "fingers",
+  "front/placements/tab-5": "fingers"
+ },
+ "placement-surface": "44136fa355b3678a",
+ "shape": "ba080cce479f18de",
+ "surface": "6d76644ecb43b6e5",
+ "version": "0.1.0"
+}

@@ -1,0 +1,39 @@
+format: 1
+kind: component
+name: hs23c-finger
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+description: >-
+  One steel finger of the Hubbell S-Series HS23C horizontal cable manager, seen from the
+  front. It is a 14 gauge flat tab folded forward from the top edge of the plate, between
+  two windows. It keeps the cables laid in the manager from rising out of it.
+provenance:
+  size: >-
+    datasheet - 14 gauge, 1.9 mm thick (the sheet's "Gauge 14"; 1.897 mm by the standard
+    gauge). Its width, 24 mm, is estimated: read off the figure against B, where a finger
+    is about a quarter of the pitch between two.
+  relief: >-
+    estimated - a flat tab 72.4 mm long, from the plate forward to the cover, drawn square
+    where the figure shows a rounded tip with the edge folded down. Five of them stand along
+    the top, one at each web between windows and one at each end, as the figure draws them.
+  guide: >-
+    estimated - the five fingers' pitch, 104 mm, and the gap between two, 80 mm, are the
+    device's `duct` guide: the figure draws the fingers over the web between each pair of
+    windows. "Cable fingers align with patch panel adaptors to prevent patch cord kinks"
+    is the sheet's claim and is checked there against a patch panel, not stated here.
+  color: >-
+    datasheet - "Finish: Black Powder Coated" on the sheet.
+size: {w: 24.0, h: 1.9}
+size-confidence: {w: estimated, h: datasheet}
+attrs: {material: Steel}
+elements:
+  finger: {at: [0.0, 0.0], size: [24.0, 1.9], class: bezel}
+relief:
+  features:
+    - node: finger
+      out: 72.4
+      color: '#3a3f45'
+      confidence: estimated
+      source: the figure draws each finger the manager's whole depth, C, 3 in (76 mm), less the plate and the cover
+skins: [default]

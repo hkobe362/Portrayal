@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="5.715mm" height="44.45mm" viewBox="0 0 5.715 44.45">
+  <!-- one wire ring end-on: the loop runs back from the viewer to the plate; its top wire,
+       its bottom wire and the post at the free end -->
+  <rect id="post" x="0" y="0" width="5.715" height="44.45" rx="2.8" fill="#262a2e"/>
+  <rect id="top" x="0" y="0" width="5.715" height="5.715" rx="2.8" fill="#3a3f45"/>
+  <rect id="bottom" x="0" y="38.735" width="5.715" height="5.715" rx="2.8" fill="#3a3f45"/>
+</svg>

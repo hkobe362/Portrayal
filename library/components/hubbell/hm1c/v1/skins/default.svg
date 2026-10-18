@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="482.6mm" height="44.45mm" viewBox="0 0 482.6 44.45">
+  <!-- the cover from the front: one panel the width of the manager -->
+  <rect id="plate" x="0" y="0" width="482.6" height="44.45" fill="#2a2d31"/>
+  <rect id="logo-zone" x="212.3" y="16.225" width="58" height="12" fill="none"/>
+</svg>
