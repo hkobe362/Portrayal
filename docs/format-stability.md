@@ -910,7 +910,9 @@ follow the DCIM's own schema, and what can break is what an already-imported
 record is called: a model name, a port name, a bay position. Before 1.0 such a
 change is allowed, and it is announced in `CHANGELOG.md`, marked **BREAKING for
 DCIM data already imported**, with what it renames. From 1.0 it is treated as
-a `contract` change is.
+a `contract` change is. Which NetBox and Nautobot the exports need, and which
+features need NetBox 4.6 or later, is in
+[`library/README.md`](../library/README.md#which-netbox-and-nautobot-the-exports-need).
 
 ## What is promised before 1.0
 
