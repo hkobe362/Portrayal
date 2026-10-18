@@ -10937,6 +10937,9 @@ def _speeds_finding(path, where, speed, speeds):
     if len(set(names)) != len(names):
         err(path, "L110", f"{where}: speeds {names} lists a rate twice")
     known = [s for s in names if s in PORT_SPEEDS]
+    if len(set(names)) == len(names) and known == names \
+            and names != sorted(names, key=PORT_SPEEDS.index):
+        err(path, "L110", f"{where}: speeds {names} is not in ascending rate order")
     if speed is not None and known and max(known, key=PORT_SPEEDS.index) != str(speed):
         err(path, "L110", f"{where}: speeds {names} must have `speed` {speed!r} as its "
                           "highest member, because `speed` is the highest native rate")
@@ -10982,8 +10985,11 @@ def lint_device_speed_vocabulary(path, data):
             g = attrs_mod.flatten(((groups.get(p.get("group")) or {}).get("attrs")))
             # a placement's `speeds` is held to its own speed, else its group's
             _speed_finding(path, f"{vname}/{p.get('id')}", a.get("speed"))
-            _speeds_finding(path, f"{vname}/{p.get('id')}",
-                            a.get("speed", g.get("speed")), a.get("speeds"))
+            # and so is a placement's own `speed` against its group's `speeds`
+            if "speeds" in a or ("speed" in a and "speeds" in g):
+                _speeds_finding(path, f"{vname}/{p.get('id')}",
+                                a.get("speed", g.get("speed")),
+                                a.get("speeds", g.get("speeds")))
 
 
 # L113's question: which media put a NETWORK INTERFACE behind the connector.

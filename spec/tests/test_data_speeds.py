@@ -64,9 +64,33 @@ def test_a_list_whose_highest_member_is_not_speed_is_an_error(errors):
 
 
 def test_a_list_without_speed_is_an_error(errors):
-    lint.lint_device_speed_vocabulary("d.yaml", _device("25g", ["1g", "10g"]))
+    d = _device("25g", ["1g", "10g", "25g"])
+    del d["groups"]["ports"]["attrs"]["speed"]
+    lint.lint_device_speed_vocabulary("d.yaml", d)
     (msg,) = _l110(errors)
-    assert "highest member" in msg
+    assert "no `speed`" in msg
+
+
+def test_a_list_out_of_order_is_an_error(errors):
+    lint.lint_device_speed_vocabulary("d.yaml", _device("25g", ["25g", "1g", "10g"]))
+    (msg,) = _l110(errors)
+    assert "ascending" in msg
+
+
+def test_a_placement_speed_contradicting_its_groups_list_is_an_error(errors):
+    d = _device("25g", ["1g", "10g", "25g"], {"speed": "10g"})
+    lint.lint_device_speed_vocabulary("d.yaml", d)
+    (msg,) = _l110(errors)
+    assert "front/port-1" in msg and "highest member" in msg
+
+
+def test_an_elements_row_carries_the_list():
+    from portrayal import elements
+    svg = ET.fromstring('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
+                        '<g data-path="p" data-speed="25g" data-speeds="1g 10g 25g"/></svg>')
+    doc = elements.face_elements(svg, "c", "front")
+    (row,) = [r for r in doc["elements"] if r.get("path") == "p"]
+    assert row["speed"] == "25g" and row["speeds"] == ["1g", "10g", "25g"]
 
 
 def test_a_duplicate_is_an_error(errors):
