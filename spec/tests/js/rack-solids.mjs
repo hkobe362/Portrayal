@@ -38,7 +38,7 @@ function samples(points, step = 0.5) {
 const distTo = (p, b) => Math.hypot(Math.max(b.x0 - p.x, 0, p.x - b.x1), Math.max(b.y0 - p.y, 0, p.y - b.y1),
   Math.max(b.z0 - p.z, 0, p.z - b.z1));
 
-// The owner's rack, with a switch far below (U5) whose cable is routed by hand
+// The reference rack of #949, with a switch far below (U5) whose cable is routed by hand
 // through ring 2 of the lacer. Since the automatic route runs a patch along
 // one manager (#949, section 4.1), c1 to c5 run along the lacer and never
 // reach a lane; c7 to c11 take the same five a ends to the switch at U5,
@@ -52,7 +52,7 @@ function owner() {
   return {rack: {...r, cables: [...F.OWNER_CABLES, c6, ...lane]}, ctx: F.ctxOf({ports: {i5: {p100: -100}}})};
 }
 
-test('the solids of the owner\'s rack: four envelopes, the lacer\'s fifteen plates and its rings, placed', () => {
+test('the solids of the reference rack of #949: four envelopes, the lacer\'s fifteen plates and its rings, placed', () => {
   const {rack, ctx} = owner();
   const s = S.solidsOf(rack, ctx);
   // and since #968 the five parts of each of its five rings
@@ -461,7 +461,7 @@ test('the mirror: a front PDU, on a four-post and on a two-post, is gone round b
 });
 
 test('a cord from the lacer\'s end ring to the lane beside a front PDU never runs in front of its outlet face', () => {
-  // #968: the owner's rack with a zero-U PDU on the left-front upright,
+  // #968: the reference rack of #949 with a zero-U PDU on the left-front upright,
   // standing in the gutter beside the lacer's ring 1 (-209.2 to -202.4). c7
   // to c11 leave ring 1 from its approach point (-215.7, 73.7 out) for the
   // lane outboard of the PDU (U11). A straight leg from there to the lane

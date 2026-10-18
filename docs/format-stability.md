@@ -303,7 +303,7 @@ reader that does not know it finds every field it read before.
   (`Through breaker A, lines L1-L2`); and `feed_leg` is written only for a
   line-to-neutral outlet on a three-phase wye input (L1 `A`, L2 `B`, L3 `C`).
   A DCIM that imported a leg holds it.
-- **A fixed breaker is named as the unit prints it** (owner decision,
+- **A fixed breaker is named as the unit prints it** (decided
   2026-10-09): the description reads `Through breaker <name>`, where the name
   is the first of the breaker placement's `attrs.label` and `attrs.section`
   (the letter on the Eaton G4 section tile) that is set, and the placement id

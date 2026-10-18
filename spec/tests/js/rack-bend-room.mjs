@@ -31,7 +31,7 @@ test('cornersOf is one function, in route-path.js, and bundles.js still exports 
 
 test('a leg between two corners is shared by halves, or by what each turn needs of it', () => {
   // a right angle, then 47.7 mm on, a turn of 15 degrees: the plug's end to a
-  // ring's line on the owner's rack. A 25 mm bend uses 25 tan 45 = 25 mm of
+  // ring's line on the reference rack of #949. A 25 mm bend uses 25 tan 45 = 25 mm of
   // the leg at the right angle and 25 tan 7.5 = 3.3 at the other: 28.3 of
   // 47.7. By halves the right angle has 23.8 and is short; by need both have
   // 47.7 / (tan 45 + tan 7.5) = 42.2
@@ -71,9 +71,9 @@ test('by need is never stricter than by halves: what has room for a radius by ha
   assert.ok(both > 50 && onlyNeed > 10, `${both} by both, ${onlyNeed} by need alone`);
 });
 
-// ── the owner's rack ─────────────────────────────────────────────────────
+// ── the reference rack of #949 ─────────────────────────────────────────────────────
 
-test('the owner\'s rack: no corner of any cord is short of its 25 mm (86 were, before #973)', () => {
+test('the reference rack of #949: no corner of any cord is short of its 25 mm (86 were, before #973)', () => {
   const r = F.rack(), ctx = F.ctxOf(r);
   // by the measure a path is judged by, a leg shared by need: none, of any cause
   assert.deepEqual(tightCorners(r, ctx, 'need'), []);
@@ -97,7 +97,7 @@ test('the owner\'s rack: no corner of any cord is short of its 25 mm (86 were, b
   assert.deepEqual(R.ringFindings(r, ctx), []);
 });
 
-test('on the owner\'s rack a path is the same however often it is asked for, and from either end', () => {
+test('on the reference rack of #949 a path is the same however often it is asked for, and from either end', () => {
   const r = F.rack(), ctx = F.ctxOf(r);
   let read = 0;
   for (const c of r.cables) {
