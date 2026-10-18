@@ -41,6 +41,15 @@ it as data (netbox-community/devicetype-library#4497,
 nautobot/devicetype-library#24).
 
   python3 dcim_export.py --dist DIR --out DIR [--device NAME]
+  python3 dcim_export.py --dist DIR --out DIR --modules
+
+`--modules` writes the module types, for both targets, from every component in
+the build, and removes each `.yaml` file under `<target>/module-types/<maker>/`
+that no component writes any more, printing `removed <path>` for it. That is
+how a component renamed to `part-numbers` stops leaving its old type behind.
+Nothing else is removed: not another kind of file in those folders, and not a
+file outside `module-types/`. `--device` writes device types only and removes
+nothing, because a module type is shared between devices.
 """
 import argparse
 import copy
@@ -3492,6 +3501,33 @@ def seating_depths(dist):
                      "module accepted, through its own bays, by itself?")
 
 
+def prune_module_types(root, kept):
+    """Remove the module-type files an earlier run wrote and this one did not.
+
+    A module type is renamed when a component gains `part-numbers`, and the old
+    file stayed behind beside the new ones - a DCIM importing the folder then
+    held a type no component describes (#70). `kept` is every path
+    export_modules wrote, and it is built from the whole build, never from one
+    device: module types are shared between devices, and the `--device` run
+    does not come here at all.
+
+    ONLY THE EXPORTER'S OWN KIND: a `.yaml` file directly inside a maker's folder
+    under `<target>/module-types/`. Another file there, and everything outside
+    `module-types/` (fibre maps, device types, images), is left alone.
+    """
+    removed = []
+    for target in TARGETS:
+        base = Path(root) / target / "module-types"
+        if not base.is_dir():
+            continue
+        for maker in sorted(p for p in base.iterdir() if p.is_dir()):
+            for f in sorted(maker.glob("*.yaml")):
+                if f.is_file() and f not in kept:
+                    f.unlink()
+                    removed.append(f)
+    return removed
+
+
 def export_modules(dist, root, images=None):
     """Every module contract in the library, as module types for both targets.
 
@@ -3559,6 +3595,7 @@ def export_modules(dist, root, images=None):
     anchored_all = anchored_bays(dist)
 
     wrote = 0
+    kept = set()                                 # every module-type file this run writes
     collisions = []                              # ((man, model), ref, kind)
     for (man, model), members in sorted(groups.items()):
         doc, contract = members[0]
@@ -3630,9 +3667,11 @@ def export_modules(dist, root, images=None):
                                  target, fibre_map)
             if target == "nautobot":
                 written = seat_names(written, depth)
-            (d / (model.replace("/", "-") + ".yaml")).write_text(
-                "---\n" + yaml.dump(written, Dumper=Indented,
-                                    sort_keys=False, width=100, default_flow_style=False))
+            f = d / (model.replace("/", "-") + ".yaml")
+            f.write_text("---\n" + yaml.dump(written, Dumper=Indented,
+                                             sort_keys=False, width=100,
+                                             default_flow_style=False))
+            kept.add(f)
             if images and RASTER:
                 if render_module_image(images, root, target, doc, ns, name, ver):
                     imaged.add(model)
@@ -3656,6 +3695,8 @@ def export_modules(dist, root, images=None):
     print(f"module types: {wrote} written from {len(built)} contract(s), "
           f"{skipped} skipped for having no manufacturer, {retired} retired "
           f"(`superseded-by`) and not exported")
+    for f in prune_module_types(root, kept):
+        print(f"removed {f}  (no component writes it any more)")
     # NAMED, NOT COUNTED. A number here would be the instrument that failed in
     # #183: it cannot tell one part quietly vanishing from forty twins
     # collapsing the way they are meant to.

@@ -25,6 +25,15 @@
   The Casa device types are otherwise unchanged: a bay's `Accepts:` line names
   the component, not its code. Every other component's module type is
   unchanged and moves to `part-numbers` later.
+- **BREAKING for DCIM data already imported: the exporter removes the
+  module-type files it no longer writes.** `dcim_export.py --modules` removes a
+  `.yaml` file under `<target>/module-types/<maker>/` that no component in the
+  build writes, and prints `removed <path>` for each. Without it a renamed type
+  stayed beside its replacement. A `--device` run removes nothing, and another
+  kind of file in those folders, or a file outside `module-types/`, is never
+  touched. Removed from both `netbox/` and `nautobot/` `module-types/Casa
+  Systems/`: `BDM2m.yaml`, `6+12 IO2.yaml` and `SMM 300GM.yaml`. Added, in both:
+  `BDM2M-W.yaml`, `BDM2M-N.yaml`, `BDM6-12-IO2.yaml` and `SMM-300-GM.yaml`.
 - **The rack kit's explorer labels the three Casa cards by their component
   name** until its label readers learn `part-numbers`: they read
   `attrs.model`, which these three no longer state.
