@@ -130,7 +130,9 @@ provenance:
     confidence: estimated
     note: >-
       estimated - the two ports are open (`cover: open`): a cable crosses the back plate through each
-      from the front to the rear. The sizes are the ports' in `rear` above.
+      from the front to the rear. The sizes are the ports' in `rear` above. The ports are round and each is declared `rect`, at
+      the port's side: an `obround` of equal sides compiles to a hole of no width in rack.json,
+      which no cable could cross.
   guides:
     confidence: estimated
     note: >-
@@ -259,8 +261,8 @@ views:
         - {id: port-1, at: [318.3, 48.9], size: [80, 80], rx: 40, fill: '#0a0b0c', vent: 1.5, kind: port}
         - {id: port-2, at: [84.3, 48.9], size: [80, 80], rx: 40, fill: '#0a0b0c', vent: 1.5, kind: port}
     passes:
-      - {id: pass-through-1, at: [318.3, 48.9], size: [80, 80], shape: obround, cover: open}
-      - {id: pass-through-2, at: [84.3, 48.9], size: [80, 80], shape: obround, cover: open}
+      - {id: pass-through-1, at: [318.3, 48.9], size: [80, 80], shape: rect, cover: open}
+      - {id: pass-through-2, at: [84.3, 48.9], size: [80, 80], shape: rect, cover: open}
   top:
     size: {w: 482.6, h: 208.0}
     panel:

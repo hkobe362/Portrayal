@@ -143,7 +143,9 @@ def test_the_back_plate_declares_the_passes_its_chassis_style_has(slug):
         decor = [d for d in doc["views"]["rear"]["panel"]["decor"] if d.get("pattern") == "brush"]
         assert len(decor) == 1, "the brush is drawn where its pass is declared"
     if style == "grommet":
-        assert all(p["shape"] == "obround" and p["size"][0] == p["size"][1] for p in rear), "round openings"
+        # round openings, declared as the square of their bore: an obround of equal sides is a
+        # hole of no width in rack.json, which no cable crosses
+        assert all(p["shape"] == "rect" and p["size"][0] == p["size"][1] for p in rear)
     if style == "solid":
         assert rear == []
 

@@ -135,7 +135,9 @@ provenance:
     note: >-
       estimated - each grommet's opening is declared a pass-through with `cover: open`, at the
       opening's size: the format has no grommet, and a cover is `open` or `brush` today. A cable
-      crosses the back plate through each opening from the front to the rear.
+      crosses the back plate through each opening from the front to the rear. The openings are
+      round and each is declared `rect`, at the bore's side: an `obround` of equal sides compiles
+      to a hole of no width in rack.json, which no cable could cross.
   guides:
     confidence: estimated
     note: >-
@@ -277,9 +279,9 @@ views:
         - {id: grommet-opening-2, at: [157.4, 53.35], size: [71.1, 71.1], rx: 35.55, fill: '#0a0b0c', vent: 1.5, kind: grommet-opening}
         - {id: grommet-opening-3, at: [259.6, 53.35], size: [71.1, 71.1], rx: 35.55, fill: '#0a0b0c', vent: 1.5, kind: grommet-opening}
     passes:
-      - {id: grommet-1, at: [55.2, 53.35], size: [71.1, 71.1], shape: obround, cover: open}
-      - {id: grommet-2, at: [157.4, 53.35], size: [71.1, 71.1], shape: obround, cover: open}
-      - {id: grommet-3, at: [259.6, 53.35], size: [71.1, 71.1], shape: obround, cover: open}
+      - {id: grommet-1, at: [55.2, 53.35], size: [71.1, 71.1], shape: rect, cover: open}
+      - {id: grommet-2, at: [157.4, 53.35], size: [71.1, 71.1], shape: rect, cover: open}
+      - {id: grommet-3, at: [259.6, 53.35], size: [71.1, 71.1], shape: rect, cover: open}
   top:
     size: {w: 482.6, h: 208.0}
     panel:
