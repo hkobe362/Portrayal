@@ -427,8 +427,8 @@ RULES = {
     "L109": ("component",  "a declared `optical.polarity` is what the paths actually wire - A straight, AF pair-flipped (and its rows exchanged at 24 fibres), universal - judged at the trunk connector's own width, and only at a width a held source draws (a warning otherwise)", "fix the paths or the polarity; the paths are the evidence, `polarity` is only the claim. For a width no source draws, add it to POLARITY_WIDTHS with the figure that draws it",
              "A polarity label the fibre paths do not match tells someone patching a link the wrong pair order, which is how a link ends up with transmit facing transmit.",
              MIXED),
-    "L110": ("component, device", "a port's `speed` is one of the closed set in spec/schemas/speeds.yaml - the highest native rate the port runs at, and nothing else", "spell the rate from the set (a 10/100/1000 jack is `1g`); media goes in `media`, a USB generation in `usb`, a PON flavour in `pon`, a caveat in the placement's `description`",
-             "A speed spelled more than one way breaks a filter such as every 1G port, and leaves the DCIM export unable to type the port, so it exports nothing for it.",
+    "L110": ("component, device", "a port's `speed` is one of the closed set in spec/schemas/speeds.yaml - the highest native rate the port runs at, and nothing else; a `speeds` list holds only members of the set, none twice, with `speed` as its highest", "spell the rate from the set (a 10/100/1000 jack is `1g`); media goes in `media`, a USB generation in `usb`, a PON flavour in `pon`, a caveat in the placement's `description`; list a multi-rate cage's rates once, ascending, ending at `speed`",
+             "A speed spelled more than one way breaks a filter such as every 1G port, and leaves the DCIM export unable to type the port, so it exports nothing for it. A `speeds` list that disagrees with `speed` publishes two answers to one question.",
              ERROR),
     "L108": ("component, device", "a stacked cage pair faces the library's way - an SFP/QSFP/QSFP-DD pair belly-to-belly, upper 0 over lower 180, or left 270 beside right 90 on a card drawn on its side, so both bails face outward; an OSFP pair the same way up, turned alike - 0 over 0, or 180 over 180 for a cage under the board, or both 90 or both 270 on its side - because a stacked OSFP cage is one connector and the OSFP MSA rev 5.22 draws both its modules heat sink up (section 7.1, Table 7-1, Figures 7-1 and 7-2)", "turn the pair; where a recorded reading says the stack is built otherwise, name the pair in `stack-exceptions:` with that reading as its `reason`",
              "A stack turned the other way seats its optics with their bails facing into the gap between the rows, where no thumb can reach them, and every rendering of the stack shows the wrong hardware.",
@@ -10920,9 +10920,38 @@ def lint_component_groups(path, data, lib_roots):
                               "Either place a part in it or drop it")
 
 
-def _speed_finding(path, where, speed):
-    """L110 for one declared speed. Nothing declared is not a finding - a port
-    that says nothing about its rate is answered by its group or its cage."""
+def _speeds_finding(path, where, speed, speeds):
+    """L110 for a declared `speeds` list: each member in the closed set, none
+    twice, and `speed` the highest member (so `speed` is in it). Nothing declared
+    is not a finding."""
+    if speeds is None:
+        return
+    if not isinstance(speeds, list):
+        err(path, "L110", f"{where}: speeds {speeds!r} is not a list of rates")
+        return
+    names = [str(s) for s in speeds]
+    for s in names:
+        if s not in PORT_SPEEDS:
+            err(path, "L110", f"{where}: speeds member {s!r} is not in the closed set "
+                              f"({' '.join(PORT_SPEEDS) or 'spec/schemas/speeds.yaml loaded nothing'})")
+    if len(set(names)) != len(names):
+        err(path, "L110", f"{where}: speeds {names} lists a rate twice")
+    known = [s for s in names if s in PORT_SPEEDS]
+    if len(set(names)) == len(names) and known == names \
+            and names != sorted(names, key=PORT_SPEEDS.index):
+        err(path, "L110", f"{where}: speeds {names} is not in ascending rate order")
+    if speed is not None and known and max(known, key=PORT_SPEEDS.index) != str(speed):
+        err(path, "L110", f"{where}: speeds {names} must have `speed` {speed!r} as its "
+                          "highest member, because `speed` is the highest native rate")
+    elif speed is None and known:
+        err(path, "L110", f"{where}: speeds {names} has no `speed` to be its highest member")
+
+
+def _speed_finding(path, where, speed, speeds=None):
+    """L110 for one declared speed (and `speeds`, the native rates of a
+    multi-rate cage). Nothing declared is not a finding - a port that says
+    nothing about its rate is answered by its group or its cage."""
+    _speeds_finding(path, where, speed, speeds)
     if speed is None:
         return
     if str(speed) in PORT_SPEEDS:
@@ -10946,13 +10975,21 @@ def lint_device_speed_vocabulary(path, data):
     group's attrs, which the renderer merges into every member, and a
     placement's own.
     """
-    for gname, gdef in (data.get("groups") or {}).items():
-        _speed_finding(path, f"groups/{gname}",
-                       attrs_mod.flatten((gdef or {}).get("attrs")).get("speed"))
+    groups = data.get("groups") or {}
+    for gname, gdef in groups.items():
+        a = attrs_mod.flatten((gdef or {}).get("attrs"))
+        _speed_finding(path, f"groups/{gname}", a.get("speed"), a.get("speeds"))
     for vname, view in (data.get("views") or {}).items():
         for p in view_parts(view or {})["placements"]:
-            _speed_finding(path, f"{vname}/{p.get('id')}",
-                           attrs_mod.flatten(p.get("attrs")).get("speed"))
+            a = attrs_mod.flatten(p.get("attrs"))
+            g = attrs_mod.flatten(((groups.get(p.get("group")) or {}).get("attrs")))
+            # a placement's `speeds` is held to its own speed, else its group's
+            _speed_finding(path, f"{vname}/{p.get('id')}", a.get("speed"))
+            # and so is a placement's own `speed` against its group's `speeds`
+            if "speeds" in a or ("speed" in a and "speeds" in g):
+                _speeds_finding(path, f"{vname}/{p.get('id')}",
+                                a.get("speed", g.get("speed")),
+                                a.get("speeds", g.get("speeds")))
 
 
 # L113's question: which media put a NETWORK INTERFACE behind the connector.
@@ -11039,8 +11076,8 @@ def lint_component_speed_vocabulary(path, data):
     if "speed" not in (data.get("fields") or {}):
         _speed_finding(path, "attrs", attrs_mod.flatten(data.get("attrs")).get("speed"))
     for gname, gdef in (data.get("groups") or {}).items():
-        _speed_finding(path, f"groups/{gname}",
-                       attrs_mod.flatten((gdef or {}).get("attrs")).get("speed"))
+        a = attrs_mod.flatten((gdef or {}).get("attrs"))
+        _speed_finding(path, f"groups/{gname}", a.get("speed"), a.get("speeds"))
     for part in data.get("parts") or []:
         if isinstance(part, dict):
             _speed_finding(path, f"parts/{part.get('id')}",
