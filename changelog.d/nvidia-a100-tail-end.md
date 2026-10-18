@@ -4,10 +4,7 @@
   stands at the corner by the top edge in a black housing, and two bosses take
   the thumbscrews of the straight or long offset extender. The card declares
   the connector as the `aux-power` port of its new rear face,
-  `nvidia/a100-pcie-80gb-tail@1`. The port is a stand-in,
-  `nvidia/a100-eps12v-standin@1`, that presents no interface; it is swapped
-  for `std/eps12v-header@1` once that part and its `eps12v-8pin` interface
-  are in the library.
+  `nvidia/a100-pcie-80gb-tail@1`, which composes `std/eps12v-header@1`.
 
 ### Changed
 - `nvidia/a100-pcie-80gb@1`'s extender upright is a flat strip, 1.2 thick,

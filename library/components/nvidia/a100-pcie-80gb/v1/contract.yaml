@@ -8,14 +8,12 @@ profile: server
 description: >-
   NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card.
   The bracket face carries one vent window and no ports. Three NVLink bridge
-  connectors sit on the top edge. The far end is open and shows the heat sink's
-  fins edge-on. It has one black CPU 8-pin power connector by the top edge and
-  two bosses for an extender. NVIDIA's straight or long offset extender can be
-  fitted to the far end; the `extender` field chooses it.
-unplaced: >-
-  Nothing in the library seats a card two slots wide. Every riser bay is one
-  slot, 120.02 x 21.59 on the 20.32 pitch, and a bay has no way to span its
-  neighbour. A dual-slot bay, or a span across two bays, would seat it.
+  connectors sit on the top edge under removable caps. The far end is open and
+  shows the heat sink's fins edge-on. It has one black CPU 8-pin power connector
+  by the top edge and two bosses for an extender. NVIDIA's straight or long
+  offset extender can be fitted to the far end; the `extender` field chooses it.
+  It plugs into one riser slot and covers the one beside it.
+slot-width: 2
 size: {w: 120.02, h: 41.91, d: 268.60}
 size-confidence: {w: registry, h: registry, d: drawing}
 attrs:
@@ -24,7 +22,6 @@ attrs:
   board-sku: 'P1001 SKU 230, NVPN 699-21001-0230-xxx'
   role: gpu
   form-factor: 'Full-height, full-length (FHFL) 10.5 in, dual-slot'
-  slots: 2
   pcie-connector: x16
   pcie-generation: 4
   pcie-height: full
@@ -50,7 +47,17 @@ fields:
       long offset one (NVPN 682-00007-5555-000) makes it 339 mm.
 faces:
   rear: {ref: nvidia/a100-pcie-80gb-tail@1}
+  plan: {ref: nvidia/a100-pcie-80gb-top@1}
 provenance:
+  slot-width: >-
+    datasheet - PB-10577 table 1: form factor "PCIe Full Height/Full Length
+    (FHFL) Dual-slot", and the face is one plate 36 across (`face-outline`), the
+    PCIe CEM 5.0 figure 11-13 two-slot bracket's envelope. The card declares
+    `slot-width: 2` as docs/pcie-two-slot-bays-design.md R1 defines it; a bay
+    that spans seats it, such as riser 1A's `slot-1` (`span: [slot-2]`). The
+    attr `slots: 2`, which said the same thing in a free-text field and which
+    nothing read, is dropped: `form-factor` keeps the brief's words and
+    `slot-width` is the fact a bay reads.
   sources: >-
     NVIDIA A100 80GB PCIe Product Brief PB-10577-001_v03, March 2022, fetched
     from https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/PB-10577-001_v02.pdf
@@ -174,8 +181,12 @@ provenance:
     starting 13.5, 70.7 and 126.1 behind the bracket's face, and 6.6 wide
     from 2.2 to 8.8 across the card. Figure 5 is the keep-out and has no
     dimensions. The caps are drawn 0.5 proud of the top edge, which is
-    estimated. The library has no NVLink interface, so the connectors are
-    boxes and nothing can mate a bridge to them.
+    estimated. THE BOXES BELOW (`nvlink-1` to `nvlink-3`) ARE THE CAPS. The
+    connectors under them are nvidia/nvlink-a100-connector@1, composed by the
+    card's `faces.plan` (nvidia/a100-pcie-80gb-top@1) at these same three
+    starts as `nvlink-1` to `nvlink-3`; it presents `nvlink-a100-pcie`, which
+    NVIDIA's two-slot bridge mates. Neither DCIM has an NVLink port, so the
+    export carries none.
   body-power-connector: >-
     photo-measured - PB-10577: "a CPU 8-pin power connector on the east edge of the
     board" (datasheet; the fact is one connector). Its place is IT Creations'
@@ -192,9 +203,13 @@ provenance:
     cells in two rows of four in a housing standing 0.2 proud of the end plate, the
     cells 0.4 (the step is estimated, see body-end).
     THE PORT is `aux-power` on the tail face (`faces.rear`, nvidia/a100-pcie-80gb-
-    tail@1), a STAND-IN, nvidia/a100-eps12v-standin@1, which presents no
-    interface. PR #1076 adds `eps12v-8pin`; a later change swaps the stand-in for
-    `std/eps12v-header@1` once it merges. The boxes below are its 3D body.
+    tail@1): std/eps12v-header@1, which presents `eps12v-8pin` for a CPU 8-pin
+    cable and which the card exports as a power port. The header's own size,
+    12.6 x 18.0 (figure 7's printed 12.6; the 18.0 estimated), is turned a
+    quarter and drawn on the tail face; the housing here is the photograph's
+    18.4 x 10.85. The two differ by 1.75 across the card's thickness, and the
+    photograph's height is the less certain (about 1 mm), so the boxes below
+    keep the photograph's and are the 3D body of the port.
   body-end: >-
     estimated - the black end plate (backplate, board and cover) stops 0.4 short
     of the shroud's lip and the connector housing stands 0.2 proud of it, so the

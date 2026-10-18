@@ -48,6 +48,15 @@ DIRECTIONS = ("plan", "rear")
 # better than silently counting it twice.
 OPTICAL_FACES = ("rear",)
 
+# WHICH FACES CARRY A POWER INLET OF THEIR OWN. A GPU's auxiliary power header is
+# on the card's far end, not on its bracket, so it is composed on the card's
+# `faces.rear` (docs/connectors-gpu-design.md section 7) and the card still
+# exports it as a power port. Only `rear`, for the reason OPTICAL_FACES is: a
+# plan face is the same module from above, and an inlet drawn there would be the
+# front's own at another angle, counted twice. Like OPTICAL_FACES this is a
+# judgement about hardware and not a list of drawings.
+POWER_FACES = ("rear",)
+
 # THE SIDES OF A BODY, AS THE PART DRAWS THEM ITSELF. Not directions: a side is
 # not another part but the outside of this one's body, a drawing in its own
 # `skins/body-<side>.svg` - a card's printed top edge, its ribbed shroud. A

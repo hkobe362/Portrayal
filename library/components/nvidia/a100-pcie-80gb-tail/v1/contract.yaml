@@ -23,7 +23,10 @@ size-notes: >-
   the same figures (the card's `body.boxes`) and each is named here.
 attrs: {media: gpu}
 parts:
-  - {ref: nvidia/a100-eps12v-standin@1, id: aux-power, at: [2.31, 1.73]}
+  # The header is 12.6 x 18.0 upright. Turned 270 about its centre it is 18.0
+  # across and 12.6 down, centred on the housing's centre (x' 11.51, y' 7.16),
+  # with its latch ramp (the left wall upright) toward the shroud, at the bottom.
+  - {ref: std/eps12v-header@1, id: aux-power, at: [5.21, -1.84], rotate: 270}
 provenance:
   size: >-
     drawing - see size-notes.
@@ -39,11 +42,16 @@ provenance:
     the wall round the opening (2.1) are estimated. How far the fins run in is
     not seen: the card's body draws them 40 mm deep.
   connector: >-
-    photo-measured - see `nvidia/a100-eps12v-standin@1`. BLACK housing on this
-    card, at the corner by the top edge: its right edge is 2 mm from the top
-    edge and its top is flush with the cover's top. The brief's "CPU 8-pin on the
-    east edge" (PB-10577 table 1) is the fact; the position is the photograph's,
-    good to about 1 mm.
+    photo-measured - BLACK housing on this card, at the corner by the top edge:
+    its edge is 2 mm from the top edge and its top is flush with the cover's top.
+    The brief's "CPU 8-pin on the east edge" (PB-10577 table 1) is the fact; the
+    position is the photograph's, good to about 1 mm. The part is
+    std/eps12v-header@1 (12.6 x 18.0, figure 7's 12.6 and an estimated 18.0),
+    turned a quarter so its two columns of four become two rows, and centred where
+    the photographed housing's centre is. The photograph's housing is 18.4 x
+    10.85: the width agrees to 0.4 and the height differs by 1.75, which is more
+    than the photograph's 1 mm, so the card's 3D housing keeps the photograph's
+    size (the card's `body-power-connector`) and this face draws the header's own.
   mount: >-
     estimated - the extender's two thumbscrews in 575TK_5 are about 313 px apart,
     which is 28.7 at 10.9 px/mm (they stand proud, so the true spacing is a little
@@ -59,6 +67,4 @@ elements:
   fins: {at: [9.66, 12.63], size: [85.8, 23.5], class: vent}
   mount-1: {at: [89.01, 4.63], size: [4.0, 4.0], class: screw}
   mount-2: {at: [60.21, 4.63], size: [4.0, 4.0], class: screw}
-unplaced: >-
-  It is the back of nvidia/a100-pcie-80gb@1, which no bay in the library seats.
 skins: [default]

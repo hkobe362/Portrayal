@@ -132,8 +132,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     named = [p for p in lib.glob("*/*/v*/contract.yaml")
              if F.face_ref(yaml.safe_load(p.read_text()) or {}, "plan")]
     # 86 since the Fibrain XCU10's drawer, seen from above under the shell top.
-    assert len(named) == 86, \
-        f"expected 86 parts naming a plan drawing, found {len(named)}"
+    # 87 since the NVIDIA A100 80GB PCIe, whose plan face is its top edge.
+    assert len(named) == 87, \
+        f"expected 87 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):

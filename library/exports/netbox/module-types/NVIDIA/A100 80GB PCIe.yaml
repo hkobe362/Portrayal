@@ -4,11 +4,16 @@ model: A100 80GB PCIe
 weight: 1.17
 weight_unit: kg
 description: NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card
+power-ports:
+  - name: '{module}/aux-power'
+    type: other
+    label: EPS12V 8-pin (CPU 8-pin)
 comments: 'NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-length card. The bracket face
-  carries one vent window and no ports. Three NVLink bridge connectors sit on the top edge. The far end
-  is open and shows the heat sink''s fins edge-on. It has one black CPU 8-pin power connector by the top
-  edge and two bosses for an extender. NVIDIA''s straight or long offset extender can be fitted to the
-  far end; the `extender` field chooses it.
+  carries one vent window and no ports. Three NVLink bridge connectors sit on the top edge under removable
+  caps. The far end is open and shows the heat sink''s fins edge-on. It has one black CPU 8-pin power
+  connector by the top edge and two bosses for an extender. NVIDIA''s straight or long offset extender
+  can be fitted to the far end; the `extender` field chooses it. It plugs into one riser slot and covers
+  the one beside it.
 
 
   Facts carried in the model that this schema has no field for:
@@ -43,8 +48,8 @@ comments: 'NVIDIA A100 80GB PCIe GPU, a passive dual-slot full-height full-lengt
 
   - role: gpu
 
-  - slots: 2
-
   - weight-kg: 1.17
+
+  - slot-width: 2 (seated, it also covers the bay beside its own, which stays empty)
 
   Contract version 1.0.0 (nvidia/a100-pcie-80gb).'
