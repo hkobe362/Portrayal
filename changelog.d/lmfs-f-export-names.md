@@ -1,7 +1,8 @@
 ### Changed
 - **BREAKING for DCIM data already imported: the three `nokia/lmfs-f` device
   types are now filed under the product name, with the mnemonic in brackets,
-  as the 7360 ISAM FX shelves are** (#997, `nokia/lmfs-f` 1.0.3). `LMFS-F`
+  as the 7360 ISAM FX shelves are** (#997). `nokia/lmfs-f` is now at 2.0.0, a
+  major because the rename is one-way. `LMFS-F`
   becomes `Lightspan MF-8 (LMFS-F)`, `LMFS-F AA kit` becomes
   `Lightspan MF-8 (LMFS-F) AA kit` and `LMFS-F AB kit` becomes
   `Lightspan MF-8 (LMFS-F) AB kit`, in both the NetBox and the Nautobot export.
