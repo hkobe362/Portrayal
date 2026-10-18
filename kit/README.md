@@ -1655,6 +1655,30 @@ cables file names a member's bundle first in its description; Nautobot's
 cable has no description, so its notes list each bundle's cables. draw.io
 draws members one by one and says so.
 
+**NetBox's own cable bundles: the option "NetBox 4.6 or later".** NetBox 4.6
+added `dcim.CableBundle`, a `name` unique across the whole instance, and a
+`bundle` column on the cable import, by name. A rack's `dcim.netbox` holds the
+NetBox version the files are for (`dcimOf`, `withDcim` and the `dcim` command
+take it; blank, or older than 4.6, is off, and it is off by default). **Off**,
+every file the kit writes is what it was, and the NetBox notes say the file does
+not fill a cable's bundle field. **On**, and with a site set
+(`dcim.site`), `cableImportRows({ ..., dcim })` also returns `bundleFile`
+(`{ columns: ['name'], rows }`, one row for each bundle that holds a cable the
+cables file writes), and each cable row has a `bundle` column, filled with the
+same name; the description still names the bundle first. Pass the same `dcim` to
+`kitReadme`. Take the file names from `netboxFiles(dcim)`: with the option on
+they are `1-rack.csv`, `2-devices.csv`, `3-modules.csv`, `4-bundles.csv` and
+`5-cables.csv`, and the README's steps follow (the bundles are step 5, the
+cables step 6); otherwise they are `KIT_FILES.netbox`. A bundle is named
+`<site> <rack> <bundle name>`, since "Bundle 1" repeats from rack to rack. With
+no site there is nothing to make a name unique, so the files are as with the
+option off and a note says so. A name over 100 characters
+(`DCIM_LIMITS.cableBundleName`, NetBox's `max_length`), or one that two bundles
+of the rack share, is left out of both files and said in the README's "Not in
+this kit"; a name is never cut. The kit cannot see the bundles an instance
+already has, and the README says it is unchecked. Nautobot has no bundle object
+and is unchanged.
+
 **The rack file is version 3 from 0.7.0.** `parseDoc` reads version 1 and 2
 files as they were, and every save writes version 3, which a page or kit
 older than 0.7.0 refuses rather than opening and losing its bundles. The

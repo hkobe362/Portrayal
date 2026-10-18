@@ -88,6 +88,10 @@
       "role": {
        "type": "string",
        "description": "The device role."
+      },
+      "netbox": {
+       "type": "string",
+       "description": "The NetBox version the import files are for. 4.6 or later also writes NetBox's own cable bundles; blank or older writes none."
       }
      }
     },
