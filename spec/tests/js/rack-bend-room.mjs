@@ -272,7 +272,7 @@ test('a hang is laid only where it leaves every corner its room, and is offered 
 test('a bend the kit\'s rules find no room for is found, and the route still exists', () => {
   // (the AOC's plug is given as a number, so it is measured whole, a leg its
   // turn may use, as every plug was before #985; a plug that cannot bend is
-  // tested in rack-rigid-plug.mjs, where this cord is laid with one)
+  // tested in rack-rigid-plug.mjs, which lays this cord with one)
   const r = F.rack(), ctx = {...F.ctxOf(r), plugReachOf: (e, c) => R.PLUG_REACH[c?.media] ?? null};
   // c9 as an AOC from the leaf below: its head ends 64.8 mm out of the port,
   // and to reach ring 3 it goes out past the tray's front edge and back in

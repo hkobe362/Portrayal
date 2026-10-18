@@ -114,6 +114,34 @@ test('an LC, a copper or a power plug is not split yet: its whole reach is a leg
   }
 });
 
+test('the reference rack\'s c9 as an AOC (rack-bend-room.mjs pins it whole): rigid, the turn at its far plug end has no room', () => {
+  const r = F.rack(), ctx = F.ctxOf(r);
+  const aoc = {...r.cables.find(c => c.id === 'c9'), media: 'aoc'}, rack = {...r, cables: [aoc]};
+  const p = R.routePath(rack, aoc, ctx);
+  assert.deepEqual(p.bends.map(b => [b.point, b.room_mm, b.short_mm]), [['reach', 0, 30]]);
+  assert.equal(mm(p), 723);
+  // given as a number it is measured whole, as rack-bend-room.mjs has it, with no finding
+  assert.deepEqual(R.routePath(rack, aoc, {...ctx, plugReachOf: () => R.PLUG_REACH.aoc}).bends, []);
+  // all sixteen cords as AOCs: 33 findings
+  assert.equal(r.cables.reduce((n, c) => { const a = {...c, media: 'aoc'}; return n + R.routePath({...r, cables: [a]}, a, ctx).bends.length; }, 0), 33);
+});
+
+test('the issue\'s count of corners that depend on the plug being a leg, on the reference rack\'s sixteen cords', () => {
+  // forcing a rigid plug of the LC reach on each cord's reach points: corners
+  // that have the room they need only because the plug is a leg. 24 on the
+  // sixteen cords today (the issue counted 23 when it was written)
+  const r = F.rack(), ctx = F.ctxOf(r);
+  let depend = 0;
+  const cables = new Set();
+  for (const c of r.cables) {
+    const p = R.routePath(r, c, ctx), need = 25;
+    const whole = cornersOf(p.points, {share: 'need'});
+    const rigid = cornersOf(p.points.map(q => (q.at === 'reach' ? {...q, rigid_mm: R.PLUG_REACH.om4} : q)), {share: 'need'});
+    for (const k of rigid) if (k.room_mm < need && whole.find(x => x.k === k.k)?.room_mm >= need) { depend++; cables.add(c.id); }
+  }
+  assert.deepEqual([depend, cables.size], [24, 16]);
+});
+
 test('the reference rack of #949 is unchanged: its sixteen LC cords, their corners and the five that turn 90 degrees where the plug ends', () => {
   const r = F.rack(), ctx = F.ctxOf(r);
   const LENGTHS = {c1: 514.2, c2: 499.8, c3: 502.7, c4: 491.4, c5: 522, c6: 515, c7: 505.8, c8: 547, c9: 611.2, c10: 613.2, c11: 616.1, c12: 623.4,
