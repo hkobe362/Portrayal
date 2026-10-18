@@ -960,9 +960,11 @@ def seat_at(point, rotate, occ_size, occ_mate):
 
 def data_attrs(attrs):
     """An attrs bag as the SVG attributes the build writes for it:
-    {data-<k>: str(v)}, in key order. The one spelling, used by
+    {data-<k>: str(v)}, in key order; a list (`speeds`) is its members joined by
+    a space. The one spelling, used by
     instance_group for every placement and by group_side_attrs for a group."""
-    return {f"data-{k}": str(v) for k, v in sorted((attrs or {}).items())}
+    return {f"data-{k}": " ".join(map(str, v)) if isinstance(v, list) else str(v)
+            for k, v in sorted((attrs or {}).items())}
 
 
 def group_side_attrs(group_name, grp):
