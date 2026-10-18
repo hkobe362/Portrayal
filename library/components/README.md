@@ -335,6 +335,7 @@ provenance:
   (depth set at install, nothing moves after), `sliding` (moves out for
   service) or `shelf` (the device stands on it). `travel` is in millimetres,
   or `full` when the source says only that, and only a `sliding` kit has it
+  (L158). A `telescoping` kit states a `preset` on at least one configuration
   (L158).
 - A kit part is `{ref, id, count}` and nothing else: it is a line of a parts
   list, not a placement, so it has no `at`. `count` is an integer of at least
@@ -342,9 +343,12 @@ provenance:
   the ids are distinct (L155).
 - A kit has one entry in `configurations` for each way it can be assembled: a
   slide has one, a kit of brackets and extensions has one per rack-depth
-  band. Each needs `id`, `racks`, `parts` and `depth`. The ids are distinct
-  and `parts` lists only ids of the kit parts (L156). Every range has min
-  below max (L157). `preset` records a factory setting, `tolerance` the `x`
+  band. Each needs `id`, `racks`, `parts` and at least one of `depth` and
+  `preset`. The ids are distinct and `parts` lists only ids of the kit parts
+  (L156). Every range has min below max (L157). `preset` records a factory
+  setting and may stand alone when the source prints no range: leave `depth`
+  out (never `[preset, preset]`) and add a kit `gaps` entry `what: depth` with
+  the configuration's id in `scope` (L157). `tolerance` records the `x`
   of a stated `±x`, and `rail-depth` the depth of the rail with no accessory.
 - `accessories` are a `cma` (cable management arm) or an `srb` (strain-relief
   bar). Each has a `ref` to a component that is not a kit (L159), and may
