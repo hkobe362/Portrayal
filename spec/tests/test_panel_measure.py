@@ -320,13 +320,13 @@ def _plate_on_dark_ground(Image, *, w=311, h=100, left=40, top=50, ground=(40, 4
 def test_plate_alone_is_refused_on_a_dark_ground(pm):
     """The case `box=` exists for: if this stops being refused, the tests below
     stop proving that a box does what `plate()` cannot."""
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     with pytest.raises(ValueError):
         pm.measure(_plate_on_dark_ground(Image))
 
 
 def test_a_box_measures_a_dark_face_on_a_dark_ground(pm):
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)
     (x0, y0, x1, y1, mm), off = pm.measure(im, box=(40, 50, 40 + 311 - 1, 50 + 100 - 1))
     assert (x0, y0, x1, y1) == (40, 50, 350, 149)
@@ -338,7 +338,7 @@ def test_a_box_measures_a_dark_face_on_a_dark_ground(pm):
 def test_a_box_still_has_to_pass_the_height_gate(pm):
     """A box is a locator, not a licence: the height check is what says the
     scale came off the face, and a hand-drawn box can be as wrong as a band."""
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)
     # same width, 20 px taller than the face: 120 px at the width's scale is
     # 42.05 mm against a known 35.05
@@ -349,7 +349,7 @@ def test_a_box_still_has_to_pass_the_height_gate(pm):
 
 
 def test_a_box_honours_the_limit(pm):
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)
     box = (40, 40, 350, 159)
     assert pm.measure(im, box=box, limit=25.0)[1] == pytest.approx(20.0, abs=0.05)
@@ -358,7 +358,7 @@ def test_a_box_honours_the_limit(pm):
 
 
 def test_a_box_is_checked_against_the_face_it_was_given(pm):
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)
     with pytest.raises(ValueError) as e:
         pm.measure(im, face=pm.MAIAEDGE_PBC, box=(40, 50, 350, 149))
@@ -367,9 +367,9 @@ def test_a_box_is_checked_against_the_face_it_was_given(pm):
 
 def test_without_a_box_measure_answers_as_it_always_did(pm):
     """Pinned to what `main` returned for this drawn plate before `box=` existed."""
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _rounded_plate(Image)
-    got = pm.measure(im)
+    got =pm.measure(im)
     mm = 108.97 / 311
     assert got[0] == (30, 25, 340, 124, mm)
     assert got[1] == abs(100 * mm - 35.05) / 35.05 * 100
@@ -379,7 +379,7 @@ def test_without_a_box_measure_answers_as_it_always_did(pm):
 
 
 def test_openings_work_on_a_callers_box(pm):
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)
     for y in range(50 + 30, 50 + 70):          # a pale opening at x 80..119 of the face
         for x in range(40 + 80, 40 + 120):
@@ -404,7 +404,7 @@ def test_openings_work_on_a_callers_box(pm):
     (40.5, 50, 350, 149),      # not whole pixels
 ])
 def test_a_bad_box_is_refused_not_clamped(pm, box):
-    Image = pytest.importorskip("PIL.Image")
+    from PIL import Image
     im = _plate_on_dark_ground(Image)       # 391 x 200
     with pytest.raises(ValueError) as e:
         pm.measure(im, box=box)
