@@ -294,7 +294,7 @@ need new nodes (a port template that hangs off `DcimDeviceType`), and the
 library's `Device` has `generate_template: true`, which probably covers the
 instance-from-type case; its docs were not read.
 
-## 4. Recommendation (a proposal; the owner picks at merge)
+## 4. Recommendation (decided 2026-10-18; see section 6)
 
 **Target choice C: the library's DCIM schema with its own `rack`, `cable`,
 `device_module`, `module_port`, `patch_panel` and `location_site` extensions, plus the
@@ -363,14 +363,16 @@ files. That second stage is not in CI because it needs an Infrahub server, and
 nothing in this note installs one. Whether the first slice should wait for a
 person with an instance is question 8.
 
-## 6. Open questions for the owner
+## 6. Open questions
 
-1. **Which schema?** C is proposed. A would write our own Rack and Cable and
-   avoid the library's churn; B would be a mapping file. Changes: what the
-   user loads, and whether the export needs a mapping file.
-2. **Is the overlay acceptable?** Two attributes on library nodes. If not,
-   interfaces carry no type and a 25G port is only a name. Changes: whether
-   section 3.5 holds.
+1. **Which schema?** Decided 2026-10-18: the export targets OpsMill's schema
+   library DCIM schema plus its extensions and the two-attribute Portrayal
+   overlay (choice C, the recommendation in section 4). A would have written
+   our own Rack and Cable and avoided the library's churn; B would have been a
+   mapping file, and stays a later option.
+2. **Is the overlay acceptable?** Decided 2026-10-18 with question 1: two
+   attributes on library nodes. Without them interfaces carry no type and a
+   25G port is only a name. Section 3.5 holds.
 3. **Rounding a half unit.** Round up (safe for a rack, wrong for the
    catalogue), or leave `height` out for a half-unit type. Changes: 3.2.
 4. **Type-level ports and bays.** Add nodes for them in the overlay now, or
