@@ -316,6 +316,18 @@ vendors:
       corporate lineage is claimed here; Tripp Lite, which Eaton sells PDUs under,
       is not entered until a Tripp Lite part is modelled.
 
+  chatsworth:
+    display: Chatsworth Products
+    aka: [CPI, Chatsworth Products, Inc.]
+    role: hardware
+    source: >-
+      Chatsworth Products, Inc. (chatsworth.com) - the name and the CPI mark on the
+      Evolution Cable Management System data sheet and on the Evolution and Motive
+      horizontal cable manager installation instructions (IIS-735441), and the maker's
+      own product pages. The directory is `chatsworth` because the products and part
+      numbers say Chatsworth; CPI is the maker's short name for itself. No corporate
+      lineage is known or claimed.
+
   # ---- lineage targets: companies that own or absorbed the above ----
   # These manufacture nothing in this library. They are here so a search or an
   # export can resolve a successor without a device having to claim it.

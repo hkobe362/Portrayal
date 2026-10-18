@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="450mm" height="177.8mm" viewBox="0 0 450 177.8">
+  <!-- the door from the front: one plain face, the aluminium strip along its middle and the
+       edges of the two returns that snap onto the finger ends -->
+  <rect id="plate" x="0" y="0" width="450" height="177.8" rx="0.8" fill="#1b1c1e" data-fill-from="finish"/>
+  <rect id="strip" x="0" y="85.9" width="450" height="6" fill="#98a1a9"/>
+  <rect id="lip-top" x="0" y="0" width="450" height="1.5" fill="#26282a" data-fill-from="finish"/>
+  <rect id="lip-bottom" x="0" y="176.3" width="450" height="1.5" fill="#121315" data-fill-from="finish"/>
+</svg>
