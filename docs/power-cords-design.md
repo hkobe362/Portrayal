@@ -11,7 +11,7 @@ derivation, the `power` and `ground` media, what is warned and what is refused).
 DC feeds are designed in [dc-power-design.md](dc-power-design.md), whose step 1 is
 merged. Neither is repeated here; this note points to them. It designs what #1045
 still wants and nothing on `main` designs yet. Facts about the kit are read from
-`main` at 60b08a88f (kit 0.51.0), not from the status lines of those notes.
+`main` at 713499fab, not from the status lines of those notes.
 
 ## 1. What is open
 
@@ -41,12 +41,12 @@ or commit and the file that shows it. #1045 is the issue and its comment of
 |---|---|---|---|
 | W1 | A design note: a connector slot of a power class as an end, a cord as two plugs, a `power` media, zero-U ends, DC feeds, A and B | **done**: the note settles the first three and lists zero-U, A and B as later steps (7.1, 7.4); DC is in dc-power-design.md. A and B are designed here (section 6) | `docs/cable-ends-design.md`, PR #1047 (4360f8efa) |
 | W2 | One exported predicate for "a cable can land here" | **done** | `cableLandsOn`, `kit/rack/cable-rules.js:345`; kit 0.30.0, PR #1047 (e1f5b617d) |
-| W3 | `power` media, a power family for the mismatch check, plug rows, diameters, colours, end allowance | **done** | `MEDIA` and `mediaKind` (`kit/rack/cable-rules.js:225`), `DIAMETERS`, `PLUG_REACH`, `END_ALLOWANCE_BY_MEDIA` (`kit/rack/route.js:1120, 1197, 2751`); the `ground` figures are estimates and say so |
+| W3 | `power` media, a power family for the mismatch check, plug rows, diameters, colours, end allowance | **done** | `MEDIA` and `mediaKind` (`kit/rack/cable-rules.js:225`), `DIAMETERS`, `PLUG_REACH`, `END_ALLOWANCE_BY_MEDIA` (`kit/rack/route.js:1125, 1245, 2803`); the `ground` figures are estimates and say so |
 | W4 | A page uses the kit's predicate | **partly**: the kit half is done (`ctx.drawnAt`, `freePorts`, `cableEndPaths`); the page is in another repository and was not read | `kit/README.md` "New in 0.30.0" |
 | W5 | DCIM: outlet path to printed name; a power cable type; proven against NetBox and Nautobot imports | **partly**: a power cable whose two ends resolve is written, with a blank type; `CABLE_TYPE` has no `power` row; no path-to-name mapping for an outlet; no import was run | `kit/rack/dcim-rules.js:367-373, 497-498`; `resolveEnd` `:206-218` looks up the path itself |
 | W6 | Library: interfaces for 5-15R, 5-20R, C39; `mates` as one or a list; 5-15P and 5-20P cord ends; `interface` on the outlets that lack one | **partly**: `nema-5-20r` and `eaton-c39` present and landable, `mates` a list, both cord ends exist (as `-cord`, not `-plug`); `nema-5-15r` is registered and no part presents it; the Amphenol outputs and inputs, and the rest of 7.8, have no `interface` | PR #1050; `spec/schemas/connectors.yaml:60-62`; `library/components/generic/nema-5-15p-cord/v1/contract.yaml`, `nema-5-20p-cord`; `amphenol-ns/output-terminal` states none |
 | W7 | A zero-U part as a cable end | **done** | kit 0.38.0 (80a3040e3) and 0.44.0; `kit/README.md` "New in 0.38.0", `zeroUEnds` in `kit/rack/ports.js` |
-| W8 | Cord types with two named ends, stock lengths, bill-of-materials lines | **not started** | `power-c13` and `power-c19` name a `conductor` and no plug (`spec/schemas/cable-types.yaml:294-315`); `cable_types_index.py` refuses an unknown key; `STOCK_M` is one list (`kit/rack/route.js:1143`); `cableBomRows` keys a line on media, length and connector family (`kit/rack/export-data.js:1274-1288`) |
+| W8 | Cord types with two named ends, stock lengths, bill-of-materials lines | **not started** | `power-c13` and `power-c19` name a `conductor` and no plug (`spec/schemas/cable-types.yaml:294-315`); `cable_types_index.py` refuses an unknown key; `STOCK_M` is one list (`kit/rack/route.js:1191`); `cableBomRows` keys a line on media, length and connector family (`kit/rack/export-data.js:1274-1288`) |
 | A9 | Lug seats on the Amphenol output terminals and input studs; DC wire and ground wire cable types | **not started** | none of the four Amphenol parts states an `interface`; `cable-types.yaml` has two `power` types and no DC or ground type; `cable_types_index.py` `FAMILIES` has no ground |
 | A10 | The DC terminal as a part on `psu-132-dc`, `pws-601s-1r`, `lpwr-f` | **not started** | none of the three states an `interface` |
 | A11 | DCIM: each end publishes the name its type file prints | **partly**: `configs[].names` exists for the paths of `states` only (a switchable outlet) and only `configFacts` reads it; the cables file does not | `render.py` `config_names` (`:4920`); `docs/format-stability.md:300`; `kit/rack/catalog.js:77` |
@@ -193,7 +193,7 @@ feed cannot be chosen without it.
 
 ### 4.4 Stock lengths
 
-`STOCK_M` is one list for every media (`kit/rack/route.js:1143`: 0.5 to 30 m).
+`STOCK_M` is one list for every media (`kit/rack/route.js:1191`: 0.5 to 30 m).
 `chooseStock` tries it in order. No maker's list of power-cord lengths is held, and
 this note does not invent one.
 
