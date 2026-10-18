@@ -472,6 +472,10 @@ and the figure's confirmation, 2026-10-18, are in decision 5 of
 `rack-file-v4-design.md`; the rule is written against end play, not the
 dressing allowance, in the same note's section on lengths.
 
+When the dressing allowance is removed, the 10 mm tolerance at a stock break
+stays, and it applies to the bare length: the measured length with no
+dressing allowance in it. Decided 2026-10-18.
+
 ### 1.7 A span in front of other ports (#1013)
 
 With no horizontal manager, a cable runs from its side lane to its port as a
