@@ -10,7 +10,7 @@ slot, the panel's flange.
 The margin is a contrast ratio of 3:1, the floor WCAG 2.1 (1.4.11, non-text
 contrast) sets for a graphical object a reader has to see, computed on the
 relative luminance of the two sRGB colours. On main the rim (#3a3e43) is 1.6:1
-against the plate and 1.9:1 against the flange, which is the ring "hardly seen"
+against the plate and 1.7:1 against the flange, which is the ring "hardly seen"
 in the issue; 3:1 is the least that makes a ring plainly visible, and a rim
 chosen for it is not so bright that the black head stops reading as black.
 
