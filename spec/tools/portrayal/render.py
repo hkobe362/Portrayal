@@ -5653,6 +5653,10 @@ def cage_entries(device, view_name, lib, families, candidates, default_occupants
                            group=groups.get(p.get("group")), extra_lift=extra,
                            occupant=default_occupants.get(p["id"]))
         if entry is not None:
+            # the configurations that have this cage, as the placement states
+            # them (#1022); the key is absent where it states none
+            if p.get("only-in"):
+                entry["only-in"] = list(p["only-in"])
             out.append(entry)
     return out
 
@@ -6148,7 +6152,13 @@ def main():
                                # way this bay holds it. Without `rotate` the C40G's
                                # horizontal slots re-rendered their card upright.
                                "rotate": b.get("rotate"),
-                               "at": b["at"], "size": b["size"]}
+                               "at": b["at"], "size": b["size"],
+                               # the configurations that have this bay, as the
+                               # device states them and absent where it states
+                               # none (#1022): the drawing leaves the bay out
+                               # of any other, so a reader of this list must
+                               # not read it as a bay of every configuration
+                               **({"only-in": list(b["only-in"])} if b.get("only-in") else {})}
                               for b in view_parts(device["views"][v])["bays"]]
                           for v in device["views"]},
                  # what a pluggable placement could take, derived - never

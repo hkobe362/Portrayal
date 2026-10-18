@@ -65,7 +65,7 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 
 | module | what it does |
 |---|---|
-| `shell.js` | the explorer shell — device picker, view switching, tree. The newest `loadDevice`/`loadStage` call holds the stage: one that a newer load overtook writes nothing and rejects with an error `isSuperseded(err)` recognises. It reads the page's own query string at start-up: `device`, `listing`, `config`, `view`, `swap`, `turn` and `fields`, so an embedding page that uses one of those names for something else collides. A `fields=` entry for a part drawn only on a face the link does not open is judged once the other faces are fetched, and kept |
+| `shell.js` | the explorer shell — device picker, view switching, tree. The newest `loadDevice`/`loadStage` call holds the stage: one that a newer load overtook writes nothing and rejects with an error `isSuperseded(err)` recognises. **A load that never settles is given up with `abandonLoad()`**, which moves that same counter on: the abandoned load writes no state, mounts no drawing, emits no `load`, and rejects as superseded. Every load, whether a host's `loadDevice`/`loadStage`, one of the shell's own selects, `openModule`, the back button or the start-up load, first emits **`loadstart`** with `{kind: 'device' \| 'stage', device, config, view, module}` (for a device load, `config` and `view` are what the caller asked for, `null` if neither). The rule for a host: start a timer on `loadstart`, call `abandonLoad()` when it runs out, and treat the rejection as superseded. The request itself is not cancelled and its answer is dropped; the stage is left empty (`loadStage` clears it before it awaits) while the state still names the previous drawing, and a `fields=` wait at start-up is abandoned too. It reads the page's own query string at start-up: `device`, `listing`, `config`, `view`, `swap`, `turn` and `fields`, so an embedding page that uses one of those names for something else collides. A `fields=` entry for a part drawn only on a face the link does not open is judged once the other faces are fetched, and kept |
 | `viewer3d.js` | 2D→3D: rasterises each face onto a chassis-sized box, adds relief meshes; a host can hold coloured marks on many parts (`setMarks`) and paint a lamp its own colour (`setLampColors`) |
 | `relief.js` | turns `data-depth` / `data-z-*` annotations into geometry |
 | `bevel.js` | a bevelled chassis body from the polygons the build publishes, triangulated and mapped for the 3D view |
@@ -1023,10 +1023,7 @@ module bay, a guard seat and a slot that accepts nothing do not land
   nothing is guessed. **How a page names a part**, in the `holder.part` of an
   end's facts: by its `attrs.model`, else its ref's name in capitals
   (`celestica/psu-r3059-f8001@1` is `PSU-R3059-F8001`), exactly as the kit
-  does. For a supply in a bay that only its default fills, the kit hears the
-  page only where that name is the part the bay ships with; a page that hands
-  in a ref for a part with no model is not heard, and the end stays loose.
-  **A page supplies `drawnAt` before it offers power
+  does. **A page supplies `drawnAt` before it offers power
   cabling**: without it an outlet-to-outlet or inlet-to-inlet cord between
   two devices' own slots gets no warning.
 - **The DCIM cables file** leaves a ground wire out by name, and a power
@@ -1523,10 +1520,10 @@ it cannot be sure:
 
 - only for a port the part composes. A port drawn by a skin alone, and every
   port of the device itself, is the page's to read off the drawing.
-- only for a bay the item's swaps or its configuration names. A device may
-  give a bay to some configurations only, and `configs.json` lists every bay
-  without saying which; a bay nothing names reads as holding its default,
-  which the build does not draw in a configuration that has no such bay.
+- only for a bay the item's configuration has. A device may give a bay to
+  some configurations only (`only-in` on its entry in `configs.json`); that
+  bay is no bay in another configuration, and nothing is answered for it. A
+  bay the configuration has and does not list holds its default.
 - it does not say whether a bay shows the back of what it holds. An enclosure
   with a closed rear has the rear adapters of its panels all the same: a
   cable on one lands, and is not drawn there. The front and the rear port of

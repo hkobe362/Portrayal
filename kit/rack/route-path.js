@@ -57,7 +57,7 @@ export function routed2d(pts, r = 4, rings = null) {
 // would enter and leave by one face: that ring is not drawn through. The
 // cable is taken to that face only, and its index is in `back`.
 //
-// HELD, NOT HOOKED (#949, the owner's decision of 2026-10-09). A cable that
+// HELD, NOT HOOKED (#949, decided 2026-10-09). A cable that
 // only reaches a short way past its PORT into a ring just beyond it is held
 // by the ring, not hooked back through it: it passes, toward the ring and away
 // from both neighbours, and turns back beyond its far face. It applies only
