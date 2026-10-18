@@ -349,7 +349,7 @@ cord measured just under a stock break could be ordered short.
   does not add the plug's length; it bends that leg into a dog-leg, straight
   out of the face for the plug and only then toward the waypoint, so a
   length grows by what the dog-leg adds over the straight leg (11 to 28 mm
-  a cord on the owner's rack, not two whole plugs), and by any detour the
+  a cord on the reference rack, not two whole plugs), and by any detour the
   new leg needs. Nothing adds the reach a second time: the length is the
   path's points and the two allowances, and a test holds it to that.
 - **What a drawing does.** A drawing that starts its routed tube at the
@@ -362,7 +362,7 @@ cord measured just under a stock break could be ordered short.
   (path point 1 and the one before last) and pass the page's cable-point `z`
   as `plugReachOf`, so drawn and measured agree.
 
-On the owner's rack of #949, every automatic route grows by 11 to 28 mm, and
+On the reference rack of #949, every automatic route grows by 11 to 28 mm, and
 seven cords pass the 0.5 m break: c7, and c9 to c14 from the lower leaf. With
 a QSFP-LC optic in each leaf port (a reach of 47.6 mm), the lower leaf's
 eight cords go round the tray's front edge and measure 0.63 to 0.67 m.
@@ -373,7 +373,7 @@ Decided 2026-10-10 for #962; built in kit 0.16.0.
 
 The kit added 0.15 m at each end of every routed cable before rounding it
 up to a stock length. The figure came from the site's early routing spec,
-with no stated purpose and no source, and on the owner's rack it was most
+with no stated purpose and no source, and on the reference rack it was most
 of each measured length: fifteen of sixteen OM4 cords rounded up to 1 m
 where a 0.5 m cord leaves about a quarter of a metre spare.
 
@@ -447,7 +447,7 @@ When the library's plug parts are measured, the table follows them.
 is 73.8 mm shorter for LC fibre, 31 for copper and a cable with no media,
 and 50 for a DAC; an AOC's is 4.8 mm longer. (By the table alone, without
 the dressing allowance, they would be 273.8, 231, 250 and 195.2 shorter.)
-On the owner's rack of #949 every cord is 73.8 mm shorter: c1 to c8 measure
+On the reference rack of #949 every cord is 73.8 mm shorter: c1 to c8 measure
 0.422 to 0.495 m and are 0.5 m cords (seven of them were 1 m cords; c4 was
 0.5 already), and the lower leaf's c9 to c16 measure 0.547 to 0.592 and stay
 1 m cords. Seven of the sixteen change stock size. On the generated racks of
@@ -459,7 +459,7 @@ touched.
 
 The stock size is the first that holds the measured length, so a cord can
 round up with little to spare over its measure: 218 of the 3,120 have under
-50 mm (217 did at 0.15 m an end), and five of the owner's (c1 39.5, c2
+50 mm (217 did at 0.15 m an end), and five of the reference rack's (c1 39.5, c2
 48.7, c5 35.0, c6 29.7, c7 5.0). The measure has the dressing allowance in
 it, so each of those still has 0.2 m and more over its path and plugs; when
 step 4 takes the allowance away, what is spare is what a tray is given to
@@ -862,7 +862,7 @@ the build chose as follows; each is in `kit/rack/resting.js` or
 
 Built in kit 0.15.0. Until then a ring was an opening and nothing else: its
 legs, hook and bar were in no list of solids, so a route could run through
-them and nothing saw it. On the owner's rack every upper cord came down into
+them and nothing saw it. On the reference rack every upper cord came down into
 its ring through the rear leg, and every lower cord, taken round the tray's
 front edge to the ring's face, ran along the face and grazed both legs.
 

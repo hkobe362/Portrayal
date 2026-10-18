@@ -165,7 +165,7 @@ function through(m, pane, portX, side, crossing, ctx, room = null) {
 // between when its centre is, the ends included: not the half-depth reach of
 // `through`, which takes a ring whose centre is just behind a port on the way
 // out to a gutter. Here the cable turns toward the other port at once, and a
-// ring behind it is a step back the patch does not need (on the owner's rack
+// ring behind it is a step back the patch does not need (on the reference rack of #949
 // of #949, a leaf port 3.1 mm short of a ring's centre, cabled away from it,
 // measured 5.5 cm longer through it, and a stock size). A ring outside the
 // stretch is left alone; with no ring between, the cord goes through the one
@@ -190,7 +190,7 @@ function along(m, pane, ax, bx, ctx, passes = null, room = null, pick = null) {
       const lo = Math.max(0, i), hi = j < 0 ? between.length - 1 : j;
       return (lo <= hi ? between.slice(lo, hi + 1) : between).map(g => ({item: m.id, via: g.via}));
     }
-    // NO RING BETWEEN (owner's decision, 2026-10-09): a ring holds the cord
+    // NO RING BETWEEN (decided 2026-10-09): a ring holds the cord
     // even where it does not turn it, so the route is never direct: the ring
     // nearest the middle of the two ports, of two as near the one on end a's
     // side. A ring outside the stretch can be one the cord would enter and

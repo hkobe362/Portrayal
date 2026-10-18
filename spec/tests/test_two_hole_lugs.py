@@ -141,7 +141,7 @@ def test_a_sized_screw_presents_a_stud_on_top_of_its_head(ref):
 
 
 def test_the_nominal_ground_screw_is_untouched():
-    """#830: the owner kept common/ground-lug@1 unsized; the sized parts sit
+    """#830 decided common/ground-lug@1 stays unsized; the sized parts sit
     beside it and nothing that placed it changed."""
     c = _contract("common/ground-lug@1")
     assert c["version"] == "1.4.1" and c["size"] == {"w": 7.0, "h": 14.0}

@@ -165,7 +165,7 @@ function reference(a, b, solids, diameter) {
   return out.sort((x, y) => x.t0 - y.t0);
 }
 const said = hits => hits.map(h => [h.solid.item, h.solid.part, h.t0, h.t1, h.at]);
-// the owner's rack with a duct at the left front upright: its floor has eight pass-throughs
+// the reference rack of #949 with a duct at the left front upright: its floor has eight pass-throughs
 function ducted() {
   const rack = {...F.ownerRack(), zeroU: [{id: 'z1', ref: 'cmv-sfd45u5w', cfg: 'base', at: 'left-front', offsetMm: 0}]};
   const ctx = F.ctxOf(), solids = S.solidsOf(rack, ctx);
