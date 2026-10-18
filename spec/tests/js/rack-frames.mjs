@@ -236,6 +236,22 @@ test('frameProducts lists the catalogue by maker and model and narrows by text o
   assert.equal(F.frameProducts(withNumber, {text: 'fs-4p'}).length, 1);
 });
 
+test('frameName is the maker and model, or the ref when the row has neither', () => {
+  assert.equal(F.frameName(AR201), 'APC AR201');
+  assert.equal(F.frameName(AR203A), 'APC AR203A');
+  assert.equal(F.frameName(GENERIC), 'Generic 4-post-frame');
+  assert.equal(F.frameName({ref: 'x/y@1', manufacturer: 'Acme'}), 'Acme');
+  assert.equal(F.frameName({ref: 'x/y@1'}), 'x/y@1');
+  assert.equal(F.frameName({ref: 'x/y@1', manufacturer: '', model: null}), 'x/y@1');
+});
+
+test('frameProducts results are the rows themselves, in the same order, with or without a name', () => {
+  const all = F.frameProducts(ROWS);
+  assert.ok(all.every(r => r === ROWS[r.ref]));
+  assert.deepEqual(F.frameProducts(ROWS, {text: 'apc'}).map(r => r.ref), ['apc/ar201@1', 'apc/ar203a@1']);
+  assert.deepEqual(F.frameProducts(ROWS, {text: 'x/none'}), []);
+});
+
 test('loadCatalog reads frames from rack.json, merges roots, refuses a clash, and takes a file with none', async () => {
   clearDistCache();
   bodies = {'https://page.test/a/rack.json': {format: 1, devices: {}, frames: {[AR203A.ref]: AR203A}},

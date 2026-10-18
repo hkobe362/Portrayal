@@ -25,6 +25,13 @@
   `editRefusal`, `customisedFrame`, `frameState`, `frameProducts`) for page
   controls. The Rack Builder's frame picker follows in the site.
 
+- **`frameName(row)` in `kit/rack/frames.js` is the name a rack product is shown
+  by** (#935). It was the private rule behind the kit's own sentences: the maker
+  and model (`APC AR201`), or the ref when a row has neither. A row's `name` is
+  the short id (`ar201`), so a page lists products by `frameName`. The kit's
+  sentences now use the export; none of their wording changes, and `rack.json`
+  gains no key.
+
 ### Changed
 - **A frame that holds a rack product refuses an edit to a number the product
   fixes** (`frame` command). While `frame.ref` is set, `kind`, `heightRU`,
