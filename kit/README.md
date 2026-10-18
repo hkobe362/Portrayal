@@ -1520,10 +1520,10 @@ it cannot be sure:
 
 - only for a port the part composes. A port drawn by a skin alone, and every
   port of the device itself, is the page's to read off the drawing.
-- only for a bay the item's swaps or its configuration names. A device may
-  give a bay to some configurations only, and `configs.json` lists every bay
-  without saying which; a bay nothing names reads as holding its default,
-  which the build does not draw in a configuration that has no such bay.
+- only for a bay the item's configuration has. A device may give a bay to
+  some configurations only (`only-in` on its entry in `configs.json`); that
+  bay is no bay in another configuration, and nothing is answered for it. A
+  bay the configuration has and does not list holds its default.
 - it does not say whether a bay shows the back of what it holds. An enclosure
   with a closed rear has the rear adapters of its panels all the same: a
   cable on one lands, and is not drawn there. The front and the rear port of

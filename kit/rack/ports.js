@@ -210,6 +210,8 @@ function absentOnPanel(item, end, ctx) {
   if (steps.length !== 1 || !slots || slots.error) return null;
   const env = slotEnv(item, slots, ctx.compByRef, ctx.redirects), swaps = item.swaps || {};
   const bay = env.bays.find(b => b.id === p.slice(0, first)), carrier = p.slice(0, cut);
+  // (kept as it was: this refuses a made-up port, so it speaks only for a bay that is spoken for; a bay left
+  // to its default is the drawing's here, though seatedPort answers for it)
   const named = id => Object.hasOwn(swaps, id) || env.built(id) !== undefined;
   if (!bay || !OTHER[bay.view] || !(named(bay.id) || (carrier !== bay.id && named(carrier)))) return null;
   const R = resolverFor(env, swaps), ref = R.refAt(`${carrier}/module`), comp = partOf(ctx.compByRef, ref);
