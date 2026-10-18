@@ -2373,18 +2373,39 @@ def outlet_rows(outlets, powers, bays, who, names=None, dev=None):
     return rows
 
 
+def module_names(contract):
+    """[(model, part number or None)]: the module types one contract exports.
+
+    A contract with `part-numbers` is one type per key, named by the key, with
+    the part number from `part` (roc-ops/Portrayal#70) - the way a device
+    configuration's map is one device type per key. One without it is one type,
+    named by `attrs.model` or else the contract's `name`, and states no part
+    number, as it always did. The schema refuses a contract with both."""
+    pns = contract.get("part-numbers")
+    if isinstance(pns, dict) and pns:
+        return [(str(k), (v or {}).get("part") if isinstance(v, dict) else None)
+                for k, v in pns.items()]
+    return [(str((contract.get("attrs") or {}).get("model") or contract["name"]), None)]
+
+
 def build_module(contract, manufacturer, load_ref=None, dropped=None,
-                 defaulted=None):
+                 defaulted=None, model=None):
     """A module contract as a DCIM module type.
 
-    `dropped` is an optional dict the caller passes in to be told which part
-    refs matched no branch, counted. `defaulted` is the same for cages typed by
-    the table rather than by the card. See `export_modules`, which prints both.
+    `model` picks which of a contract's `module_names` this is the type of; the
+    first when it is left out, which is the only one for a contract with one
+    name. `dropped` is an optional dict the caller passes in to be told which
+    part refs matched no branch, counted. `defaulted` is the same for cages
+    typed by the table rather than by the card. See `export_modules`, which
+    prints both.
     """
     load_ref = load_ref or (lambda _r: None)
     attrs = contract.get("attrs") or {}
-    model = str(attrs.get("model") or contract["name"])
+    names = dict(module_names(contract))
+    model = str(model) if model is not None else next(iter(names))
     out = {"manufacturer": manufacturer, "model": model}
+    if names.get(model):
+        out["part_number"] = names[model]
 
     if attrs.get("weight-kg"):
         out["weight"] = round(float(attrs["weight-kg"]), 2)
@@ -3290,10 +3311,18 @@ def module_key(dist, contract):
     once per orientation collapse to one key, as they collapse to one type. A
     contract with no manufacturer (`common/`) is written nowhere and keys by
     its ref, so a model seated through it still gets a depth."""
+    return module_keys(dist, contract)[0]
+
+
+def module_keys(dist, contract):
+    """Every (manufacturer, model) a module contract is written as: one per
+    `part-numbers` key, else the one `module_key` answers. Everything keyed by
+    model - what seats where, how deep - holds for each of them, because they
+    are one drawing in the same bays."""
     man = dist.manufacturer_of(contract.get("ns"))
     if not man:
-        return ("", f"{contract.get('ns')}/{contract.get('name')}")
-    return (man, str((contract.get("attrs") or {}).get("model") or contract["name"]))
+        return [("", f"{contract.get('ns')}/{contract.get('name')}")]
+    return [(man, model) for model, _part in module_names(contract)]
 
 
 def _chassis_seated(dist):
@@ -3306,7 +3335,7 @@ def _chassis_seated(dist):
                 for ref in b.get("accepts") or []:
                     c = dist.component_by_ref(ref)
                     if c and c.get("kind") == "module":
-                        seated.add(module_key(dist, c))
+                        seated.update(module_keys(dist, c))
     return seated
 
 
@@ -3339,9 +3368,10 @@ def pass_through_bays(dist):
             continue
         (bid, b), = bays.items()
         if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
-               and module_key(dist, rc) in direct
+               and direct.intersection(module_keys(dist, rc))
                for r in (b or {}).get("accepts") or []):
-            out.setdefault(module_key(dist, c), set()).add(bid)
+            for key in module_keys(dist, c):
+                out.setdefault(key, set()).add(bid)
     return out
 
 
@@ -3356,7 +3386,8 @@ def _chassis_seats(dist):
                 for ref in b.get("accepts") or []:
                     c = dist.component_by_ref(ref)
                     if c and c.get("kind") == "module":
-                        seats.setdefault(module_key(dist, c), set()).add(str(b.get("id")))
+                        for key in module_keys(dist, c):
+                            seats.setdefault(key, set()).add(str(b.get("id")))
     return seats
 
 
@@ -3389,22 +3420,23 @@ def anchored_bays(dist):
             for r in (b or {}).get("accepts") or []:
                 rc = dist.component_by_ref(r)
                 if rc and rc.get("kind") == "module":
-                    nested.add(module_key(dist, rc))
+                    nested.update(module_keys(dist, rc))
     through = pass_through_bays(dist)
     out = {}
     for c in dist.modules():
         bays = c.get("bays")
-        key = module_key(dist, c)
-        if (not isinstance(bays, dict) or c.get("superseded-by") or key in through
-                or key in nested or len(seats.get(key, ())) != 1):
+        if not isinstance(bays, dict) or c.get("superseded-by"):
             continue
-        ids = {bid for bid, b in bays.items()
-               if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
-                      and module_key(dist, rc) in direct
-                      for r in (b or {}).get("accepts") or [])}
-        if ids:
-            seat, = seats[key]
-            out.setdefault(key, (seat, set()))[1].update(ids)
+        for key in module_keys(dist, c):
+            if key in through or key in nested or len(seats.get(key, ())) != 1:
+                continue
+            ids = {bid for bid, b in bays.items()
+                   if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
+                          and direct.intersection(module_keys(dist, rc))
+                          for r in (b or {}).get("accepts") or [])}
+            if ids:
+                seat, = seats[key]
+                out.setdefault(key, (seat, set()))[1].update(ids)
     return out
 
 
@@ -3422,9 +3454,9 @@ def seating_depths(dist):
     than refs, so a twin that no device names still passes its parent's depth
     to what it seats. A model no bay accepts has no entry.
     """
-    def key_of(ref):
+    def keys_of(ref):
         c = dist.component_by_ref(ref)
-        return module_key(dist, c) if c and c.get("kind") == "module" else None
+        return module_keys(dist, c) if c and c.get("kind") == "module" else []
 
     depths = {k: {1} for k in _chassis_seated(dist)}
     through = pass_through_bays(dist)
@@ -3437,11 +3469,12 @@ def seating_depths(dist):
         # so the depths its bays would pass on describe no document.
         if not isinstance(bays, dict) or c.get("superseded-by"):
             continue
-        key = module_key(dist, c)
-        flat = set(through.get(key, ())) | set(anchored.get(key, (None, ()))[1])
-        under = [(key_of(ref), 0 if bid in flat else 1)
-                 for bid, b in bays.items() for ref in (b or {}).get("accepts") or []]
-        carriers.append((key, [(k, s) for k, s in under if k]))
+        for key in module_keys(dist, c):
+            flat = set(through.get(key, ())) | set(anchored.get(key, (None, ()))[1])
+            under = [(k, 0 if bid in flat else 1)
+                     for bid, b in bays.items() for ref in (b or {}).get("accepts") or []
+                     for k in keys_of(ref)]
+            carriers.append((key, under))
 
     # A bay tree is finite and acyclic in any library that renders; the bound
     # stops a cycle from looping rather than deciding anything.
@@ -3507,8 +3540,12 @@ def export_modules(dist, root, images=None):
         if not man:
             skipped += 1
             continue
-        built.append((man, build_module(contract, man, dist.component_by_ref, dropped,
-                                        defaulted), contract))
+        # ONE TYPE PER ORDER CODE (#70): a contract with `part-numbers` is built
+        # once for each key. `dropped` and `defaulted` count a placement once
+        # per type, which is what each type holds.
+        for model, _part in module_names(contract):
+            built.append((man, build_module(contract, man, dist.component_by_ref, dropped,
+                                            defaulted, model=model), contract))
 
     groups = {}
     for man, doc, contract in built:
@@ -3579,7 +3616,7 @@ def export_modules(dist, root, images=None):
         withheld = {bid for c in authors for bid, b in (c.get("bays") or {}).items()
                     if bid not in through and bid not in (anchored or (None, ()))[1]
                     and any(dist.component_by_ref(r)
-                            and module_key(dist, dist.component_by_ref(r)) in multi
+                            and multi.intersection(module_keys(dist, dist.component_by_ref(r)))
                             for r in (b or {}).get("accepts") or [])}
         seated = depths.get((man, model)) or set()
         depth = next(iter(seated)) if len(seated) == 1 else None

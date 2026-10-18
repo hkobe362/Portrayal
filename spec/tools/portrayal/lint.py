@@ -7589,7 +7589,8 @@ def lint_part_number_keys(path, data):
       vendor that really prints one can be waived with its reason.
 
     Configurations' keys in a device and in a listing are both read, and the
-    top level too, though L59 already says nothing reads it.
+    top level too, though L59 already says nothing reads it. A component's
+    `part-numbers` is read the same way: its keys are module type file names.
     """
     maps = [("part-numbers", data.get("part-numbers"))]
     for cname, cfg in (data.get("configurations") or {}).items():
@@ -14083,6 +14084,7 @@ def main():
             if d is not None:
                 comp_matrix.append((f, d))
                 lint_attrs_null(f, d)
+                lint_part_number_keys(f, d)
                 _skin_checks(f, d)
                 lint_component_parts(f, d, args.library)
                 lint_component_bay_kits(f, d, args.library)
