@@ -1,9 +1,11 @@
 {
  "bay-accepts": {
   "front/bays/cb0": [
+   "juniper/jnp10k-re-blnk@1",
    "juniper/jnp10k-re1@2"
   ],
   "front/bays/cb1": [
+   "juniper/jnp10k-re-blnk@1",
    "juniper/jnp10k-re1@2"
   ],
   "front/bays/fpc0": [
@@ -95,37 +97,47 @@
    "juniper/jnp10016-fan@1"
   ],
   "rear/bays/psu0": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu1": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu2": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu3": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu4": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu5": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu6": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu7": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu8": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ],
   "rear/bays/psu9": [
-   "juniper/jnp10k-pwr-ac2@1"
+   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-blnk@1"
   ]
  },
- "composed": "cbd8ee45839766d2",
+ "composed": "6d4fa9a75b10caa9",
  "composed-refs": {
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -136,6 +148,8 @@
   "juniper/jnp10k-lc2101@1": "1.1.0+fff3bea0aaa97e31",
   "juniper/jnp10k-lc480@1": "1.1.0+cc9a4c04de3f8362",
   "juniper/jnp10k-pwr-ac2@1": "1.1.0+80cd0676c5b89325",
+  "juniper/jnp10k-pwr-blnk@1": "1.0.0+1cb408d8424a4a65",
+  "juniper/jnp10k-re-blnk@1": "1.0.0+c1d77e93362f9010",
   "juniper/jnp10k-re1@2": "2.1.0+80ff396be7681e75",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa",
   "std/qsfp28@1": "1.4.1+f836f540ce576bbc",
@@ -146,10 +160,11 @@
   "std/usb-a@1": "1.3.0+3c77f06ea6794bfc"
  },
  "configs": [
-  "base"
+  "base",
+  "premium"
  ],
  "format": 1,
- "gaps": "6e8c86f3a84b3d24",
+ "gaps": "5b70c182c3cd5228",
  "groups": [
   "cooling",
   "fpcs",
@@ -199,7 +214,7 @@
   "rear/bays/psu8",
   "rear/bays/psu9"
  ],
- "names": "d2c03eece4bf02e2",
+ "names": "73913b82690184d2",
  "placement-addressing": {
   "for": {
    "front/placements/led-cbs": [
@@ -297,6 +312,6 @@
  },
  "placement-surface": "bd322227e79ad6b5",
  "shape": "d314da0fc1f3a88e",
- "surface": "cacdc8b070447f40",
- "version": "2.0.6"
+ "surface": "dab777d85a53c473",
+ "version": "2.1.0"
 }
