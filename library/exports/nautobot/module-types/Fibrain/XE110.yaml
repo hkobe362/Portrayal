@@ -2,9 +2,9 @@
 manufacturer: Fibrain
 model: XE110
 description: Fibrain XE110 - HD RJ45 connection module, Cat.5, unscreened, with keystone adapter
-console-ports:
+interfaces:
   - name: '{module.parent}/{module}/jack'
-    type: rj-45
+    type: 1000base-t
 comments: 'Fibrain XE110 - HD RJ45 connection module, Cat.5, unscreened, with keystone adapter. Seats
   in one position of a Fibrain HD RJ45 holder (XMU00, XMS00). Carries one RJ45 jack on its front; the
   cable ends on its IDC back. Green dust cover.

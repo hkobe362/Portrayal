@@ -26,7 +26,7 @@ body:
     - {id: body, at: [0.0, 1.3], size: [14.6, 16.1], from: 0, depth: 38.0, color: '#c0c1c4',
        confidence: datasheet, source: 'the module as DSH XE210 rev 2 draws it, 14.60 x 16.10 across the front and 38.00 long; a zinc alloy die-cast shell, bright metal on the photograph. The keystone adapter on the photograph is a clear collar and a latch tab behind the face, not dimensioned, and is not drawn'}
 parts:
-  - {id: jack, ref: std/rj45-ganged@2, at: [0.95, 6.0], attrs: {finish: '#479e35'}}
+  - {id: jack, ref: common/rj45-ganged-eth-plain@1, at: [0.95, 6.0], attrs: {finish: '#479e35'}}
 provenance:
   size: >-
     datasheet for the width, the front height and the depth - see size-notes;
@@ -46,7 +46,9 @@ provenance:
     same face as the one of XR200 in green, with a clear keystone collar behind
     it.
   jack: >-
-    estimated - as fibrain/xr200@1: std/rj45-ganged@2, whose body tier lands on
+    estimated - as fibrain/xr200@1: common/rj45-ganged-eth-plain@1, the lamp-less
+    Ethernet member of the family (no lamp window on the maker's drawings, and
+    the bare cell would export as a console port), whose body tier lands on
     the opening drawn on the XR200 elevation, 11.90 wide from x 1.35 and from y
     6.50.
   colour: >-

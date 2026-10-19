@@ -487,6 +487,11 @@ FAMILY_PART = {
     # the ganged cell with ONE lamp (a LINK/ACT jack, the AurCore AIS non-PoE
     # builds): the same Ethernet jack, so the same row (#738)
     "common/rj45-ganged-link@1": ("iface", "1000base-t"),
+    # the ganged cell with an Ethernet claim and NO lamps (the Fibrain HD modules):
+    # the same Ethernet jack, so the same row. 1000base-t is the family's default for
+    # an Ethernet cell, not a rate any datasheet gave; `-eth` in the ref keeps
+    # iface_type's guard open for it.
+    "common/rj45-ganged-eth-plain@1": ("iface", "1000base-t"),
     # the ganged cell with two lamps and NO Ethernet claim (#370): a timing or
     # console jack whose housing shows lamps, so it falls back to the bare
     # cell's answer. Its ref has no `-eth`, which is what iface_type's guard

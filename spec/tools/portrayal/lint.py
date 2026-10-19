@@ -328,7 +328,7 @@ RULES = {
     "L75": ("component",  "a slot's structured facts agree with its prose, and lanes fit the connector", "fix `lanes`/`connector` or the description",
             "A slot's prose and its structured facts would drift apart, so a reader and the card-fit check would see different slots, and a lane count wider than the connector is a typo, not a slot.",
             ERROR),
-    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps, and the lamped cell that makes no Ethernet claim holds no Ethernet jack", "put an Ethernet jack on common/rj45-eth@1 or common/rj45-ganged-eth@1; a console or timing jack takes std/rj45@2 or std/rj45-ganged@2, or common/rj45-ganged-lamped@1 when its housing shows lamps",
+    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps, and the lamped cell that makes no Ethernet claim holds no Ethernet jack", "put an Ethernet jack on common/rj45-eth@1 or common/rj45-ganged-eth@1, or on common/rj45-ganged-eth-plain@1 when its housing has no lamps; a console or timing jack takes std/rj45@2 or std/rj45-ganged@2, or common/rj45-ganged-lamped@1 when its housing shows lamps",
             "Every Ethernet jack has to answer whether it has link lamps the same way, or a drawing can leave out lamps the hardware has, or add them to a console jack, and the viewer cannot light them consistently. The lamped cell that claims no media suits a timing jack with lamps and would call an Ethernet jack something the part does not say.",
             WARNING),
     "L77": ("component",  "a `sink` sits in a cavity, because that is what it measures from", "use `pocket` for a recess in an otherwise solid face",
@@ -11885,6 +11885,12 @@ RJ45_BARE_REFS = {"std/rj45@2", "std/rj45-ganged@2"}
 # that takes the bare part's roles, and an Ethernet jack on it is sent to
 # common/rj45-ganged-eth@1, which says what the jack is.
 RJ45_NEUTRAL_REFS = {"common/rj45-ganged-lamped@1"}
+# The ganged cell with the Ethernet claim and NO lamps: an Ethernet jack whose
+# housing really has none (the Fibrain HD modules). It is not "an Ethernet jack
+# on a part with no lamps" in the census's sense - that count is for the bare
+# cell, which says nothing about Ethernet and leaves the lamps undecided - so an
+# Ethernet jack on it is accepted without lamps.
+RJ45_PLAIN_ETH_REFS = {"common/rj45-ganged-eth-plain@1"}
 # A carrier that draws nothing and exists to attach one vendor's meanings
 # (dell/rj45-port-14g) is the family member it composes, for census purposes;
 # and the family's own members compose each other by definition, so a contract
@@ -11894,15 +11900,18 @@ RJ45_FAMILY_DIRS = {("std", "rj45"), ("std", "rj45-ganged"),
                     ("common", "rj45-ganged-eth"),
                     ("common", "rj45-ganged-link"),
                     ("common", "rj45-ganged-lamped"),
+                    ("common", "rj45-ganged-eth-plain"),
                     ("dell", "rj45-port-14g")}
 
 
 def rj45_class(ref, lib_roots, depth=0):
-    """'lamped', 'neutral', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
+    """'lamped', 'neutral', 'plain-eth', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
     if ref in RJ45_LAMPED_REFS:
         return "lamped"
     if ref in RJ45_NEUTRAL_REFS:
         return "neutral"
+    if ref in RJ45_PLAIN_ETH_REFS:
+        return "plain-eth"
     if ref in RJ45_BARE_REFS:
         return "bare"
     if depth > 2:
@@ -11992,7 +12001,7 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
         if rj45_wants_lamps(q, groups, name):
             if cls == "neutral":
                 neutral_eth += 1
-            elif cls != "lamped" and str(q.get("id")) not in lamped_for:
+            elif cls not in ("lamped", "plain-eth") and str(q.get("id")) not in lamped_for:
                 unlamped_eth += 1
         elif cls == "lamped":
             lamped_bare += 1
@@ -12001,6 +12010,7 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
 
 RJ45_CENSUS_MSG = ("An Ethernet jack is common/rj45-eth@1 or common/rj45-ganged-eth@1 "
                    "(common/rj45-ganged-link@1 where it has one lamp, "
+                   "common/rj45-ganged-eth-plain@1 where its housing has none, "
                    "common/rj45-eth-pinside@1 where the lamps are opposite the keyway); "
                    "a console or timing jack is std/rj45@2 or std/rj45-ganged@2, or "
                    "common/rj45-ganged-lamped@1 where its housing shows lamps "

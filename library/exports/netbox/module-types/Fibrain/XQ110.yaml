@@ -2,9 +2,9 @@
 manufacturer: Fibrain
 model: XQ110
 description: Fibrain XQ110 - HD RJ45 connection module, Cat.6, unscreened, with keystone adapter
-console-ports:
+interfaces:
   - name: '{module}/jack'
-    type: rj-45
+    type: 1000base-t
 comments: 'Fibrain XQ110 - HD RJ45 connection module, Cat.6, unscreened, with keystone adapter. Seats
   in one position of a Fibrain HD RJ45 holder (XMU00, XMS00). Carries one RJ45 jack on its front; the
   cable ends on its IDC back. Red dust cover.

@@ -2,9 +2,9 @@
 manufacturer: Fibrain
 model: XE100
 description: Fibrain XE100 - HD RJ45 connection module, Cat.5, unscreened, without adapters
-console-ports:
+interfaces:
   - name: '{module}/jack'
-    type: rj-45
+    type: 1000base-t
 comments: 'Fibrain XE100 - HD RJ45 connection module, Cat.5, unscreened, without adapters. Seats in one
   position of a Fibrain HD RJ45 holder (XMU00, XMS00). Carries one RJ45 jack on its front; the cable ends
   on its IDC back. Green dust cover.

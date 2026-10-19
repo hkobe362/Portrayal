@@ -218,7 +218,9 @@ def test_the_field_connectors_are_not_modules():
 @pytest.mark.parametrize("m", sorted(MODULES))
 def test_a_module_carries_one_rj45_jack_of_the_family_on_the_drawn_opening(m):
     c = contract(m)
-    assert [(p["id"], p["ref"]) for p in c["parts"]] == [("jack", "std/rj45-ganged@2")]
+    # the lamp-less Ethernet member of the family, not the bare cell: the bare cell is a console jack
+    assert [(p["id"], p["ref"]) for p in c["parts"]] == [("jack", "common/rj45-ganged-eth-plain@1")]
+    assert "lamp-less" in c["provenance"]["jack"]
     x, y = c["parts"][0]["at"]
     # std/rj45-ganged@2 draws its body tier 0.395 in from its edge and 0.5 down: that lands on the
     # drawn opening, 1.35 across and 6.50 down
