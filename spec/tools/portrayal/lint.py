@@ -571,11 +571,11 @@ RULES = {
     "L156": ("kit",        "every configuration of a kit has its own `id`, and names in `parts` only ids of the kit's own `parts` (error)", "list the part ids the configuration uses, as the kit's `parts` spell them; give each configuration an id of its own",
              "A kit configuration that names parts the kit does not have, or shares an id with another, cannot be assembled, and a device's depth override that names it could point at the wrong one.",
              ERROR),
-    "L157": ("kit",        "every depth range of a kit configuration, one `[min, max]` or one per hole type, has min below max (error)", "write the range as `[min, max]` in mm, from the source; a single figure is a `preset`, not a range",
-             "A depth range whose minimum is not below its maximum fits no rack, so a person building a rack would be told the kit fits a depth it cannot.",
+    "L157": ("kit",        "every depth range of a kit configuration, one `[min, max]` or one per hole type, has min below max, and a configuration with a `preset` and no `depth` has a kit `gaps` entry `what: depth` that lists its id in `scope` (error)", "write the range as `[min, max]` in mm, from the source; a single figure is a `preset`, not a range, and a preset may stand alone: leave `depth` out and add the gap `what: depth` with the configuration's id in `scope`",
+             "A depth range whose minimum is not below its maximum fits no rack, so a person building a rack would be told the kit fits a depth it cannot; a configuration that states only its factory setting has no range, and without a gap that says so the missing range looks like an oversight rather than a source that is silent.",
              ERROR),
-    "L158": ("kit",        "`travel` appears only on a kit whose `motion` is `sliding` (error)", "drop `travel`, or set `motion: sliding` if the rails really slide out for service",
-             "Travel on fixed rails would claim the equipment slides out for service when it does not.",
+    "L158": ("kit",        "`travel` appears only on a kit whose `motion` is `sliding`, and a kit whose `motion` is `telescoping` states a `preset` on at least one configuration (error)", "drop `travel`, or set `motion: sliding` if the rails really slide out for service; give a telescoping kit the factory setting its source prints, as the `preset` of the configuration it belongs to",
+             "Travel on fixed rails would claim the equipment slides out for service when it does not, and a telescoping kit is set at install, so one that records no factory setting leaves the rack builder nothing to start from.",
              ERROR),
     "L159": ("kit",        "every accessory `ref` of a kit resolves to a component in the library that is not a kit (error)", "fix the ref (namespace/name@major), or write the arm's or the bar's contract",
              "An accessory ref that points at nothing, or at another kit, leaves a cable arm or bar the kit promises and cannot draw.",
@@ -4313,8 +4313,11 @@ def lint_kit(path, data, lib_roots):
             parts under one id would make it ambiguous;
       L156  each configuration names only the kit's own part ids, and has an id
             of its own - a device's `chassis.kits[].depth.config` names one;
-      L157  every range has min < max;
-      L158  `travel` only with `motion: sliding`;
+      L157  every range has min < max, and a configuration that states a
+            `preset` and no `depth` ("factory setting known, range unknown",
+            decided 2026-10-18) is covered by a `gaps` entry `what: depth`;
+      L158  `travel` only with `motion: sliding`, and a telescoping kit states
+            a `preset` on at least one configuration;
       L159  each accessory ref resolves to a component that is not a kit.
 
     ERRORS, ALL OF THEM. The kind is new and no kit exists yet, so there is no
@@ -4337,6 +4340,7 @@ def lint_kit(path, data, lib_roots):
         ids.append(pid)
     known = set(ids)
     seen_cfg = set()
+    unknown_range = []
     for i, cfg in enumerate(data.get("configurations") or []):
         if not isinstance(cfg, dict):
             continue
@@ -4354,9 +4358,25 @@ def lint_kit(path, data, lib_roots):
             if isinstance(rng, list) and len(rng) == 2 \
                     and all(isinstance(x, (int, float)) for x in rng) and not rng[0] < rng[1]:
                 err(path, "L157", f"configuration {cid}: {label} {rng} - min must be below max")
+        if "depth" not in cfg and "preset" in cfg and cid not in unknown_range:
+            unknown_range.append(cid)
+    covered = set()
+    for gap in data.get("gaps") or []:
+        if isinstance(gap, dict) and gap.get("what") == "depth" and isinstance(gap.get("scope"), list):
+            covered.update(gap["scope"])
+    for cid in unknown_range:
+        if cid not in covered:
+            err(path, "L157", f"configuration {cid}: a `preset` and no `depth` - the factory setting "
+                "is known and the range is not, so add a `gaps` entry `what: depth` with this "
+                "configuration's id in its `scope`, saying what the source does not print")
     if "travel" in data and data.get("motion") != "sliding":
         err(path, "L158", f"travel: {data['travel']} on a kit whose motion is "
             f"{data.get('motion')!r} - only a sliding kit travels")
+    if data.get("motion") == "telescoping" and not any(
+            isinstance(c, dict) and "preset" in c for c in data.get("configurations") or []):
+        err(path, "L158", "motion: telescoping, and no configuration states a `preset` - a "
+            "telescoping kit is set at install, so give the factory setting the source prints "
+            "on at least one configuration")
     for i, acc in enumerate(data.get("accessories") or []):
         if not isinstance(acc, dict) or not isinstance(acc.get("ref"), str):
             continue
@@ -8604,7 +8624,7 @@ def lint_device_kits(path, data, lib_roots):
                 f"configuration of {ref} (it has {', '.join(sorted(configs)) or 'none'})")
             continue
         want, got = (configs[cid] or {}).get("depth"), over.get("range")
-        if isinstance(want, list) != isinstance(got, list) or (
+        if want is not None and isinstance(want, list) != isinstance(got, list) or (
                 isinstance(want, dict) and isinstance(got, dict)
                 and set(want) != set(got)):
             shape = (f"one range per hole type ({', '.join(sorted(want))})"
