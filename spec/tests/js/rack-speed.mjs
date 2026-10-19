@@ -144,7 +144,7 @@ test('spareOf takes the path it is handed, and reads the one kept without', () =
 // With the way up through a tray's gap (#966) a cable that tried one is laid
 // again without it, and the counter counts both lays: it reads 101 and 38
 // (87 and 34 before the gap; 102 and 38 before a hand-edited route was kept
-// from the gap, which two of the rack's bundled cables now are).
+// from the gap, and with it a bundle's cables: one lay fewer is tried).
 test('at 300 cables: run-outs are tried at 101 lead ends, not 1,202, and 38 are taken', () => {
   const made = speedRack(M, F, {cables: 300, bundles: 4, seed: 11}), rack = made.rack, ctx = made.ctxOf(rack);
   R.RUN_OUTS.tried = R.RUN_OUTS.taken = 0;
