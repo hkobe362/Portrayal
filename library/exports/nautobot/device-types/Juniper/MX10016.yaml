@@ -5,6 +5,8 @@ slug: juniper-mx10016
 u_height: 21.0
 is_full_depth: true
 description: Juniper MX10016 - the 21RU, sixteen-slot flagship of the MX10000 family
+front_image: true
+rear_image: true
 module-bays:
   - name: cb0
     position: cb0
