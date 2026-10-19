@@ -14,12 +14,12 @@
 import {uLabel, zeroUOf, zeroUById, bundlesOf, rollOf, zeroUPane, zeroUBottom} from './model.js';
 import {zeroUEnds} from './ports.js';
 import {portPathOf} from './cable-rules.js';
-import {followTrunk} from './bundle-route.js';
+import {followTrunk, bundleDiameter} from './bundle-route.js';
 import {RU, OPENING, RAIL_W} from './rails.js';
 import {throughRings, cornersOf, STRAIGHT_DEG} from './route-path.js';
 import {zeroUOnLane, zeroUX, carriesLane, runsThrough, STANDOFF, sideOfAt} from './zero-u.js';
 import {isZeroUPart, zeroUTouched, neighbours, anchorY, laneY, setbackOf, rollPoint, centreX, railOf, isQuarter, unitsOf} from './fit.js';
-import {solidsOf, traysOf, detour, legCrossings, CLEAR, zeroUPanelPoint} from './solids.js';
+import {solidsOf, traysOf, gapsOf, detour, legCrossings, CLEAR, zeroUPanelPoint} from './solids.js';
 import {surfacesOf, hang, heldStretch, drapeOf, bendOf, bendIsDefault, defaultBecause, newCrossing} from './resting.js';
 
 export const LANE_GAP = 40;          // mm: a lane runs in the middle of a 40 mm gutter outside each rail
@@ -1675,7 +1675,8 @@ function writable(v) {
   }
 }
 const sigOf = v => (writable(v) ? JSON.stringify(v) : null);
-// THE WORLD OF A RACK AND A CONTEXT: {solids, surfaces, lanesAt, id}.
+// THE WORLD OF A RACK AND A CONTEXT: {solids, surfaces, gaps, lanesAt, id}
+// (`gaps`: the open gaps behind trays, solids.js gapsOf).
 // `lanesAt(y)` is the side lanes at a height, where laneXAt puts them (rule
 // 3 of section 1.3), read off a table of every unit. `id` is a number that
 // two worlds share exactly when their text is the same (the solids, the
@@ -1690,7 +1691,7 @@ function worldOf(rack, ctx) {
   let per = isObj(ctx) ? worldMemo.get(rack) : null;
   if (isObj(ctx) && !per) worldMemo.set(rack, per = new WeakMap());
   if (per?.has(ctx)) return per.get(ctx);
-  const solids = solidsOf(rack, ctx), surfaces = surfacesOf(rack, ctx);
+  const solids = solidsOf(rack, ctx), surfaces = surfacesOf(rack, ctx), gaps = gapsOf(rack, ctx);
   const H = rack.frame.heightRU, names = lanesOf(rack.frame);
   const at = ru => [...new Set(names.map(l => laneXAt(rack, l, ru, ctx?.chassisOf)))];
   const whole = Number.isInteger(H) && H >= 1 && H <= 1000;
@@ -1702,14 +1703,14 @@ function worldOf(rack, ctx) {
   };
   let id = null;
   if (whole) {
-    const text = sigOf([solids, traysOf(rack, ctx), table, off]);
+    const text = sigOf([solids, traysOf(rack, ctx), gaps, table, off]);
     // the last few worlds seen, the one just asked for first
     const k = text === null ? -1 : worlds.findIndex(w => w.text === text);
     const known = k >= 0 ? worlds.splice(k, 1)[0] : text === null ? null : {text, id: ++worldCount};
     if (known) { worlds.unshift(known); if (worlds.length > 6) worlds.length = 6; }
     id = known ? known.id : null;
   }
-  const out = {solids, surfaces, lanesAt, id};
+  const out = {solids, surfaces, gaps, lanesAt, id};
   per?.set(ctx, out);
   return out;
 }
@@ -1816,7 +1817,8 @@ function layInputs(rack, cable, ctx, given, plain = false) {
   // the part beside the rack each end is on, whose body its plug leg is not
   // found crossing (layFrom); null for an end on a rack device
   const own = e => (itemOf(rack, e.item) ? null : zeroUById(rack, e.item)?.id ?? null);
-  return {...(plain ? {plain: true} : {}), media: cable.media, a, b, diameter, need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
+  const gapD = gapDiameterOf(rack, cable, ctx, diameter);
+  return {...(plain ? {plain: true} : {}), media: cable.media, a, b, diameter, ...(gapD ? {gapD} : {}), need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
     ends: {a: own(cable.a), b: own(cable.b)}, wps, stops, rests};
 }
 // One more thing a cable rests on, unless it is listed.
@@ -1832,9 +1834,32 @@ const restedIn = rests => o => { if (!rests.some(x => x.kind === o.kind && x.ite
 // gives the one kept its cable's id (`named`). So the lay of a cable down
 // the gutter its side was chosen for (autoRoute measures both, under an id
 // of their own) is the lay of the cable itself, and is made once.
+// THE WAY UP THROUGH A TRAY'S GAP, OR ROUND ITS FRONT EDGE (#966), by length
+// after the bend radius. A cable is laid with the gaps behind trays (solids.js
+// gapsOf) as a way up or down. Where a lay tried one, it is laid again
+// without them, and the lay with the gap is kept only if it went through one
+// and is the better of the two by the measure that chooses between a
+// cable's two ends (pickOf): fewer crossings, then less bend short of its
+// room, then shorter. So a rise through a gap that leaves a corner short, or
+// a longer one, is the front edge, and a cable that does not rise through a
+// gap is laid as it was before, whatever the search tried on the way.
 function layFrom(inp, world) {
+  const full = layOnce(inp, world, true);
+  if (!full.tried) return full;
+  const front = layOnce(inp, world, false);
+  if (!full.gapped) return front;
+  const score = x => [x.path.crossings.length, x.path.bends.reduce((m, f) => m + f.short_mm * (f.turns?.length ?? 1), 0), pathLength(x.path).measured];
+  const sg = score(full), sf = score(front), tol = [0, 0.05, 1e-6];
+  for (let i = 0; i < 3; i++) if (Math.abs(sg[i] - sf[i]) > tol[i]) return sg[i] < sf[i] ? full : front;
+  return front;
+}
+function layOnce(inp, world, withGaps) {
   const plain = inp.plain === true;
-  let usedNovel = false;
+  // (a plain lay is not offered the gap: PLAIN, at layOf)
+  const gaps = withGaps && !plain ? world.gaps : [];
+  // whether any lay tried, the one kept or not, went up through a gap: the
+  // search that ends in a lay without one may still have been led elsewhere by it
+  let usedNovel = false, usedGap = false;
   const {a, b, diameter, wps, stops, rests} = inp, r = diameter / 2;
   const rested = restedIn(rests);
   const marks = wps.map(() => null);
@@ -1897,7 +1922,7 @@ function layFrom(inp, world) {
     for (const e of list)
       if (Object.is(e.p.x, p.x) && Object.is(e.p.y, p.y) && Object.is(e.p.z, p.z) && Object.is(e.q.x, q.x) && Object.is(e.q.y, q.y)
         && Object.is(e.q.z, q.z) && Object.is(e.room, room) && e.how === how) return e.got;
-    const got = detour(p, q, solids, {diameter, lanes: lanesAt, room, rear: (how & 1) === 1, loose: (how & 2) === 2});
+    const got = detour(p, q, solids, {diameter, lanes: lanesAt, room, rear: (how & 1) === 1, loose: (how & 2) === 2, gaps, gapDiameter: inp.gapD ?? diameter});
     list.push({p: {x: p.x, y: p.y, z: p.z}, q: {x: q.x, y: q.y, z: q.z}, room, how, got});
     return got;
   };
@@ -1969,11 +1994,12 @@ function layFrom(inp, world) {
     // solids.js detour): twice the installed bend radius, or `runs.room`
     // where two right angles' worth is not enough (below)
     const taut = [out[0]], tautLegs = [], detours = [], own = [from[0]];
-    let stuck = 0;
+    let stuck = 0, gapped = false;
     for (let k = 1; k < out.length; k++) {
       const between = [ref(from[k - 1]), ref(from[k])];
       const extra = solids.length ? roundOf(out[k - 1], out[k], runs.room ?? 2 * bend, (runs.rear === true ? 1 : 0) + (runs.loose === true ? 2 : 0)) : [];
       if (extra === null) stuck++;
+      if (extra?.gap) { gapped = true; usedGap = true; }
       if (extra?.length) {
         detours.push({between, points: extra.map(p => ({x: p.x, y: p.y, z: p.z}))});
         for (const p of extra) { tautLegs.push(between); own.push(-1); taut.push({x: p.x, y: p.y, z: p.z, at: 'detour'}); }
@@ -1982,7 +2008,7 @@ function layFrom(inp, world) {
       own.push(from[k]);
       taut.push(out[k]);
     }
-    return {rings, findings, marks, taut, tautLegs, detours, own, stuck, ahead: aheadOf(taut)};
+    return {rings, findings, marks, taut, tautLegs, detours, own, stuck, gapped, ahead: aheadOf(taut)};
   };
   // ROOM AT A RING (#973, section 3.4). An approach point is where a cable
   // comes onto a ring's run, and where it turns onto it: the stretch from
@@ -2326,7 +2352,7 @@ function layFrom(inp, world) {
     ...(!d && legs[c.k] && JSON.stringify(legs[c.k - 1][1]) === JSON.stringify(legs[c.k][0]) ? {stop: legs[c.k - 1][1]} : {}),
     ...(d ? {apart_mm: c.legs_mm[1], turns: [c, d].map(x => ({point: final[x.k].at, at: spot(x.k), angle_deg: x.angle_deg}))} : {})}));
   return {path: {points: final, rings, findings, marks, crossings, detours, rests, bends, covers: [], allowance: endAllowance({media: inp.media}), media: inp.media},
-    legs, need, r, novel: usedNovel};
+    legs, need, r, novel: usedNovel || L.gapped, gapped: L.gapped, tried: usedGap};
 }
 
 // WHAT A LAY COVERS (#1013, section 1.7): with no manager a leg is a free span
@@ -2531,6 +2557,18 @@ const cableDiameter = (cable, ctx) => {
   const d = typeof ctx?.diameterOf === 'function' ? ctx.diameterOf(cable) : null;
   return typeof d === 'number' && d > 0 ? d : ownMedia(DIAMETERS, cable?.media) ?? UNSET_D;
 };
+
+// WHAT A TRAY'S GAP IS HELD TO (#966): a bundled cable goes up through the
+// gap with the bundle it rides in, so it is the bundle's outside diameter
+// (bundles.js, from its members'), not its own. null when the cable is alone
+// or is the widest there is.
+function gapDiameterOf(rack, cable, ctx, diameter) {
+  const b = drawnBundleOf(rack, cable?.id);
+  if (!b) return null;
+  const ds = b.members.map(m => (rack.cables || []).find(c => c.id === m.cable)).filter(Boolean).map(c => cableDiameter(c, ctx));
+  const d = ds.length >= 2 ? bundleDiameter(ds) : 0;
+  return d > diameter ? d : null;
+}
 
 // The marks of a path drawn from its other end, for its points reversed: the
 // list reversed, and each ring passed turned to the other sense. A ring not
