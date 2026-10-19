@@ -39,7 +39,7 @@ from portrayal import manifest as _manifest
 from portrayal import optical
 from portrayal import optical_ports
 from portrayal import stacks
-from portrayal.faces import DIRECTIONS, OPTICAL_FACES, face_ref
+from portrayal.faces import BODY_SIDES, DIRECTIONS, OPTICAL_FACES, face_ref, side_patch, side_viewbox
 from portrayal.manifest import (view_parts, targets, split_target, presented_interface,
                       VIEW_KEY_ORDER,
                       component_refs, load_yaml, nested_key_host, chained_occupant_ref,
@@ -313,8 +313,8 @@ RULES = {
     "L70": ("device",     "a `fact:` gap names a real fact and does not contradict the device", "fix the gap's scope or remove it",
             "A gap scoped to a misspelt fact leaves the comparison showing a bare blank although the search was done, and a device that states a figure while calling the vendor silent on it shows a number and a retraction at once.",
             ERROR),
-    "L71": ("component",  "a body box reaches no further than the part says it is deep; a round one states its axis (a ring its wall) and is square across it; one that `shows` a drawing is a box of a part declaring that face", "shrink the body box or raise `body.depth`; state `axis`/`wall` or square the envelope; declare the face or drop `shows`",
-            "A body box deeper than the part gives the wrong bay hole, pull distance and fit checks, and a round piece with no axis or a non-square section builds as an oval in 3D.",
+    "L71": ("component",  "a body box reaches no further than the part says it is deep, unless it is a fitted option (`when`); a round one states its axis (a ring its wall) and is square across it; one that `shows` a drawing is a box of a part declaring that face, and one that shows a side shows a patch inside that side's `skins/body-<side>.svg`, whose width and height are its viewBox's in mm", "shrink the body box or raise `body.depth`; state `axis`/`wall` or square the envelope; declare the face, draw the side, widen its viewBox or drop `shows`",
+            "A body box deeper than the part gives the wrong bay hole, pull distance and fit checks, a round piece with no axis or a non-square section builds as an oval in 3D, and a side patch outside its drawing is smeared with the drawing's edge.",
             MIXED),
     "L72": ("device",     "a bay's `plan:` or `rear:` lands in a view that exists, inside the chassis", "fix the plan view name or the coordinates",
             "A bay projected into a view or neighbour that does not exist draws nothing and raises nothing, so the plan or rear view silently loses the part.",
@@ -544,8 +544,8 @@ RULES = {
     "L147": ("component",  "a connection point's `turns` is a subset of the turns its part's interface allows in connectors.yaml, and only the presented point states one (an error)", "list only turns the interface allows - a point narrows the list, it cannot widen it; move `turns` to the point the interface is presented at, or drop it",
              "A connection point cannot allow a turn its interface does not, since no mating part is drawn for that turn, and `turns` on a point nothing reads would look like a setting that works when it does nothing.",
              ERROR),
-    "L148": ("component",  "a node a field moves or shows names a `choice` field the contract declares, and every option its `data-move` or `data-show` lists is one of that field's options; every option of a field with SHOW nodes shows at least one node, or is listed in the field's `drawn-by-absence` (an error)", "declare the field as a choice, or name only its options in the table; spell a move `option: dx dy [deg]`; show a node for the option, or list it in `drawn-by-absence`",
-             "A switch or selector position drawn for an option nobody can set, or an option with nothing drawn for it, would look correct while the drawing never changes when that option is chosen.",
+    "L148": ("component",  "a node a field moves or shows names a `choice` field the contract declares, and every option its `data-move` or `data-show` lists is one of that field's options; every option of a field with SHOW nodes shows at least one node, or is listed in the field's `drawn-by-absence`; a body piece fitted by an option (`when`) names a choice field and its options, and every skin shows a node for each option it lists (an error)", "declare the field as a choice, or name only its options in the table; spell a move `option: dx dy [deg]`; show a node for the option, or list it in `drawn-by-absence`; give a fitted piece's option a SHOW node in every skin",
+             "A switch or selector position drawn for an option nobody can set, or an option with nothing drawn for it, would look correct while the drawing never changes when that option is chosen; a fitted piece whose option no node shows is never built.",
              ERROR),
     "L149": ("component",  "a node a position moves stays inside its part under every move: its box, translated and turned, lies within `size` (an error)", "shorten the move, or move the node in the skin so its travel stays on the part",
              "An actuator moved off its own part would be drawn on the chassis beside it, and extruded there in the 3D view.",
@@ -2778,6 +2778,8 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
     a 170.9 reach and a PCB starting 13.9 behind the plate and running 170.9,
     which is 184.8. The number the part states has to contain its own body.
     A box with no `confidence` is counted, once per file, as L35 counts.
+    A piece that `shows` a side shows a patch of the part's own
+    body-<side>.svg that lies inside that drawing (faces.side_patch).
     """
     body = data.get("body") or {}
     boxes = body.get("boxes") or []
@@ -2785,8 +2787,15 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
         return
     d = float((data.get("size") or {}).get("d") or 0)
     unmarked = 0
+    sized = set()      # side drawings whose stated size has been checked
     for i, b in enumerate(boxes):
         reach = float(b.get("from") or 0) + float(b["depth"])
+        # A FITTED OPTION IS NOT THE BARE PART. size.d and body.depth are the
+        # part as it ships; an extender a buyer bolts on (`when`) makes it
+        # longer, and holding that piece to the bare reach would make the
+        # option undrawable or the part's own depth a lie.
+        if b.get("when"):
+            reach = 0.0
         if reach > d + 0.05:
             err(path, "L71", f"body box {b.get('id') or i} reaches {reach:g} behind the "
                              f"face and size.d says the part is {d:g} deep")
@@ -2827,15 +2836,141 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
         # `faces`, and the index publishes just those; a piece naming a face
         # the part never declared is built plain, silently, for as long as the
         # contract lives - the failure L77 exists for, one key over.
-        for which in b.get("shows") or []:
+        #
+        # A SIDE IS THE PART'S OWN body-<side>.svg, and a piece crops the patch
+        # of it the piece lies under - so the patch has to be inside the
+        # drawing, or the crop reads past its edge and the side is smeared
+        # with whatever the edge pixel holds. The drawing's width and height
+        # are its viewBox's, in mm, or a browser scales it to another aspect.
+        shows = b.get("shows") or []
+        if "plan" in shows and "top" in shows:
+            err(path, "L71", f"body box {name} shows both `plan` and `top` - they paint "
+                             f"the same side; keep one")
+        for which in shows:
             if shape != "box":
                 err(path, "L71", f"body box {name} is a {shape} and `shows` a drawing - "
-                                 f"only a box has a flat top or back to carry one")
+                                 f"only a box has a flat side to carry one")
+            elif which in BODY_SIDES:
+                sp = Path(path).parent / "skins" / f"body-{which}.svg"
+                vb = side_viewbox(sp)
+                if not sp.exists():
+                    err(path, "L71", f"body box {name} shows the part's `{which}` side and "
+                                     f"there is no skins/body-{which}.svg")
+                    continue
+                if vb is None:
+                    err(sp, "L71", f"body-{which}.svg has no viewBox of four numbers, so "
+                                   f"no piece can tell which patch of it to show")
+                    continue
+                if sp not in sized:
+                    sized.add(sp)
+                    root = ET.parse(sp).getroot()
+                    for attr, want in (("width", vb[2]), ("height", vb[3])):
+                        got = root.get(attr) or ""
+                        try:
+                            ok = got.endswith("mm") and abs(float(got[:-2]) - want) <= 0.05
+                        except ValueError:
+                            ok = False
+                        if not ok:
+                            err(sp, "L71", f"body-{which}.svg says {attr}={got!r} and its viewBox "
+                                           f"is {want:g} - state it as {want:g}mm")
+                x0, y0, x1, y1 = side_patch(b, which, float((data.get("size") or {}).get("w") or 0),
+                                            float(body.get("depth") or 0))
+                vx, vy, vw, vh = vb
+                if x0 < vx - 0.05 or y0 < vy - 0.05 or x1 > vx + vw + 0.05 or y1 > vy + vh + 0.05:
+                    err(path, "L71", f"body box {name} shows {x0:g}..{x1:g} x {y0:g}..{y1:g} of "
+                                     f"body-{which}.svg, whose viewBox covers {vx:g}..{vx + vw:g} x "
+                                     f"{vy:g}..{vy + vh:g} - widen the drawing or drop `{which}`")
             elif not face_ref(data, which):
                 err(path, "L71", f"body box {name} shows the part's `{which}` drawing and "
                                  f"the part declares no `faces.{which}`")
     if unmarked:
         warn(path, "L71", f"{unmarked} of {len(boxes)} body boxes carry no confidence")
+    for a, b, axis, at in coplanar_box_faces(boxes):
+        err(path, "L71", f"body boxes {a} and {b} share a face plane at {axis} {at:g} where "
+                         f"they overlap - the two faces z-fight and shimmer in 3D; end one "
+                         f"of them 0.05 short of the plane")
+
+
+def coplanar_box_faces(boxes):
+    """Pairs of plain boxes that have a face on one plane and overlap there.
+
+    Two faces on the same plane, facing the same way, over a shared patch are
+    drawn at one depth and the GPU picks between them pixel by pixel, so the
+    patch shimmers as the camera moves. Faces that face opposite ways (boxes
+    that abut) are not this. Pieces fitted for different options are never
+    drawn together and are not compared. Returns (id, id, axis, plane)."""
+    def extent(b):
+        x, y = (float(v) for v in b["at"])
+        w, h = (float(v) for v in b["size"])
+        z = float(b.get("from") or 0)
+        return {"x": (x, x + w), "y": (y, y + h), "z": (z, z + float(b["depth"]))}
+
+    plain = [(b.get("id") or str(i), b) for i, b in enumerate(boxes)
+             if (b.get("shape") or "box") == "box"]
+    found = []
+    for i, (na, a) in enumerate(plain):
+        for nb, b in plain[i + 1:]:
+            if a.get("when") and b.get("when") and a["when"] != b["when"]:
+                continue
+            ea, eb = extent(a), extent(b)
+            for axis in "xyz":
+                others = [k for k in "xyz" if k != axis]
+                if any(min(ea[k][1], eb[k][1]) - max(ea[k][0], eb[k][0]) <= 1e-6
+                       for k in others):
+                    continue
+                for end in (0, 1):
+                    if abs(ea[axis][end] - eb[axis][end]) < 1e-6:
+                        found.append((na, nb, axis, ea[axis][end]))
+    return found
+
+
+def lint_component_fitted_pieces(path, data):
+    """L148, for a body piece: a fitted option (`when`) is a choice the part
+    offers, and the drawing can say it was chosen.
+
+    The kit builds such a piece only while the part's drawing shows a
+    `data-show-from` node for one of the options it lists (relief.js
+    pieceFitted), because the drawing is where a configuration's choice and a
+    viewer's are both settled. A piece whose option no node shows is never
+    built, and nothing anywhere says so: the extender that was modelled and
+    is never seen. So every skin carries a SHOW node for each option a piece
+    lists - an empty group, when the face does not change with it."""
+    fields = data.get("fields") or {}
+    fitted = [(b.get("id") or i, b["when"]) for i, b in
+              enumerate((data.get("body") or {}).get("boxes") or []) if b.get("when")]
+    if not fitted:
+        return
+    skins_dir = Path(path).parent / "skins"
+    shown = {}
+    for skin in (data.get("skins") or ["default"]):
+        sp = skins_dir / f"{skin}.svg"
+        try:
+            root = ET.parse(sp).getroot()
+        except (OSError, ET.ParseError):
+            continue          # L3 reports a missing or unparseable skin
+        got = shown[skin] = {}
+        for el in root.iter():
+            k = el.get("data-show-from")
+            if k is not None:
+                got.setdefault(k, set()).update((el.get("data-show") or "").split())
+    for name, when in fitted:
+        for k, opts in sorted(when.items()):
+            f = fields.get(k) or {}
+            if f.get("type") != "choice":
+                err(path, "L148", f"body box {name} is fitted by {k!r}, which is not a choice "
+                                  "field the contract declares")
+                continue
+            options = {str(o) for o in f.get("options") or []}
+            for o in [str(o) for o in opts]:
+                if o not in options:
+                    err(path, "L148", f"body box {name} is fitted by {k}={o}, which is not an "
+                                      f"option of {k} ({', '.join(sorted(options))})")
+                    continue
+                for skin, got in sorted(shown.items()):
+                    if o not in got.get(k, set()):
+                        err(path, "L148", f"body box {name} is fitted by {k}={o} and skin {skin} "
+                                          f"shows no node for it, so the piece is never built - "
+                                          f"add a node with data-show-from=\"{k}\" data-show=\"{o}\"")
 
 
 def lint_component_sink_context(path, data, _lib_roots=None):
@@ -14176,6 +14311,7 @@ def main():
                 lint_component_spanned_exclusion(f, d, args.library)
                 lint_component_relief_confidence(f, d, args.library)
                 lint_component_body_boxes(f, d)
+                lint_component_fitted_pieces(f, d)
                 lint_component_faces_once(f, d)
                 # L83 IS HANDED THE PART'S OWN REF, so it can catch a contract
                 # naming itself as its own face - a copy-paste away, and

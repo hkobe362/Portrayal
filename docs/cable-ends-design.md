@@ -196,6 +196,8 @@ Without `ends` the zone reader answers what it always did.
 
 ## 7. Later steps, named
 
+The audit of these steps against the code, and the design of the open ones, is in [power-cords-design.md](power-cords-design.md).
+
 1. **A zero-U part as an end** (a vertical PDU): **done in kit 0.38.0.** An end
    names the part's id as its `item` and one of its own connector slots as its
    `path`. No page reads a part beside the rack, so the catalogue answers for
