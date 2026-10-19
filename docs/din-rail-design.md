@@ -116,7 +116,7 @@ dimension a drawing labels between the two flanges of a hat.
 | depth | 7.5 (AD 1, EN 1, ITC 2) | 15.0 (AD 1, EN 2, ITC 3) | 5.5 (AD 1, EN 3, ITC 5 drawing; **ITC 5 text says 5**) | 15.0 (EN 3, ITC 4) |
 | thickness | 1.0 (AD 1, EN 1, ITC 2) | 1.5 (AD 1, EN 2, ITC 3) | 1.0 (AD 1, EN 3, ITC 5) | 1.5 (EN 3, ITC 4) |
 | crown | 27.0 (AD 1, ITC 2, EN 3 tolerance drawing; **EN 1 labels 25**) | **27.0 (AD 1, ITC 3) or 24 (EN 2, EN 3): open** | 10.5 (AD 1, ITC 5) | – |
-| flange (hat) or lip (G) | 4.0 (AD 1) | – | – | **6 (EN 3) or 9 (ITC 4): open** |
+| flange (hat) or lip (G) | 4.0 (AD 1) | 4.0 (AD 1) | – | **6 (EN 3) or 9 (ITC 4): open** |
 | slot | 6.3 x 18.0 (AD 1 and 4, EN 1, ITC 2) | 6.3 x 18.0 (AD 1, EN 2, ITC 3) | 4.2 x 12.2 (AD 1, EN 3, ITC 5) | 6.3 x 18 (EN 3, ITC 4) |
 | slot pitch | 25.0 (AD 1, EN 1, ITC 2) | 25.0 (AD 1, EN 2, ITC 3) | 20.0 (AD 1, EN 3, ITC 5) | 25.0 (EN 3, ITC 4) |
 | first slot centre from the end | 12.5, derived (AD 4, section 3.3) | as `ts35x7.5`, not drawn | – | – |
