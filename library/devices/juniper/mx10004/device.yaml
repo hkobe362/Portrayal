@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: mx10004
-version: 2.0.6
+version: 2.1.0
 maturity: modelled
 manufacturer: Juniper
 model: MX10004
@@ -109,6 +109,11 @@ gaps:
     reason: vendor-silent
     wanted: a vendor dimension for the RCB face - the FRU table covers
       chassis, cards and PSUs but not the RCB; 389 mm is photo-derived.
+  - what: sfb-bays
+    reason: needs-photo
+    wanted: the switch fabric boards (JNP10004-SF2) and their cover (JNP10004-SF-BLNK)
+      sit inside the chassis behind the fan trays, where no face shows them. Vendor
+      count is five boards and one cover on the base; none is drawn.
 groups:
   res:
     term: Slot
@@ -170,10 +175,10 @@ views:
     components:
       bays:
         - {id: re0, at: [2.5, 20.0], size: {w: 389.0, h: 38.1},
-           accepts: [juniper/jnp10k-re1@2], default: juniper/jnp10k-re1@2,
+           accepts: [juniper/jnp10k-re1@2, juniper/jnp10k-re-blnk@1], default: juniper/jnp10k-re1@2,
            group: res, rel-pos: 0}
         - {id: re1, at: [2.5, 58.1], size: {w: 389.0, h: 38.1},
-           accepts: [juniper/jnp10k-re1@2], default: juniper/jnp10k-re1@2,
+           accepts: [juniper/jnp10k-re1@2, juniper/jnp10k-re-blnk@1], default: juniper/jnp10k-re1@2,
            group: res, rel-pos: 1}
         - {id: fpc0, at: [2.5, 118.0], size: {w: 437.0, h: 48.0},
            accepts: [juniper/jnp10k-lc9600@1, juniper/jnp10k-lc480@1, juniper/jnp10k-lc-blank@1],
@@ -214,13 +219,13 @@ views:
     components:
       bays:
         - {id: psu0, at: [3.0, 9.0], size: {w: 84.0, h: 97.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1], default: juniper/jnp10k-pwr-ac2@1,
+           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
            group: psus, rel-pos: 0}
         - {id: psu1, at: [3.0, 106.5], size: {w: 84.0, h: 97.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1], default: juniper/jnp10k-pwr-ac2@1,
+           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
            group: psus, rel-pos: 1}
         - {id: psu2, at: [3.0, 204.0], size: {w: 84.0, h: 97.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1], default: juniper/jnp10k-pwr-ac2@1,
+           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
            group: psus, rel-pos: 2}
         - {id: fan0, at: [89.0, 9.0], size: {w: 176.0, h: 293.0},
            accepts: [juniper/jnp10004-fan2@1], default: juniper/jnp10004-fan2@1,
@@ -268,27 +273,23 @@ configurations:
   base:
     kind: base
     source: >-
-      vendor - Juniper publishes this as an orderable bundle. the hardware
-      guide's 'MX10004 Configurations' section lists the components of each configuration,
-      and the line-card covers in this base are its own: it ships sixteen of them on the
-      MX10016 in EVERY configuration, over the note that "Line cards and the cable
-      management system are not part of the base or redundant configurations. You must
-      order them separately." NOT YET FULLY FAITHFUL: the vendor bundle also ships ONE
-      routing engine rather than two, and covers rather than modules in one SFB slot and
-      one power slot. This library seats all of them, because JNP10K-PWR-BLNK and the SF
-      blank are not modelled yet. The line-card half - the part that was drawing holes -
-      is now right.
+      vendor - Juniper publishes this as an orderable bundle. The hardware guide's
+      'MX10004 Configurations' table (MX10004-BASE) lists one RCB with one RCB cover
+      (JNP10K-RE-BLNK), two power supplies with one power supply blank cover panel
+      (JNP10K-PWR-BLNK), and four line card covers (JNP10K-LC-BLNK), over the note that
+      line cards and the cable management system are not part of the base configuration.
+      This base draws exactly that: one board in RCB slot 0 and its cover in slot 1, two
+      supplies and a cover in the third supply slot, and a cover in each of the four
+      line-card slots. The five switch fabric boards and their cover sit inside the
+      chassis, not visible from outside, and no bay for them is drawn.
     default: true
     description: >-
-      Chassis only - what you spec before deciding what goes in it. The 4 slot bays are
-      EMPTY; cooling, psus, res are populated. Enough to power on and reach the box,
-      which is the question most people ask first and the one `default` used to answer
-      with whatever the drawing happened to be populated with. The line-card slots are
-      drawn EMPTY rather than blanked, which is not the intent: no MX10000-series
-      line-card blank is modelled, and none is named in the staged guides - they
-      document power-supply cover panels only. Every other chassis in the library seats
-      a blank here.
+      The chassis as Juniper ships MX10004-BASE. One routing and control board with a
+      cover over the second slot, two power supplies with a cover over the third, fans,
+      and a cover in each of the four line-card slots. Line cards are ordered separately.
     bays:
+      re1: juniper/jnp10k-re-blnk@1
+      psu2: juniper/jnp10k-pwr-blnk@1
       fpc0: juniper/jnp10k-lc-blank@1
       fpc1: juniper/jnp10k-lc-blank@1
       fpc2: juniper/jnp10k-lc-blank@1
