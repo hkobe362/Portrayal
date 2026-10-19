@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: xr100
-version: 1.0.0
+version: 1.0.1
 class: adapter-panel
 behaviour: fills
 profile: networking
@@ -61,4 +61,10 @@ provenance:
   seating: >-
     datasheet - 'fixation: without adapters': the module clips into a window of
     the XMU00 or XMS00 holder directly.
+  art-outline: >-
+    the shell strips above and below the frame carry a 0.15 outline in #8d939a,
+    the kit shell's dim grey, so the near-black shell reads against the black
+    holder on a light stage and a dark one. The outline is not on the maker's
+    drawing. This module has no shield rim and no keystone collar: the sheet
+    says unscreened, without adapters.
 skins: [default]

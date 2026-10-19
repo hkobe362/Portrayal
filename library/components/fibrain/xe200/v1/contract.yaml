@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: xe200
-version: 1.0.0
+version: 1.0.1
 class: adapter-panel
 behaviour: fills
 profile: networking
@@ -61,4 +61,10 @@ provenance:
   seating: >-
     datasheet - 'fixation: without adapters': the module clips into a window of
     the XMU00 or XMS00 holder directly.
+  art-stand-ins: >-
+    STAND-IN, in the face: the shield rim, a 0.30 bright-metal line 0.15 inside
+    the frame edge. The sheet says the die-cast shell is 360 degree EMC and the
+    photograph shows bright metal behind the face, but no document dimensions
+    how much of it shows round the frame, so the width is chosen and is not
+    measured. There is no keystone collar: the sheet says without adapters.
 skins: [default]

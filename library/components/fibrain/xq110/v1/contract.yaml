@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: xq110
-version: 1.0.0
+version: 1.0.1
 class: adapter-panel
 behaviour: fills
 profile: networking
@@ -60,15 +60,28 @@ provenance:
     keystone adapter'. The photograph shows a clear plastic collar behind the face
     and a clear latch tab over the shell. The sheet's drawing is the same as the
     one on the module without the adapter and dimensions neither. The adapter
-    is therefore recorded in `attrs.keystone` and not drawn; the library's
+    is therefore recorded in `attrs.keystone` and drawn on the face as the stand-in under art-stand-ins; the library's
     keystone-opening standard is another maker's landscape opening and is not
     claimed.
   not-modelled: >-
     the IDC back, which takes the cable and is not a port here; the dust cover's
     hinged door; the clamp nub, 0.22 out of the right side; the latch tab under
-    the frame; the keystone collar.
+    the frame; the keystone collar's depth behind the face (the face draws its front rim only).
   seating: >-
     datasheet - the module clips into a window of the XMU00 or XMS00 holder.
     The keystone adapter is for third-party keystone openings, and no sheet
     says it is fitted when the module sits in the HD holder.
+  art-stand-ins: >-
+    STAND-INS, in the face. The photograph shows a clear keystone collar and a
+    clear latch tab and the sheet dimensions neither, so: the latch is drawn
+    the width of the tab under the frame (6.78) and 1.1 high over the top
+    strip; the collar is a 0.20 clear outline 0.6 inside the frame edge; the
+    tab under the frame is drawn clear. The widths are chosen, not measured.
+    They stay inside the 14.6 envelope: the registry's keystone jack body,
+    14.5 x 16.1 (common/keystone-blank@1, size-notes), agrees with this frame,
+    so the collar is not drawn outside it, where it would lap the next window.
+  art-outline: >-
+    the shell strips carry a 0.15 outline in #8d939a, the kit shell's dim
+    grey, so the near-black shell reads against the black holder on a light
+    stage and a dark one. It is not on the maker's drawing.
 skins: [default]

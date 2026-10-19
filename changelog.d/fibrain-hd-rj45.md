@@ -32,3 +32,21 @@
   grounding). Illustrative: holders and modules are ordered separately, so the
   orderable `xpu00` and `xps00` stay empty, as their datasheets give them.
   The XCU10's drawer is unchanged, because the maker lists no copper for it.
+
+### Changed
+- **The Fibrain HD RJ45 modules draw a face of their own, and the frame's top
+  reads in 3D** (art, patch bumps: the twelve modules 1.0.0 to 1.0.1,
+  `fibrain/xpu-top-sheet` 1.0.0 to 1.0.1, `fibrain/xpu` 0.2.0 to 0.2.1). A
+  screened module draws a shield rim round its frame, a keystone module a clear
+  collar, a clear latch over the shell and a clear tab under the frame, so the
+  four kinds of one category differ in shape and not only in colour; the widths
+  of the rim, the collar and the latch are stand-ins, said so in each part's
+  sources, because no sheet dimensions them. The dark shell strips of an
+  unscreened module carry a thin outline in the kit's dim grey, so they read
+  against the black holder on a light stage and a dark one. The top sheet draws
+  its eight slots rimmed and its five screw heads raised 0.7 (the head height is
+  the one estimated figure). The copper-mixed 3D preview that came out blank was
+  not a renderer fault: the scene appears once its face textures are
+  rasterised, six to eight seconds on a software renderer, and the shot had been
+  taken at six. A test pins that every copper configuration compiles to six
+  painted faces and 48 jacks.
