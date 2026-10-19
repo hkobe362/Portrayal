@@ -76,7 +76,9 @@ know, so none was needed):
   value the reader cannot use as a colour moves to `colorAsWritten`. A kit
   before 0.31.0 keeps the key and draws the cable by its media. The schema
   under `/schemas/v3/` describes both keys; `color` is the first key of that
-  schema with a `pattern`.
+  schema with a `pattern`. The order and the `color` key were decided
+  2026-10-18; the other rulings in `rack-file-v4-design.md` section 14 still
+  wait to be confirmed.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
@@ -154,6 +156,7 @@ also draws is that part's row. Each row may carry:
 | `class` | `data-class` | string |
 | `ref` | `data-ref` | `<component>:<resolved version>`, as the SVG writes it |
 | `media`, `speed`, `group`, `group-role`, `rel-pos` | the `data-` attribute of the same name | string |
+| `speeds` | `data-speeds` | list: every native rate of a multi-rate cage, ascending, ending at `speed` (`["1g","10g","25g"]`); absent on a single-rate port. Written per group from the vendor's figure; native rates only, no breakout |
 | `states` | `data-states` | list: the lamp vocabulary |
 | `for` | `data-for` | list: the owners, local paths or device-absolute `/<view>/<path>` |
 | `inner` | `data-inner` | `true` for a port inside another port's housing |
@@ -287,6 +290,16 @@ reader that does not know it finds every field it read before.
   listed, and a module the rack's own `swaps` put in a bay is not listed. A
   display's readings (`data-messages`) are not states. Always an object; `{}`
   on a device that declares none. Additive.
+- **`bays[view][].only-in`** and **`cages[view][].only-in`** in
+  `<device>.configs.json` (#1022): the configurations that have this bay or
+  cage, a list of configuration names exactly as `device.yaml` states it on the
+  bay or the placement. Absent where the device states none, which is a bay
+  of every configuration; an empty list is never written. A configuration not
+  in the list has no such bay: the drawing leaves it out, and a reader must
+  not take it for a bay holding its `default`. (`configs[].bays` need not list
+  a bay the configuration has, which then holds its `default`, and may name
+  one it lacks.) The kit reads it so (`slotEnv`, `holdsAt`). Additive:
+  `contract` is still 2.
 - **`configs[].names`** beside it: the name a DCIM knows each of those parts
   by, `{"outlet-a1": "A1"}`, where that is not the placement id. It is read
   from the device's own `interfaces:` through the function that names the
@@ -303,7 +316,7 @@ reader that does not know it finds every field it read before.
   (`Through breaker A, lines L1-L2`); and `feed_leg` is written only for a
   line-to-neutral outlet on a three-phase wye input (L1 `A`, L2 `B`, L3 `C`).
   A DCIM that imported a leg holds it.
-- **A fixed breaker is named as the unit prints it** (owner decision,
+- **A fixed breaker is named as the unit prints it** (decided
   2026-10-09): the description reads `Through breaker <name>`, where the name
   is the first of the breaker placement's `attrs.label` and `attrs.section`
   (the letter on the Eaton G4 section tile) that is set, and the placement id
@@ -910,7 +923,9 @@ follow the DCIM's own schema, and what can break is what an already-imported
 record is called: a model name, a port name, a bay position. Before 1.0 such a
 change is allowed, and it is announced in `CHANGELOG.md`, marked **BREAKING for
 DCIM data already imported**, with what it renames. From 1.0 it is treated as
-a `contract` change is.
+a `contract` change is. Which NetBox and Nautobot the exports need, and which
+features need NetBox 4.6 or later, is in
+[`library/README.md`](../library/README.md#which-netbox-and-nautobot-the-exports-need).
 
 ## What is promised before 1.0
 
