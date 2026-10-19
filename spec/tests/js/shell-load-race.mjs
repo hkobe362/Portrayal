@@ -12,12 +12,20 @@ const meta = (name, configs) => JSON.stringify({
   bays: {}, cages: {},
   configs: configs.map(c => ({name: c, files: {front: `${name}.${c}.front.svg`, rear: `${name}.${c}.rear.svg`}})),
 });
+// c has one bay, so a module seated in it is a skin fetch the reseat awaits
+const bayMeta = JSON.parse(meta('c', ['base']));
+bayMeta.bays = {front: [{id: 'bay-1', accepts: ['v/mod@1']}]};
 const routes = {
-  'devices.json': () => JSON.stringify({devices: [{name: 'a', ns: 'v'}, {name: 'b', ns: 'v'}]}),
-  'components.json': () => JSON.stringify({components: []}),
+  'devices.json': () => JSON.stringify({devices: [{name: 'a', ns: 'v'}, {name: 'b', ns: 'v'}, {name: 'c', ns: 'v'}]}),
+  'components.json': () => JSON.stringify({components: [{ns: 'v', name: 'mod', major: 'v1', skins: ['default']}]}),
   'a.configs.json': () => meta('a', ['ac', 'dc']),
   'b.configs.json': () => meta('b', ['base']),
+  'c.configs.json': () => JSON.stringify(bayMeta),
+  'v--mod--v1--default.svg': async () => { if (held['skin']) await held['skin'].p; return 'mod'; },
 };
+for (const v of ['front', 'rear'])
+  routes[`c.base.${v}.svg`] = () => JSON.stringify({
+    src: `c.base.${v}`, parts: [{attrs: {'data-path': 'bay-1'}}]});
 // every face is its own file name, so the mounted drawing says which load drew it
 for (const f of ['a.ac.front', 'a.ac.rear', 'a.dc.front', 'a.dc.rear', 'b.base.front', 'b.base.rear'])
   routes[`${f}.svg`] = async () => { if (held[`${f}.svg`]) await held[`${f}.svg`].p; return f; };
@@ -98,6 +106,39 @@ test('a face that lands after a configuration change is not stacked on the new o
   assert.deepEqual(drawn(), ['a.ac.front'], 'exactly one drawing, the newer one');
   assert.equal(shell.state.svg.getAttribute('data-src'), 'a.ac.front');
   assert.deepEqual(loads, ['a.ac.front']);
+});
+
+test('a load overtaken while its reseat is awaited refreshes nothing and announces nothing', async () => {
+  await fresh();
+  await shell.loadDevice('c');
+  // a module the reader seated: the reseat of the next stage load fetches its skin
+  shell.state.touched.add('bay-1');
+  shell.state.cfgBays['bay-1'] = 'v/mod@1';
+  loads.length = 0;
+  let redraws = 0;
+  const clear = shell.el.tree.replaceChildren;
+  shell.el.tree.replaceChildren = (...a) => { redraws++; return clear.apply(shell.el.tree, a); };
+  try {
+    held['skin'] = gate();
+    const older = outcome(shell.loadStage());
+    await tick();
+    assert.deepEqual(drawn(), ['c.base.front'], 'the older load has mounted its face and waits in the reseat');
+    redraws = 0;
+    const newer = outcome(shell.loadDevice('a', {config: 'dc', view: 'rear'}));
+    assert.equal(await newer, 'loaded');
+    const afterNewer = redraws;
+    assert.deepEqual(loads, ['a.dc.rear']);
+    held['skin'].open();
+    assert.equal(await older, 'superseded');
+    await tick();
+    assert.equal(redraws, afterNewer, 'the superseded load redrew the tree');
+    assert.deepEqual(loads, ['a.dc.rear'], 'the superseded load announced its drawing');
+    assert.deepEqual(drawn(), ['a.dc.rear']);
+    assert.equal(shell.state.svg.getAttribute('data-src'), 'a.dc.rear');
+    assert.deepEqual(where(), ['a', 'dc', 'rear']);
+  } finally {
+    shell.el.tree.replaceChildren = clear;
+  }
 });
 
 test('a load nothing overtook resolves as before', async () => {

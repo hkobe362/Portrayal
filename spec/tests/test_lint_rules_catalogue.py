@@ -70,6 +70,15 @@ def test_every_entry_has_scope_rule_fix_why_and_severity():
         assert entry[4] in lint.SEVERITIES, code
 
 
+def test_l31_text_names_every_view_it_checks():
+    # DEPTH_AXIS keys left and right are the sides; the rest are named in the text.
+    named = [v for v in lint.DEPTH_AXIS if v not in ("left", "right")]
+    assert named, "DEPTH_AXIS lost its non-side views"
+    text = lint.RULES["L31"][1]
+    missing = [v for v in named if v not in text]
+    assert not missing, f"L31's text does not name these views it checks: {missing}"
+
+
 def test_docs_page_matches_the_generator():
     page = (ROOT / "docs" / "lint-rules.md").read_text()
     assert page == lint.rules_text(markdown=True), (
