@@ -76,7 +76,9 @@ know, so none was needed):
   value the reader cannot use as a colour moves to `colorAsWritten`. A kit
   before 0.31.0 keeps the key and draws the cable by its media. The schema
   under `/schemas/v3/` describes both keys; `color` is the first key of that
-  schema with a `pattern`.
+  schema with a `pattern`. The order and the `color` key were decided
+  2026-10-18; the other rulings in `rack-file-v4-design.md` section 14 still
+  wait to be confirmed.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
