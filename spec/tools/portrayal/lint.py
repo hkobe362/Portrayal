@@ -133,7 +133,7 @@ RULES = {
     "L10": ("component",  "composed parts resolve, ids are unique, composition does not cycle (depth <= 4), and neither a part nor a bay's `default` or `accepts` is a `kind: kit`", "fix the `parts:` refs; a part must not compose itself; a kit is named from a device's `chassis.kits`, never composed or seated",
             "A composition that names a missing part, repeats an id or loops back on itself cannot be drawn, and a kit composed as a part offers something no configuration can hold.",
             ERROR),
-    "L11": ("component",  "interface/mates declarations carry a `mate` connection point, and a wrapper keeps the interface of what it composes", "add `connection-points.mate`; do not change the interface in a wrapper",
+    "L11": ("component",  "interface/mates declarations carry a `mate` connection point (a `mates` on a part with `behaviour: fills` is exempt: its bay places it), and a wrapper keeps the interface of what it composes", "add `connection-points.mate`; do not change the interface in a wrapper",
             "A receptacle or plug with no mate point has nothing to align to, so it cannot be seated, and a wrapper that changes its interface lets parts pass the fit check against something they do not really mate.",
             ERROR),
     "L12": ("device",     "mate-to resolves to a receptacle whose interface the occupant mates; a seated part's `rate` is at or below its cage's media", "point `mate-to` at the receptacle id; check `interface` and `mates` agree; seat a part the cage offers",

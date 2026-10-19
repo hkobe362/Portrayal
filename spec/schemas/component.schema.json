@@ -159,7 +159,7 @@
      "items": {"$ref": "#/$defs/segment"}
     }
    ],
-   "description": "this component mates INTO a receptacle presenting this interface. A part that OCCUPIES a receptacle (`mate-to`, or an `occupants:` seat) requires a `mate` connection-point, which is what aligns it to its host; a part that FILLS a bay (a card in a riser slot) does not, because the bay places it by `at`. ONE INTERFACE, OR A LIST OF THEM for a part that seats in more than one kind of receptacle: a NEMA 5-15P goes into a 5-15R and into a 5-20R, a C14 plug into a C13 outlet and an Eaton C39. Each receptacle keeps its own interface because what each accepts differs, so the part names every one it seats in and is offered by a slot presenting any of them. A single interface and a one-item list say the same thing; write the single interface. One `mate` point serves every interface listed."
+   "description": "this component mates INTO a receptacle presenting this interface. Requires a `mate` connection-point, which is what aligns a part to its host, unless the part has `behaviour: fills`: a card that FILLS a bay (a riser slot) is placed by the bay's `at`, so its `mates` names the slot form and aligns nothing. ONE INTERFACE, OR A LIST OF THEM for a part that seats in more than one kind of receptacle: a NEMA 5-15P goes into a 5-15R and into a 5-20R, a C14 plug into a C13 outlet and an Eaton C39. Each receptacle keeps its own interface because what each accepts differs, so the part names every one it seats in and is offered by a slot presenting any of them. A single interface and a one-item list say the same thing; write the single interface. One `mate` point serves every interface listed."
   },
   "optical": {
    "type": "object",

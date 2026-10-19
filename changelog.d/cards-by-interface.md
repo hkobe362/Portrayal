@@ -18,9 +18,10 @@
   explicit lists only.
 
 ### Changed
-- **L11 asks a `mate` connection point of a part that occupies a receptacle, and
-  no longer of a part that fills a bay** for its `mates`: the bay places a card
-  by `at`. The schema's description of `mates` says so.
+- **L11 no longer asks a `mate` connection point for the `mates` of a part with
+  `behaviour: fills`**: the bay places a card by `at`. A part that occupies a
+  receptacle, or states no behaviour, is asked as before. The schema's
+  description of `mates` says so.
 - The DCIM description of a module bay that states an `interface` says the
   interface's note and then any list.
 - No library part states `interface` or the new `mates` yet, so no part, device

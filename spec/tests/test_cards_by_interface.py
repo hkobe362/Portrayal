@@ -401,7 +401,7 @@ def test_l11_a_part_that_fills_and_presents_an_interface_is_still_asked_for_its_
 def test_the_schema_description_of_mates_says_so():
     schema = json.loads((SCHEMAS / "component.schema.json").read_text())
     text = schema["properties"]["mates"]["description"]
-    assert "FILLS a bay" in text and "OCCUPIES" in text
+    assert "`behaviour: fills`" in text and "FILLS a bay" in text
 
 
 # --- lint: the redundant-list warning ---------------------------------------------
@@ -489,7 +489,14 @@ def _authored_bays(contract):
 
 
 def test_no_bay_in_the_library_states_an_interface_yet():
-    """The slice publishes a key and builds a mechanism; it migrates nothing."""
+    """The slice publishes a key and builds a mechanism; it migrates nothing.
+
+    THIS IS ALSO A GUARD. Some readers of a bay's `accepts` still read the
+    authored list alone: in dcim_export.py `_chassis_seated`, `_chassis_seats`,
+    `pass_through_bays`, `anchored_bays`, `seating_depths` and the device-bay
+    rows, and `manifest.component_refs` (the incremental build's dependency
+    graph). The slice that first states an `interface` on a real bay deletes
+    this test and routes those readers through `manifest.offers` first."""
     found = []
     for cf in libwalk.iter_components([LIB]):
         for bid, b in _authored_bays(load_yaml(cf) or {}).items():
