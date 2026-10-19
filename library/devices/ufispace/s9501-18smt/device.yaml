@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: s9501-18smt
-version: 5.0.1
+version: 4.0.0
 maturity: modelled
 manufacturer: UfiSpace
 model: S9501-18SMT
@@ -824,15 +824,23 @@ views:
       - {at: [4.0, 9.5], text: GND, font-size: 2.4, anchor: start, for: ground-screws-1}
       - {at: [188.0, 9.5], text: GND, font-size: 2.4, anchor: start, for: ground-screws-2}
       # the circled earth symbol the lugs drew, 6.6 above each hole centre: a ring 2.7 in radius and the
-      # four bars of common/ground-symbol@1's art, as one stroked path per hole
+      # four bars of common/ground-symbol@1's art: per hole, the ring at 0.3 and the bars at 0.32, as main drew them
       - {at: [9.4, 15.2], for: ground-screws-1, fill: '#c7ccd1', stroke-width: 0.3,
-         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0 M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
+         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0'}
+      - {at: [9.4, 15.2], for: ground-screws-1, fill: '#c7ccd1', stroke-width: 0.32,
+         path: 'M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
       - {at: [25.2, 15.2], for: ground-screws-1, fill: '#c7ccd1', stroke-width: 0.3,
-         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0 M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
+         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0'}
+      - {at: [25.2, 15.2], for: ground-screws-1, fill: '#c7ccd1', stroke-width: 0.32,
+         path: 'M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
       - {at: [193.3, 15.2], for: ground-screws-2, fill: '#c7ccd1', stroke-width: 0.3,
-         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0 M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
+         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0'}
+      - {at: [193.3, 15.2], for: ground-screws-2, fill: '#c7ccd1', stroke-width: 0.32,
+         path: 'M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
       - {at: [209.0, 15.2], for: ground-screws-2, fill: '#c7ccd1', stroke-width: 0.3,
-         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0 M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
+         path: 'M -2.7 0 A 2.7 2.7 0 1 0 2.7 0 A 2.7 2.7 0 1 0 -2.7 0'}
+      - {at: [209.0, 15.2], for: ground-screws-2, fill: '#c7ccd1', stroke-width: 0.32,
+         path: 'M 0 -1.7 L 0 -0.2 M -1.5 -0.2 L 1.5 -0.2 M -1 0.7 L 1 0.7 M -0.5 1.6 L 0.5 1.6'}
     components:
       placements:
         - {ref: common/ground-stud-pair-5-8-m4@1, id: ground-screws-1, at: [5.3625, 17.8], group: grounding, rel-pos: 2,

@@ -267,14 +267,18 @@ def test_s9501_18smt_prints_an_earth_symbol_above_each_of_its_four_holes():
     own art); the pair hosts draw none, so each hole has a silkscreen ring and
     bars (a part there would lie across the lug's seat)."""
     view = _device("ufispace/s9501-18smt")["views"]["right"]
-    marks = {(m["for"], m["at"][0]): m for m in view["silkscreen"] if m.get("path")}
+    paths = [m for m in view["silkscreen"] if m.get("path")]
     holes = [(9.4, "ground-screws-1"), (25.2, "ground-screws-1"),
              (193.3, "ground-screws-2"), (209.0, "ground-screws-2")]
-    assert set(marks) == {(host, x) for x, host in holes}
-    for m in marks.values():
+    assert {(m["for"], m["at"][0]) for m in paths} == {(host, x) for x, host in holes}
+    assert len(paths) == 2 * len(holes)
+    for m in paths:
         assert m["at"][1] == pytest.approx(15.2)
         assert m["fill"] == "#c7ccd1"
-        assert m["path"].count("M") == 5
+    # the ring at 0.3 and the four bars at 0.32, as main drew them
+    for x, host in holes:
+        ours = [m for m in paths if (m["for"], m["at"][0]) == (host, x)]
+        assert sorted((m["stroke-width"], m["path"].count("M")) for m in ours) == [(0.3, 1), (0.32, 4)]
     assert not [p for p in view["components"]["placements"] if p["ref"] == "common/ground-symbol@1"]
 
 
