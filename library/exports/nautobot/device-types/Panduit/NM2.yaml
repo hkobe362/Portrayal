@@ -28,6 +28,6 @@ comments: "2RU front-and-rear horizontal cable manager, Panduit NetManager High 
   \ area; 127 at the 50% maximum fill - the same bulletin, which notes the rear section may be partially\
   \ blocked by rack posts\n- physical.color: Black\n- physical.cover-material: PVC\n- physical.material:\
   \ ABS\n- physical.mounting-hardware: #12-24 mounting screws, as shipped with the covers\n- physical.weight-kg:\
-  \ 1.134\n\nDrawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything\
+  \ 1.134\n\nDrawing version 0.1.1. A major bump means a slot moved or an id was renamed, so anything\
   \ cached from an earlier export may no longer line up.\nModel maturity: modelled. Every dimension in\
   \ the source records where it came from."

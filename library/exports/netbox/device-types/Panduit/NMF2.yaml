@@ -24,6 +24,6 @@ comments: "2RU front-only horizontal cable manager, Panduit NetManager High Capa
   \ at the 50% maximum fill - Panduit Space-Saving Cable Management Rack Systems bulletin RKCB46, Cable\
   \ Capacity Charts\n- performance.cable-capacity-media: cat6\n- physical.color: Black\n- physical.cover-material:\
   \ PVC\n- physical.material: ABS\n- physical.mounting-hardware: #12-24 mounting screws, as shipped with\
-  \ the cover\n- physical.weight-kg: 0.73\n\nDrawing version 0.1.0. A major bump means a slot moved or\
+  \ the cover\n- physical.weight-kg: 0.73\n\nDrawing version 0.1.1. A major bump means a slot moved or\
   \ an id was renamed, so anything cached from an earlier export may no longer line up.\nModel maturity:\
   \ modelled. Every dimension in the source records where it came from."
