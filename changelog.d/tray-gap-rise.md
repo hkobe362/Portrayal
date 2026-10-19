@@ -9,4 +9,4 @@
   waypoints. It is used by the automatic route only: no saved key points at it.
   **Saved racks' routed lengths, stock sizes and everything read off them
   change for a cord that now rises through a gap** (on the FHD-CMP5DR
-  reference rack, five of the lower leaf's eight cords, 103 to 198 mm shorter).
+  reference rack, five of the lower leaf's eight cords, 122 to 198 mm shorter).
