@@ -258,9 +258,15 @@ def test_the_live_library_keeps_no_retired_major(tmp_path):
     # #887 re-majored the 4-port XFP MIC again for its pic/port ids; @3 stays
     # because juniper/mpc2e-3d@3 still accepts it beside @4.
     kept["juniper/mic-3d-4xge-xfp"] = [2, 3, 4]
+    # DEPRECATED, NOT DELETED (#374): the five ASR 9903 parts re-derived on the
+    # installation guide's 439.9 mm body. A saved rack or a contract may still
+    # name the @1, so it stays, carries `superseded-by` and nothing seats it.
+    for name in ("cisco/a9903-20hg-pec", "cisco/a9903-8hg-pec", "cisco/asr-9903-fan",
+                 "cisco/pwr-1p6kw-ac", "cisco/pwr-1p6kw-dc"):
+        kept[name] = [1, 2]
     assert multi == kept, multi
     for name, majors in kept.items():
-        if name.startswith("juniper/"):
+        if name.startswith(("juniper/", "cisco/")):
             old = LIB / "components" / name / f"v{majors[0]}" / "contract.yaml"
             assert (lint.load_yaml(old) or {}).get("superseded-by") == f"{name}@{majors[1]}", old
     # psu-550w USED TO BE HERE, the one retired major kept on purpose: the

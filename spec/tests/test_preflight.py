@@ -283,6 +283,25 @@ def test_exports_fail_on_a_stale_a_missing_and_an_extra_file(tmp_path):
     assert preflight.compare_exports(fresh, fresh) == ([], [], [])
 
 
+def test_exports_report_a_stale_module_type_file_as_no_longer_exported(tmp_path, monkeypatch):
+    """A component renamed to `part-numbers` leaves its old module-type file in
+    the tree; the exporter no longer writes it, so the check names it."""
+    old = "library/exports/netbox/module-types/Casa Systems/BDM2m.yaml"
+    new = "netbox/module-types/Casa Systems/BDM2M-W.yaml"
+    base = make_repo(tmp_path, {old: "old\n", "library/exports/" + new: "new\n"})
+
+    def regenerate(root, out):
+        (Path(out) / new).parent.mkdir(parents=True)
+        (Path(out) / new).write_text("new\n")
+        return []
+    monkeypatch.setattr(preflight, "regenerate_exports", regenerate)
+    (tmp_path / "library/x.yaml").write_text("changed\n")      # something that feeds the exports
+    res = preflight.check_exports(ctx_of(tmp_path, base))
+    assert not res.ok and any(
+        d == "no longer exported: netbox/module-types/Casa Systems/BDM2m.yaml"
+        for d in res.details), (res.summary, res.details)
+
+
 def test_exports_fail_when_current_but_not_committed(tmp_path, monkeypatch):
     base = make_repo(tmp_path, {"library/exports/netbox/a.yaml": "old\n"})
     (tmp_path / "library/exports/netbox/a.yaml").write_text("new\n")

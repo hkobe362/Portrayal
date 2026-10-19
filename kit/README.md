@@ -90,6 +90,30 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 
 Plain ES modules. No bundler, no build step.
 
+## A part pulled on one view
+
+Two views of a device can place the same id (a DIN rail panel's `left` and
+`right` both place `screw-upper`), so a part is a view and an id. The shell's
+`pulled` event is `{ paths }`, bare ids as ever. On a device with more than one
+view it also carries `views`, optional: `views[i]` is the view `paths[i]` is off
+on. A one-view device sends `{ paths }` and nothing more, and a host that
+ignores `views` hears what it heard before. The field is `view` rather than
+`scope` because `scope` already names a relief instance (`createReliefScope`).
+
+Every `view` below is optional, and a call without one means what it did:
+
+- `shell.select(path, fromTree, view)`, `shell.over(path, view)` and
+  `shell.pulledPaths(view)`; left off, a path is the first face that draws it.
+  The `select` event gains a fifth argument, the view (undefined on a one-view
+  device).
+- `shell.setPulled(paths, on, views)`: `views` is one view for every path, or a
+  list beside `paths`. `shell.pulledViews()` is the view of each of
+  `pulledPaths()`, `null` on a one-view device.
+- `viewer.setPulled(paths, views)` and `setPulled(paths, scope, views)` in
+  `relief.js`: a part given a view is hidden on that view's face only; one given
+  none is hidden on every face, as before.
+- Tree rows carry `data-view` on a device with more than one view.
+
 ## A part that slides
 
 New in 0.19.0. A device may declare a part that slides (a rail panel on
@@ -575,6 +599,17 @@ into a dog-leg rather than adding the plug again. **Routed lengths change in
 0.13.0** on every routed cable, almost all longer: by what the dog-leg out of each plug adds,
 and by far more where the reach puts a leg over a tray floor.
 
+**A DAC's or an AOC's plug is rigid (#985).** `PLUG_SPLIT`, beside
+`PLUG_REACH`, gives a media's reach as a rigid length and a boot length;
+only a DAC and an AOC are split (all 64.8 rigid, Amphenol C-NDAAFR-0099: 45
+MIN required to bend, boot included), and LC, copper and power are `null`,
+"not split yet", and measured whole as before. The reach point of a rigid
+plug has `rigid_mm`, and `cornersOf` takes the leg into the first corner
+from where the rigid part ends, so a turn at the reach point has no room and
+the cable runs on to a lead point before it turns. A reach the page gives as
+a number is measured whole as before. **Routed lengths, stock sizes and bend
+findings change for DAC and AOC cords** at the next measure.
+
 A routed length is the path plus an **end allowance** at each end, by the
 cable's media (#962, docs/cable-lay-design.md section 1.6).
 `END_ALLOWANCE_BY_MEDIA` is the sourced table, in metres an end (its name
@@ -691,6 +726,16 @@ a millimetre, are one finding.
 shared `<style>` and `<defs>` once and keys a node by that and its own art (`rasterKeyText` is the
 whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on
 a copy (`rasterize`), never on it.
+
+**Also in 0.50.0: a body piece carries a side drawing, and a fitted piece follows its field.**
+A piece in `body.boxes` that `shows: [left|right|top|bottom]` is painted on that side with the patch
+of the part's own `body-<side>.svg` it lies under (`pieceArtCrop` in `relief.js` gives the frames;
+`components.json` publishes each drawing under `body.drawings` with its viewBox origin as `at`).
+A piece with `when: {field: [options]}` is built only while the part's drawing shows a node for one
+of those options (`pieceFitted`, `shownOptions`), so `setFields` on the part's path fits or removes
+it, and the scene is rebuilt as for any field that shows a node. `svgCanvas` takes an optional
+density, `pxmm`. A page that does neither changes nothing. `kit/component.html` opens one component
+in the 3D viewer with camera presets and its choice fields.
 
 **New in 0.50.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
 part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card
@@ -895,10 +940,12 @@ media and nothing could change it. It is now drawn, in this order, in:
    `jacket`;
 4. else its media's, from `COLORS` in `rack/cable-geometry.js`, as before.
 
-**No default changed.** Every media is the colour it was (an AOC is still
-`#3a3f45`), so a rack that states nothing is drawn as it was. `COLORS` is
-the one table that holds those colours; `JACKETS`, the hero's table, now
-names entries of it and holds no colour of its own.
+**One default changed.** An AOC with no colour stated is a teal of the
+multimode aqua family, `#08788a`, so that it is told from OM3 and OM4's
+`#2bb3c8` (it was dark grey, `#3a3f45`; decided on #1028), and
+every other media is the colour it was. `COLORS` is the one table that holds
+those colours; `JACKETS`, the hero's table, names entries of it and holds no
+colour of its own.
 
 - **A colour is hex**: `#` and three or six hex digits, in either case, as
   `jacket-color` is written on the cable ends of the library. `hexColor(v)`
@@ -1652,6 +1699,30 @@ cables file names a member's bundle first in its description; Nautobot's
 cable has no description, so its notes list each bundle's cables. draw.io
 draws members one by one and says so.
 
+**NetBox's own cable bundles: the option "NetBox 4.6 or later".** NetBox 4.6
+added `dcim.CableBundle`, a `name` unique across the whole instance, and a
+`bundle` column on the cable import, by name. A rack's `dcim.netbox` holds the
+NetBox version the files are for (`dcimOf`, `withDcim` and the `dcim` command
+take it; blank, or older than 4.6, is off, and it is off by default). **Off**,
+every file the kit writes is what it was, and the NetBox notes say the file does
+not fill a cable's bundle field. **On**, and with a site set
+(`dcim.site`), `cableImportRows({ ..., dcim })` also returns `bundleFile`
+(`{ columns: ['name'], rows }`, one row for each bundle that holds a cable the
+cables file writes), and each cable row has a `bundle` column, filled with the
+same name; the description still names the bundle first. Pass the same `dcim` to
+`kitReadme`. Take the file names from `netboxFiles(dcim)`: with the option on
+they are `1-rack.csv`, `2-devices.csv`, `3-modules.csv`, `4-bundles.csv` and
+`5-cables.csv`, and the README's steps follow (the bundles are step 5, the
+cables step 6); otherwise they are `KIT_FILES.netbox`. A bundle is named
+`<site> <rack> <bundle name>`, since "Bundle 1" repeats from rack to rack. With
+no site there is nothing to make a name unique, so the files are as with the
+option off and a note says so. A name over 100 characters
+(`DCIM_LIMITS.cableBundleName`, NetBox's `max_length`), or one that two bundles
+of the rack share, is left out of both files and said in the README's "Not in
+this kit"; a name is never cut. The kit cannot see the bundles an instance
+already has, and the README says it is unchecked. Nautobot has no bundle object
+and is unchanged.
+
 **The rack file is version 3 from 0.7.0.** `parseDoc` reads version 1 and 2
 files as they were, and every save writes version 3, which a page or kit
 older than 0.7.0 refuses rather than opening and losing its bundles. The
@@ -1726,13 +1797,16 @@ const { text, notes: n } = toDrawio(shell.state.svg, doc, { cables });
   for that cable: it is listed in the file's notes, an XML comment inside
   `<mxfile>`, with the reason. `notes` adds the caller's own lines to the same
   comment. `toDrawio` also returns them as `notes`.
-- **Style.** `cableStyle` is a map from `media` to a stroke colour, merged over
-  `CABLE_COLOURS` (dac, aoc, cu, mm, sm, the OM and OS grades, and a grey
-  `default`), or a function from a cable to a whole draw.io edge style. A
-  cable that carries its own `color` (`#rgb` or `#rrggbb`) is drawn in it,
-  ahead of the map; a function is handed the cable and reads `color` itself.
-  `CABLE_COLOURS` is this writer's own palette, chosen to read on draw.io's
-  white page, and is not the Rack Builder's `COLORS`.
+- **Style.** A cable is stroked in the colour the Rack Builder draws it in
+  (`COLORS`, by `mediaColor`; copper by its purpose), so a drawing exported
+  here shows each cable as the explorer does. `cableStyle` is a map from
+  `media` to a stroke colour, read ahead of that (its `default` is what a
+  media the kit has no colour for takes), or a function from a cable to a
+  whole draw.io edge style. A cable that carries its own `color` (`#rgb` or
+  `#rrggbb`) is drawn in it, ahead of the map; a function is handed the cable
+  and reads `color` itself. `CABLE_COLOURS` (dac, aoc, cu, mm, sm, the OM and
+  OS grades, the Cat grades and `default`) is exported, and derived from
+  `COLORS`: it holds no colour of its own.
 - **Identity.** Edge ids are `cable-<id>`, slugged like the other cell ids (a
   stub is `cable-<id>-a` or `-b`, and its label `cable-<id>-a-far`). The edge's
   label is `label` and `length`. `id`, `media`, `purpose` and `length` are kept

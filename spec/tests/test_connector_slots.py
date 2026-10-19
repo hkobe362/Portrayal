@@ -90,7 +90,11 @@ def test_the_connector_registry_is_not_vacuous():
                          # GPU power and NVLink (P-0028): presented by parts no
                          # device places yet, so none is a slot below
                          "eps12v-8pin", "pcie-8pin", "pcie-12vhpwr", "pcie-12v-2x6",
-                         "nvlink-a100-pcie"}
+                         "nvlink-a100-pcie",
+                         # the two PCIe slot forms (docs/cards-by-interface-design.md):
+                         # a riser bay states one as its `interface`, so no part
+                         # presents either and neither is a slot below
+                         "pcie-fh", "pcie-lp"}
     # No connector interface is also a cage family's: one core, two registries,
     # and an interface must not be answered by both.
     fam_ifaces = {f.get("interface") for f in render_mod._pluggable_families().values()}
@@ -110,7 +114,9 @@ def test_every_connector_presenting_part_is_a_connector_slot(comps):
                                    "stud-pair-5-8", "stud-pair-3-4", "stud-pair-1",
                                    "mrj21", "vhdci", "rj11",
                                    # a cover mount, not a connector - see the registry test above
-                                   "breaker-1ru-guard"}
+                                   "breaker-1ru-guard",
+                                   # the A100's faces compose these (P-0072)
+                                   "eps12v-8pin", "nvlink-a100-pcie"}
                for c in entries)
     # a slot has no rate ladder, so no media ceiling
     assert all(c["media"] is None for c in entries)
