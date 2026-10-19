@@ -873,6 +873,10 @@ export const DCIM_LIMITS = {
   deviceName: 64,
   // NetBox Rack.name is a 100-character field (seen on NetBox 4.7.2).
   rackName: 100,
+  // NetBox CableBundle.name is a 100-character field, unique across the
+  // instance (facts: v4.7.2, 251458b8, dcim/models/cables.py, CableBundle:
+  // CharField(max_length=100, unique=True)). Nautobot has no bundle.
+  cableBundleName: 100,
   // Cable.label (100) and Cable.description (200, PrimaryModel), NetBox v4.7.2
   // (facts: 251458b8, dcim/models/cables.py and netbox/models/__init__.py).
   // Nautobot's label is held to the same 100 here; its cable has no
