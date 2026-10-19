@@ -1177,6 +1177,9 @@
   "L123": 1,
   "L97": 1
  },
+ "components/juniper/jnp10k-pwr-blnk/v1/contract.yaml": {
+  "L123": 1
+ },
  "components/juniper/jnp304-blnk/v1/contract.yaml": {
   "L97": 1
  },
@@ -2064,13 +2067,13 @@
  },
  "devices/juniper/mx10008/device.yaml": {
   "L119": 1,
-  "L33": 6,
+  "L33": 12,
   "L69": 1,
   "L93": 1
  },
  "devices/juniper/mx10016/device.yaml": {
   "L119": 1,
-  "L33": 10,
+  "L33": 20,
   "L69": 1,
   "L93": 1
  },
