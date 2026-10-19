@@ -162,7 +162,6 @@
   "L97": 1
  },
  "components/cisco/a99-rp-f/v1/contract.yaml": {
-  "L123": 1,
   "L97": 1
  },
  "components/cisco/a99-rp3-se/v2/contract.yaml": {
@@ -447,6 +446,9 @@
   "L27": 1
  },
  "components/cisco/asr-9903-fan/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/cisco/asr-9903-fan/v2/contract.yaml": {
   "L27": 1
  },
  "components/cisco/asr-9910-fan/v1/contract.yaml": {
