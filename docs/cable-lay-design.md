@@ -300,7 +300,7 @@ the lower leaf's eight cords rise through the gap at 42.3 mm from the rail,
 c12 and c15, 125.7, 122.4, 129.3, 125.7 and 198.0 mm shorter than round the
 edge (611.2, 613.2, 616.1, 623.4 and 648.0 mm before); the other three keep
 the front edge. A full gap raises no finding or warning, and a bundle is held to the gap by
-its diameter alone; both are open for the owner.
+its diameter alone; both are still open.
 
 **The gap is not a pathway a user can pin.** It is used by the automatic route
 only, and the file has no key for it (decided 2026-10-18). A hand route keeps
