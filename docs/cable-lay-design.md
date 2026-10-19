@@ -271,6 +271,44 @@ still gone round by the same preferred way, and the short leg is a finding
 detour round a plate that is not pulled taut, and the way up behind a tray
 for a plug that ends behind its back edge.
 
+**The gap behind a tray is a way up or down as well (#966, kit 0.52.0).** A
+tray whose floor stops short of the rail it stands on leaves an open gap
+between the floor's back edge and the rail. The FHD-CMP5DR's strip ends 48.8
+mm in front of the rail, and a real cord rises through it, where rule 1 sent
+the same cord round the front edge, 116.5 mm out (the detour's plane 123.7
+out, two bend radii in front of the ring's line). The router finds the gap
+from the floor boxes the tray publishes (`gapsOf` in `kit/rack/solids.js`: the
+largest floor box is the strip; the gap is the band behind it up to the body's
+rear plane, less any other floor box that reaches into the band) and from
+nothing typed into it; a tray that publishes no floor, or whose floor reaches
+the rail, has none. It is a named thing of its own, `{item, via, away, x0,
+x1, z0, z1, width, edge}`: which tray it belongs to and how wide it is.
+A leg that crosses the floor top to bottom is offered the gap beside the front
+edge, and the shorter wins **by length after the installed bend radius**: the
+rise turns in the gap's depth (the plane stands the cable's radius from the
+rail and its radius and `CLEAR` from the strip's edge, and where the cable is
+slanted it turns less than a right angle at each end), and a way whose turns,
+pulled taut, have less than the radius is not taken. A cable (or, for one in a
+bundle, the bundle, by the diameter `bundleDiameter` gives) wider than the
+gap, or both of whose ends stand off the gap's width, keeps the front edge.
+The lay with the gap is kept only if it passed through one and is the better
+of the two by the measure that chooses between a cable's two ends: fewer
+crossings, then less bend short of its room, then shorter; so a cable that does
+not rise through a gap is laid as it was before. On the reference rack five of
+the lower leaf's eight cords rise through the gap at 42.3 mm from the rail,
+6.5 mm behind the strip's edge, clear of the strip and the rail: c9, c10, c11,
+c12 and c15, 125.7, 122.4, 129.3, 125.7 and 198.0 mm shorter than round the
+edge (611.2, 613.2, 616.1, 623.4 and 648.0 mm before); the other three keep
+the front edge. A full gap raises no finding or warning, and a bundle is held to the gap by
+its diameter alone; both are open for the owner.
+
+**The gap is not a pathway a user can pin.** It is used by the automatic route
+only, and the file has no key for it (decided 2026-10-18). A hand route keeps
+its waypoints as before and is not led through it. To make it pinnable, one
+more value in a `lay` entry would point at the gap by `item` and `via`
+(`docs/rack-file-v4-design.md` section 3.9), an additive schema change; the
+router's gap already carries both.
+
 A hand route keeps its waypoints; the detours are added between them in the
 same way, and a leg the three rules cannot clear is left as drawn and reported.
 

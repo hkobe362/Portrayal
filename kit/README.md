@@ -698,6 +698,15 @@ cable's notes; `layNotes(rack, { bends, covers })` gives the same as one line
 a cable, for a file with no row for one. Corners at one point, to a tenth of
 a millimetre, are one finding.
 
+**New in 0.52.0: a tray's gap is a way up or down in the automatic route** (#966,
+docs/cable-lay-design.md 1.3). `gapsOf(rack, ctx)` (solids.js) finds each open gap between a tray's
+floor and its rail, `{item, via, away, x0, x1, z0, z1, width, edge}`, from the floor boxes the tray
+publishes alone; `detour` takes a `gaps` option, and `routePath` lays a cable with and without them and
+keeps the one through a gap only if it is the better lay (fewer crossings, less bend short, shorter),
+the cable or its bundle (`bundleDiameter`, now in bundle-route.js, still exported by bundles.js) held to
+the gap's width and the turns to the bend radius. **Routed lengths, stock sizes and the answers read off
+them change** for a cord that rises behind a tray. No `lay` value points at a gap yet.
+
 **New in 0.51.0: the relief detail pass asks for each raster once.** `rasterKey` rewrites a face's
 shared `<style>` and `<defs>` once and keys a node by that and its own art (`rasterKeyText` is the
 whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on

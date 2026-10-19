@@ -43,6 +43,12 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // bend, PLUG_SPLIT): the generated racks of bend-room-sample (`sample-N`), and
 // only they, since every other rack here is LC, or gives the reach as a number
 // as speed-fixture does. 1,259 of the 3,094 answers moved.
+// RECORDED AGAIN FOR KIT 0.52.0 (#966), which moves the answers of a cable that
+// rises through the open gap behind a tray instead of going round its front
+// edge: 1,045 answers in 67 racks, all from 541 cables, each 6.4 to 282.2 mm
+// shorter (105 of them a smaller stock size). Listed before they were
+// recorded, by running this file's digests with --exact on the kit before and
+// after over the same racks: no answer moved for any other reason.
 test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);
