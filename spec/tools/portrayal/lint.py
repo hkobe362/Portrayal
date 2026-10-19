@@ -133,7 +133,7 @@ RULES = {
     "L10": ("component",  "composed parts resolve, ids are unique, composition does not cycle (depth <= 4), and neither a part nor a bay's `default` or `accepts` is a `kind: kit`", "fix the `parts:` refs; a part must not compose itself; a kit is named from a device's `chassis.kits`, never composed or seated",
             "A composition that names a missing part, repeats an id or loops back on itself cannot be drawn, and a kit composed as a part offers something no configuration can hold.",
             ERROR),
-    "L11": ("component",  "interface/mates declarations carry a `mate` connection point, and a wrapper keeps the interface of what it composes", "add `connection-points.mate`; do not change the interface in a wrapper",
+    "L11": ("component",  "interface/mates declarations carry a `mate` connection point (a `mates` on a part with `behaviour: fills` is exempt: its bay places it), and a wrapper keeps the interface of what it composes", "add `connection-points.mate`; do not change the interface in a wrapper",
             "A receptacle or plug with no mate point has nothing to align to, so it cannot be seated, and a wrapper that changes its interface lets parts pass the fit check against something they do not really mate.",
             ERROR),
     "L12": ("device",     "mate-to resolves to a receptacle whose interface the occupant mates; a seated part's `rate` is at or below its cage's media", "point `mate-to` at the receptacle id; check `interface` and `mates` agree; seat a part the cage offers",
@@ -655,7 +655,7 @@ RULES = {
     "L184": ("component",  "a `supersedes` lists removed component majors: each entry names an `ns/name@major` that is not the part itself and is not in the library any more, carries a `sha256:` signature and the commit it was taken from, and no ref is listed twice", "fix the ref or the signature; remove the entry when the old major is still in the library (it says `superseded-by` instead)",
              "A redirect is read by a saved rack, so a ref that is still published, a self-pointer or a signature that is not one would send a swap to a part that is not what the rack named, or never fire.",
              ERROR),
-    "L185": ("component",  "a bay's `span` names other bays of the same component, each the same size, `rotate` and `mirror`, following one another along the card's component side (the bay's own +y, turned by its `rotate`, which is 0 or 180) with no gap wider than a bay and no step sideways; a bay that accepts a part `n` slots wide names at least `n - 1` of them; and a part that composes a part wider than one slot is at least that wide itself", "fix the ids or the bays' geometry; add the covered bay to `span`, or take the wide part out of `accepts`; give the composing part the `slot-width` of what it composes",
+    "L185": ("component",  "a bay's `span` names other bays of the same component, each the same size, `rotate` and `mirror`, following one another along the card's component side (the bay's own +y, turned by its `rotate`, which is 0 or 180) with no gap wider than a bay and no step sideways; a bay whose `accepts` list names a part `n` slots wide names at least `n - 1` of them (a bay that states an `interface` takes a wide part only where its `span` is long enough, and is not an error where it is not); and a part that composes a part wider than one slot is at least that wide itself", "fix the ids or the bays' geometry; add the covered bay to `span`, or take the wide part out of `accepts`; give the composing part the `slot-width` of what it composes",
              "A card two slots wide is drawn across its bay and the next one and covers that one, so a span that names the wrong bay, a bay in the wrong place or none at all puts the card over the wrong opening or offers it where it cannot go.",
              ERROR),
     "L186": ("component, device", "a card wider than one slot and a bay it covers are never both filled - by a configuration, or by what the bays ship", "empty the covered bay (`<carrier>/<bay>: \"\"` in the configuration), or seat a one-slot part; a component does not ship a two-slot default over a bay that ships one too",
@@ -682,6 +682,9 @@ RULES = {
     "L193": ("rack", "a rack product is what its place says it is: its directory is its `name`, no device or listing of its vendor has that name, a four-post form lists a `front` and a `rear` rail and every other form the `front` alone, only the `rear` rail has a `depth`, a depth range runs from less to more with its `factory` inside it, every `provenance` key is a key the rack states, and a figure whose confidence is `estimated` has a `gaps` entry of its own name (error)", "rename the directory or the `name`; list the rails the form has; write the range as `min` below `max`; give each provenance entry the key of the figure it covers; declare every stand-in in `gaps` with what would close it",
              "A rack is referenced as `<vendor>/<name>@<major>` without its kind, so the name has to be free among the vendor's devices, and a saved rack file copies a product's rails and depth; a stand-in that is not declared reads as a printed figure.",
              ERROR),
+    "L194": ("component", "a bay that states an `interface` does not also list, in `accepts`, a part that mates it and is wide enough for the bay", "delete the entry from `accepts`: the bay takes it through its `interface` already; keep in `accepts` only the parts that do not mate it, such as a vendor blank",
+             "A list kept beside the interface it was written for goes on asserting what the interface already says, and the next card added to the library is then named by hand in one riser and by its interface in the others.",
+             WARNING),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -1564,7 +1567,12 @@ def resolve_component(ref, lib_roots):
 def lint_component_mating(path, data, lib_roots):
     """L11: mating declarations must be usable and must survive composition."""
     cps = data.get("connection-points") or {}
+    # A PART THAT FILLS A BAY IS NOT ASKED FOR A `mate` POINT FOR ITS `mates`:
+    # the bay places it by `at`, so there is nothing to align (cards by
+    # interface: a card says which slot form it fits, a riser bay says the same).
     for key in ("interface", "mates"):
+        if key == "mates" and data.get("behaviour") == "fills":
+            continue
         if data.get(key) and "mate" not in cps:
             err(path, "L11", f"{key}: {data[key]!r} declared but no 'mate' "
                              "connection-point - nothing to align to")
@@ -4851,6 +4859,26 @@ def lint_component_span(path, data, lib_roots):
         if width > own:
             err(path, "L185", f"parts/{q.get('id')}: composes {q['ref']}, which is {width} "
                 f"slots wide, and this part says it is {own} - give it `slot-width: {width}`")
+
+
+def lint_component_bay_interface(path, data, lib_roots):
+    """L194: an `accepts` entry that the bay's `interface` already takes.
+
+    The union (manifest.takes) keeps a vendor blank in `accepts`, where it is a
+    positive claim no `mates` makes. A card that mates the interface and is wide
+    enough is taken without the list, so naming it there is the list the
+    interface came to replace."""
+    for bid, b in sorted((data.get("bays") or {}).items()):
+        if not isinstance(b, dict) or not b.get("interface"):
+            continue
+        for ref in b.get("accepts") or []:
+            q = resolve_component(ref, lib_roots)
+            c = (load_yaml(q) or {}) if q else None
+            # takes() is True for a listed ref, so ask the interface half alone
+            if c and _manifest.takes({**b, "accepts": []}, ref, c):
+                warn(path, "L194", f"bays/{bid}: accepts {ref}, which mates "
+                     f"{b['interface']!r} and fits, so the interface takes it - drop it "
+                     "from the list")
 
 
 def lint_component_span_exclusion(path, data, lib_roots):
@@ -13166,8 +13194,10 @@ def lint_device(path, validator, lib_roots):
                 err(path, "L5", f"{vname}/{b['id']}: default {b['default']} is a "
                     "`kind: kit` - a bay seats modules; a device names a kit under "
                     "`chassis.kits`")
-            if b.get("default") and b["default"] not in (b.get("accepts") or []):
-                err(path, "L6", f"bay {b['id']} default {b['default']} not in accepts")
+            if b.get("default") and not _bay_takes(b, b["default"], lib_roots):
+                err(path, "L6", f"bay {b['id']} default {b['default']} not in accepts"
+                    + (f" and does not fit interface {b['interface']}"
+                       if b.get("interface") else ""))
             # A BAY NOTHING EVER FILLS RENDERS AS A HOLE, and the modelling skill
             # has
             # said so for a while - "no module means no lamp, so nothing in it is
@@ -13530,6 +13560,15 @@ def lint_device(path, validator, lib_roots):
     return data
 
 
+def _bay_takes(bay, ref, lib_roots):
+    """manifest.takes for `ref`, resolving its contract only when the bay states
+    an `interface` and the list does not already name it."""
+    if ref in (bay.get("accepts") or []) or not bay.get("interface"):
+        return ref in (bay.get("accepts") or [])
+    cp = resolve_component(ref, lib_roots)
+    return _manifest.takes(bay, ref, (load_yaml(cp) or {}) if cp else None)
+
+
 def lint_device_configuration_bays(path, data, lib_roots):
     """L8: a configuration seats what its bays accept.
 
@@ -13549,12 +13588,23 @@ def lint_device_configuration_bays(path, data, lib_roots):
     is enough. A nested key is scoped by its head: a component's bays carry no
     `only-in`, because a configuration varies a chassis and not a card.
     """
+    # THE BAYS, NOT THEIR LISTS: a bay that states an `interface` takes what
+    # mates it as well (manifest.takes), so L8 asks each bay, not a list.
     bay_accepts = {}
     bay_scopes = {}
     for view in (data.get("views") or {}).values():
         for b in view_parts(view)["bays"]:
-            bay_accepts[b["id"]] = b.get("accepts") or []
+            bay_accepts[b["id"]] = [b]
             bay_scopes.setdefault(b["id"], []).append(b.get("only-in"))
+
+    def modules_of(bays):
+        """The module refs a head bay names, plus the library parts that mate its
+        `interface` (render's candidates), for the nested walk."""
+        refs = []
+        for bay in bays:
+            refs += _manifest.offers(
+                bay, _slot_core(lib_roots)[4] if bay.get("interface") else None)
+        return refs
 
     def scoped_out(bid, cname):
         scopes = bay_scopes.get(bid.split("/")[0])
@@ -13563,22 +13613,24 @@ def lint_device_configuration_bays(path, data, lib_roots):
         return sorted({c for s in scopes for c in s})
 
     def nested_accepts(key):
+        """The bays a nested key can name: every module the head bay seats, each
+        one's bay called by the next segment. None when there is none."""
         head, *rest = key.split("/")
-        accepts = bay_accepts.get(head)
-        if accepts is None:
+        bays = bay_accepts.get(head)
+        if bays is None:
             return None
         for seg in rest:
             found = None
-            for mref in accepts:
+            for mref in modules_of(bays):
                 cp = resolve_component(mref, lib_roots)
                 c = (load_yaml(cp) or {}) if cp else {}
                 b = (c.get("bays") or {}).get(seg)
                 if isinstance(b, dict):
-                    found = (found or []) + list(b.get("accepts") or [])
+                    found = (found or []) + [b]
             if found is None:
                 return None
-            accepts = found
-        return accepts
+            bays = found
+        return bays
     for cname, cfg in (data.get("configurations") or {}).items():
         for bid, ref in (cfg.get("bays") or {}).items():
             # an empty string seats nothing, so scoping the bay out of the
@@ -13594,7 +13646,7 @@ def lint_device_configuration_bays(path, data, lib_roots):
                 acc = nested_accepts(bid)
                 if acc is None:
                     err(path, "L8", f"config {cname}: unknown nested bay {bid}")
-                elif ref and ref not in acc:
+                elif ref and not any(_bay_takes(b, ref, lib_roots) for b in acc):
                     err(path, "L8", f"config {cname}: {bid} does not accept {ref}")
                 continue
             if bid not in bay_accepts:
@@ -13609,7 +13661,7 @@ def lint_device_configuration_bays(path, data, lib_roots):
                 # had never met the case and rejected the emptiest possible ref
                 # for not being a module the bay accepts.
                 continue
-            elif ref not in bay_accepts[bid]:
+            elif not any(_bay_takes(b, ref, lib_roots) for b in bay_accepts[bid]):
                 err(path, "L8", f"config {cname}: bay {bid} ref {ref!r} not in accepts")
 
 
@@ -14391,6 +14443,7 @@ def main():
                 lint_component_slots(f, d)
                 lint_component_span(f, d, args.library)
                 lint_component_span_exclusion(f, d, args.library)
+                lint_component_bay_interface(f, d, args.library)
                 lint_component_rj45_lamps(f, d, args.library)
                 lint_component_groups(f, d, args.library)
                 lint_component_part_interfaces(f, d, args.library)

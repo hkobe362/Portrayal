@@ -159,6 +159,18 @@ class Library:
     def __init__(self, roots):
         self.roots = [Path(r) for r in roots]
         self.cache = {}
+        self._candidates = None
+
+    def offers(self, bay):
+        """Every ref `bay` takes (manifest.offers): its `accepts` as authored,
+        and for a bay that states an `interface` every library part that mates
+        it and fits. The library is walked only for a bay with an `interface`."""
+        if not bay.get("interface"):
+            return list(bay.get("accepts") or [])
+        if self._candidates is None:
+            self._candidates = _pluggable_candidates(self.roots)
+        from portrayal.manifest import offers
+        return offers(bay, self._candidates)
 
     def resolve(self, ref):
         """ref = namespace/name@major -> (contract dict, skin dir Path)."""
@@ -3942,7 +3954,7 @@ def render_view(device, view_name, view, lib, include=(), config_name="default",
     # bay's own data-depth is taken.
     def occupant_depth(b):
         ds = []
-        for ref in (b.get("accepts") or []):
+        for ref in lib.offers(b):
             try:
                 c, _ = lib.resolve(ref)
             except Exception:
@@ -4356,7 +4368,7 @@ def render_view(device, view_name, view, lib, include=(), config_name="default",
             # chassis, it is the occupant's own published depth read through the
             # bay that holds it.
             depths = []
-            for _ref in (b.get("accepts") or []):
+            for _ref in lib.offers(b):
                 try:
                     _c, _ = lib.resolve(_ref)
                 except Exception:
@@ -6162,7 +6174,8 @@ def main():
                              for n, c in sorted(configs.items())],
                  # what each bay will take, so a viewer can offer the swap rather
                  # than guessing from component class
-                 "bays": {v: [{"id": b["id"], "accepts": b.get("accepts") or [],
+                 "bays": {v: [{"id": b["id"], "accepts": lib.offers(b),
+                               **({"interface": b["interface"]} if b.get("interface") else {}),
                                "default": b.get("default"), "group": b.get("group"),
                                "rel-pos": b.get("rel-pos"),
                                # a viewer swapping an occupant has to place it the

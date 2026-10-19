@@ -2224,8 +2224,13 @@ def contract_view(entry):
             "optical": entry.get("optical") or {}}
 
 
-def bay_row(bay_id, accepts=None, span=None):
+def bay_row(bay_id, accepts=None, span=None, interface=None):
     """One `module-bays` row, for a bay on a device or a bay on a module.
+
+    `interface` is the form a bay takes by its `mates` (spec/schemas/
+    connectors.yaml): its `note` is said instead of a list, and an `accepts`
+    list beside it follows as "Also accepts". A bay with no `interface` reads
+    exactly as it always did.
 
     `span` is the bays a card wider than one slot covers from here
     (docs/pcie-two-slot-bays-design.md, R5). Neither DCIM can reserve a second
@@ -2243,7 +2248,14 @@ def bay_row(bay_id, accepts=None, span=None):
     # NetBox schema allows on a bay description.
     spans = (f"Spans {', '.join(span)} for a card {len(span) + 1} slots wide. "
              if span else "")
-    if accepts:
+    if interface:
+        from portrayal.render import _connector_registry
+        note = (_connector_registry().get(interface) or {}).get("note")
+        lead = spans + (f"Takes {note}. " if note else f"Takes {interface}. ")
+        names = list(dict.fromkeys(a.split("/")[-1].split("@")[0] for a in accepts or []))
+        bay["description"] = (fit_items(lead + "Also accepts: ", names) if names
+                              else fit(lead.strip()))
+    elif accepts:
         # The name loses its major, so two majors of one part would repeat.
         names = list(dict.fromkeys(
             a.split("/")[-1].split("@")[0] for a in accepts))
@@ -2535,7 +2547,8 @@ def build_module(contract, manufacturer, load_ref=None, dropped=None,
     nested = contract.get("bays") or {}
     if isinstance(nested, dict) and nested:
         out["module-bays"] = sorted(
-            (bay_row(bid, (b or {}).get("accepts"), (b or {}).get("span"))
+            (bay_row(bid, (b or {}).get("accepts"), (b or {}).get("span"),
+                     (b or {}).get("interface"))
              for bid, b in nested.items()),
             key=bay_order)
 

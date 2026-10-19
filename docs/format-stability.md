@@ -923,6 +923,20 @@ rewrites a file on load, and writes the new ref only when the rack is saved
 after an edit. A removed ref with no redirect is reported as no longer in the
 library and kept as written.
 
+**A card seats by its interface** ([`cards-by-interface-design.md`](cards-by-interface-design.md)).
+A component bay may state `interface`, beside `accepts` or instead of it, and a
+card states `mates`; the two interface keys `pcie-fh` and `pcie-lp` are in
+`spec/schemas/connectors.yaml`. These are held as format, because a contract
+outside the library writes them and a rename breaks it: the two spellings; the
+union (a bay that states both takes the list and every part that mates the
+interface); the width rule (a part `slot-width: n` is taken through an
+interface only by a bay whose `span` names at least `n - 1` bays); and that a
+part that fills a bay is not asked for a `mate` point for its `mates` (L11).
+The published `accepts` of a bay in `components.json` and `<device>.configs.json`
+is every ref the bay takes, and an `interface` is published beside it; for a bay
+that states none it is the list the contract states, as it was. `contract` does
+not rise, since both are additive. No library part states either key yet.
+
 **A lint code.** A device manifest waives a rule by its code (`lint.waive`),
 so lint codes are never renumbered or reused. A rule that is deleted keeps its
 code, listed as retired, and a new rule always takes a new code. A test pins
