@@ -1,9 +1,10 @@
 # Infrahub export: which schema to target
 
-Status: proposed 2026-10-18. Issue #1115, part of #1111 (decided 2026-10-18:
-Infrahub is the next DCIM export target). This note is the issue's first step,
-the choice of schema. No exporter is built, and the recommendation in section 4
-is a proposal: the owner picks the schema when this note is merged.
+Status: schema decided 2026-10-18. Issue #1115, part of #1111 (decided
+2026-10-18: Infrahub is the next DCIM export target). This note is the issue's
+first step, the choice of schema. The choice, C plus the two-attribute overlay
+(section 4), was decided on 2026-10-18; section 6 records it. The exporter is
+not built yet, and questions 3 to 9 in section 6 remain open.
 
 Builds on `spec/tools/portrayal/dcim_export.py` (`build`, `build_module`,
 `iface_type`), the NetBox trees under `library/exports/netbox/`, and the rack
