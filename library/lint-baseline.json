@@ -162,7 +162,6 @@
   "L97": 1
  },
  "components/cisco/a99-rp-f/v1/contract.yaml": {
-  "L123": 1,
   "L97": 1
  },
  "components/cisco/a99-rp3-se/v2/contract.yaml": {
@@ -447,6 +446,9 @@
   "L27": 1
  },
  "components/cisco/asr-9903-fan/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/cisco/asr-9903-fan/v2/contract.yaml": {
   "L27": 1
  },
  "components/cisco/asr-9910-fan/v1/contract.yaml": {
@@ -1176,6 +1178,9 @@
  "components/juniper/jnp10k-pwr-ac2/v1/contract.yaml": {
   "L123": 1,
   "L97": 1
+ },
+ "components/juniper/jnp10k-pwr-blnk/v1/contract.yaml": {
+  "L123": 1
  },
  "components/juniper/jnp304-blnk/v1/contract.yaml": {
   "L97": 1
@@ -2064,13 +2069,13 @@
  },
  "devices/juniper/mx10008/device.yaml": {
   "L119": 1,
-  "L33": 6,
+  "L33": 12,
   "L69": 1,
   "L93": 1
  },
  "devices/juniper/mx10016/device.yaml": {
   "L119": 1,
-  "L33": 10,
+  "L33": 20,
   "L69": 1,
   "L93": 1
  },
@@ -2207,6 +2212,34 @@
   "L29": 5
  },
  "devices/readylinks/gl-12xb-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-12xb-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-12xc-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-12xc-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xb-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xb-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xc-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xc-p600d/device.yaml": {
   "L29": 1,
   "L61": 6
  },
