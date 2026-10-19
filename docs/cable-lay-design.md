@@ -271,7 +271,7 @@ still gone round by the same preferred way, and the short leg is a finding
 detour round a plate that is not pulled taut, and the way up behind a tray
 for a plug that ends behind its back edge.
 
-**The gap behind a tray is a way up or down as well (#966, kit 0.52.0).** A
+**The gap behind a tray is a way up or down as well (#966).** A
 tray whose floor stops short of the rail it stands on leaves an open gap
 between the floor's back edge and the rail. The FHD-CMP5DR's strip ends 48.8
 mm in front of the rail, and a real cord rises through it, where rule 1 sent

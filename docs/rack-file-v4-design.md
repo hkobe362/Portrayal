@@ -794,7 +794,7 @@ acted on until lay order is built; ignoring it moves a cable across its
 pathway by millimetres and is harmless, as that note argues.
 
 The gap behind a tray (#966) needs no key in version 4, and is built: the
-automatic route uses it (kit 0.52.0, docs/cable-lay-design.md 1.3), and a
+automatic route uses it (docs/cable-lay-design.md 1.3), and a
 user cannot pin it. If it becomes a pathway a user can pin, it is one more
 value in a `lay` entry, naming the tray (`item`, `via`) the router's gap
 already carries, an additive schema change.
