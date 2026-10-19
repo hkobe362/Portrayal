@@ -25,7 +25,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import yaml
-from portrayal.manifest import load_yaml
+from portrayal.manifest import load_yaml, offers
 
 from portrayal.faces import DIRECTIONS, face_ref  # noqa: E402
 from portrayal.render import (SVG_NS, STATE_CSS, Library, instance_group,  # noqa: E402
@@ -253,9 +253,13 @@ def seated_in_bays(roots):
     told instead, gathered the way named_as_faces gathers faces.
     """
     found = set()
+    candidates = []
 
     def take(bay):
-        found.update(r for r in bay.get("accepts") or [] if isinstance(r, str))
+        if bay.get("interface") and not candidates:
+            candidates.append(_pluggable_candidates(roots))
+        found.update(r for r in offers(bay, candidates[0] if candidates else None)
+                     if isinstance(r, str))
         if isinstance(bay.get("default"), str):
             found.add(bay["default"])
 
@@ -425,7 +429,11 @@ def main():
                 "bays": {bid: {"at": b.get("at"),
                                "size": dict(zip(("w", "h"), b.get("size") or []))
                                if isinstance(b.get("size"), list) else b.get("size"),
-                               "accepts": b.get("accepts") or [],
+                               # EVERY REF THE BAY TAKES (manifest.offers): the
+                               # list it states and, for a bay that states an
+                               # `interface`, every part that mates it and fits
+                               "accepts": offers(b, candidates),
+                               **({"interface": b["interface"]} if b.get("interface") else {}),
                                **({"default": b["default"]} if "default" in b else {}),
                                # A TURNED SLOT - riser 3a's two carry `rotate: 180`,
                                # the card upside down in them - is placed turned by the
