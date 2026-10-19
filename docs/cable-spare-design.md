@@ -378,8 +378,8 @@ No page, no export and no finding changes.
   turns at three high; 17.4 against 25); that a coil's length, its legs and the
   end play add to the spare; that `routePath` points are unchanged by an entry;
   that Cat6A, AOC and power cords are refused as the floor is too shallow.
-- Whatever release record the repository asks of a kit change (a version and a
-  fragment).
+- A changelog fragment, as the template asks of a kit change; the kit version
+  is bumped when the kit is published.
 
 It depends on questions 1 and 2 only for the interim bound and for legs counting
 as spare (section 6). Auto placement (3.5), the library parts (3.4) and the
