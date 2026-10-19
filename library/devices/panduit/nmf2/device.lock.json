@@ -1,9 +1,9 @@
 {
  "bay-accepts": {},
- "composed": "e36d6f6c33a9ef96",
+ "composed": "8b0d4b53b012de80",
  "composed-refs": {
   "panduit/nm-base-2ru@1": "1.0.0+318cc540f8827a36",
-  "panduit/nm-cover-2ru@1": "1.0.0+f7334e8cb19cd249",
+  "panduit/nm-cover-2ru@1": "1.0.1+ca02789ec5ab4ae7",
   "panduit/nm-fingers@1": "1.0.0+79fd0b3333cd60f1"
  },
  "configs": [
@@ -11,7 +11,7 @@
   "cover-off"
  ],
  "format": 1,
- "gaps": "75bf28ac6bfdfe71",
+ "gaps": "0674667d57f1f063",
  "groups": [
   "body",
   "cover",
@@ -43,5 +43,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "8cc5897e7a747791",
  "surface": "e83ea80c8d66bdb5",
- "version": "0.1.0"
+ "version": "0.1.1"
 }

@@ -14,3 +14,17 @@
   parts that fill their rack units, the verticals `rack-side`. The PR2VSD06 states no capacity because
   no Panduit document does. The NM3, NM4, NCMHF1 and the PatchLink, Open-Access and strain-relief
   parts are not modelled.
+
+### Fixed
+- The 3D viewer's opening view is fitted to the chassis box (`kit/camera-fit.js`): the nearest distance
+  at which all eight corners sit inside the frame for the lens and the frame's aspect, never nearer than
+  the old two spans, with the dolly limit and the far plane moved to match. A 7 ft manager (`panduit/pr2vd08`,
+  `wmpvhc45e`) used to open cut off at the top and the bottom, because the eye was asked for 4260 mm out and
+  pulled in to the 2500 mm dolly limit; a box that was framed keeps the opening view it had.
+- The 2RU NetManager covers (`panduit/nm-cover-2ru` and `nm-rear-cover-2ru`, 1.0.1, on the NM2 and NMF2)
+  are no longer one flat slab: a panel sunk inside a raised rim, with five hinge knuckles along each of the
+  top and bottom edges. The rim, the panel's thickness and the knuckles are estimated stand-ins, declared
+  as such in the sources and on every feature; no Panduit view draws the cover's section or hinge.
+- A test holds the fingers of every Panduit manager in front of the backbone and not through it: each
+  finger rises from its well's floor to inside the face, and the front and rear wells leave the backbone
+  between them.

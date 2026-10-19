@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: nmf2
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Panduit
 model: NMF2
@@ -167,8 +167,9 @@ gaps:
     reason: vendor-silent
     note: >-
       the specification sheet says the dual hinged cover opens 110 degrees to the top or bottom
-      without being removed; no view draws a hinge, and the cover is drawn as one fitted plate
-      that is either on or off.
+      without being removed; no view draws a hinge. The cover carries five stand-in hinge knuckles on
+      its top edge and on its bottom edge (their count, size and place are estimated) and is drawn as
+      one fitted plate that is either on or off.
     wanted: a drawing or a close render of the cover's hinge
   - what: blanking-panel
     scope: [front, rear]

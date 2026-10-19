@@ -39,6 +39,7 @@ import { bevelledArrays } from './bevel.js';
 import { expandStates } from './states.js';
 import { jdist, faceFile, distResolver, readIndex } from './dist.js';
 import { createLamps } from './lamps.js';
+import { openingView } from './camera-fit.js';
 
 const CLS_LABEL = {fan: 'Fan module', psu: 'Power supply', tab: 'Info tab'};
 // box-face shading, in +x -x +y -y +z -z order: sides darker, lid lifted,
@@ -1277,6 +1278,18 @@ export function createViewer(container, opts = {}) {
 
   // --- loading ----------------------------------------------------------------
 
+  // THE OPENING VIEW, FITTED (camera-fit.js says why a multiple of the span is
+  // not enough). The limits that follow the camera move with it: a 7 ft manager
+  // sits 2500+ mm out, past the dolly limit and the far plane a 1U box needs.
+  function openOn(w, h, d, span) {
+    const v = openingView({W: w, H: h, D: d, fov: camera.fov, aspect: camera.aspect, span});
+    controls.maxDistance = v.maxDistance;
+    camera.far = v.far;
+    camera.updateProjectionMatrix();
+    camera.position.set(...v.position);
+    controls.target.set(0, 0, 0);
+  }
+
   // The component index does NOT depend on the device, so loading it does not
   // belong behind either mode's "did the subject change" guard - that is what
   // made every device switch pull 2 MB of device-independent data down again.
@@ -1312,9 +1325,7 @@ export function createViewer(container, opts = {}) {
       // The span is stable: every device now opens at about 22 degrees.
       // The same framing the component path below already uses, rather than a
       // third set of constants: one opening view, two callers.
-      const span = Math.max(W, H, D);
-      camera.position.set(span * 0.9, span * 0.8, span * 1.6);
-      controls.target.set(0, 0, 0);
+      openOn(W, H, D);
     }
     CFG = config || devIndex.default;
     await build(CFG);
@@ -1331,10 +1342,8 @@ export function createViewer(container, opts = {}) {
       if (!COMP_ENTRY) throw new Error(`unknown component ${COMP}`);
       W = COMP_ENTRY.size.w; H = COMP_ENTRY.size.h;
       D = COMP_ENTRY.body ? COMP_ENTRY.body.depth : Math.max(COMP_ENTRY.size.d || 2, 2);
-      const span = Math.max(W, H);
-      camera.position.set(span * 0.9, span * 0.8, span * 1.6);
-      camera.near = 5; camera.updateProjectionMatrix();
-      controls.target.set(0, 0, 0);
+      camera.near = 5;
+      openOn(W, H, D, Math.max(W, H));   // a component's span has never counted its depth
     }
     CFG = skin || COMP_ENTRY.skins[0];
     await build(CFG);

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: nm2
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Panduit
 model: NM2
@@ -169,8 +169,9 @@ gaps:
     reason: vendor-silent
     note: >-
       the specification sheet says the dual hinged covers open 110 degrees to the top or bottom
-      without being removed; no view draws a hinge, and each cover is drawn as one fitted plate that
-      is either on or off.
+      without being removed; no view draws a hinge. Each cover carries five stand-in hinge knuckles on
+      its top edge and on its bottom edge (their count, size and place are estimated) and is drawn as
+      one fitted plate that is either on or off.
     wanted: a drawing or a close render of a cover's hinge
   - what: ring-section
     scope: [rear, top, left, right]

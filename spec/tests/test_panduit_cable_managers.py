@@ -342,6 +342,139 @@ def test_the_cover_contracts_say_lid_and_no_mechanism_is_invented_for_the_hinge(
                 assert "hinge" not in json.dumps(contract.get("elements", {})).lower()
 
 
+# --- fingers: in front of the backbone, not through it ---------------------------------------------------
+
+def _well_depth(root):
+    """How deep the face's well is: the one element the build gives a `data-depth`."""
+    depths = {float(e.get("data-depth")) for e in root.iter() if e.get("data-depth")}
+    assert len(depths) == 1, depths
+    return depths.pop()
+
+
+def _finger_spans(root):
+    """Every finger feature of a face as (path, start, end): where it stands from, and
+    to, measured from the face's own plane with `out` the way the viewer reads it -
+    a negative number is inside the chassis. A feature starts at its group's lift
+    plus its own, and ends at its `data-z-out`."""
+    spans = []
+    for g in root.iter("{http://www.w3.org/2000/svg}g"):
+        if not (g.get("id") or "").startswith(("fingers-", "rear-fingers-")) or g.get("data-z-lift") is None:
+            continue
+        for r in g.iter():
+            if r.get("data-z-out") is not None:
+                spans.append((r.get("data-path"), float(g.get("data-z-lift")) + float(r.get("data-z-lift") or 0),
+                              float(r.get("data-z-out"))))
+    return spans
+
+
+def depth_order_faults(front_spans, front_depth, rear_spans, rear_depth, D, tol=0.15):
+    """What is wrong with the depth order of a manager's fingers, as readable strings.
+    The backbone is the slab between the two wells' floors: D less the front well's
+    depth and the rear well's. A finger must stand ON its floor or in front of it
+    (start no deeper than the floor), reach out (end past its start) and stay inside
+    the chassis (end no further than the face); and the two wells must not overlap,
+    or one side's fingers stand in the other's."""
+    faults = []
+    for face, spans, depth in (("front", front_spans, front_depth), ("rear", rear_spans, rear_depth)):
+        if depth is None:
+            continue
+        for path, start, end in spans:
+            if start < -depth - tol:
+                faults.append(f"{face} {path}: starts {-start - depth:.2f} mm behind its floor, through the backbone")
+            if end <= start:
+                faults.append(f"{face} {path}: ends at {end}, not past its start {start}")
+            if end > tol:
+                faults.append(f"{face} {path}: ends {end} mm outside the face")
+    if front_depth is not None and rear_depth is not None and D - front_depth - rear_depth < 0:
+        faults.append(f"the two wells overlap by {front_depth + rear_depth - D:.2f} mm: no backbone between them")
+    return faults
+
+
+def test_the_depth_order_check_catches_a_finger_through_the_backbone():
+    """The check itself, on numbers: a finger that starts 20 mm behind its floor, one
+    that ends outside the face, one that does not reach out, and wells that overlap."""
+    good = [("f1", -303.0, -43.0)]
+    assert depth_order_faults(good, 303.0, [("r1", -203.0, -28.0)], 203.0, 526.4) == []
+    assert depth_order_faults([("f1", -323.0, -43.0)], 303.0, [], None, 526.4)
+    assert depth_order_faults([("f1", -303.0, 5.0)], 303.0, [], None, 526.4)
+    assert depth_order_faults([("f1", -303.0, -303.0)], 303.0, [], None, 526.4)
+    assert depth_order_faults(good, 303.0, [("r1", -203.0, -28.0)], 203.0, 500.0)
+
+
+@needs_dist
+@pytest.mark.parametrize("name", list(FINGERS))
+def test_the_fingers_stand_in_front_of_the_backbone_and_not_through_it(name):
+    """The drawing says so in numbers the viewer builds from: each finger rises from
+    the floor of its face's well to inside the face, the front's and the rear's wells
+    leave the backbone between them, and nothing of a front finger is behind a rear
+    one's floor. The two vertical managers' 90 fingers a side are the ones this was
+    asked of: they were read as passing through the central spine, and do not."""
+    per_face = {}
+    for face in FINGERS[name]:
+        root = svg(name, face)
+        spans = _finger_spans(root)
+        assert spans, f"{name} {face}: no finger carries relief"
+        per_face[face] = (spans, _well_depth(root))
+    front, rear = per_face.get("front"), per_face.get("rear")
+    chassis_d = float(device_yaml(name)["chassis"]["depth"])
+    faults = depth_order_faults(front[0], front[1], rear[0] if rear else [], rear[1] if rear else None, chassis_d)
+    assert not faults, faults[:5]
+
+
+def _contract(ref):
+    return yaml.safe_load((LIB / "components" / ref / "v1" / "contract.yaml").read_text())
+
+
+def _rect(doc, node):
+    (x, y), (w, h) = doc["elements"][node]["at"], doc["elements"][node]["size"]
+    return x, y, x + w, y + h
+
+
+@pytest.mark.parametrize("ref", ["panduit/nm-cover-2ru", "panduit/nm-rear-cover-2ru"])
+def test_a_2ru_cover_is_a_panel_in_a_rim_with_knuckles_and_not_one_slab(ref):
+    """The NM2's cover read as a flat board in 3D: a plate and two lips, all of them
+    one colour. It is a panel sunk inside a raised rim with five hinge knuckles along
+    each of its top and bottom edges. What no Panduit view draws (the rim, the panel's
+    thickness, the knuckles' count and size) is declared a stand-in, in the sources
+    and on every feature, and not left looking measured."""
+    doc = _contract(ref)
+    feats = {f["node"]: f for f in doc["relief"]["features"]}
+    assert set(feats) == set(doc["elements"]), "every drawn element is a feature, and the other way round"
+    levels = {f["out"] for f in feats.values()}
+    assert len(levels) >= 2 and feats["plate"]["out"] == min(levels), \
+        f"the panel stands below the rim, the knuckles and the lips: {sorted(levels)}"
+    top = sorted(n for n in feats if n.startswith("knuckle-top-"))
+    bottom = sorted(n for n in feats if n.startswith("knuckle-bottom-"))
+    assert len(top) == len(bottom) == 5
+    assert all(_rect(doc, n)[1] < 10 for n in top) and all(_rect(doc, n)[3] > doc["size"]["h"] - 10 for n in bottom)
+    plate = feats["plate"]
+    for n in top + bottom + ["rim-left", "rim-right"]:
+        # standing on the panel and above it: the rim and the knuckles are the cover's full thickness
+        assert feats[n]["lift"] == plate["lift"] and feats[n]["out"] > plate["out"], n
+        assert feats[n]["out"] == feats["lip-top"]["out"], n
+        assert feats[n]["color"] != plate["color"], f"{n} reads apart from the panel"
+    # every figure no document gives is estimated, and the provenance says it is a stand-in
+    assert all(f["confidence"] == "estimated" for f in feats.values())
+    assert "STAND-IN" in doc["provenance"]["detail"]
+    assert all(f["source"] for f in feats.values())
+
+
+@pytest.mark.parametrize("ref", ["panduit/nm-cover-2ru", "panduit/nm-rear-cover-2ru"])
+def test_no_two_features_of_a_2ru_cover_share_a_top_face_where_they_overlap(ref):
+    """Two boxes whose tops are one plane and whose footprints overlap z-fight in 3D,
+    and a render picks one of them at random from one frame to the next."""
+    doc = _contract(ref)
+    feats = doc["relief"]["features"]
+    for i, a in enumerate(feats):
+        ra = _rect(doc, a["node"])
+        for b in feats[i + 1:]:
+            if a["out"] != b["out"]:
+                continue
+            rb = _rect(doc, b["node"])
+            overlap = min(ra[2], rb[2]) - max(ra[0], rb[0]) > 1e-6 and min(ra[3], rb[3]) - max(ra[1], rb[1]) > 1e-6
+            assert not overlap, (a["node"], b["node"])
+
+
 # --- capacity: only what a Panduit table or calculator states, and its basis ------------------------------
 
 @pytest.mark.parametrize("name", list(CAPACITY))
