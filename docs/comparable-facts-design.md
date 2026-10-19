@@ -280,7 +280,8 @@ risks encoding a vendor's marketing. The recount supports splitting the family:
   now seven. It stays unclaimed.
 - `forwarding` (4) is **already claimed** by `forwarding-rate`, and its values
   are not rates: `FP4` on `nokia/sr-1-ac` and `sr-1-dc` (a chip name), a feature
-  sentence on `ufispace/s9620-32e` and `s9720-56ed`. That is an existing wrong
+  sentence on `ufispace/s9620-32e` and `s9720-56ed` (which state SRv6 there, so
+  they compare as silent on `srv6`). That is an existing wrong
   reading in the published layer, found by this recount and not decided here
   (question 5).
 
@@ -317,7 +318,9 @@ says "service ports 0-19 can individually break out" (`s9700-53dx`),
 key here (3 devices) holds a **USB port** ("1x USB 3.0 Type-A maintenance port").
 A canonical `service-port` would invite a reader to look for the data ports.
 
-The 27 devices split cleanly into two facts and a leftover:
+The 27 devices fall into two facts and a leftover (three devices, `s9700-23d`,
+`s9700-53dx` and `s9725-64e`, are in both of the first two, so the groups sum
+to 30):
 
 - **The USB port.** `usb` (20 devices: Celestica, Cisco, Juniper, UfiSpace) and
   `service-port` (3 UfiSpace, all USB) are one claim on **23 devices**, no device
@@ -395,10 +398,11 @@ touches `comparable.py` or its test).
 
 Each is answerable in one line.
 
-1. **What is the least reach a fact needs?** The facts promoted by #99 cover 18
-   to 46 devices (`test_the_promoted_facts_reach_the_devices_that_carry_them`
-   floors run from `gnss` 18 up). The proposal's `macsec` is 11 (13 later). Is 11
-   enough, or is the floor 18 and `macsec` waits?
+1. **What is the least reach a fact needs?** The facts #99 promoted resolve on 20
+   to 96 devices on `main` (the floors in
+   `test_the_promoted_facts_reach_the_devices_that_carry_them` run 18 to 40, from
+   `gnss` up). The proposal's `macsec` is 11 (13 later). Is 11 enough, or is the
+   floor 18 and `macsec` waits?
 2. **Per-media `port-modes` facts (breakout option C): build them, or let the
    merged `speeds` field carry native rates and supersede the prose?** Changes
    whether the native-rate question gets a prose column.
