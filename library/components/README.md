@@ -249,6 +249,24 @@ The rest earns its place:
   `docs/tilted-facets-design.md`.
 - `fields` for what varies without the shape changing: a supply's wattage, a
   drive's capacity. Do not make a new skin per wattage.
+- `part-numbers` for a module that is ordered under a code, the way a device
+  configuration's is: `{<model>: {part: <part number>}}`, with no `power-cord`.
+  Each key is one DCIM module type, named by the key, with `part_number` from
+  `part`, and one contract with two keys is two module types with the same
+  ports: Casa's BDM2m is `BDM2M-W` (Open) and `BDM2M-N` (No Licenses), one
+  drawing and two things to buy. Use it, and not `attrs.model`, when the
+  vendor's ordering information names the module; a contract states one or
+  the other, and the schema refuses both, so the name has one source. A module
+  with neither is exported under its contract `name`. Take the keys from the
+  vendor's ordering table exactly as printed and cite the sheet and its page in
+  `provenance`. Do not list a licence, a cable or a kit as a module: only what
+  the contract draws. A bay's `Accepts:` line names components and not
+  codes, so it does not change. The rack kit cannot tell which code was
+  bought from a bay that accepts the component, so it opens the type file of the
+  first key in sorted order (`partNumber` in `kit/rack/export-data.js`); the
+  two files carry the same ports, so the choice changes no cable. Adding the key, or moving a
+  module from `attrs.model` to it, renames module types that a DCIM may already
+  hold, so it is announced as **BREAKING for DCIM data already imported**.
 - `states` for lamps, named as tokens (`link`, `activity`, `fault`), with the
   behaviour in `behaviour`.
 - `characters` for a `class: display` element - how many character cells it
@@ -335,6 +353,7 @@ provenance:
   (depth set at install, nothing moves after), `sliding` (moves out for
   service) or `shelf` (the device stands on it). `travel` is in millimetres,
   or `full` when the source says only that, and only a `sliding` kit has it
+  (L158). A `telescoping` kit states a `preset` on at least one configuration
   (L158).
 - A kit part is `{ref, id, count}` and nothing else: it is a line of a parts
   list, not a placement, so it has no `at`. `count` is an integer of at least
@@ -342,9 +361,12 @@ provenance:
   the ids are distinct (L155).
 - A kit has one entry in `configurations` for each way it can be assembled: a
   slide has one, a kit of brackets and extensions has one per rack-depth
-  band. Each needs `id`, `racks`, `parts` and `depth`. The ids are distinct
-  and `parts` lists only ids of the kit parts (L156). Every range has min
-  below max (L157). `preset` records a factory setting, `tolerance` the `x`
+  band. Each needs `id`, `racks`, `parts` and at least one of `depth` and
+  `preset`. The ids are distinct and `parts` lists only ids of the kit parts
+  (L156). Every range has min below max (L157). `preset` records a factory
+  setting and may stand alone when the source prints no range: leave `depth`
+  out (never `[preset, preset]`) and add a kit `gaps` entry `what: depth` with
+  the configuration's id in `scope` (L157). `tolerance` records the `x`
   of a stated `±x`, and `rail-depth` the depth of the rail with no accessory.
 - `accessories` are a `cma` (cable management arm) or an `srb` (strain-relief
   bar). Each has a `ref` to a component that is not a kit (L159), and may

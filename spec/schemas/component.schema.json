@@ -15,6 +15,19 @@
    "interface"
   ]
  },
+ "not": {
+  "required": [
+   "part-numbers",
+   "attrs"
+  ],
+  "properties": {
+   "attrs": {
+    "required": [
+     "model"
+    ]
+   }
+  }
+ },
  "$comment": "A KIT IS THE THIRD KIND (roc-ops/Portrayal#905, docs/rack-mounting-design.md section 4): a rail, bracket or slide kit, a set of ordinary components a device names from `chassis.kits` and never places. It has no `class` and no `size` - its parts carry both - and admits only the kit keys. A component or a module still requires `class` and `size` and takes none of the kit keys.",
  "if": {
   "required": [
@@ -48,7 +61,8 @@
     "install",
     "parts",
     "configurations",
-    "accessories"
+    "accessories",
+    "gaps"
    ]
   },
   "properties": {
@@ -80,6 +94,7 @@
    "install": false,
    "configurations": false,
    "accessories": false,
+   "gaps": false,
    "parts": {
     "items": {
      "properties": {
@@ -159,7 +174,7 @@
      "items": {"$ref": "#/$defs/segment"}
     }
    ],
-   "description": "this component mates INTO a receptacle presenting this interface. Requires a `mate` connection-point, which is what aligns it to its host. ONE INTERFACE, OR A LIST OF THEM for a part that seats in more than one kind of receptacle: a NEMA 5-15P goes into a 5-15R and into a 5-20R, a C14 plug into a C13 outlet and an Eaton C39. Each receptacle keeps its own interface because what each accepts differs, so the part names every one it seats in and is offered by a slot presenting any of them. A single interface and a one-item list say the same thing; write the single interface. One `mate` point serves every interface listed."
+   "description": "this component mates INTO a receptacle presenting this interface. Requires a `mate` connection-point, which is what aligns a part to its host, unless the part has `behaviour: fills`: a card that FILLS a bay (a riser slot) is placed by the bay's `at`, so its `mates` names the slot form and aligns nothing. ONE INTERFACE, OR A LIST OF THEM for a part that seats in more than one kind of receptacle: a NEMA 5-15P goes into a 5-15R and into a 5-20R, a C14 plug into a C13 outlet and an Eaton C39. Each receptacle keeps its own interface because what each accepts differs, so the part names every one it seats in and is offered by a slot presenting any of them. A single interface and a one-item list say the same thing; write the single interface. One `mate` point serves every interface listed."
   },
   "optical": {
    "type": "object",
@@ -599,6 +614,27 @@
    "type": "string",
    "minLength": 40,
    "description": "WHY NOTHING SEATS THIS PART. A component nothing references is either work in progress or dead weight, and from the outside the two look identical. Saying which, here, is what lets L89 fail on an unreferenced part that carries no `unplaced`. The sentence is for a reader who has just found the part and is deciding whether to use it, extend it or delete it: say what would seat it and what is missing, and name the issue if the work is tracked. Not a waiver and not a silence - a part that IS seated must not carry this."
+  },
+  "part-numbers": {
+   "type": "object",
+   "minProperties": 1,
+   "propertyNames": {
+    "pattern": "^\\S(.*\\S)?$"
+   },
+   "description": "THE ORDER CODES THIS MODULE IS SOLD UNDER, the shape of a device configuration's `part-numbers` without a power cord: model -> {part}. Each key is one exported DCIM module type, named by the key, with `part_number` from `part`, so one drawing with two order codes (Casa's BDM2m, `BDM2M-W` Open and `BDM2M-N` No Licenses) is two module types with the same ports. A contract states this OR `attrs.model`, never both, so the name has one source; one with neither is exported under its `name`. Take the keys from the vendor's ordering table as printed and cite the sheet and page in `provenance`. The rack kit opens the type file of the first key in sorted order. Adding it to a module that was named by `attrs.model` renames its module type in a DCIM that already holds it.",
+   "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "part"
+    ],
+    "properties": {
+     "part": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   }
   },
   "superseded-by": {
    "type": "string",
@@ -1106,9 +1142,30 @@
     "required": [
      "id",
      "racks",
-     "parts",
-     "depth"
+     "parts"
     ],
+    "$comment": "AT LEAST ONE OF `depth` AND `preset` (roc-ops/Portrayal#904, decided 2026-10-18). A source can print a factory setting and no range (the COR550 rail's 630, the first Smartoptics band's 600), and a range written as `[630, 630]` would invent one. `if`/`then` rather than `anyOf` so that the message for a configuration with neither names both keys: `anyOf` would say only that the configuration is not valid under any of the given schemas.",
+    "if": {
+     "not": {
+      "anyOf": [
+       {
+        "required": [
+         "depth"
+        ]
+       },
+       {
+        "required": [
+         "preset"
+        ]
+       }
+      ]
+     }
+    },
+    "then": {
+     "required": [
+      "depth or preset"
+     ]
+    },
     "additionalProperties": false,
     "properties": {
      "id": {
@@ -1138,12 +1195,13 @@
       "description": "the parts this configuration uses, each the `id` of one of the kit's own `parts` (L156)"
      },
      "depth": {
-      "$ref": "#/$defs/kit-depth"
+      "$ref": "#/$defs/kit-depth",
+      "description": "the rack depth this configuration fits, front flange to rear flange, in mm. OPTIONAL WHEN `preset` IS STATED, and one of the two is required: a source that prints a factory setting and no range leaves `depth` out, and the range is then unknown (a `gaps` entry says so, L157). Never `[preset, preset]`."
      },
      "preset": {
       "type": "number",
       "exclusiveMinimum": 0,
-      "description": "a factory setting the kit ships at, in mm of rack depth (the COR550 rail's 630)"
+      "description": "a factory setting the kit ships at, in mm of rack depth (the COR550 rail's 630). It may stand alone: a configuration with a `preset` and no `depth` reads as 'factory setting known, range unknown', and nothing derives a range from it. A telescoping kit states one on at least one of its configurations (L158)."
      },
      "tolerance": {
       "type": "number",
@@ -1196,6 +1254,51 @@
        ]
       },
       "description": "the sides of the rack, seen from the front, the accessory can be fitted on"
+     }
+    }
+   }
+  },
+  "gaps": {
+   "type": "array",
+   "description": "A KIT ONLY: what the sources do not say, in the shape a device's `gaps` has. Lint L157 asks for an entry `what: depth` whose `scope` lists every configuration that states a `preset` and no `depth`: the factory setting is known and the range is not.",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "what",
+     "reason",
+     "wanted"
+    ],
+    "properties": {
+     "what": {
+      "$ref": "#/$defs/segment",
+      "description": "the missing knowledge, as a token: `depth`"
+     },
+     "scope": {
+      "type": "array",
+      "description": "what it applies to: the `id` of each configuration",
+      "items": {
+       "type": "string"
+      }
+     },
+     "reason": {
+      "description": "why it is missing, because that decides who can close it",
+      "enum": [
+       "vendor-silent",
+       "sources-disagree",
+       "nos-dependent",
+       "needs-hardware",
+       "needs-photo",
+       "needs-drawing"
+      ]
+     },
+     "note": {
+      "type": "string",
+      "description": "what was looked at and what it did not say. Cite the section, so the next reader does not repeat the search"
+     },
+     "wanted": {
+      "type": "string",
+      "description": "what would close it, as a request someone can act on"
      }
     }
    }
@@ -1348,14 +1451,21 @@
     "type": "object",
     "required": [
      "at",
-     "size",
-     "accepts"
+     "size"
+    ],
+    "anyOf": [
+     {"required": ["accepts"]},
+     {"required": ["interface"]}
     ],
     "additionalProperties": false,
     "properties": {
      "at": {
       "$ref": "#/$defs/xy",
       "description": "mm offset from the carrier's origin (top-left, y-down)"
+     },
+     "interface": {
+      "$ref": "#/$defs/segment",
+      "description": "THE INTERFACE THIS SLOT PRESENTS, as on a device's bay: a part is seated here when its `mates` names it and it is wide enough (its `slot-width` is at most 1 plus the number of bays in this bay's `span`). With `accepts` stated as well the bay takes the UNION: every ref in the list, and every part that mates the interface. A bay with no `interface` takes its `accepts` list and nothing else. Electrical detail (generation, lane width) belongs in `attrs` and the bay's `slot`, not in the key."
      },
      "size": {
       "$ref": "#/$defs/xy",
@@ -1367,7 +1477,7 @@
        "type": "string"
       },
       "minItems": 1,
-      "description": "component refs this bay takes. Required, as on a device: a bay that names nothing offers nothing"
+      "description": "component refs this bay takes. A bay states this or `interface`, as on a device: a bay that names nothing offers nothing"
      },
      "default": {
       "type": [
