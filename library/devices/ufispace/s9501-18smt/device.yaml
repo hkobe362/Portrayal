@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: s9501-18smt
-version: 4.0.0
+version: 4.1.0
 maturity: modelled
 manufacturer: UfiSpace
 model: S9501-18SMT
@@ -317,7 +317,9 @@ provenance:
       on its two holes, at 17.3 and 201.15 mm. The height, 21.8 mm, is the one the four lug
       placements already had and is not re-measured. AXIS: x = 0 is the FRONT on a right view.
       Formerly four common/ground-lug@1 placements, ground-1 to ground-4, at x 5.9, 21.7, 189.8
-      and 205.5 (hole centres 9.4, 25.2, 193.3 and 209.0).
+      and 205.5 (hole centres 9.4, 25.2, 193.3 and 209.0). The circled earth symbol each lug drew
+      above its hole, 6.6 above the centre, is a common/ground-symbol@1 over each hole (ground-mark-1
+      to ground-mark-4), as the lug drew it to within 0.1 mm of the ring.
 
 attrs:
   performance:
@@ -832,6 +834,10 @@ views:
            description: 'HIG Figure 22 Location-2, the rearward designated grounding
              location - two tapped M4 holes, measured 15.7 apart: one two-hole landing',
            attrs: {stud-size: M4}}
+        - {ref: common/ground-symbol@1, id: ground-mark-1, at: [6.4, 12.2], for: ground-screws-1, group: grounding, rel-pos: 4}
+        - {ref: common/ground-symbol@1, id: ground-mark-2, at: [22.2, 12.2], for: ground-screws-1, group: grounding, rel-pos: 5}
+        - {ref: common/ground-symbol@1, id: ground-mark-3, at: [190.3, 12.2], for: ground-screws-2, group: grounding, rel-pos: 6}
+        - {ref: common/ground-symbol@1, id: ground-mark-4, at: [206.0, 12.2], for: ground-screws-2, group: grounding, rel-pos: 7}
 configurations:
   dc:
     kind: base

@@ -249,6 +249,32 @@ def test_a_two_hole_plate_draws_both_screws_and_its_printed_mark(device):
     assert "ground-pair" in _device(device)["provenance"]
 
 
+def test_the_dcs500_m5_screw_sits_on_the_washer_its_datasheet_shows():
+    """The datasheet rear shows washered screws: the M5 screw draws the head
+    on an ISO 7089 washer (10 across, 1.0 thick), and a lug starts above it."""
+    c = _contract(SIZED_M5)
+    assert c["size"] == {"w": 10.0, "h": 10.0}
+    feats = {f["node"]: f for f in c["relief"]["features"]}
+    assert feats["washer"]["cyl"] == pytest.approx(1.0)
+    assert feats["head"]["cyl"] == pytest.approx(3.7)
+    assert feats["head"]["lift"] == pytest.approx(1.0)
+    svg = (LIB / "components/common/ground-screw-m5/v1/skins/default.svg").read_text()
+    assert 'id="washer"' in svg and 'id="head"' in svg
+
+
+def test_s9501_18smt_prints_an_earth_symbol_above_each_of_its_four_holes():
+    """Main drew the circled earth symbol 6.6 above each hole centre (the lug's
+    own art); the pair hosts draw none, so each hole has a ground-symbol."""
+    marks = {p["id"]: p for p in _device("ufispace/s9501-18smt")["views"]["right"]["components"]["placements"]
+             if p["ref"] == "common/ground-symbol@1"}
+    holes = {"ground-mark-1": (9.4, "ground-screws-1"), "ground-mark-2": (25.2, "ground-screws-1"),
+             "ground-mark-3": (193.3, "ground-screws-2"), "ground-mark-4": (209.0, "ground-screws-2")}
+    assert set(marks) == set(holes)
+    for pid, (x, host) in holes.items():
+        assert marks[pid]["at"] == pytest.approx([x - 3.0, 12.2]), pid
+        assert marks[pid]["for"] == host, pid
+
+
 def test_the_plain_screw_seats_a_ring_lug_where_ground_lug_does():
     """The symbol-less screw is common/ground-lug@1's stud alone: the same
     interface, presented at the same height. Its full geometry - axis, seat,

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: dcs500
-version: 4.0.0
+version: 5.0.0
 maturity: modelled
 manufacturer: Edgecore
 model: AS7816-64X
@@ -163,10 +163,10 @@ provenance:
       387.75 off the plate edges, y 32.7. THAT IS NOT 5/8 IN.: 15.875 would be 36.2 px, three pixels short
       of what both plates read, and 3/4 in. would be 43.4. No pair host is placed, because each one is
       built at a lug pitch and this one matches none, and a gap records the pitch. All four screws are
-      common/ground-screw-m5@1, the ISO 7045 M5 pan head the kit's screws are (#918; it was the nominal
-      common/ground-screw@1, drawn at about M3); the first of each plate keeps the rotate 90 the one stud
-      had, which turns only the seat. The head is 9.5 across, so each screw's centre is where the nominal
-      one's was and the heads sit inside the 31.6 mm plates. THE PLATE IS PLAIN: the datasheet rear shows
+      common/ground-screw-m5@1, the ISO 7045 M5 pan head the kit's screws are, on its ISO 7089 washer (#918;
+      it was the nominal common/ground-screw@1, drawn at about M3); the first of each plate keeps the rotate 90
+      the one stud had, which turns only the seat. The washer is 10 across, so each screw's centre is where
+      the nominal one's was and the washers sit inside the 31.6 mm plates. THE PLATE IS PLAIN: the datasheet rear shows
       a light plate, two washered screws and one earth symbol printed above it, which is the plate's silkscreen
       mark, so the 14 x 7 cutouts the one stud carried are gone. Formerly one common/ground-lug@1 per
       plate, ground-1 and ground-0, each standing for both screws at the middle of its plate.
@@ -901,27 +901,27 @@ views:
         rel-pos: 5}
       - ref: common/ground-screw-m5@1
         id: ground-1
-        at: [45.1, 27.95]
+        at: [44.85, 27.7]
         rotate: 90
         group: grounding
         rel-pos: 1
         attrs: {stud-size: M5}
       - ref: common/ground-screw-m5@1
         id: ground-1b
-        at: [62.3, 27.95]
+        at: [62.05, 27.7]
         group: grounding
         rel-pos: 3
         attrs: {stud-size: M5}
       - ref: common/ground-screw-m5@1
         id: ground-0
-        at: [365.8, 27.95]
+        at: [365.55, 27.7]
         rotate: 90
         group: grounding
         rel-pos: 0
         attrs: {stud-size: M5}
       - ref: common/ground-screw-m5@1
         id: ground-0b
-        at: [383.0, 27.95]
+        at: [382.75, 27.7]
         group: grounding
         rel-pos: 2
         attrs: {stud-size: M5}

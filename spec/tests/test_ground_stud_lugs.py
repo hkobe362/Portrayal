@@ -49,7 +49,7 @@ SIZED_SCREWS = ("common/ground-screw-m6@1", "common/ground-screw-m4@1", "common/
 # #918: the M5 screw a device places alone (the DCS500's four, 17.2 apart, no lug pitch):
 # its stud axis and the height a lug starts at, as SINGLE holds them for the others
 M5 = "common/ground-screw-m5@1"
-SIZED_ALONE = {M5: dict(axis=(4.75, 4.75), top=3.7)}
+SIZED_ALONE = {M5: dict(axis=(5.0, 5.0), top=4.7)}
 # the 10-32 studs of the SR-1 DC terminal block, two per pole host (#828)
 SR1_STUD = "nokia/sr-1-dc-stud@1"
 
