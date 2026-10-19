@@ -137,7 +137,7 @@
    "juniper/jnp10k-pwr-blnk@1"
   ]
  },
- "composed": "8998b51f5387a553",
+ "composed": "6d4fa9a75b10caa9",
  "composed-refs": {
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -148,7 +148,7 @@
   "juniper/jnp10k-lc2101@1": "1.1.0+fff3bea0aaa97e31",
   "juniper/jnp10k-lc480@1": "1.1.0+cc9a4c04de3f8362",
   "juniper/jnp10k-pwr-ac2@1": "1.1.0+80cd0676c5b89325",
-  "juniper/jnp10k-pwr-blnk@1": "1.0.0+fb48f72b5c5f52b1",
+  "juniper/jnp10k-pwr-blnk@1": "1.0.0+1cb408d8424a4a65",
   "juniper/jnp10k-re-blnk@1": "1.0.0+c1d77e93362f9010",
   "juniper/jnp10k-re1@2": "2.1.0+80ff396be7681e75",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa",

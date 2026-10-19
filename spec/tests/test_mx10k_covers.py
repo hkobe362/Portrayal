@@ -8,6 +8,7 @@ aperture they fill, named by their part number) and the base counts per chassis.
 SFBs are not visible from outside the chassis and no SFB bay is drawn, so their
 covers are not part of this slice.
 """
+import os
 import pathlib
 import re
 
@@ -73,17 +74,79 @@ def test_re_cover_is_the_size_of_the_rcb_aperture_in_all_three():
         assert sizes == {(c["w"], c["h"])}, name
 
 
-def test_pwr_cover_is_the_smallest_psu_aperture_so_it_overhangs_none():
-    c = contract("jnp10k-pwr-blnk")["size"]
-    heights = {}
+def _num(v):
+    return float(v.replace("mm", ""))
+
+
+def _translate(tf):
+    x = y = 0.0
+    for a, b in re.findall(r"translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)", tf or ""):
+        x += float(a)
+        y += float(b)
+    return x, y
+
+
+@pytest.fixture(scope="module")
+def rear_rects(tmp_path_factory):
+    """{chassis: {bay id: (opening rect, occupant face rect, occupant ref)}} read from the
+    rendered base rear view, in the drawing's own millimetres."""
+    import subprocess
+    import sys
+    import xml.etree.ElementTree as ET
+    out = {}
     for name in COUNTS:
-        sizes = {(b["size"]["w"], b["size"]["h"]) for b in bays(device(name), "rear", "psu")}
-        assert len(sizes) == 1, name
-        w, h = sizes.pop()
-        assert w == c["w"], name
-        assert h >= c["h"], name
-        heights[name] = h
-    assert min(heights.values()) == c["h"]
+        dest = tmp_path_factory.mktemp(name)
+        subprocess.run([sys.executable, str(ROOT / "spec/tools/portrayal/render.py"),
+                        str(LIB / "devices" / "juniper" / name / "device.yaml"),
+                        "--library", str(LIB), "--out", str(dest)],
+                       check=True, capture_output=True,
+                       env={**os.environ,"PYTHONPATH": str(ROOT / "spec/tools")})
+        root = ET.parse(dest / f"{name}.base.rear.svg").getroot()
+        byid = {e.get("id"): e for e in root.iter() if e.get("id")}
+        found = {}
+        for bid in [b["id"] for b in bays(device(name), "rear", "psu")]:
+            op = byid[f"{bid}--opening"]
+            mod = byid[f"{bid}--module"]
+            face = byid[f"{bid}--module--face"]
+            tx, ty = _translate(mod.get("transform"))
+            o = (_num(op.get("x")), _num(op.get("y")), _num(op.get("width")), _num(op.get("height")))
+            f = (tx + _num(face.get("x")), ty + _num(face.get("y")),
+                 _num(face.get("width")), _num(face.get("height")))
+            found[bid] = (o, f, mod.get("data-ref").split(":")[0])
+        out[name] = found
+    return out
+
+
+@pytest.mark.parametrize("name", sorted(COUNTS))
+def test_pwr_cover_fills_its_bay_as_the_supply_does(name, rear_rects):
+    """Read from the rendered rear view. The supply is a 97.0 mm part centred in its bay, so in
+    a shorter bay it stands proud of the opening evenly; the cover has to do the same, and
+    leave no band of the opening showing, rather than sit short of it."""
+    found = rear_rects[name]
+    supplies = [v for v in found.values() if v[2] == "juniper/jnp10k-pwr-ac2@1"]
+    covers = [v for v in found.values() if v[2] == PWR]
+    assert supplies and covers, name
+    for o, f, _ in covers:
+        # the cover's face covers the whole opening: no black band above or below
+        assert f[0] <= o[0] + 0.01 and f[1] <= o[1] + 0.01, (name, o, f)
+        assert f[0] + f[2] >= o[0] + o[2] - 0.01 and f[1] + f[3] >= o[1] + o[3] - 0.01, (name, o, f)
+        # and stands proud of the opening by exactly what the supply does: the same edges
+        so, sf, _ = supplies[0]
+        assert abs((f[1] - o[1]) - (sf[1] - so[1])) <= 0.01, (name, o, f, so, sf)
+        assert abs(f[2] - sf[2]) <= 0.01 and abs(f[3] - sf[3]) <= 0.01, (name, f, sf)
+
+
+def test_pwr_cover_provenance_says_where_its_size_comes_from():
+    """Juniper's guides give the supply's envelope but no figure for the cover, so the size is
+    derived from the supply and the bay and must be marked so, not as a datasheet figure."""
+    c = contract("jnp10k-pwr-blnk")
+    size = " ".join(c["provenance"]["size"].split())
+    assert size.startswith("derived")
+    assert "JNP10K-PWR-AC2" in size and "97.0" in size
+    assert "datasheet" not in size.split(" - ")[0]
+    assert (c["size"]["w"], c["size"]["h"]) == (84.0, 97.0)
+    assert c["size"] == contract("jnp10k-pwr-ac2")["size"]
+    assert set(c["size-confidence"].values()) == {"estimated"}
 
 
 @pytest.mark.parametrize("name", sorted(COUNTS))

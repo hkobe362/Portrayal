@@ -18,13 +18,17 @@ provenance:
     so this part draws no elements at all. `absent` stays, because an empty slot is a
     real thing to draw.
   size: >-
-    derived - fills the 84.0 mm wide power supply aperture the JNP10K-PWR-AC2
-    occupies. The three chassis open slightly different apertures in this library
-    (84.0 x 97.0 mm on the MX10004, 84.0 x 93.5 mm on the MX10008, 84.0 x 91.0 mm
-    on the MX10016), each read from a photograph or drawing and none measured; the
-    cover takes the smallest, which fits all three, rather than overhang a bay. The
-    difference is the library's own and is recorded against the supply too. No
-    vendor drawing of the cover is in the corpus.
+    derived - the size of the JNP10K-PWR-AC2 it stands beside, 84.0 x 97.0 mm,
+    so the cover and the supply fill a bay the same way. The three chassis open
+    slightly different apertures in this library (84.0 x 97.0 mm on the MX10004,
+    84.0 x 93.5 mm on the MX10008, 84.0 x 91.0 mm on the MX10016), each read from
+    a photograph or drawing and none measured. The supply is drawn at its own size,
+    centred in the bay, so in the two shorter bays it stands proud of the opening
+    by the same amount top and bottom; the cover does exactly that, which leaves no
+    dark band showing and no overhang beyond the supply's. Juniper's hardware
+    guides list the supply's physical specifications and ship the cover in the
+    configuration tables, but give no dimensions for the cover, so there is no
+    vendor figure to use.
   part-number: >-
     vendor - JNP10K-PWR-BLNK, named as the "power supply blank cover panel" in the
     MX10004 hardware guide's configuration table (MX10004-BASE and
@@ -41,9 +45,10 @@ provenance:
 states: [absent]
 size:
   w: 84.0
-  h: 91.0
+  h: 97.0
 size-confidence: {w: estimated, h: estimated}
 size-notes: >-
-  A slot opening, not the part: no vendor drawing of the cover is held. The width is the
-  supply aperture on all three chassis; the height is the shortest of the three apertures
-  the library draws, so the cover never overhangs a bay.
+  Derived, not measured: no vendor drawing or dimension of the cover is held. It takes the
+  JNP10K-PWR-AC2's own 84.0 x 97.0 mm, so it fills a bay exactly as the supply does,
+  centred, and in the 93.5 and 91.0 mm bays stands proud of the opening by the
+  same amount the supply does.
