@@ -285,7 +285,7 @@ configurations:
     default: true
     description: >-
       The chassis as Juniper ships MX10004-BASE. One routing and control board with a
-      cover over the second slot, two power supplies with a cover over the third, fans,
+      cover over the second slot. Two power supplies with a cover over the third, fans,
       and a cover in each of the four line-card slots. Line cards are ordered separately.
     bays:
       re1: juniper/jnp10k-re-blnk@1

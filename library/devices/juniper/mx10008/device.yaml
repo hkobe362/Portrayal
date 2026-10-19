@@ -297,7 +297,7 @@ configurations:
     default: true
     description: >-
       The chassis as Juniper ships MX10008-BASE. One routing and control board with a
-      cover over the second slot, three power supplies with a cover over each of the
+      cover over the second slot. Three power supplies with a cover over each of the
       other three, fans, and a cover in each of the eight line-card slots. Line cards are
       ordered separately.
     bays:
