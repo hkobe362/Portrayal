@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: 49253-lpm-ring
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 description: >-
   A steel distribution ring of the Leviton 49253-LPM 1RU five-ring manager seen from the
@@ -9,6 +9,17 @@ description: >-
   its front end two overlapping legs that leave a 9.5 mm slit a patch cord is laid in
   through
 provenance:
+  edge: >-
+    drawing - the front view of the 49253-LPM drawing outlines each bar 9.5 mm across with
+    its corners rounded 1.17 mm [0.046 in], a flat face 7.19 mm across inside that outline,
+    and a line across the face 5.59 mm [0.22 in] in from each end. The skin draws the radii,
+    the 1.17 mm edge band and the two seam lines over the legs. The break the drawing shows
+    across the face near the upper leg is not drawn: the side view puts the legs' overlap
+    elsewhere and the two do not agree on where the legs part.
+  face-colour: >-
+    estimated - the face is drawn a lighter value than the panel so the ring reads against it
+    in 2D. Satin black powder coat catches the light the panel does not; no document states
+    a reflectance, so the shade is a render choice and not a measured one.
   size: >-
     drawing - the front view of Leviton's 49253-LPM dimensional drawing (DXF): each ring is
     a band 9.5 mm across (x 21.35 to 30.85 for the first) and 38.1 mm [1.50 in] high, from

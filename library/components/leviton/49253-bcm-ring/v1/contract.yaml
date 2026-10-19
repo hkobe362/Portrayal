@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: 49253-bcm-ring
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 description: >-
   A steel distribution ring of the Leviton 49253-BCM 2RU five-ring manager seen from the
@@ -9,6 +9,17 @@ description: >-
   3 in high, its front end two overlapping legs that leave a 9.5 mm slit a patch cord is
   laid in through
 provenance:
+  edge: >-
+    drawing - the front view of the 49253-BCM drawing draws each bar's corners as 1.17 mm
+    [0.046 in] arcs, and the front views of the 49253-LPM and 49253-6MR drawings add a flat
+    face 7.19 mm across and a line across it 5.59 mm [0.22 in] in from each end. The skin
+    draws the radii, the 1.17 mm edge band and the two seam lines over the legs; the seams
+    are read on those two drawings and carried to this ring, whose own front view has the
+    same arcs.
+  face-colour: >-
+    estimated - the face is drawn a lighter value than the panel so the ring reads against it
+    in 2D. Satin black powder coat catches the light the panel does not; no document states
+    a reflectance, so the shade is a render choice and not a measured one.
   size: >-
     drawing - the front view of Leviton's 49253-BCM dimensional drawing (DXF): each ring is
     a band 9.5 mm across and 76.2 mm [3.00 in] high, from 5.95 to 82.15 mm up the 88.1

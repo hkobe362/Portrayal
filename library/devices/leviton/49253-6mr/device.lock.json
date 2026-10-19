@@ -1,10 +1,10 @@
 {
  "bay-accepts": {},
- "composed": "cea48b9a45838323",
+ "composed": "c820d12faeb94fba",
  "composed-refs": {
-  "leviton/49253-2cv@1": "1.0.0+b3b788237096251a",
+  "leviton/49253-2cv@1": "1.0.1+e75e93187015df6a",
   "leviton/49253-6mr-panel@1": "1.0.0+da89d25051c7e462",
-  "leviton/49253-6mr-ring@1": "1.0.0+04604d43cc87f827",
+  "leviton/49253-6mr-ring@1": "1.0.1+921d5a9d7beeb666",
   "leviton/49253-flange@1": "1.0.0+f3dfe1002c8301e6"
  },
  "configs": [
@@ -64,6 +64,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "f410b050b8d4a3a3",
- "surface": "0450ed9dcdc68ee4",
- "version": "0.1.0"
+ "surface": "95e903ff03b137b2",
+ "version": "0.1.1"
 }

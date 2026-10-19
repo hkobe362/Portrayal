@@ -20,6 +20,6 @@ comments: "1RU five-ring horizontal cable manager with 6 in rings, Leviton 49253
   \ (0.240 in OD) at the 30 percent recommended practical maximum fill of one ring's 6.5 sq in usable\
   \ area (1.25 x 5.25 in); 71 at 50 percent and 35 at 25 percent - Leviton application note NS-AN-23-006-05-30-23,\
   \ page 14. A ring's count\n- physical.color: Black\n- physical.material: 16-gauge steel, black powder\
-  \ coated\n- physical.mounting-hardware: Four\n\nDrawing version 0.1.0. A major bump means a slot moved\
+  \ coated\n- physical.mounting-hardware: Four\n\nDrawing version 0.1.1. A major bump means a slot moved\
   \ or an id was renamed, so anything cached from an earlier export may no longer line up.\nModel maturity:\
   \ modelled. Every dimension in the source records where it came from."

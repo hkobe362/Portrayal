@@ -182,9 +182,19 @@ def test_the_49253_cover_seats_on_the_outer_rings_and_comes_off(name):
     assert cover.get("data-ref", "").startswith(f"leviton/{cover_ref}@1"), "1RU managers take the 1CV, 2RU the 2CV"
     assert cover.get("data-behaviour") == "mounts", "a cover with a pull handle in the explorer"
     plate = el["cover--plate"]
-    assert close(float(plate.get("width")), 442.7, 0.01) and close(float(plate.get("height")), h, 0.1)
-    # its plate is flush with the ring tips, so it stays inside the manager's own depth
-    assert close(float(plate.get("data-z-out")), float(el["guide-1--leg-outer"].get("data-z-out")), 0.01)
+    # the drawing's front view: a plate 438.76 mm wide and, at each end, the fold's strip 1.98 mm
+    # outside its edge, 442.7 mm over both
+    lip_l, lip_r = el["cover--lip-left"], el["cover--lip-right"]
+    assert close(float(plate.get("width")), 438.74, 0.01) and close(float(plate.get("height")), h, 0.1)
+    assert close(float(lip_l.get("width")), 1.98, 0.01) and close(float(lip_r.get("width")), 1.98, 0.01)
+    assert close(float(lip_l.get("x")) + float(plate.get("width")) + float(lip_l.get("width")) * 2, 442.7, 0.01)
+    assert close(float(plate.get("x")), float(lip_l.get("x")) + float(lip_l.get("width")), 0.01)
+    assert close(float(lip_r.get("x")), float(plate.get("x")) + float(plate.get("width")), 0.01)
+    # the strips and the plate stand in the same plane: one sheet wrapping round, not two
+    assert close(float(lip_l.get("data-z-out")), float(plate.get("data-z-out")), 0.01)
+    # its plate is flush with the ring tips to within the 0.1 mm a placement adds so the legs
+    # do not share its plane, so it stays inside the manager's own depth
+    assert close(float(plate.get("data-z-out")), float(el["guide-1--leg-outer"].get("data-z-out")), 0.15)
     # each end's pocket is 3.81 mm between plate and tab, over a ring leg 3.175 mm thick
     pocket = abs(float(el["cover--hook-left"].get("data-z-out"))) - 1.22
     assert pocket > 3.175 and close(pocket, 3.81, 0.01)

@@ -12,4 +12,11 @@
   and, on the two front-and-rear ducts, four oval pass-throughs in the top and four in the
   bottom. Cable capacity is the figure Leviton's application note states, with its basis. The
   designer covers 49265-DC1 and 49265-DC2 are not modelled: Leviton gives their width and
-  profile depth but no height.
+  profile depth but no height. After the first look: the two covers are drawn to their
+  front view (a plate 438.76 mm wide with 3.175 mm corner radii, and the fold's strip 1.98
+  mm outside the plate's edge at each end) and no longer show the rings through their
+  front in 3D; the five ring parts read against the panel in 2D, with the drawing's 1.17
+  mm radius edge and end seams; the finger walls of the three ducts stand on a foot and
+  widen at each slot root, as a stand-in for the 6.35 mm root radius. The 49253-6MR's
+  rear stays plain because its drawing's back view draws nothing but the holes, the folded
+  edges and the ear slots.

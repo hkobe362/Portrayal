@@ -1,11 +1,11 @@
 {
  "bay-accepts": {},
- "composed": "2bfc159a2c117bb3",
+ "composed": "ec04a48a03d72eae",
  "composed-refs": {
-  "leviton/49253-1cv@1": "1.0.0+355b6e81ab0b4e17",
+  "leviton/49253-1cv@1": "1.0.1+668724dd679f3f8b",
   "leviton/49253-flange@1": "1.0.0+f3dfe1002c8301e6",
   "leviton/49253-lpm-panel@1": "1.0.0+0944945005913654",
-  "leviton/49253-lpm-ring@1": "1.0.0+4cc4f98da9b63b98"
+  "leviton/49253-lpm-ring@1": "1.0.1+1aeb6a8b7ca4d3ca"
  },
  "configs": [
   "base",
@@ -65,5 +65,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "b360c727cd339270",
  "surface": "ffc2e5826cbe6724",
- "version": "0.1.0"
+ "version": "0.1.1"
 }

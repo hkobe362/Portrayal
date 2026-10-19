@@ -1,13 +1,13 @@
 {
  "bay-accepts": {},
- "composed": "b8b13ff48c1d7939",
+ "composed": "821fda6fe32a43cf",
  "composed-refs": {
   "leviton/versi-duct-front-base-1ru@1": "1.0.0+cd8e0b14120ab257",
   "leviton/versi-duct-front-cover-1ru@1": "1.0.0+9a4bdf0ebcb1d01e",
-  "leviton/versi-duct-front-fingers@1": "1.0.0+f05a8252ba5ad801",
+  "leviton/versi-duct-front-fingers@1": "1.0.1+3c2ac63a8febcb09",
   "leviton/versi-duct-rear-base-1ru@1": "1.0.0+16e0ca774f895f3f",
   "leviton/versi-duct-rear-cover-1ru@1": "1.0.0+78445fe7728760c6",
-  "leviton/versi-duct-rear-fingers@1": "1.0.0+9822e9cc4975ab47"
+  "leviton/versi-duct-rear-fingers@1": "1.0.1+41cd3935473226d4"
  },
  "configs": [
   "base",
@@ -58,5 +58,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "28823356c6907c7f",
  "surface": "8dab86a4ecffb18b",
- "version": "0.1.0"
+ "version": "0.1.1"
 }

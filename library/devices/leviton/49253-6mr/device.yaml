@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 49253-6mr
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Leviton
 model: 49253-6MR
@@ -68,6 +68,11 @@ provenance:
     note: >-
       drawing - the rear view: the back of the plate, plain, with ten round holes 4.58 mm
       across, two behind each ring's middle 52.3 mm apart, and the folded edges end-on.
+      Read again line by line against the drawing's BACK view, whose line work is the
+      plate's outline, the two folded edges, the ten holes and one slot 3.2 x 7.1 mm in
+      each of the four ear corners (the ears are not drawn): there is no other feature, no
+      rivet, tab, weld mark or label, so the rear is plain by the drawing and not by
+      omission.
   top:
     confidence: drawing
     note: >-
