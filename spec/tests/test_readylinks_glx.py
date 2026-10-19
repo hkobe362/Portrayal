@@ -9,6 +9,7 @@ BNC card and the blank already use.
 """
 import json
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -150,3 +151,77 @@ def test_a_sku_renders_with_its_cards_seated(name, tmp_path):
             assert f'"{slot}/module/rl{i}"' in els, (slot, i)
     if n == 1:
         assert '"slot-2/module/rl' not in els
+
+
+TWO_ROW = [n for n, s in sorted(SKUS.items()) if s[2] == 2]
+
+
+@pytest.mark.parametrize("name", TWO_ROW)
+def test_both_rows_print_rl1_to_rl12_and_the_tree_tells_them_apart(name, tmp_path):
+    """The maker prints RL1 to RL12 on each of the two plates (its product renders of the GL-24xB
+    and GL-24xC and the data sheet's "(24) ... ports" for two cards), so the drawing repeats the
+    legends; what must not repeat is a port's id and path, which carry the slot."""
+    r = subprocess.run([sys.executable, str(RENDER), str(LIB / "devices/readylinks" / name / "device.yaml"),
+                        "--library", str(LIB), "--out", str(tmp_path)], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr[-800:]
+    svg = (tmp_path / f"{name}.as-sold.front.svg").read_text()
+    legends = re.findall(r">(RL\d+)<", svg)
+    assert len(legends) == 24
+    assert legends[:12] == legends[12:] == [f"RL{i}" for i in range(1, 13)]
+    els = json.loads((tmp_path / f"{name}.as-sold.front.elements.json").read_text())["elements"]
+    ports = [e for e in els if e.get("group") == "readylink"]
+    ids = [e["id"] for e in ports]
+    assert len(ids) == len(set(ids)) == 24
+    assert [e["path"] for e in ports if e["seat"] == "slot-1"] == [f"slot-1/module/rl{i}" for i in range(1, 13)]
+    assert [e["path"] for e in ports if e["seat"] == "slot-2"] == [f"slot-2/module/rl{i}" for i in range(1, 13)]
+
+
+# The maker's product renders of the GL-12xB and GL-12xC (front, 3.62 px per mm from the jack
+# pitch), measured from the jack's centre down to the legend's baseline: the BNC row 32 px
+# (8.8 mm), the F-type row 35 px (9.7 mm). The GL-24xB and GL-24xC renders give 32.5 and 36 px
+# at 3.70 px per mm (8.8 and 9.7 mm). One pixel is 0.27 mm; the jack's centre and the legend's
+# baseline are each good to a pixel, so a gap is good to two: 0.55 mm.
+MAKER_GAP = {"gl-x-lc-12xb": 8.8, "gl-x-lc-12xc": 9.7}
+GAP_TOLERANCE = 0.55
+
+
+def _jack_centre(contract, rl):
+    part = next(p for p in contract["parts"] if p["id"] == rl and p["group"] == "readylink")
+    ns, rest = part["ref"].split("@")[0].rsplit("/", 1)
+    jack = yaml.safe_load((LIB / "components" / ns / rest / "v1/contract.yaml").read_text())
+    point = next(iter(jack["connection-points"].values()))["at"]
+    return part["at"][0] + point[0], part["at"][1] + point[1]
+
+
+def _legends(name):
+    svg = (LIB / "components/readylinks" / name / "v1/skins/default.svg").read_text()
+    return {t: (float(x), float(y)) for x, y, t in
+            re.findall(r'<text x="([\d.]+)" y="([\d.]+)"[^>]*>(RL\d+)</text>', svg)}
+
+
+@pytest.mark.parametrize("name", sorted(MAKER_GAP))
+def test_a_cards_legend_sits_under_its_jack_as_far_as_the_makers_render_shows(name):
+    contract = _contract(name)
+    legends = _legends(name)
+    assert sorted(legends) == sorted(f"RL{i}" for i in range(1, 13))
+    for i in range(1, 13):
+        cx, cy = _jack_centre(contract, f"rl{i}")
+        lx, baseline = legends[f"RL{i}"]
+        assert lx == pytest.approx(cx, abs=0.1), f"RL{i}"
+        assert baseline - cy == pytest.approx(MAKER_GAP[name], abs=GAP_TOLERANCE), f"RL{i}"
+
+
+def test_the_f_type_jack_sits_higher_against_its_legend_than_the_bnc_does_as_the_maker_has_it():
+    """The F-type card's jack is 0.75 lower than the BNC card's and its legend 1.3 lower, in the
+    vendor's model; the product renders show the same, so the F-type jack's gap to its legend
+    is the larger of the two. It is the maker's elevation, not a slip in the drawing."""
+    gaps = {}
+    for name in MAKER_GAP:
+        _cx, cy = _jack_centre(_contract(name), "rl1")
+        gaps[name] = _legends(name)["RL1"][1] - cy
+    assert gaps["gl-x-lc-12xc"] > gaps["gl-x-lc-12xb"]
+    assert gaps["gl-x-lc-12xc"] - gaps["gl-x-lc-12xb"] == pytest.approx(
+        MAKER_GAP["gl-x-lc-12xc"] - MAKER_GAP["gl-x-lc-12xb"], abs=GAP_TOLERANCE)
+    # the F-type jack centre is the vendor model's (y 8.50, x 24.35 + 20.70 n)
+    assert _jack_centre(_contract("gl-x-lc-12xc"), "rl1") == pytest.approx((24.35, 8.50), abs=0.01)
+    assert _jack_centre(_contract("gl-x-lc-12xc"), "rl12") == pytest.approx((24.35 + 20.70 * 11, 8.50), abs=0.01)
