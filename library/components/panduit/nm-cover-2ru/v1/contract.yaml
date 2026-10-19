@@ -1,0 +1,62 @@
+format: 1
+kind: component
+name: nm-cover-2ru
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+lid: true
+description: >-
+  The hinged cover of a Panduit NetManager High Capacity 2RU horizontal manager (NM2 and NMF2)
+  seen from the front - a PVC plate across the finger tips with a lip along its top and
+  bottom edge. It ships fitted on the front of the manager and on the rear of a front-and-rear
+  one, and opens up or down 110 degrees
+provenance:
+  size: >-
+    drawing - the plan view of the NMF2 and NM2 customer drawings (Panduit 10404-16 and 10404-20):
+    the cover is the thin bar along the front edge of the finger zone, as wide as the body,
+    and the parts list says "1- 2RU 19" COVER" (NMF2) and "2- 2RU 19" COVERS" (NM2), "2RU COVER:
+    PVC". 444.83 wide as the body (see nm-base-2ru) and 88 high.
+  relief: >-
+    drawing - the cover is the front 12.6 mm of the plan (the bar along the top of the
+    view, measured at 300 dpi). Its plate and lips are 3.5 and 1.5 thick, ESTIMATED: no view
+    sections the cover. The reference of this part is the front of the manager, so a placement
+    lifts nothing: the plate stands from 136.2 to 139.7 above the well's floor and the lips
+    from 127.1.
+  lid: >-
+    datasheet - the NetManager High Capacity specification sheet (RKSP237): "Dual hinged
+    covers shall allow access to the cable pathway", "Opens 110 degrees to the top or bottom
+    to provide complete access to the horizontal pathway without having to remove the
+    cover". It opens over the channel, so it is a lid (`lid: true`), and the pass-through windows
+    in the plate beneath it may be declared. The format has no hinge, so the cover is on or
+    off; the device records the gap.
+  color: >-
+    datasheet - "Cover Material: PVC", "The manager is black" on the product pages. The shade
+    is this library's render, a little lighter than the manager so the two read apart.
+size: {w: 444.83, h: 88}
+size-confidence: {w: estimated, h: drawing}
+attrs: {material: PVC}
+elements:
+  lip-top: {at: [0.0, 0.0], size: [444.83, 1.5], class: bezel}
+  lip-bottom: {at: [0.0, 86.5], size: [444.83, 1.5], class: bezel}
+  plate: {at: [0.0, 0.0], size: [444.83, 88], class: bezel}
+relief:
+  features:
+    - node: lip-top
+      lift: 127.1
+      out: 139.7
+      color: '#333639'
+      confidence: estimated
+      source: the plan view of the NetManager drawings, the cover over the front 12.6 mm; the lip's thickness is not dimensioned
+    - node: lip-bottom
+      lift: 127.1
+      out: 139.7
+      color: '#333639'
+      confidence: estimated
+      source: the plan view of the NetManager drawings, the cover over the front 12.6 mm; the lip's thickness is not dimensioned
+    - node: plate
+      lift: 136.2
+      out: 139.7
+      color: '#333639'
+      confidence: estimated
+      source: the plan view of the NetManager drawings; the plate's thickness is not dimensioned
+skins: [default]
