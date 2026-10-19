@@ -83,7 +83,7 @@
    "cisco/a9k-slot-cover@1"
   ]
  },
- "composed": "41ab8c849afcc6ef",
+ "composed": "5b6127806a53c0b5",
  "composed-refs": {
   "cisco/a99-10x400ge-x-se@2": "2.0.0+2cafa41984d516db",
   "cisco/a99-10x400ge-x-tr@2": "2.0.0+19038735632bb9ea",
@@ -105,8 +105,8 @@
   "cisco/a9k-ground-pad@1": "1.0.0+16625790efad7bbe",
   "cisco/a9k-mod200-se@2": "2.1.0+de8e21d4bd17b80e",
   "cisco/a9k-mod200-tr@2": "2.1.0+6e1203d705f80c28",
-  "cisco/a9k-mod400-se@2": "2.1.0+9a7e4ec613c42641",
-  "cisco/a9k-mod400-tr@2": "2.1.0+7c3bae8480488e6d",
+  "cisco/a9k-mod400-se@2": "2.1.0+abd6915ddc69839f",
+  "cisco/a9k-mod400-tr@2": "2.1.0+d0a655f5ccf2128c",
   "cisco/a9k-mpa-1x100ge@1": "1.0.1+e20cd2c36b929236",
   "cisco/a9k-mpa-1x40ge@1": "1.1.1+8dc1a59fc90fb9a1",
   "cisco/a9k-mpa-20x10ge@1": "1.1.0+25fd535447fcbae9",
@@ -207,5 +207,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "01946118ea90708c",
  "surface": "8517117eb2a35961",
- "version": "3.2.0"
+ "version": "3.2.1"
 }
