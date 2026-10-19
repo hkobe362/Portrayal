@@ -268,7 +268,7 @@ RULES = {
     "L55": ("library",    "every vendor namespace is in spec/schemas/vendors.yaml", "add the vendor to the registry with display, role and source",
             "A namespace missing from the registry breaks the link from the name on the metal to the company that owns it now, so a search under the current name finds nothing.",
             MIXED),
-    "L56": ("listing",    "a listing sits under a software vendor in spec/schemas/vendors.yaml and lists a device that exists - every configuration it overrides, port it names and component it maps is the hardware's", "register the NOS vendor with role software, point `hardware` at a device's <namespace>/<directory>, and name only configurations and ids that device declares",
+    "L56": ("listing",    "a listing sits under a software or reseller vendor in spec/schemas/vendors.yaml and lists a device that exists - every configuration it overrides, port it names and component it maps is the hardware's, and a reseller's carries no `nos`, `nos-versions` or `interfaces`", "register the vendor with role software (a NOS) or reseller (hardware sold under its own part numbers), point `hardware` at a device's <namespace>/<directory>, and name only configurations and ids that device declares",
             "A listing that names a port, configuration or part the hardware lacks would export interfaces and modules to a DCIM that no box has.",
             ERROR),
     "L57": ("device",     "exactly one configuration is `kind: base`, and each says whether it is orderable", "set `kind` on every configuration",
@@ -1818,6 +1818,18 @@ def _load_vendors(schemas):
 
 VENDORS, NAMESPACES = _load_vendors(
     Path(__file__).resolve().parents[2] / "schemas")
+
+
+def vendor_roles(entry):
+    """The roles a registry entry states, as a set.
+
+    `role` is one word or, for a vendor that is two things at once (FS makes
+    hardware and resells another maker's), a list of words. `both` is the old
+    spelling of hardware and software together.
+    """
+    role = (entry or {}).get("role")
+    words = [role] if isinstance(role, str) else list(role or [])
+    return {w for r in words for w in (("hardware", "software") if r == "both" else (r,))}
 
 
 def _load_pluggable_families(schemas):
@@ -7886,7 +7898,12 @@ def lint_rack(path, data, roots):
 
 
 def lint_listing(path, data, roots):
-    """L56: a listing lives under a NOS vendor and lists hardware that exists.
+    """L56: a listing lives under a NOS vendor or a reseller and lists hardware that exists.
+
+    A reseller listing (FS.com selling an APC cabinet under an FS part number)
+    is the same file without the NOS: it may say `model`, `aliases`,
+    `portfolio` and `source`, and carries no `nos`, `nos-versions` or
+    `interfaces`.
 
     A listing is a NOS vendor's entry for a box on its compatibility list:
     devices/arrcus/as7726-32x/listing.yaml points at edgecore/as7726-32x and
@@ -7902,12 +7919,27 @@ def lint_listing(path, data, roots):
     path = Path(path)
     ns = path.parent.parent.name
     entry = VENDORS.get(ns)
-    if entry is None or entry.get("role") not in ("software", "both"):
-        err(path, "L56", f"a listing lives under a NOS vendor, and {ns!r} is "
+    roles = vendor_roles(entry)
+    nos_only = [k for k in ("nos", "nos-versions", "interfaces") if data.get(k)]
+    if not roles & {"software", "reseller"}:
+        err(path, "L56", f"a listing lives under a NOS vendor or a reseller, and {ns!r} is "
             + ("in no vendor registry" if entry is None else f"registered with role {entry.get('role')!r}")
-            + ". Add it to spec/schemas/vendors.yaml with role: software, or move the "
-            "listing under the vendor that sells this NOS - the hardware's own maker "
+            + ". Add it to spec/schemas/vendors.yaml with role: software (a NOS) or "
+            "reseller (hardware sold under its own part numbers), or move the "
+            "listing under the vendor that sells this - the hardware's own maker "
             "files it under its `manufacturer:` and needs no listing")
+    elif "software" not in roles and nos_only:
+        err(path, "L56", f"{ns!r} is a reseller, and a reseller listing says only what the "
+            f"seller changes - `model`, `aliases`, `portfolio`, `source`. It names a NOS "
+            f"({', '.join('`' + k + '`' for k in nos_only)}), which belongs to a vendor with "
+            "role: software; a reseller sells the hardware as it is, so its ports keep the "
+            "maker's names")
+    elif "reseller" not in roles and not data.get("nos"):
+        err(path, "L56", f"{ns!r} is a NOS vendor, so its listing says which NOS it lists: "
+            "add `nos`")
+    elif "reseller" in roles and not data.get("nos") and nos_only:
+        err(path, "L56", f"a listing without `nos` is a reseller listing, which carries no "
+            f"{', '.join('`' + k + '`' for k in nos_only)}; add `nos` or drop them")
     hw = str(data.get("hardware") or "")
     man = next((Path(r) / "devices" / hw / "device.yaml" for r in roots
                 if (Path(r) / "devices" / hw / "device.yaml").exists()), None)
@@ -8080,7 +8112,7 @@ def lint_vendor_registry(root):
                 continue
             warn(child, "L55", f"namespace {child.name!r} is in no vendor registry. "
                  "Add it to spec/schemas/vendors.yaml with `display`, `role` "
-                 "(hardware | software | both) and `source` - and, if the company "
+                 "(hardware | software | reseller | both, or a list of them) and `source` - and, if the company "
                  "has been renamed, bought or absorbed since the metal was made, "
                  "`successor`/`parent`/`brands`, because that is the part a "
                  "consumer cannot derive and nobody writes down later. If this is "
