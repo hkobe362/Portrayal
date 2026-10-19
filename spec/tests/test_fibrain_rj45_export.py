@@ -28,10 +28,32 @@ def export(target, model):
     return yaml.safe_load(p.read_text())
 
 
-def test_the_copper_mixed_build_seats_modules_whose_exports_are_all_in_the_set():
+EXAMPLES = ("copper-mixed", "xpu00-copper", "xps00-copper")
+
+
+def seats(example):
     d = yaml.safe_load((LIB / "devices/fibrain/xpu/device.yaml").read_text())
-    seated = {v for k, v in d["configurations"]["copper-mixed"]["bays"].items() if "/pos-" in k}
-    assert seated and {r.split("/")[1].split("@")[0] for r in seated} <= set(MODULES)
+    return [v for k, v in d["configurations"][example]["bays"].items() if "/pos-" in k]
+
+
+@pytest.mark.parametrize("example", EXAMPLES)
+def test_a_copper_example_seats_modules_whose_exports_are_all_in_the_set(example):
+    seated = seats(example)
+    assert len(seated) == 48
+    assert {r.split("/")[1].split("@")[0] for r in seated} <= set(MODULES)
+
+
+@pytest.mark.parametrize("target", TARGETS)
+@pytest.mark.parametrize("example", EXAMPLES)
+def test_a_copper_example_lists_48_copper_interfaces_and_no_console_port(target, example):
+    """An example is no device type (the exporter files only the orderable frames), so the
+    48 ports of a full frame are counted through the module types its 48 seats export."""
+    n = 0
+    for ref in seats(example):
+        doc = export(target, ref.split("/")[1].split("@")[0].upper())
+        assert "console-ports" not in doc
+        n += len(doc["interfaces"])
+    assert n == 48
 
 
 @pytest.mark.parametrize("target", TARGETS)
@@ -47,6 +69,7 @@ def test_every_module_seated_in_the_copper_mixed_build_exports_an_interface(targ
     d = yaml.safe_load((LIB / "devices/fibrain/xpu/device.yaml").read_text())
     seated = {v.split("/")[1].split("@")[0]
               for k, v in d["configurations"]["copper-mixed"]["bays"].items() if "/pos-" in k}
+    assert len(seated) > 4
     for m in sorted(seated):
         doc = export(target, m.upper())
         assert [i["name"] for i in doc["interfaces"]] == [JACK[target]], m

@@ -43,18 +43,34 @@ const swItem = SEATED.items.find(i => i.ref === 'sw');
 const end = (item, path, view = 'front') => ({item: item.id, path, view});
 const JACK = (slot, pos) => `slot-${slot}/module/pos-${pos}/module/jack`;
 
-test('the frame\'s example build seats two holders with six modules each, as the manifest says', () => {
-  const cfg = cfgFile.configs.find(c => c.name === 'copper-mixed');
-  assert.ok(cfg, 'copper-mixed is a configuration of the frame');
-  const seated = Object.entries(cfg.bays).filter(([k]) => k.includes('/'));
-  assert.equal(seated.length, 12);
-  for (const [, ref] of seated) assert.ok(MODULES.includes(ref), ref);
-  assert.deepEqual([cfg.bays['slot-1'], cfg.bays['slot-2']], ['fibrain/xms00@1', 'fibrain/xmu00@1']);
+const SLOTS = [1, 2, 3, 4, 5, 6, 7, 8];
+const HOLDERS = {'copper-mixed': null, 'xpu00-copper': 'fibrain/xmu00@1', 'xps00-copper': 'fibrain/xms00@1'};
+
+test('the copper examples seat a holder in all eight slots with six modules each, as the manifest says', () => {
+  for (const name of Object.keys(HOLDERS)) {
+    const cfg = cfgFile.configs.find(c => c.name === name);
+    assert.ok(cfg, `${name} is a configuration of the frame`);
+    const seated = Object.entries(cfg.bays).filter(([k]) => k.includes('/'));
+    assert.equal(seated.length, 48, name);
+    for (const [, ref] of seated) assert.ok(MODULES.includes(ref), ref);
+    for (const s of SLOTS) {
+      const want = HOLDERS[name] ?? (s % 2 ? 'fibrain/xms00@1' : 'fibrain/xmu00@1');
+      assert.equal(cfg.bays[`slot-${s}`], want, `${name} slot-${s}`);
+    }
+  }
+});
+
+test('the orderable frames and the base ship empty', () => {
+  for (const name of ['base', 'xpu00', 'xps00']) {
+    const cfg = cfgFile.configs.find(c => c.name === name);
+    assert.ok(cfg, name);
+    assert.deepEqual(Object.keys(cfg.bays ?? {}), [], name);
+  }
 });
 
 test('every seated module\'s jack is a copper port on the front, in its holder, in its slot', () => {
   let n = 0;
-  for (const slot of [1, 2]) for (const pos of [1, 2, 3, 4, 5, 6]) {
+  for (const slot of SLOTS) for (const pos of [1, 2, 3, 4, 5, 6]) {
     const got = P.seatedPort(frame, end(frame, JACK(slot, pos)), ctx);
     assert.equal(got?.port, true, `${JACK(slot, pos)}`);
     assert.equal(got.onView, 'front');
@@ -64,12 +80,12 @@ test('every seated module\'s jack is a copper port on the front, in its holder, 
     assert.ok(MODULES.includes(got.holder.ref), got.holder.ref);
     n++;
   }
-  assert.equal(n, 12);
+  assert.equal(n, 48);
 });
 
-test('the kit lists the twelve jacks as cable ends of the frame\'s front', () => {
+test('the kit lists the 48 jacks as cable ends of the frame\'s front', () => {
   const paths = P.cableEndPaths(frame, 'front', ctx).filter(p => p.endsWith('/jack')).sort();
-  const want = [1, 2].flatMap(s => [1, 2, 3, 4, 5, 6].map(p => JACK(s, p))).sort();
+  const want = SLOTS.flatMap(s => [1, 2, 3, 4, 5, 6].map(p => JACK(s, p))).sort();
   assert.deepEqual(paths, want);
 });
 
@@ -102,9 +118,20 @@ test('a cable from a switch RJ45 port to a seated module is accepted, lands as c
   assert.ok(R.autoRoute(rack, c, rc).length >= 1, 'a route was found');
 });
 
+test('a cable lands on the last jack of the last slot, slot-8/pos-6', () => {
+  const jack = end(frame, JACK(8, 6));
+  assert.equal(jack.path, 'slot-8/module/pos-6/module/jack');
+  const res = apply(SEATED, [{op: 'cable.add', a: end(swItem, 'mgmt'), b: jack, media: 'cat6a'}], ctx);
+  assert.equal(res.error, undefined);
+  const settled = P.settleEnd(res.rack, jack, {facts: {item: true, drawing: true, port: false, cage: false, occupied: false, holder: null}, info: null, reason: 'no port'}, ctx);
+  assert.equal(settled.facts.port, true);
+  assert.equal(settled.info.family, 'copper');
+});
+
 test('a made-up position, an empty slot and the back of a jack are not ports', () => {
   assert.notEqual(P.seatedPort(frame, end(frame, JACK(1, 7)), ctx)?.port, true, 'pos-7');
-  assert.notEqual(P.seatedPort(frame, end(frame, JACK(3, 1)), ctx)?.port, true, 'slot-3 holds nothing');
+  const bare = add(M.newRack(), 'xpu', 40, {label: 'bare'}).items[0];
+  assert.notEqual(P.seatedPort(bare, end(bare, JACK(3, 1)), ctx)?.port, true, 'slot-3 of the bare frame holds nothing');
   // no IDC rear is modelled: the jack is on the front only
   assert.notEqual(P.seatedPort(frame, end(frame, JACK(1, 1), 'rear'), ctx)?.port, true, 'jack on the rear');
   // a made-up port on a module that is seated is refused when the cable is added, as the kit refuses it for any part

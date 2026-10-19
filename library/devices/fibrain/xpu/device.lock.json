@@ -279,7 +279,9 @@
   "lc-duplex-192",
   "mixed",
   "xps00",
-  "xpu00"
+  "xps00-copper",
+  "xpu00",
+  "xpu00-copper"
  ],
  "format": 1,
  "gaps": "5608a0bc430956d1",
@@ -318,7 +320,7 @@
   "top/placements/side-right",
   "top/placements/top-sheet"
  ],
- "names": "e12a4cd975fd3e8b",
+ "names": "6279d1bb30a8fba3",
  "placement-addressing": {
   "rel-pos": {
    "front/bays/slot-1": 1,
@@ -371,6 +373,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "4f06594705d30884",
- "surface": "656658c4c310ee31",
+ "surface": "7f646ad73018925e",
  "version": "0.2.0"
 }

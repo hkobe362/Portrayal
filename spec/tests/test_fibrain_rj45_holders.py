@@ -290,17 +290,66 @@ def test_the_fibre_holders_gain_no_bays():
         assert "bays" not in yaml.safe_load(p.read_text()), p
 
 
-def test_the_frame_has_a_copper_example_with_a_holder_and_modules_seated():
+def _cfg(name):
     d = yaml.safe_load((LIB / "devices/fibrain/xpu/device.yaml").read_text())
-    cfg = d["configurations"]["copper-mixed"]
+    return d["configurations"][name]
+
+
+def _name(ref):
+    return ref.split("/")[1].split("@")[0]
+
+
+# DSH XPU00 rev 2: "48 ports per 1U for copper" = 8 slots x 6 ways
+COPPER_EXAMPLES = {
+    # name -> holders its eight slots may seat
+    "copper-mixed": {"fibrain/xms00@1", "fibrain/xmu00@1"},
+    "xpu00-copper": {"fibrain/xmu00@1"},
+    "xps00-copper": {"fibrain/xms00@1"},
+}
+SCREENED_OF = {"fibrain/xms00@1": "screened", "fibrain/xmu00@1": "unscreened"}
+
+
+@pytest.mark.parametrize("name", COPPER_EXAMPLES)
+def test_a_copper_example_fills_all_eight_slots_with_six_modules_each(name):
+    cfg = _cfg(name)
     assert cfg["kind"] == "example"
-    assert cfg["bays"]["slot-1"] == "fibrain/xms00@1" and cfg["bays"]["slot-2"] == "fibrain/xmu00@1"
-    seated = {k: v for k, v in cfg["bays"].items() if "/" in k}
-    assert {re.sub(r"/pos-\d$", "", k) for k in seated} == {"slot-1", "slot-2"}
-    assert len(seated) == 12
-    refs = set(seated.values())
-    assert refs <= set(MODULE_REFS)
-    # one screened, one unscreened and one keystone module among them
-    assert any(contract(r.split("/")[1].split("@")[0])["attrs"]["screening"] == "screened" for r in refs)
-    assert any(contract(r.split("/")[1].split("@")[0])["attrs"]["screening"] == "unscreened" for r in refs)
-    assert any(contract(r.split("/")[1].split("@")[0])["attrs"]["keystone"] == "adapter" for r in refs)
+    assert "part-numbers" not in cfg
+    bays = cfg["bays"]
+    assert {k for k in bays if "/" not in k} == {f"slot-{n}" for n in range(1, 9)}
+    assert {k for k in bays if "/" in k} == {f"slot-{n}/pos-{p}" for n in range(1, 9) for p in range(1, 7)}
+    assert len(bays) == 8 + 48
+    assert set(bays[f"slot-{n}"] for n in range(1, 9)) <= COPPER_EXAMPLES[name]
+    for n in range(1, 9):
+        holder = bays[f"slot-{n}"]
+        # a screened holder takes screened modules and an unscreened one unscreened, as the datasheets pair them
+        for p in range(1, 7):
+            m = bays[f"slot-{n}/pos-{p}"]
+            assert m in MODULE_REFS, m
+            assert contract(_name(m))["attrs"]["screening"] == SCREENED_OF[holder], (n, p)
+
+
+def test_copper_mixed_alternates_the_holders_and_mixes_categories_and_keystone():
+    bays = _cfg("copper-mixed")["bays"]
+    assert [bays[f"slot-{n}"] for n in range(1, 9)] == ["fibrain/xms00@1", "fibrain/xmu00@1"] * 4
+    for n in range(1, 9):
+        mods = [_name(bays[f"slot-{n}/pos-{p}"]) for p in range(1, 7)]
+        assert {MODULES[m][0] for m in mods} == {"5", "6", "6A"}, n
+        assert any(MODULES[m][2] for m in mods), f"slot-{n} has a keystone module"
+
+
+@pytest.mark.parametrize("name,holder", [("xpu00-copper", "fibrain/xmu00@1"), ("xps00-copper", "fibrain/xms00@1")])
+def test_the_part_number_copper_examples_say_illustrative_and_ordered_separately(name, holder):
+    cfg = _cfg(name)
+    assert all(cfg["bays"][f"slot-{n}"] == holder for n in range(1, 9))
+    text = " ".join(cfg["description"].split()).lower()
+    assert "illustrative" in text and "ordered separately" in text
+    if name == "xps00-copper":
+        assert cfg["component-attrs"]["grounding-bar"] == _cfg("xps00")["component-attrs"]["grounding-bar"]
+
+
+def test_the_orderable_frames_and_base_still_ship_empty():
+    # DSH XPU00 rev 2 is titled 'empty' and the XPS00 sheet says the same: no holder in either SKU
+    for name in ("base", "xpu00", "xps00"):
+        assert "bays" not in _cfg(name), name
+    assert _cfg("xpu00")["kind"] == "orderable" and _cfg("xps00")["kind"] == "orderable"
+    assert _cfg("base")["kind"] == "base"

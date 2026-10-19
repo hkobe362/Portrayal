@@ -23,5 +23,12 @@
   interface and not a console port. The two holders differ in the screening
   springs the screened one draws. XR300 and XR310 are cable-end plugs and are
   not modules. `fibrain/xpu` takes both holders in each of its eight slots
-  (0.1.1 to 0.2.0) and gains the `copper-mixed` example build; the XCU10's
-  drawer is unchanged, because the maker lists no copper for it.
+  (0.1.1 to 0.2.0) and gains three example builds that fill all eight slots
+  with a six-way holder and six modules each, 48 RJ45 ports in the one unit
+  (DSH XPU00: "48 ports per 1U for copper"): `copper-mixed` (screened XMS00
+  and unscreened XMU00 alternating, each with modules of its own screening;
+  Cat.5, Cat.6 and Cat.6A, with keystone-adapter modules in every holder),
+  `xpu00-copper` (eight XMU00) and `xps00-copper` (eight XMS00, with
+  grounding). Illustrative: holders and modules are ordered separately, so the
+  orderable `xpu00` and `xps00` stay empty, as their datasheets give them.
+  The XCU10's drawer is unchanged, because the maker lists no copper for it.
