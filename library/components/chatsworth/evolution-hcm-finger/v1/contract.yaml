@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: evolution-hcm-finger
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 behaviour: mounts
 description: >-
@@ -35,6 +35,12 @@ provenance:
     names the finish of the steel; the fingers are plastic and the data sheet gives their
     colour only with the part colour letter (7 black, E Glacier White). The default is the
     black of a render of the part.
+  shading: >-
+    estimated - a stand-in for the light a render would give: the head carries a lit rim and a
+    10% lighter face, and the 4.0 either side of it, where the slot is, is shaded, so that a
+    black finger reads against the black back plate. The rim and the shade are semi-transparent
+    white and black over the finish, so they hold for Glacier White too. No document gives a
+    chamfer or a radius for the head.
 size: {w: 45.0, h: 11.4}
 size-confidence: {w: estimated, h: estimated}
 attrs: {material: Plastic}

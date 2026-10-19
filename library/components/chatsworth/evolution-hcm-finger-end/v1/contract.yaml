@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: evolution-hcm-finger-end
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 behaviour: mounts
 description: >-
@@ -26,6 +26,9 @@ provenance:
     184 to 190 under the door. The head runs to the plate's edge on the outer side.
   finish: >-
     estimated - as evolution-hcm-finger.
+  shading: >-
+    estimated - as evolution-hcm-finger: a lit rim on the head and the slot beside it shaded, a
+    stand-in so a black finger reads against the black plate.
 size: {w: 45.0, h: 11.4}
 size-confidence: {w: estimated, h: estimated}
 attrs: {material: Plastic}

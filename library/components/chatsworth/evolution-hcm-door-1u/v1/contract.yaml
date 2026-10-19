@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: evolution-hcm-door-1u
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 behaviour: mounts
 lid: true
@@ -41,6 +41,13 @@ provenance:
     estimated - black, or Glacier White (colour letter 7 or E in the part number). The
     default is the black of the maker's renders; the Glacier White shade is a configuration's
     to give.
+  contour: >-
+    estimated - STAND-INS, NOT MEASUREMENTS. The data sheet calls the door "contoured" and its
+    pictures (page 3) show a face that falls away toward the top and bottom returns, with the
+    aluminium strip standing proud of it in a darker channel. No document dimensions any of it,
+    so the bevel is declared as a stand-in: 7.0 wide each side, falling 1.0 toward the return
+    (`profile-y` on the plate), the strip 0.8 proud, the channel 1.5 either side of the strip,
+    and the lit and shaded bands drawn over the finish are the light a render would give.
   mark: >-
     not drawn - the maker's renders show a small square badge near the door's left end.
     A vendor mark is never drawn, and nothing is reserved for it.
@@ -51,11 +58,18 @@ elements:
   plate: {at: [0.0, 0.0], size: [450.0, 44.45], class: bezel}
   lip-top: {at: [0.0, 0.0], size: [450.0, 1.5], class: bezel}
   lip-bottom: {at: [0.0, 42.95], size: [450.0, 1.5], class: bezel}
+  strip: {at: [0.0, 19.225], size: [450.0, 6.0], class: bezel}
 relief:
   features:
+    - node: strip
+      lift: 206.0
+      out: 206.8
+      confidence: estimated
+      source: the aluminium strip stands proud of the contoured face in the maker's pictures; 0.8 is a stand-in, no document gives it
     - node: plate
       lift: 204.0
       out: 206.0
+      profile-y: [[0.0, 205.0], [7.0, 206.0], [37.45, 206.0], [44.45, 205.0]]
       confidence: estimated
       source: no document dimensions the door section; a thin moulding in the maker's pictures
     - node: lip-top

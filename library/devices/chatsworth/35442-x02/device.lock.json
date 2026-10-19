@@ -1,11 +1,11 @@
 {
  "bay-accepts": {},
- "composed": "3376cfbcf0a96684",
+ "composed": "758d93efa3aaea55",
  "composed-refs": {
-  "chatsworth/evolution-hcm-base-solid-2u@1": "1.0.0+4bfb8f976eb9a99a",
-  "chatsworth/evolution-hcm-door-2u@1": "1.0.0+5f2cfeb85425e610",
-  "chatsworth/evolution-hcm-finger-end@1": "1.0.0+635d7db9f5c43bd3",
-  "chatsworth/evolution-hcm-finger@1": "1.0.0+7b14b10e1b0afc87"
+  "chatsworth/evolution-hcm-base-solid-2u@1": "1.0.1+d61a13bfedbead2e",
+  "chatsworth/evolution-hcm-door-2u@1": "1.0.1+f85772bb2cd41fc6",
+  "chatsworth/evolution-hcm-finger-end@1": "1.0.1+685d1c2f4a4ce766",
+  "chatsworth/evolution-hcm-finger@1": "1.0.1+b5ec0de334c0d212"
  },
  "configs": [
   "base",
@@ -99,5 +99,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "bf4c9acf55541bad",
  "surface": "e107f117dfaba1bb",
- "version": "0.1.0"
+ "version": "0.1.1"
 }

@@ -26,6 +26,6 @@ comments: "2U Evolution horizontal cable manager with a solid chassis, Chatswort
   \ fill table gives (the 50% fill of the usable area, 17.0 sq in); its recommended fill for the same\
   \ cable is 87\n- performance.cable-capacity-media: cat6\n- physical.finish: Black or Glacier White powder\
   \ coat paint\n- physical.material: Steel, aluminum and plastic T-shaped cable guides\n- physical.weight-kg:\
-  \ 1.8\n\nDrawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached\
+  \ 1.8\n\nDrawing version 0.1.1. A major bump means a slot moved or an id was renamed, so anything cached\
   \ from an earlier export may no longer line up.\nModel maturity: modelled. Every dimension in the source\
   \ records where it came from."

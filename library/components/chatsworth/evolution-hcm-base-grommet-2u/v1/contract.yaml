@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: evolution-hcm-base-grommet-2u
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 description: >-
   The back plate of the 2U Chatsworth Evolution horizontal cable manager with grommets
@@ -14,6 +14,11 @@ fields:
     type: text
     default: '#232527'
 provenance:
+  shading: >-
+    estimated - a stand-in for the light a render would give: a 12% white layer over the plate,
+    not over its openings, so the plate reads as a plate against the black fingers in front of
+    it. It is a semi-transparent layer over the finish, so it holds for Glacier White too; no
+    document gives the plate's shade.
   size: >-
     datasheet - the Evolution Cable Management System data sheet (page 3, Evolution Horizontal
     Cable Managers table) gives 2U x 19" EIA x 8.2" (208 mm), chassis style with grommets, for

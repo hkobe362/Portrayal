@@ -10,3 +10,9 @@
   fingers, ports, brush and grommets are read off pictures and are `estimated`. A grommet and
   a door that swings up or down cannot be stated in the format and are gaps. The Evolution G3
   verticals, Motive, Velocity and the Universal manager are left for later.
+- The Evolution door is no longer a plain slab: its face is contoured, falling away toward the
+  top and bottom returns, and carries the aluminium strip proud of it in a shaded channel, in 2D
+  and in 3D. The fingers are drawn with a lit head and shaded slots, so a door-pulled drawing
+  shows them, the back plate carries a lit layer so it reads as a plate behind the black
+  fingers in 3D, and the brush window of the `33548` managers is outlined on the rear view. The
+  bevel, strip height, shading and frame are stand-ins stated in the components' sources.

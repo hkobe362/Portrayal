@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 33548-x02
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Chatsworth Products
 model: 33548-X02
@@ -126,7 +126,7 @@ provenance:
       the 66.1 between the finger plates), centred on the height, 30 mm in from the end of the
       450.0 between the ears, as seen from the front: the insert is about a third of the part's
       width in the perspective picture. The bristles are drawn vertical, meeting in a horizontal
-      line; the picture does not show their direction. The plate's ears are the ends of the plate;
+      line; the picture does not show their direction. The window is outlined with a light frame 3.0 outside it and the seam is a lighter line, both STAND-INS so the brush reads on the dark plate: the picture shows the insert's raised rim and no document dimensions it. The plate's ears are the ends of the plate;
       their mounting holes are not drawn.
   passes:
     confidence: estimated
@@ -260,8 +260,10 @@ views:
     size: {w: 482.6, h: 88.9}
     panel:
       decor:
-        - {id: back, at: [0, 0], size: [482.6, 88.9], fill: '#232527', sink: 0.05, kind: base}
+        - {id: back, at: [0, 0], size: [482.6, 88.9], fill: '#3a3c3e', sink: 0.05, kind: base}
         - {id: brush, at: [46.3, 24.6], size: [150, 39.7], rx: 0, pattern: brush, bristle: vertical, sink: 1}
+        - {id: brush-frame, at: [43.3, 21.6], size: [156, 45.7], rx: 3, stroke: '#8b9299', stroke-width: 1.4}
+        - {id: brush-seam, at: [46.3, 43.25], size: [150, 1.2], rx: 0, fill: '#6c737a', kind: brush-seam}
     passes:
       - {id: brush-window, at: [46.3, 24.6], size: [150, 39.7], shape: rect, cover: brush}
   top:
