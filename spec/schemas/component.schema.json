@@ -15,6 +15,19 @@
    "interface"
   ]
  },
+ "not": {
+  "required": [
+   "part-numbers",
+   "attrs"
+  ],
+  "properties": {
+   "attrs": {
+    "required": [
+     "model"
+    ]
+   }
+  }
+ },
  "$comment": "A KIT IS THE THIRD KIND (roc-ops/Portrayal#905, docs/rack-mounting-design.md section 4): a rail, bracket or slide kit, a set of ordinary components a device names from `chassis.kits` and never places. It has no `class` and no `size` - its parts carry both - and admits only the kit keys. A component or a module still requires `class` and `size` and takes none of the kit keys.",
  "if": {
   "required": [
@@ -601,6 +614,27 @@
    "type": "string",
    "minLength": 40,
    "description": "WHY NOTHING SEATS THIS PART. A component nothing references is either work in progress or dead weight, and from the outside the two look identical. Saying which, here, is what lets L89 fail on an unreferenced part that carries no `unplaced`. The sentence is for a reader who has just found the part and is deciding whether to use it, extend it or delete it: say what would seat it and what is missing, and name the issue if the work is tracked. Not a waiver and not a silence - a part that IS seated must not carry this."
+  },
+  "part-numbers": {
+   "type": "object",
+   "minProperties": 1,
+   "propertyNames": {
+    "pattern": "^\\S(.*\\S)?$"
+   },
+   "description": "THE ORDER CODES THIS MODULE IS SOLD UNDER, the shape of a device configuration's `part-numbers` without a power cord: model -> {part}. Each key is one exported DCIM module type, named by the key, with `part_number` from `part`, so one drawing with two order codes (Casa's BDM2m, `BDM2M-W` Open and `BDM2M-N` No Licenses) is two module types with the same ports. A contract states this OR `attrs.model`, never both, so the name has one source; one with neither is exported under its `name`. Take the keys from the vendor's ordering table as printed and cite the sheet and page in `provenance`. The rack kit opens the type file of the first key in sorted order. Adding it to a module that was named by `attrs.model` renames its module type in a DCIM that already holds it.",
+   "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "part"
+    ],
+    "properties": {
+     "part": {
+      "type": "string",
+      "minLength": 1
+     }
+    }
+   }
   },
   "superseded-by": {
    "type": "string",

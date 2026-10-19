@@ -398,6 +398,11 @@ def main():
                 "size-confidence": data.get("size-confidence") or {},
                 "size-notes": data.get("size-notes", ""),
                 "attrs": data.get("attrs") or {},
+                # THE ORDER CODES A MODULE IS SOLD UNDER (#70), in the order the
+                # contract writes them: one DCIM module type per key. Left out of
+                # an entry whose contract has none, so every other row is
+                # unchanged.
+                **({"part-numbers": data["part-numbers"]} if data.get("part-numbers") else {}),
                 # what a form can change on it - see the schema's `fields`
                 "fields": data.get("fields") or {},
                 "skins": data.get("skins", ["default"]),

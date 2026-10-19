@@ -940,6 +940,20 @@ a `contract` change is. Which NetBox and Nautobot the exports need, and which
 features need NetBox 4.6 or later, is in
 [`library/README.md`](../library/README.md#which-netbox-and-nautobot-the-exports-need).
 
+**A component's `part-numbers`.** A component contract may carry the map a
+device configuration carries, `{<model>: {part: <part number>}}` with no
+`power-cord`, and it is an optional key, so it does not raise `format`. Each key
+is one exported module type, named by the key, with `part_number` from `part`;
+a contract with two keys exports two module types with the same ports, and one
+without the key exports under `attrs.model` or its `name` as before. The schema
+refuses a contract that carries both `part-numbers` and `attrs.model`, so the
+name has one source. The build publishes the map on the contract's
+`components.json` entry as `part-numbers`, with its keys sorted like every key
+in that file, and leaves the key out of every entry that has none. The rack kit
+opens the module type file of the first key in sorted order. Moving a module from `attrs.model` to
+`part-numbers` renames its module type, which is a DCIM-data change in the
+sense above.
+
 ## What is promised before 1.0
 
 The package is at 0.x, and at 0.x the promise is deliberately small:
