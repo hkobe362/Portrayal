@@ -131,10 +131,10 @@
    "casa/ups-32x4@1"
   ]
  },
- "composed": "36ca1aa05b3cf0f4",
+ "composed": "6a111d494c9c00eb",
  "composed-refs": {
   "casa/bdm2@1": "1.7.0+02a739768ed88c36",
-  "casa/bdm2m@1": "1.7.0+03a5e11ab8e9e159",
+  "casa/bdm2m@1": "1.8.0+ea61f77e23ccc6af",
   "casa/bdm@1": "1.7.0+79100eca87e8b2e1",
   "casa/blank-faceplate@1": "1.5.1+27d90af8946d4918",
   "casa/c40g-ac-inlet-panel@1": "1.6.0+51ba7ccf9a2b14d7",
@@ -149,7 +149,7 @@
   "casa/ds-8x192@1": "1.7.0+b9f32b3b1d8a8d90",
   "casa/ds-8x8@1": "1.7.0+410e1ef3be87c45c",
   "casa/ds-8x96@1": "1.7.0+9becbc6f97b9b738",
-  "casa/io-6p12-io2@1": "1.7.1+21b48a89c06b3a12",
+  "casa/io-6p12-io2@1": "1.8.0+d3632638df4e586e",
   "casa/io-6p12-sw-io2@1": "1.8.1+a4a3f3529d79da1e",
   "casa/io-6p12-sw@2": "2.8.1+aa01c1bbf9acd86b",
   "casa/io-6p12@2": "2.7.1+0502099d2bbac9e2",
@@ -160,7 +160,7 @@
   "casa/shelf-ground-stud@1": "1.0.0+f01b75c5bc2629db",
   "casa/smm-2x10g@1": "1.8.0+db87321c9f98ab60",
   "casa/smm-300g@1": "1.7.0+d4c64698e8ea3aea",
-  "casa/smm-300gm@1": "1.7.0+f3287d5abb9ba209",
+  "casa/smm-300gm@1": "1.8.0+a1ad3e21982cf550",
   "casa/smm-8x10g@1": "1.10.0+e1bff95d7568d2ae",
   "casa/smm-sw-bdm-a@1": "1.6.1+05dc7f4bc2b5e414",
   "casa/smm-sw-bdm-b@1": "1.6.1+d6b46fad86cd779f",
@@ -316,5 +316,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "7dc5aebb427e6693",
  "surface": "a5d7643eb617cb55",
- "version": "0.5.20"
+ "version": "0.5.21"
 }

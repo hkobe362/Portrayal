@@ -392,14 +392,19 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # The Eaton PDU12IEC's grounding stud (#1044), a common/ground-stud@1 on its rear
 # face between the inlet and the breakers, adds one more seat (down) and one
 # more device.
-WANT = {"down": 108, "left": 27, "up": 8, "right": 21}
+# The seven ReadyLinks GL-x siblings (#763) each place the GL-12xB-240D's rear
+# stud again, seven more seats (down) on seven more devices.
+WANT = {"down": 115, "left": 27, "up": 8, "right": 21}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
 # four poles (one level in), and one M4 pair on each of eight UfiSpace
 # chassis (#830), every one of which leads its wire left, toward the end of
 # the flank its pair sits at
-WANT_PAIRS = {"down": 45, "left": 12, "up": 1, "right": 1}
+# (#918) and the S9501-18SMT's two M4 pairs, one leading left and one right,
+# which brought the pair seats to 61 on 34 devices; their four studs are
+# still ring-lug seats, as the four lugs they replace were
+WANT_PAIRS = {"down": 45, "left": 13, "up": 1, "right": 2}
 NAMES = {0: "right", 90: "down", 180: "left", 270: "up"}
 LEADS = {"right": 0, "down": 90, "left": 180, "up": 270}
 PAIR_IFACES = ("stud-pair-5-8", "stud-pair-3-4", "stud-pair-1")
@@ -462,9 +467,9 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 66   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC
+    assert len({k[0] for k in ring}) == 73   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, and the seven ReadyLinks GL-x siblings
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
-    assert len({k[0] for k in pairs}) == 33
+    assert len({k[0] for k in pairs}) == 34
     # a pair is turned only along itself
     assert {r["turn"] for r in pairs.values()} == {0, 180}
 

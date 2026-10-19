@@ -463,10 +463,34 @@ def component_versions(library: pathlib.Path, below=()):
     never holds a ref a library below it holds (overlay.py), so no part is
     answered twice.
     """
-    out = {}
-    for root in (*below, library):
-        _collect_versions(out, pathlib.Path(root))
+    out = _Versions()
+    roots = [pathlib.Path(r) for r in (*below, library)]
+    # EVERY PART THAT MATES AN INTERFACE, because a bay that states one takes
+    # them (manifest.offers), and an edit to such a card has to reach the lock of
+    # a device whose configurations draw it there
+    for root in roots:
+        for ct in (root / "components").glob("*/*/v*/contract.yaml"):
+            try:
+                doc = manifest.load_yaml(ct) or {}
+            except Exception:
+                continue
+            if doc.get("superseded-by"):
+                continue
+            ref = f"{ct.parts[-4]}/{ct.parts[-3]}@{ct.parts[-2][1:]}"
+            for iface in manifest.mates_of(doc):
+                out.candidates.setdefault(iface, []).append((ref, doc))
+    for root in roots:
+        _collect_versions(out, root)
     return out
+
+
+class _Versions(dict):
+    """The `component_versions` mapping, carrying `candidates` beside it:
+    `{interface: [(ref, contract)]}`, what `manifest.offers` reads."""
+
+    def __init__(self):
+        super().__init__()
+        self.candidates = {}
 
 
 def _collect_versions(out, library: pathlib.Path):
@@ -488,11 +512,12 @@ def _collect_versions(out, library: pathlib.Path):
             ver + "+" + _component_digest(ct.parent, doc))
         # what this major draws: its parts, the defaults they ship holding,
         # its faces (manifest.drawn_refs), and what its own bays seat or take
-        out.setdefault(f"{vendor}/{name}", {})[major] = _children(doc)
+        out.setdefault(f"{vendor}/{name}", {})[major] = _children(
+            doc, getattr(out, "candidates", None))
     return out
 
 
-def _children(contract):
+def _children(contract, candidates=None):
     """The refs a component draws that it does not itself contain: its `parts`
     with the defaults they ship holding and its faces (`manifest.drawn_refs`),
     and every ref its own bays seat or take.
@@ -514,7 +539,7 @@ def _children(contract):
         refs += [(a or {}).get("ref") for a in contract.get("accessories") or []]
     for bay in (contract.get("bays") or {}).values():
         bay = bay or {}
-        refs += [bay.get("default")] + list(bay.get("accepts") or [])
+        refs += [bay.get("default")] + manifest.offers(bay, candidates)
     return [r for r in refs if r]
 
 
@@ -555,7 +580,7 @@ def _composed(doc, versions):
         for kind in ("bays", "placements"):
             for item in (((view or {}).get("components") or {}).get(kind) or []):
                 for ref in ([item.get("ref"), item.get("default")]
-                            + list(item.get("accepts") or [])):
+                            + manifest.offers(item, getattr(versions, "candidates", None))):
                     if ref:
                         todo.append(ref)
     while todo:

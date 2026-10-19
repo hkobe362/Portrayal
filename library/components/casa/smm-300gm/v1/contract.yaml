@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: smm-300gm
-version: 1.7.0
+version: 1.8.0
 class: supervisor
 behaviour: fills
 profile: networking
@@ -16,8 +16,9 @@ description: >-
 size: {w: 30.47, h: 345.5, d: 380.0}
 size-confidence: {d: known-wrong}
 size-notes: 'd 380.0 is IMPOSSIBLE - a front and a rear card mate at a midplane inside a 386.0 chassis and two at 380.0 need 760. See provenance/depth-known-wrong'
+part-numbers:
+  SMM-300-GM: {part: SMM-300-GM}
 attrs:
-  model: 'SMM 300GM'
   role: supervisor
   qsfp28: '2'
   sfp-plus: '10'
@@ -28,6 +29,11 @@ attrs:
   nebs: 'Designed to NEBS level 3 requirements'
   power-draw-max-w: 160
 provenance:
+  part-numbers: >-
+    datasheet - C40G_DS_RevA and C100G_DS_RevA (CommScope, 9-2024), Ordering Information, page 5 of
+    each: SMM-300-GM "SMM300Gm w/10x10G Ports + 2x100G Ports". It was named by attrs.model
+    "SMM 300GM" before, which neither sheet orders. The sheets' Specifications table, page 4, lists
+    the module as SMM300GM with two 100GE (QSFP28) and ten 10GE (SFP+) interfaces.
   led-states: >-
     datasheet - C100G Hardware Installation Guide (rev 07/08/2022) Table 1-2 and Table 6-1,
     Front-installed module LEDs, and the C40G guide (rev 07/07/2022) Table 1-2, for the SMM, QAM
