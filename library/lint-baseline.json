@@ -2215,6 +2215,34 @@
   "L29": 1,
   "L61": 6
  },
+ "devices/readylinks/gl-12xb-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-12xc-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-12xc-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xb-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xb-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xc-240d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
+ "devices/readylinks/gl-24xc-p600d/device.yaml": {
+  "L29": 1,
+  "L61": 6
+ },
  "devices/readylinks/gl-8xep/device.yaml": {
   "L93": 1
  },
