@@ -147,4 +147,15 @@ interfaces:
   pcie-12vhpwr: {standard: pcie-16pin-header, note: 'the 16-pin 12VHPWR connector of PCIe CEM 5.0 and ATX 3.0: twelve 12 V and ground power contacts on 3.00 pitch and four sense contacts; marked "H+". generic/pcie-16pin-plug@1 mates it'}
   pcie-12v-2x6: {standard: pcie-16pin-header, note: 'the 12V-2x6 revision of the 16-pin connector (PCIe CEM 5.1, ATX 3.1): the same housing as 12VHPWR with the sense contacts recessed further; marked "H++". The cable plug is unchanged, so generic/pcie-16pin-plug@1 mates it'}
   nvlink-a100-pcie: {standard: nvlink-a100-pcie-connector, note: 'the NVLink bridge connector on the top edge of an A100 PCIe card (three per card); nvidia/nvlink-bridge-a100-2slot@1, NVIDIA 900-53651-0000-000, mates it at both ends. Other cards that take a bridge (A30, A40, H100 PCIe, H100 NVL, H200 NVL) have their own bridge part numbers and are not this interface until a source says the connectors intermate'}
+  # PCIe add-in card slots (docs/cards-by-interface-design.md). THE KEY IS THE SLOT
+  # THE BRACKET FITS, as `sfp` names the cage and not the optic, and it is spelled
+  # without the word bracket because the standards entry names the part and this
+  # names the opening. Two keys by bracket height; length, lane width and
+  # generation stay in `attrs` and the bay's `slot:` block, because a gen3 card
+  # seats in a gen4 slot and an x8 card in an x16. A two-slot card is not a key: it
+  # mates `pcie-fh` and states `slot-width: 2`. A component bay states the key as
+  # its `interface`, and a card that fills a bay states it as `mates`. No part
+  # states either yet.
+  pcie-fh: {standard: pcie-bracket-fh, note: 'a PCIe slot whose opening takes a full-height add-in card bracket (PCI Express CEM 5.0, figure 11-5); a two-slot card mates it too and states slot-width: 2'}
+  pcie-lp: {standard: pcie-bracket-lp, note: 'a PCIe slot whose opening takes a low-profile add-in card bracket (PCI Express CEM 5.0, figure 11-9)'}
   breaker-1ru-guard: {cover: true, note: 'NOT A CONNECTOR - A COVER MOUNT. The face of a 1RU plug-in breaker, where its touch guard screws on; amphenol-ns/touch-guard-1ru@1 mates it. Registered here because a cover that ships on a part and comes off is the same mechanism as a dust cap in a port: one slot, one occupant, a default'}

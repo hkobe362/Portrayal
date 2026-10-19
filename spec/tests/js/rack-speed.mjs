@@ -43,6 +43,14 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // bend, PLUG_SPLIT): the generated racks of bend-room-sample (`sample-N`), and
 // only they, since every other rack here is LC, or gives the reach as a number
 // as speed-fixture does. 1,259 of the 3,094 answers moved.
+// RECORDED AGAIN FOR #966, which moves the answers of a cable that
+// rises through the open gap behind a tray instead of going round its front
+// edge: 1,045 answers in 67 racks, all from 532 cables, each 6.4 to 282.2 mm
+// shorter. A hand-edited route never uses the gap (a cable whose route is
+// edited, a bundle with a written trunk or a hand-edited member), which left
+// nine bundled cables of the speed racks on the front edge. Listed before they
+// were recorded, by running this file's digests with --exact on the kit before
+// and after over the same racks: no answer moved for any other reason.
 test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);
@@ -133,11 +141,15 @@ test('spareOf takes the path it is handed, and reads the one kept without', () =
 // read of the rack of the budgets below, by the kit's own counter, not by the
 // clock: the run-outs were tried at 1,202 lead ends (1,070 of them with a
 // floor in the lead), three trial lays each, and taken at 34.
-test('at 300 cables: run-outs are tried at 87 lead ends, not 1,202, and the 34 taken before are taken', () => {
+// With the way up through a tray's gap (#966) a cable that tried one is laid
+// again without it, and the counter counts both lays: it reads 101 and 38
+// (87 and 34 before the gap; 102 and 38 before a hand-edited route was kept
+// from the gap, and with it a bundle's cables: one lay fewer is tried).
+test('at 300 cables: run-outs are tried at 101 lead ends, not 1,202, and 38 are taken', () => {
   const made = speedRack(M, F, {cables: 300, bundles: 4, seed: 11}), rack = made.rack, ctx = made.ctxOf(rack);
   R.RUN_OUTS.tried = R.RUN_OUTS.taken = 0;
   for (const c of rack.cables) R.routePath(rack, c, ctx);
-  assert.deepEqual({...R.RUN_OUTS}, {tried: 87, taken: 34});
+  assert.deepEqual({...R.RUN_OUTS}, {tried: 101, taken: 38});
 });
 
 // ── the budgets ──────────────────────────────────────────────────────────
@@ -157,7 +169,11 @@ test('at 300 cables: run-outs are tried at 87 lead ends, not 1,202, and the 34 t
 // and EDITED 0.2 and are 0.1. On a shared machine at a load of 14 a first
 // read took 3 s (2.9 s with the run-outs gated, 3.3 s without), so the
 // ceiling is twice that, and some nine times a quiet machine's.
-const FIRST_MS = 6000, SECOND = 0.03, ANEW = 0.1, EDITED = 0.1;
+// HELD AFTER #966 (the gap behind a tray, 302 of 1,026 lays laid twice): on the
+// loaded machine above a first read took 4.4 to 4.8 s before and 7.4 to 8.3 s
+// after, past 6000, so FIRST_MS is 10000 (what it was before #1038) and the
+// fractions are as they were.
+const FIRST_MS = 10000, SECOND = 0.03, ANEW = 0.1, EDITED = 0.1;
 test('at 300 cables: a first read within its budget, and a second, a new context and one cable moved within a fraction of it', () => {
   const made = speedRack(M, F, {cables: 300, bundles: 4, seed: 11}), rack = made.rack;
   assert.equal(rack.cables.length, 300);

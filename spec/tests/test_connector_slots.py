@@ -90,7 +90,11 @@ def test_the_connector_registry_is_not_vacuous():
                          # GPU power and NVLink (P-0028): presented by parts no
                          # device places yet, so none is a slot below
                          "eps12v-8pin", "pcie-8pin", "pcie-12vhpwr", "pcie-12v-2x6",
-                         "nvlink-a100-pcie"}
+                         "nvlink-a100-pcie",
+                         # the two PCIe slot forms (docs/cards-by-interface-design.md):
+                         # a riser bay states one as its `interface`, so no part
+                         # presents either and neither is a slot below
+                         "pcie-fh", "pcie-lp"}
     # No connector interface is also a cage family's: one core, two registries,
     # and an interface must not be answered by both.
     fam_ifaces = {f.get("interface") for f in render_mod._pluggable_families().values()}
