@@ -50,8 +50,8 @@ recommendation, not a decision.
 
 1. **Draw the coil with legs, and count the legs as spare.** The path, the need
    and the stock size are not touched. `routePath` keeps returning the same
-   points with and without a `slack` entry, as the version-4 test already
-   asserts. The coil and its legs are separate output.
+   points with and without a `slack` entry, as `spec/tests/js/rack-slack.mjs`
+   already asserts. The coil and its legs are separate output.
 2. **Measure the cells from the part, and warn rather than refuse past a bound.**
    A cell is the floor between two rings. It holds a turn only where the turn
    fits at the cable's bend radius. How high turns may stack is not in any
@@ -126,8 +126,8 @@ placement on the figure with legs and at the stock the cord has (a cord whose
 stored length after legs is under one turn is not placed, and has no legs). A
 stock size then rises only for a cord with an explicit entry that cannot afford
 its legs (section 3.6). Breaks: the lengths of such cords on saved racks
-(section 4), and the version-4 test that the path is the same with and without a
-`slack` entry.
+(section 4), and the test in `rack-slack.mjs` that the path is the same with and
+without a `slack` entry.
 
 **Option C: move the lay line to the edge of the floor** where a cell holds a
 coil. A line at 50.3 leaves 58.2 of centre-line room beyond it, enough for a turn
@@ -346,10 +346,10 @@ two-way (nothing depends on it once it is back out).
 
 | change | where | |
 |---|---|---|
-| a coil and its legs as kit output (`spareCoils`, or a field of `spareMarks`); `routePath` `points` untouched | kit API | two-way until a page draws it; one-way once a published page and agents read it |
+| a coil and its legs as kit output (`spareCoils`, or a field of `spareMarks`); `routePath` `points` untouched | kit API | two-way until a page draws it; one-way once a published page or a script reads it |
 | cells of a tray, with capacity, as kit output | kit API | two-way |
 | the `stored` text of the schedule, the BOM spare line, `inspect` and `describe` for a placed cord (from "not placed" to a place) | export content, downloads | one-way: spreadsheets read the text |
-| `spare-unplaced` falls; a new finding kind for a spare that does not fit (`spare-no-room`) | finding kinds | one-way for the new kind: agents match kinds |
+| `spare-unplaced` falls; a new finding kind for a spare that does not fit (`spare-no-room`) | finding kinds | one-way for the new kind: readers match finding kinds |
 | a stack bound in the tray contract (`slack: {kind: area, stack}`), if measured | library schema, optional key | one-way (schema label); the contract `format` stays 1 |
 | the drum height of a spool, spool data on the FHD parts | library schema and the parts | one-way for the key; each part's version and lock move |
 | a stored-room key for a vertical manager, if a source states one | library schema | one-way |
@@ -442,17 +442,21 @@ every figure is from the library's own parts and the kit.
   decisions 4 and 8 of section 10; [cable-lay-design.md](cable-lay-design.md)
   sections 4.4, 5, 6 and 9 (read only); [cable-managers-design.md](cable-managers-design.md)
   sections 14 and 15; [vertical-cable-managers-design.md](vertical-cable-managers-design.md)
+  (searched for spare and storage: it says nothing of either)
 - `kit/rack/route.js` (`alongTray`, `railSide`, `STOCK_M`, `END_PLAY_M`,
   `BREAK_TOL_M`, `spareOf`, `withRoutedLengths`, `FILL_LIMIT`, `DIAMETERS`),
-  `route-path.js`, `bundle-route.js`, `queries.js`, `slack.js`, `solids.js`
-  (`traysOf`), `resting.js` (`BEND`); read only
+  `queries.js`, `slack.js`, `solids.js` (`traysOf`), `resting.js` (`BEND`);
+  read only. `route-path.js` and `bundle-route.js` were searched for spare and
+  slack and hold neither
 - `library/components/fs/fhd-cmp5dr-tray/v1/contract.yaml`, whose provenance cites
   FS's 0U/1U Horizontal Cable Manager Datasheet (updated 2025-05-11); the
   repository records no URL for it. `library/devices/fs/fhd-1ufmt-n/device.yaml`,
   citing the FHD-1UFMT-N Fiber Enclosure Datasheet, page 4; no URL recorded.
-- Tests: `spec/tests/js/rack-resting.mjs`, `rack-lay-findings.mjs`,
-  `rack-speed.mjs`, `speed-goldens.json`, `rack-slack.mjs`,
-  `rack-spare-ducts.mjs`, `route-direct-fixture.mjs`
+- Tests: `spec/tests/js/rack-resting.mjs` (the strip, 48.8 to 110),
+  `rack-slack.mjs` (twelve `spare-unplaced`; the unchanged points),
+  `rack-spare-ducts.mjs`, `rack-speed.mjs` and `speed-goldens.json` (the digests
+  that placement would move), `route-direct-fixture.mjs` (the reference rack).
+  `rack-lay-findings.mjs` was searched for tray and spare and holds neither.
 
 **Checked against `origin/main` at `713499fab`:** each file path, function, key
 and constant named above exists there; the counts (one tray component, one device
