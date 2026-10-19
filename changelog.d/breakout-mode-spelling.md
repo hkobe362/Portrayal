@@ -4,8 +4,7 @@
   or a device is a count of one or more with no leading zero, the letter `x`,
   and a speed from `spec/schemas/speeds.yaml` in lower case (`4x25g`, `1x400g`),
   so a filter for ports that break out can read the count. It is an error, and
-  no mode in the library fails it. L194 stays reserved for the open change that
-  holds that code.
+  no mode in the library fails it.
 
 ### Changed
 - **The three S9600 lane-sharing keys are renamed.** `breakout` becomes

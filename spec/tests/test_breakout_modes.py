@@ -59,7 +59,6 @@ def test_a_rule_with_no_modes_is_skipped():
 def test_a_listing_and_a_device_are_both_read():
     assert lint.RULES["L195"][0] == "listing, device"
     assert lint.RULES["L195"][4] == lint.ERROR
-    assert "L194" in lint.RESERVED or "L194" in lint.RULES
 
 
 # ---- every mode on main ----------------------------------------------------------

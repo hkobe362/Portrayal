@@ -16,21 +16,21 @@
    "cisco/asr-9902-fan@1"
   ],
   "rear/bays/pm-0": [
-   "cisco/pwr-1p6kw-ac@1",
-   "cisco/pwr-1p6kw-dc@1"
+   "cisco/pwr-1p6kw-ac@2",
+   "cisco/pwr-1p6kw-dc@2"
   ],
   "rear/bays/pm-1": [
-   "cisco/pwr-1p6kw-ac@1",
-   "cisco/pwr-1p6kw-dc@1"
+   "cisco/pwr-1p6kw-ac@2",
+   "cisco/pwr-1p6kw-dc@2"
   ]
  },
- "composed": "426407647e1fdf6a",
+ "composed": "50ce9896c12332ce",
  "composed-refs": {
   "cisco/a99-rp-f@1": "2.1.1+b951b88e9818502c",
   "cisco/a9k-ground-pad@1": "1.0.0+16625790efad7bbe",
   "cisco/asr-9902-fan@1": "1.0.0+344beeb5cf839688",
-  "cisco/pwr-1p6kw-ac@1": "1.0.1+25f8deb0bfb52801",
-  "cisco/pwr-1p6kw-dc@1": "1.0.1+1c34a8d7eed0c211",
+  "cisco/pwr-1p6kw-ac@2": "2.0.0+5a44d78f01035c6c",
+  "cisco/pwr-1p6kw-dc@2": "2.0.0+946b6d06dcec4453",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/led-rect-sm@1": "1.0.0+9ebac9d739e4dcb6",
   "common/power-switch-slide@1": "1.0.0+18edf3cf4c1163ad",
@@ -50,7 +50,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "a6e62978ac616737",
+ "gaps": "9a285cce3e7158bc",
  "groups": [
   "board-status",
   "fan-trays",
@@ -273,7 +273,7 @@
   "rear/placements/power-status",
   "rear/placements/power-switch"
  ],
- "names": "784819fcd8041869",
+ "names": "2381a82961e46c68",
  "placement-addressing": {
   "for": {
    "front/placements/board-status": [
@@ -652,7 +652,7 @@
   "rear/placements/power-switch": "power-switch"
  },
  "placement-surface": "44136fa355b3678a",
- "shape": "0ebf327bc2284cd8",
- "surface": "d2150fd433350ee4",
- "version": "1.0.4"
+ "shape": "30000f98363b0e8f",
+ "surface": "461a557ece5c508d",
+ "version": "2.0.0"
 }

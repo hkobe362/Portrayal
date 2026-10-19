@@ -496,6 +496,8 @@ silkscreen:
 - Text printed on a module's own faceplate is not chassis silkscreen. It
   belongs in that component's skin, inside `<g id="silkscreen">`.
 - Use `text:` for words and `path:` for lines and symbols. Exactly one.
+- **Printing that runs sideways is drawn rotated** (decided 2026-10-18). See
+  "Rotated printing" below for the one form to write.
 - **Label what the panel labels.** Every port, lamp and button that carries a
   printed legend on the hardware gets one here. Missing labels are the single
   most repeated review finding: a face that renders correctly and says nothing
@@ -505,6 +507,54 @@ silkscreen:
   checks that a `for:` target is nearby; nothing checks alignment.
 - **One gap per lamp block.** Measure the lamp-to-label distance once from the
   photograph and reuse it for every lamp in that block.
+
+### Rotated printing
+
+A legend is turned when the space for it is narrower than the word is long: a
+6.4 mm gap between two jacks on a 14.5 mm plate, a fan tray's edge. About 290
+component skins already do this, so the form below is what the library does,
+not a new rule. One `<text>` carries the turn; the glyphs are not converted to
+paths.
+
+```svg
+<g id="silkscreen">
+  <text x="22.82" y="7.25" transform="rotate(-90 22.82 7.25)" text-anchor="middle"
+        font-family="sans-serif" font-size="3.1" font-weight="bold" fill="#333333">10Gb</text>
+</g>
+```
+
+- **Direction.** SVG turns clockwise on screen. `rotate(90 ...)` reads top to
+  bottom (2,104 uses in the skins); bottom to top is `-90` (262 uses) or `270`
+  (19 uses, all Juniper skins, e.g. `juniper/scb-mx/v3`). They draw the same
+  thing. **Write `-90` for new work.** It is the only bottom-to-top spelling
+  a device's own silkscreen marks use (`rotate: -90`, e.g.
+  `celestica/ds2000`), the placement checks in lint name it (`90, 270, -90`),
+  and the renderer emits it as given. Lint's `_svg_rot` accepts any
+  `rotate(` form, so it holds nobody to a spelling and no existing skin was
+  changed; a rotation of 270 is not a defect.
+- **Pivot.** The text's own `x y`, written twice: `x="22.82" y="7.25"
+  transform="rotate(-90 22.82 7.25)"`. Two skins pivot elsewhere
+  (`commscope/cc3008`, `eaton/g4-outlet-labels`); do not copy them. With
+  `text-anchor="middle"` (the usual choice) `y` is the middle of the word along
+  the plate and `x` is the BASELINE. At `-90` the capitals rise to the left of
+  the baseline, so the ink centres about `x - cap-height / 2`: to centre a
+  label at card x 21.7 with 3.1 mm type, put `x` about 1.1 mm to its right.
+  Measure the ink, then add the half capital back.
+- **Font.** `font-family="sans-serif"`, the size from the reference: a
+  capital's height in a vector master is the extent across the turned glyphs
+  (2.25 mm there, so 3.1 mm type at about 0.72 em). `fill` is the reference's
+  glyph colour. Add `font-weight="bold"` when the reference's
+  strokes are visibly heavy, as Dell's lettering is; otherwise leave it off.
+- **Where it sits.** Inside `<g id="silkscreen">` (lint L38; Juniper names it
+  `<g id="...-silkscreen">`, which the sweep also takes). Lint's box for a
+  rotated text is the upright box turned about the pivot (L50), and it
+  estimates 0.6 em a letter, so allow it a little extra room.
+- **Contract.** The contract does not record skin printing as `elements:`. A
+  rotated label is a skin node and nothing else: no box, rotated or upright,
+  appears in the contract. If a number on the label is data (the PSU's
+  `watts`), the contract holds the attr and the text carries `data-from`.
+  Say where the position was measured in `provenance`, in the key that
+  explains the printing.
 
 **Gate 3.** Render with silkscreen, compare to the reference. Every legend is
 present, spelled as printed, next to its cutout. Make L14 pass before moving on.

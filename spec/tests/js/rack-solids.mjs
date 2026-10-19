@@ -115,7 +115,9 @@ test('owner\'s fixture: today\'s routes cross the lacer\'s plates; with the deto
   // front of the ring's line, and here two and a half, 62.5 mm: pulled taut,
   // the cord turns 107.7 degrees there, not a right angle, and that turn
   // and the right angle at the approach point need 59.2 mm of the leg
-  // between them (136.2 = 73.7 + 62.5)
+  // between them (136.2 = 73.7 + 62.5). (c6 could rise through the gap
+  // behind the tray, #966, but it would have to run on out of its plug to a
+  // lead point to turn, and that is the longer: 0.881 m against 0.852.)
   const [d6] = R.routePath(rack, rack.cables[5], ctx).detours;
   assert.deepEqual(d6.between, [{end: 'a'}, {item: 'i3', via: 'guide-2'}]);
   assert.deepEqual(d6.points.map(p => Math.round(p.z * 10) / 10), [136.2]);
