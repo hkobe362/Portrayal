@@ -11,7 +11,9 @@
   site the files are as with the option off and a note says why. A name over
   100 characters, or one that two bundles of a rack share, is left out and said,
   never cut. The kit cannot see a bundle the instance already has, and the
-  README says so. **With the option off, every file is what it was.** Nautobot
+  README says so: NetBox refuses the whole bundles file if any bundle in it
+  already exists, so remove those rows first (or skip the file on a re-import);
+  the cables still join those bundles by name. **With the option off, every file is what it was.** Nautobot
   has no bundle object and is unchanged. `cableImportRows` takes `dcim` and
   returns `bundleFile`; `netboxFiles(dcim)` gives the file names; `kitReadme`
   reads the option from its `dcim`.

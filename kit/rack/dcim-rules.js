@@ -805,9 +805,10 @@ export function kitReadme({target = 'netbox', rack, date, dcim = {}, typeFiles =
     item(`Steps 4 and ${bundled ? 6 : 5} find a device by its name in every site, and step 4 finds a module type by its model in every manufacturer: ` +
          'a name NetBox already has twice is refused as not unique.');
     if (bundled)
-      item('This kit cannot see the cable bundles an instance already has. A bundle name must be unique in NetBox (the name field of dcim.CableBundle is unique), ' +
-           'and what NetBox does with a name it already holds has not been tried on a running instance. Look in the instance\'s cable bundles before step 5. ' +
-           'Step 6 finds a bundle by its name, so a cable naming a bundle that already exists joins it, with the cables already in it.');
+      item('This kit cannot see the cable bundles an instance already has. A bundle name must be unique in NetBox, and NetBox refuses the whole of ' +
+           `${F.bundles} if any bundle in it already exists: nothing in the file is created. Look in the instance's cable bundles before step 5, ` +
+           'and remove the rows of the bundles that already exist. Step 6 finds a bundle by its name, so a cable naming a bundle that already exists joins it, ' +
+           `with the cables already in it. When you import this rack again, skip ${F.bundles} and import ${F.cables} alone.`);
   }
   out.push('');
 

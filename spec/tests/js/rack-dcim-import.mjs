@@ -656,7 +656,7 @@ test('with the option on, a bundles file comes first, the cables file names each
   assert.ok(!text.some(l => /4-cables\.csv/.test(l)));
   assert.ok(text.some(l => /^- Steps 4 and 6 find a device by its name/.test(l)), text.join('\n'));
   // Nothing the kit cannot see is promised.
-  assert.ok(text.some(l => /cannot see the cable bundles an instance already has/.test(l) && /not been tried/.test(l)), text.join('\n'));
+  assert.ok(text.some(l => /cannot see the cable bundles an instance already has/.test(l) && /refuses the whole of 4-bundles\.csv/.test(l) && /remove the rows/.test(l) && /skip 4-bundles\.csv/.test(l)), text.join('\n'));
 });
 
 test('two racks whose bundles share a name get bundles that differ, by site and rack', () => {
