@@ -26,7 +26,7 @@ NOT_COVERED = {"cisco/a9k-mod80-se@2", "cisco/a9k-mod80-tr@2",
 MAX_CARDS = {"asr-9922": 20, "asr-9912": 10, "asr-9910": 8, "asr-9906": 4,
              "asr-9904": 2, "asr-9010": 8, "asr-9006": 4}
 SUPERVISOR_SLOTS = {"asr-9006": 2, "asr-9904": 2, "asr-9906": 2, "asr-9910": 2}
-GAINED =sorted(set(MAX_CARDS) - {"asr-9010"})
+GAINED = sorted(set(MAX_CARDS) - {"asr-9010"})
 
 
 def _bays(chassis):
@@ -84,9 +84,8 @@ def _local(tag):
 
 def _device_point(transform, x, y):
     """Where `translate(a,b) rotate(r) translate(c,d)` sends a point."""
-    import math
     import re
-    nums = [[float(n) for n in re.split(r"[ ,]+", args.strip())]
+    nums =[[float(n) for n in re.split(r"[ ,]+", args.strip())]
             for _, args in re.findall(r"(\w+)\(([^)]*)\)", transform)]
     (a, b), (r,), (c, d) = nums
     x, y = x + c, y + d
@@ -177,7 +176,6 @@ def _drawn(chassis, slot, ref):
     (kind, id-or-text, (x0, y0, x1, y1)), read from the rendered SVG.
     A text's box is estimated from its font size (0.7 em a character, wide
     on purpose), turned by its own `rotate` and then by the seat's."""
-    import math
     import re
     from xml.etree import ElementTree as ET
     from portrayal import render
