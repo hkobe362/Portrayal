@@ -39,7 +39,7 @@ from portrayal import manifest as _manifest
 from portrayal import optical
 from portrayal import optical_ports
 from portrayal import stacks
-from portrayal.faces import DIRECTIONS, OPTICAL_FACES, face_ref
+from portrayal.faces import BODY_SIDES, DIRECTIONS, OPTICAL_FACES, face_ref, side_patch, side_viewbox
 from portrayal.manifest import (view_parts, targets, split_target, presented_interface,
                       VIEW_KEY_ORDER,
                       component_refs, load_yaml, nested_key_host, chained_occupant_ref,
@@ -268,7 +268,7 @@ RULES = {
     "L55": ("library",    "every vendor namespace is in spec/schemas/vendors.yaml", "add the vendor to the registry with display, role and source",
             "A namespace missing from the registry breaks the link from the name on the metal to the company that owns it now, so a search under the current name finds nothing.",
             MIXED),
-    "L56": ("listing",    "a listing sits under a software vendor in spec/schemas/vendors.yaml and lists a device that exists - every configuration it overrides, port it names and component it maps is the hardware's", "register the NOS vendor with role software, point `hardware` at a device's <namespace>/<directory>, and name only configurations and ids that device declares",
+    "L56": ("listing",    "a listing sits under a software or reseller vendor in spec/schemas/vendors.yaml and lists a device that exists - every configuration it overrides, port it names and component it maps is the hardware's, and a reseller's carries no `nos`, `nos-versions` or `interfaces`", "register the vendor with role software (a NOS) or reseller (hardware sold under its own part numbers), point `hardware` at a device's <namespace>/<directory>, and name only configurations and ids that device declares",
             "A listing that names a port, configuration or part the hardware lacks would export interfaces and modules to a DCIM that no box has.",
             ERROR),
     "L57": ("device",     "exactly one configuration is `kind: base`, and each says whether it is orderable", "set `kind` on every configuration",
@@ -313,8 +313,8 @@ RULES = {
     "L70": ("device",     "a `fact:` gap names a real fact and does not contradict the device", "fix the gap's scope or remove it",
             "A gap scoped to a misspelt fact leaves the comparison showing a bare blank although the search was done, and a device that states a figure while calling the vendor silent on it shows a number and a retraction at once.",
             ERROR),
-    "L71": ("component",  "a body box reaches no further than the part says it is deep; a round one states its axis (a ring its wall) and is square across it; one that `shows` a drawing is a box of a part declaring that face", "shrink the body box or raise `body.depth`; state `axis`/`wall` or square the envelope; declare the face or drop `shows`",
-            "A body box deeper than the part gives the wrong bay hole, pull distance and fit checks, and a round piece with no axis or a non-square section builds as an oval in 3D.",
+    "L71": ("component",  "a body box reaches no further than the part says it is deep, unless it is a fitted option (`when`); a round one states its axis (a ring its wall) and is square across it; one that `shows` a drawing is a box of a part declaring that face, and one that shows a side shows a patch inside that side's `skins/body-<side>.svg`, whose width and height are its viewBox's in mm", "shrink the body box or raise `body.depth`; state `axis`/`wall` or square the envelope; declare the face, draw the side, widen its viewBox or drop `shows`",
+            "A body box deeper than the part gives the wrong bay hole, pull distance and fit checks, a round piece with no axis or a non-square section builds as an oval in 3D, and a side patch outside its drawing is smeared with the drawing's edge.",
             MIXED),
     "L72": ("device",     "a bay's `plan:` or `rear:` lands in a view that exists, inside the chassis", "fix the plan view name or the coordinates",
             "A bay projected into a view or neighbour that does not exist draws nothing and raises nothing, so the plan or rear view silently loses the part.",
@@ -544,8 +544,8 @@ RULES = {
     "L147": ("component",  "a connection point's `turns` is a subset of the turns its part's interface allows in connectors.yaml, and only the presented point states one (an error)", "list only turns the interface allows - a point narrows the list, it cannot widen it; move `turns` to the point the interface is presented at, or drop it",
              "A connection point cannot allow a turn its interface does not, since no mating part is drawn for that turn, and `turns` on a point nothing reads would look like a setting that works when it does nothing.",
              ERROR),
-    "L148": ("component",  "a node a field moves or shows names a `choice` field the contract declares, and every option its `data-move` or `data-show` lists is one of that field's options; every option of a field with SHOW nodes shows at least one node, or is listed in the field's `drawn-by-absence` (an error)", "declare the field as a choice, or name only its options in the table; spell a move `option: dx dy [deg]`; show a node for the option, or list it in `drawn-by-absence`",
-             "A switch or selector position drawn for an option nobody can set, or an option with nothing drawn for it, would look correct while the drawing never changes when that option is chosen.",
+    "L148": ("component",  "a node a field moves or shows names a `choice` field the contract declares, and every option its `data-move` or `data-show` lists is one of that field's options; every option of a field with SHOW nodes shows at least one node, or is listed in the field's `drawn-by-absence`; a body piece fitted by an option (`when`) names a choice field and its options, and every skin shows a node for each option it lists (an error)", "declare the field as a choice, or name only its options in the table; spell a move `option: dx dy [deg]`; show a node for the option, or list it in `drawn-by-absence`; give a fitted piece's option a SHOW node in every skin",
+             "A switch or selector position drawn for an option nobody can set, or an option with nothing drawn for it, would look correct while the drawing never changes when that option is chosen; a fitted piece whose option no node shows is never built.",
              ERROR),
     "L149": ("component",  "a node a position moves stays inside its part under every move: its box, translated and turned, lies within `size` (an error)", "shorten the move, or move the node in the skin so its travel stays on the part",
              "An actuator moved off its own part would be drawn on the chassis beside it, and extruded there in the 3D view.",
@@ -571,11 +571,11 @@ RULES = {
     "L156": ("kit",        "every configuration of a kit has its own `id`, and names in `parts` only ids of the kit's own `parts` (error)", "list the part ids the configuration uses, as the kit's `parts` spell them; give each configuration an id of its own",
              "A kit configuration that names parts the kit does not have, or shares an id with another, cannot be assembled, and a device's depth override that names it could point at the wrong one.",
              ERROR),
-    "L157": ("kit",        "every depth range of a kit configuration, one `[min, max]` or one per hole type, has min below max (error)", "write the range as `[min, max]` in mm, from the source; a single figure is a `preset`, not a range",
-             "A depth range whose minimum is not below its maximum fits no rack, so a person building a rack would be told the kit fits a depth it cannot.",
+    "L157": ("kit",        "every depth range of a kit configuration, one `[min, max]` or one per hole type, has min below max, and a configuration with a `preset` and no `depth` has a kit `gaps` entry `what: depth` that lists its id in `scope` (error)", "write the range as `[min, max]` in mm, from the source; a single figure is a `preset`, not a range, and a preset may stand alone: leave `depth` out and add the gap `what: depth` with the configuration's id in `scope`",
+             "A depth range whose minimum is not below its maximum fits no rack, so a person building a rack would be told the kit fits a depth it cannot; a configuration that states only its factory setting has no range, and without a gap that says so the missing range looks like an oversight rather than a source that is silent.",
              ERROR),
-    "L158": ("kit",        "`travel` appears only on a kit whose `motion` is `sliding` (error)", "drop `travel`, or set `motion: sliding` if the rails really slide out for service",
-             "Travel on fixed rails would claim the equipment slides out for service when it does not.",
+    "L158": ("kit",        "`travel` appears only on a kit whose `motion` is `sliding`, and a kit whose `motion` is `telescoping` states a `preset` on at least one configuration (error)", "drop `travel`, or set `motion: sliding` if the rails really slide out for service; give a telescoping kit the factory setting its source prints, as the `preset` of the configuration it belongs to",
+             "Travel on fixed rails would claim the equipment slides out for service when it does not, and a telescoping kit is set at install, so one that records no factory setting leaves the rack builder nothing to start from.",
              ERROR),
     "L159": ("kit",        "every accessory `ref` of a kit resolves to a component in the library that is not a kit (error)", "fix the ref (namespace/name@major), or write the arm's or the bar's contract",
              "An accessory ref that points at nothing, or at another kit, leaves a cable arm or bar the kit promises and cannot draw.",
@@ -1828,6 +1828,18 @@ VENDORS, NAMESPACES = _load_vendors(
     Path(__file__).resolve().parents[2] / "schemas")
 
 
+def vendor_roles(entry):
+    """The roles a registry entry states, as a set.
+
+    `role` is one word or, for a vendor that is two things at once (FS makes
+    hardware and resells another maker's), a list of words. `both` is the old
+    spelling of hardware and software together.
+    """
+    role = (entry or {}).get("role")
+    words = [role] if isinstance(role, str) else list(role or [])
+    return {w for r in words for w in (("hardware", "software") if r == "both" else (r,))}
+
+
 def _load_pluggable_families(schemas):
     """The pluggable ladder registry, or an empty one if the checkout is broken.
 
@@ -2786,6 +2798,8 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
     a 170.9 reach and a PCB starting 13.9 behind the plate and running 170.9,
     which is 184.8. The number the part states has to contain its own body.
     A box with no `confidence` is counted, once per file, as L35 counts.
+    A piece that `shows` a side shows a patch of the part's own
+    body-<side>.svg that lies inside that drawing (faces.side_patch).
     """
     body = data.get("body") or {}
     boxes = body.get("boxes") or []
@@ -2793,8 +2807,15 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
         return
     d = float((data.get("size") or {}).get("d") or 0)
     unmarked = 0
+    sized = set()      # side drawings whose stated size has been checked
     for i, b in enumerate(boxes):
         reach = float(b.get("from") or 0) + float(b["depth"])
+        # A FITTED OPTION IS NOT THE BARE PART. size.d and body.depth are the
+        # part as it ships; an extender a buyer bolts on (`when`) makes it
+        # longer, and holding that piece to the bare reach would make the
+        # option undrawable or the part's own depth a lie.
+        if b.get("when"):
+            reach = 0.0
         if reach > d + 0.05:
             err(path, "L71", f"body box {b.get('id') or i} reaches {reach:g} behind the "
                              f"face and size.d says the part is {d:g} deep")
@@ -2835,15 +2856,141 @@ def lint_component_body_boxes(path, data, _lib_roots=None):
         # `faces`, and the index publishes just those; a piece naming a face
         # the part never declared is built plain, silently, for as long as the
         # contract lives - the failure L77 exists for, one key over.
-        for which in b.get("shows") or []:
+        #
+        # A SIDE IS THE PART'S OWN body-<side>.svg, and a piece crops the patch
+        # of it the piece lies under - so the patch has to be inside the
+        # drawing, or the crop reads past its edge and the side is smeared
+        # with whatever the edge pixel holds. The drawing's width and height
+        # are its viewBox's, in mm, or a browser scales it to another aspect.
+        shows = b.get("shows") or []
+        if "plan" in shows and "top" in shows:
+            err(path, "L71", f"body box {name} shows both `plan` and `top` - they paint "
+                             f"the same side; keep one")
+        for which in shows:
             if shape != "box":
                 err(path, "L71", f"body box {name} is a {shape} and `shows` a drawing - "
-                                 f"only a box has a flat top or back to carry one")
+                                 f"only a box has a flat side to carry one")
+            elif which in BODY_SIDES:
+                sp = Path(path).parent / "skins" / f"body-{which}.svg"
+                vb = side_viewbox(sp)
+                if not sp.exists():
+                    err(path, "L71", f"body box {name} shows the part's `{which}` side and "
+                                     f"there is no skins/body-{which}.svg")
+                    continue
+                if vb is None:
+                    err(sp, "L71", f"body-{which}.svg has no viewBox of four numbers, so "
+                                   f"no piece can tell which patch of it to show")
+                    continue
+                if sp not in sized:
+                    sized.add(sp)
+                    root = ET.parse(sp).getroot()
+                    for attr, want in (("width", vb[2]), ("height", vb[3])):
+                        got = root.get(attr) or ""
+                        try:
+                            ok = got.endswith("mm") and abs(float(got[:-2]) - want) <= 0.05
+                        except ValueError:
+                            ok = False
+                        if not ok:
+                            err(sp, "L71", f"body-{which}.svg says {attr}={got!r} and its viewBox "
+                                           f"is {want:g} - state it as {want:g}mm")
+                x0, y0, x1, y1 = side_patch(b, which, float((data.get("size") or {}).get("w") or 0),
+                                            float(body.get("depth") or 0))
+                vx, vy, vw, vh = vb
+                if x0 < vx - 0.05 or y0 < vy - 0.05 or x1 > vx + vw + 0.05 or y1 > vy + vh + 0.05:
+                    err(path, "L71", f"body box {name} shows {x0:g}..{x1:g} x {y0:g}..{y1:g} of "
+                                     f"body-{which}.svg, whose viewBox covers {vx:g}..{vx + vw:g} x "
+                                     f"{vy:g}..{vy + vh:g} - widen the drawing or drop `{which}`")
             elif not face_ref(data, which):
                 err(path, "L71", f"body box {name} shows the part's `{which}` drawing and "
                                  f"the part declares no `faces.{which}`")
     if unmarked:
         warn(path, "L71", f"{unmarked} of {len(boxes)} body boxes carry no confidence")
+    for a, b, axis, at in coplanar_box_faces(boxes):
+        err(path, "L71", f"body boxes {a} and {b} share a face plane at {axis} {at:g} where "
+                         f"they overlap - the two faces z-fight and shimmer in 3D; end one "
+                         f"of them 0.05 short of the plane")
+
+
+def coplanar_box_faces(boxes):
+    """Pairs of plain boxes that have a face on one plane and overlap there.
+
+    Two faces on the same plane, facing the same way, over a shared patch are
+    drawn at one depth and the GPU picks between them pixel by pixel, so the
+    patch shimmers as the camera moves. Faces that face opposite ways (boxes
+    that abut) are not this. Pieces fitted for different options are never
+    drawn together and are not compared. Returns (id, id, axis, plane)."""
+    def extent(b):
+        x, y = (float(v) for v in b["at"])
+        w, h = (float(v) for v in b["size"])
+        z = float(b.get("from") or 0)
+        return {"x": (x, x + w), "y": (y, y + h), "z": (z, z + float(b["depth"]))}
+
+    plain = [(b.get("id") or str(i), b) for i, b in enumerate(boxes)
+             if (b.get("shape") or "box") == "box"]
+    found = []
+    for i, (na, a) in enumerate(plain):
+        for nb, b in plain[i + 1:]:
+            if a.get("when") and b.get("when") and a["when"] != b["when"]:
+                continue
+            ea, eb = extent(a), extent(b)
+            for axis in "xyz":
+                others = [k for k in "xyz" if k != axis]
+                if any(min(ea[k][1], eb[k][1]) - max(ea[k][0], eb[k][0]) <= 1e-6
+                       for k in others):
+                    continue
+                for end in (0, 1):
+                    if abs(ea[axis][end] - eb[axis][end]) < 1e-6:
+                        found.append((na, nb, axis, ea[axis][end]))
+    return found
+
+
+def lint_component_fitted_pieces(path, data):
+    """L148, for a body piece: a fitted option (`when`) is a choice the part
+    offers, and the drawing can say it was chosen.
+
+    The kit builds such a piece only while the part's drawing shows a
+    `data-show-from` node for one of the options it lists (relief.js
+    pieceFitted), because the drawing is where a configuration's choice and a
+    viewer's are both settled. A piece whose option no node shows is never
+    built, and nothing anywhere says so: the extender that was modelled and
+    is never seen. So every skin carries a SHOW node for each option a piece
+    lists - an empty group, when the face does not change with it."""
+    fields = data.get("fields") or {}
+    fitted = [(b.get("id") or i, b["when"]) for i, b in
+              enumerate((data.get("body") or {}).get("boxes") or []) if b.get("when")]
+    if not fitted:
+        return
+    skins_dir = Path(path).parent / "skins"
+    shown = {}
+    for skin in (data.get("skins") or ["default"]):
+        sp = skins_dir / f"{skin}.svg"
+        try:
+            root = ET.parse(sp).getroot()
+        except (OSError, ET.ParseError):
+            continue          # L3 reports a missing or unparseable skin
+        got = shown[skin] = {}
+        for el in root.iter():
+            k = el.get("data-show-from")
+            if k is not None:
+                got.setdefault(k, set()).update((el.get("data-show") or "").split())
+    for name, when in fitted:
+        for k, opts in sorted(when.items()):
+            f = fields.get(k) or {}
+            if f.get("type") != "choice":
+                err(path, "L148", f"body box {name} is fitted by {k!r}, which is not a choice "
+                                  "field the contract declares")
+                continue
+            options = {str(o) for o in f.get("options") or []}
+            for o in [str(o) for o in opts]:
+                if o not in options:
+                    err(path, "L148", f"body box {name} is fitted by {k}={o}, which is not an "
+                                      f"option of {k} ({', '.join(sorted(options))})")
+                    continue
+                for skin, got in sorted(shown.items()):
+                    if o not in got.get(k, set()):
+                        err(path, "L148", f"body box {name} is fitted by {k}={o} and skin {skin} "
+                                          f"shows no node for it, so the piece is never built - "
+                                          f"add a node with data-show-from=\"{k}\" data-show=\"{o}\"")
 
 
 def lint_component_sink_context(path, data, _lib_roots=None):
@@ -4174,8 +4321,11 @@ def lint_kit(path, data, lib_roots):
             parts under one id would make it ambiguous;
       L156  each configuration names only the kit's own part ids, and has an id
             of its own - a device's `chassis.kits[].depth.config` names one;
-      L157  every range has min < max;
-      L158  `travel` only with `motion: sliding`;
+      L157  every range has min < max, and a configuration that states a
+            `preset` and no `depth` ("factory setting known, range unknown",
+            decided 2026-10-18) is covered by a `gaps` entry `what: depth`;
+      L158  `travel` only with `motion: sliding`, and a telescoping kit states
+            a `preset` on at least one configuration;
       L159  each accessory ref resolves to a component that is not a kit.
 
     ERRORS, ALL OF THEM. The kind is new and no kit exists yet, so there is no
@@ -4198,6 +4348,7 @@ def lint_kit(path, data, lib_roots):
         ids.append(pid)
     known = set(ids)
     seen_cfg = set()
+    unknown_range = []
     for i, cfg in enumerate(data.get("configurations") or []):
         if not isinstance(cfg, dict):
             continue
@@ -4215,9 +4366,25 @@ def lint_kit(path, data, lib_roots):
             if isinstance(rng, list) and len(rng) == 2 \
                     and all(isinstance(x, (int, float)) for x in rng) and not rng[0] < rng[1]:
                 err(path, "L157", f"configuration {cid}: {label} {rng} - min must be below max")
+        if "depth" not in cfg and "preset" in cfg and cid not in unknown_range:
+            unknown_range.append(cid)
+    covered = set()
+    for gap in data.get("gaps") or []:
+        if isinstance(gap, dict) and gap.get("what") == "depth" and isinstance(gap.get("scope"), list):
+            covered.update(gap["scope"])
+    for cid in unknown_range:
+        if cid not in covered:
+            err(path, "L157", f"configuration {cid}: a `preset` and no `depth` - the factory setting "
+                "is known and the range is not, so add a `gaps` entry `what: depth` with this "
+                "configuration's id in its `scope`, saying what the source does not print")
     if "travel" in data and data.get("motion") != "sliding":
         err(path, "L158", f"travel: {data['travel']} on a kit whose motion is "
             f"{data.get('motion')!r} - only a sliding kit travels")
+    if data.get("motion") == "telescoping" and not any(
+            isinstance(c, dict) and "preset" in c for c in data.get("configurations") or []):
+        err(path, "L158", "motion: telescoping, and no configuration states a `preset` - a "
+            "telescoping kit is set at install, so give the factory setting the source prints "
+            "on at least one configuration")
     for i, acc in enumerate(data.get("accessories") or []):
         if not isinstance(acc, dict) or not isinstance(acc.get("ref"), str):
             continue
@@ -7617,7 +7784,8 @@ def lint_part_number_keys(path, data):
       vendor that really prints one can be waived with its reason.
 
     Configurations' keys in a device and in a listing are both read, and the
-    top level too, though L59 already says nothing reads it.
+    top level too, though L59 already says nothing reads it. A component's
+    `part-numbers` is read the same way: its keys are module type file names.
     """
     maps = [("part-numbers", data.get("part-numbers"))]
     for cname, cfg in (data.get("configurations") or {}).items():
@@ -7779,7 +7947,12 @@ def lint_rack(path, data, roots):
 
 
 def lint_listing(path, data, roots):
-    """L56: a listing lives under a NOS vendor and lists hardware that exists.
+    """L56: a listing lives under a NOS vendor or a reseller and lists hardware that exists.
+
+    A reseller listing (FS.com selling an APC cabinet under an FS part number)
+    is the same file without the NOS: it may say `model`, `aliases`,
+    `portfolio` and `source`, and carries no `nos`, `nos-versions` or
+    `interfaces`.
 
     A listing is a NOS vendor's entry for a box on its compatibility list:
     devices/arrcus/as7726-32x/listing.yaml points at edgecore/as7726-32x and
@@ -7795,12 +7968,27 @@ def lint_listing(path, data, roots):
     path = Path(path)
     ns = path.parent.parent.name
     entry = VENDORS.get(ns)
-    if entry is None or entry.get("role") not in ("software", "both"):
-        err(path, "L56", f"a listing lives under a NOS vendor, and {ns!r} is "
+    roles = vendor_roles(entry)
+    nos_only = [k for k in ("nos", "nos-versions", "interfaces") if data.get(k)]
+    if not roles & {"software", "reseller"}:
+        err(path, "L56", f"a listing lives under a NOS vendor or a reseller, and {ns!r} is "
             + ("in no vendor registry" if entry is None else f"registered with role {entry.get('role')!r}")
-            + ". Add it to spec/schemas/vendors.yaml with role: software, or move the "
-            "listing under the vendor that sells this NOS - the hardware's own maker "
+            + ". Add it to spec/schemas/vendors.yaml with role: software (a NOS) or "
+            "reseller (hardware sold under its own part numbers), or move the "
+            "listing under the vendor that sells this - the hardware's own maker "
             "files it under its `manufacturer:` and needs no listing")
+    elif "software" not in roles and nos_only:
+        err(path, "L56", f"{ns!r} is a reseller, and a reseller listing says only what the "
+            f"seller changes - `model`, `aliases`, `portfolio`, `source`. It names a NOS "
+            f"({', '.join('`' + k + '`' for k in nos_only)}), which belongs to a vendor with "
+            "role: software; a reseller sells the hardware as it is, so its ports keep the "
+            "maker's names")
+    elif "reseller" not in roles and not data.get("nos"):
+        err(path, "L56", f"{ns!r} is a NOS vendor, so its listing says which NOS it lists: "
+            "add `nos`")
+    elif "reseller" in roles and not data.get("nos") and nos_only:
+        err(path, "L56", f"a listing without `nos` is a reseller listing, which carries no "
+            f"{', '.join('`' + k + '`' for k in nos_only)}; add `nos` or drop them")
     hw = str(data.get("hardware") or "")
     man = next((Path(r) / "devices" / hw / "device.yaml" for r in roots
                 if (Path(r) / "devices" / hw / "device.yaml").exists()), None)
@@ -7973,7 +8161,7 @@ def lint_vendor_registry(root):
                 continue
             warn(child, "L55", f"namespace {child.name!r} is in no vendor registry. "
                  "Add it to spec/schemas/vendors.yaml with `display`, `role` "
-                 "(hardware | software | both) and `source` - and, if the company "
+                 "(hardware | software | reseller | both, or a list of them) and `source` - and, if the company "
                  "has been renamed, bought or absorbed since the metal was made, "
                  "`successor`/`parent`/`brands`, because that is the part a "
                  "consumer cannot derive and nobody writes down later. If this is "
@@ -8465,7 +8653,7 @@ def lint_device_kits(path, data, lib_roots):
                 f"configuration of {ref} (it has {', '.join(sorted(configs)) or 'none'})")
             continue
         want, got = (configs[cid] or {}).get("depth"), over.get("range")
-        if isinstance(want, list) != isinstance(got, list) or (
+        if want is not None and isinstance(want, list) != isinstance(got, list) or (
                 isinstance(want, dict) and isinstance(got, dict)
                 and set(want) != set(got)):
             shape = (f"one range per hole type ({', '.join(sorted(want))})"
@@ -14189,6 +14377,7 @@ def main():
             if d is not None:
                 comp_matrix.append((f, d))
                 lint_attrs_null(f, d)
+                lint_part_number_keys(f, d)
                 _skin_checks(f, d)
                 lint_component_parts(f, d, args.library)
                 lint_component_bay_kits(f, d, args.library)
@@ -14218,6 +14407,7 @@ def main():
                 lint_component_spanned_exclusion(f, d, args.library)
                 lint_component_relief_confidence(f, d, args.library)
                 lint_component_body_boxes(f, d)
+                lint_component_fitted_pieces(f, d)
                 lint_component_faces_once(f, d)
                 # L83 IS HANDED THE PART'S OWN REF, so it can catch a contract
                 # naming itself as its own face - a copy-paste away, and

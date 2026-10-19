@@ -41,6 +41,15 @@ it as data (netbox-community/devicetype-library#4497,
 nautobot/devicetype-library#24).
 
   python3 dcim_export.py --dist DIR --out DIR [--device NAME]
+  python3 dcim_export.py --dist DIR --out DIR --modules
+
+`--modules` writes the module types, for both targets, from every component in
+the build, and removes each `.yaml` file under `<target>/module-types/<maker>/`
+that no component writes any more, printing `removed <path>` for it. That is
+how a component renamed to `part-numbers` stops leaving its old type behind.
+Nothing else is removed: not another kind of file in those folders, and not a
+file outside `module-types/`. `--device` writes device types only and removes
+nothing, because a module type is shared between devices.
 """
 import argparse
 import copy
@@ -57,6 +66,7 @@ from portrayal.artifacts import Dist, face_file
 from portrayal.manifest import view_parts, alias_names, config_airflow
 from portrayal import manifest as _manifest
 from portrayal import optical_ports
+from portrayal.faces import POWER_FACES
 
 # Portrayal media/speed -> DCIM interface type. Every value here is valid in
 # both libraries: NetBox's enum is a strict superset of Nautobot's (227 types
@@ -2391,18 +2401,39 @@ def outlet_rows(outlets, powers, bays, who, names=None, dev=None):
     return rows
 
 
+def module_names(contract):
+    """[(model, part number or None)]: the module types one contract exports.
+
+    A contract with `part-numbers` is one type per key, named by the key, with
+    the part number from `part` (roc-ops/Portrayal#70) - the way a device
+    configuration's map is one device type per key. One without it is one type,
+    named by `attrs.model` or else the contract's `name`, and states no part
+    number, as it always did. The schema refuses a contract with both."""
+    pns = contract.get("part-numbers")
+    if isinstance(pns, dict) and pns:
+        return [(str(k), (v or {}).get("part") if isinstance(v, dict) else None)
+                for k, v in pns.items()]
+    return [(str((contract.get("attrs") or {}).get("model") or contract["name"]), None)]
+
+
 def build_module(contract, manufacturer, load_ref=None, dropped=None,
-                 defaulted=None):
+                 defaulted=None, model=None):
     """A module contract as a DCIM module type.
 
-    `dropped` is an optional dict the caller passes in to be told which part
-    refs matched no branch, counted. `defaulted` is the same for cages typed by
-    the table rather than by the card. See `export_modules`, which prints both.
+    `model` picks which of a contract's `module_names` this is the type of; the
+    first when it is left out, which is the only one for a contract with one
+    name. `dropped` is an optional dict the caller passes in to be told which
+    part refs matched no branch, counted. `defaulted` is the same for cages
+    typed by the table rather than by the card. See `export_modules`, which
+    prints both.
     """
     load_ref = load_ref or (lambda _r: None)
     attrs = contract.get("attrs") or {}
-    model = str(attrs.get("model") or contract["name"])
+    names = dict(module_names(contract))
+    model = str(model) if model is not None else next(iter(names))
     out = {"manufacturer": manufacturer, "model": model}
+    if names.get(model):
+        out["part_number"] = names[model]
 
     if attrs.get("weight-kg"):
         out["weight"] = round(float(attrs["weight-kg"]), 2)
@@ -2463,6 +2494,20 @@ def build_module(contract, manufacturer, load_ref=None, dropped=None,
             # L105 fails a part that declares them and routes anywhere else.
             ifaces.extend([{**row, "name": iid} for iid in part["interfaces"]]
                           if part.get("interfaces") else [row])
+
+    # A POWER INLET DRAWN ON THE CARD'S OTHER SIDE (docs/connectors-gpu-design.md
+    # section 7): a GPU's auxiliary header is on its far end, composed by its
+    # rear face, and the card is what carries the power port. One level, as
+    # optical.capacities walks faces; the face's own part id names the port.
+    # A face is `{ref: x}` in a contract and flattened to `x` in the index.
+    for face in POWER_FACES:
+        face_ref_ = (contract.get("faces") or {}).get(face)
+        if isinstance(face_ref_, dict):
+            face_ref_ = face_ref_.get("ref")
+        for part in ((load_ref(face_ref_) or {}).get("parts") or []) if face_ref_ else []:
+            ref = str(part.get("ref") or "").split("@")[0] if isinstance(part, dict) else ""
+            if ref in PART_POWER:
+                powers.append(power_row(ref, part.get("id")))
 
     # THE DECLARED INLET, when no part draws one. Second, not first: a composed
     # part knows its own id and there may be several, so it wins wherever it
@@ -3309,10 +3354,18 @@ def module_key(dist, contract):
     once per orientation collapse to one key, as they collapse to one type. A
     contract with no manufacturer (`common/`) is written nowhere and keys by
     its ref, so a model seated through it still gets a depth."""
+    return module_keys(dist, contract)[0]
+
+
+def module_keys(dist, contract):
+    """Every (manufacturer, model) a module contract is written as: one per
+    `part-numbers` key, else the one `module_key` answers. Everything keyed by
+    model - what seats where, how deep - holds for each of them, because they
+    are one drawing in the same bays."""
     man = dist.manufacturer_of(contract.get("ns"))
     if not man:
-        return ("", f"{contract.get('ns')}/{contract.get('name')}")
-    return (man, str((contract.get("attrs") or {}).get("model") or contract["name"]))
+        return [("", f"{contract.get('ns')}/{contract.get('name')}")]
+    return [(man, model) for model, _part in module_names(contract)]
 
 
 def _chassis_seated(dist):
@@ -3325,7 +3378,7 @@ def _chassis_seated(dist):
                 for ref in b.get("accepts") or []:
                     c = dist.component_by_ref(ref)
                     if c and c.get("kind") == "module":
-                        seated.add(module_key(dist, c))
+                        seated.update(module_keys(dist, c))
     return seated
 
 
@@ -3358,9 +3411,10 @@ def pass_through_bays(dist):
             continue
         (bid, b), = bays.items()
         if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
-               and module_key(dist, rc) in direct
+               and direct.intersection(module_keys(dist, rc))
                for r in (b or {}).get("accepts") or []):
-            out.setdefault(module_key(dist, c), set()).add(bid)
+            for key in module_keys(dist, c):
+                out.setdefault(key, set()).add(bid)
     return out
 
 
@@ -3375,7 +3429,8 @@ def _chassis_seats(dist):
                 for ref in b.get("accepts") or []:
                     c = dist.component_by_ref(ref)
                     if c and c.get("kind") == "module":
-                        seats.setdefault(module_key(dist, c), set()).add(str(b.get("id")))
+                        for key in module_keys(dist, c):
+                            seats.setdefault(key, set()).add(str(b.get("id")))
     return seats
 
 
@@ -3408,22 +3463,23 @@ def anchored_bays(dist):
             for r in (b or {}).get("accepts") or []:
                 rc = dist.component_by_ref(r)
                 if rc and rc.get("kind") == "module":
-                    nested.add(module_key(dist, rc))
+                    nested.update(module_keys(dist, rc))
     through = pass_through_bays(dist)
     out = {}
     for c in dist.modules():
         bays = c.get("bays")
-        key = module_key(dist, c)
-        if (not isinstance(bays, dict) or c.get("superseded-by") or key in through
-                or key in nested or len(seats.get(key, ())) != 1):
+        if not isinstance(bays, dict) or c.get("superseded-by"):
             continue
-        ids = {bid for bid, b in bays.items()
-               if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
-                      and module_key(dist, rc) in direct
-                      for r in (b or {}).get("accepts") or [])}
-        if ids:
-            seat, = seats[key]
-            out.setdefault(key, (seat, set()))[1].update(ids)
+        for key in module_keys(dist, c):
+            if key in through or key in nested or len(seats.get(key, ())) != 1:
+                continue
+            ids = {bid for bid, b in bays.items()
+                   if any((rc := dist.component_by_ref(r)) and rc.get("kind") == "module"
+                          and direct.intersection(module_keys(dist, rc))
+                          for r in (b or {}).get("accepts") or [])}
+            if ids:
+                seat, = seats[key]
+                out.setdefault(key, (seat, set()))[1].update(ids)
     return out
 
 
@@ -3441,9 +3497,9 @@ def seating_depths(dist):
     than refs, so a twin that no device names still passes its parent's depth
     to what it seats. A model no bay accepts has no entry.
     """
-    def key_of(ref):
+    def keys_of(ref):
         c = dist.component_by_ref(ref)
-        return module_key(dist, c) if c and c.get("kind") == "module" else None
+        return module_keys(dist, c) if c and c.get("kind") == "module" else []
 
     depths = {k: {1} for k in _chassis_seated(dist)}
     through = pass_through_bays(dist)
@@ -3456,11 +3512,12 @@ def seating_depths(dist):
         # so the depths its bays would pass on describe no document.
         if not isinstance(bays, dict) or c.get("superseded-by"):
             continue
-        key = module_key(dist, c)
-        flat = set(through.get(key, ())) | set(anchored.get(key, (None, ()))[1])
-        under = [(key_of(ref), 0 if bid in flat else 1)
-                 for bid, b in bays.items() for ref in (b or {}).get("accepts") or []]
-        carriers.append((key, [(k, s) for k, s in under if k]))
+        for key in module_keys(dist, c):
+            flat = set(through.get(key, ())) | set(anchored.get(key, (None, ()))[1])
+            under = [(k, 0 if bid in flat else 1)
+                     for bid, b in bays.items() for ref in (b or {}).get("accepts") or []
+                     for k in keys_of(ref)]
+            carriers.append((key, under))
 
     # A bay tree is finite and acyclic in any library that renders; the bound
     # stops a cycle from looping rather than deciding anything.
@@ -3476,6 +3533,33 @@ def seating_depths(dist):
             return depths
     raise SystemExit("seating_depths: the module bay graph does not settle - is a "
                      "module accepted, through its own bays, by itself?")
+
+
+def prune_module_types(root, kept):
+    """Remove the module-type files an earlier run wrote and this one did not.
+
+    A module type is renamed when a component gains `part-numbers`, and the old
+    file stayed behind beside the new ones - a DCIM importing the folder then
+    held a type no component describes (#70). `kept` is every path
+    export_modules wrote, and it is built from the whole build, never from one
+    device: module types are shared between devices, and the `--device` run
+    does not come here at all.
+
+    ONLY THE EXPORTER'S OWN KIND: a `.yaml` file directly inside a maker's folder
+    under `<target>/module-types/`. Another file there, and everything outside
+    `module-types/` (fibre maps, device types, images), is left alone.
+    """
+    removed = []
+    for target in TARGETS:
+        base = Path(root) / target / "module-types"
+        if not base.is_dir():
+            continue
+        for maker in sorted(p for p in base.iterdir() if p.is_dir()):
+            for f in sorted(maker.glob("*.yaml")):
+                if f.is_file() and f not in kept:
+                    f.unlink()
+                    removed.append(f)
+    return removed
 
 
 def export_modules(dist, root, images=None):
@@ -3526,8 +3610,12 @@ def export_modules(dist, root, images=None):
         if not man:
             skipped += 1
             continue
-        built.append((man, build_module(contract, man, dist.component_by_ref, dropped,
-                                        defaulted), contract))
+        # ONE TYPE PER ORDER CODE (#70): a contract with `part-numbers` is built
+        # once for each key. `dropped` and `defaulted` count a placement once
+        # per type, which is what each type holds.
+        for model, _part in module_names(contract):
+            built.append((man, build_module(contract, man, dist.component_by_ref, dropped,
+                                            defaulted, model=model), contract))
 
     groups = {}
     for man, doc, contract in built:
@@ -3541,6 +3629,7 @@ def export_modules(dist, root, images=None):
     anchored_all = anchored_bays(dist)
 
     wrote = 0
+    kept = set()                                 # every module-type file this run writes
     collisions = []                              # ((man, model), ref, kind)
     for (man, model), members in sorted(groups.items()):
         doc, contract = members[0]
@@ -3598,7 +3687,7 @@ def export_modules(dist, root, images=None):
         withheld = {bid for c in authors for bid, b in (c.get("bays") or {}).items()
                     if bid not in through and bid not in (anchored or (None, ()))[1]
                     and any(dist.component_by_ref(r)
-                            and module_key(dist, dist.component_by_ref(r)) in multi
+                            and multi.intersection(module_keys(dist, dist.component_by_ref(r)))
                             for r in (b or {}).get("accepts") or [])}
         seated = depths.get((man, model)) or set()
         depth = next(iter(seated)) if len(seated) == 1 else None
@@ -3612,9 +3701,11 @@ def export_modules(dist, root, images=None):
                                  target, fibre_map)
             if target == "nautobot":
                 written = seat_names(written, depth)
-            (d / (model.replace("/", "-") + ".yaml")).write_text(
-                "---\n" + yaml.dump(written, Dumper=Indented,
-                                    sort_keys=False, width=100, default_flow_style=False))
+            f = d / (model.replace("/", "-") + ".yaml")
+            f.write_text("---\n" + yaml.dump(written, Dumper=Indented,
+                                             sort_keys=False, width=100,
+                                             default_flow_style=False))
+            kept.add(f)
             if images and RASTER:
                 if render_module_image(images, root, target, doc, ns, name, ver):
                     imaged.add(model)
@@ -3638,6 +3729,8 @@ def export_modules(dist, root, images=None):
     print(f"module types: {wrote} written from {len(built)} contract(s), "
           f"{skipped} skipped for having no manufacturer, {retired} retired "
           f"(`superseded-by`) and not exported")
+    for f in prune_module_types(root, kept):
+        print(f"removed {f}  (no component writes it any more)")
     # NAMED, NOT COUNTED. A number here would be the instrument that failed in
     # #183: it cannot tell one part quietly vanishing from forty twins
     # collapsing the way they are meant to.

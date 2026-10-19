@@ -361,12 +361,12 @@ build. While the library holds no kit the file is `{"kits": []}`.
   "configurations": [{"id": "four-post", "racks": ["4-post"], "parts": ["inner"],
                       "depth": {"square": [631, 868]}, "rail-depth": 714}],
   "accessories": [{"kind": "cma", "ref": "acme/cma@1", "rail-depth": 845}],
-  "superseded-by": null, "provenance": {"depth": "..."}}]}
+  "superseded-by": null, "provenance": {"depth": "..."}, "gaps": []}]}
 ```
 
 Rows are sorted by `ref`, and every row carries every key above. A key the
 contract leaves out is `null` (`travel`, `install`, `superseded-by`), an empty
-string (`description`), an empty list (`accessories`) or an empty object
+string (`description`), an empty list (`accessories`, `gaps`) or an empty object
 (`provenance`). `parts`,
 `configurations` and `accessories` are as the contract writes them; the
 component schema describes each key. A part is a ref, not geometry: the
@@ -375,6 +375,19 @@ geometry of a kit's parts is read from `components.json` by their refs.
 The file is new, and did not raise `contract`, which is still 2. Removing or
 renaming a key, or changing what one means, is a `contract` change; adding a
 key is not.
+
+**A kit configuration may state a `preset` and no `depth`. One-way, decided
+2026-10-18.** A configuration states at least one of the two. One with a
+`preset` alone is published as the contract writes it, with the `preset` and no
+`depth` key: not `null`, and not `[preset, preset]`. It means "factory setting
+known, range unknown", so a reader that takes `depth` to be always present
+must now handle its absence, and a `kits.json` or `<device>.configs.json` that
+holds such a configuration cannot be taken back to a reader that cannot. The
+kit's `gaps` row says which configurations have no range (`what: depth`, the
+ids in `scope`; always present, `[]` where the kit has none), and a
+`telescoping` kit states a `preset` on at least one configuration. Lint L157
+and L158 hold both; the row for `gaps` is additive. No kit in the library uses
+this yet.
 
 ### Ears and kits on a device
 
@@ -940,6 +953,20 @@ DCIM data already imported**, with what it renames. From 1.0 it is treated as
 a `contract` change is. Which NetBox and Nautobot the exports need, and which
 features need NetBox 4.6 or later, is in
 [`library/README.md`](../library/README.md#which-netbox-and-nautobot-the-exports-need).
+
+**A component's `part-numbers`.** A component contract may carry the map a
+device configuration carries, `{<model>: {part: <part number>}}` with no
+`power-cord`, and it is an optional key, so it does not raise `format`. Each key
+is one exported module type, named by the key, with `part_number` from `part`;
+a contract with two keys exports two module types with the same ports, and one
+without the key exports under `attrs.model` or its `name` as before. The schema
+refuses a contract that carries both `part-numbers` and `attrs.model`, so the
+name has one source. The build publishes the map on the contract's
+`components.json` entry as `part-numbers`, with its keys sorted like every key
+in that file, and leaves the key out of every entry that has none. The rack kit
+opens the module type file of the first key in sorted order. Moving a module from `attrs.model` to
+`part-numbers` renames its module type, which is a DCIM-data change in the
+sense above.
 
 ## What is promised before 1.0
 
