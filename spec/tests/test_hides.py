@@ -4,7 +4,7 @@ A cover is a removable part that hides others - a bezel over drives, a filter
 cover over PSUs. A placement writes `hides: [...]`; the compiler writes
 `data-hides="<id> <id> ..."` on the cover's group, and one attribute says both
 "this is a cover" and what it covers. `data-for` keeps its meanings, since
-screws, ground studs and ESD jacks carry it too. L194 checks every id.
+screws, ground studs and ESD jacks carry it too. L196 checks every id.
 """
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -69,12 +69,12 @@ def test_nothing_else_in_the_library_carries_data_hides():
     assert carriers == {("c40g", "psu-cover"), ("r660", "bezel")}, carriers
 
 
-# --- L194 --------------------------------------------------------------------
+# --- L196 --------------------------------------------------------------------
 
 def _codes(views):
     with lint.collecting() as found:
         lint.lint_device_hides("device.yaml", {"views": views}, ROOTS)
-    return [m for m in found.errors + found.warnings if "[L194]" in m]
+    return [m for m in found.errors + found.warnings if "[L196]" in m]
 
 
 def _front(cover_hides, bays=None, placements=(), cover_at=(0.0, 0.0), **view):
@@ -85,21 +85,21 @@ def _front(cover_hides, bays=None, placements=(), cover_at=(0.0, 0.0), **view):
                         "hides": cover_hides}, *placements]}, **view}}
 
 
-def test_L194_a_bay_the_cover_overlaps_is_quiet():
+def test_L196_a_bay_the_cover_overlaps_is_quiet():
     assert not _codes(_front(["psu-1"]))
 
 
-def test_L194_a_placement_the_cover_overlaps_is_quiet():
+def test_L196_a_placement_the_cover_overlaps_is_quiet():
     ring = {"ref": RING, "id": "ring", "at": [20.0, 0.0]}
     assert not _codes(_front(["ring"], placements=[ring]))
 
 
-def test_L194_an_id_that_names_nothing_is_an_error():
+def test_L196_an_id_that_names_nothing_is_an_error():
     found = _codes(_front(["psu-9"]))
     assert found and "not a placement or a bay on this face" in found[0]
 
 
-def test_L194_an_id_on_another_face_is_an_error():
+def test_L196_an_id_on_another_face_is_an_error():
     views = _front(["psu-1"], bays=[])
     views["rear"] = {"components": {"bays": [
         {"id": "psu-1", "at": [10.0, 5.0], "size": {"w": 80.0, "h": 30.0}}]}}
@@ -107,12 +107,12 @@ def test_L194_an_id_on_another_face_is_an_error():
     assert found and "on rear, not on this face" in found[0]
 
 
-def test_L194_an_id_the_cover_does_not_overlap_is_an_error():
+def test_L196_an_id_the_cover_does_not_overlap_is_an_error():
     bays = [{"id": "psu-1", "at": [10.0, 100.0], "size": {"w": 80.0, "h": 30.0}}]
     found = _codes(_front(["psu-1"], bays=bays))
     assert found and "does not overlap" in found[0]
 
 
-def test_L194_a_cover_cannot_hide_itself():
+def test_L196_a_cover_cannot_hide_itself():
     found = _codes(_front(["cover"]))
     assert found and "itself" in found[0]

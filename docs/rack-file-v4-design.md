@@ -793,9 +793,11 @@ held face exists since step 3 of that note). `position` is kept and not
 acted on until lay order is built; ignoring it moves a cable across its
 pathway by millimetres and is harmless, as that note argues.
 
-The gap behind a tray (#966) needs no key in version 4. If it becomes a
-pathway a user can pin, it is one more value in a `lay` entry, an additive
-schema change.
+The gap behind a tray (#966) needs no key in version 4, and is built: the
+automatic route uses it (docs/cable-lay-design.md 1.3), a
+hand-edited route never does, and a user cannot pin it. If it becomes a pathway a user can pin, it is one more
+value in a `lay` entry, naming the tray (`item`, `via`) the router's gap
+already carries, an additive schema change.
 
 ### 3.10 Straps
 
@@ -1330,7 +1332,7 @@ legend says spare cable is listed and not drawn.
 
 **Not in the pull request, and no format change when they come:** lay order
 by `position` (cable lay step 5), the quarter turns of #550, placing a new
-held item (7.1), the gap behind a tray (#966), the direction faults of #986,
+held item (7.1), the gap behind a tray as a pinnable pathway (#966), the direction faults of #986,
 the generic ear slots in `ears.py` (2.5, #1010), drawing and placing spare
 (3.4, #1011), and ring anchors (3.10, #1009).
 
@@ -1552,7 +1554,8 @@ one-way.
 
 **Needs no version, only a build:**
 
-- Lay order by `position`, and the gap behind a tray (#966).
+- Lay order by `position`. (The gap behind a tray, #966, is built, for the
+  automatic route only; pinning it is the one additive `lay` value of 3.9.)
 - The quarter turns of `roll` and the mount kit facts of #550.
 - Placing a device on a shelf, in a drawer or on a DIN rail (#972), once the
   library has `hosts:`; and acting on `width` and `options`, once a product
@@ -1886,6 +1889,9 @@ grey whatever was said of it, and on a dark stage nearly invisible.
 
 ### 14.2 The order
 
+**Decided 2026-10-18:** this order, and `color` as the new saved key on a
+cable. Nothing else in this section is decided by that (see 14.3 and 14.7).
+
 A cable is drawn in the first of these that says something:
 
 1. **its own colour**, `color` on the cable in the rack file;
@@ -1907,6 +1913,10 @@ drawing. The last two cables are the media's dark grey, as every AOC was.
 ### 14.3 What was decided in the build
 
 Each is built, and each waits for a person to confirm it, as section 13's do.
+The order of 14.2 and the `color` key were decided 2026-10-18; no item below
+is marked decided by that. Items 3 ("both ends, or neither") and 5 (a type's
+colour for a named type only) are how items 2 and 3 of 14.2 read, and are decided only as far as the order says so. Their further
+wording here, and every other item, still waits.
 
 1. **A colour is hex.** `#` and three or six hex digits, either case, stored
    as `#rrggbb` in lower case. That is how `jacket-color` is written on
@@ -2043,3 +2053,17 @@ same kind of question for every media.
   cable whose file names the type; nothing in the kit writes that key yet.
 - A colour for a bundle, a strap, or a plug.
 - A jacket colour for any type but the one with a source.
+
+### 14.7 Still open
+
+- **The AOC default** (`COLORS.aoc`, 14.5): whether it becomes aqua. One-way:
+  it recolours every existing drawing, sheet and 3D file with an AOC.
+- **The draw.io palette** (`CABLE_COLOURS` in `kit/drawio.js`): whether it
+  follows `COLORS`. One-way for the same reason.
+- **The Rack Builder page's half**, which is not in this repository: the
+  cable form's colour input, and passing the readers to `cablePlan` and
+  `cablePlan3d`. Until it does, no page shows a colour from the ends or a
+  type.
+- **Named cable types with sourced jacket colours** (#897): each type needs a
+  source for its colour; the table holds one today.
+- The rulings of 14.3 other than the order, as noted there.

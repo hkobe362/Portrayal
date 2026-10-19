@@ -76,7 +76,9 @@ know, so none was needed):
   value the reader cannot use as a colour moves to `colorAsWritten`. A kit
   before 0.31.0 keeps the key and draws the cable by its media. The schema
   under `/schemas/v3/` describes both keys; `color` is the first key of that
-  schema with a `pattern`.
+  schema with a `pattern`. The order and the `color` key were decided
+  2026-10-18; the other rulings in `rack-file-v4-design.md` section 14 still
+  wait to be confirmed.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
@@ -159,7 +161,7 @@ also draws is that part's row. Each row may carry:
 | `for` | `data-for` | list: the owners, local paths or device-absolute `/<view>/<path>` |
 | `inner` | `data-inner` | `true` for a port inside another port's housing |
 | `covered-by` | `data-covered-by` | on a bay a card wider than one slot covers: the path of the bay the card is seated in ([pcie-two-slot-bays-design.md](pcie-two-slot-bays-design.md)) |
-| `hides` | `data-hides` | list: on a cover, the paths of the placements and bays on this face that it hides; a row with it is a cover. Written from the placement's `hides:` and checked by L194 |
+| `hides` | `data-hides` | list: on a cover, the paths of the placements and bays on this face that it hides; a row with it is a cover. Written from the placement's `hides:` and checked by L196 |
 | `connection-points` | `data-cp`, `data-cp-at`, `data-cp-dir`, `data-cp-on` on the part's markers | `{name: {at, face, dir?, on?}}`: `at` as written, in the part's own frame; `face`, the same point in the face's frame |
 | `seat` | the path | the bay or cage this row's part is seated in, innermost first; absent on the chassis's own rows |
 | `moves-with`, `moves-by` | `data-moves-with`, `data-moves-by` on the row's element, or on the nearest element it sits inside | the adjustment that moves this row's box, and `[dx, dy, dz]`: the mm it moves for each mm of position (see [A part that slides](#a-part-that-slides)); absent on a row nothing moves |
@@ -360,12 +362,12 @@ build. While the library holds no kit the file is `{"kits": []}`.
   "configurations": [{"id": "four-post", "racks": ["4-post"], "parts": ["inner"],
                       "depth": {"square": [631, 868]}, "rail-depth": 714}],
   "accessories": [{"kind": "cma", "ref": "acme/cma@1", "rail-depth": 845}],
-  "superseded-by": null, "provenance": {"depth": "..."}}]}
+  "superseded-by": null, "provenance": {"depth": "..."}, "gaps": []}]}
 ```
 
 Rows are sorted by `ref`, and every row carries every key above. A key the
 contract leaves out is `null` (`travel`, `install`, `superseded-by`), an empty
-string (`description`), an empty list (`accessories`) or an empty object
+string (`description`), an empty list (`accessories`, `gaps`) or an empty object
 (`provenance`). `parts`,
 `configurations` and `accessories` are as the contract writes them; the
 component schema describes each key. A part is a ref, not geometry: the
@@ -374,6 +376,19 @@ geometry of a kit's parts is read from `components.json` by their refs.
 The file is new, and did not raise `contract`, which is still 2. Removing or
 renaming a key, or changing what one means, is a `contract` change; adding a
 key is not.
+
+**A kit configuration may state a `preset` and no `depth`. One-way, decided
+2026-10-18.** A configuration states at least one of the two. One with a
+`preset` alone is published as the contract writes it, with the `preset` and no
+`depth` key: not `null`, and not `[preset, preset]`. It means "factory setting
+known, range unknown", so a reader that takes `depth` to be always present
+must now handle its absence, and a `kits.json` or `<device>.configs.json` that
+holds such a configuration cannot be taken back to a reader that cannot. The
+kit's `gaps` row says which configurations have no range (`what: depth`, the
+ids in `scope`; always present, `[]` where the kit has none), and a
+`telescoping` kit states a `preset` on at least one configuration. Lint L157
+and L158 hold both; the row for `gaps` is additive. No kit in the library uses
+this yet.
 
 ### Ears and kits on a device
 
@@ -909,6 +924,20 @@ rewrites a file on load, and writes the new ref only when the rack is saved
 after an edit. A removed ref with no redirect is reported as no longer in the
 library and kept as written.
 
+**A card seats by its interface** ([`cards-by-interface-design.md`](cards-by-interface-design.md)).
+A component bay may state `interface`, beside `accepts` or instead of it, and a
+card states `mates`; the two interface keys `pcie-fh` and `pcie-lp` are in
+`spec/schemas/connectors.yaml`. These are held as format, because a contract
+outside the library writes them and a rename breaks it: the two spellings; the
+union (a bay that states both takes the list and every part that mates the
+interface); the width rule (a part `slot-width: n` is taken through an
+interface only by a bay whose `span` names at least `n - 1` bays); and that a
+part that fills a bay is not asked for a `mate` point for its `mates` (L11).
+The published `accepts` of a bay in `components.json` and `<device>.configs.json`
+is every ref the bay takes, and an `interface` is published beside it; for a bay
+that states none it is the list the contract states, as it was. `contract` does
+not rise, since both are additive. No library part states either key yet.
+
 **A lint code.** A device manifest waives a rule by its code (`lint.waive`),
 so lint codes are never renumbered or reused. A rule that is deleted keeps its
 code, listed as retired, and a new rule always takes a new code. A test pins
@@ -925,6 +954,20 @@ DCIM data already imported**, with what it renames. From 1.0 it is treated as
 a `contract` change is. Which NetBox and Nautobot the exports need, and which
 features need NetBox 4.6 or later, is in
 [`library/README.md`](../library/README.md#which-netbox-and-nautobot-the-exports-need).
+
+**A component's `part-numbers`.** A component contract may carry the map a
+device configuration carries, `{<model>: {part: <part number>}}` with no
+`power-cord`, and it is an optional key, so it does not raise `format`. Each key
+is one exported module type, named by the key, with `part_number` from `part`;
+a contract with two keys exports two module types with the same ports, and one
+without the key exports under `attrs.model` or its `name` as before. The schema
+refuses a contract that carries both `part-numbers` and `attrs.model`, so the
+name has one source. The build publishes the map on the contract's
+`components.json` entry as `part-numbers`, with its keys sorted like every key
+in that file, and leaves the key out of every entry that has none. The rack kit
+opens the module type file of the first key in sorted order. Moving a module from `attrs.model` to
+`part-numbers` renames its module type, which is a DCIM-data change in the
+sense above.
 
 ## What is promised before 1.0
 
