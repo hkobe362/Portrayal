@@ -940,10 +940,12 @@ media and nothing could change it. It is now drawn, in this order, in:
    `jacket`;
 4. else its media's, from `COLORS` in `rack/cable-geometry.js`, as before.
 
-**No default changed.** Every media is the colour it was (an AOC is still
-`#3a3f45`), so a rack that states nothing is drawn as it was. `COLORS` is
-the one table that holds those colours; `JACKETS`, the hero's table, now
-names entries of it and holds no colour of its own.
+**One default changed.** An AOC with no colour stated is a teal of the
+multimode aqua family, `#08788a`, so that it is told from OM3 and OM4's
+`#2bb3c8` (it was dark grey, `#3a3f45`; decided on #1028), and
+every other media is the colour it was. `COLORS` is the one table that holds
+those colours; `JACKETS`, the hero's table, names entries of it and holds no
+colour of its own.
 
 - **A colour is hex**: `#` and three or six hex digits, in either case, as
   `jacket-color` is written on the cable ends of the library. `hexColor(v)`
@@ -1771,13 +1773,16 @@ const { text, notes: n } = toDrawio(shell.state.svg, doc, { cables });
   for that cable: it is listed in the file's notes, an XML comment inside
   `<mxfile>`, with the reason. `notes` adds the caller's own lines to the same
   comment. `toDrawio` also returns them as `notes`.
-- **Style.** `cableStyle` is a map from `media` to a stroke colour, merged over
-  `CABLE_COLOURS` (dac, aoc, cu, mm, sm, the OM and OS grades, and a grey
-  `default`), or a function from a cable to a whole draw.io edge style. A
-  cable that carries its own `color` (`#rgb` or `#rrggbb`) is drawn in it,
-  ahead of the map; a function is handed the cable and reads `color` itself.
-  `CABLE_COLOURS` is this writer's own palette, chosen to read on draw.io's
-  white page, and is not the Rack Builder's `COLORS`.
+- **Style.** A cable is stroked in the colour the Rack Builder draws it in
+  (`COLORS`, by `mediaColor`; copper by its purpose), so a drawing exported
+  here shows each cable as the explorer does. `cableStyle` is a map from
+  `media` to a stroke colour, read ahead of that (its `default` is what a
+  media the kit has no colour for takes), or a function from a cable to a
+  whole draw.io edge style. A cable that carries its own `color` (`#rgb` or
+  `#rrggbb`) is drawn in it, ahead of the map; a function is handed the cable
+  and reads `color` itself. `CABLE_COLOURS` (dac, aoc, cu, mm, sm, the OM and
+  OS grades, the Cat grades and `default`) is exported, and derived from
+  `COLORS`: it holds no colour of its own.
 - **Identity.** Edge ids are `cable-<id>`, slugged like the other cell ids (a
   stub is `cable-<id>-a` or `-b`, and its label `cable-<id>-a-far`). The edge's
   label is `label` and `length`. `id`, `media`, `purpose` and `length` are kept
