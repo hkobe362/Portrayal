@@ -12,6 +12,7 @@ import {readFileSync, readdirSync} from 'node:fs';
 import * as R from '../../../kit/rack/route.js';
 import * as S from '../../../kit/rack/solids.js';
 import * as M from '../../../kit/rack/model.js';
+import {apply} from '../../../kit/rack/commands.js';
 import {cornersOf} from '../../../kit/rack/route-path.js';
 import * as F from './cable-solids-fixture.mjs';
 
@@ -205,17 +206,97 @@ test('a saved rack opens, and a rack with no tray is as it was', () => {
   for (const c of rack.cables) assert.doesNotThrow(() => R.routePath(rack, c, bare), c.id);
 });
 
-test('a hand route keeps its waypoints; the detour between them may rise through the gap', () => {
+// What main gave: the same rack with the gap closed (a floor that reaches the rail leaves none), the
+// strip's front edge where it was
+const asMain = ctx => {
+  const closed = {...F.SIZES, 'fhd-cmp5dr': F.closed()};
+  return {...ctx, chassisOf: ref => closed[ref] ?? null};
+};
+// whether the cord rises through the gap: it is shorter than main's route round the front edge
+const rose = (rack, c, ctx) => mm(R.routePath(rack, c, asMain(ctx))) - mm(R.routePath(rack, c, ctx)) > 1;
+
+test('a hand-edited route never uses the gap: no leg of it, those between its waypoints too, is offered one', () => {
   const {rack: base, ctx} = owner();
-  const route = [{item: 'i3', via: 'guide-3'}];
-  const c = {...base.cables[1], route, routeEdited: true};
-  const rack = {...base, cables: [c]};
-  assert.deepEqual(R.resolveRoute(rack, c, ctx).waypoints, route);
-  const p = R.routePath(rack, c, ctx);
-  assert.deepEqual(rack.cables[0].route, route);
+  const main = asMain(ctx);
+  const ring3 = {item: 'i3', via: 'guide-3'}, ring2 = {item: 'i3', via: 'guide-2'};
+  // the same cord, c2, written by hand: one waypoint, and two in either order
+  const routes = [[ring3], [ring2, ring3], [ring3, ring2]];
+  for (const route of routes) {
+    const c = {...base.cables[1], route, routeEdited: true};
+    const rack = {...base, cables: [c]};
+    assert.deepEqual(R.resolveRoute(rack, c, ctx).waypoints, route);
+    const p = R.routePath(rack, c, ctx), m = R.routePath(rack, c, main);
+    const text = JSON.stringify(route.map(w => w.via));
+    assert.deepEqual(rack.cables[0].route, route, text);
+    assert.equal(rose(rack, c, ctx), false, text);
+    // the route of main, point for point and to the millimetre
+    assert.deepEqual(p.points, m.points, text);
+    assert.deepEqual([p.detours, p.bends, p.crossings], [m.detours, m.bends, m.crossings], text);
+    assert.equal(mm(p), mm(m), text);
+  }
+  // the front-edge detour of one waypoint is main's 610.6 mm, 123.7 out; the automatic cord is 483.6
+  const one = {...base.cables[1], route: [ring3], routeEdited: true};
+  const p = R.routePath({...base, cables: [one]}, one, ctx);
   assert.equal(p.detours.length, 1);
-  assert.deepEqual(p.detours[0].between, [{end: 'a'}, {item: 'i3', via: 'guide-3'}]);
-  assert.ok(p.detours[0].points.every(q => q.z > 0 && q.z < 48.8));
+  assert.deepEqual(p.detours[0].between, [{end: 'a'}, ring3]);
+  assert.ok(p.detours[0].points.every(q => q.z > 110));
+  assert.equal(mm(p), 610.6);
+});
+
+test('a route written by the route command is hand-edited, and never uses the gap', () => {
+  const {rack: base, ctx} = owner();
+  const before = R.routePath(base, base.cables[1], ctx);
+  assert.equal(rose(base, base.cables[1], ctx), true);
+  const done = apply(base, {op: 'cable.route', id: 'c2', route: [{item: 'i3', via: 'guide-3'}]}, ctx);
+  assert.equal(done.error, undefined);
+  const c = done.rack.cables.find(x => x.id === 'c2');
+  assert.equal(c.routeEdited, true);
+  const p = R.routePath(done.rack, c, ctx);
+  assert.equal(rose(done.rack, c, ctx), false);
+  assert.deepEqual(p.points, R.routePath(done.rack, c, asMain(ctx)).points);
+  assert.equal(mm(p), 610.6);
+  // and the cord is put back on its own route: it rises through the gap again
+  const back = apply(done.rack, {op: 'cable.route.reset', id: 'c2'}, ctx);
+  assert.equal(back.error, undefined);
+  const q = R.routePath(back.rack, back.rack.cables.find(x => x.id === 'c2'), ctx);
+  assert.equal(rose(back.rack, back.rack.cables.find(x => x.id === 'c2'), ctx), true);
+  assert.deepEqual(q.points, before.points);
+});
+
+test('on one rack the automatic cord rises through the gap and the hand-edited one beside it goes round', () => {
+  const {rack: base, ctx} = owner();
+  const hand = {...base.cables[1], id: 'h2', a: {...base.cables[1].a, path: 'p140'}, b: {...base.cables[1].b, path: 'bay4'}, route: [{item: 'i3', via: 'guide-4'}], routeEdited: true};
+  const rack = {...base, cables: [base.cables[1], hand]};
+  const auto = R.routePath(rack, rack.cables[0], ctx);
+  assert.equal(rose(rack, rack.cables[0], ctx), true);
+  assert.equal(mm(auto), 483.6);
+  const p = R.routePath(rack, hand, ctx);
+  assert.equal(rose(rack, hand, ctx), false);
+  assert.deepEqual(p.points, R.routePath(rack, hand, asMain(ctx)).points);
+});
+
+test('a bundle with a trunk drawn by hand, or a member routed by hand, uses no gap; one the kit routes does', () => {
+  const {rack: base, ctx} = owner();
+  const c2 = base.cables[1];
+  const more = {...c2, id: 'x0'};
+  const bundle = (route, members = [c2, more]) => ({id: 'b1', number: 1, label: 'B', members: members.map(c => ({cable: c.id})), route});
+  const withB = (b, cables) => ({...base, cables, bundles: [b]});
+  const asAuto = withB(bundle([]), [c2, more]);
+  assert.equal(rose(asAuto, asAuto.cables[0], ctx), true);
+  // a trunk written by hand through a ring of the tray: no member rises
+  const trunked = withB(bundle([{item: 'i3', via: 'guide-3'}]), [c2, more]);
+  for (const c of trunked.cables) {
+    const p = R.routePath(trunked, c, ctx);
+    assert.equal(rose(trunked, c, ctx), false, c.id);
+    assert.deepEqual(p.points, R.routePath(trunked, c, asMain(ctx)).points, c.id);
+  }
+  // one member hand-edited: the bundle goes round the front edge together, the automatic member too
+  const mixed = withB(bundle([]), [c2, {...more, route: [{item: 'i3', via: 'guide-3'}], routeEdited: true}]);
+  for (const c of mixed.cables) {
+    const p = R.routePath(mixed, c, ctx);
+    assert.equal(rose(mixed, c, ctx), false, c.id);
+    assert.deepEqual(p.points, R.routePath(mixed, c, asMain(ctx)).points, c.id);
+  }
 });
 
 test('the gap is the router\'s own: no key of the rack file names it', () => {

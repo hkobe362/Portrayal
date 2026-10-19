@@ -303,14 +303,18 @@ the front edge. A full gap raises no finding or warning, and a bundle is held to
 its diameter alone; both are still open.
 
 **The gap is not a pathway a user can pin.** It is used by the automatic route
-only, and the file has no key for it (decided 2026-10-18). A hand route keeps
-its waypoints as before and is not led through it. To make it pinnable, one
-more value in a `lay` entry would point at the gap by `item` and `via`
-(`docs/rack-file-v4-design.md` section 3.9), an additive schema change; the
-router's gap already carries both.
+only, and the file has no key for it (decided 2026-10-18). **A hand-edited
+route never uses the gap** (decided 2026-10-19): a cable whose route was edited
+(`routeEdited`), a cable in a bundle whose trunk is written, and every cable of
+a bundle with a member edited by hand are offered no gap on any leg, those
+between their waypoints too, and go round the front edge as before. To make it
+pinnable, one more value in a `lay` entry would point at the gap by `item` and
+`via` (`docs/rack-file-v4-design.md` section 3.9), an additive schema change;
+the router's gap already carries both.
 
 A hand route keeps its waypoints; the detours are added between them in the
-same way, and a leg the three rules cannot clear is left as drawn and reported.
+same way (by the front edge, never the gap), and a leg the three rules cannot
+clear is left as drawn and reported.
 
 ### 1.4 The finding
 

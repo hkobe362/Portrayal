@@ -370,7 +370,7 @@ function patchRing(rack, cable, m, rings, ctx) {
     // under the cable's own id: the page's readers are asked about this
     // cable, and must know it. The lay kept (pickOf) is judged, as the side
     // is measured: no port covered need be read for it.
-    const path = pickOf(rack, {...cable, route: [{item: m.id, via: g.via}], routeEdited: true}, ctx, {name: false})?.path;
+    const path = pickOf(rack, {...cable, route: [{item: m.id, via: g.via}], routeEdited: true, measuring: true}, ctx, {name: false})?.path;
     if (!path) return null;
     const score = layScore(path);
     if (!best || layBetter(score, best.score)) best = {g, score};
@@ -1825,7 +1825,7 @@ function layInputs(rack, cable, ctx, given, plain = false) {
   // found crossing (layFrom); null for an end on a rack device
   const own = e => (itemOf(rack, e.item) ? null : zeroUById(rack, e.item)?.id ?? null);
   const gapD = gapDiameterOf(rack, cable, ctx, diameter);
-  return {...(plain ? {plain: true} : {}), media: cable.media, a, b, diameter, ...(gapD ? {gapD} : {}), need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
+  return {...(plain ? {plain: true} : {}), media: cable.media, a, b, diameter, ...(gapD ? {gapD} : {}), ...(byHand(rack, cable, ctx) ? {noGap: true} : {}), need: bendOf(cable, ctx), drape: drapeOf(cable, ctx),
     ends: {a: own(cable.a), b: own(cable.b)}, wps, stops, rests};
 }
 // One more thing a cable rests on, unless it is listed.
@@ -1863,7 +1863,7 @@ function layFrom(inp, world) {
 function layOnce(inp, world, withGaps) {
   const plain = inp.plain === true;
   // (a plain lay is not offered the gap: PLAIN, at layOf)
-  const gaps = withGaps && !plain ? world.gaps : [];
+  const gaps = withGaps && !plain && inp.noGap !== true ? world.gaps : [];
   // whether any lay tried, the one kept or not, went up through a gap: the
   // search that ends in a lay without one may still have been led elsewhere by it
   let usedNovel = false, usedGap = false;
@@ -2587,6 +2587,20 @@ function gapDiameterOf(rack, cable, ctx, diameter) {
   const ds = b.members.map(m => (rack.cables || []).find(c => c.id === m.cable)).filter(Boolean).map(c => cableDiameter(c, ctx));
   const d = ds.length >= 2 ? bundleDiameter(ds) : 0;
   return d > diameter ? d : null;
+}
+
+// WHETHER A ROUTE IS THE HAND'S (#966): a cable whose route was edited
+// (`routeEdited`), a cable in a drawn bundle whose trunk is written, and a
+// cable in a bundle with a member that is edited by hand. None of their legs,
+// those between waypoints too, is offered a tray's gap. The lays that
+// patchRing makes of a cable's own route carry `measuring` and are not
+// hand-made: they choose the ring the automatic route takes.
+function byHand(rack, cable, ctx) {
+  if (cable?.routeEdited === true && cable.measuring !== true) return true;
+  const b = drawnBundleOf(rack, cable?.id);
+  if (!b) return false;
+  return trunkRoute(rack, b, ctx).waypoints.length > 0
+    || b.members.some(m => (rack.cables || []).find(c => c.id === m.cable)?.routeEdited === true);
 }
 
 // The marks of a path drawn from its other end, for its points reversed: the
