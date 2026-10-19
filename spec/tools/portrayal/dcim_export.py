@@ -487,6 +487,12 @@ FAMILY_PART = {
     # the ganged cell with ONE lamp (a LINK/ACT jack, the AurCore AIS non-PoE
     # builds): the same Ethernet jack, so the same row (#738)
     "common/rj45-ganged-link@1": ("iface", "1000base-t"),
+    # the ganged cell with two lamps and NO Ethernet claim (#370): a timing or
+    # console jack whose housing shows lamps, so it falls back to the bare
+    # cell's answer. Its ref has no `-eth`, which is what iface_type's guard
+    # reads, so a placement that states no timing function and no Ethernet
+    # speed is not typed as an interface either.
+    "common/rj45-ganged-lamped@1": ("console", "rj-45"),
 }
 
 # ...AND FAMILY_PART IS A FALLBACK, NOT A DECISION. #125 gave std/rj45@2 seven
