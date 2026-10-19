@@ -172,7 +172,8 @@ places a cord's spare may go. Reading the output of the first:
 
 This differs a little from the 2.2 to 3 m of the version-4 note (1.89 to 3.12
 here); the turn shape is the difference, and both say the same thing: **at three
-high one lacer takes well under half of what sixteen cords ask**, and the number
+high one lacer takes 38 to 63 per cent of the 4.96 m sixteen cords ask**
+(1.89 to 3.12 m; 12 of the 31.6 turns at the shortest turn), and the number
 that decides it, how high turns may stack, is not in the sources. The three-high
 figure is `FILL_LIMIT` times the ring opening, a rule made for the area a
 cable fills in a ring, applied to turns on a floor. It is not a measurement of a
