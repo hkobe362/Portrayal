@@ -86,6 +86,9 @@ export function endPane(rack, end) {
 // two FS rings measured so far, whose bands are 6.8 mm (fs/d-ring-snap-in)
 // and 9.9 mm (fs/cmh-5dr1u-ring) thick along the run.
 export const RING_DEPTH = 10;
+// How many lead ends the run-outs of a lay were tried at, and how many of
+// those took one (#1038): a count a test reads, never an input.
+export const RUN_OUTS = {tried: 0, taken: 0};
 export function ringOf(g) {
   if (g?.kind !== 'ring') return null;
   const stated = typeof g.depth === 'number' && g.depth > 0;
@@ -1709,7 +1712,11 @@ function worldOf(rack, ctx) {
     if (known) { worlds.unshift(known); if (worlds.length > 6) worlds.length = 6; }
     id = known ? known.id : null;
   }
-  const out = {solids, surfaces, lanesAt, id};
+  // the solids that are a tray's floor (#1038, the run-outs): the solid whose
+  // box is a floor of its item's tray, read off the trays the world's text covers
+  const floors = new Set(), trays = traysOf(rack, ctx), same = (u, v) => ['x0', 'x1', 'y0', 'y1', 'z0', 'z1'].every(k => Math.abs(u[k] - v[k]) < 1e-6);
+  for (const s of solids) if (trays.some(t => t.item === s.item && t.floors.some(f => same(f, s.box)))) floors.add(s);
+  const out = {solids, surfaces, lanesAt, id, floors};
   per?.set(ctx, out);
   return out;
 }
@@ -1887,7 +1894,7 @@ function layFrom(inp, world) {
   // again, and all but a leg or two of it are the legs of the last try.
   // Found again by the seven numbers themselves, each the same number
   // (Object.is): the sum only says which few to compare.
-  const rounds = new Map();
+  const rounds = new Map(), roundOther = new WeakSet(), otherPoints = new WeakSet();
   // `how` is which way round is asked for (#1026): 1 `rear`, 2 `loose`, 3 both.
   const roundOf = (p, q, room, how = 0) => {
     // (`how` is compared and is not in the sum: the ways round one leg, asked each way, are found in one list)
@@ -1898,6 +1905,9 @@ function layFrom(inp, world) {
       if (Object.is(e.p.x, p.x) && Object.is(e.p.y, p.y) && Object.is(e.p.z, p.z) && Object.is(e.q.x, q.x) && Object.is(e.q.y, q.y)
         && Object.is(e.q.z, q.z) && Object.is(e.room, room) && e.how === how) return e.got;
     const got = detour(p, q, solids, {diameter, lanes: lanesAt, room, rear: (how & 1) === 1, loose: (how & 2) === 2});
+    // the way round is round something other than a tray's floor where the
+    // first body the leg meets is not one (what a run-out is tried for, below)
+    if (got?.length && !world.floors.has(legCrossings(p, q, solids, {diameter})[0]?.solid)) roundOther.add(got);
     list.push({p: {x: p.x, y: p.y, z: p.z}, q: {x: q.x, y: q.y, z: q.z}, room, how, got});
     return got;
   };
@@ -1976,7 +1986,11 @@ function layFrom(inp, world) {
       if (extra === null) stuck++;
       if (extra?.length) {
         detours.push({between, points: extra.map(p => ({x: p.x, y: p.y, z: p.z}))});
-        for (const p of extra) { tautLegs.push(between); own.push(-1); taut.push({x: p.x, y: p.y, z: p.z, at: 'detour'}); }
+        for (const p of extra) {
+          const q = {x: p.x, y: p.y, z: p.z, at: 'detour'};
+          if (roundOther.has(extra)) otherPoints.add(q);
+          tautLegs.push(between); own.push(-1); taut.push(q);
+        }
       }
       tautLegs.push(between);
       own.push(from[k]);
@@ -2180,23 +2194,28 @@ function layFrom(inp, world) {
     // need no way round at all. So where a detour stands in a plug's own
     // leg, the run-outs are tried before any offer, and the shortest is
     // taken that leaves that leg no detour, no corner shorter of room in
-    // all, and nothing newly crossed. Not in a plain lay (layOf).
-    const leadDetour = (T, end) => {
+    // all, and nothing newly crossed. Not in a plain lay (layOf). Tried only
+    // where a detour in the leg is round a body that is no tray's floor (#1038,
+    // `other`: a ring's part or its web; a floor is gone round, as it was
+    // before, and a run-out was never taken at one); a run-out is still
+    // judged by any detour left in the leg.
+    const leadDetour = (T, end, other = false) => {
       const i = T.taut.findIndex(p => p.end === end && p.at === 'reach');
       if (i < 0) return false;
       const step = end === 'a' ? 1 : -1;
-      for (let j = i + step; j > 0 && j < T.taut.length - 1 && (T.own[j] === -1 || T.taut[j].end === end); j += step) if (T.taut[j].at === 'detour') return true;
+      for (let j = i + step; j > 0 && j < T.taut.length - 1 && (T.own[j] === -1 || T.taut[j].end === end); j += step) if (T.taut[j].at === 'detour' && (!other || otherPoints.has(T.taut[j]))) return true;
       return false;
     };
     if (!plain) for (const end of ['a', 'b']) {
-      if (!leadDetour(L, end)) continue;
+      if (!leadDetour(L, end, true)) continue;
+      RUN_OUTS.tried++;
       let out = null;
       for (const m of [0.5, 1, 1.5]) {
         const r2 = {...runs, [end]: m * bend}, L2 = lay(offs, leads, r2), s2 = shortOf(L2.taut), len = lengthOf(L2.taut);
         if (L2.stuck > L.stuck || L2.ahead.length > L.ahead.length || s2 > short + 1e-9 || leadDetour(L2, end) || len > lengthOf(L.taut) - 1e-9) continue;
         if (!out || len < out.len - 1e-9) out = {L: L2, s: s2, len, r: r2};
       }
-      if (out) { Object.assign(runs, out.r); L = out.L; short = out.s; usedNovel = true; }
+      if (out) { RUN_OUTS.taken++; Object.assign(runs, out.r); L = out.L; short = out.s; usedNovel = true; }
     }
     // The best change on offer is made, and the offers are drawn up again,
     // until none helps or six have been made: the best of all of them each

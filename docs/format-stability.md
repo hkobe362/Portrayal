@@ -76,7 +76,9 @@ know, so none was needed):
   value the reader cannot use as a colour moves to `colorAsWritten`. A kit
   before 0.31.0 keeps the key and draws the cable by its media. The schema
   under `/schemas/v3/` describes both keys; `color` is the first key of that
-  schema with a `pattern`.
+  schema with a `pattern`. The order and the `color` key were decided
+  2026-10-18; the other rulings in `rack-file-v4-design.md` section 14 still
+  wait to be confirmed.
 
 Each device and component also carries its own semantic version and lock, which
 records what changed in *that hardware's drawing*. That is a separate system,
@@ -359,12 +361,12 @@ build. While the library holds no kit the file is `{"kits": []}`.
   "configurations": [{"id": "four-post", "racks": ["4-post"], "parts": ["inner"],
                       "depth": {"square": [631, 868]}, "rail-depth": 714}],
   "accessories": [{"kind": "cma", "ref": "acme/cma@1", "rail-depth": 845}],
-  "superseded-by": null, "provenance": {"depth": "..."}}]}
+  "superseded-by": null, "provenance": {"depth": "..."}, "gaps": []}]}
 ```
 
 Rows are sorted by `ref`, and every row carries every key above. A key the
 contract leaves out is `null` (`travel`, `install`, `superseded-by`), an empty
-string (`description`), an empty list (`accessories`) or an empty object
+string (`description`), an empty list (`accessories`, `gaps`) or an empty object
 (`provenance`). `parts`,
 `configurations` and `accessories` are as the contract writes them; the
 component schema describes each key. A part is a ref, not geometry: the
@@ -373,6 +375,19 @@ geometry of a kit's parts is read from `components.json` by their refs.
 The file is new, and did not raise `contract`, which is still 2. Removing or
 renaming a key, or changing what one means, is a `contract` change; adding a
 key is not.
+
+**A kit configuration may state a `preset` and no `depth`. One-way, decided
+2026-10-18.** A configuration states at least one of the two. One with a
+`preset` alone is published as the contract writes it, with the `preset` and no
+`depth` key: not `null`, and not `[preset, preset]`. It means "factory setting
+known, range unknown", so a reader that takes `depth` to be always present
+must now handle its absence, and a `kits.json` or `<device>.configs.json` that
+holds such a configuration cannot be taken back to a reader that cannot. The
+kit's `gaps` row says which configurations have no range (`what: depth`, the
+ids in `scope`; always present, `[]` where the kit has none), and a
+`telescoping` kit states a `preset` on at least one configuration. Lint L157
+and L158 hold both; the row for `gaps` is additive. No kit in the library uses
+this yet.
 
 ### Ears and kits on a device
 

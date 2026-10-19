@@ -703,6 +703,16 @@ shared `<style>` and `<defs>` once and keys a node by that and its own art (`ras
 whole-text rewrite; no two texts it tells apart share a key), and `svgCanvas` returns the kept raster instead of a copy: draw on
 a copy (`rasterize`), never on it.
 
+**Also in 0.50.0: a body piece carries a side drawing, and a fitted piece follows its field.**
+A piece in `body.boxes` that `shows: [left|right|top|bottom]` is painted on that side with the patch
+of the part's own `body-<side>.svg` it lies under (`pieceArtCrop` in `relief.js` gives the frames;
+`components.json` publishes each drawing under `body.drawings` with its viewBox origin as `at`).
+A piece with `when: {field: [options]}` is built only while the part's drawing shows a node for one
+of those options (`pieceFitted`, `shownOptions`), so `setFields` on the part's path fits or removes
+it, and the scene is rebuilt as for any field that shows a node. `svgCanvas` takes an optional
+density, `pxmm`. A page that does neither changes nothing. `kit/component.html` opens one component
+in the 3D viewer with camera presets and its choice fields.
+
 **New in 0.50.0: a card two slots wide** (docs/pcie-two-slot-bays-design.md). components.json gives a
 part wider than one slot `slot-width` and a nested bay the siblings it can cover, `span`. A card
 `n` slots wide seats only in a bay whose `span` names `n - 1` bays, and only while each of them holds
