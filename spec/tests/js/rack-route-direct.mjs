@@ -300,9 +300,13 @@ test('ends on two managers still take the lane; on opposite sides, the shorter s
   // 1913.1 and 2120 before its turns were given room, #973: 13.4 and 70.3
   // longer, the right by more for the wider turn it makes to end a's ring;
   // 1926.5 and 2190.3 before the lacer stood centred in its unit, 0.225 mm up;
-  // 1926.6 and 2190.2 before the left rose through the gap behind the tray
-  // into its first ring, #966: 125.7 mm shorter than round the front edge)
-  assert.deepEqual([len(left), len(right)], [1800.9, 2190.2]);
+  // 1926.6 and 2190.2 before the automatic left rose through the gap behind
+  // the tray into its first ring, #966: 125.7 mm shorter than round the front
+  // edge. `len` writes the route by hand, and a hand-edited route never uses
+  // the gap, so it measures the front edge, 1926.6; the cable itself, on its
+  // own route, rises: 1800.9)
+  assert.deepEqual([len(left), len(right)], [1926.6, 2190.2]);
+  assert.equal(mm(R.routedLength(r, c, ctx)), 1800.9);
   // written the other way round, the same side
   const back = {...c, a: c.b, b: c.a};
   assert.deepEqual(R.autoRoute(r, back, ctx), left.toReversed());
