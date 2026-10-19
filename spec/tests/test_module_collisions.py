@@ -67,8 +67,9 @@ def _groups():
         man = dist.manufacturer_of(c.get("ns"))
         if not man:
             continue
-        doc = dx.build_module(c, man, dist.component_by_ref)
-        out[(man, doc["model"])].append((doc, f"{c['ns']}/{c['name']}"))
+        for model, _part in dx.module_names(c):
+            doc = dx.build_module(c, man, dist.component_by_ref, model=model)
+            out[(man, doc["model"])].append((doc, f"{c['ns']}/{c['name']}"))
     return dict(out)
 
 

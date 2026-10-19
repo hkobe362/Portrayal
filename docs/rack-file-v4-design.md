@@ -793,9 +793,11 @@ held face exists since step 3 of that note). `position` is kept and not
 acted on until lay order is built; ignoring it moves a cable across its
 pathway by millimetres and is harmless, as that note argues.
 
-The gap behind a tray (#966) needs no key in version 4. If it becomes a
-pathway a user can pin, it is one more value in a `lay` entry, an additive
-schema change.
+The gap behind a tray (#966) needs no key in version 4, and is built: the
+automatic route uses it (docs/cable-lay-design.md 1.3), a
+hand-edited route never does, and a user cannot pin it. If it becomes a pathway a user can pin, it is one more
+value in a `lay` entry, naming the tray (`item`, `via`) the router's gap
+already carries, an additive schema change.
 
 ### 3.10 Straps
 
@@ -1330,7 +1332,7 @@ legend says spare cable is listed and not drawn.
 
 **Not in the pull request, and no format change when they come:** lay order
 by `position` (cable lay step 5), the quarter turns of #550, placing a new
-held item (7.1), the gap behind a tray (#966), the direction faults of #986,
+held item (7.1), the gap behind a tray as a pinnable pathway (#966), the direction faults of #986,
 the generic ear slots in `ears.py` (2.5, #1010), drawing and placing spare
 (3.4, #1011), and ring anchors (3.10, #1009).
 
@@ -1552,7 +1554,8 @@ one-way.
 
 **Needs no version, only a build:**
 
-- Lay order by `position`, and the gap behind a tray (#966).
+- Lay order by `position`. (The gap behind a tray, #966, is built, for the
+  automatic route only; pinning it is the one additive `lay` value of 3.9.)
 - The quarter turns of `roll` and the mount kit facts of #550.
 - Placing a device on a shelf, in a drawer or on a DIN rail (#972), once the
   library has `hosts:`; and acting on `width` and `options`, once a product

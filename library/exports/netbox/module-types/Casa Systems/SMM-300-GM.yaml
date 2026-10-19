@@ -1,6 +1,7 @@
 ---
 manufacturer: Casa Systems
-model: SMM 300GM
+model: SMM-300-GM
+part_number: SMM-300-GM
 description: Casa/CommScope SMM300GM Switch and Management Module - the supervisor for the C100G and C40G
   CCAP chassis, and the SMM 300G fitted with a newer packet processor after the original went end-of-life
 console-ports:
@@ -61,4 +62,4 @@ comments: 'Casa/CommScope SMM300GM Switch and Management Module - the supervisor
 
   - timing: IEEE 1588v2
 
-  Contract version 1.7.0 (casa/smm-300gm).'
+  Contract version 1.8.0 (casa/smm-300gm).'

@@ -535,10 +535,10 @@ def test_a_published_kit_carries_what_kits_json_says_of_it(lib):
     """THE SAME KIT IN TWO FILES. kits.json states it once; configs.json
     resolves it per device. Every fact kits.json carries about the kit itself
     is in the row, except where it lives (`ns`, `name`, `major`), its
-    succession and its provenance, which are the catalogue's."""
+    succession, its provenance and its gaps, which are the catalogue's."""
     entry = components_index.kit_entry(KIT_REF, "acme", "v1", KIT)
     row = _published(lib, KITS[1:])[0] | {"ref": KIT_REF}
-    kept = set(entry) - {"ns", "name", "major", "kind", "superseded-by", "provenance"}
+    kept = set(entry) - {"ns", "name", "major", "kind", "superseded-by", "provenance", "gaps"}
     assert kept <= set(row)
     for key in kept - {"parts", "accessories"}:
         assert row[key] == entry[key], key
