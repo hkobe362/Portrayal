@@ -1533,7 +1533,7 @@ const SVG_CACHE = new Map();
 // Passing no scope uses the default one, which is what every existing caller
 // does and what this module did before - so nothing had to change to keep working.
 export function createReliefScope(deps = {}) {
-  return {overrides: new Map(), states: new Map(), pulled: new Set(), lampBinds: new Map(),
+  return {overrides: new Map(), states: new Map(), pulled: new Set(), pulledIn: new Map(), lampBinds: new Map(),
           pxmm: deps.PXMM, fruPaths: deps.FRU_PATHS};
 }
 const DEFAULT_SCOPE = createReliefScope();
@@ -1812,13 +1812,32 @@ export function applyNodeLampColors(root, scope) {
 // NESTED PARTS COME WITH IT. Pulling a supply takes its lamps and its ports,
 // because they are on it - a tree row pointing at geometry that is no longer
 // drawn is exactly the dangling selection this was reported for.
-export function setPulled(paths, scope) {
-  const s = _sc(scope).pulled;
+//
+// OF THE VIEW IT IS ON. Two views can place one id (the DIN rail's left and
+// right both place `screw-upper`), so `views` - optional, one view for every
+// path or a list beside `paths` - says which face a path is off on. A path with
+// no view is off on every face that has it, as it always was; one with a view
+// is off on that face only.
+export function setPulled(paths, scope, views) {
+  const sc = _sc(scope), s = sc.pulled, at = sc.pulledIn;
   s.clear();
-  for (const p of paths || []) if (p) s.add(String(p));
+  at.clear();
+  (paths || []).forEach((p, i) => {
+    if (!p) return;
+    const v = Array.isArray(views) ? views[i] : views;
+    if (v == null) { s.add(String(p)); return; }
+    if (!at.has(String(v))) at.set(String(v), new Set());
+    at.get(String(v)).add(String(p));
+  });
 }
-export function clearPulled(scope) { _sc(scope).pulled.clear(); }
-export function pulledPaths(scope) { return new Set(_sc(scope).pulled); }
+export function clearPulled(scope) { _sc(scope).pulled.clear(); _sc(scope).pulledIn.clear(); }
+/** Every path that is off, on whichever view. */
+export function pulledPaths(scope) {
+  const sc = _sc(scope);
+  return new Set([...sc.pulled, ...[...sc.pulledIn.values()].flatMap(s => [...s])]);
+}
+/** The paths off on one view alone: the ones named for it, no more. */
+export function pulledOn(view, scope) { return new Set(_sc(scope).pulledIn.get(String(view)) || []); }
 
 /** Is `path` the pulled part itself, or something sitting on it? */
 function _isPulled(path, pulled) {
@@ -1827,23 +1846,47 @@ function _isPulled(path, pulled) {
   return false;
 }
 
-/** Hide what this viewer has taken off, in a parsed document. */
-export function applyPulled(root, scope) {
+/** Is `path`, drawn on `view`, off: by name for every view, or for this one? */
+export function isPulledOn(path, view, scope) {
+  const sc = _sc(scope);
+  return _isPulled(path, sc.pulled)
+    || (view != null && sc.pulledIn.has(String(view)) && _isPulled(path, sc.pulledIn.get(String(view))));
+}
+
+/** Hide what this viewer has taken off, in the scene under `o`. A mesh is on the
+ *  face whose group it hangs under (`userData.portrayalView`, set where the face's
+ *  group is made), so a part pulled on one face stays on the other that places the
+ *  same id. `view` is the face `o` is already known to be on. */
+export function hidePulled(o, scope, view = null) {
+  const v = (o.userData && o.userData.portrayalView) || view;
+  const p = o.userData && o.userData.portrayalPath;
+  if (p) o.visible = !isPulledOn(p, v, scope);
+  for (const c of o.children || []) hidePulled(c, scope, v);
+}
+
+/** Hide what this viewer has taken off, in a parsed document. `view` is the face
+ *  the document is; without it only what was taken off for every view is hidden. */
+export function applyPulled(root, scope, view) {
   if (!root) return root;
   for (const el of root.querySelectorAll("[data-portrayal-pulled]")) {
     el.removeAttribute("data-portrayal-pulled");
     el.removeAttribute("display");
   }
-  const pulled = _sc(scope).pulled;
-  if (!pulled.size) return root;
-  for (const el of root.querySelectorAll("[data-path]"))
-    if (_isPulled(el.getAttribute("data-path"), pulled)) {
-      el.setAttribute("data-portrayal-pulled", "");
-      el.setAttribute("display", "none");
-    }
-  // a part's projections on other faces go with it
+  const sc = _sc(scope);
+  const pulled = view != null && sc.pulledIn.has(String(view))
+    ? new Set([...sc.pulled, ...sc.pulledIn.get(String(view))]) : sc.pulled;
+  // a part's projections on other faces go with it, whichever face it was taken
+  // off on: the projection is the same part seen through another face
+  const anywhere = pulledPaths(scope);
+  if (!anywhere.size) return root;
+  if (pulled.size)
+    for (const el of root.querySelectorAll("[data-path]"))
+      if (_isPulled(el.getAttribute("data-path"), pulled)) {
+        el.setAttribute("data-portrayal-pulled", "");
+        el.setAttribute("display", "none");
+      }
   for (const el of root.querySelectorAll("[data-projection][data-of]"))
-    if (_isPulled(el.getAttribute("data-of"), pulled)) {
+    if (_isPulled(el.getAttribute("data-of"), anywhere)) {
       el.setAttribute("data-portrayal-pulled", "");
       el.setAttribute("display", "none");
     }
@@ -1870,7 +1913,8 @@ export function applyNodeStates(root, scope) {
 // and never re-shapes, so a texture can be redrawn from the text it was built
 // from without re-extracting any geometry - which is the whole reason clicking a
 // state chip does not cost a rebuild.
-export function restyleText(text, scope) {
+// `view` is the face the text is, for what was taken off on that face alone.
+export function restyleText(text, scope, view) {
   if (!text) return text;
   const div = document.createElement('div');
   div.innerHTML = text;
@@ -1881,7 +1925,7 @@ export function restyleText(text, scope) {
   // a face keeps its members where the registry puts them through a repaint
   applyNodeAdjustments(div, scope);
   applyNodeLampColors(div, scope);
-  applyPulled(div, scope);
+  applyPulled(div, scope, view);
   return div.innerHTML;
 }
 
@@ -2534,7 +2578,7 @@ export function markPositionFields(root) {
   return root;
 }
 
-export async function extractRelief(url, scope, {back = false} = {}) {
+export async function extractRelief(url, scope, {back = false, view = null} = {}) {
   const div = document.createElement('div');
   div.style.cssText = 'position:absolute;left:-10000px;top:0;width:1000px;visibility:hidden';
   div.innerHTML = await svgSource(url, scope);
@@ -2567,7 +2611,7 @@ export async function extractRelief(url, scope, {back = false} = {}) {
   // has to put it back. Left as display:none it would measure 0x0 and extrude a
   // degenerate feature instead of none at all - a cover that is off should leave
   // no geometry behind, not a flat one.
-  applyPulled(svg, scope);
+  applyPulled(svg, scope, view);
   for (const el of [...q("[data-portrayal-pulled]")]) el.remove();
   // AND A NODE A POSITION HIDES, for the same reason (docs/switch-positions-
   // design.md section 6): a breaker's off flag is not drawn while it is on, and
@@ -3380,7 +3424,7 @@ export async function buildFaceRelief(F, ctx) {
     const restyle = ctx.restyle || [];
     // `anim` - the material and its mm size - is what lets the viewer redraw
     // the same texture at several instants of a CSS animation (see lamps.js)
-    const reg = (svgText, run, anim = null) => { if (svgText) restyle.push({svgText, run, anim}); };
+    const reg = (svgText, run, anim = null) => { if (svgText) restyle.push({svgText, run, anim, view: F.view}); };
     // what a restyle will change, kept whole by the batch pass; with no
     // `ctx.restyle` nothing ever runs a restyle, so nothing is live
     const live = new Set();
@@ -3403,7 +3447,7 @@ export async function buildFaceRelief(F, ctx) {
       return;
     }
     const {cavities, outs, domes, vents, apertures = [], frus, subBodies = [], flatLifted = [],
-           cleanText, shown} = await extractRelief(src, ctx.scope, {back: !!ctx.back});
+           cleanText, shown} = await extractRelief(src, ctx.scope, {back: !!ctx.back, view: F.view});
     if (ctx.apertures) ctx.apertures[F.view] = apertures;
     // A MODULE PREVIEW IS THE PART'S SIZE BOX HERE. A part that declares
     // `head:` publishes a preview whose viewBox also holds the head and its
@@ -3473,6 +3517,9 @@ export async function buildFaceRelief(F, ctx) {
     faceSvg[F.view] = faceText;   // LOD re-rasterises from this; keep it squared
     facePunch[F.view] = [];
     const grp = new THREE.Group();
+    // the face this group is, so a pulled part is hidden on its own face and not
+    // on the other that places the same id (setPulled's `views`)
+    grp.userData.portrayalView = F.view;
     grp.position.set(...F.pos());
     grp.rotation.set(...F.rot);
     // A FACE MAY BE AUTHORED MIRRORED and the underside is - a bottom view is drawn

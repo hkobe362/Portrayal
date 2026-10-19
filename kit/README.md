@@ -90,6 +90,30 @@ jsDelivr with `?dist=cdn` (and `&index=<version>`).
 
 Plain ES modules. No bundler, no build step.
 
+## A part pulled on one view
+
+Two views of a device can place the same id (a DIN rail panel's `left` and
+`right` both place `screw-upper`), so a part is a view and an id. The shell's
+`pulled` event is `{ paths }`, bare ids as ever. On a device with more than one
+view it also carries `views`, optional: `views[i]` is the view `paths[i]` is off
+on. A one-view device sends `{ paths }` and nothing more, and a host that
+ignores `views` hears what it heard before. The field is `view` rather than
+`scope` because `scope` already names a relief instance (`createReliefScope`).
+
+Every `view` below is optional, and a call without one means what it did:
+
+- `shell.select(path, fromTree, view)`, `shell.over(path, view)` and
+  `shell.pulledPaths(view)`; left off, a path is the first face that draws it.
+  The `select` event gains a fifth argument, the view (undefined on a one-view
+  device).
+- `shell.setPulled(paths, on, views)`: `views` is one view for every path, or a
+  list beside `paths`. `shell.pulledViews()` is the view of each of
+  `pulledPaths()`, `null` on a one-view device.
+- `viewer.setPulled(paths, views)` and `setPulled(paths, scope, views)` in
+  `relief.js`: a part given a view is hidden on that view's face only; one given
+  none is hidden on every face, as before.
+- Tree rows carry `data-view` on a device with more than one view.
+
 ## A part that slides
 
 New in 0.19.0. A device may declare a part that slides (a rail panel on
