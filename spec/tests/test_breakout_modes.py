@@ -14,7 +14,7 @@ import sys
 import pytest
 import yaml
 
-from portrayal import lint
+from portrayal import libwalk, lint
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 LIB = ROOT / "library"
@@ -65,7 +65,7 @@ def test_a_listing_and_a_device_are_both_read():
 # ---- every mode on main ----------------------------------------------------------
 
 def _files():
-    return sorted(list(LIB.glob("devices/*/*/listing.yaml")) + list(LIB.glob("devices/*/*/device.yaml")))
+    return libwalk.iter_listings(LIB) + libwalk.iter_devices(LIB)
 
 
 def test_every_mode_in_the_library_passes():
