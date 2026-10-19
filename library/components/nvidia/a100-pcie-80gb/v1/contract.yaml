@@ -125,6 +125,12 @@ provenance:
     fins show as lines across the window on a 5.0 pitch, the first at x 36.25,
     sixteen in all. Readings on the far half are corrected for the
     photograph's 0.6 degree turn.
+    THE DRAWN FRAME ENDS 8.49 SHORT OF THAT, at x 109.11, and the window at
+    107.31 (a review of the preview): the photographed window ran under the
+    riser's right post with no end margin, and std/pcie-bracket-fh-2slot@1's
+    windows end 12.76 from the flange. The far screws sit at x 106.11 and the
+    last two fins (x 106.0 and 111.0) are not drawn. This end is a drawing
+    choice, not a measurement.
   face-markings: >-
     photo-measured - the bracket carries no lamp, no label, no printing and
     no connector. The control is the fins and the Torx recesses, which
@@ -551,12 +557,12 @@ body:
      color: '#a8afb5', confidence: estimated, when: {extender: [long-offset]},
      source: 'as the first thumbscrew'}
 elements:
-  grille: {at: [29.80, 9.90], size: [87.80, 29.40], class: bezel}
-  vent: {at: [31.20, 11.80], size: [84.60, 25.80], class: vent}
+  grille: {at: [29.80, 9.90], size: [79.31, 29.40], class: bezel}
+  vent: {at: [31.20, 11.80], size: [76.11, 25.80], class: vent}
   screw-1: {at: [30.35, 10.85], size: [4.30, 4.30], class: screw}
-  screw-2: {at: [112.45, 10.85], size: [4.30, 4.30], class: screw}
+  screw-2: {at: [103.96, 10.85], size: [4.30, 4.30], class: screw}
   screw-3: {at: [30.35, 33.65], size: [4.30, 4.30], class: screw}
-  screw-4: {at: [112.45, 33.65], size: [4.30, 4.30], class: screw}
+  screw-4: {at: [103.96, 33.65], size: [4.30, 4.30], class: screw}
 relief:
   wall: '#8a9199'
   features:

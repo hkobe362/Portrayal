@@ -2524,6 +2524,18 @@ def instance_group(lib, ref, inst_id, at, label, attrs, group, rel_pos, skin_nam
                 kids = list(holder)
                 holder.insert(max(kids.index(c) for c in last) + 1, mine)
                 break
+    # WHAT BELONGS ONLY TO A COVERED BAY IS NOT DRAWN. A composed part's ink is
+    # not inside any bay's group - the riser's plate is a part, painted over the
+    # cards - so a latch row that serves one slot would be drawn across the
+    # card that covers it and read as a second bracket. A skin node that names
+    # the sibling bay it serves in `data-hide-when-covered` is dropped when that
+    # bay is covered; the attribute is a bay id of THIS carrier, and a carrier
+    # with no span never has a covered bay, so the node stays everywhere else.
+    if covered_by:
+        for holder in list(g.iter()):
+            for kid in list(holder):
+                if kid.get("data-hide-when-covered") in covered_by:
+                    holder.remove(kid)
     # AN OPTIC IN A CAGE ON A SEATED CARD (#484, R2). A configuration's
     # `occupants:` keys such a cage by the MODULE-LESS path - `front-6/xg0` -
     # the convention its nested `bays:` keys already use (bay_path above), and
