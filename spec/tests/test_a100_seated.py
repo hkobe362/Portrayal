@@ -9,6 +9,7 @@ nvidia/nvlink-a100-connector@1 on its plan face; the card exports the first as a
 power port. The R740xd's example configuration seats the card across riser 1's
 two openings.
 """
+import copy
 import shutil
 import sys
 from pathlib import Path
@@ -78,7 +79,9 @@ def test_l185_is_quiet_on_riser_1a_with_the_card_in_slot_1():
 
 
 def test_l185_refuses_the_card_in_a_one_slot_bay_with_no_span():
-    riser = load_yaml(RISER)
+    # load_yaml hands every caller in the process the same dict, and the lock
+    # hashes it: edit a copy
+    riser = copy.deepcopy(load_yaml(RISER))
     riser["bays"]["slot-3"]["accepts"] = [*riser["bays"]["slot-3"]["accepts"], A100]
     parts = {A100: load_yaml(CARD)}
     assert [m for _, m in _rule(lint.lint_component_span, riser, parts)] == [
