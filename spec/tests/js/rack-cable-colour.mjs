@@ -29,8 +29,9 @@ import {loadTree, outputsOf} from './speed-goldens.mjs';
 // DECLARES a jacket colour (a field with a default), two makers' ends that
 // compose it and state one, and one that states it two parts down.
 const BLACK = '#1c1c1c', AQUA = '#49eaf8', PURPLE = '#6b3fa0';
-// What an AOC with no colour stated is drawn in (#1028): the OM3 and OM4 aqua.
-const AOC_NOW = '#2bb3c8';
+// What an AOC with no colour stated is drawn in (#1028): a deeper teal of the
+// OM3 and OM4 aqua family (rack-aoc-colour.mjs holds how far it is from them).
+const AOC_NOW = '#08788a';
 const ENDS = ['generic/qsfp-cable@1', 'maker/aoc@1', 'maker/aec@1', 'maker/deep@1', 'maker/optic@1'];
 const SLOTS = {sw: {default: 'base', bays: {front: [], rear: []},
   cages: {front: [1, 2, 3, 4].map(n => ({id: `port-${n}`, interface: 'qsfp', media: 'qsfp', accepts: ENDS, default: null})), rear: []},
@@ -239,7 +240,7 @@ test('rule 4, and no default changed: every media is the colour it was', () => {
   for (const media of C.MEDIA) assert.equal(G.colorOf({media}), MAIN[media], media);
   assert.deepEqual(C.MEDIA.map(m => MAIN[m]).length, 10);
   assert.deepEqual(C.MEDIA.filter(m => !Object.hasOwn(MAIN, m)), [], 'a media with no recorded colour');
-  assert.equal(G.colorOf({media: 'aoc'}), '#2bb3c8', 'an AOC is aqua, as OM4 is');
+  assert.equal(G.colorOf({media: 'aoc'}), AOC_NOW, 'an AOC is the teal of the multimode family');
   assert.equal(G.colorOf({media: 'unset'}), '#9aa3ad');
   assert.equal(G.colorOf({media: 'copper', purpose: 'server'}), '#5aa7ff');
   assert.equal(G.colorOf({media: 'copper', purpose: 'management'}), '#9aa3ad');
@@ -490,22 +491,22 @@ test('draw.io: a cable whose colour is said carries it and is drawn in it; one c
   // the vendor draws it: the stated colour ahead of the media's entry, and the map's entry without one
   assert.match(strokeOf(rows(pair({cable: {color: '#f80'}})), {aoc: '#111111'}), /strokeColor=#ff8800;$/);
   assert.match(strokeOf(rows(pair()), {aoc: '#111111'}), /strokeColor=#111111;$/);
-  assert.match(strokeOf(rows(pair()), undefined), /strokeColor=#2bb3c8;$/, "an AOC is drawn as the kit draws it");
+  assert.match(strokeOf(rows(pair()), undefined), new RegExp(`strokeColor=${AOC_NOW};$`), "an AOC is drawn as the kit draws it");
   assert.match(strokeOf([{...base, color: 'red'}], {aoc: '#111111'}), /strokeColor=#111111;$/, 'a value that is no colour is not drawn');
   // a page's own style function is handed the row, colour and all
   assert.equal(strokeOf(rows(pair({cable: {color: '#f80'}})), c => `strokeColor=${c.color};`), 'strokeColor=#ff8800;');
 });
 
 // ── the AOC default, and the draw.io palette that follows the kit (#1028) ──
-test('an AOC with no colour stated is aqua, the same value as OM4, in the explorer\'s resolver', () => {
-  assert.equal(G.colorOf({media: 'aoc'}), G.colorOf({media: 'om4'}));
-  assert.equal(G.colorOf({media: 'aoc'}), '#2bb3c8');
-  assert.equal(G.COLORS.aoc, G.COLORS.om4);
-  assert.equal(G.colorOf(C.cablePlan(pair({media: 'aoc'})).links[0]), G.colorOf(C.cablePlan(pair({media: 'om4'})).links[0]));
-  assert.deepEqual(drawn(pair({media: 'aoc'})), {color: '#2bb3c8', from: 'media'});
-  // the hero's jacket for multimode is the same entry, so an AOC and its plug agree
-  assert.equal(G.COLORS.aoc, G.JACKETS.mm);
-  assert.equal(G.PLUGS.mm, G.COLORS.aoc);
+test('an AOC with no colour stated is the multimode family\'s teal, not OM4\'s aqua, in the explorer\'s resolver', () => {
+  assert.equal(G.colorOf({media: 'aoc'}), AOC_NOW);
+  assert.equal(G.COLORS.aoc, AOC_NOW);
+  assert.notEqual(G.colorOf({media: 'aoc'}), G.colorOf({media: 'om4'}));
+  assert.equal(G.colorOf(C.cablePlan(pair({media: 'aoc'})).links[0]), AOC_NOW);
+  assert.deepEqual(drawn(pair({media: 'aoc'})), {color: AOC_NOW, from: 'media'});
+  // the hero's jacket for multimode, and its plug, are OM4's entry as before
+  assert.equal(G.JACKETS.mm, G.COLORS.om4);
+  assert.equal(G.PLUGS.mm, G.COLORS.om4);
 });
 
 test('every other COLORS entry is as it was', () => {
@@ -548,7 +549,7 @@ test('draw.io: a cable\'s own colour, and a caller\'s map, still win over the ki
   assert.match(strokeOf([edgeOf('copper', 'management')], {'copper-management': '#222222'}), /strokeColor=#222222;$/);
   // a map's `default` is still what an unknown media takes
   assert.match(strokeOf([edgeOf('mystery')], {default: '#333333'}), /strokeColor=#333333;$/);
-  assert.match(strokeOf([edgeOf('aoc')], {default: '#333333'}), /strokeColor=#2bb3c8;$/);
+  assert.match(strokeOf([edgeOf('aoc')], {default: '#333333'}), new RegExp(`strokeColor=${AOC_NOW};$`));
 });
 
 test('NetBox and Nautobot: the color column is the cable\'s own colour, six digits with no #, and blank otherwise', () => {

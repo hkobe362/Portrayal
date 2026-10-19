@@ -916,8 +916,9 @@ media and nothing could change it. It is now drawn, in this order, in:
    `jacket`;
 4. else its media's, from `COLORS` in `rack/cable-geometry.js`, as before.
 
-**One default changed.** An AOC with no colour stated is aqua, `#2bb3c8`, as
-OM3 and OM4 are (it was dark grey, `#3a3f45`; decided on #1028), and
+**One default changed.** An AOC with no colour stated is a teal of the
+multimode aqua family, `#08788a`, so that it is told from OM3 and OM4's
+`#2bb3c8` (it was dark grey, `#3a3f45`; decided on #1028), and
 every other media is the colour it was. `COLORS` is the one table that holds
 those colours; `JACKETS`, the hero's table, names entries of it and holds no
 colour of its own.

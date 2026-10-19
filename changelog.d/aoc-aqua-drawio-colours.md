@@ -2,13 +2,13 @@
 - **One-way: recolours existing drawings. An AOC with no colour stated is
   drawn aqua, and a draw.io export strokes each cable in the colour the
   Rack Builder draws it in** (#1028, `kit/rack/cable-geometry.js`,
-  `kit/drawio.js`). `COLORS.aoc` is the multimode aqua `#2bb3c8`, the colour of
-  OM3 and OM4, where it was dark grey `#3a3f45`; no other `COLORS` entry
-  changes. The draw.io writer no longer keeps a palette of its own: a cable's
+  `kit/drawio.js`). `COLORS.aoc` is the teal `#08788a`, of the multimode aqua
+  family but not OM3's and OM4's `#2bb3c8`, where it was dark grey `#3a3f45`; no
+  other `COLORS` entry changes. The draw.io writer no longer keeps a palette of its own: a cable's
   stroke is what `mediaColor` gives it (copper by its purpose), after the
   cable's own `color` and a caller's `cableStyle` map, which still win.
   `CABLE_COLOURS` is still exported, now derived from `COLORS`. Its colours
-  change: dac `#4D4D4D` to `#15171a`; aoc `#2F80C0` to `#2bb3c8`; cu, mm, sm,
+  change: dac `#4D4D4D` to `#15171a`; aoc `#2F80C0` to `#08788a`; cu, mm, sm,
   om1, om2, os1, os2, cat5e and `default` to the OS2 yellow `#e8c547` (the
   kit has no colour of its own for the media it does not list, and draws
   them so); om3 and om4 `#16A5A5` to `#2bb3c8`; om5 `#7DB343` to `#9acd32`;
