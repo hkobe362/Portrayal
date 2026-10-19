@@ -682,6 +682,9 @@ RULES = {
     "L193": ("rack", "a rack product is what its place says it is: its directory is its `name`, no device or listing of its vendor has that name, a four-post form lists a `front` and a `rear` rail and every other form the `front` alone, only the `rear` rail has a `depth`, a depth range runs from less to more with its `factory` inside it, every `provenance` key is a key the rack states, and a figure whose confidence is `estimated` has a `gaps` entry of its own name (error)", "rename the directory or the `name`; list the rails the form has; write the range as `min` below `max`; give each provenance entry the key of the figure it covers; declare every stand-in in `gaps` with what would close it",
              "A rack is referenced as `<vendor>/<name>@<major>` without its kind, so the name has to be free among the vendor's devices, and a saved rack file copies a product's rails and depth; a stand-in that is not declared reads as a printed figure.",
              ERROR),
+    "L195": ("listing, device", "every `interfaces[].breakout.modes` entry is `<count>x<speed>`: a count of one or more with no leading zero, the letter `x`, and a speed from the closed set in spec/schemas/speeds.yaml, in lower case", "write the mode as `4x25g`, never `4 x 25GE` or `4x25`; spell the speed from spec/schemas/speeds.yaml (`1x400g`, `8x50g`)",
+             "A filter for ports that break out reads the count in front of the `x`, and a mode in any other spelling is one it cannot read or compare.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -690,6 +693,7 @@ RULES = {
 # counts these as present, and fails once a reserved code is also in RULES -
 # whichever branch lands second deletes its line.
 RESERVED = {
+    "L194": "hides on a placement (roc-ops/Portrayal#1164)",
 }
 
 # A CODE THAT NAMED A RULE WHICH IS GONE. A device manifest waives a rule by its
@@ -7765,6 +7769,7 @@ def lint_listing(path, data, roots):
     claim and the only question is whether the registry and the hardware agree.
     """
     path = Path(path)
+    lint_breakout_modes(path, data)
     ns = path.parent.parent.name
     entry = VENDORS.get(ns)
     if entry is None or entry.get("role") not in ("software", "both"):
@@ -7807,6 +7812,27 @@ def lint_listing(path, data, roots):
                 "place. A component the NOS reports has to land on something drawn - map "
                 "it to `chassis`, a `region:`, or the id the hardware uses")
             break
+
+
+def lint_breakout_modes(path, data):
+    """L195: a breakout mode is `<count>x<speed>`, the speed from speeds.yaml.
+
+    Read from `interfaces[].breakout.modes` of a listing and of a device alike
+    (docs/breakout-design.md, "The shape", 3). The set is the one L110 reads, so
+    a speed added there is a speed allowed here. A schema fault in `interfaces`
+    is L1's to report; this rule skips what is not a rule with a list of modes.
+    """
+    for i, rule in enumerate(data.get("interfaces") or []):
+        modes = ((rule or {}).get("breakout") or {}).get("modes") if isinstance(rule, dict) else None
+        if not isinstance(modes, list):
+            continue
+        for mode in modes:
+            m = re.fullmatch(r"([1-9][0-9]*)x(.+)", mode) if isinstance(mode, str) else None
+            if not m or m.group(2) not in PORT_SPEEDS:
+                err(path, "L195", f"interfaces[{i}].breakout.modes: {mode!r} is not "
+                    "`<count>x<speed>` with a count from 1 up and a speed from the closed set "
+                    f"({' '.join(PORT_SPEEDS) or 'spec/schemas/speeds.yaml loaded nothing'}). "
+                    "Write it as `4x25g`, not `4 x 25GE` or `4x25`")
 
 
 # THE LAB CODES. The rules are in labs.py, because labs_index.py has to resolve
@@ -12847,6 +12873,7 @@ def lint_device(path, validator, lib_roots):
     lint_device_rel_pos(path, data)
     lint_device_group_names(path, data)
     lint_device_speed_vocabulary(path, data)
+    lint_breakout_modes(path, data)
     lint_device_port_rate(path, data, lib_roots)
     lint_device_port_optics(path, data, lib_roots)
     lint_device_pluggable_media(path, data)
