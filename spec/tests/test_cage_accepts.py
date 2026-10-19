@@ -679,6 +679,16 @@ def test_the_lift_census():
                             doc, lambda r: lib.resolve(r)[0])[2]
                         assert c["lift"] == pytest.approx(want), (c["id"], c["lift"], want)
                         continue
+                    if c["interface"] == "pdu-button":
+                        # A KEYHOLE CUT IN A SHEET (#939): the FS-PDUBK's keyholes are
+                        # placed `in:` the well that builds the plate, so each slot is
+                        # published at the plate's floor, as far below the face as the
+                        # well is deep - the sheet's own depth, not a figure of the part
+                        placed = {p["id"]: p for p in ((d["views"][v].get("components") or {})
+                                                       .get("placements") or [])}
+                        host = placed[placed[c["id"]]["in"]]
+                        assert c["lift"] == -lib.resolve(host["ref"])[0]["size"]["d"], (c["id"], c["lift"])
+                        continue
                     assert c["interface"] == "lc-duplex", (c["id"], c["lift"])
                     bezel = {f["node"]: f.get("out") for f in
                              (lib.resolve(_ref(d, v, c["id"]))[0].get("relief")
