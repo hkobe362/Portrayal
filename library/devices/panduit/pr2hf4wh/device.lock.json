@@ -1,10 +1,10 @@
 {
  "bay-accepts": {},
- "composed": "42af3a1645ecd24b",
+ "composed": "9648a524596bba3a",
  "composed-refs": {
   "panduit/pr2hf-base-4ru@1": "1.0.0+d337e4914d1144ab",
   "panduit/pr2hf-cover-4ru@1": "1.0.0+a77f5888434dde6f",
-  "panduit/pr2hf-fingers@1": "1.0.0+125125294b66406e"
+  "panduit/pr2hf-fingers@1": "1.0.0+80c21b93510da5ba"
  },
  "configs": [
   "base",

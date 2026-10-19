@@ -1,13 +1,13 @@
 {
  "bay-accepts": {},
- "composed": "f99e357e1f836047",
+ "composed": "50de081935e6fe4d",
  "composed-refs": {
   "panduit/ncmh2-base@1": "1.0.0+c9ad9abf32805513",
   "panduit/ncmh2-cover@1": "1.0.0+18f3370e1afb35a8",
-  "panduit/ncmh2-fingers@1": "1.0.0+82d900d17eea8fe2",
+  "panduit/ncmh2-fingers@1": "1.0.0+a8a9c72c96b6e246",
   "panduit/ncmh2-rear-base@1": "1.0.0+b27daee02f731c68",
   "panduit/ncmh2-rear-cover@1": "1.0.0+01885c6977ab7853",
-  "panduit/ncmh2-rear-fingers@1": "1.0.0+d29d6b723a364df9"
+  "panduit/ncmh2-rear-fingers@1": "1.0.0+1a395748cd68cc4d"
  },
  "configs": [
   "base",

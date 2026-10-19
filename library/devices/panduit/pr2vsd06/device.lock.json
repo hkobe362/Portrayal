@@ -1,11 +1,11 @@
 {
  "bay-accepts": {},
- "composed": "52e83b645987d180",
+ "composed": "04768f3784a00c0d",
  "composed-refs": {
   "panduit/pr2v-base-06@1": "1.0.0+04c0366442ecbeee",
   "panduit/pr2v-door-06@1": "1.0.0+6613ade24546596b",
-  "panduit/pr2v-finger-section-front@1": "1.0.0+7a15971825c0087b",
-  "panduit/pr2v-finger-section-rear@1": "1.0.0+7df6319f9efc82df",
+  "panduit/pr2v-finger-section-front@1": "1.0.0+8eb02ae3b1465674",
+  "panduit/pr2v-finger-section-rear@1": "1.0.0+4c5a942a4a734fe9",
   "panduit/pr2v-rear-base-06@1": "1.0.0+42ccc9c467527f1d"
  },
  "configs": [

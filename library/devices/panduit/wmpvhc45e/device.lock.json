@@ -1,10 +1,10 @@
 {
  "bay-accepts": {},
- "composed": "c28fa691cccd855e",
+ "composed": "f93dcf37837d473e",
  "composed-refs": {
   "panduit/wmpvhc-base@1": "1.0.0+8aad493de80eb31f",
   "panduit/wmpvhc-cover@1": "1.0.0+57a015c8eed95227",
-  "panduit/wmpvhc-fingers@1": "1.0.0+627dca5a44f4e394"
+  "panduit/wmpvhc-fingers@1": "1.0.0+999ac9260c7f9e37"
  },
  "configs": [
   "base",

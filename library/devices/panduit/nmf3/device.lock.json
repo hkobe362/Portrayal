@@ -1,10 +1,10 @@
 {
  "bay-accepts": {},
- "composed": "49d12fe46105d594",
+ "composed": "2b3b2368a63053d8",
  "composed-refs": {
   "panduit/nm-base-3ru@1": "1.0.0+6bffa79754f7e65c",
   "panduit/nm-cover-3ru@1": "1.0.0+a4a85c8259a84d45",
-  "panduit/nm-fingers@1": "1.0.0+ce9b3e685cb894f0"
+  "panduit/nm-fingers@1": "1.0.0+79fd0b3333cd60f1"
  },
  "configs": [
   "base",
