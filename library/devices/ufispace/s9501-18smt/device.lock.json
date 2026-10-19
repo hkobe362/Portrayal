@@ -116,10 +116,6 @@
   "rear/bays/fan-0",
   "rear/bays/fan-1",
   "rear/bays/fan-2",
-  "right/placements/ground-mark-1",
-  "right/placements/ground-mark-2",
-  "right/placements/ground-mark-3",
-  "right/placements/ground-mark-4",
   "right/placements/ground-screws-1",
   "right/placements/ground-screws-2",
   "top/placements/screw-t1",
@@ -127,7 +123,7 @@
   "top/placements/screw-t3",
   "top/placements/screw-t4"
  ],
- "names": "5a8445a49e36cfca",
+ "names": "6792fd7a815333af",
  "placement-addressing": {
   "for": {
    "front/placements/led-fan": [
@@ -191,18 +187,6 @@
    ],
    "front/placements/reset": [
     "chassis"
-   ],
-   "right/placements/ground-mark-1": [
-    "ground-screws-1"
-   ],
-   "right/placements/ground-mark-2": [
-    "ground-screws-1"
-   ],
-   "right/placements/ground-mark-3": [
-    "ground-screws-2"
-   ],
-   "right/placements/ground-mark-4": [
-    "ground-screws-2"
    ]
   },
   "rel-pos": {
@@ -261,10 +245,6 @@
    "rear/bays/fan-0": 0,
    "rear/bays/fan-1": 1,
    "rear/bays/fan-2": 2,
-   "right/placements/ground-mark-1": 4,
-   "right/placements/ground-mark-2": 5,
-   "right/placements/ground-mark-3": 6,
-   "right/placements/ground-mark-4": 7,
    "right/placements/ground-screws-1": 2,
    "right/placements/ground-screws-2": 3,
    "top/placements/screw-t1": 1,
@@ -331,10 +311,6 @@
   "rear/bays/fan-0": "fans",
   "rear/bays/fan-1": "fans",
   "rear/bays/fan-2": "fans",
-  "right/placements/ground-mark-1": "grounding",
-  "right/placements/ground-mark-2": "grounding",
-  "right/placements/ground-mark-3": "grounding",
-  "right/placements/ground-mark-4": "grounding",
   "right/placements/ground-screws-1": "grounding",
   "right/placements/ground-screws-2": "grounding",
   "top/placements/screw-t1": "furniture",
@@ -343,7 +319,7 @@
   "top/placements/screw-t4": "furniture"
  },
  "placement-surface": "614a11fa5278ecbc",
- "shape": "1765e23753a1e063",
- "surface": "d6f9eac7337a25ff",
- "version": "4.1.0"
+ "shape": "8c6979c20c33e110",
+ "surface": "d1e58b75255d5872",
+ "version": "5.0.1"
 }

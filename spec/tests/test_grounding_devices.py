@@ -264,15 +264,18 @@ def test_the_dcs500_m5_screw_sits_on_the_washer_its_datasheet_shows():
 
 def test_s9501_18smt_prints_an_earth_symbol_above_each_of_its_four_holes():
     """Main drew the circled earth symbol 6.6 above each hole centre (the lug's
-    own art); the pair hosts draw none, so each hole has a ground-symbol."""
-    marks = {p["id"]: p for p in _device("ufispace/s9501-18smt")["views"]["right"]["components"]["placements"]
-             if p["ref"] == "common/ground-symbol@1"}
-    holes = {"ground-mark-1": (9.4, "ground-screws-1"), "ground-mark-2": (25.2, "ground-screws-1"),
-             "ground-mark-3": (193.3, "ground-screws-2"), "ground-mark-4": (209.0, "ground-screws-2")}
-    assert set(marks) == set(holes)
-    for pid, (x, host) in holes.items():
-        assert marks[pid]["at"] == pytest.approx([x - 3.0, 12.2]), pid
-        assert marks[pid]["for"] == host, pid
+    own art); the pair hosts draw none, so each hole has a silkscreen ring and
+    bars (a part there would lie across the lug's seat)."""
+    view = _device("ufispace/s9501-18smt")["views"]["right"]
+    marks = {(m["for"], m["at"][0]): m for m in view["silkscreen"] if m.get("path")}
+    holes = [(9.4, "ground-screws-1"), (25.2, "ground-screws-1"),
+             (193.3, "ground-screws-2"), (209.0, "ground-screws-2")]
+    assert set(marks) == {(host, x) for x, host in holes}
+    for m in marks.values():
+        assert m["at"][1] == pytest.approx(15.2)
+        assert m["fill"] == "#c7ccd1"
+        assert m["path"].count("M") == 5
+    assert not [p for p in view["components"]["placements"] if p["ref"] == "common/ground-symbol@1"]
 
 
 def test_the_plain_screw_seats_a_ring_lug_where_ground_lug_does():
