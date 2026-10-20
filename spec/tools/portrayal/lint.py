@@ -328,7 +328,7 @@ RULES = {
     "L75": ("component",  "a slot's structured facts agree with its prose, and lanes fit the connector", "fix `lanes`/`connector` or the description",
             "A slot's prose and its structured facts would drift apart, so a reader and the card-fit check would see different slots, and a lane count wider than the connector is a typo, not a slot.",
             ERROR),
-    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps, and the lamped cell that makes no Ethernet claim holds no Ethernet jack", "put an Ethernet jack on common/rj45-eth@1 or common/rj45-ganged-eth@1; a console or timing jack takes std/rj45@2 or std/rj45-ganged@2, or common/rj45-ganged-lamped@1 when its housing shows lamps",
+    "L76": ("device",     "the RJ45 census: every Ethernet jack says whether it has lamps, and the lamped cell that makes no Ethernet claim holds no Ethernet jack", "put an Ethernet jack on common/rj45-eth@1 or common/rj45-ganged-eth@1, or on common/rj45-ganged-eth-plain@1 when its housing has no lamps; a console or timing jack takes std/rj45@2 or std/rj45-ganged@2, or common/rj45-ganged-lamped@1 when its housing shows lamps",
             "Every Ethernet jack has to answer whether it has link lamps the same way, or a drawing can leave out lamps the hardware has, or add them to a console jack, and the viewer cannot light them consistently. The lamped cell that claims no media suits a timing jack with lamps and would call an Ethernet jack something the part does not say.",
             WARNING),
     "L77": ("component",  "a `sink` sits in a cavity, because that is what it measures from", "use `pocket` for a recess in an otherwise solid face",
@@ -685,6 +685,12 @@ RULES = {
     "L194": ("component", "a bay that states an `interface` does not also list, in `accepts`, a part that mates it and is wide enough for the bay", "delete the entry from `accepts`: the bay takes it through its `interface` already; keep in `accepts` only the parts that do not mate it, such as a vendor blank",
              "A list kept beside the interface it was written for goes on asserting what the interface already says, and the next card added to the library is then named by hand in one riser and by its interface in the others.",
              WARNING),
+    "L195": ("listing, device", "every `interfaces[].breakout.modes` entry is `<count>x<speed>`: a count of one or more with no leading zero, the letter `x`, and a speed from the closed set in spec/schemas/speeds.yaml, in lower case", "write the mode as `4x25g`, never `4 x 25GE` or `4x25`; spell the speed from spec/schemas/speeds.yaml (`1x400g`, `8x50g`)",
+             "A filter for ports that break out reads the count in front of the `x`, and a mode in any other spelling is one it cannot read or compare.",
+             ERROR),
+    "L196": ("device", "every id in a placement's `hides` names another placement or a bay on the same face, and the cover's box overlaps that part's box (error)", "name the part by its id on this face, or move the cover over it; a part on another face is that face's cover to name",
+             "`hides` becomes `data-hides`, which a consumer reads as \"remove this cover to see these\". An id that names nothing, or a part elsewhere on the face, makes the consumer hide a part the cover does not cover.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -6918,6 +6924,50 @@ def lint_device_overhang(path, data, lib_roots):
                                "The figure is stale or overstated")
 
 
+def lint_device_hides(path, data, lib_roots):
+    """L196: a cover's `hides` names parts on its own face that it lies over.
+
+    `hides` is written as `data-hides` on the cover's group, and a consumer
+    that lifts the cover off shows what the list names. An id that names
+    nothing, or a part on another face, would show a part the cover never
+    covered, and a part the cover does not overlap is not behind it. The
+    ids are the face's own placements and bays; a part on another face is
+    that face's cover to name, so it is reported as such.
+    """
+    views = data.get("views") or {}
+    ids = {vn: {x.get("id") for k in ("placements", "bays") for x in view_parts(v)[k]}
+           for vn, v in views.items()}
+    for vname, view in views.items():
+        vp = view_parts(view or {})
+        boxes = {}
+        for q in vp["placements"]:
+            sz = contract_size(q["ref"], lib_roots) if q.get("ref") else None
+            if q.get("at") and sz and "w" in sz and "h" in sz:
+                x, y, w, h = q["at"][0], q["at"][1], float(sz["w"]), float(sz["h"])
+                if q.get("rotate") in (90, 270, -90):
+                    cx, cy = x + w / 2, y + h / 2
+                    x, y, w, h = cx - h / 2, cy - w / 2, h, w
+                boxes[q["id"]] = (x, y, x + w, y + h)
+        for b in vp["bays"]:
+            if _decor_box(b):
+                boxes[b["id"]] = _decor_box(b)
+        for q in vp["placements"]:
+            for hid in q.get("hides") or []:
+                where = f"{vname}: {q['id']} hides {hid!r}"
+                if hid == q["id"] or hid not in ids[vname]:
+                    elsewhere = sorted(vn for vn, s in ids.items() if vn != vname and hid in s)
+                    err(path, "L196", f"{where}, which is "
+                        + ("itself" if hid == q["id"] else
+                           f"on {', '.join(elsewhere)}, not on this face; that face's "
+                           "cover names it" if elsewhere else
+                           "not a placement or a bay on this face"))
+                elif q["id"] in boxes and hid in boxes:
+                    ox, oy = _box_overlap(boxes[q["id"]], boxes[hid])
+                    if ox <= 0 or oy <= 0:
+                        err(path, "L196", f"{where}, which the cover does not overlap; "
+                            "move the cover over it or drop the id")
+
+
 def _decor_box(d):
     at, sz = d.get("at"), d.get("size")
     if not at or not sz:
@@ -7966,6 +8016,7 @@ def lint_listing(path, data, roots):
     claim and the only question is whether the registry and the hardware agree.
     """
     path = Path(path)
+    lint_breakout_modes(path, data)
     ns = path.parent.parent.name
     entry = VENDORS.get(ns)
     roles = vendor_roles(entry)
@@ -8023,6 +8074,27 @@ def lint_listing(path, data, roots):
                 "place. A component the NOS reports has to land on something drawn - map "
                 "it to `chassis`, a `region:`, or the id the hardware uses")
             break
+
+
+def lint_breakout_modes(path, data):
+    """L195: a breakout mode is `<count>x<speed>`, the speed from speeds.yaml.
+
+    Read from `interfaces[].breakout.modes` of a listing and of a device alike
+    (docs/breakout-design.md, "The shape", 3). The set is the one L110 reads, so
+    a speed added there is a speed allowed here. A schema fault in `interfaces`
+    is L1's to report; this rule skips what is not a rule with a list of modes.
+    """
+    for i, rule in enumerate(data.get("interfaces") or []):
+        modes = ((rule or {}).get("breakout") or {}).get("modes") if isinstance(rule, dict) else None
+        if not isinstance(modes, list):
+            continue
+        for mode in modes:
+            m = re.fullmatch(r"([1-9][0-9]*)x(.+)", mode) if isinstance(mode, str) else None
+            if not m or m.group(2) not in PORT_SPEEDS:
+                err(path, "L195", f"interfaces[{i}].breakout.modes: {mode!r} is not "
+                    "`<count>x<speed>` with a count from 1 up and a speed from the closed set "
+                    f"({' '.join(PORT_SPEEDS) or 'spec/schemas/speeds.yaml loaded nothing'}). "
+                    "Write it as `4x25g`, not `4 x 25GE` or `4x25`")
 
 
 # THE LAB CODES. The rules are in labs.py, because labs_index.py has to resolve
@@ -12101,6 +12173,12 @@ RJ45_BARE_REFS = {"std/rj45@2", "std/rj45-ganged@2"}
 # that takes the bare part's roles, and an Ethernet jack on it is sent to
 # common/rj45-ganged-eth@1, which says what the jack is.
 RJ45_NEUTRAL_REFS = {"common/rj45-ganged-lamped@1"}
+# The ganged cell with the Ethernet claim and NO lamps: an Ethernet jack whose
+# housing really has none (the Fibrain HD modules). It is not "an Ethernet jack
+# on a part with no lamps" in the census's sense - that count is for the bare
+# cell, which says nothing about Ethernet and leaves the lamps undecided - so an
+# Ethernet jack on it is accepted without lamps.
+RJ45_PLAIN_ETH_REFS = {"common/rj45-ganged-eth-plain@1"}
 # A carrier that draws nothing and exists to attach one vendor's meanings
 # (dell/rj45-port-14g) is the family member it composes, for census purposes;
 # and the family's own members compose each other by definition, so a contract
@@ -12110,15 +12188,18 @@ RJ45_FAMILY_DIRS = {("std", "rj45"), ("std", "rj45-ganged"),
                     ("common", "rj45-ganged-eth"),
                     ("common", "rj45-ganged-link"),
                     ("common", "rj45-ganged-lamped"),
+                    ("common", "rj45-ganged-eth-plain"),
                     ("dell", "rj45-port-14g")}
 
 
 def rj45_class(ref, lib_roots, depth=0):
-    """'lamped', 'neutral', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
+    """'lamped', 'neutral', 'plain-eth', 'bare' or 'retired' for an RJ45-ish ref, following one carrier."""
     if ref in RJ45_LAMPED_REFS:
         return "lamped"
     if ref in RJ45_NEUTRAL_REFS:
         return "neutral"
+    if ref in RJ45_PLAIN_ETH_REFS:
+        return "plain-eth"
     if ref in RJ45_BARE_REFS:
         return "bare"
     if depth > 2:
@@ -12208,7 +12289,7 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
         if rj45_wants_lamps(q, groups, name):
             if cls == "neutral":
                 neutral_eth += 1
-            elif cls != "lamped" and str(q.get("id")) not in lamped_for:
+            elif cls not in ("lamped", "plain-eth") and str(q.get("id")) not in lamped_for:
                 unlamped_eth += 1
         elif cls == "lamped":
             lamped_bare += 1
@@ -12217,6 +12298,7 @@ def _rj45_census(placements, groups, lib_roots, name=None, elsewhere=(), view=No
 
 RJ45_CENSUS_MSG = ("An Ethernet jack is common/rj45-eth@1 or common/rj45-ganged-eth@1 "
                    "(common/rj45-ganged-link@1 where it has one lamp, "
+                   "common/rj45-ganged-eth-plain@1 where its housing has none, "
                    "common/rj45-eth-pinside@1 where the lamps are opposite the keyway); "
                    "a console or timing jack is std/rj45@2 or std/rj45-ganged@2, or "
                    "common/rj45-ganged-lamped@1 where its housing shows lamps "
@@ -13063,6 +13145,7 @@ def lint_device(path, validator, lib_roots):
     lint_device_rel_pos(path, data)
     lint_device_group_names(path, data)
     lint_device_speed_vocabulary(path, data)
+    lint_breakout_modes(path, data)
     lint_device_port_rate(path, data, lib_roots)
     lint_device_port_optics(path, data, lib_roots)
     lint_device_pluggable_media(path, data)
@@ -13075,6 +13158,7 @@ def lint_device(path, validator, lib_roots):
     lint_device_kits(path, data, lib_roots)
     lint_device_ear_span(path, data)
     lint_device_overhang(path, data, lib_roots)
+    lint_device_hides(path, data, lib_roots)
     lint_device_bay_pitch(path, data)
     lint_device_empty_views(path, data)
     lint_device_occupants(path, data, lib_roots)

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: s9600-64x
-version: 4.0.8
+version: 4.0.9
 maturity: modelled
 manufacturer: UfiSpace
 model: S9600-64X
@@ -294,7 +294,7 @@ attrs:
       for 1PPS and 10MHz, shielded RJ45 for ToD
     tsn: Time Sensitive Networking, Class C timing accuracy
     srv6: full Segment Routing over IPv6
-    breakout: SFP28 ports 0-3 break out of QSFP28 port 0; enabling them disables port 0
+    sfp28-sharing: SFP28 ports 0-3 break out of QSFP28 port 0; enabling them disables port 0
     nos-required: NOS integration is necessary to activate the timing and sync features
     optics-qsfp28: 100G SR4/LR4/ER4/ZR4, up to 40 km
     optics-sfp28: 25G SR/LR/ER, 10G SFP+ SR/LR/ER, up to 40 km

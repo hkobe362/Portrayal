@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: s9600-32x
-version: 3.0.6
+version: 3.0.7
 maturity: modelled
 manufacturer: UfiSpace
 model: S9600-32X
@@ -295,7 +295,7 @@ attrs:
       Galileo E1B/C at a minimum RF sensitivity of -166 dBm; passive and active
       antennas are auto-detected and an active antenna is fed up to 5 V DC / 150 mA
     routing: full Segment Routing over IPv6 (SRv6)
-    breakout: >-
+    sfp28-sharing: >-
       the four SFP28 ports break out from 100G port 0; enabling them disables
       port 0
     compliance-programme: IEEE 802.1CM fronthaul; ITU-T G.8273.2 T-BC Class C
