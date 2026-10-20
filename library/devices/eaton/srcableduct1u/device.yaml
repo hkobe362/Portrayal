@@ -1,16 +1,16 @@
 format: 1
 kind: device
 name: srcableduct1u
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Eaton
 model: SRCABLEDUCT1U
 description: >-
-  Eaton Tripp Lite series SmartRack 1U horizontal cable manager, a finger duct with cover: a
-  black cold rolled steel channel on a back plate that bolts to the rack rails and stands 67.7
-  mm out of them. A wall along its top and another along its bottom each carry 24 slots a
-  cable is laid through into the channel, and a cover across the front closes it. The cover
-  ships fitted and lifts off.
+  Eaton Tripp Lite series SmartRack 1U horizontal cable manager, a finger duct with cover.
+  It is a black cold rolled steel channel on a back plate that bolts to the rack rails and
+  stands 67.7 mm out of them. A wall along its top and one along its bottom each carry 24
+  slots. A cable is laid through a slot into the channel, and a cover across the front closes
+  it. The cover ships fitted and lifts off.
 profile: passive
 provenance:
   sources:

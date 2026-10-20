@@ -1,17 +1,17 @@
 format: 1
 kind: device
 name: srcableduct1ufc
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Eaton
 model: SRCABLEDUCT1UFC
 description: >-
   Eaton Tripp Lite series SmartRack 1U horizontal fiber cable manager, a finger duct with a
-  snap-on cover, in high-visibility yellow steel for fiber, copper and coax cable: a channel on
-  a back plate that bolts to the rack rails, on either the front or the rear, and stands 104.9
-  mm out of them. A wall along its top and another along its bottom each carry 24 slots a
-  cable is laid through, and two windows in the back plate pass cable to the other side. The
-  cover ships fitted and snaps off.
+  snap-on cover, in high-visibility yellow steel for fiber, copper and coax cable. Its channel
+  is on a back plate that bolts to the rack rails, on either the front or the rear, and
+  stands 104.9 mm out of them. A wall along its top and one along its bottom each carry 24
+  slots a cable is laid through. Two windows in the back plate pass cable to the other side.
+  The cover ships fitted and snaps off.
 profile: passive
 provenance:
   sources:
