@@ -118,6 +118,18 @@ vendors:
       (working/intake/fs/fhd). No corporate lineage is known or claimed - FS
       is the name on the metal today.
 
+  hubbell:
+    display: Hubbell
+    aka: [Hubbell Premise Wiring]
+    role: hardware
+    source: >-
+      the name in the header of every cable-manager spec sheet on hubbellcdn.com
+      ("Hubbell Premise Wiring - Hubbell Incorporated (Delaware), 40 Waterview Drive,
+      Shelton, CT"): Hubbell Premise Wiring is the structured-cabling business of
+      Hubbell Incorporated. The directory is `hubbell` because the sheets and part
+      numbers (HM24C, HS23C, HSD13) say Hubbell. No corporate lineage is known or
+      claimed.
+
   fibrain:
     display: Fibrain
     role: hardware
