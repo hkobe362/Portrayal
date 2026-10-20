@@ -846,6 +846,9 @@
  "components/dell/psu-2400w-ac-14g/v1/contract.yaml": {
   "L97": 1
  },
+ "components/dell/r660xs-fan/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/dell/rack-latch-14g/v1/contract.yaml": {
   "L97": 1
  },
@@ -1857,6 +1860,11 @@
   "L145": 1,
   "L21": 40,
   "L29": 29
+ },
+ "devices/dell/r660xs/device.yaml": {
+  "L145": 1,
+  "L21": 12,
+  "L29": 18
  },
  "devices/dell/r740xd/device.yaml": {
   "L113": 1,

@@ -109,5 +109,7 @@ def test_only_a_rack_face_is_wider_than_its_plane():
     assert set(wide) <= {"r740xd:front", "r740xd:front-lff-12", "fhd-1ufmt-n:front",
                          "r660:front", "r660:front-sff8sf", "r660:front-nobp",
                          "r660:front-e3s16", "r660:front-e3s14", "lmfs-f:front",
+                         # the R660xs, as the R660: both control panels sit in the ears
+                         "r660xs:front", "r660xs:front-sff8", "r660xs:front-lff4",
                          "cmh-6dr1u:front", "dinrail2u:front", "dinrail4u:front"}, \
         f"a face is wider than its plane and is not a known rack face: {wide}"
