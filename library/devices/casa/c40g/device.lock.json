@@ -242,6 +242,14 @@
     "psu-4"
    ]
   },
+  "hides": {
+   "front/placements/psu-cover": [
+    "psu-1",
+    "psu-2",
+    "psu-3",
+    "psu-4"
+   ]
+  },
   "rel-pos": {
    "front/bays/fan-left": 0,
    "front/bays/fan-right": 1,
@@ -316,5 +324,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "7dc5aebb427e6693",
  "surface": "a5d7643eb617cb55",
- "version": "0.5.21"
+ "version": "0.6.0"
 }

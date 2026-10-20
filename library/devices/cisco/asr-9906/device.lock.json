@@ -26,6 +26,10 @@
    "cisco/a9k-4x100ge@1",
    "cisco/a9k-8hg-flex-se@1",
    "cisco/a9k-8hg-flex-tr@1",
+   "cisco/a9k-mod200-se@2",
+   "cisco/a9k-mod200-tr@2",
+   "cisco/a9k-mod400-se@2",
+   "cisco/a9k-mod400-tr@2",
    "cisco/a9k-slot-cover@1"
   ],
   "front/bays/slot-2": [
@@ -46,6 +50,10 @@
    "cisco/a9k-4x100ge@1",
    "cisco/a9k-8hg-flex-se@1",
    "cisco/a9k-8hg-flex-tr@1",
+   "cisco/a9k-mod200-se@2",
+   "cisco/a9k-mod200-tr@2",
+   "cisco/a9k-mod400-se@2",
+   "cisco/a9k-mod400-tr@2",
    "cisco/a9k-slot-cover@1"
   ],
   "front/bays/slot-3": [
@@ -66,6 +74,10 @@
    "cisco/a9k-4x100ge@1",
    "cisco/a9k-8hg-flex-se@1",
    "cisco/a9k-8hg-flex-tr@1",
+   "cisco/a9k-mod200-se@2",
+   "cisco/a9k-mod200-tr@2",
+   "cisco/a9k-mod400-se@2",
+   "cisco/a9k-mod400-tr@2",
    "cisco/a9k-slot-cover@1"
   ],
   "front/bays/slot-4": [
@@ -86,6 +98,10 @@
    "cisco/a9k-4x100ge@1",
    "cisco/a9k-8hg-flex-se@1",
    "cisco/a9k-8hg-flex-tr@1",
+   "cisco/a9k-mod200-se@2",
+   "cisco/a9k-mod200-tr@2",
+   "cisco/a9k-mod400-se@2",
+   "cisco/a9k-mod400-tr@2",
    "cisco/a9k-slot-cover@1"
   ],
   "front/bays/slot-5": [
@@ -97,7 +113,7 @@
    "cisco/a9k-slot-cover@1"
   ]
  },
- "composed": "2ddd51708eb40782",
+ "composed": "9e99315fba9003ca",
  "composed-refs": {
   "cisco/a99-10x400ge-x-se@2": "2.0.0+2cafa41984d516db",
   "cisco/a99-10x400ge-x-tr@2": "2.0.0+19038735632bb9ea",
@@ -118,6 +134,20 @@
   "cisco/a9k-8hg-flex-se@1": "1.0.2+03516fc4b483b7d3",
   "cisco/a9k-8hg-flex-tr@1": "1.0.2+9ad9d14b6d1ff977",
   "cisco/a9k-ground-pad@1": "1.0.0+16625790efad7bbe",
+  "cisco/a9k-mod200-se@2": "2.1.1+79c38aa04c32a5c0",
+  "cisco/a9k-mod200-tr@2": "2.1.1+836ec572270932a7",
+  "cisco/a9k-mod400-se@2": "2.1.1+d3e4c72b96c6b6d9",
+  "cisco/a9k-mod400-tr@2": "2.1.1+26627d3755e9af31",
+  "cisco/a9k-mpa-1x100ge@1": "1.0.1+e20cd2c36b929236",
+  "cisco/a9k-mpa-1x40ge@1": "1.1.1+8dc1a59fc90fb9a1",
+  "cisco/a9k-mpa-20x10ge@1": "1.1.0+25fd535447fcbae9",
+  "cisco/a9k-mpa-20x1ge@1": "1.1.0+00dad9ab4b3f3b21",
+  "cisco/a9k-mpa-2x100ge@1": "1.0.1+f62956c5a69a404b",
+  "cisco/a9k-mpa-2x10ge@1": "1.1.0+3fd71b809add4dbd",
+  "cisco/a9k-mpa-2x40ge@1": "1.1.1+0ca0e0dc023099b6",
+  "cisco/a9k-mpa-4x10ge@1": "1.1.0+245398ffc48325b1",
+  "cisco/a9k-mpa-8x10ge@1": "1.0.1+7b3f087bdb8a23b6",
+  "cisco/a9k-mpa-blank@1": "1.0.0+66e8be1724f60104",
   "cisco/a9k-rsp5-se@2": "2.0.0+ba8627abfa53f20b",
   "cisco/a9k-rsp5-tr@2": "2.0.0+f8c8c5ef3b5ca115",
   "cisco/a9k-rsp880-lt-se@2": "2.0.0+80a999257b1234cb",
@@ -130,10 +160,13 @@
   "std/db9@1": "1.1.0+98651b76e201a6b4",
   "std/qsfp-dd@1": "1.3.1+c3cf5f2db67d8233",
   "std/qsfp-ganged@1": "1.4.1+6ac71d72bfdf9de9",
+  "std/qsfp28@1": "1.4.1+f836f540ce576bbc",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
   "std/sfp-ganged@1": "1.1.1+46f35de7bfa8a751",
+  "std/sfp@1": "1.4.1+3cc1934aedfbc611",
   "std/smb@1": "1.0.0+8e814eaf9c2e6e5b",
-  "std/usb-a@1": "1.3.0+3c77f06ea6794bfc"
+  "std/usb-a@1": "1.3.0+3c77f06ea6794bfc",
+  "std/xfp@1": "1.0.0+beb5b8168c581dc6"
  },
  "configs": [
   "base"
@@ -159,7 +192,7 @@
   "rear/cutout/ground-pad-rear",
   "rear/placements/ground-pad-rear"
  ],
- "names": "3a7d03eba3936bbe",
+ "names": "cf0e61c5633e4736",
  "placement-addressing": {
   "for": {
    "front/placements/esd-jack": [
@@ -193,6 +226,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "416d7a3dfc60b07a",
- "surface": "e21c9661ddd46860",
- "version": "1.1.0"
+ "surface": "f4da3755af36d171",
+ "version": "1.2.3"
 }

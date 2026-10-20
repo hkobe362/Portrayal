@@ -98,6 +98,17 @@ vendors:
       Resellers list these racks under their own part numbers; that is a
       listing, not a second product.
 
+  leviton:
+    display: Leviton
+    aka: [Leviton Network Solutions, Leviton Manufacturing Co., Inc.]
+    role: hardware
+    source: >-
+      the name on the product specification sheets, instruction sheets and dimensional
+      drawings of the 49253 five-ring horizontal managers and the VERSI-DUCT horizontal
+      ducts ("Leviton Manufacturing Co., Inc.", "LEVITON Network Solutions"), and on
+      leviton.com/en/products. The directory is `leviton` because the part numbers,
+      drawings and pages say Leviton. No corporate lineage is known or claimed.
+
   fs:
     display: FS.com
     role: hardware
@@ -335,9 +346,32 @@ vendors:
       corporate lineage is claimed here; Tripp Lite, which Eaton sells PDUs under,
       is not entered until a Tripp Lite part is modelled.
 
+  chatsworth:
+    display: Chatsworth Products
+    aka: [CPI, Chatsworth Products, Inc.]
+    role: hardware
+    source: >-
+      Chatsworth Products, Inc. (chatsworth.com) - the name and the CPI mark on the
+      Evolution Cable Management System data sheet and on the Evolution and Motive
+      horizontal cable manager installation instructions (IIS-735441), and the maker's
+      own product pages. The directory is `chatsworth` because the products and part
+      numbers say Chatsworth; CPI is the maker's short name for itself. No corporate
+      lineage is known or claimed.
+
   # ---- lineage targets: companies that own or absorbed the above ----
   # These manufacture nothing in this library. They are here so a search or an
   # export can resolve a successor without a device having to claim it.
+
+  panduit:
+    display: Panduit
+    aka: [Panduit Corp.]
+    role: hardware
+    source: >-
+      the name on the specification sheets and part drawings of the NetManager, NetManager
+      High Capacity, PatchRunner 2 and NetRunner cable managers ("PANDUIT CORP.", Tinley Park,
+      Illinois), and on panduit.com/en/products. The directory is `panduit` because the
+      sheets, drawings and part numbers (NCMH2, NMF2, PR2HF3, PR2VD10, WMPVHC45E) say Panduit.
+      No corporate lineage is known or claimed.
 
   accton:
     display: Accton Technology
