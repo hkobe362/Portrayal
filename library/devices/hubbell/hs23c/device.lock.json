@@ -1,19 +1,19 @@
 {
  "bay-accepts": {},
- "composed": "0d589f76e51df0bb",
+ "composed": "1e3737222bfd8991",
  "composed-refs": {
-  "hubbell/hs23c-finger@1": "1.0.0+5270bc96862c0a34",
-  "hubbell/hs23c-floor@1": "1.0.0+612a38d11c17bc23",
+  "hubbell/hs23c-finger@1": "1.0.1+9235b43192fb7085",
+  "hubbell/hs23c-floor@1": "1.0.1+ed03d7f97eeb6b47",
   "hubbell/hs23c-plate@1": "1.0.0+4a65debec65312df",
-  "hubbell/hs23c-tab@1": "1.0.0+747751e7dc792809",
-  "hubbell/hs2c@1": "1.0.0+e9852664f0be60b6"
+  "hubbell/hs23c-tab@1": "1.0.1+89c3af941c86be83",
+  "hubbell/hs2c@1": "1.0.1+50dfb74c5e3e8688"
  },
  "configs": [
   "base",
   "cover-off"
  ],
  "format": 1,
- "gaps": "d05eed7b7cf90c57",
+ "gaps": "04d1995d6d8eac59",
  "groups": [
   "body",
   "cover",
@@ -71,6 +71,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "ba080cce479f18de",
- "surface": "6d76644ecb43b6e5",
- "version": "0.1.0"
+ "surface": "8cb983c749c50898",
+ "version": "0.1.1"
 }

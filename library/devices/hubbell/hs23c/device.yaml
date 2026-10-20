@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: hs23c
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Hubbell
 model: HS23C
@@ -123,7 +123,19 @@ gaps:
     note: >-
       the sheet's figure draws five top fingers, a flange with five tabs and windows in the
       plate, and its table gives A, B and C only. The finger width, the tab size and the
-      window sizes are read off the figure against B and A.
+      window sizes are read off the figure against B and A. The top view's tip radius (6 mm)
+      and folded rim (the sheet's 1.9 mm) are stand-ins for the rounded tip and folded edge
+      the figure shows, and the fold's depth is not drawn. The finger, tab and flange are
+      drawn in mid steel tones so they read against the black plate; the sheet states none.
+    wanted: the dimensioned customer drawing
+  - what: cover-face
+    scope: [front]
+    reason: needs-drawing
+    note: >-
+      the sheet's figure shows a rolled top edge on the cover, two slot marks near the ends and
+      the name plate at the middle. The face draws a 6 mm roll, a 14 by 4 mm slot 12 mm in from
+      each end and the plate's 45 by 25 mm box blank; the roll's width and the slot's size and
+      place are stand-ins.
     wanted: the dimensioned customer drawing
   - what: cable-capacity
     scope: [front]
@@ -199,33 +211,62 @@ views:
     panel:
       decor:
         - {id: plate-edge, at: [0, 0], size: [482.6, 1.9], fill: '#1b1d20', kind: plate}
-        - {id: finger-1-top, at: [21.3, 1.9], size: [24, 72.4], fill: '#2a2d31', kind: finger}
-        - {id: finger-2-top, at: [125.3, 1.9], size: [24, 72.4], fill: '#2a2d31', kind: finger}
-        - {id: finger-3-top, at: [229.3, 1.9], size: [24, 72.4], fill: '#2a2d31', kind: finger}
-        - {id: finger-4-top, at: [333.3, 1.9], size: [24, 72.4], fill: '#2a2d31', kind: finger}
-        - {id: finger-5-top, at: [437.3, 1.9], size: [24, 72.4], fill: '#2a2d31', kind: finger}
+        - {id: finger-1-top, at: [21.3, 1.9], size: [24, 72.4], rx: 6, fill: '#3a3f45', kind: finger}
+        - {id: finger-1-root, at: [21.3, 1.9], size: [24, 12], fill: '#3a3f45', kind: finger}
+        - {id: finger-1-face, at: [21.8, 2.4], size: [23, 71.4], rx: 5.5, fill: '#8b949e', kind: finger}
+        - {id: finger-1-face-root, at: [21.8, 2.4], size: [23, 11.5], fill: '#8b949e', kind: finger}
+        - {id: finger-1-rim-left, at: [21.8, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-1-rim-right, at: [42.9, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-2-top, at: [125.3, 1.9], size: [24, 72.4], rx: 6, fill: '#3a3f45', kind: finger}
+        - {id: finger-2-root, at: [125.3, 1.9], size: [24, 12], fill: '#3a3f45', kind: finger}
+        - {id: finger-2-face, at: [125.8, 2.4], size: [23, 71.4], rx: 5.5, fill: '#8b949e', kind: finger}
+        - {id: finger-2-face-root, at: [125.8, 2.4], size: [23, 11.5], fill: '#8b949e', kind: finger}
+        - {id: finger-2-rim-left, at: [125.8, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-2-rim-right, at: [146.9, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-3-top, at: [229.3, 1.9], size: [24, 72.4], rx: 6, fill: '#3a3f45', kind: finger}
+        - {id: finger-3-root, at: [229.3, 1.9], size: [24, 12], fill: '#3a3f45', kind: finger}
+        - {id: finger-3-face, at: [229.8, 2.4], size: [23, 71.4], rx: 5.5, fill: '#8b949e', kind: finger}
+        - {id: finger-3-face-root, at: [229.8, 2.4], size: [23, 11.5], fill: '#8b949e', kind: finger}
+        - {id: finger-3-rim-left, at: [229.8, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-3-rim-right, at: [250.9, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-4-top, at: [333.3, 1.9], size: [24, 72.4], rx: 6, fill: '#3a3f45', kind: finger}
+        - {id: finger-4-root, at: [333.3, 1.9], size: [24, 12], fill: '#3a3f45', kind: finger}
+        - {id: finger-4-face, at: [333.8, 2.4], size: [23, 71.4], rx: 5.5, fill: '#8b949e', kind: finger}
+        - {id: finger-4-face-root, at: [333.8, 2.4], size: [23, 11.5], fill: '#8b949e', kind: finger}
+        - {id: finger-4-rim-left, at: [333.8, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-4-rim-right, at: [354.9, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-5-top, at: [437.3, 1.9], size: [24, 72.4], rx: 6, fill: '#3a3f45', kind: finger}
+        - {id: finger-5-root, at: [437.3, 1.9], size: [24, 12], fill: '#3a3f45', kind: finger}
+        - {id: finger-5-face, at: [437.8, 2.4], size: [23, 71.4], rx: 5.5, fill: '#8b949e', kind: finger}
+        - {id: finger-5-face-root, at: [437.8, 2.4], size: [23, 11.5], fill: '#8b949e', kind: finger}
+        - {id: finger-5-rim-left, at: [437.8, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
+        - {id: finger-5-rim-right, at: [458.9, 13.9], size: [1.9, 54.4], fill: '#6a727b', kind: finger}
   bottom:
     size: {w: 482.6, h: 76.2}
     panel:
       decor:
         - {id: plate-edge, at: [0, 0], size: [482.6, 1.9], fill: '#1b1d20', kind: plate}
-        - {id: floor, at: [0, 1.9], size: [482.6, 72.4], fill: '#272a2e', kind: floor}
+        - {id: floor, at: [0, 1.9], size: [482.6, 72.4], fill: '#33383d', kind: floor}
   left:
     size: {w: 76.2, h: 88.9}
     panel:
       decor:
         - {id: plate-edge, at: [0, 0], size: [1.9, 88.9], fill: '#1b1d20', kind: plate}
-        - {id: finger, at: [1.9, 0], size: [72.4, 1.9], fill: '#2a2d31', kind: finger}
-        - {id: floor, at: [1.9, 87.0], size: [72.4, 1.9], fill: '#272a2e', kind: floor}
-        - {id: tab, at: [72.4, 67.0], size: [1.9, 20.0], fill: '#2a2d31', kind: tab}
+        - {id: finger-outline, at: [1.9, 0], size: [72.4, 1.9], rx: 0.5, fill: '#3a3f45', kind: finger}
+        - {id: finger, at: [2.2, 0.3], size: [71.8, 1.3], rx: 0.4, fill: '#8b949e', kind: finger}
+        - {id: floor, at: [1.9, 87.0], size: [72.4, 1.9], fill: '#33383d', kind: floor}
+        - {id: tab-outline, at: [72.4, 67.0], size: [1.9, 20.0], fill: '#3a3f45', kind: tab}
+        - {id: tab, at: [72.7, 67.3], size: [1.3, 19.4], fill: '#6f7882', kind: tab}
   right:
     size: {w: 76.2, h: 88.9}
     panel:
       decor:
         - {id: plate-edge, at: [74.3, 0], size: [1.9, 88.9], fill: '#1b1d20', kind: plate}
-        - {id: finger, at: [1.9, 0], size: [72.4, 1.9], fill: '#2a2d31', kind: finger}
-        - {id: floor, at: [1.9, 87.0], size: [72.4, 1.9], fill: '#272a2e', kind: floor}
-        - {id: tab, at: [1.9, 67.0], size: [1.9, 20.0], fill: '#2a2d31', kind: tab}
+        - {id: finger-outline, at: [1.9, 0], size: [72.4, 1.9], rx: 0.5, fill: '#3a3f45', kind: finger}
+        - {id: finger, at: [2.2, 0.3], size: [71.8, 1.3], rx: 0.4, fill: '#8b949e', kind: finger}
+        - {id: floor, at: [1.9, 87.0], size: [72.4, 1.9], fill: '#33383d', kind: floor}
+        - {id: tab-outline, at: [1.9, 67.0], size: [1.9, 20.0], fill: '#3a3f45', kind: tab}
+        - {id: tab, at: [2.2, 67.3], size: [1.3, 19.4], fill: '#6f7882', kind: tab}
 configurations:
   base:
     kind: base

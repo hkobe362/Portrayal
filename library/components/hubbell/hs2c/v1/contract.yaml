@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: hs2c
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 behaviour: mounts
 lid: true
@@ -16,8 +16,17 @@ provenance:
     thickness is the sheet's "Gauge 14", 1.9 mm.
   relief: >-
     estimated - a flat panel 1.9 mm thick at the very front of the manager, in front of the
-    tabs. The figure shows a rolled top edge and two slot marks near the ends, neither
-    dimensioned, neither drawn.
+    tabs. The rolled top edge and the two slot marks near the ends that the figure shows
+    are drawn in the face only (see `face`), not in the 3D section, which no sheet
+    dimensions.
+  face: >-
+    estimated - STAND-IN. The figure shows a rolled top edge, two slot marks near the ends
+    and the name plate at the middle. None is dimensioned. The face draws the roll as a
+    band 6 mm high along the top, a slot 14 by 4 mm at each end, 12 mm in from it and
+    centred on the height, and the name plate as a blank panel in its reserved box; the
+    roll's width and the slot's size and place are stand-ins, not the maker's. The roll
+    and plate are in a lighter steel tone than the panel so they read on both stages.
+    No mark is drawn on the plate.
   lid: >-
     datasheet - "Cover: Included, Lift off" on the sheet, and "Door is removeable to allow for
     easy addition of patch cords" in its features; the figure draws the cover lifted clear of
@@ -34,6 +43,10 @@ size-confidence: {w: datasheet, h: datasheet}
 attrs: {material: Steel}
 elements:
   plate: {at: [0.0, 0.0], size: [482.6, 88.9], class: bezel}
+  roll-top: {at: [0.0, 0.0], size: [482.6, 6.0], class: bezel}
+  slot-left: {at: [12.0, 42.45], size: [14.0, 4.0], class: bezel}
+  slot-right: {at: [456.6, 42.45], size: [14.0, 4.0], class: bezel}
+  name-plate: {at: [218.8, 31.95], size: [45.0, 25.0], class: label}
   logo-zone: {at: [218.8, 31.95], size: [45.0, 25.0], class: label}
 relief:
   features:

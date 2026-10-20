@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: hm144c
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Hubbell
 model: HM144C
@@ -123,6 +123,24 @@ gaps:
       the HM144C sheet (PREM-HM144C-SPEC-EN) gives no dimensions table and no material; the
       width, the height, the wire and the finish are the HM14C's.
     wanted: the dimensioned customer drawing, or a dimensions table for the HM144C
+  - what: ring-bend
+    scope: [front, rear, left, right, top, bottom]
+    reason: needs-drawing
+    note: >-
+      the sheet's figure shows each wire ring bent round where it leaves the plate and at its
+      free end, with a hook on the post of alternate rings, and dimensions none of it. The
+      side views draw the loop with a 11.43 mm corner radius (two wire diameters), a stand-in;
+      the 3D loop keeps square corners and no hook is drawn. The rings are drawn in a mid
+      steel tone so they read against the black plate; the sheet states none.
+    wanted: the dimensioned customer drawing, or the maker's figure for the ring's bend and hook
+  - what: cover-face
+    scope: [front]
+    reason: needs-drawing
+    note: >-
+      the sheet's figure shows a folded edge along the cover, the HM24C photograph a lip along
+      the top and a name plate at the middle. The face draws a 6 mm fold along the top and foot
+      and the plate's 58 by 12 mm box blank; the fold's width is a stand-in.
+    wanted: the dimensioned customer drawing
   - what: cover-hinge
     scope: [front]
     reason: vendor-silent
@@ -198,53 +216,45 @@ views:
     panel:
       decor:
         - {id: plate-edge, at: [0, 101.6], size: [482.6, 1.5], fill: '#1b1d20', kind: plate}
-        - {id: rear-1-top, at: [14.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-2-top, at: [126.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-3-top, at: [238.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-4-top, at: [350.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-5-top, at: [462.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-1-top, at: [14.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-2-top, at: [126.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-3-top, at: [238.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-4-top, at: [350.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-5-top, at: [462.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
+        - {id: rear-1-top, at: [14.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-2-top, at: [126.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-3-top, at: [238.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-4-top, at: [350.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-5-top, at: [462.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-1-top, at: [14.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-2-top, at: [126.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-3-top, at: [238.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-4-top, at: [350.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-5-top, at: [462.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
   bottom:
     size: {w: 482.6, h: 204.7}
     panel:
       decor:
         - {id: plate-edge, at: [0, 101.6], size: [482.6, 1.5], fill: '#1b1d20', kind: plate}
-        - {id: rear-1-bottom, at: [14.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-2-bottom, at: [126.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-3-bottom, at: [238.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-4-bottom, at: [350.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-5-bottom, at: [462.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-1-bottom, at: [14.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-2-bottom, at: [126.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-3-bottom, at: [238.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-4-bottom, at: [350.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: guide-5-bottom, at: [462.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#3a3f45', kind: ring}
+        - {id: rear-1-bottom, at: [14.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-2-bottom, at: [126.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-3-bottom, at: [238.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-4-bottom, at: [350.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: rear-5-bottom, at: [462.4425, 0], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-1-bottom, at: [14.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-2-bottom, at: [126.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-3-bottom, at: [238.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-4-bottom, at: [350.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
+        - {id: guide-5-bottom, at: [462.4425, 103.1], size: [5.715, 101.6], rx: 2.8, fill: '#59616a', kind: ring}
   left:
     size: {w: 204.7, h: 44.45}
     panel:
       decor:
         - {id: plate-edge, at: [101.6, 0], size: [1.5, 44.45], fill: '#1b1d20', kind: plate}
-        - {id: rear-wire-top, at: [0, 0], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-wire-bottom, at: [0, 38.735], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-post, at: [0, 0], size: [5.715, 44.45], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: front-wire-top, at: [103.1, 0], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: front-wire-bottom, at: [103.1, 38.735], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: front-post, at: [198.985, 0], size: [5.715, 44.45], rx: 2.8, fill: '#3a3f45', kind: ring}
+        - {id: rear-loop, at: [2.8575, 2.8575], size: [95.885, 38.735], rx: 8.57, stroke: '#59616a', stroke-width: 5.715, kind: ring}
+        - {id: front-loop, at: [105.9575, 2.8575], size: [95.885, 38.735], rx: 8.57, stroke: '#59616a', stroke-width: 5.715, kind: ring}
   right:
     size: {w: 204.7, h: 44.45}
     panel:
       decor:
         - {id: plate-edge, at: [101.6, 0], size: [1.5, 44.45], fill: '#1b1d20', kind: plate}
-        - {id: front-wire-top, at: [0, 0], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: front-wire-bottom, at: [0, 38.735], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: front-post, at: [0, 0], size: [5.715, 44.45], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-wire-top, at: [103.1, 0], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-wire-bottom, at: [103.1, 38.735], size: [101.6, 5.715], rx: 2.8, fill: '#3a3f45', kind: ring}
-        - {id: rear-post, at: [198.985, 0], size: [5.715, 44.45], rx: 2.8, fill: '#3a3f45', kind: ring}
+        - {id: front-loop, at: [2.8575, 2.8575], size: [95.885, 38.735], rx: 8.57, stroke: '#59616a', stroke-width: 5.715, kind: ring}
+        - {id: rear-loop, at: [105.9575, 2.8575], size: [95.885, 38.735], rx: 8.57, stroke: '#59616a', stroke-width: 5.715, kind: ring}
 configurations:
   base:
     kind: base

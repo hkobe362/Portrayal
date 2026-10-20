@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: hs23c-tab
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 behaviour: mounts
 description: >-
@@ -18,7 +18,9 @@ provenance:
     the figure draws five of them, one below each finger. The notch the figure shows near
     the tip of each is not drawn.
   color: >-
-    datasheet - "Finish: Black Powder Coated" on the sheet.
+    datasheet - "Finish: Black Powder Coated" on the sheet. Drawn in a mid steel tone, like
+    the fingers, so it reads against the near-black flange (a stand-in: the sheet states no
+    tone for a highlight).
 size: {w: 15.0, h: 20.0}
 size-confidence: {w: estimated, h: estimated}
 attrs: {material: Steel}
@@ -29,7 +31,7 @@ relief:
     - node: tab
       lift: 70.5
       out: 72.4
-      color: '#2a2d31'
+      color: '#6f7882'
       confidence: estimated
       source: the figure draws each tab standing at the front edge of the flange, just behind the cover
 skins: [default]

@@ -1,17 +1,17 @@
 {
  "bay-accepts": {},
- "composed": "844a5a8268e42339",
+ "composed": "e4a819dc26296dff",
  "composed-refs": {
   "hubbell/hm-plate-2u@1": "1.0.0+424beadf063bbe87",
-  "hubbell/hm-ring-2u@1": "1.0.0+41e387c5dbfcdf5a",
-  "hubbell/hm2c@1": "1.0.0+c059ee9caa9e6b6d"
+  "hubbell/hm-ring-2u@1": "1.0.1+03451f7cc5ddc247",
+  "hubbell/hm2c@1": "1.0.1+67d2cfc3ce19bb42"
  },
  "configs": [
   "base",
   "cover-off"
  ],
  "format": 1,
- "gaps": "052edd7fde5ffac5",
+ "gaps": "6b6bbd738c6b5295",
  "groups": [
   "body",
   "cover",
@@ -70,6 +70,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "cea60a9829ed7b48",
- "surface": "605dd2bc3eab753d",
- "version": "0.1.0"
+ "surface": "71805b9eeb256ce0",
+ "version": "0.1.1"
 }

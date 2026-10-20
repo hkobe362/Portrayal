@@ -1,7 +1,7 @@
 format: 1
 kind: component
 name: hs23c-floor
-version: 1.0.0
+version: 1.0.1
 class: mechanical
 description: >-
   The bottom flange of the Hubbell S-Series HS23C horizontal cable manager, seen from the
@@ -18,7 +18,9 @@ provenance:
     openings cut in it between the tabs, which are not drawn because the figure dimensions
     none.
   color: >-
-    datasheet - "Finish: Black Powder Coated" on the sheet.
+    datasheet - "Finish: Black Powder Coated" on the sheet. Drawn a step lighter than the
+    plate so the flange and the plate it stands on read apart (a stand-in: the sheet
+    states no tone).
 size: {w: 482.6, h: 1.9}
 size-confidence: {w: datasheet, h: datasheet}
 attrs: {material: Steel}
@@ -28,7 +30,7 @@ relief:
   features:
     - node: floor
       out: 72.4
-      color: '#1b1d20'
+      color: '#33383d'
       confidence: estimated
       source: the figure draws the flange the whole depth, C, 3 in (76 mm), less the plate and the cover
 skins: [default]

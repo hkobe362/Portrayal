@@ -14,3 +14,12 @@
   of each M-Series height (`hm-plate-1u`, `hm-ring-1u`, `hm1c`, and the 2u and 3u),
   the HS23C's plate, floor, finger, tab and cover (`hs2c`), and the HSD13's base, finger,
   end block and cover.
+- **Hubbell art, after the first look**: an M-Series wire ring is a closed round-wire loop
+  fixed to the plate (a root wire joins its two wires at the plate) and reads in a mid steel
+  tone against the black plate; the side views draw it with bent corners (a stand-in radius,
+  gap `ring-bend`). The covers draw a folded edge top and foot and a blank name plate
+  (HM1C, HM2C, HM3C) or a rolled top edge, two slot marks and the plate (HS2C); the fold,
+  slot and radius are stand-ins (gap `cover-face`). The HS23C's fingers have a rounded tip
+  and folded rim in the top view, and its fingers, tabs and flange are drawn in steel
+  tones so they read on the dark plate and on a light stage. The HSD13's cover has no
+  face detail in any source, so it is unchanged.
