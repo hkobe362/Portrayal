@@ -118,6 +118,18 @@ vendors:
       (working/intake/fs/fhd). No corporate lineage is known or claimed - FS
       is the name on the metal today.
 
+  hubbell:
+    display: Hubbell
+    aka: [Hubbell Premise Wiring]
+    role: hardware
+    source: >-
+      the name in the header of every cable-manager spec sheet on hubbellcdn.com
+      ("Hubbell Premise Wiring - Hubbell Incorporated (Delaware), 40 Waterview Drive,
+      Shelton, CT"): Hubbell Premise Wiring is the structured-cabling business of
+      Hubbell Incorporated. The directory is `hubbell` because the sheets and part
+      numbers (HM24C, HS23C, HSD13) say Hubbell. No corporate lineage is known or
+      claimed.
+
   fibrain:
     display: Fibrain
     role: hardware
@@ -349,6 +361,17 @@ vendors:
   # ---- lineage targets: companies that own or absorbed the above ----
   # These manufacture nothing in this library. They are here so a search or an
   # export can resolve a successor without a device having to claim it.
+
+  panduit:
+    display: Panduit
+    aka: [Panduit Corp.]
+    role: hardware
+    source: >-
+      the name on the specification sheets and part drawings of the NetManager, NetManager
+      High Capacity, PatchRunner 2 and NetRunner cable managers ("PANDUIT CORP.", Tinley Park,
+      Illinois), and on panduit.com/en/products. The directory is `panduit` because the
+      sheets, drawings and part numbers (NCMH2, NMF2, PR2HF3, PR2VD10, WMPVHC45E) say Panduit.
+      No corporate lineage is known or claimed.
 
   accton:
     display: Accton Technology
