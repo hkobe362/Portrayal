@@ -7,6 +7,8 @@ is_full_depth: false
 weight: 2.04
 weight_unit: kg
 description: 3U horizontal ring-style cable manager with saddle rings, Belden 9511-1903
+front_image: true
+rear_image: true
 comments: "3U horizontal ring-style cable manager with saddle rings, Belden 9511-1903. A flat black steel\
   \ panel the full 19 in width bolts to the rack rails. Steel saddle rings are screwed to it. Each ring\
   \ is a strap bent into an open loop that stands 3.0 in out of the panel. A slit in its bottom bar lets\
