@@ -329,6 +329,17 @@ vendors:
       DD-4P product brief (Sept 2025). No corporate lineage is known or
       claimed - Credo is the name on the metal today.
 
+  belden:
+    display: Belden
+    aka: [Belden, Inc]
+    role: hardware
+    source: >-
+      the name and logo on the Belden technical data sheets of the BHH191UR to BHH194UR
+      horizontal managers and the 9510-1901, 9511-1903, 9511-1904 and 9512-1901 horizontal
+      cable managers (catalog.belden.com/techdata, revision 05-31-2024), whose footer reads
+      "(c) 2026 Belden, Inc". No corporate lineage is known or claimed - Belden is the name
+      on the metal today.
+
   siemon:
     display: Siemon
     role: hardware
