@@ -350,6 +350,17 @@ vendors:
   # These manufacture nothing in this library. They are here so a search or an
   # export can resolve a successor without a device having to claim it.
 
+  panduit:
+    display: Panduit
+    aka: [Panduit Corp.]
+    role: hardware
+    source: >-
+      the name on the specification sheets and part drawings of the NetManager, NetManager
+      High Capacity, PatchRunner 2 and NetRunner cable managers ("PANDUIT CORP.", Tinley Park,
+      Illinois), and on panduit.com/en/products. The directory is `panduit` because the
+      sheets, drawings and part numbers (NCMH2, NMF2, PR2HF3, PR2VD10, WMPVHC45E) say Panduit.
+      No corporate lineage is known or claimed.
+
   accton:
     display: Accton Technology
     role: hardware
