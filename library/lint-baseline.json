@@ -1779,7 +1779,7 @@
   "L93": 1
  },
  "devices/cisco/asr-9006/device.yaml": {
-  "L29": 5,
+  "L29": 7,
   "L39": 1,
   "L42": 1,
   "L54": 3,
@@ -1812,20 +1812,20 @@
  },
  "devices/cisco/asr-9904/device.yaml": {
   "L119": 1,
-  "L29": 9,
+  "L29": 11,
   "L42": 1,
   "L54": 2,
   "L93": 1
  },
  "devices/cisco/asr-9906/device.yaml": {
-  "L29": 13,
+  "L29": 15,
   "L39": 1,
   "L42": 1,
   "L54": 2,
   "L93": 1
  },
  "devices/cisco/asr-9910/device.yaml": {
-  "L29": 14,
+  "L29": 16,
   "L39": 2,
   "L54": 2,
   "L69": 1,
@@ -1833,13 +1833,13 @@
  },
  "devices/cisco/asr-9912/device.yaml": {
   "L119": 1,
-  "L29": 14,
+  "L29": 16,
   "L54": 2,
   "L93": 1
  },
  "devices/cisco/asr-9922/device.yaml": {
   "L119": 1,
-  "L29": 15,
+  "L29": 17,
   "L33": 4,
   "L54": 2,
   "L69": 1,
