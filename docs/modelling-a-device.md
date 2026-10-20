@@ -308,6 +308,14 @@ Establish `chassis.width/height/depth` and each view's `size`.
   a component in a bay, not paint. A rear cover drawn as a bare white decor
   rectangle is a box nobody can identify, because it appears in no component
   list.
+- A cover says what it hides. A cover is a removable part that hides others (a
+  bezel over drives, a filter cover over PSUs); its placement lists them in
+  `hides: [...]`, beside any `for:`, and the compiler writes
+  `data-hides="<id> <id> ..."` on its group. That attribute is how a consumer
+  tells a cover from a screw or a ground stud, which carry `data-for` too. Name
+  the placements and bays on the same face that the cover lies over, by id.
+  Check: L196 refuses an id that names nothing on the face, one on another face,
+  and one the cover does not overlap.
 - A vent says it is one: `pattern: vent`, or `vent: <mm>` on a plain rect
   (the sheet's thickness, 1 if nothing states it). A dark rectangle with
   neither is a plate, whatever its colour. The declaration is what the lint

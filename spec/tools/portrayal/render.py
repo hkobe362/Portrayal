@@ -4208,6 +4208,14 @@ def render_view(device, view_name, view, lib, include=(), config_name="default",
         du = data_for(p.get("under"))
         if du:
             g.set("data-under", du)
+        # A COVER SAYS WHAT IT HIDES. One attribute is both "this is a cover"
+        # and the list, so a consumer lifts covers by `[data-hides]` and needs
+        # no guess from a class or from `data-for`, which screws and ESD jacks
+        # carry too. The tokens are data-paths in THIS drawing, like
+        # `data-covered-by`; a placement's or a bay's path on a device face is
+        # its id, and L196 has checked each names one that the cover overlaps.
+        if p.get("hides"):
+            g.set("data-hides", " ".join(p["hides"]))
         if p["id"] in member_of:
             mark_member(g, member_of[p["id"]], flat=bool(p.get("projection-of")))
         svg.append(g)
