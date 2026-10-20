@@ -78,6 +78,16 @@ vendors:
     role: hardware
     source: 'the name on the ES1010 and on its PSU FRU label'
 
+  startech:
+    display: StarTech.com
+    role: hardware
+    source: >-
+      the StarTech.com name and logo on the data sheet and on the dimensioned drawing
+      ("Product Drawing", third angle projection) of each of CMDUCT1UX, CMDUCT2U, CABLMANAGERH,
+      CABLMANAGER2, CMHOOK1U, CMHOOK1UN, CMHOOKMW and CMBRUSH1U, and on startech.com. The
+      directory is `startech` because the part numbers, data sheets and drawings say StarTech.com.
+      No corporate lineage is known or claimed.
+
   maiaedge:
     display: MaiaEdge
     role: hardware
