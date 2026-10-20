@@ -688,6 +688,9 @@ RULES = {
     "L195": ("listing, device", "every `interfaces[].breakout.modes` entry is `<count>x<speed>`: a count of one or more with no leading zero, the letter `x`, and a speed from the closed set in spec/schemas/speeds.yaml, in lower case", "write the mode as `4x25g`, never `4 x 25GE` or `4x25`; spell the speed from spec/schemas/speeds.yaml (`1x400g`, `8x50g`)",
              "A filter for ports that break out reads the count in front of the `x`, and a mode in any other spelling is one it cannot read or compare.",
              ERROR),
+    "L196": ("device", "every id in a placement's `hides` names another placement or a bay on the same face, and the cover's box overlaps that part's box (error)", "name the part by its id on this face, or move the cover over it; a part on another face is that face's cover to name",
+             "`hides` becomes `data-hides`, which a consumer reads as \"remove this cover to see these\". An id that names nothing, or a part elsewhere on the face, makes the consumer hide a part the cover does not cover.",
+             ERROR),
 }
 
 # A CODE HANDED OUT TO WORK THAT HAS NOT LANDED YET. Two branches written at
@@ -6921,6 +6924,50 @@ def lint_device_overhang(path, data, lib_roots):
                                "The figure is stale or overstated")
 
 
+def lint_device_hides(path, data, lib_roots):
+    """L196: a cover's `hides` names parts on its own face that it lies over.
+
+    `hides` is written as `data-hides` on the cover's group, and a consumer
+    that lifts the cover off shows what the list names. An id that names
+    nothing, or a part on another face, would show a part the cover never
+    covered, and a part the cover does not overlap is not behind it. The
+    ids are the face's own placements and bays; a part on another face is
+    that face's cover to name, so it is reported as such.
+    """
+    views = data.get("views") or {}
+    ids = {vn: {x.get("id") for k in ("placements", "bays") for x in view_parts(v)[k]}
+           for vn, v in views.items()}
+    for vname, view in views.items():
+        vp = view_parts(view or {})
+        boxes = {}
+        for q in vp["placements"]:
+            sz = contract_size(q["ref"], lib_roots) if q.get("ref") else None
+            if q.get("at") and sz and "w" in sz and "h" in sz:
+                x, y, w, h = q["at"][0], q["at"][1], float(sz["w"]), float(sz["h"])
+                if q.get("rotate") in (90, 270, -90):
+                    cx, cy = x + w / 2, y + h / 2
+                    x, y, w, h = cx - h / 2, cy - w / 2, h, w
+                boxes[q["id"]] = (x, y, x + w, y + h)
+        for b in vp["bays"]:
+            if _decor_box(b):
+                boxes[b["id"]] = _decor_box(b)
+        for q in vp["placements"]:
+            for hid in q.get("hides") or []:
+                where = f"{vname}: {q['id']} hides {hid!r}"
+                if hid == q["id"] or hid not in ids[vname]:
+                    elsewhere = sorted(vn for vn, s in ids.items() if vn != vname and hid in s)
+                    err(path, "L196", f"{where}, which is "
+                        + ("itself" if hid == q["id"] else
+                           f"on {', '.join(elsewhere)}, not on this face; that face's "
+                           "cover names it" if elsewhere else
+                           "not a placement or a bay on this face"))
+                elif q["id"] in boxes and hid in boxes:
+                    ox, oy = _box_overlap(boxes[q["id"]], boxes[hid])
+                    if ox <= 0 or oy <= 0:
+                        err(path, "L196", f"{where}, which the cover does not overlap; "
+                            "move the cover over it or drop the id")
+
+
 def _decor_box(d):
     at, sz = d.get("at"), d.get("size")
     if not at or not sz:
@@ -13111,6 +13158,7 @@ def lint_device(path, validator, lib_roots):
     lint_device_kits(path, data, lib_roots)
     lint_device_ear_span(path, data)
     lint_device_overhang(path, data, lib_roots)
+    lint_device_hides(path, data, lib_roots)
     lint_device_bay_pitch(path, data)
     lint_device_empty_views(path, data)
     lint_device_occupants(path, data, lib_roots)

@@ -305,6 +305,7 @@ ISSUED = {
     "L193": "rack",
     "L194": "component",
     "L195": "listing, device",
+    "L196": "device",
 }
 
 

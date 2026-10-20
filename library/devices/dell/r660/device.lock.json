@@ -968,6 +968,64 @@
     "chassis"
    ]
   },
+  "hides": {
+   "front-e3s14/placements/bezel": [
+    "e3s-0",
+    "e3s-1",
+    "e3s-10",
+    "e3s-11",
+    "e3s-12",
+    "e3s-13",
+    "e3s-2",
+    "e3s-3",
+    "e3s-4",
+    "e3s-5",
+    "e3s-6",
+    "e3s-7",
+    "e3s-8",
+    "e3s-9"
+   ],
+   "front-e3s16/placements/bezel": [
+    "e3s-0",
+    "e3s-1",
+    "e3s-10",
+    "e3s-11",
+    "e3s-12",
+    "e3s-13",
+    "e3s-14",
+    "e3s-15",
+    "e3s-2",
+    "e3s-3",
+    "e3s-4",
+    "e3s-5",
+    "e3s-6",
+    "e3s-7",
+    "e3s-8",
+    "e3s-9"
+   ],
+   "front-sff8sf/placements/bezel": [
+    "drive-0",
+    "drive-1",
+    "drive-2",
+    "drive-3",
+    "drive-4",
+    "drive-5",
+    "drive-6",
+    "drive-7"
+   ],
+   "front/placements/bezel": [
+    "drive-0",
+    "drive-1",
+    "drive-2",
+    "drive-3",
+    "drive-4",
+    "drive-5",
+    "drive-6",
+    "drive-7",
+    "drive-8",
+    "drive-9"
+   ]
+  },
   "rel-pos": {
    "front-e3s14/bays/e3s-0": 0,
    "front-e3s14/bays/e3s-1": 1,
@@ -1292,5 +1350,5 @@
  "placement-surface": "7c9dbf2f6e7571f7",
  "shape": "125139ee2c5f1b2d",
  "surface": "48f38bf56e359030",
- "version": "5.1.1"
+ "version": "5.2.0"
 }
