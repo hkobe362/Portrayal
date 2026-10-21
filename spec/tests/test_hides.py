@@ -67,7 +67,9 @@ def test_nothing_else_in_the_library_carries_data_hides():
             if n.get("data-hides") is not None:
                 carriers.add((svg.name.split(".")[0], n.get("id")))
     # the R6615's bezel is the R660's part over its own fronts
-    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel"), ("r6615", "bezel")}, carriers
+    # the R6625's security bezel hides its drives the way the R660's does
+    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel"), ("r6615", "bezel"),
+                        ("r6625", "bezel")}, carriers
 
 
 # --- L196 --------------------------------------------------------------------

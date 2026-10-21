@@ -559,7 +559,11 @@ def test_the_comparison_layer_can_now_reach_them():
     in the rear panel of the switch"). The four share one fan part, and the bays are
     on the rear face, numbered 0 and 1. The sentence is quoted in each device's fans
     group.
+
+    EIGHTY-NINE IS THE DELL R6625, n+1 over four dual-rotor modules, from its
+    technical guide's thermal features ("The PowerEdge R6625 allows N+1 fan
+    redundancy").
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 88, n
+    assert n == 89, n

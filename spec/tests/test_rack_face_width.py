@@ -97,6 +97,8 @@ def test_only_a_rack_face_is_wider_than_its_plane():
     # across 440 - wider than the 430 body - so its front is the whole plate.
     # r660: the R740xd's case in 1U - both control panels sit in the ears.
     # r6615: the R660's case on the R6615 - both control panels sit in the ears.
+    # r6625: the R660's 1U chassis again - the same two control panels in the ears
+    # (ISM tables 1 to 5), on each of its six fronts.
     # lmfs-f: the Lightspan MF-8's left flange carries the dual-stud grounding
     # point, the front-cover hook and the ESD point (UDS s2.4), so its front is
     # the 481 rack face over a 448 body.
@@ -112,5 +114,7 @@ def test_only_a_rack_face_is_wider_than_its_plane():
                          "r660:front-e3s16", "r660:front-e3s14", "lmfs-f:front",
                          "r6615:front", "r6615:front-sff8", "r6615:front-lff4",
                          "r6615:front-e3s16", "r6615:front-e3s14",
+                         "r6625:front", "r6625:front-sff8sf", "r6625:front-lff4",
+                         "r6625:front-nobp", "r6625:front-e3s16", "r6625:front-e3s14",
                          "cmh-6dr1u:front", "dinrail2u:front", "dinrail4u:front"}, \
         f"a face is wider than its plane and is not a known rack face: {wide}"
