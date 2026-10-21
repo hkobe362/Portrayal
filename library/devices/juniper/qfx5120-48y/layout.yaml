@@ -14,17 +14,6 @@ description: >-
   chassis lamps. It ships as one front panel in four power and airflow variants: AC or DC supplies,
   front-to-back (AIR OUT) or back-to-front (AIR IN).
 profile: networking
-lint:
-  waive:
-    L57: >-
-      a fixed-port switch ships with its supplies and fans installed and has no build with the
-      traffic slots empty: every port is on the chassis, and the guide's ordering table lists only the
-      four complete variants, so there is no base build to describe.
-    L29: >-
-      the QFX5120 hardware guide gives no power figure for a fan module: its tables carry whole-switch
-      figures and the supplies' ratings only. The two fan modules this chassis accepts therefore have
-      none, and the module total is a floor; the count is the honest record, kept visible here and
-      on each fan contract (`power-absent: not-published`) until a document states a wattage.
 provenance:
   sources:
     confidence: datasheet
@@ -295,6 +284,10 @@ groups:
     index-origin: 0
     attrs:
       redundancy: '4+1'
+      redundancy-note: >-
+        QFX5120 hardware guide, Fan Modules for QFX5120 Switches: the 48T, 48Y and 48YM ship with five
+        fan modules (4+1 redundancy) in the rear panel, slots 0 to 4 left to right; all five should be
+        installed and only one removed at a time
   fan-leds:
     term: LED
     role: indicator

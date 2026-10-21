@@ -8,29 +8,13 @@ model: QFX5120-48YM
 portfolio: {line: QFX Series, family: QFX5120}
 description: >-
   Juniper QFX5120-48YM, a 1RU data-centre leaf switch running Junos OS. It has 48 SFP28 ports (25, 10
-  or 1 GbE, set a quad at a time) and 8 QSFP28 ports (100 or 40 GbE, channelizable), all with MACsec.
+  or 1 GbE, set a quad at a time) and 8 QSFP28 ports (100 or 40 GbE, channelizable). All have MACsec.
   The ports sit in three blocks on the port side: 24 SFP28, then the 8 QSFP28 in four columns, then 24
   more SFP28. A strip beneath them holds one lamp per port. The rear carries two power supplies, five
   fan modules, the console, two RJ-45 management ports and a USB port. It also has the 10M OUT and PPS
   OUT timing ports, the reset button and the four chassis lamps. It ships as one front panel in four power
   and airflow variants: AC or DC supplies, front-to-back (AIR OUT) or back-to-front (AIR IN).
 profile: networking
-lint:
-  waive:
-    L57: >-
-      a fixed-port switch ships with its supplies and fans installed and has no build with the traffic
-      slots empty: every port is on the chassis, and the guide's ordering table lists only the four complete
-      variants, so there is no base build to describe.
-    L61: >-
-      the numerals and their arrows are printed in one strip beneath the lower row, each entry a lamp,
-      an arrow and a number on a 7.1 mm pitch that is half the cage pitch, so a glyph lands near the centre
-      of the cage above it by the layout of the strip and is not trying to line up with that cage; the
-      positions are measured off the photograph (the dark lamps at 7.1 mm, the glyphs beside them).
-    L29: >-
-      the QFX5120 hardware guide gives no power figure for a fan module: its tables carry whole-switch
-      figures and the supplies' ratings only. The two fan modules this chassis accepts therefore have
-      none, and the module total is a floor; the count is the honest record, kept visible here and on
-      each fan contract (`power-absent: not-published`) until a document states a wattage.
 provenance:
   sources:
     confidence: datasheet
@@ -316,7 +300,12 @@ groups:
     term: Fan
     role: service
     index-origin: 0
-    attrs: {redundancy: 4+1}
+    attrs:
+      redundancy: 4+1
+      redundancy-note: >-
+        QFX5120 hardware guide, Fan Modules for QFX5120 Switches: the 48T, 48Y and 48YM ship with five
+        fan modules (4+1 redundancy) in the rear panel, slots 0 to 4 left to right; all five should be
+        installed and only one removed at a time
   fan-leds:
     term: LED
     role: indicator
