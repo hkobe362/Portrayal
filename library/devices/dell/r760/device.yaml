@@ -229,11 +229,14 @@ provenance:
       157.5..279.1 for the middle 16 sockets), and by the fan connectors on the board's front edge
       (y 478) lying under the fan cage (423..497). THE DIMM SOCKETS' REAR ENDS ARE AT PLAN Y 257
       (the shroud's rear edge, figure 15 callout 5), 114 mm in front of where figure 180's own
-      origin would put them: that shift is the board's 'neck' (see the board part). SEATED
+      origin would put them: that shift is the board's 'neck' (see the board part). Each socket is the figure's
+      158.8 mm from latch to latch (plan y 257.0 to 415.8) and is drawn with common/dimm-plan@1 (3.8 x 133.4,
+      the module without its latches) centred in it, at y 269.7. SEATED
       MODULES PROJECT INTO THIS VIEW through their rear bay's `plan:` - the supplies, the risers,
       the BOSS module, the LOM and OCP cards and the rear I/O board - at positions mirrored from
       the rear bays (plan x = 434 - rear x - width). NOT IN THIS VIEW: the heatsinks' true outline
-      (the R660's retention plate is used), the cards, the backplane and the cabling.
+      (the R660's retention plate is used), the cards, the drive backplane, the rear-mounting front PERC module and the
+      intrusion switch module (figure 15 callouts 2, 8 and 1), and the cabling.
   sides-and-bottom:
     confidence: estimated
     note: >-
@@ -781,22 +784,22 @@ views:
     components:
       bays:
         - *b-panel-left
-        - {id: e3s-0, at: [30.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: &e3s-acc [dell/e3s-carrier@1, dell/e3s-carrier-blank@2, std/drive-e3s@1], default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 0}
-        - {id: e3s-1, at: [40.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 1}
-        - {id: e3s-2, at: [50.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 2}
-        - {id: e3s-3, at: [60.7, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 3}
-        - {id: e3s-4, at: [70.9, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 4}
-        - {id: e3s-5, at: [81.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 5}
-        - {id: e3s-6, at: [91.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 6}
-        - {id: e3s-7, at: [101.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 7}
-        - {id: e3s-8, at: [284.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 8}
-        - {id: e3s-9, at: [294.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 9}
-        - {id: e3s-10, at: [304.7, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 10}
-        - {id: e3s-11, at: [314.9, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 11}
-        - {id: e3s-12, at: [325.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 12}
-        - {id: e3s-13, at: [335.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 13}
-        - {id: e3s-14, at: [345.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 14}
-        - {id: e3s-15, at: [355.7, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 15}
+        - {id: e3s-0, at: [31.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: &e3s-acc [dell/e3s-carrier@1, dell/e3s-carrier-blank@2, std/drive-e3s@1], default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 0}
+        - {id: e3s-1, at: [41.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 1}
+        - {id: e3s-2, at: [51.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 2}
+        - {id: e3s-3, at: [61.925, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 3}
+        - {id: e3s-4, at: [72.125, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 4}
+        - {id: e3s-5, at: [82.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 5}
+        - {id: e3s-6, at: [92.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 6}
+        - {id: e3s-7, at: [102.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 7}
+        - {id: e3s-8, at: [285.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 8}
+        - {id: e3s-9, at: [295.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 9}
+        - {id: e3s-10, at: [305.925, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 10}
+        - {id: e3s-11, at: [316.125, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 11}
+        - {id: e3s-12, at: [326.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 12}
+        - {id: e3s-13, at: [336.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 13}
+        - {id: e3s-14, at: [346.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 14}
+        - {id: e3s-15, at: [356.925, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 15}
       placements:
         - *p-power
         - *p-usb
@@ -844,22 +847,22 @@ views:
     components:
       bays:
         - *b-panel-left
-        - {id: e3s-0, at: [30.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 0}
-        - {id: e3s-1, at: [40.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 1}
-        - {id: e3s-2, at: [50.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 2}
-        - {id: e3s-3, at: [60.7, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 3}
-        - {id: e3s-4, at: [70.9, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 4}
-        - {id: e3s-5, at: [81.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 5}
-        - {id: e3s-6, at: [91.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 6}
-        - {id: e3s-7, at: [101.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 7}
-        - {id: e3s-8, at: [370.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 8}
-        - {id: e3s-9, at: [380.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 9}
-        - {id: e3s-10, at: [390.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 10}
-        - {id: e3s-11, at: [400.7, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 11}
-        - {id: e3s-12, at: [410.9, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 12}
-        - {id: e3s-13, at: [421.1, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 13}
-        - {id: e3s-14, at: [431.3, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 14}
-        - {id: e3s-15, at: [441.5, 4.58], size: {w: 10.2, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 15}
+        - {id: e3s-0, at: [31.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 0}
+        - {id: e3s-1, at: [41.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 1}
+        - {id: e3s-2, at: [51.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 2}
+        - {id: e3s-3, at: [61.925, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 3}
+        - {id: e3s-4, at: [72.125, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 4}
+        - {id: e3s-5, at: [82.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 5}
+        - {id: e3s-6, at: [92.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 6}
+        - {id: e3s-7, at: [102.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 7}
+        - {id: e3s-8, at: [371.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 8}
+        - {id: e3s-9, at: [381.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 9}
+        - {id: e3s-10, at: [391.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 10}
+        - {id: e3s-11, at: [401.925, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 11}
+        - {id: e3s-12, at: [412.125, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 12}
+        - {id: e3s-13, at: [422.325, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 13}
+        - {id: e3s-14, at: [432.525, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 14}
+        - {id: e3s-15, at: [442.725, 4.58], size: {w: 7.75, h: 77.65}, rotate: 90, accepts: *e3s-acc, default: dell/e3s-carrier-blank@2, group: drives-e3s, rel-pos: 15}
       placements:
         - *p-power
         - *p-usb
@@ -899,13 +902,13 @@ views:
         # into the system board. Listed before the risers so that, seen from above, the riser cages paint over them.
         - &rb-lom {id: lom, at: [110.59, 68.71], size: {w: 42.58, h: 15.93},
            accepts: [dell/lom-2x1g-16g@1, dell/lom-blank-16g@1, dell/mic-card-16g@1], default: dell/lom-2x1g-16g@1, group: lom-card, rel-pos: 1,
-           plan: {view: top, at: [277.0, 1.6], in: system-board, under: [system-cover]}}
+           plan: {view: top, at: [280.83, 0.0], in: system-board, under: [system-cover]}}
         - &rb-rio {id: rio, at: [250.5, 68.71], size: {w: 85.37, h: 15.93},
            accepts: [dell/rear-io-board-16g@1], default: dell/rear-io-board-16g@1, group: rear-io, rel-pos: 1,
-           plan: {view: top, at: [97.7, 0.0], in: system-board, under: [system-cover]}}
+           plan: {view: top, at: [98.13, 0.0], in: system-board, under: [system-cover]}}
         - &rb-ocp {id: ocp, at: [164.95, 68.7], size: {w: 71.8, h: 15.1},
            accepts: [dell/ocp3-blank-16g@1, dell/ocp3-4x1g-rj45@1, dell/ocp3-2x10g-rj45@1, dell/ocp3-4x10g-rj45@1, dell/ocp3-2x25g-sfp28@1, dell/ocp3-4x25g-sfp28@1, dell/ocp3-2x100g-qsfp56@1], default: dell/ocp3-blank-16g@1, group: ocp, rel-pos: 1,
-           plan: {view: top, at: [195.15, 0.6], in: system-board, under: [system-cover]}}
+           plan: {view: top, at: [197.25, 0.0], in: system-board, under: [system-cover]}}
         # THE SUPPLIES: 86 mm bays; a 60 mm supply seats through the adapter module
         - &rb-psu1 {id: psu-1, at: [9.8, 45.8], size: {w: 86.3, h: 41.0},
            accepts: [dell/psu-2400w-ac-86mm@1, dell/psu-adapter-60mm-2u-16g@1], default: dell/psu-2400w-ac-86mm@1, group: psus, rel-pos: 1,

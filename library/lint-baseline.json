@@ -759,6 +759,9 @@
  "components/dell/boss-n1-module-1u/v1/contract.yaml": {
   "L27": 1
  },
+ "components/dell/boss-n1-module-2u-16g/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/dell/control-panel-grid-14g/v1/contract.yaml": {
   "L97": 1
  },
@@ -767,6 +770,9 @@
   "L97": 1
  },
  "components/dell/control-panel-left-16g/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/dell/control-panel-left-2u-16g/v1/contract.yaml": {
   "L27": 1
  },
  "components/dell/dc-terminal-6ryj9/v1/contract.yaml": {
@@ -780,6 +786,9 @@
   "L97": 1
  },
  "components/dell/fan-1u-16g/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/dell/fan-2u-16g/v1/contract.yaml": {
   "L27": 1
  },
  "components/dell/fan-cage-14g/v1/contract.yaml": {
@@ -845,6 +854,9 @@
  },
  "components/dell/psu-2400w-ac-14g/v1/contract.yaml": {
   "L97": 1
+ },
+ "components/dell/psu-adapter-60mm-2u-16g/v1/contract.yaml": {
+  "L27": 1
  },
  "components/dell/rack-latch-14g/v1/contract.yaml": {
   "L97": 1
@@ -1868,6 +1880,10 @@
   "L39": 3,
   "L54": 4,
   "L93": 1
+ },
+ "devices/dell/r760/device.yaml": {
+  "L145": 1,
+  "L29": 28
  },
  "devices/eaton/evma8365x/device.yaml": {
   "L29": 1

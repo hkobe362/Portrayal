@@ -16,7 +16,7 @@ provenance:
   size: >-
     photo-measured - 39.0 x 44.0 from rear-face x 127.4, y 1.0: the module's bracket between riser 1 and riser 3, with its thumbscrew.
   carriers: >-
-    photo-measured - two carriers standing side by side at module-local x 3.8..15.1 and 17.8..28.6, y 7.6..40.4 (figure 10: px 463..501 and 510..546 across, 150..260 down at 3.36 px/mm). They read 11 mm wide and 33 tall against dell/boss-n1-m2-carrier@1's 10.0 x 26.0, so the carrier sits centred in a larger bay; either the 2U bracket's windows are larger than the carrier or the figure exaggerates them, and the figure has no scale to say which. Carrier 0 is on the left with its orange tab at the bottom and carrier 1 on the right with its tab at the top, as the figure shows and as ISM figure 25 of the R660 numbers them; the R760 service label was not read for its own.
+    photo-measured - two carriers standing side by side, centred at module-local x 9.45 and 23.2 and y 24.0 (figure 10: px 463..501 and 510..546 across, 150..260 down at 3.36 px/mm). They read 11 mm wide and 33 tall against dell/boss-n1-m2-carrier@1's 10.0 x 26.0. The bays reserve the part's own 10.0 x 26.0 (one piece of metal, one footprint wherever it seats, as the 1U module's bays do), centred on the figure's carriers; either the 2U bracket's windows are larger than the carrier or the figure exaggerates them, and the figure has no scale to say which. Carrier 0 is on the left with its orange tab at the bottom and carrier 1 on the right with its tab at the top, as the figure shows and as ISM figure 25 of the R660 numbers them; the R760 service label was not read for its own.
   thumbscrew: >-
     photo-measured - the blue thumbscrew at module-local (35.5, 22.5), diameter about 10.3, and a round hole below it at (35.7, 32.4), diameter about 6.
   default-carriers: >-
@@ -28,14 +28,14 @@ size-confidence: {w: photo-measured, h: photo-measured}
 plan: {ref: dell/boss-n1-plan@1}
 bays:
   carrier-0:
-    at: [3.8, 7.6]
-    size: [11.3, 32.8]
+    at: [4.45, 11.0]
+    size: [10.0, 26.0]
     rotate: 270
     accepts: [dell/boss-n1-m2-carrier@1]
     default: dell/boss-n1-m2-carrier@1
   carrier-1:
-    at: [17.8, 7.6]
-    size: [10.8, 32.8]
+    at: [18.2, 11.0]
+    size: [10.0, 26.0]
     rotate: 90
     accepts: [dell/boss-n1-m2-carrier@1]
     default: dell/boss-n1-m2-carrier@1

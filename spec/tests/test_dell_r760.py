@@ -361,7 +361,7 @@ def test_the_memory_channels_are_the_isms():
 def test_the_plan_projections_follow_the_rear_bays():
     # plan x = 434 - rear x - width, the R660's convention, for the supplies and risers
     rear = view_bays("rear")
-    for bay in ("psu-1", "psu-2", "riser-1", "riser-3", "riser-4"):
+    for bay in ("psu-1", "psu-2", "riser-1", "riser-2", "riser-3", "riser-4", "boss", "lom", "rio", "ocp"):
         at, w = rear[bay]["at"][0], rear[bay]["size"]["w"]
         assert rear[bay]["plan"]["at"][0] == pytest.approx(434.0 - at - w, abs=0.15), bay
 
@@ -428,12 +428,33 @@ def test_the_build_binds_each_front_to_its_configurations():
 def test_the_dcim_device_types_are_two_u_and_full_depth():
     folder = EXPORTS / "netbox" / "device-types" / "Dell"
     files = sorted(folder.glob("PowerEdge R760 *.yaml"))
-    assert files, "no R760 device type was exported"
+    assert len(files) == 7, [f.name for f in files]
     assert any(f.name == "PowerEdge R760 sff24-rc1-1b2a3b4b.yaml" for f in files), "the default build is a device type"
+    docs = {}
     for f in files:
         doc = yaml.safe_load(f.read_text())
         assert doc["u_height"] == 2.0 and doc["is_full_depth"] is True, f.name
         assert doc["manufacturer"] == "Dell" and doc["model"].startswith("PowerEdge R760 "), f.name
-    # one device type per distinct configuration: every orderable build is exported under its own name
-    wanted = {f"PowerEdge R760 {n}.yaml" for n in orderable()}
-    assert wanted <= {f.name for f in files}, sorted(wanted - {f.name for f in files})[:5]
+        docs[f.name] = doc
+    # One device type per SKU and set of bays the configuration renders (the exporter's rule, the R660's too): the bays
+    # differ by front and by the 4 x 2.5 inch rear module's, not by which riser sits in a bay, so the 78 builds are
+    # seven types - the default 24-bay, the 16-bay, the 8-bay, the 12 x 3.5 inch and the E3.S fronts (whose two layouts
+    # carry the same bays), and the two 4 x 2.5 inch rear builds - and each carries what the ISM lists
+    prefixes = {name.split(" ")[2].split("-")[0] for name in docs}
+    assert prefixes == {"sff24", "sff16", "sff8", "lff12", "e3s16"}
+    assert sum("r4x25" in name for name in docs) == 2
+    default = docs["PowerEdge R760 sff24-rc1-1b2a3b4b.yaml"]
+    positions = {b["position"] for b in default["module-bays"]}
+    assert {"psu-1", "psu-2", "boss", "lom", "ocp", "rio", "riser-1", "riser-2", "riser-3", "riser-4", "panel-left"} <= positions
+    assert {f"fan-{i}" for i in range(1, 7)} <= positions
+    assert {f"dimm-{c}{n}" for c in "ab" for n in range(1, 17)} <= positions
+    assert {f"drive-{i}" for i in range(24)} <= positions
+
+
+@needs_exports
+def test_the_new_modules_export_as_module_types():
+    folder = EXPORTS / "netbox" / "module-types" / "Dell"
+    for part in NEW_PARTS:
+        c = contract(f"dell/{part}@1")
+        if c.get("kind") == "module":
+            assert (folder / f"{part}.yaml").is_file(), part

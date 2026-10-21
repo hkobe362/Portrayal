@@ -133,8 +133,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
              if F.face_ref(yaml.safe_load(p.read_text()) or {}, "plan")]
     # 86 since the Fibrain XCU10's drawer, seen from above under the shell top.
     # 87 since the NVIDIA A100 80GB PCIe, whose plan face is its top edge.
-    assert len(named) == 87, \
-        f"expected 87 parts naming a plan drawing, found {len(named)}"
+    # 100 since the Dell R760's eleven 2U risers, BOSS-N1 module and 86 mm supply name plans.
+    assert len(named) == 100, \
+        f"expected 100 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -260,9 +261,10 @@ def test_the_index_carries_a_parts_other_faces():
     # 141 since its ten LC holders and six multimode SC ones, each with a rear;
     # 142 since the FHD RJ45 module's punch-down rear;
     # 143 since nvidia/a100-pcie-80gb@1 declares its far end as a rear face.
+    # 156 since the Dell R760's eleven 2U risers, BOSS-N1 module and 86 mm supply name plans.
     with_faces = [e for e in entries if e.get("faces")]
-    assert len(with_faces) == 143, \
-        f"expected exactly 143 of {len(entries)} entries to carry a faces " \
+    assert len(with_faces) == 156, \
+        f"expected exactly 156 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 

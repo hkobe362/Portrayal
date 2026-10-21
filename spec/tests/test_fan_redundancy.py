@@ -549,7 +549,12 @@ def test_the_comparison_layer_can_now_reach_them():
     its User Guide's fan mode behaviour (the redundant fan kit adds one fan, and
     in redundant mode one rotor failure leaves the system running). Its bays are
     in the top view too.
+
+    EIGHTY-FOUR IS THE DELL R760, n+1 over six fan modules, from its technical
+    guide's thermal features ("The R760 allows N+1 fan redundancy, allowing
+    continuous operation with one fan failure in the system"). Its six bays are in
+    the top view, as the R660's four are.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 83, n
+    assert n == 84, n
