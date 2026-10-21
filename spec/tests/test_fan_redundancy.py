@@ -574,7 +574,13 @@ def test_the_comparison_layer_can_now_reach_them():
     guide's thermal features ("The R760 allows N+1 fan redundancy, allowing
     continuous operation with one fan failure in the system"). Its six bays are in
     the top view, as the R660's four are.
+
+    NINETY-THREE TO NINETY-SIX ARE THE JUNIPER EX4300-24T, -24P, -48T AND -48P, n+0
+    over two fan modules each, from the hardware guide's Fan Modules section ("Both the
+    fan modules must be installed for optimal functioning of the switch"; the switch runs
+    30 seconds without thermal shutdown while one is replaced). The guide states no N+1
+    form, so the figure says that no spare fan is claimed.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 92, n
+    assert n == 96, n
