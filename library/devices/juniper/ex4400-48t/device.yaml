@@ -93,12 +93,13 @@ provenance:
     confidence: drawing
     note: >-
       Figure 34 callouts 2 to 5 and Figure 54 (g022614), measured on the render of Figure 31. A dark plate
-      361.2 to 439.5 across and 1.4 to 15.5 down. The model name EX4400 is printed up and to the left of the
-      USB-C port, spanning 374.3 to 385.2 across (centre 379.8), with no PoE++ mark and no POE lamp. The USB-C console port is centred at 393.7, 8.3 with the USB
-      symbol below it. Two columns of lamps sit at 406.2 and 410.1 across: SYS, ALM, MST and CLD on the
-      left with their legends, and SPD, DX and EN on the right (the CLD row has no right-hand lamp). The
-      rows are at 3.8, 6.8, 9.7 and 12.8 down; the render scatters them by up to 0.5 mm and they are aligned.
-      The mode button is a flush disc at 423.1, 8.6. The legends' type size is estimated.
+      361.2 to 439.5 across and 1.4 to 15.5 down. The model name EX4400 is printed up and to the left
+      of the USB-C port, spanning 374.3 to 385.2 across (centre 379.8), with no PoE++ mark and no POE
+      lamp. The USB-C console port is centred at 393.7, 8.3 with the USB symbol below it. Two columns
+      of lamps sit at 406.2 and 410.1 across: SYS, ALM, MST and CLD on the left with their legends, and
+      SPD, DX and EN on the right (the CLD row has no right-hand lamp). The rows are at 3.8, 6.8, 9.7
+      and 12.8 down; the render scatters them by up to 0.5 mm and they are aligned. The mode button is
+      a flush disc at 423.1, 8.6. The legends' type size is estimated.
   extension-slot:
     confidence: estimated
     note: >-
