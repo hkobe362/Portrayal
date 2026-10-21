@@ -1,0 +1,35 @@
+format: 1
+kind: component
+name: riser-3-cage-2u-16g
+version: 1.0.0
+class: riser
+profile: server
+description: >-
+  the riser 3 cage of a 16th-generation 2U PowerEdge (R760) - two stacked full-height windows in the middle of the rear; shared by risers 3A and 3B
+attrs:
+  power-absent: not-applicable
+provenance:
+  power: >-
+    NOT APPLICABLE - sheet metal; the riser that composes it carries the power record.
+  why-this-is-its-own-part: >-
+    THE METAL IS SHARED AND THE WIRING IS NOT: risers 3A (slot 5 only) and 3B (slots 4 and 5) differ in what they carry (R760 ISM figures 215-217, table 153), not in the face the rear shows. Authored for the R760 as the batch's shared 2U 16G part.
+  sources: >-
+    photo-measured - R760 ISM figure 10 (rear view), the embedded 1529 x 528 image at 3.36 px/mm; see dell/riser-1-cage-2u-16g@1/provenance/sources for the scale and its 1.5 mm tolerance. Facts read, art not traced.
+  size: >-
+    photo-measured - 128.7 x 44.0 from rear-face x 168.0, y 1.0: from the BOSS bay's right edge to the divider beside riser 4, from the lid edge to the PSU bays' top (y 45.0). The metal is drawn across the whole 128.7: the figure's cage runs about 172.0 to 286.6, and the rest is the divider's edge and the BOSS bay's, taken into this part so that a bracket's flange end, which lies under it, is inside the part's extent and no opening shows round it.
+  windows: >-
+    photo-measured - 84.6 wide at rear x 184.2..268.8, 11.3 tall at y 7.1..18.4 and 27.7..38.7, the same heights as riser 1's. A bracket sits behind with its tip at the RIGHT (rotate 180): the 27 mm tip end of a full-height bracket would otherwise lie outside the cage's left edge.
+  numerals: >-
+    NONE PRINTED IN THE FIGURE - see dell/riser-1-cage-2u-16g@1/provenance/numerals. Slot 4 is the lower and slot 5 the upper (ISM figure 217).
+size: {w: 128.7, h: 44.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  features:
+  - node: plate
+    out: 20.0
+    shape: true
+    color: '#cfd3d7'
+    confidence: estimated
+    source: >-
+      estimated by analogy with the 1U R660 risers' cages, 20 mm proud in Dell's R660 service model; no ISM figure gives the cage's depth, and Dell's R760 service model (r760.glb, `R760_ ExpansionCardRiser3`) is held but the depth was not read from it in the change that measured the covers and fans.
+skins: [default]

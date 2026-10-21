@@ -68,8 +68,9 @@ def test_nothing_else_in_the_library_carries_data_hides():
                 carriers.add((svg.name.split(".")[0], n.get("id")))
     # the R6615's bezel is the R660's part over its own fronts
     # the R6625's security bezel hides its drives the way the R660's does
+    # the R760's security bezel (dell/bezel-2u-16g@1) names its drives as the R660's does
     assert carriers == {("c40g", "psu-cover"), ("r660", "bezel"), ("r6615", "bezel"),
-                        ("r6625", "bezel")}, carriers
+                        ("r6625", "bezel"), ("r760", "bezel")}, carriers
 
 
 # --- L196 --------------------------------------------------------------------
