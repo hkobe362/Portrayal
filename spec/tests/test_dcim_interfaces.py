@@ -819,6 +819,7 @@ WITHHELD = {
 # until this rule; its slot-1 was always given, plainly.
 ANCHORED = {
     "Dell/riser-2s-16g": ("riser-2", ["e3s-0", "e3s-1"]),
+    "Dell/r6615-riser-2u": ("riser-2", ["e3s-0", "e3s-1"]),  # the R6615's riser 2U, the same carrier
     "Fibrain/XCU10": ("drawer", ["slot-1", "slot-2", "slot-3", "slot-4"]),
 }
 
