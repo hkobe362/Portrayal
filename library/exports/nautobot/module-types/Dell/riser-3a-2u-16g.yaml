@@ -5,13 +5,13 @@ description: Dell riser 3A of the PowerEdge R760 - one full-height PCIe Gen4 x16
   on dell/riser-3-cage-2u-16g@1, its lower window closed by a vented plate; fitted in riser configuration
   5
 module-bays:
-  - name: slot-4
-    position: slot-4
-    description: 'Accepts: pcie-filler-fh-16g'
   - name: slot-5
     position: slot-5
     description: 'Accepts: pcie-filler-fh-16g, pcie-bracket-fh, pcie-card-fh, n3100-4c, mcx4111a-fh, mcx4121a-fh,
       mcx4131a-fh, mcx512a-fh, mcx512f-fh, mcx515a-fh, mcx516a-fh, mcx621102-fh, mcx621202-fh (+10 more)'
+  - name: window-4
+    position: window-4
+    description: 'Accepts: pcie-filler-fh-16g'
 comments: 'Dell riser 3A of the PowerEdge R760 - one full-height PCIe Gen4 x16 slot (slot 5, the upper)
   on dell/riser-3-cage-2u-16g@1, its lower window closed by a vented plate; fitted in riser configuration
   5

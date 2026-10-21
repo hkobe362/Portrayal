@@ -18,7 +18,7 @@ provenance:
     technical guide and spec sheet were searched for 'riser' beside a wattage
     and none gives one.
   slots: >-
-    datasheet - R760 ISM table 153, configurations 3-1, 3-2, 5-1 and 5-2: R4P carries slot 7 only, full height, Gen5 x16 on processor 2; the -2 builds (4P FL) take a double-width card. ISM figure 218 shows one connector, labelled slot 7; the upper window is shut by a plate, modelled as slot 8, which takes the filler and nothing else. The ISM lists no slot 8 for this riser.
+    datasheet - R760 ISM table 153, configurations 3-1, 3-2, 5-1 and 5-2: R4P carries slot 7 only, full height, Gen5 x16 on processor 2; the -2 builds (4P FL) take a double-width card. ISM figure 218 shows one connector, labelled slot 7; the upper window is shut by a plate, modelled as `window-8`, which takes the filler and nothing else and is deliberately NOT named a slot: the ISM lists no slot 8 for this riser, and a `slot-8` bay would be exported as a PCIe slot that does not exist.
   face: >-
     photo-measured - composed from dell/riser-4-cage-2u-16g@1, the same face as the two-slot risers.
   seating: >-
@@ -31,7 +31,7 @@ plan: {ref: dell/riser-4-plan-2u-16g@1}
 parts:
   - {ref: dell/riser-4-cage-2u-16g@1, id: plate, at: [0, 0]}
 bays:
-  slot-8:
+  window-8:
     rotate: 180
     behind: true
     at: [17.2, -0.65]

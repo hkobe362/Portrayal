@@ -31,5 +31,5 @@ relief:
     color: '#cfd3d7'
     confidence: estimated
     source: >-
-      estimated by analogy with the 1U R660 risers' cages, 20 mm proud in Dell's R660 service model; no R760 model or figure gives the cage's depth.
+      estimated by analogy with the 1U R660 risers' cages, 20 mm proud in Dell's R660 service model; no ISM figure gives the cage's depth, and Dell's R760 service model (r760.glb, `R760_ ExpansionCardRiser3`) is held but the depth was not read from it in the change that measured the covers and fans.
 skins: [default]

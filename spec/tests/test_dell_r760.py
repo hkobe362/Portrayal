@@ -278,9 +278,24 @@ def test_slots_are_numbered_as_the_ism_numbers_them():
 
 
 def test_the_single_slot_risers_close_the_other_window_with_a_filler():
-    for riser, plated in (("1p", "slot-1"), ("3a", "slot-4"), ("4p", "slot-8")):
-        bay = contract(f"dell/riser-{riser}-2u-16g@1")["bays"][plated]
-        assert bay["accepts"] == ["dell/pcie-filler-fh-16g@1"] and "slot" not in bay, riser
+    # ISM table 153 lists no slot 1 for riser 1P, no 4 for 3A and no 8 for 4P (figure 211 shows the window shut by a
+    # plate), so that window is not NAMED as a slot: the DCIM exports list every bay name as a module bay, and a
+    # `slot-N` bay there is a PCIe slot that does not exist.
+    for riser, window, phantom in (("1p", "window-1", "slot-1"), ("3a", "window-4", "slot-4"), ("4p", "window-8", "slot-8")):
+        bays = contract(f"dell/riser-{riser}-2u-16g@1")["bays"]
+        assert phantom not in bays, (riser, "still names the dead window as a slot")
+        assert bays[window]["accepts"] == ["dell/pcie-filler-fh-16g@1"] and "slot" not in bays[window], riser
+        assert bays[window]["default"] == "dell/pcie-filler-fh-16g@1", riser
+
+
+@needs_exports
+def test_the_exports_list_no_pcie_slot_for_a_dead_window():
+    for riser, phantom in (("1p", "slot-1"), ("3a", "slot-4"), ("4p", "slot-8")):
+        for system in ("netbox", "nautobot"):
+            doc = yaml.safe_load((EXPORTS / system / "module-types" / "Dell" / f"riser-{riser}-2u-16g.yaml").read_text())
+            names = {b["name"].split("/")[-1] for b in doc["module-bays"]}
+            assert phantom not in names, (system, riser, sorted(names))
+            assert re.sub(r"slot", "window", phantom) in names, (system, riser, sorted(names))
 
 
 def test_the_rear_row_is_the_r660s_moved_down_a_unit():
@@ -395,6 +410,159 @@ def test_the_2u_risers_do_not_collide_with_the_1u_riser_names():
     for r in ("1p", "2a", "3a", "4p"):
         assert (LIB / "components" / "dell" / f"riser-{r}-16g").is_dir()
         assert (LIB / "components" / "dell" / f"riser-{r}-2u-16g").is_dir()
+
+
+# --- what Dell's R760 service model measures ----------------------------------------------------------
+#
+# The model is Dell's own CAD (working/intake/dell/3d-models/r760.glb, not committed), read per part node from its
+# un-exploded assembly node `Main Assembly (1)`, in mm. Plan frame: rear wall at cad z 736.1 (the shell body's end, where
+# the rear row sits), plan y = 736.1 - cad z1; plan x = 209.0 - cad x1 (cad x -8.0 is the body's centre line).
+# Face frame: face x = 232.7 - cad x, face y = 95.7 - cad y. Each value below is the node's world box.
+
+CITING = ["bezel-2u-16g", "air-shroud-2u-16g", "system-cover-2u-16g", "backplane-cover-2u-16g", "fan-2u-16g"]
+
+
+@pytest.mark.parametrize("part", CITING)
+def test_the_parts_the_r760_model_measures_cite_it(part):
+    c = contract(f"dell/{part}@1")
+    text = json.dumps(c.get("provenance") or {})
+    assert "r760.glb" in text, f"{part} does not cite the R760 service model"
+    assert set(c["size-confidence"].values()) <= {"measured", "datasheet"}, (part, c["size-confidence"])
+    assert "measured" in c["size-confidence"].values(), part
+
+
+def test_no_contract_says_no_r760_model_is_held():
+    for path in (LIB / "components" / "dell").glob("*/v1/contract.yaml"):
+        text = " ".join(path.read_text().split())
+        assert "no R760 model" not in text, f"{path.parent.parent.name} still says no R760 model is held"
+
+
+def test_the_bezel_is_the_models_front_bezel():
+    c = contract("dell/bezel-2u-16g@1")
+    # `PEr760_ FrontBezel_-1.001` / `Body_1_33.001`: 430.7 x 81.0 x 19.7 (z 0.3..19.9, 0.4 into the drives' face at 19.5)
+    assert c["size"]["w"] == pytest.approx(430.7, abs=0.06) and c["size"]["h"] == pytest.approx(81.0, abs=0.06)
+    assert c["size"]["d"] == pytest.approx(19.7, abs=0.06)
+    assert set(c["size-confidence"].values()) == {"measured"}
+    plate = next(f for f in c["relief"]["features"] if f["node"] == "plate")
+    assert plate["out"] == pytest.approx(19.7, abs=0.06) and plate["confidence"] == "measured"
+    # `PEr760_ FrontBezel_ Button_-1.001` 19.9 x 43.8 at the left end (face x 25.3, y 21.2 -> bezel-local 0.0, 18.6) and
+    # `PEr760_ FrontBezel_ Hook_-1.001` 15.0 x 15.0 (face x 66.4, y 13.4 -> local 41.0, 10.8): the lock the key turns
+    release, lock = c["elements"]["release"], c["elements"]["lock"]
+    assert release["size"] == pytest.approx([19.9, 43.8], abs=0.06) and release["at"] == pytest.approx([0.0, 18.6], abs=0.1)
+    assert lock["size"] == pytest.approx([15.0, 15.0], abs=0.06) and lock["at"] == pytest.approx([41.0, 10.8], abs=0.1)
+    text = json.dumps(c["provenance"])
+    for node in ("FrontBezel_-1.001", "FrontBezel_ Button", "FrontBezel_ Hook", "BezelKey"):
+        assert node in text, f"the bezel's provenance does not name {node}"
+
+
+def test_every_front_seats_the_bezel_where_the_model_has_it():
+    # face x 25.4..456.1 and y 2.6..83.6 on the 482.6 x 86.8 face
+    for view, v in VIEWS.items():
+        if not view.startswith("front"):
+            continue
+        bezel = next(p for p in v["components"]["placements"] if p["id"] == "bezel")
+        assert bezel["at"] == pytest.approx([25.4, 2.6], abs=0.06), view
+
+
+def test_the_bezel_skin_draws_the_models_openings():
+    svg = (LIB / "components" / "dell" / "bezel-2u-16g" / "v1" / "skins" / "default.svg").read_text()
+    path = next(el for el in ET.fromstring(svg).iter("{http://www.w3.org/2000/svg}path") if el.get("id") == "plate")
+    subpaths = re.findall(r"M", path.get("d"))
+    # the face, and the 25 openings the FrontBezel body's triangles leave open: five hexagons across the middle row, a
+    # half-cell below each and above the first three, two interlocked rows between them (four cells each) and a part-cell
+    # above and below at each end (5 + 3 + 5 + 4 + 4 + 4 = 25)
+    assert len(subpaths) == 1 + 25
+    assert ET.fromstring(svg).get("viewBox") == "0 0 430.7 81.0"
+
+
+def test_the_air_shroud_is_the_models():
+    c = contract("dell/air-shroud-2u-16g@1")
+    # `PEr760_ Airshroud_ Assembly-1.001`: 434.4 x 187.7 (z 307.3..495.0 -> plan y 241.1..428.8)
+    assert c["size"]["w"] == pytest.approx(434.4, abs=0.06) and c["size"]["h"] == pytest.approx(187.7, abs=0.06)
+    assert set(c["size-confidence"].values()) == {"measured"}
+    bay = next(p for p in view_placements("top").values() if p["id"] == "air-shroud")
+    assert bay["at"] == pytest.approx([0.1, 241.1], abs=0.15)
+
+
+def test_the_system_cover_and_its_latch_are_the_models():
+    c = contract("dell/system-cover-2u-16g@1")
+    # `PEr760_ SystemCover_-1.001`: 444.0 x 571.6 (z 190.8..762.3, slid back 26.2 behind the rear wall as the R660's is);
+    # seated, its rear edge is the rear wall, plan y 0. The model's 444.0 is 5.0 past each wall of the ISM's 434.0 body and
+    # is drawn at 434.0 (the lint does not let a part reach past the face; the `system-cover-width` gap records it).
+    # `PEr760_ SystemCover_ Latch_ -1.001`: 40.0 x 72.8 at cad x -28.0..12.0, z 314.8..387.6 -> plan x 197.0, lid-local y 374.7
+    assert (c["size"]["w"], c["size"]["h"]) == pytest.approx((434.0, 571.6), abs=0.06)
+    assert c["size-confidence"] == {"w": "datasheet", "h": "measured"}
+    latch = c["elements"]["latch"]
+    assert latch["size"] == pytest.approx([40.0, 72.8], abs=0.06) and latch["at"] == pytest.approx([197.0, 374.7], abs=0.15)
+    assert c["elements"]["cover"]["size"] == pytest.approx([434.0, 571.6], abs=0.06)
+    assert "by analogy" not in json.dumps(c["provenance"]), "the latch is no longer placed by analogy with the R660"
+    assert "Latch_ -1.001" in json.dumps(c["provenance"]) and "444.0" in json.dumps(c["provenance"])
+    bay = next(p for p in view_placements("top").values() if p["id"] == "system-cover")
+    assert bay["at"] == pytest.approx([0.0, 0.0], abs=0.06)
+
+
+def test_the_backplane_cover_is_the_models():
+    c = contract("dell/backplane-cover-2u-16g@1")
+    # `PEr760_ DriveBackPlane_ Cover_ Assembly-1.001`: 444.0 x 54.0 (z 138.7..192.7 -> plan y 543.4..597.4) over the
+    # backplane (z 137.9..186.6), drawn 434.0 wide like the system cover. The 129.1 mm plate in front of it is the shell's
+    # fixed cage top (`PEr760_ Shell_ Top_`).
+    assert (c["size"]["w"], c["size"]["h"]) == pytest.approx((434.0, 54.0), abs=0.06)
+    assert c["size-confidence"] == {"w": "datasheet", "h": "measured"}
+    bay = next(p for p in view_placements("top").values() if p["id"] == "backplane-cover")
+    assert bay["at"] == pytest.approx([0.0, 543.4], abs=0.06)
+    decor = {d["id"]: d for d in VIEWS["top"]["panel"]["decor"]}
+    cage_top = decor["cage-top"]
+    assert cage_top["at"][1] == pytest.approx(597.4, abs=0.06)
+    assert cage_top["at"][1] + cage_top["size"][1] == pytest.approx(722.7, abs=0.06)
+    assert "Shell_ Top_" in cage_top["source"] and "r760.glb" in cage_top["source"]
+
+
+def test_the_fan_module_is_the_models():
+    c = contract("dell/fan-2u-16g@1")
+    # `CoolingFan Prefab (n)`: 64.0 x 58.2 on the plan (z 240.6..298.8 -> plan y 437.3..495.5) and 68.0 tall (cad y 24.5..92.6);
+    # the six boxes overlap by 0.2 on a 63.8 pitch, so the part is the pitch
+    assert (c["size"]["w"], c["size"]["h"], c["size"]["d"]) == pytest.approx((63.8, 58.2, 68.0), abs=0.06)
+    assert set(c["size-confidence"].values()) == {"measured"}
+    bays = view_bays("top")
+    xs = [16.6, 80.4, 144.2, 227.5, 291.3, 355.1]
+    for i, x in enumerate(xs, start=1):
+        b = bays[f"fan-{i}"]
+        assert b["at"] == pytest.approx([x, 437.3], abs=0.06), i
+        assert (b["size"]["w"], b["size"]["h"]) == pytest.approx((63.8, 58.2), abs=0.06), i
+    assert [bays[f"fan-{i}"]["at"][0] for i in (2, 3, 5, 6)] == pytest.approx([80.4, 144.2, 291.3, 355.1], abs=0.06)
+
+
+def test_the_smart_flow_vent_is_the_figures_coarse_grid():
+    # ISM figure 2 (fig-0002.png, 2.364 px/mm on the 482.6 face): eight columns on a 16.95 pitch and four rows on a 17.55 one
+    # between the vent plate's frame bars, drawn as the R660 draws its vent - a frame and a rectangle per opening
+    decor = VIEWS["front-sff16"]["panel"]["decor"]
+    holes = [d for d in decor if d.get("fill") == "#141719"]
+    assert len(holes) == 32, len(holes)
+    assert not any(d.get("pattern") == "grille" for d in decor), "the vent is drawn as openings, not a pattern"
+    xs = sorted({round(d["at"][0], 2) for d in holes})
+    ys = sorted({round(d["at"][1], 2) for d in holes})
+    assert len(xs) == 8 and len(ys) == 4
+    assert [b - a for a, b in zip(xs, xs[1:])] == pytest.approx([16.95] * 7, abs=0.1)
+    assert [b - a for a, b in zip(ys, ys[1:])] == pytest.approx([17.55] * 3, abs=0.1)
+    for d in holes:
+        assert 14.0 <= d["size"][0] <= 16.0 and 14.5 <= d["size"][1] <= 16.5
+        assert 169.8 <= d["at"][0] and d["at"][0] + d["size"][0] <= 312.8 and 3.6 <= d["at"][1] and d["at"][1] + d["size"][1] <= 83.2
+    text = " ".join(str(DEV["provenance"]["vent-plates"]).split())
+    assert "SMART FLOW VENT IS MEASURED" in text and "figure 2" in text and "16.95" in text
+
+
+def test_the_gaps_record_where_the_model_and_the_ism_disagree():
+    gaps = {g["what"]: g for g in DEV["gaps"] if g.get("reason") == "sources-disagree"}
+    for what in ("bezel-depth", "air-shroud-depth", "system-cover-width", "fan-module-length", "backplane-cover-extent",
+                 "rear-row-offset"):
+        assert what in gaps, f"no sources-disagree gap {what}"
+        note = " ".join(str(gaps[what]["note"]).split())
+        assert "r760.glb" in note and "ISM" in note, what
+
+
+def test_the_changelog_counts_seven_device_types():
+    text = (ROOT / "changelog.d" / "dell-r760.md").read_text()
+    assert "78 device types" not in text and "7 device types" in text
 
 
 # --- the build ----------------------------------------------------------------------------------------

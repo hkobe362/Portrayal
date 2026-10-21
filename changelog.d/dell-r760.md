@@ -6,8 +6,9 @@
   the ISM's figures 5 and 6. The rear for each riser configuration of ISM table 153 but the paddle build (0 to 10 and 13;
   the -2 full-length builds share their -1 rears and 12 repeats 7), with the slots numbered as Dell numbers them, the
   2 x 2.5 inch and 4 x E3.S rear drive modules in riser 3's place and the 4 x 2.5 inch module in riser 1's. The top view
-  carries the system board, 32 DIMM slots, heatsinks, air shroud, six fans and their cage and the covers. 78 builds, one
-  DCIM device type each, and an example.
+  carries the system board, 32 DIMM slots, heatsinks, air shroud, six fans and their cage and the covers. 78 builds,
+  exported as 7 device types (one per set of bays the builds render), and an example. The bezel, air shroud, covers,
+  cover latch and fan are measured from Dell's R760 service model.
 - Shared 2U 16th-generation parts for the R760's siblings: `dell/bezel-2u-16g`, `dell/control-panel-left-2u-16g`,
   the 86 mm supply `dell/psu-2400w-ac-86mm` with its plan `dell/psu-86mm-plan` and the adapter that seats a 60 mm supply in
   an 86 mm bay, `dell/psu-adapter-60mm-2u-16g`, the BOSS-N1 `dell/boss-n1-module-2u-16g` and `dell/boss-n1-blank-2u-16g`,

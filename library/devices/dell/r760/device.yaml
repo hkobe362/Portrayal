@@ -19,7 +19,7 @@
 format: 1
 kind: device
 name: r760
-version: 1.0.0
+version: 2.0.1
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R760
@@ -132,13 +132,15 @@ provenance:
       NO FIGURE DRAWS IT, so its place is the R740xd's, below the port, which that
       device's ISM states in words and this one's does not.
   bezel:
-    confidence: estimated
+    confidence: measured
     note: >-
-      DRAWN FITTED, as on the R740xd and R660, and taken off in the viewer: the
+      measured - DRAWN FITTED, as on the R740xd and R660, and taken off in the viewer: the
       optional security bezel (dell/bezel-2u-16g@1) covers the body between the ears, and
       `for:` names the drives behind it. THE ISM DRAWS NO FRONT FIGURE WITH THE BEZEL
-      ON; its isometric figure 37 is the source of the honeycomb, and every dimension of
-      the part is an estimate (see that part). The LCD bezel is not modelled.
+      ON; Dell's R760 service model (r760.glb, `R760_ FrontBezel`) gives its size, honeycomb,
+      button and lock, and the ISM's isometric figure 37 is the check on the honeycomb (see that
+      part). Its depth is where the model and the ISM disagree - see the bezel-depth gap. The LCD
+      bezel is not modelled.
   fronts:
     confidence: drawing
     note: >-
@@ -157,8 +159,11 @@ provenance:
       16 x 2.5 a Smart Flow vent plate over bays 8 to 15's width (169.8..312.8), on the 8 x 2.5 two
       blanking plates (170.3..308.5 and 311.0..452.0, the second's right end the less
       clear), on the E3.S fronts the three or two 84.8 mm vent plates of the slot grid. Each
-      is a dark mesh in a frame; the mesh is drawn as a grille pattern whose cell is an
-      estimate.
+      is a dark mesh in a frame. THE 16 x 2.5 FRONT'S SMART FLOW VENT IS MEASURED, as a coarse grid: ISM figure 2
+      (fig-0002.png, 2.364 px/mm) shows eight columns by four rows of openings between thick bars, a 16.95 pitch
+      across and 17.55 down, drawn as the R660 draws its vent (a frame and one rectangle per opening, 14.95 x 15.55).
+      The fan and cables seen through the openings are not drawn. The 8 x 2.5 and E3.S plates' mesh is still a
+      grille pattern whose cell is an estimate.
   rear:
     confidence: photo-measured
     note: >-
@@ -181,11 +186,13 @@ provenance:
       86 mm wide form factor'), so each bay accepts the 86 mm supply and the adapter module
       that carries a 60 mm one.
   rear-row:
-    confidence: photo-measured
+    confidence: measured
     note: >-
-      estimated - the LOM card (110.59), OCP card (164.95) and rear I/O board (250.5) are the R660's
+      measured - the LOM card (110.59), OCP card (164.95) and rear I/O board (250.5) are the R660's
       parts at the R660's x positions, the R660's y plus 44.0, and the ISM's table 5 names the same
-      items. THE FIGURE READS THE ROW A LITTLE RIGHT OF THE R660'S, and the offset is not resolved:
+      items. DELL'S R760 SERVICE MODEL (r760.glb) PUTS THE ROW AT THE R660'S x, offset 0.0 once each model is
+      referred to its own chassis centre line (see the rear-row-offset gap). THE ISM'S FIGURE READS THE ROW A LITTLE
+      RIGHT OF THE R660'S, which the model does not support and which is not applied:
       the LOM RJ45 pair 115.5..133.3 and 136.9..154.8 against the R660's openings at 114.7 and 136.7;
       the OCP cage 169.0..242.0 against 164.95..236.75 (about 4 right); the rear I/O's ID button
       centred at 259.2 against 252.4, its iDRAC RJ45 276.2 against 274.4 and its VGA 323.8 against
@@ -221,7 +228,15 @@ provenance:
       with the cover off, at 1.965 px/mm (the 434 body against 850 px; a perspective render, so
       about 2%), origin x 185 px and y 128 px (the rear wall): the six fans (plan x 12.7, 77.1,
       141.5, 225.4, 289.8, 354.2; y 432.6; each 64 x 61, a 19 mm gap in the middle) and their
-      cage, the air shroud and its wings, the risers' roofs, the cage's top plate. Figure 180
+      cage, the air shroud and its wings, the risers' roofs, the cage's top plate. THE AIR SHROUD, SYSTEM COVER (AND ITS
+      LATCH), BACKPLANE COVER AND SIX FANS ARE NOW MEASURED from Dell's R760 service model (r760.glb, un-exploded
+      `Main Assembly (1)` nodes, mapped to this plan with the rear wall at cad z 736.1 - plan y = 736.1 - cad z1 - and
+      plan x = 209.0 - cad x1, cad x -8.0 being the body's centre line): the shroud 434.4 x 187.7 at (0.1, 241.1), the
+      cover 434.0 x 571.6 (the model's 444.0 drawn on the body's 434.0) seated with its rear edge on the rear wall, the
+      backplane cover 434.0 x 54.0 at y 543.4, the fans 63.8 (their pitch; 64.0 with the handle) x 58.2 x 68.0 at y 437.3. The model's fan cage, heatsinks, DIMMs and board are not re-read here: the
+      figure's positions stand for them, 0.8 to 4.7 off the model's (the fan-module-length gap). Where the model and
+      the figure disagree the gaps say so. The fixed plate in front of the backplane cover (the shell's own cage top,
+      `PEr760_ Shell_ Top_-1.001`) is this view's panel decor. Figure 180
       (the system board's DIMM plan, 2233 x 1887 px) gives the board, the 32 DIMM sockets and
       the processor sockets at 5.2 px/mm, anchored on the 7.6 mm socket pitch (the R660's); it puts
       the board 424.4 wide against the R660 PCB's 423.1, the check. The two figures are joined by the
@@ -357,10 +372,85 @@ gaps:
     scope: [front]
     reason: needs-photo
     note: >-
-      no front view of the R760 with its bezel on is held; see dell/bezel-2u-16g@1, whose every dimension
-      is an estimate from the ISM's isometric figure.
+      no photograph or ISM figure of the R760's front with its bezel on, straight on, is held; see
+      dell/bezel-2u-16g@1, whose size, openings, button and lock are measured from Dell's R760 service
+      model (r760.glb) and checked against the ISM's isometric figure 37. What the model cannot give is
+      how the drawn face looks in light: the colour is this drawing's.
     wanted: >-
       a straight-on photograph of an R760 front with the security bezel
+  - what: bezel-depth
+    scope: [front]
+    reason: sources-disagree
+    note: >-
+      Dell's R760 service model (r760.glb, `PEr760_ FrontBezel_-1.001` `Body_1_33.001`) has the bezel 19.7
+      deep, cad z 0.3..19.9 against the drive carriers' front face at z 19.5 (20.2 with the LED-number
+      bodies); the ISM's table 10 gives 35.84 mm ear to front with the bezel and 22.0 without, which
+      is 13.84 off the drives' face (the R660's table gives the same 13.84). Same measure, different value
+      by 5.9 mm. The part draws the model's 19.7; the ISM's figure is the part's `depth` provenance.
+    wanted: >-
+      a side view or dimensioned drawing of the R760 with the bezel fitted
+  - what: air-shroud-depth
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      Dell's R760 service model (r760.glb, `PEr760_ Airshroud_ Assembly-1.001`) has the shroud 434.4 x 187.7
+      (plan y 241.1..428.8); the ISM's figure 15 (callout 4 on the embedded top view, 1.965 px/mm, about 2%)
+      read 430.0 x 166.0 at y 250.0..416.0 - 21.7 shorter. The model is drawn; the figure's reading is
+      kept in the part's provenance. The shroud's wings (ISM figure 15) are not in the model's bounding
+      box and are kept from the figure.
+    wanted: >-
+      a dimensioned top view of the R760's air shroud
+  - what: system-cover-width
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      Dell's R760 service model (r760.glb, `PEr760_ SystemCover_-1.001` and the drive backplane cover) has
+      the lids 444.0 wide, 5.0 over the body's 434.0 on each side; the ISM's table 10 gives 434.0 between
+      the ears (Xb) and the R660's model has its lid at 433.4 against the same 434.0. The model's 444.0 is
+      recorded in the parts' provenance and the lids are DRAWN AT THE BODY'S 434.0 (plan x 0.0): the lint
+      (L150) does not let a part reach past the face without a stated `chassis.overhang`, and a lid's side
+      flanges are not an overhang of the rack face. The depths, 571.6 and 54.0, are the model's.
+    wanted: >-
+      the R760's cover as a dimensioned drawing, or its folded edges' width
+  - what: fan-module-length
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      Dell's R760 service model (r760.glb, `CoolingFan Prefab (n)`) has each fan module 64.0 x 58.2 on the plan
+      and 68.0 tall; the ISM's figure 15 top view read 64.0 x 61.0 (about 2%), 2.8 longer. The model is drawn:
+      the bays are 63.8 x 58.2 at plan y 437.3 against the figure's 432.6, and 0.8 to 3.8 right of the figure's
+      x positions (the model's six modules span 402.5, the figure's 405.5). The width is the model's 63.8 pitch:
+      each module's 64.0 box includes a handle that overlaps its neighbour's by 0.2, which the lint (an overlap
+      of bays) does not allow.
+    wanted: >-
+      Dell's fan module dimensions
+  - what: backplane-cover-extent
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      The ISM's figure 15 shows one plate from the backplane to the chassis front (read 129.1 deep, plan y
+      593.6..722.7) and the part was first drawn as the 'drive backplane cover'. Dell's R760 service model
+      (r760.glb) has the removable `PEr760_ DriveBackPlane_ Cover_ Assembly-1.001` only 54.0 deep (plan y
+      543.4..597.4) over the backplane, and the plate in front of it is the shell's own fixed cage top,
+      `PEr760_ Shell_ Top_-1.001` (z 12.0..141.8, 129.8 deep, plan y 594.3..724.1 - the figure's reading to
+      1 mm). The cover part is the model's 54.0; the cage top is drawn as the top view's own panel decor, so
+      the look is the figure's.
+    wanted: >-
+      confirmation that the ISM's 'drive backplane cover' is the 54 mm piece
+  - what: rear-row-offset
+    scope: [rear]
+    reason: sources-disagree
+    note: >-
+      The model gives the rear row's x: r760.glb has the LOM card (`R760_ LOM`), OCP board and rear I/O board
+      (`R760_ RearIO`) at cad x -128.0, -61.5 and 22.0 (the left edges), exactly 8.0 left of the R660's
+      model (`PE_R660_LOM card_Assemby` -120.0, OCP -53.5, `PEr760_RearIOBoard_Assembly` 30.0) - and the R760's
+      chassis centre line is 8.0 left of the R660's (-8.0 against 0.0, from the two models' system covers, and the R760's shell and supplies).
+      So the row sits at the R660's x positions to 0.1 mm, and the R660's x are KEPT (measured). The ISM's
+      figure 10 reads the row 2 to 7 mm right of them (see the rear-row provenance); that is not
+      supported by the model and is within the figure's 1.5 mm and perspective, so it is recorded here, not applied.
+      The OCP board is 12.0 shallower in the R760's model (120.6 against 132.6); the R660's OCP parts are used.
+    wanted: >-
+      a dimensioned rear view of the R760's rear row
 
 groups:
   drives:
@@ -586,7 +676,7 @@ views:
         - &p-tag {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [393.0, 84.75], group: tags, rel-pos: 1}
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23]
           hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23]
           group: covers
@@ -602,9 +692,43 @@ views:
         - *d-rail-t
         - *d-rail-b
         - *d-cage
-        # the Smart Flow vent plate over the middle eight bays' width (ISM figure 2), and its mesh
+        # the Smart Flow vent plate over the middle eight bays' width (ISM figure 2), and its coarse grid as the R660 draws
+        # its vent: eight columns on a 16.95 pitch by four rows on a 17.55 one, each opening 14.95 x 15.55 between 2.0 mm
+        # bars. Measured from fig-0002.png at 2.364 px/mm (the face's 1141 px against 482.6): frame bars at x 173.4 and
+        # 308.8 and y 7.6 and 77.8.
         - {at: [169.8, 3.6], size: [143.0, 79.6], fill: '#3b4046'}
-        - {at: [176.0, 9.0], size: [130.8, 68.8], fill: '#1a1d21', pattern: grille, vent: 1, pattern-pitch: [4.2, 4.2]}
+        - {at: [174.4, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [174.4, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [174.4, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [174.4, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [191.35, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [191.35, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [191.35, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [191.35, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [208.3, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [208.3, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [208.3, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [208.3, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [225.25, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [225.25, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [225.25, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [225.25, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [242.2, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [242.2, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [242.2, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [242.2, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [259.15, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [259.15, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [259.15, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [259.15, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [276.1, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [276.1, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [276.1, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [276.1, 61.25], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [293.05, 8.6], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [293.05, 26.15], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [293.05, 43.7], size: [14.95, 15.55], fill: '#141719'}
+        - {at: [293.05, 61.25], size: [14.95, 15.55], fill: '#141719'}
       cutouts:
         - *c-power
         - *c-usb
@@ -645,7 +769,7 @@ views:
         - *p-tag
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15]
           hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15]
           group: covers
@@ -698,7 +822,7 @@ views:
         - *p-tag
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7]
           hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7]
           group: covers
@@ -752,7 +876,7 @@ views:
         - *p-tag
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [lff-drive-0, lff-drive-1, lff-drive-2, lff-drive-3, lff-drive-4, lff-drive-5, lff-drive-6, lff-drive-7, lff-drive-8, lff-drive-9, lff-drive-10, lff-drive-11]
           hides: [lff-drive-0, lff-drive-1, lff-drive-2, lff-drive-3, lff-drive-4, lff-drive-5, lff-drive-6, lff-drive-7, lff-drive-8, lff-drive-9, lff-drive-10, lff-drive-11]
           group: covers
@@ -815,7 +939,7 @@ views:
         - *p-tag
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15]
           hides: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15]
           group: covers
@@ -878,7 +1002,7 @@ views:
         - *p-tag
         - ref: dell/bezel-2u-16g@1
           id: bezel
-          at: [24.3, 2.2]
+          at: [25.4, 2.6]
           for: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15]
           hides: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15]
           group: covers
@@ -982,6 +1106,9 @@ views:
     # REAR AT y=0, FRONT AT y=722.7 - the library's plan convention. The seated modules project into it through
     # their bays' `plan:`; the rest is read off ISM figures 15 and 180 (see the top provenance).
     size: {w: 434.0, h: 722.7}
+    panel:
+      decor:
+        - {id: cage-top, at: [0.0, 597.4], size: [434.0, 125.3], fill: '#dfe2e5', confidence: measured, source: "r760.glb `PEr760_ Shell_ Top_-1.001`, the shell's fixed top over the front drive cage: cad z 12.0..141.8, 129.8 deep, plan y 594.3..724.1, drawn from where the backplane cover ends (597.4) to the front face (722.7) and across the body's 434.0 (the model's 479.4 includes the ear flanges)"}
     components:
       bays:
         - {id: dimm-b8, at: [13.25, 269.7], size: {w: 3.8, h: 133.4}, accepts: &dimm-acc [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 1, in: system-board, under: [system-cover, air-shroud]}
@@ -1016,12 +1143,12 @@ views:
         - {id: dimm-a3, at: [401.45, 269.7], size: {w: 3.8, h: 133.4}, accepts: *dimm-acc, default: common/dimm-plan@1, group: memory, rel-pos: 30, in: system-board, under: [system-cover, air-shroud]}
         - {id: dimm-a13, at: [408.95, 269.7], size: {w: 3.8, h: 133.4}, accepts: *dimm-acc, default: common/dimm-plan@1, group: memory, rel-pos: 31, in: system-board, under: [system-cover, air-shroud]}
         - {id: dimm-a5, at: [416.45, 269.7], size: {w: 3.8, h: 133.4}, accepts: *dimm-acc, default: common/dimm-plan@1, group: memory, rel-pos: 32, in: system-board, under: [system-cover, air-shroud]}
-        - {id: fan-1, at: [12.7, 432.6], size: {w: 64.0, h: 61.0}, accepts: &fan-acc [dell/fan-2u-16g@1], default: dell/fan-2u-16g@1, group: fans, rel-pos: 1, under: [system-cover]}
-        - {id: fan-2, at: [77.1, 432.6], size: {w: 64.0, h: 61.0}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 2, under: [system-cover]}
-        - {id: fan-3, at: [141.5, 432.6], size: {w: 64.0, h: 61.0}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 3, under: [system-cover]}
-        - {id: fan-4, at: [225.4, 432.6], size: {w: 64.0, h: 61.0}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 4, under: [system-cover]}
-        - {id: fan-5, at: [289.8, 432.6], size: {w: 64.0, h: 61.0}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 5, under: [system-cover]}
-        - {id: fan-6, at: [354.2, 432.6], size: {w: 64.0, h: 61.0}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 6, under: [system-cover]}
+        - {id: fan-1, at: [16.6, 437.3], size: {w: 63.8, h: 58.2}, accepts: &fan-acc [dell/fan-2u-16g@1], default: dell/fan-2u-16g@1, group: fans, rel-pos: 1, under: [system-cover]}
+        - {id: fan-2, at: [80.4, 437.3], size: {w: 63.8, h: 58.2}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 2, under: [system-cover]}
+        - {id: fan-3, at: [144.2, 437.3], size: {w: 63.8, h: 58.2}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 3, under: [system-cover]}
+        - {id: fan-4, at: [227.5, 437.3], size: {w: 63.8, h: 58.2}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 4, under: [system-cover]}
+        - {id: fan-5, at: [291.3, 437.3], size: {w: 63.8, h: 58.2}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 5, under: [system-cover]}
+        - {id: fan-6, at: [355.1, 437.3], size: {w: 63.8, h: 58.2}, accepts: *fan-acc, default: dell/fan-2u-16g@1, group: fans, rel-pos: 6, under: [system-cover]}
       placements:
         - {ref: dell/system-board-r760@1, id: system-board, at: [5.0, 115.4], group: interior, rel-pos: 1,
            under: [heatsink-1, heatsink-2, air-shroud, fan-cage, system-cover, backplane-cover, fan-1, fan-2, fan-3, fan-4, fan-5, fan-6, dimm-b8, dimm-b16, dimm-b2, dimm-b10, dimm-b6, dimm-b14, dimm-b4, dimm-b12, dimm-b9, dimm-b1, dimm-b15, dimm-b7, dimm-b11, dimm-b3, dimm-b13, dimm-b5, dimm-a8, dimm-a16, dimm-a2, dimm-a10, dimm-a6, dimm-a14, dimm-a4, dimm-a12, dimm-a9, dimm-a1, dimm-a15, dimm-a7, dimm-a11, dimm-a3, dimm-a13, dimm-a5]}
@@ -1030,10 +1157,10 @@ views:
         # The standard and 2U high-performance heatsinks are taller; their plan is not drawn apart.
         - {ref: dell/heatsink-1u-16g@1, id: heatsink-1, at: [279.4, 243.9], group: processors, rel-pos: 1, in: system-board, under: [system-cover, air-shroud]}
         - {ref: dell/heatsink-1u-16g@1, id: heatsink-2, at: [65.2, 243.9], group: processors, rel-pos: 2, in: system-board, under: [system-cover, air-shroud]}
-        - {ref: dell/air-shroud-2u-16g@1, id: air-shroud, at: [3.0, 250.0], group: interior, rel-pos: 3, in: system-board, under: [system-cover]}
+        - {ref: dell/air-shroud-2u-16g@1, id: air-shroud, at: [0.1, 241.1], group: interior, rel-pos: 3, in: system-board, under: [system-cover]}
         - {ref: dell/fan-cage-2u-16g@1, id: fan-cage, at: [10.2, 423.4], group: interior, rel-pos: 2, under: [system-cover], frames: [fan-1, fan-2, fan-3, fan-4, fan-5, fan-6]}
-        - {ref: dell/system-cover-2u-16g@1, id: system-cover, at: [0.3, 0.0], group: covers, rel-pos: 1, under: [backplane-cover]}
-        - {ref: dell/backplane-cover-2u-16g@1, id: backplane-cover, at: [4.0, 593.6], group: covers, rel-pos: 2}
+        - {ref: dell/system-cover-2u-16g@1, id: system-cover, at: [0.0, 0.0], group: covers, rel-pos: 1, under: [backplane-cover]}
+        - {ref: dell/backplane-cover-2u-16g@1, id: backplane-cover, at: [0.0, 543.4], group: covers, rel-pos: 2}
   bottom:
     size: {w: 434.0, h: 722.7}
     panel:

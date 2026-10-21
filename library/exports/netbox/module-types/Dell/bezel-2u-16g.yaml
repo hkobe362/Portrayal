@@ -1,11 +1,11 @@
 ---
 manufacturer: Dell
 model: bezel-2u-16g
-description: The optional security bezel for a 16th-generation 2U PowerEdge (R760) - a honeycomb of large
-  hexagonal openings between two end plates, a keylock and a release button at the left end
-comments: 'The optional security bezel for a 16th-generation 2U PowerEdge (R760) - a honeycomb of large
-  hexagonal openings between two end plates, a keylock and a release button at the left end. Open in the
-  hexagons, so the drives show through. Unbranded
+description: The optional security bezel for a 16th-generation 2U PowerEdge (R760) - a honeycomb of hexagonal
+  openings between two end plates, a keylock and a release button at the left end
+comments: 'The optional security bezel for a 16th-generation 2U PowerEdge (R760) - a honeycomb of hexagonal
+  openings between two end plates, a keylock and a release button at the left end. Open in the hexagons,
+  so the drives show through. Unbranded
 
 
   Facts carried in the model that this schema has no field for:

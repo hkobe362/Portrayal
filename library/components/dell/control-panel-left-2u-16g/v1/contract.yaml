@@ -15,7 +15,7 @@ provenance:
   marks: >-
     photo-measured, panel-local mm: the five status glyphs centred at y 10.6, 14.9, 19.4, 23.6 and 28.3 (drive, temperature, electrical, memory, PCIe - ISM table 2's order; the R660's glyph art moved from its 8.25 to 29.28), the italic i at y 4.7..6.9, the health bar 2.05 wide at x 7.0 from y 10.2 to 27.2 (17.0 long - twice the R660's, which splits that length between the health bar and the Quick Sync bar), and the Quick Sync bar below it to 36.4 with the wireless arcs at about 38.5.
   depth: >-
-    BORROWED from dell/control-panel-left-16g@1 (itself borrowed from dell/control-panel-left-14g@1's measured 22.80); no R760 model is held.
+    BORROWED from dell/control-panel-left-16g@1 (itself borrowed from dell/control-panel-left-14g@1's measured 22.80); Dell's R760 service model (r760.glb, `R760_ LeftCP`) is held but its depth was not read from it in the change that measured the covers and fans.
   quick-sync-is-optional: >-
     the ISM calls the Quick Sync 2 indicator optional (figure 8 against figure 7); every R760 front figure held draws the bar below the health bar as a dark strip, so it is drawn. A build without it is not modelled as a variant.
 size: {w: 10.1, h: 82.0, d: 22.8}

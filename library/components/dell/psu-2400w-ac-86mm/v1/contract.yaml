@@ -54,7 +54,7 @@ relief:
     color: '#d9661a'
     confidence: estimated
     source: >-
-      borrowed from the 60 mm supply's latch (dell/psu-1400w-ac-60mm@1, measured on Dell's R660 service model); no R760 model is held
+      borrowed from the 60 mm supply's latch (dell/psu-1400w-ac-60mm@1, measured on Dell's R660 service model); Dell's R760 service model (r760.glb, `PEr760_ PowerSupplyUnit_ Assembly-1.001`) is held but this latch was not read from it in the change that measured the covers and fans
 parts:
   - {ref: std/c20-inlet@1, id: inlet, at: [49.7, 8.4], rotate: 90, behind: true}
 elements:
