@@ -67,9 +67,10 @@ provenance:
     confidence: datasheet
     note: >-
       NOT MODELLED. The guide's inventory (Table 68) ships two mounting brackets and mounting screws and
-      says the switch mounts in a two-post or four-post rack; the datasheet lists the four-post kit EX-4PST-RMK
-      as a separate item. No figure measures the bracket position, so no ear position is written and no
-      rail kit is listed in chassis.kits. The kit's part number is recorded here for the later dedupe.
+      says the switch mounts in a two-post or four-post rack; the datasheet lists the kits EX-4PST-RMK
+      (four-post), EX-RMK (rack-mount) and EX-WMK (wall-mount) as separate items. No figure measures the
+      bracket position, so no ear position is written and no rail kit is listed in chassis.kits. The kit's
+      part number is recorded here for the later dedupe.
   front-ports:
     confidence: photo-measured
     note: >-
@@ -198,9 +199,11 @@ provenance:
       community NetBox elevation (estimated); see the components.
   interface-names:
     note: >-
-      Not printed and not modelled. Junos names the jacks ge-0/0/0 to ge-0/0/23 and the built-in QSFP+
-      ports et-0/1/0 to et-0/1/3 in the guide's examples, but no table in the guide states the numbering
-      rule for this slice's ports, so they stay out of the file as a block and go here.
+      Not printed and not modelled. The guide's configuration examples name the 48-port switch's jacks
+      ge-0/0/0 to ge-0/0/47 and the uplink module's ports ge-0/2/0 to ge-0/2/3 and xe-0/2/0 to xe-0/2/3;
+      the 24-port range ge-0/0/0 to ge-0/0/23 follows by the same rule and is not stated. The built-in
+      QSFP+ ports' names are stated nowhere held. No table gives the numbering rule, so the names stay
+      out of the file as a block and go here.
   lifecycle:
     note: >-
       Searched Juniper's end-of-life notices and third-party trackers on 2026-10-21. Trackers list end-of-life
