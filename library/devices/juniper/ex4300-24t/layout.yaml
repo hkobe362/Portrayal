@@ -81,7 +81,7 @@ provenance:
       14.13 and 102.89 for the first columns of its first two blocks), so the column pitch is about
       13.98, the registry's 13.97 ganged-jack pitch (0.550 in), and the blocks start 88.8 mm apart, a
       4.98 mm gutter. Row centres read 14.9 and 29.6 mm down on this photograph and 15.5 and 30.7 on
-      the 48P one: the pooled 15.2 and 30.0 are used (a 14.8 step, which is also what the registry's
+      the 48P one: the pooled 15.2 and 30.0 were the first draft, and the render laid over the photograph at matched scale sat 0.8 mm high, so the rows centre 16.0 and 30.8 mm down (a 14.8 step, which is also what the registry's
       ganged-jack notes allow for a 1U face; the registry's 12.09 is a magjack-only figure). The top
       row is the same part turned 180 so that its keyway is up, as the photograph shows lamp tabs
       above the upper jacks and below the lower. Past the second block the plate is bare to the
@@ -145,7 +145,7 @@ provenance:
       at (36.2, 8.4), the vertical USB port at (35.1, 28.7), fan module 0 from 49.1 to 97.7, four
       QSFP+ ports from 108.0 to 183.5 on the registry's 19.0 mm pitch (the figure's separators read
       107.9, 127.4, 146.8, 165.8 and 184.3), fan slot numbers beside the block, fan module 1 from
-      194.9 to 243.5, power supply slot 0 from 257.8 and slot 1 from 347.2, each 84.0 mm wide, and a
+      194.9 to 243.5, power supply slot 0 from 257.5 and slot 1 from 348.9 (module edges found in the 600 dpi figure at 257.3 and 348.7), each 84.0 mm wide, and a
       strip at the right edge. The serial number label (callout 4) sits at 101.3 to 123.2 x 13.6 to
       18.1. The figure is shared by the 24-port and 48-port models.
   rear-qsfp-lamps:
@@ -371,6 +371,8 @@ views:
     size: {w: 441.0, h: 43.7}
     panel:
       decor:
+        - {id: shell-1, kind: jack-shell, at: [5.8, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
+        - {id: shell-2, kind: jack-shell, at: [94.6, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
         - {at: [29.8, 0.8], size: [320.2, 6.2], pattern: vent, vent: 1.0}
         - {at: [12.5, 41.0], size: [75.5, 2.2], pattern: vent, vent: 1.0}
         - {at: [101.3, 41.0], size: [256.0, 2.2], pattern: vent, vent: 1.0}
@@ -396,7 +398,7 @@ views:
       blocks:
         - id: rj45
           ref: common/rj45-ganged-eth@1
-          at: [7.85, 9.7]
+          at: [7.85, 10.5]
           count: 24
           rows: 2
           pitch: 13.97
@@ -407,7 +409,7 @@ views:
           cutouts: true
           rotate: {top: 180}
           attrs: {media: rj45, speed: 1g}
-          numerals: {dx-by-row: [6.35, 8.65], dy-top: 29.5, dy-bottom: 15.5, font-size: 1.7, anchor: middle, fill: '#e4e6e9'}
+          numerals: {dx-by-row: [6.35, 8.65], dy-top: 28.7, dy-bottom: 14.7, font-size: 1.7, anchor: middle, fill: '#e4e6e9'}
       placements:
         - {block: rj45}
         - {ref: juniper/ex4300-console-usb-mini@1, id: console, at: [355.75, 3.5], group: mgmt, rel-pos: 0}
@@ -469,12 +471,12 @@ views:
            accepts: [juniper/ex4300-fan-afo@1, juniper/ex4300-fan-afi@1], default: juniper/ex4300-fan-afo@1}
         - {id: fan-1, at: [194.9, 0.85], size: {w: 48.6, h: 42.0}, group: fans, rel-pos: 1,
            accepts: [juniper/ex4300-fan-afo@1, juniper/ex4300-fan-afi@1], default: juniper/ex4300-fan-afo@1}
-        - {id: psu-0, at: [257.8, 0.85], size: {w: 84.0, h: 42.0}, group: psus, rel-pos: 0,
+        - {id: psu-0, at: [257.5, 0.85], size: {w: 84.0, h: 42.0}, group: psus, rel-pos: 0,
            accepts: [juniper/ex4300-jpsu-350-ac-afo@1, juniper/ex4300-jpsu-350-ac-afi@1, juniper/ex4300-jpsu-715-ac-afo@1,
                      juniper/ex4300-jpsu-1100-ac-afo@1, juniper/ex4300-jpsu-550-dc-afo@1, juniper/ex4300-jpsu-550-dc-afi@1,
                      juniper/ex4300-psu-blank@1],
            default: juniper/ex4300-jpsu-350-ac-afo@1}
-        - {id: psu-1, at: [347.2, 0.85], size: {w: 84.0, h: 42.0}, group: psus, rel-pos: 1,
+        - {id: psu-1, at: [348.9, 0.85], size: {w: 84.0, h: 42.0}, group: psus, rel-pos: 1,
            accepts: [juniper/ex4300-jpsu-350-ac-afo@1, juniper/ex4300-jpsu-350-ac-afi@1, juniper/ex4300-jpsu-715-ac-afo@1,
                      juniper/ex4300-jpsu-1100-ac-afo@1, juniper/ex4300-jpsu-550-dc-afo@1, juniper/ex4300-jpsu-550-dc-afi@1,
                      juniper/ex4300-psu-blank@1],

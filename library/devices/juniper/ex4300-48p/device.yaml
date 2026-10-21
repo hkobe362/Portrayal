@@ -75,10 +75,11 @@ provenance:
       102.89, 191.64 and 280.55 for the first column of the next three (the 24T photograph reads 14.33
       and 103.08), so the column pitch is 13.98, the registry's 13.97 ganged-jack pitch (0.550 in), and
       the blocks start 88.8 mm apart, a 4.98 mm gutter. Row centres read 15.5 and 30.7 mm down on this
-      photograph and 14.9 and 29.6 on the 24T one: the pooled 15.2 and 30.0 are used (a 14.8 step, which
-      is also what the registry's ganged-jack notes allow for a 1U face; the registry's 12.09 is a magjack-only
-      figure). The top row is the same part turned 180 so that its keyway is up, as the photograph shows
-      lamp tabs above the upper jacks and below the lower.
+      photograph and 14.9 and 29.6 on the 24T one: the pooled 15.2 and 30.0 were the first draft, and
+      the render laid over the photograph at matched scale sat 0.8 mm high, so the rows centre 16.0 and
+      30.8 mm down (a 14.8 step, which is also what the registry's ganged-jack notes allow for a 1U face;
+      the registry's 12.09 is a magjack-only figure). The top row is the same part turned 180 so that
+      its keyway is up, as the photograph shows lamp tabs above the upper jacks and below the lower.
   port-numbering:
     confidence: photo-measured
     note: >-
@@ -136,8 +137,9 @@ provenance:
       8.4), the vertical USB port at (35.1, 28.7), fan module 0 from 49.1 to 97.7, four QSFP+ ports from
       108.0 to 183.5 on the registry's 19.0 mm pitch (the figure's separators read 107.9, 127.4, 146.8,
       165.8 and 184.3), fan slot numbers beside the block, fan module 1 from 194.9 to 243.5, power supply
-      slot 0 from 257.8 and slot 1 from 347.2, each 84.0 mm wide, and a strip at the right edge. The serial
-      number label (callout 4) sits at 101.3 to 123.2 x 13.6 to 18.1.
+      slot 0 from 257.5 and slot 1 from 348.9 (module edges found in the 600 dpi figure at 257.3 and 348.7),
+      each 84.0 mm wide, and a strip at the right edge. The serial number label (callout 4) sits at 101.3
+      to 123.2 x 13.6 to 18.1.
   rear-qsfp-lamps:
     confidence: drawing
     note: >-
@@ -348,6 +350,10 @@ views:
     size: {w: 441.0, h: 43.7}
     panel:
       decor:
+      - {id: shell-1, kind: jack-shell, at: [5.8, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
+      - {id: shell-2, kind: jack-shell, at: [94.6, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
+      - {id: shell-3, kind: jack-shell, at: [183.4, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
+      - {id: shell-4, kind: jack-shell, at: [272.2, 10.3], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
       - {at: [29.8, 0.8], size: [320.2, 6.2], pattern: vent, vent: 1.0}
       - {at: [12.5, 41.0], size: [75.5, 2.2], pattern: vent, vent: 1.0}
       - {at: [101.3, 41.0], size: [75.5, 2.2], pattern: vent, vent: 1.0}
@@ -355,54 +361,54 @@ views:
       - {at: [278.9, 41.0], size: [75.5, 2.2], pattern: vent, vent: 1.0}
       - {id: lcd, kind: display, at: [377.2, 6.8], size: [35.6, 9.6], rx: 0.6, fill: '#404c40'}
       cutouts:
-      - {id: port-0, at: [7.85, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-1, at: [7.85, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-2, at: [21.82, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-3, at: [21.82, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-4, at: [35.79, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-5, at: [35.79, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-6, at: [49.76, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-7, at: [49.76, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-8, at: [63.73, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-9, at: [63.73, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-10, at: [77.7, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-11, at: [77.7, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-12, at: [96.65, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-13, at: [96.65, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-14, at: [110.62, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-15, at: [110.62, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-16, at: [124.59, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-17, at: [124.59, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-18, at: [138.56, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-19, at: [138.56, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-20, at: [152.53, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-21, at: [152.53, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-22, at: [166.5, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-23, at: [166.5, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-24, at: [185.45, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-25, at: [185.45, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-26, at: [199.42, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-27, at: [199.42, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-28, at: [213.39, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-29, at: [213.39, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-30, at: [227.36, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-31, at: [227.36, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-32, at: [241.33, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-33, at: [241.33, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-34, at: [255.3, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-35, at: [255.3, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-36, at: [274.25, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-37, at: [274.25, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-38, at: [288.22, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-39, at: [288.22, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-40, at: [302.19, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-41, at: [302.19, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-42, at: [316.16, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-43, at: [316.16, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-44, at: [330.13, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-45, at: [330.13, 24.5], size: [12.7, 11.0], shape: rect}
-      - {id: port-46, at: [344.1, 9.7], size: [12.7, 11.0], shape: rect}
-      - {id: port-47, at: [344.1, 24.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-0, at: [7.85, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-1, at: [7.85, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-2, at: [21.82, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-3, at: [21.82, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-4, at: [35.79, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-5, at: [35.79, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-6, at: [49.76, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-7, at: [49.76, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-8, at: [63.73, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-9, at: [63.73, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-10, at: [77.7, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-11, at: [77.7, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-12, at: [96.65, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-13, at: [96.65, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-14, at: [110.62, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-15, at: [110.62, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-16, at: [124.59, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-17, at: [124.59, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-18, at: [138.56, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-19, at: [138.56, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-20, at: [152.53, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-21, at: [152.53, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-22, at: [166.5, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-23, at: [166.5, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-24, at: [185.45, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-25, at: [185.45, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-26, at: [199.42, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-27, at: [199.42, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-28, at: [213.39, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-29, at: [213.39, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-30, at: [227.36, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-31, at: [227.36, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-32, at: [241.33, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-33, at: [241.33, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-34, at: [255.3, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-35, at: [255.3, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-36, at: [274.25, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-37, at: [274.25, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-38, at: [288.22, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-39, at: [288.22, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-40, at: [302.19, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-41, at: [302.19, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-42, at: [316.16, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-43, at: [316.16, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-44, at: [330.13, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-45, at: [330.13, 25.3], size: [12.7, 11.0], shape: rect}
+      - {id: port-46, at: [344.1, 10.5], size: [12.7, 11.0], shape: rect}
+      - {id: port-47, at: [344.1, 25.3], size: [12.7, 11.0], shape: rect}
       - {id: console, at: [355.75, 3.5], size: [7.9, 4.6], shape: rect}
       - {id: btn-menu, at: [419.15, 5.95], size: [6.1, 6.1], shape: circle}
       - {id: btn-enter, at: [419.15, 14.15], size: [6.1, 6.1], shape: circle}
@@ -475,313 +481,313 @@ views:
       placements:
       - ref: common/rj45-ganged-eth@1
         id: port-0
-        at: [7.85, 9.7]
+        at: [7.85, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 0
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-1
-        at: [7.85, 24.5]
+        at: [7.85, 25.3]
         group: rj45
         rel-pos: 1
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-2
-        at: [21.82, 9.7]
+        at: [21.82, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 2
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-3
-        at: [21.82, 24.5]
+        at: [21.82, 25.3]
         group: rj45
         rel-pos: 3
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-4
-        at: [35.79, 9.7]
+        at: [35.79, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 4
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-5
-        at: [35.79, 24.5]
+        at: [35.79, 25.3]
         group: rj45
         rel-pos: 5
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-6
-        at: [49.76, 9.7]
+        at: [49.76, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 6
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-7
-        at: [49.76, 24.5]
+        at: [49.76, 25.3]
         group: rj45
         rel-pos: 7
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-8
-        at: [63.73, 9.7]
+        at: [63.73, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 8
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-9
-        at: [63.73, 24.5]
+        at: [63.73, 25.3]
         group: rj45
         rel-pos: 9
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-10
-        at: [77.7, 9.7]
+        at: [77.7, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 10
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-11
-        at: [77.7, 24.5]
+        at: [77.7, 25.3]
         group: rj45
         rel-pos: 11
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-12
-        at: [96.65, 9.7]
+        at: [96.65, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 12
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-13
-        at: [96.65, 24.5]
+        at: [96.65, 25.3]
         group: rj45
         rel-pos: 13
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-14
-        at: [110.62, 9.7]
+        at: [110.62, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 14
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-15
-        at: [110.62, 24.5]
+        at: [110.62, 25.3]
         group: rj45
         rel-pos: 15
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-16
-        at: [124.59, 9.7]
+        at: [124.59, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 16
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-17
-        at: [124.59, 24.5]
+        at: [124.59, 25.3]
         group: rj45
         rel-pos: 17
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-18
-        at: [138.56, 9.7]
+        at: [138.56, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 18
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-19
-        at: [138.56, 24.5]
+        at: [138.56, 25.3]
         group: rj45
         rel-pos: 19
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-20
-        at: [152.53, 9.7]
+        at: [152.53, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 20
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-21
-        at: [152.53, 24.5]
+        at: [152.53, 25.3]
         group: rj45
         rel-pos: 21
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-22
-        at: [166.5, 9.7]
+        at: [166.5, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 22
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-23
-        at: [166.5, 24.5]
+        at: [166.5, 25.3]
         group: rj45
         rel-pos: 23
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-24
-        at: [185.45, 9.7]
+        at: [185.45, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 24
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-25
-        at: [185.45, 24.5]
+        at: [185.45, 25.3]
         group: rj45
         rel-pos: 25
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-26
-        at: [199.42, 9.7]
+        at: [199.42, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 26
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-27
-        at: [199.42, 24.5]
+        at: [199.42, 25.3]
         group: rj45
         rel-pos: 27
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-28
-        at: [213.39, 9.7]
+        at: [213.39, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 28
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-29
-        at: [213.39, 24.5]
+        at: [213.39, 25.3]
         group: rj45
         rel-pos: 29
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-30
-        at: [227.36, 9.7]
+        at: [227.36, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 30
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-31
-        at: [227.36, 24.5]
+        at: [227.36, 25.3]
         group: rj45
         rel-pos: 31
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-32
-        at: [241.33, 9.7]
+        at: [241.33, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 32
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-33
-        at: [241.33, 24.5]
+        at: [241.33, 25.3]
         group: rj45
         rel-pos: 33
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-34
-        at: [255.3, 9.7]
+        at: [255.3, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 34
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-35
-        at: [255.3, 24.5]
+        at: [255.3, 25.3]
         group: rj45
         rel-pos: 35
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-36
-        at: [274.25, 9.7]
+        at: [274.25, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 36
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-37
-        at: [274.25, 24.5]
+        at: [274.25, 25.3]
         group: rj45
         rel-pos: 37
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-38
-        at: [288.22, 9.7]
+        at: [288.22, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 38
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-39
-        at: [288.22, 24.5]
+        at: [288.22, 25.3]
         group: rj45
         rel-pos: 39
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-40
-        at: [302.19, 9.7]
+        at: [302.19, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 40
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-41
-        at: [302.19, 24.5]
+        at: [302.19, 25.3]
         group: rj45
         rel-pos: 41
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-42
-        at: [316.16, 9.7]
+        at: [316.16, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 42
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-43
-        at: [316.16, 24.5]
+        at: [316.16, 25.3]
         group: rj45
         rel-pos: 43
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-44
-        at: [330.13, 9.7]
+        at: [330.13, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 44
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-45
-        at: [330.13, 24.5]
+        at: [330.13, 25.3]
         group: rj45
         rel-pos: 45
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-46
-        at: [344.1, 9.7]
+        at: [344.1, 10.5]
         rotate: 180
         group: rj45
         rel-pos: 46
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
       - ref: common/rj45-ganged-eth@1
         id: port-47
-        at: [344.1, 24.5]
+        at: [344.1, 25.3]
         group: rj45
         rel-pos: 47
         attrs: {media: rj45, speed: 1g, poe: 802.3at}
@@ -904,7 +910,7 @@ views:
         - juniper/ex4300-fan-afi@1
         default: juniper/ex4300-fan-afo@1
       - id: psu-0
-        at: [257.8, 0.85]
+        at: [257.5, 0.85]
         size: {w: 84.0, h: 42.0}
         group: psus
         rel-pos: 0
@@ -918,7 +924,7 @@ views:
         - juniper/ex4300-psu-blank@1
         default: juniper/ex4300-jpsu-1100-ac-afo@1
       - id: psu-1
-        at: [347.2, 0.85]
+        at: [348.9, 0.85]
         size: {w: 84.0, h: 42.0}
         group: psus
         rel-pos: 1
