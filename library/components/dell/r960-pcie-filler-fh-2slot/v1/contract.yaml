@@ -1,0 +1,25 @@
+format: 1
+kind: module
+name: r960-pcie-filler-fh-2slot
+version: 1.0.0
+class: blank
+behaviour: fills
+profile: server
+description: >-
+  Vented double-width slot filler of the PowerEdge R960's GPU riser configuration - the plate over
+  a full-height slot that takes a double-width card (slots 3, 6, 8 and 11)
+provenance:
+  sources: >-
+    ESTIMATED. R960 ISM table 88 and the technical guide's table 17 give configuration 3's slots 3,
+    6, 8 and 11 as double-width, full-length full-height; the ISM draws no rear view of that
+    configuration (figures 10 and the technical guide's 7-9 are configurations 0, 1 and 2), and
+    no photograph of a filler over a double-width slot is held.
+  size: >-
+    estimated - two full-height slot pitches, 90.0 x 38.7 (the single filler's 90.0 x 18.42 over a
+    20.32 pitch, twice, less the web): the plate is drawn as the single filler's vent window
+    twice, one above the other.
+  depth: >-
+    NOT KNOWN; drawn as a plate.
+size: {w: 90.0, h: 38.7}
+size-confidence: {w: estimated, h: estimated}
+skins: [default]

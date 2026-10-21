@@ -1,0 +1,31 @@
+format: 1
+kind: component
+name: r960-support-bar
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The support bar of the PowerEdge R960 seen from above - the steel bar across the chassis behind the air shroud, held
+  by blue captive screws
+provenance:
+  sources: >-
+    R960 ISM figure 12 (callout 10, "Support bar") and the "Removing / Installing the support bar" procedures
+    (figures 39 and 40: a different bar for full-length and half-length risers).
+  size: >-
+    photo-measured - 436.0 x 35.0 from figure 12 (px 220..1015 across at 1.813; 815..880 down at 1.863).
+  variants: >-
+    ISM figures 39 and 40 show a support bar for full-length risers and one for half-length risers; only the one in
+    figure 12 (half length) is drawn.
+size: {w: 436.0, h: 35.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  features:
+  - node: bar
+    out: 4.0
+    color: '#b9bec4'
+    confidence: estimated
+    source: sheet steel standing above the shroud's plate; not measured
+elements:
+  bar: {at: [0.0, 0.0], size: [436.0, 35.0], class: bezel}
+skins: [default]

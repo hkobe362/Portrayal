@@ -552,4 +552,5 @@ def test_the_comparison_layer_can_now_reach_them():
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 83, n
+    # 84 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
+    assert n == 84, n

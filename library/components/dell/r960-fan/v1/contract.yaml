@@ -1,0 +1,29 @@
+format: 1
+kind: module
+name: r960-fan
+version: 1.0.0
+class: fan
+behaviour: fills
+profile: server
+description: >-
+  Dual-rotor hot-plug fan module of the PowerEdge R960 seen from above - one of up to six in the fan cage,
+  with its orange release latch
+provenance:
+  sources: >-
+    R960 ISM figure 12 (the six fans in the fan cage, numbered 1 to 6 across the front edge of the cage, each with an
+    orange latch), the "Cooling fan specifications" section (table 12: "up to six sets of Standard cooling fans")
+    and the "Removing a cooling fan" procedure (figures 44 and 45); the spec sheet's "Up to 6 sets (dual fan
+    module) hot plug fans".
+  size: >-
+    photo-measured - 64.0 x 86.0 from figure 12: the modules are 115 to 120 px across at 1.813 px/mm (63 to 66 mm; fans
+    1 to 6 at px 255..370, 370..488, 488..608, 640..755, 757..873, 873..990) and 160 px deep at 1.863. The
+    gap between fans 3 and 4 holds the cage's centre post.
+  depth: >-
+    NOT MEASURED. No R960 figure shows a fan from the side; 60.0 is estimated by analogy with a 4U fan wall.
+  power: >-
+    NOT STATED in the R960 documents held.
+size: {w: 64.0, h: 86.0, d: 60.0}
+size-confidence: {w: photo-measured, h: photo-measured, d: estimated}
+elements:
+  body: {at: [0.0, 0.0], size: [64.0, 86.0], class: bezel}
+skins: [default]

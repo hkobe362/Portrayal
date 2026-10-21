@@ -1,0 +1,20 @@
+format: 1
+kind: component
+name: r960-riser-2-plan
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  riser 2 of the PowerEdge R960 seen from above - the cage in the middle of the rear, under the
+  riser 3 cage, with its blue release tab
+provenance:
+  size: >-
+    photo-measured - R960 ISM figure 15 (the machine from above with the risers lifted out, 1227 x 1854 at 300
+    ppi): the cage 149.7 wide as the rear face gives the riser (ISM figure 10) and about 250 long
+    at 1.86 px/mm down, with the 2.7% scale mismatch between the figure's axes that
+    dell/r960-riser-plan@1 records.
+  is-a-plan: >-
+    A plan part: what the top view draws where the rear bay projects the riser.
+size: {w: 149.7, h: 250.0}
+size-confidence: {w: photo-measured, h: estimated}
+skins: [default]

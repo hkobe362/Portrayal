@@ -1,0 +1,26 @@
+format: 1
+kind: component
+name: r960-fan-cage
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  The fan cage assembly of the PowerEdge R960 seen from above - the frame across the chassis that holds the six
+  fan modules, with its warning labels along the front edge
+provenance:
+  sources: >-
+    R960 ISM figure 12 (callout 2, the cooling fans, and the cage's two printed warnings "Heavy fan cage - handle with
+    care" and "When removed from the system, lay the fan cage on its front") and "Removing the cooling fan cage
+    assembly".
+  size: >-
+    photo-measured - 425.0 x 114.0 from figure 12 (px 235..1005 across at 1.813; 1150..1360 down at 1.863; the
+    2.7% anisotropy dell/r960-system-board@1 records).
+  depth: >-
+    NOT MEASURED; the fans' own height (dell/r960-fan@1, estimated).
+size: {w: 425.0, h: 114.0, d: 60.0}
+size-confidence: {w: photo-measured, h: photo-measured, d: estimated}
+relief:
+  wall: '#2b3035'
+elements:
+  frame: {at: [0.0, 0.0], size: [425.0, 114.0], class: bezel}
+skins: [default]

@@ -1,0 +1,63 @@
+format: 1
+kind: module
+name: r960-bezel
+version: 1.0.0
+class: bezel
+behaviour: mounts
+profile: server
+description: >-
+  The optional security bezel of the PowerEdge R960 - a honeycomb of hexagonal openings between a plain end plate at each
+  side, a keylock at the left. Open between the bars, so the drives show through. Unbranded
+attrs:
+  power-absent: not-applicable
+provenance:
+  power: >-
+    NOT APPLICABLE - a metal cover with no electronics; the LCD bezel, which has some, is not this part. The ISM and
+    technical guide give no figure for either.
+  sources: >-
+    R960 ISM figure 34 (a 300 ppi perspective drawing of the LCD bezel being lifted off, 1650 x 1103) and the "Removing /
+    Installing the front bezel" procedures (figures 33-35). No photograph or drawing of the SECURITY bezel straight on is
+    held: the ISM's two bezel figures are oblique and show the LCD variant, and the spec sheet and technical guide give
+    only its name. The honeycomb is read from figure 34, whose mesh is the same on both bezels.
+  size: >-
+    ESTIMATED - 432.1 x 174.3, the body between the ear panels (x 24.4..456.5) as the fronts draw it, full height. No
+    document gives the bezel's own dimensions.
+  honeycomb: >-
+    ESTIMATED FROM AN OBLIQUE FIGURE - hexagons 46 across the points and 39.8 across the flats in a staggered grid (a
+    34.5 column pitch, a 39.8 row pitch offset 19.9 in alternate columns), bars 4.5 wide. Figure 34 shows about eight
+    cells across the visible face in rows of three or four, with an arch cell along the top edge; the grid here is a
+    regular fit and does not reproduce the arches.
+  end-plates: >-
+    ESTIMATED - plain plates 8 wide at the left and 12 at the right (over the VGA plate), the darker ends figure 34 shows.
+  lock: >-
+    ISM "Removing the front bezel": unlock it, press the release button, disengage the left end, unhook the right (figure
+    34's callout 1 is the lock). Drawn at the first bar, top left; its exact position is a guess. The release button is NOT
+    DRAWN.
+  depth: >-
+    datasheet - R960 ISM table 7: 36 mm from the bezel's outer face to the ear plane with the bezel and 22 without,
+    so the bezel stands 14.0 off the face.
+  lcd-variant: >-
+    NOT MODELLED. The spec sheet offers an "LCD bezel or security bezel"; the LCD bezel's panel (ISM figure 34) is a
+    different part with a display and buttons.
+size: {w: 432.1, h: 174.3, d: 14.0}
+size-confidence: {w: estimated, h: estimated, d: datasheet}
+relief:
+  features:
+  - node: plate
+    out: 14.0
+    shape: true
+    color: '#8f8b85'
+    confidence: datasheet
+    source: 36 mm ear-to-front with the bezel against 22 without, R960 ISM table 7
+elements:
+  plate:
+    at: [0.0, 0.0]
+    size: [432.1, 174.3]
+    class: bezel
+    description: the bezel - end plates and honeycomb bars - over an open ground
+  lock:
+    at: [10.0, 12.0]
+    size: [8.0, 8.0]
+    class: control
+    description: the keylock - unlocked with the bezel key before the bezel comes off
+skins: [default]

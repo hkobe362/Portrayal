@@ -1,0 +1,25 @@
+format: 1
+kind: component
+name: r960-riser-plan
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  riser 1 or riser 4 of the PowerEdge R960 seen from above - the black cage roof with its printed
+  riser caption and the step and handle that run forward under it
+provenance:
+  size: >-
+    photo-measured - R960 ISM figure 12 (the machine from above, cover off, 1227 x 1854 at 300 ppi): the
+    roof's width 105.0, as the rear face gives the cage (ISM figure 10, 100 to 105); the length 258.0 from
+    the rear to the end of the handle step, read at 1.86 px/mm down against 1.81 px/mm across (the
+    two scales differ by 2.7%, the photograph being taken from above and slightly in front of the machine,
+    so the length is good to about 3%).
+  roof: >-
+    photo-measured - figure 12: a black plate 105 wide by about 130 long from the rear with its caption
+    ("RISER 4", "RISER 1") and two square cut-outs, then the handle step (a lighter, rounded plate with a
+    blue stripe) to the end.
+  is-a-plan: >-
+    A plan part: what the top view draws where the rear bay projects the riser.
+size: {w: 105.0, h: 258.0}
+size-confidence: {w: photo-measured, h: estimated}
+skins: [default]

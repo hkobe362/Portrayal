@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="149.7mm" height="250.0mm" viewBox="0 0 149.7 250.0">
+  <!-- R960 riser 2 from above: original art read off ISM figure 15. -->
+  <rect x="0.0" y="0.0" width="149.7" height="250.0" rx="1" fill="#a9afb5" stroke="#6d747a" stroke-width="0.4"/>
+  <rect x="38.0" y="18.0" width="74.0" height="214.0" fill="#c3c8cd" stroke="#7d848b" stroke-width="0.4"/>
+  <rect x="68.0" y="170.0" width="14.0" height="26.0" fill="#2f7fc1"/>
+  <rect x="60.0" y="196.0" width="30.0" height="8.0" fill="#1b1e21"/>
+</svg>

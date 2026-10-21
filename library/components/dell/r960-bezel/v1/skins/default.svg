@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432.1mm" height="174.3mm" viewBox="0 0 432.1 174.3">
+  <!-- R960 security bezel: original art, a honeycomb fitted to ISM figure 34 (see the contract). The
+       openings are holes: nothing is drawn in them, so the drives show through. -->
+  <defs>
+    <pattern id="honey" x="8.0" y="0" width="69.0" height="39.84" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#8f8b85" stroke-width="4.5" stroke-linejoin="round">
+        <polygon points="0,19.92 11.5,0 34.5,0 46,19.92 34.5,39.84 11.5,39.84"/>
+        <polygon points="34.5,0 46,-19.92 69,-19.92 80.5,0 69,19.92 46,19.92"/>
+        <polygon points="34.5,39.84 46,19.92 69,19.92 80.5,39.84 69,59.76 46,59.76"/>
+        <polygon points="-34.5,0 -23,-19.92 0,-19.92 11.5,0 0,19.92 -23,19.92"/>
+        <polygon points="-34.5,39.84 -23,19.92 0,19.92 11.5,39.84 0,59.76 -23,59.76"/>
+      </g>
+    </pattern>
+  </defs>
+  <g id="plate">
+    <rect x="8.0" y="0" width="412.1" height="174.3" fill="url(#honey)"/>
+    <rect x="8.0" y="0" width="412.1" height="3.0" fill="#8f8b85"/>
+    <rect x="8.0" y="171.3" width="412.1" height="3.0" fill="#8f8b85"/>
+    <rect x="0" y="0" width="8.0" height="174.3" fill="#2b2e32"/>
+    <rect x="420.1" y="0" width="12.0" height="174.3" fill="#2b2e32"/>
+  </g>
+  <circle id="lock" cx="14.0" cy="16.0" r="3.6" fill="#16181a" stroke="#4a4f55" stroke-width="0.6"/>
+</svg>

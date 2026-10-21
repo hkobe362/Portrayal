@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74.5mm" height="123.0mm" viewBox="0 0 74.5 123.0">
+  <!-- r960-heatsink: original art read off ISM figure 15. -->
+  <defs>
+    <pattern id="fins" x="0" y="4" width="74.5" height="3.6" patternUnits="userSpaceOnUse">
+      <rect x="3" y="0" width="68.5" height="1.6" fill="#7d848b"/>
+    </pattern>
+  </defs>
+  <rect id="block" x="0" y="0" width="74.5" height="123.0" rx="1" fill="#9aa1a8" stroke="#6d737a" stroke-width="0.4"/>
+  <rect x="0" y="4" width="74.5" height="115" fill="url(#fins)"/>
+  <rect x="14" y="52" width="46.5" height="14" fill="#b87333"/>
+  <circle cx="6" cy="6" r="2.4" fill="#2b3035"/>
+  <circle cx="68.5" cy="6" r="2.4" fill="#2b3035"/>
+  <circle cx="6" cy="117" r="2.4" fill="#2b3035"/>
+  <circle cx="68.5" cy="117" r="2.4" fill="#2b3035"/>
+</svg>

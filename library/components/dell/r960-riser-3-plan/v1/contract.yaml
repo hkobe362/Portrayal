@@ -1,0 +1,19 @@
+format: 1
+kind: component
+name: r960-riser-3-plan
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  riser 3 of the PowerEdge R960 seen from above - the black cage roof with its printed caption and the
+  step and handle that run forward under it
+provenance:
+  size: >-
+    photo-measured - R960 ISM figure 12 (the machine from above, cover off): the roof 104.3 wide as the rear
+    face gives the cage (ISM figure 10), 258.0 long from the rear to the end of the handle step, with the
+    2.7% scale mismatch between the figure's two axes that dell/r960-riser-plan@1 records.
+  is-a-plan: >-
+    A plan part: what the top view draws where the rear bay projects the riser.
+size: {w: 104.3, h: 258.0}
+size-confidence: {w: photo-measured, h: estimated}
+skins: [default]

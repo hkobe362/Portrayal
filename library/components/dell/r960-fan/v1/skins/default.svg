@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64.0mm" height="86.0mm" viewBox="0 0 64.0 86.0">
+  <!-- r960-fan: original art read off ISM figure 12. -->
+  <rect id="body" x="0" y="0" width="64.0" height="86.0" rx="1" fill="#2b3035" stroke="#1a1d21" stroke-width="0.4"/>
+  <rect x="6" y="14" width="40" height="58" rx="2" fill="#1b1e21"/>
+  <path d="M26 30 L26 56 M20 38 L26 30 L32 38" stroke="#7d848b" stroke-width="1.2" fill="none"/>
+  <rect x="49" y="26" width="8" height="18" rx="1.5" fill="#e07a1f"/>
+</svg>

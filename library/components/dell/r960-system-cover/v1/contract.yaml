@@ -1,0 +1,41 @@
+format: 1
+kind: component
+name: r960-system-cover
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The system cover of the PowerEdge R960 - the lid over everything behind the drive cage, with its lock and release
+  latch
+provenance:
+  sources: >-
+    R960 ISM "Removing the system cover" (figure 36) and "Installing the system cover" (figure 37): a lock turned
+    with a flat-head or Phillips screwdriver, a release latch lifted until the cover slides back. The ISM figure 12
+    shows the machine with the cover off, so the cover's own outline is not drawn in any figure held.
+  size: >-
+    estimated - 440.0 x 745.0: the 444 body's width less the side walls and the length from the rear wall to the drive cage
+    cover (ISM figure 12: the cage cover begins at plan y 735), taken to tuck under it as the R660's lid does
+    (dell/system-cover-1u-16g@1). No R960 document gives the cover's dimensions.
+  latch: >-
+    NOT DRAWN IN POSITION - the lock and latch are in figures 36 and 37, a perspective view without a scale. The
+    latch is drawn on the centre line at the front third, a guess.
+size: {w: 440.0, h: 745.0}
+size-confidence: {w: estimated, h: estimated}
+relief:
+  wall: '#1a1d21'
+  features:
+  - node: cover
+    out: 1.0
+    color: '#c3c8cd'
+    confidence: estimated
+    source: sheet steel of about a millimetre, so the lid reads as a surface
+  - node: latch
+    out: 2.0
+    color: '#2b6cb0'
+    confidence: estimated
+    source: the latch stands proud of the lid; not measured
+elements:
+  cover: {at: [0.0, 0.0], size: [440.0, 745.0], class: bezel}
+  latch: {at: [208.0, 560.0], size: [24.0, 60.0], class: latch}
+skins: [default]

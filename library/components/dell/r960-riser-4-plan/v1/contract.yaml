@@ -1,0 +1,19 @@
+format: 1
+kind: component
+name: r960-riser-4-plan
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  riser 4 of the PowerEdge R960 seen from above - dell/r960-riser-plan@1's cage roof and step, 15 mm in from the left of a
+  120 mm frame that is the rear bay's width, so it lands where the bay is mirrored
+provenance:
+  size: >-
+    photo-measured - as dell/r960-riser-plan@1 (R960 ISM figure 12): a 105.0 wide cage 258.0 long. The frame is the riser 4 bay's
+    120.0 (the cage, 317.7..422.9 on ISM figure 10, and the thumbscrew's flange to its right), so that the plan sits at the
+    mirror of the bay. The 15 mm of frame at the plan's left is empty: it is the flange, which seen from above is under the cage's edge.
+  is-a-plan: >-
+    A plan part: what the top view draws where the rear bay projects the riser.
+size: {w: 120.0, h: 258.0}
+size-confidence: {w: photo-measured, h: estimated}
+skins: [default]

@@ -1,0 +1,31 @@
+format: 1
+kind: component
+name: r960-air-shroud-top-cover
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The air shroud top cover of the PowerEdge R960 seen from above - the black moulded plate between the fan cage
+  and the support bar, with the Dell mark and two raised ribs
+provenance:
+  sources: >-
+    R960 ISM figure 12 (callout 3, "Air shroud top cover") and the "Removing the air shroud top cover" procedure
+    (figure 46): it comes off first, under the support bar and the fan cage, to reach the processors and memory.
+  size: >-
+    photo-measured - 436.0 x 142.0 from figure 12 (px 220..1020 across at 1.813; 880..1145 down at 1.863).
+  required: >-
+    ISM thermal notes: the air shroud is required in every air-cooled configuration.
+size: {w: 436.0, h: 142.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  wall: '#15181b'
+  features:
+  - node: shroud
+    out: 0.5
+    color: '#1b1e21'
+    confidence: estimated
+    source: a moulded cover; drawn as a surface over what it covers
+elements:
+  shroud: {at: [0.0, 0.0], size: [436.0, 142.0], class: bezel}
+skins: [default]

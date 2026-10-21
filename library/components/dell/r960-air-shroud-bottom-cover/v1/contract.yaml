@@ -1,0 +1,29 @@
+format: 1
+kind: component
+name: r960-air-shroud-bottom-cover
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The air shroud bottom cover of the PowerEdge R960 seen from above - the black plate with screw bosses between the
+  support bar and the risers
+provenance:
+  sources: >-
+    R960 ISM figure 12 (callout 9, "Air shroud bottom cover", a black plate with bosses and an airflow arrow) and
+    the removal procedures that list "Remove the riser air shroud".
+  size: >-
+    photo-measured - 426.0 x 93.0 from figure 12 (px 232..1005 across at 1.813; 640..812 down at 1.863).
+size: {w: 426.0, h: 93.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  wall: '#15181b'
+  features:
+  - node: shroud
+    out: 0.5
+    color: '#16191c'
+    confidence: estimated
+    source: a moulded cover; drawn as a surface over what it covers
+elements:
+  shroud: {at: [0.0, 0.0], size: [426.0, 93.0], class: bezel}
+skins: [default]

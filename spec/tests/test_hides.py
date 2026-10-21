@@ -66,7 +66,8 @@ def test_nothing_else_in_the_library_carries_data_hides():
         for n in ET.parse(svg).iter():
             if n.get("data-hides") is not None:
                 carriers.add((svg.name.split(".")[0], n.get("id")))
-    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel")}, carriers
+    # ("r960", "bezel"): the PowerEdge R960's honeycomb security bezel, over its drives
+    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel"), ("r960", "bezel")}, carriers
 
 
 # --- L196 --------------------------------------------------------------------

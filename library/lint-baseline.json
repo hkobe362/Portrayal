@@ -846,6 +846,9 @@
  "components/dell/psu-2400w-ac-14g/v1/contract.yaml": {
   "L97": 1
  },
+ "components/dell/r960-fan/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/dell/rack-latch-14g/v1/contract.yaml": {
   "L97": 1
  },
@@ -1868,6 +1871,12 @@
   "L39": 3,
   "L54": 4,
   "L93": 1
+ },
+ "devices/dell/r960/device.yaml": {
+  "L145": 1,
+  "L21": 89,
+  "L29": 26,
+  "L44": 23
  },
  "devices/eaton/evma8365x/device.yaml": {
   "L29": 1

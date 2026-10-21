@@ -1,0 +1,19 @@
+format: 1
+kind: component
+name: r960-psu-plan
+version: 1.0.0
+class: mechanical
+profile: server
+description: >-
+  an 86 mm power supply bay of the PowerEdge R960 seen from above - the can a supply (or a 60 mm supply in its adapter) runs
+  into the chassis as
+provenance:
+  size: >-
+    estimated - 86.0 x 217.0: the width is the bay's (ISM figure 10), the length the compartment's in ISM figure 15 (px
+    215 to 420 down at 1.863 px/mm, the machine from above with the risers lifted out). No R960 document gives a
+    supply's depth.
+  is-a-plan: >-
+    A plan part: what the top view draws where the rear bay projects the supply.
+size: {w: 86.0, h: 217.0}
+size-confidence: {w: photo-measured, h: estimated}
+skins: [default]

@@ -1,0 +1,34 @@
+format: 1
+kind: component
+name: r960-heatsink
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The processor heatsink of the PowerEdge R960 seen from above - a finned block with a copper-tipped
+  base and four captive screws, over each of the four sockets
+provenance:
+  sources: >-
+    R960 ISM figures 14 and 15 (the heatsinks on the PEM and on the system board, from above) and the "Removing a
+    heat sink" procedure (figure 143). ISM table 30 gives the processor and heat sink matrix.
+  size: >-
+    photo-measured - 74.5 x 123.0 from figure 15 (px 370..505 across at 1.813 px/mm; 860..1090 down, 124 mm at 1.863,
+    the 2.7% anisotropy dell/r960-system-board@1 records). The air-cooled R960 heat sinks of table 30 are not
+    told apart by size in any document held.
+  height: >-
+    NOT MEASURED. No R960 figure shows a heatsink from the side; borrowed from dell/heatsink-1u-16g@1's 33.1 (a
+    1U heatsink), which is wrong for a 4U machine's taller heatsink and is marked estimated.
+size: {w: 74.5, h: 123.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  wall: '#6d737a'
+  features:
+  - node: block
+    out: 33.1
+    color: '#8a9096'
+    confidence: estimated
+    source: borrowed from dell/heatsink-1u-16g@1; no R960 figure shows a heatsink's height
+elements:
+  block: {at: [0.0, 0.0], size: [74.5, 123.0], class: bezel}
+skins: [default]

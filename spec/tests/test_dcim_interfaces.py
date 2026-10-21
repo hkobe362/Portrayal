@@ -827,6 +827,8 @@ ANCHORED = {
 # blank position when it names ports, so an MPC in the adapter in `fpc3` names
 # its port `fpc3/x`, as in an MX960's `fpc3` (NetBox: `fpc3/mpc/x`).
 PASS_THROUGH = {
+    # the Dell R960's 26 mm supply adapter: its `psu` bay takes the 60 mm supplies the R660 also seats directly
+    "Dell/r960-psu-adapter-60mm": ["psu"],
     "Juniper/MX2000-LC-ADAPTER": ["mpc"],
 }
 
