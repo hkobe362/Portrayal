@@ -1,0 +1,35 @@
+format: 1
+kind: component
+name: system-cover-2u-16g
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The system cover of a 16th-generation 2U PowerEdge (R760) - the lid over everything behind the drive backplane, released by its latch
+provenance:
+  sources: >-
+    R760 Installation and Service Manual (ISM) 'Removing the system cover' and 'Installing the system cover' (figures 39 and 40) and figure 15 (inside the system, the cover off, which shows the open interior up to the backplane's cover). No document held dimensions the cover; its extent is the chassis' own.
+  size: >-
+    estimated - 433.4 x 600.0 at plan x 0.3, y 0: the 433.4 body width of the R660's cover (dell/system-cover-1u-16g@1) and a rear edge at the rear wall, running forward under the backplane cover, whose rear edge is at plan y 593.6 in figure 15; 6.4 is the overlap beneath it.
+  latch: >-
+    estimated - the latch is placed by analogy with the R660's, centred across the lid 25.0 x 63.6 at 6/10 of the length; no R760 figure shows the lid from above.
+size: {w: 433.4, h: 600.0}
+size-confidence: {w: estimated, h: estimated}
+relief:
+  wall: '#1a1d21'
+  features:
+  - node: cover
+    out: 1.0
+    color: '#c3c8cd'
+    confidence: estimated
+    source: sheet steel of about a millimetre, so the lid reads as a surface
+  - node: latch
+    out: 2.0
+    color: '#2b6cb0'
+    confidence: estimated
+    source: the latch stands proud of the lid; not measured
+elements:
+  cover: {at: [0.0, 0.0], size: [433.4, 600.0], class: bezel}
+  latch: {at: [204.2, 360.0], size: [25.0, 63.6], class: latch}
+skins: [default]

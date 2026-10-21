@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="433.35mm" height="82.4mm" viewBox="0 0 433.35 82.4">
+  <!-- dell/bezel-2u-16g: the 16G 2U security bezel, unbranded. ESTIMATED from
+       the ISM's isometric figure (see the contract). THE OPENINGS ARE HOLES:
+       `plate` is one path - the face with each hexagon cut out of it,
+       fill-rule evenodd - so the drives show through in 2D and the contract
+       can extrude its outline with the holes in it for 3D. The lock and the
+       release sit on the left end plate. -->
+  <path id="plate" fill-rule="evenodd" fill="#3a3e43" d="M0 0 H433.35 V82.4 H0 Z
+    M46.15 28.2 L58.625 6.6 H83.575 L96.05 28.2 L83.575 49.8 H58.625 Z
+    M87.75 52.2 L100.225 30.6 H125.175 L137.65 52.2 L125.175 73.8 H100.225 Z
+    M129.35 28.2 L141.825 6.6 H166.775 L179.25 28.2 L166.775 49.8 H141.825 Z
+    M170.95 52.2 L183.425 30.6 H208.375 L220.85 52.2 L208.375 73.8 H183.425 Z
+    M212.55 28.2 L225.025 6.6 H249.975 L262.45 28.2 L249.975 49.8 H225.025 Z
+    M254.15 52.2 L266.625 30.6 H291.575 L304.05 52.2 L291.575 73.8 H266.625 Z
+    M295.75 28.2 L308.225 6.6 H333.175 L345.65 28.2 L333.175 49.8 H308.225 Z
+    M337.35 52.2 L349.825 30.6 H374.775 L387.25 52.2 L374.775 73.8 H349.825 Z"/>
+  <circle id="lock" cx="12.5" cy="16.0" r="4.5" fill="#1b1e21" stroke="#6d747a" stroke-width="0.4"/>
+  <path d="M10.4 16.0 H14.6 M12.5 13.9 V18.1" stroke="#8d949b" stroke-width="0.5" fill="none"/>
+  <rect id="release" x="3.2" y="35.0" width="4.6" height="22.0" rx="1.2" fill="#2b2f33" stroke="#5a6066" stroke-width="0.3"/>
+</svg>

@@ -1,0 +1,19 @@
+format: 1
+kind: component
+name: backplane-cover-2u-16g
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The drive backplane cover of a 16th-generation 2U PowerEdge (R760) - the fixed panel over the front drive cage, ahead of the system cover
+provenance:
+  sources: >-
+    R760 Installation and Service Manual (ISM) 'Removing the drive backplane cover' and 'Installing the drive backplane cover' (figures 41 and 42) and figure 15 (inside the system), whose top view shows the cage's top plate from the cables' end to the front, at 1.965 px/mm (perspective render, about 2%). `mounts`: the ISM has its own removal procedure, and the system cover's front edge tucks under it.
+  size: >-
+    photo-measured - 430.0 x 129.1 at plan x 5.0, y 593.6: from where the plate begins, behind the backplane (figure 15's callouts 1 and 16 at y 589), to the chassis' front face at y 722.7.
+size: {w: 430.0, h: 129.1}
+size-confidence: {w: photo-measured, h: photo-measured}
+elements:
+  plate: {at: [0.0, 0.0], size: [430.0, 129.1], class: bezel}
+skins: [default]

@@ -1,0 +1,31 @@
+format: 1
+kind: component
+name: air-shroud-2u-16g
+version: 1.0.0
+class: mechanical
+behaviour: mounts
+profile: server
+description: >-
+  The processor air shroud of a 16th-generation 2U PowerEdge (R760) seen from above - the dark moulding over the processors and the memory, between the risers and the fans, with three wings over the DIMM groups
+provenance:
+  sources: >-
+    photo-measured - R760 Installation and Service Manual (ISM) figure 15 (inside the system), callout 4 'Air shroud', the embedded top view at 1.965 px/mm; positions carry about 2% (the figure is a perspective render). ISM figures 43 and 44 (removing and installing the air shroud), and the technical guide's thermal notes, for what it is. The GPU air shroud (figures 16 and 45 to 50) is a different part and is not modelled.
+  size: >-
+    photo-measured - 430.0 x 166.0 at plan x 3.0, y 250.0: from the wings' rear edge (y 250) to the memory label strip along its front edge (y 416); the figure shows it from the left wall to the right one.
+  wings: >-
+    photo-measured - the three wings stand over the DIMM groups: x 2.5..76.3 (the left group), 152.7..280.0 (the middle 16) and 356.0..430.0 (the right group), their rear edges at y 250 and the body's at about 258. They match the DIMM groups of the board figure (ISM figure 180: 11.4..71.5, 157.5..279.1 and 362.3..421.9) to the wing widths, which is the check that figure 15's frame and figure 180's are the same.
+  required: >-
+    TG thermal notes: the CPU air shroud is required in every air-cooled build.
+size: {w: 430.0, h: 166.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  wall: '#15181b'
+  features:
+  - node: shroud
+    out: 0.5
+    color: '#1b1e21'
+    confidence: estimated
+    source: a moulded cover; drawn as a surface over what it covers
+elements:
+  shroud: {at: [0.0, 0.0], size: [430.0, 166.0], class: bezel}
+skins: [default]

@@ -1,0 +1,23 @@
+format: 1
+kind: module
+name: fan-2u-16g
+version: 1.0.0
+class: fan
+behaviour: fills
+profile: server
+description: >-
+  Hot-plug cooling fan module of a 16th-generation 2U PowerEdge (R760) seen from above - one 60 mm fan in a housing with its orange handle; six of them across the chassis
+provenance:
+  sources: >-
+    photo-measured - R760 Installation and Service Manual (ISM) figure 15 (inside the system), the embedded top view, at 1.965 px/mm (the 434 mm chassis width against 850 px; the figure is a perspective render, so positions carry about 2%): six modules in two groups of three across the fan cage, each with an airflow arrow, a hazard mark and an orange handle at its right. ISM 'Cooling fan specifications' (table 17): up to six fans, of three grades - standard (no label), High performance Silver and High performance Gold - the grade being the label colour.
+  size: >-
+    photo-measured - 64.0 x 61.0 on the figure's top view (modules at plan x 12.7, 77.1, 141.5, 225.4, 289.8 and 354.2, y 432.6; a pitch of 64.4 and a 19 mm gap in the middle). The height is not given: 56.0 is an estimate by analogy with a 60 mm fan.
+  grade: >-
+    NOT MODELLED - the three grades differ by label colour and by the thermal restriction matrix (ISM tables 39 to 53), and the figure's modules are unlabelled standard fans; one part stands for all three.
+  power: >-
+    NOT STATED in the R760 documents held.
+size: {w: 64.0, h: 61.0, d: 56.0}
+size-confidence: {w: photo-measured, h: photo-measured, d: estimated}
+elements:
+  body: {at: [0.0, 0.0], size: [64.0, 61.0], class: bezel}
+skins: [default]
