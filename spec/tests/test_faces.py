@@ -134,8 +134,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 86 since the Fibrain XCU10's drawer, seen from above under the shell top.
     # 87 since the NVIDIA A100 80GB PCIe, whose plan face is its top edge.
     # 92 since the R660xs's five risers (1a, 1b, 2a, 2d, 2e) name plans
-    assert len(named) == 92, \
-        f"expected 87 parts naming a plan drawing, found {len(named)}"
+    # 100 since the R6615's eight risers (r6615-riser-1q, -2a, -2t, -2u, -3a, -3p, -3s, -4p).
+    assert len(named) == 100, \
+        f"expected 100 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -263,8 +264,9 @@ def test_the_index_carries_a_parts_other_faces():
     # 143 since nvidia/a100-pcie-80gb@1 declares its far end as a rear face.
     with_faces = [e for e in entries if e.get("faces")]
     # 148 since the R660xs's five risers
-    assert len(with_faces) == 148, \
-        f"expected exactly 143 of {len(entries)} entries to carry a faces " \
+    # 156 since the R6615's eight risers each carry the plan of the R660 riser they match.
+    assert len(with_faces) == 156, \
+        f"expected exactly 156 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
