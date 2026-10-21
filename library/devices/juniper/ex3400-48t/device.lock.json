@@ -21,7 +21,7 @@
    "juniper/ex3400-psu-blank@1"
   ]
  },
- "composed": "4152b30fcdc3f38f",
+ "composed": "50e469f0e50f5b8d",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/ground-screw-10-32@1": "1.0.0+f0abf79f91058854",
@@ -30,9 +30,9 @@
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
-  "juniper/ex3400-console-usb-mini@1": "1.0.0+03eaa9e94b2be74a",
-  "juniper/ex3400-fan-afi@1": "1.0.0+0b20d3e1df2fe62c",
-  "juniper/ex3400-fan-afo@1": "1.0.0+9e93ed65f76e52f1",
+  "juniper/ex3400-fan-afi@1": "1.0.0+c8115059a4c3bd24",
+  "juniper/ex3400-fan-afo@1": "1.0.0+7ff7fcf7bf5466fd",
+  "juniper/ex3400-ground-pair@1": "1.0.0+462302bfcd31ba35",
   "juniper/ex3400-jpsu-150-ac-afi@1": "1.0.0+f4d4dc7b37a38eec",
   "juniper/ex3400-jpsu-150-ac-afo@1": "1.0.0+f7addbca98146769",
   "juniper/ex3400-jpsu-150-dc-afo@1": "1.0.0+bbdfa05dd0a029ed",
@@ -50,7 +50,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "58a491e7838e206c",
+ "gaps": "0e1301e3f168758f",
  "groups": [
   "esd",
   "fans",
@@ -66,7 +66,6 @@
   "uplink-leds"
  ],
  "ids": [
-  "front/cutout/console",
   "front/cutout/led-alm",
   "front/cutout/led-dx",
   "front/cutout/led-en",
@@ -135,7 +134,6 @@
   "front/cutout/uplink-1",
   "front/cutout/uplink-2",
   "front/cutout/uplink-3",
-  "front/placements/console",
   "front/placements/led-alm",
   "front/placements/led-dx",
   "front/placements/led-en",
@@ -219,8 +217,7 @@
   "rear/cutout/vcp-1",
   "rear/placements/con",
   "rear/placements/esd-rear",
-  "rear/placements/ground-screw-0",
-  "rear/placements/ground-screw-1",
+  "rear/placements/ground-pair",
   "rear/placements/led-vcp-0-act",
   "rear/placements/led-vcp-0-status",
   "rear/placements/led-vcp-1-act",
@@ -230,7 +227,7 @@
   "rear/placements/vcp-0",
   "rear/placements/vcp-1"
  ],
- "names": "66903cd2ec401fb0",
+ "names": "eeca437c901c4ef7",
  "placement-addressing": {
   "for": {
    "front/placements/led-alm": [
@@ -298,7 +295,6 @@
    ]
   },
   "rel-pos": {
-   "front/placements/console": 2,
    "front/placements/led-alm": 1,
    "front/placements/led-dx": 1,
    "front/placements/led-en": 2,
@@ -373,8 +369,7 @@
    "rear/bays/psu-1": 1,
    "rear/placements/con": 3,
    "rear/placements/esd-rear": 0,
-   "rear/placements/ground-screw-0": 0,
-   "rear/placements/ground-screw-1": 1,
+   "rear/placements/ground-pair": 0,
    "rear/placements/led-vcp-0-act": 0,
    "rear/placements/led-vcp-0-status": 1,
    "rear/placements/led-vcp-1-act": 2,
@@ -385,10 +380,9 @@
    "rear/placements/vcp-1": 1
   }
  },
- "placement-attrs": "7ffe85c3182d3a6d",
+ "placement-attrs": "4a0407815a9c865f",
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
-  "front/placements/console": "mgmt",
   "front/placements/led-alm": "status-leds",
   "front/placements/led-dx": "mode-leds",
   "front/placements/led-en": "mode-leds",
@@ -463,8 +457,7 @@
   "rear/bays/psu-1": "psus",
   "rear/placements/con": "mgmt",
   "rear/placements/esd-rear": "esd",
-  "rear/placements/ground-screw-0": "grounding",
-  "rear/placements/ground-screw-1": "grounding",
+  "rear/placements/ground-pair": "grounding",
   "rear/placements/led-vcp-0-act": "qsfp-leds",
   "rear/placements/led-vcp-0-status": "qsfp-leds",
   "rear/placements/led-vcp-1-act": "qsfp-leds",
@@ -475,7 +468,7 @@
   "rear/placements/vcp-1": "qsfp-plus"
  },
  "placement-surface": "dd8ae06130c015a3",
- "shape": "d7ed4fafb69828db",
- "surface": "0bbadd6e7aa1b27c",
+ "shape": "c428feae68503435",
+ "surface": "fe2aacda070c4d1a",
  "version": "0.1.0"
 }

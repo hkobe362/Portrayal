@@ -8,6 +8,8 @@ weight: 4.64
 weight_unit: kg
 airflow: rear-to-front
 description: Juniper EX3400-48T, a 1U access switch with 48 10/100/1000BASE-T ports and no PoE
+front_image: true
+rear_image: true
 console-ports:
   - name: Console
     type: rj-45
@@ -164,14 +166,14 @@ comments: 'Juniper EX3400-48T, a 1U access switch with 48 10/100/1000BASE-T port
 
   - features.macsec: IEEE 802.1AE MACsec on all Gigabit and 10 Gigabit Ethernet ports, 88 Gbps of encryption
 
-  - features.optics-qsfp: the rear uplink ports take QSFP+ transceivers; the supported list is in Juniper''s
+  - features.optics-qsfp: the rear uplink ports take QSFP+ transceivers. The supported list is in Juniper''s
   Hardware Compatibility Tool, which the guide names and which is not held here
 
-  - features.optics-sfp-plus: the front uplink ports take SFP and SFP+ transceivers, singly or mixed;
-  the supported list is in Juniper''s Hardware Compatibility Tool, which the guide names and which is
+  - features.optics-sfp-plus: the front uplink ports take SFP and SFP+ transceivers, singly or mixed.
+  The supported list is in Juniper''s Hardware Compatibility Tool, which the guide names and which is
   not held here
 
-  - features.uplinks: four SFP or SFP+ ports on the front and two QSFP+ ports on the rear
+  - features.uplink-ports: four SFP or SFP+ ports on the front and two QSFP+ ports on the rear
 
   - features.virtual-chassis: up to 10 switches. The QSFP+ ports are Virtual Chassis ports by default
 

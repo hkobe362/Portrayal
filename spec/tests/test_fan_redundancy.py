@@ -243,7 +243,11 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     assert "edgecore/cor580" in unstated and "edgecore/dcs510" in unstated
     assert {"cisco/asr-9901", "cisco/asr-9902", "cisco/asr-9903"} <= set(unstated)
     assert "cisco/n9k-c93180yc-ex" in unstated
-    assert len(unstated) == 28, unstated
+    # THE FOUR JUNIPER EX3400 MADE IT THIRTY-TWO: the guide says both fan modules must be installed
+    # and working, and names no N+1 form, so each group quotes the sentence and states no form.
+    assert {"juniper/ex3400-24t", "juniper/ex3400-24p", "juniper/ex3400-48t",
+            "juniper/ex3400-48p"} <= set(unstated)
+    assert len(unstated) == 32, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():

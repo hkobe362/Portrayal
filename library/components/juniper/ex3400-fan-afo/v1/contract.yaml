@@ -7,9 +7,9 @@ behaviour: fills
 profile: networking
 description: >-
   Fan module, airflow out (AFO), for the Juniper EX3400. Two sit side by side on the rear panel,
-  numbered 0 and 1. Each is hot-removable and hot-insertable. The face has an orange handle with a grey AIR OUT
-  chip, a honeycomb grille above and below it, and a captive screw at the top left. Air leaves
-  the chassis at this face, front to back.
+  numbered 0 and 1. Each is hot-removable and hot-insertable. The face has an orange handle with a
+  grey AIR OUT chip. A honeycomb grille sits above and below the handle, and a captive screw at the
+  top left. Air leaves the chassis at this face, front to back.
 attrs:
   cli-name: Fan Module, Airflow Out (AFO)
   airflow: front-to-back

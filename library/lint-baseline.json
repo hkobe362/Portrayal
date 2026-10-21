@@ -1132,9 +1132,6 @@
  "components/hpe/sff-sc-carrier/v1/contract.yaml": {
   "L27": 1
  },
- "components/juniper/ex3400-console-usb-mini/v1/contract.yaml": {
-  "L26": 1
- },
  "components/juniper/ex3400-fan-afi/v1/contract.yaml": {
   "L27": 1
  },
@@ -2069,25 +2066,25 @@
  "devices/juniper/ex3400-24p/device.yaml": {
   "L29": 1,
   "L57": 1,
-  "L61": 36,
+  "L61": 35,
   "L69": 1
  },
  "devices/juniper/ex3400-24t/device.yaml": {
   "L29": 1,
   "L57": 1,
-  "L61": 36,
+  "L61": 35,
   "L69": 1
  },
  "devices/juniper/ex3400-48p/device.yaml": {
   "L29": 1,
   "L57": 1,
-  "L61": 60,
+  "L61": 59,
   "L69": 1
  },
  "devices/juniper/ex3400-48t/device.yaml": {
   "L29": 2,
   "L57": 1,
-  "L61": 60,
+  "L61": 59,
   "L69": 1
  },
  "devices/juniper/mx10003/device.yaml": {
