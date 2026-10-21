@@ -28,9 +28,10 @@ provenance:
     figure 60 against its sockets (the 3.7 px/mm there is the sockets' 147 mm
     over 545 px) and is an estimate. The board's rear 4.4, where the connectors
     pass the wall, is not drawn. The interposer board's top edge is taken at the
-    end of the supplies' cans (222.0 down this part, where dell/psu-60mm-plan@1
-    stops), which is where figure 8 shows the cans meeting it; a first reading
-    at 228.7 left a 6.7 mm white gap the figure does not have.
+    end of the supplies' cans (222.0 down the top view, where
+    dell/psu-60mm-plan@1 stops; 217.6 down this part, which stands 4.4 below the
+    view's rear edge), which is where figure 8 shows the cans meeting it; a
+    reading at 228.7 left a 6.7 mm white gap the figure does not have.
   depth: >-
     ESTIMATED - 38.3, the R660's interior well (dell/system-board-r660@1: the
     PCB top at 4.5 against a 42.8 lid line). Both are 1U chassis of the same
@@ -46,5 +47,5 @@ relief:
 elements:
   board: {at: [127.7, 0.0], size: [298.3, 373.0], class: bezel}
   corner: {at: [83.7, 176.0], size: [44.0, 197.0], class: bezel}
-  pib: {at: [0.0, 222.0], size: [83.7, 151.0], class: bezel}
+  pib: {at: [0.0, 217.6], size: [83.7, 155.4], class: bezel}
 skins: [default]

@@ -15,9 +15,10 @@ provenance:
     drawing - the chassis's own footprint, 434.0 wide between the side walls and
     699.1 from the rear wall to the front (dell/r660xs, chassis.depth).
   depth: >-
-    ESTIMATED - 38.3, the system board's well (dell/r660xs-system-board@1), so
-    the floor and the board's PCB share one interior height. No R660xs figure
-    gives the floor's height.
+    ESTIMATED - 40.3, 2.0 deeper than the system board's well (38.3,
+    dell/r660xs-system-board@1), so the chassis sheet lies beneath the PCB and
+    the 3D viewer paints the board over it; at the same depth the floor painted
+    over the board. No R660xs figure gives either height.
   why-this-is-a-part: >-
     THE TOP VIEW'S FLOOR WAS A DECOR RECTANGLE, and a decor rectangle is part of
     the top face the 3D viewer paints, so it stood over the whole chassis as an
@@ -26,7 +27,7 @@ provenance:
     parts stand in it, as they do in the board's own well. No cover is drawn
     over it because no figure draws the R660xs's cover from above (see the
     device's air-shroud-covers-backplane-in-top-view gap).
-size: {w: 434.0, h: 699.1, d: 38.3}
+size: {w: 434.0, h: 699.1, d: 40.3}
 size-confidence: {w: drawing, h: drawing, d: estimated}
 relief:
   wall: '#1e2226'

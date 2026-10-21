@@ -214,7 +214,7 @@
    "dell/r660xs-fan@1"
   ]
  },
- "composed": "188609935c740470",
+ "composed": "02e403bf7055f7d4",
  "composed-refs": {
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
   "common/drive-blank-25@2": "2.0.0+af7efd33cf1a467a",
@@ -250,7 +250,7 @@
   "dell/psu-700w-ac-60mm@1": "1.1.0+a856b1721f7bce6e",
   "dell/psu-800w-ac-60mm@1": "1.1.0+715a72241a42ddf5",
   "dell/r660xs-boss-riser@1": "1.0.0+39493527224edf9f",
-  "dell/r660xs-chassis-floor@1": "1.0.0+019cdb3337d6b944",
+  "dell/r660xs-chassis-floor@1": "1.0.0+c1da7eef2f295e7c",
   "dell/r660xs-fan@1": "1.0.0+b161f0c578ca9bfd",
   "dell/r660xs-lom-2x1g@1": "1.0.0+80e1b45d133ee30e",
   "dell/r660xs-riser-1-cage@1": "1.0.0+1c5c5bd4fc3caf3e",
@@ -263,7 +263,7 @@
   "dell/r660xs-riser-2a@1": "1.0.0+179e016ad1ddb20b",
   "dell/r660xs-riser-2d@1": "1.0.0+524903e278c3a9c6",
   "dell/r660xs-riser-2e@1": "1.0.0+cb5b18769d5773e7",
-  "dell/r660xs-system-board@1": "1.0.0+23f5b37b63414607",
+  "dell/r660xs-system-board@1": "1.0.0+6e49fa53ae1d9ead",
   "dell/system-id-button-14g@1": "1.0.1+a453cf90c341d8d0",
   "nvidia/mcx4111a-lp@1": "1.0.0+eb651c58e0e70765",
   "nvidia/mcx4121a-lp@1": "1.0.0+4edd656656654de5",
@@ -316,7 +316,7 @@
   "sff8-rc6-1b2e"
  ],
  "format": 1,
- "gaps": "0d8f32ff18db42b7",
+ "gaps": "5fcc6d507fa193a2",
  "groups": [
   "boss",
   "covers",
@@ -747,5 +747,5 @@
  "placement-surface": "0b5a92b0ccf1ec74",
  "shape": "60765134accf8472",
  "surface": "c010e13a8fd6053c",
- "version": "1.0.0"
+ "version": "1.0.1"
 }

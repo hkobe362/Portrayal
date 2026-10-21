@@ -5,6 +5,7 @@ configuration's rear, the supply bays, the top view's fans, heatsinks and DIMM
 slots, and the DCIM device types. The sources are the ISM's tables 8 and 95,
 its figures 1 to 3, 7, 8 and 60.
 """
+import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -332,16 +333,33 @@ def test_the_top_view_declares_what_it_does_not_draw(doc):
     assert not any("plan" in b for b in _bays(doc, "front-lff4") if b["id"].startswith("lff-drive-"))
 
 
+def _translate(node):
+    m = re.match(r"translate\(([-\d.]+),([-\d.]+)\)", node.get("transform", ""))
+    return (float(m.group(1)), float(m.group(2))) if m else (0.0, 0.0)
+
+
 def test_the_supply_plans_reach_the_interposer_board():
     # figure 8: the supplies' cans end where the power interposer board begins; they did not touch
-    top = yaml.safe_load(DEVICE.read_text())
-    board = next(p for p in top["views"]["top"]["components"]["placements"] if p["id"] == "system-board")
-    pib = yaml.safe_load((LIB / "components" / "dell" / "r660xs-system-board" / "v1" / "contract.yaml").read_text())["elements"]["pib"]
-    psu = yaml.safe_load((LIB / "components" / "dell" / "psu-60mm-plan" / "v1" / "contract.yaml").read_text())
-    for b in _bays(top, "rear"):
-        if b["id"] in ("psu-1", "psu-2"):
-            can_end = board["at"][1] + b["plan"]["at"][1] + psu["size"]["h"]
-            assert board["at"][1] + pib["at"][1] - can_end <= 0.5, b["id"]
+    # Compared as rendered: `in: system-board` orders a plan, it does not move it into the board's
+    # coordinates, so only the interposer takes the board's offset
+    root = ET.parse(DIST / "r660xs.sff10-rc1-1a2a.top.svg").getroot()
+    by_id = {n.get("id"): n for n in root.iter() if n.get("id")}
+    pib_top = _translate(by_id["system-board"])[1] + float(by_id["system-board--pib"].get("y"))
+    for plan in ("psu-1-plan", "psu-2-plan"):
+        node = by_id[plan]
+        can = next(r for r in node.iter() if r.tag.endswith("rect"))
+        can_end = _translate(node)[1] + float(can.get("y")) + float(can.get("height"))
+        assert abs(pib_top - can_end) <= 0.5, (plan, can_end, pib_top)
+
+
+def test_the_chassis_floor_lies_beneath_the_system_board_in_3d():
+    # a well is painted by its depth: the floor at the board's depth painted over the board.
+    # The floor's well must be deeper than the board's, so the board stands above it
+    svg = DIST / "r660xs.sff10-rc1-1a2a.top.svg"
+    depth = {n.get("id"): float(n.get("data-depth")) for n in ET.parse(svg).iter()
+             if n.get("id") in ("chassis-floor", "system-board") and n.get("data-depth")}
+    assert set(depth) == {"chassis-floor", "system-board"}
+    assert depth["chassis-floor"] > depth["system-board"]
 
 
 # --- the DCIM device types -----------------------------------------------------

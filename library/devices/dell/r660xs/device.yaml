@@ -17,7 +17,7 @@
 format: 1
 kind: device
 name: r660xs
-version: 1.0.0
+version: 1.0.1
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R660xs
@@ -373,6 +373,16 @@ gaps:
       place without it is not drawn.
     wanted: >-
       a rear view of a build without the BOSS riser
+  - what: psu-1-mark-absent-in-rc3-and-rc4
+    scope: [rear]
+    reason: needs-drawing
+    note: >-
+      the PSU 1 mark (the boxed bolt and the 1) is printed on riser 2's cage
+      (dell/r660xs-riser-2-cage@1), so it is absent in riser configurations 3 and
+      4, where a blank or the rear drives stand in riser 2's place and no figure
+      shows those builds.
+    wanted: >-
+      a rear view of a build in riser configuration 3 or 4
   - what: five-fan-builds
     scope: [top]
     reason: vendor-silent
