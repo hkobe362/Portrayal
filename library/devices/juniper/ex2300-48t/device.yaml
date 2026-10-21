@@ -86,6 +86,14 @@ provenance:
       photo-measured - one row of four SFP+/SFP cages numbered 0 to 3 with a pair of lamp slots flanking
       each numeral; the guide gives 4x10G SFP/SFP+ and says the ports can be Virtual Chassis ports with
       SFP+ transceivers but not with SFP.
+  front-console:
+    confidence: estimated
+    note: >-
+      estimated - the mini-USB console port (guide Figure 4, callout 5, printed CON) is drawn as chassis
+      art, a 7.9 x 4.6 mm shell with its opening, read off the 24P and 48P photographs (25 x 14 px and
+      24 x 14 px at 3.27 px per mm). It is not a component: the library has no mini-USB receptacle and
+      its DCIM export has no row for one, so a placed part would export nothing. The rear RJ-45 console
+      port is a component and exports.
   rear-layout:
     confidence: estimated
     note: >-
@@ -222,6 +230,9 @@ views:
       decor:
       - {id: plate-top, kind: label-plate, at: [364.6, 1.0], size: [76.4, 15.3], fill: '#6e7276'}
       - {id: plate-right, kind: label-plate, at: [422.6, 1.0], size: [18.4, 42.6], fill: '#6e7276'}
+      - {id: console, kind: console-shell, at: [425.6, 39.0], size: [7.9, 4.6], rx: 0.6, fill: '#c9cbcd'}
+      - {id: console-opening, kind: console-opening, at: [426.3, 39.7], size: [6.5, 3.2], rx: 0.5, fill: '#1c2024'}
+      - {id: console-pins, kind: console-pins, at: [427.3, 41.2], size: [4.5, 0.7], fill: '#3a4046'}
       - {id: shell-1, kind: jack-shell, at: [7.31, 11.6], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
       - {id: shell-2, kind: jack-shell, at: [96.13, 11.6], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
       - {id: shell-3, kind: jack-shell, at: [184.95, 11.6], size: [86.9, 25.9], rx: 0.6, fill: '#b1b2b5'}
@@ -282,14 +293,14 @@ views:
       - {id: uplink-1, at: [378.85, 27.3], size: [14.25, 10.4], shape: rect}
       - {id: uplink-2, at: [393.1, 27.3], size: [14.25, 10.4], shape: rect}
       - {id: uplink-3, at: [407.35, 27.3], size: [14.25, 10.4], shape: rect}
-      - {id: led-uplink-0-a, at: [367.63, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-0-b, at: [374.83, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-1-a, at: [381.88, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-1-b, at: [389.08, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-2-a, at: [396.13, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-2-b, at: [403.33, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-3-a, at: [410.38, 39.3], size: [1.6, 4.6], shape: rect}
-      - {id: led-uplink-3-b, at: [417.58, 39.3], size: [1.6, 4.6], shape: rect}
+      - {id: led-uplink-0-a, at: [367.63, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-0-b, at: [374.83, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-1-a, at: [381.88, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-1-b, at: [389.08, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-2-a, at: [396.13, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-2-b, at: [403.33, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-3-a, at: [410.38, 40.2], size: [1.6, 2.8], shape: rect}
+      - {id: led-uplink-3-b, at: [417.58, 40.2], size: [1.6, 2.8], shape: rect}
       - {id: led-sys, at: [426.0, 5.8], size: [2.0, 2.0], shape: circle}
       - {id: led-alm, at: [426.0, 10.3], size: [2.0, 2.0], shape: circle}
       - {id: led-mst, at: [426.0, 14.8], size: [2.0, 2.0], shape: circle}
@@ -297,7 +308,6 @@ views:
       - {id: led-dx, at: [431.3, 10.3], size: [2.0, 2.0], shape: circle}
       - {id: led-en, at: [431.3, 14.8], size: [2.0, 2.0], shape: circle}
       - {id: btn-mode, at: [427.6, 32.3], size: [4.0, 4.0], shape: circle}
-      - {id: console, at: [425.6, 39.0], size: [7.9, 4.6], shape: rect}
     silkscreen:
     - {at: [15.71, 40.3], text: '0', font-size: 2.0, anchor: middle, fill: '#ea6a3c', for: port-0}
     - {at: [18.01, 41.4], text: '1', font-size: 2.0, anchor: middle, fill: '#ea6a3c', for: port-1}
@@ -375,7 +385,7 @@ views:
       stroke-width: 0.35
       fill: '#e4e6e9'
       for: btn-mode
-    - {at: [437.4, 41.8], text: CON, font-size: 1.6, anchor: middle, fill: '#e4e6e9', for: console}
+    - {at: [437.4, 41.8], text: CON, font-size: 1.6, anchor: middle, fill: '#e4e6e9', for: chassis}
     components:
       placements:
       - ref: common/rj45-ganged-eth@1
@@ -786,7 +796,6 @@ views:
         group: controls
         rel-pos: 0
         attrs: {function: Factory Reset/Mode}
-      - {ref: juniper/ex2300-console-usb-mini@1, id: console, at: [425.6, 39.0], group: mgmt, rel-pos: 0}
   rear:
     size: {w: 441.9, h: 44.45}
     panel:

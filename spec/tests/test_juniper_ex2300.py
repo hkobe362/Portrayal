@@ -155,7 +155,11 @@ def test_the_front_has_the_guides_status_lamps_button_and_console(name):
     assert len(modes) == m["mode_leds"]
     assert ("led-poe" in modes) == m["poe"]
     assert pl["btn-mode"]["ref"] == "common/reset-button@1"
-    assert pl["console"]["ref"] == "juniper/ex2300-console-usb-mini@1"
+    # the mini-USB console is chassis art with its own opening, not a placed part (nothing in the DCIM
+    # export could carry it)
+    decor = {x.get("id"): x for x in d["views"]["front"]["panel"]["decor"]}
+    assert decor["console"]["size"] == [7.9, 4.6]
+    assert "console" not in pl
     legends = {s["text"] for s in d["views"]["front"]["silkscreen"] if "text" in s}
     assert {"SYS", "ALM", "MST", "SPD", "DX", "EN", "CON", "0", "1", "2", "3"} <= legends
     assert ("POE" in legends) == m["poe"] and ("PoE+" in legends) == m["poe"]
@@ -196,8 +200,10 @@ def test_the_dc_rear_has_the_terminal_block_and_one_fan():
     assert d["configurations"]["dc"]["views"] == {"rear": "rear-dc"}
     assert d["views"]["rear-dc"]["face"] == "rear"
     pl = by_id(d, "rear-dc")
-    assert pl["dc-terminal"]["ref"] == "juniper/ex2300-dc-terminal@1"
-    assert "ac-inlet" not in pl
+    decor = {x.get("id"): x for x in d["views"]["rear-dc"]["panel"]["decor"]}
+    assert decor["dc-terminal"]["size"] == [52.6, 17.5]
+    assert len([i for i in decor if i.startswith("dc-pole-") and not i.endswith("-screw")]) == 4
+    assert "ac-inlet" not in pl and "dc-terminal" not in pl
     assert len([x for x in d["views"]["rear-dc"]["panel"]["decor"] if x.get("kind") == "fan-grille"]) == 1
     # the management cluster is the AC rear's
     for i in ("mgmt", "usb", "console-rj45", "esd-rear-jack"):
@@ -266,13 +272,8 @@ def test_the_dcim_device_types_export_one_per_configuration(name, cid, part):
 
 # --- the components ----------------------------------------------------------
 
-def test_the_two_new_components_are_prefixed_and_sized_from_photographs():
-    con = yaml.safe_load((COMP / "ex2300-console-usb-mini/v1/contract.yaml").read_text())
-    dc = yaml.safe_load((COMP / "ex2300-dc-terminal/v1/contract.yaml").read_text())
-    assert con["size"] == {"w": 7.9, "h": 4.6} and con["class"] == "port"
-    assert dc["size"] == {"w": 52.6, "h": 17.5} and dc["class"] == "inlet"
-    assert set(dc["elements"]) == {"pole-1", "pole-2", "pole-3", "pole-4"}
-    assert con["attrs"]["role"] == "console"
-    for c in (con, dc):
-        assert c["size-confidence"] == {"w": "estimated", "h": "estimated"}
-        assert (COMP / c["name"] / "v1/skins/default.svg").exists()
+def test_this_slice_adds_no_component():
+    """Every part is a registry or common one: the guide's supply and fans are built in, and the two
+    pieces of metalwork no library part covers (the mini-USB console, the DC terminal block) are chassis
+    art, because the DCIM export has no row that could carry a part of either kind."""
+    assert not list(COMP.glob("ex2300-*"))

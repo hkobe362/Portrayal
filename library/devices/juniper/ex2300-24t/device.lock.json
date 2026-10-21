@@ -1,6 +1,6 @@
 {
  "bay-accepts": {},
- "composed": "272926683820b1e3",
+ "composed": "43ff78bdb2495538",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/esd-warning@1": "1.0.0+630c20786ff1f896",
@@ -12,8 +12,6 @@
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
   "common/screw-head@1": "1.1.0+0f38d482bcc27ec9",
   "common/usb-symbol@1": "1.0.0+fbb7f12a15136c0d",
-  "juniper/ex2300-console-usb-mini@1": "1.0.0+f862bec8b2929a8f",
-  "juniper/ex2300-dc-terminal@1": "1.0.0+309aad571259c289",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
   "std/rj45@2": "2.1.0+2c8fec73bdc493fb",
@@ -42,7 +40,6 @@
  ],
  "ids": [
   "front/cutout/btn-mode",
-  "front/cutout/console",
   "front/cutout/led-alm",
   "front/cutout/led-dx",
   "front/cutout/led-en",
@@ -86,7 +83,6 @@
   "front/cutout/uplink-2",
   "front/cutout/uplink-3",
   "front/placements/btn-mode",
-  "front/placements/console",
   "front/placements/led-alm",
   "front/placements/led-dx",
   "front/placements/led-en",
@@ -134,7 +130,6 @@
   "rear-dc/cutout/mgmt",
   "rear-dc/cutout/usb",
   "rear-dc/placements/console-rj45",
-  "rear-dc/placements/dc-terminal",
   "rear-dc/placements/esd-mark",
   "rear-dc/placements/esd-rear-jack",
   "rear-dc/placements/mgmt",
@@ -163,7 +158,7 @@
   "rear/placements/usb",
   "rear/placements/usb-mark"
  ],
- "names": "d7253bd148c50314",
+ "names": "106a88d979ccc97e",
  "placement-addressing": {
   "for": {
    "front/placements/btn-mode": [
@@ -235,7 +230,6 @@
   },
   "rel-pos": {
    "front/placements/btn-mode": 0,
-   "front/placements/console": 0,
    "front/placements/led-alm": 1,
    "front/placements/led-dx": 1,
    "front/placements/led-en": 2,
@@ -279,7 +273,6 @@
    "front/placements/uplink-2": 2,
    "front/placements/uplink-3": 3,
    "rear-dc/placements/console-rj45": 3,
-   "rear-dc/placements/dc-terminal": 0,
    "rear-dc/placements/esd-mark": 2,
    "rear-dc/placements/esd-rear-jack": 0,
    "rear-dc/placements/mgmt": 1,
@@ -308,7 +301,6 @@
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
   "front/placements/btn-mode": "controls",
-  "front/placements/console": "mgmt",
   "front/placements/led-alm": "status-leds",
   "front/placements/led-dx": "mode-leds",
   "front/placements/led-en": "mode-leds",
@@ -352,7 +344,6 @@
   "front/placements/uplink-2": "uplink",
   "front/placements/uplink-3": "uplink",
   "rear-dc/placements/console-rj45": "mgmt",
-  "rear-dc/placements/dc-terminal": "power-input",
   "rear-dc/placements/esd-mark": "furniture",
   "rear-dc/placements/esd-rear-jack": "esd",
   "rear-dc/placements/mgmt": "mgmt",
@@ -377,7 +368,7 @@
   "rear/placements/usb-mark": "furniture"
  },
  "placement-surface": "c226bc8590799548",
- "shape": "57758c2f60c940c0",
- "surface": "c2b5426c62cfbacf",
+ "shape": "8d227ff8223ef24f",
+ "surface": "c3792100cbf7ef77",
  "version": "0.1.0"
 }
