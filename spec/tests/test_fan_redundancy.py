@@ -563,7 +563,13 @@ def test_the_comparison_layer_can_now_reach_them():
     EIGHTY-NINE IS THE DELL R6625, n+1 over four dual-rotor modules, from its
     technical guide's thermal features ("The PowerEdge R6625 allows N+1 fan
     redundancy").
+
+    NINETY AND NINETY-ONE ARE THE JUNIPER QFX5120-48Y AND QFX5120-48YM,
+    4+1 over five rear bays: the hardware guide ships both with "five fan modules
+    (4+1 redundancy)" and numbers the slots 0 to 4. The two share one fan module
+    pair (QFX5110-FANAFO and -FANAFI, by airflow), so this is two devices on one
+    cooling part, counted twice because the guide states it for both.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 89, n
+    assert n == 91, n

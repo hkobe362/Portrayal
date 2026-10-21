@@ -2196,6 +2196,15 @@
   "L29": 1,
   "L93": 1
  },
+ "devices/juniper/qfx5120-48y/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5120-48ym/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 52
+ },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
   "L29": 1,
