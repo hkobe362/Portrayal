@@ -332,6 +332,15 @@ def test_nothing_but_those_are_exported_and_each_is_a_configuration():
     assert names <= set(doc()["configurations"])
 
 
+def test_the_bezel_reserves_the_dell_wordmark_and_draws_none():
+    base = LIB / "components" / "dell" / "r960-bezel" / "v1"
+    contract = yaml.safe_load((base / "contract.yaml").read_text())
+    assert "logo-zone" in contract["elements"]
+    assert "no-branding" in contract["provenance"]
+    svg = (base / "skins" / "default.svg").read_text()
+    assert re.search(r'<rect id="logo-zone"', svg)
+
+
 def test_the_module_types_of_the_new_parts_are_exported():
     for part in ("r960-psu-2800w-ac", "r960-psu-2400w-ac", "r960-psu-adapter-60mm", "r960-riser-1b",
                  "r960-riser-2", "r960-riser-3b", "r960-riser-4b", "r960-rear-io-board", "r960-fan",

@@ -21,5 +21,6 @@
     <rect x="21.0" y="166.8" width="377.0" height="1.2" fill="#8f8b85"/>
   </g>
   <rect id="release" x="410.0" y="62.3" width="20.8" height="43.9" rx="2" fill="#4a4f55" stroke="#1d2024" stroke-width="0.4"/>
+  <rect id="logo-zone" x="181.0" y="90.0" width="50.0" height="22.0" fill="none" stroke="none"/>
   <circle id="lock" cx="10.5" cy="13.3" r="3.6" fill="#16181a" stroke="#4a4f55" stroke-width="0.6"/>
 </svg>

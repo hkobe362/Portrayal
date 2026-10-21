@@ -900,7 +900,7 @@
    "dell/r960-fan@1"
   ]
  },
- "composed": "dc4c53f79689cc72",
+ "composed": "9ea9b4185902c03a",
  "composed-refs": {
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
   "common/drive-blank-25@2": "2.0.0+af7efd33cf1a467a",
@@ -938,7 +938,7 @@
   "dell/psu-60mm-plan@1": "1.0.0+780eb4d359517cc9",
   "dell/r960-air-shroud-bottom-cover@1": "1.0.0+d0ce2d9fd822d543",
   "dell/r960-air-shroud-top-cover@1": "1.0.0+841adb557c113464",
-  "dell/r960-bezel@1": "1.0.0+45d23b8d50f3ff84",
+  "dell/r960-bezel@1": "1.0.0+f7d5bf07a5ae0320",
   "dell/r960-drive-cage-cover@1": "1.0.0+310887dc0975b13c",
   "dell/r960-fan-cage@1": "1.0.0+798b325649a70510",
   "dell/r960-fan@1": "1.0.0+6f60e7b9a17c6671",

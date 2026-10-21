@@ -44,6 +44,10 @@ provenance:
     datasheet - R960 ISM table 7: 36 mm from the bezel's outer face to the ear plane with the bezel and 22 without,
     so the bezel stands 14.0 off the face. The model's bezel front sits 13.5 off its chassis front face (cad z 3.7 against 17.2), 0.5 under,
     and the datasheet is kept.
+  no-branding: >-
+    DELIBERATELY UNBRANDED. R960 ISM figure 34 shows a Dell wordmark across the honeycomb, low and a little left of the centre; it
+    is not drawn, and `logo-zone` reserves its place with nothing in it. The model's bezel carries no logo, so the zone (50.0 x 22.0
+    at 181.0, 90.0) is ESTIMATED from the oblique figure.
   lcd-variant: >-
     NOT MODELLED. The spec sheet offers an "LCD bezel or security bezel"; the LCD bezel's panel (ISM figure 34) is a
     different part with a display and buttons. The model holds it and could draw it; this pass draws the security bezel.
@@ -73,4 +77,9 @@ elements:
     size: [20.8, 43.9]
     class: control
     description: the release button at the right end - pressed after unlocking, to free the bezel's left end
+  logo-zone:
+    at: [181.0, 90.0]
+    size: [50.0, 22.0]
+    class: bezel
+    description: where Dell's wordmark sits; reserved and left empty
 skins: [default]
