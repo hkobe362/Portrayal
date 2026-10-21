@@ -10,4 +10,8 @@
   module slot cover panels, the mini-USB console port and the LCD panel buttons
   (`juniper/ex4300-*`).
 - The DCIM device types for the eleven EX4300 part numbers, in the NetBox and Nautobot
-  exports.
+  exports, and the module types for the supplies, fan modules and cover panels.
+
+### Changed
+- The DCIM exporter types the EX4300's mini-USB console port as a `usb-mini-b` console
+  port. No existing export changes.
