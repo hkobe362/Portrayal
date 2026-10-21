@@ -39,11 +39,12 @@ provenance:
   size: >-
     photo-measured - 149.7 x 18.5.
   depth: >-
-    estimated - 250.0, read off ISM figure 15 (riser 2's cage in the top view) at 1.86 px/mm.
-size: {w: 149.7, h: 18.5, d: 250.0}
-size-confidence: {w: photo-measured, h: photo-measured, d: estimated}
+    measured - Dell's R960 service model, working/intake/dell/3d-models/r960.glb: `ExpansionCardRiser2_` under `R960_ Riser 2` in the `Main
+    Assembly` node is 275.5 long (cad z 595.8 to 871.3). The first pass had 250.0, read off ISM figure 15 at 1.86 px/mm.
+size: {w: 149.7, h: 18.5, d: 275.5}
+size-confidence: {w: photo-measured, h: photo-measured, d: measured}
 body:
-  depth: 250.0
+  depth: 275.5
   color: '#4a5057'
 plan: {ref: dell/r960-riser-2-plan@1}
 relief:

@@ -16,8 +16,12 @@ provenance:
     no photograph of a filler over a double-width slot is held.
   size: >-
     estimated - two full-height slot pitches, 90.0 x 38.7 (the single filler's 90.0 x 18.42 over a
-    20.32 pitch, twice, less the web): the plate is drawn as the single filler's vent window
-    twice, one above the other.
+    20.32 pitch, twice, less the web).
+  window: >-
+    ESTIMATED - one tall vent window spanning both slots (82.4 x 32.7, in five rows of vent slots), so that slots 3, 6, 8 and 11 of riser
+    configuration 3 read as double width on the rear. The first pass drew the single filler's window twice, one above the other, which read
+    as two single slots. No R960 figure shows a filler over a double-width slot and none shows the slot marks of risers 3A and 4A, so
+    the window is the single filler's width and the two slots' height: a reading of the table, not of a photograph.
   depth: >-
     NOT KNOWN; drawn as a plate.
 size: {w: 90.0, h: 38.7}

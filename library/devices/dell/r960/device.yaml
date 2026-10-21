@@ -1,10 +1,15 @@
 # SOURCES:
 # Dell's PowerEdge R960 Installation and Service Manual (the ISM), Technical
 # Guide and Spec Sheet, read as the PDFs Dell publishes (hashes under
-# `datasheet` and `references`). Nothing else: no stencil, service model,
-# reseller figure or third-party photograph was used. The ISM's figures are
-# photographs and drawings embedded at 150 to 600 ppi, measured at the scale
-# each provenance entry gives; none is orthographic, and each says by how much.
+# `datasheet` and `references`), and Dell's R960 service model
+# (working/intake/dell/3d-models/r960.glb, Dell's CAD, held and not committed),
+# read with glbparts.py for the top view, the supplies' depth and the bezel.
+# No stencil, reseller figure or third-party photograph was used. The ISM's
+# figures are photographs and drawings embedded at 150 to 600 ppi, measured at
+# the scale each provenance entry gives; none is orthographic, and each says by
+# how much. The model's positions are the `Main Assembly` node's (the scene also
+# holds exploded copies under `Extra content`), in plan as x = 228.0 - cad x1
+# and y = 883.94 - cad z1.
 # STATE:
 # DONE: the envelope from ISM table 7; six fronts (32, 24, 16 and 8 x 2.5 inch,
 # 16 x E3.S, 8 x 2.5 inch + 16 x E3.S) each a view bound by
@@ -13,9 +18,10 @@
 # riser configurations 0-1, 0-2, 1, 2 and 3 over the four 86 mm supply bays
 # (the 60 mm supplies in their adapter, 2400 W and 2800 W), the BOSS-N1 bay,
 # LOM, OCP and rear I/O board; the top view from ISM figures 12 to 15 and 95 to
-# 96 (system board, processor expansion module, four heatsinks, 64 DIMM
-# slots, six fans, shrouds, support bar, covers, and the plan projections of the
-# seated parts); estimated bottom and sides.
+# 96 (system board, processor expansion module, 64 DIMM slots, drive cage cover)
+# and from the service model (four heatsinks, six fans, fan cage, shrouds,
+# support bar, system cover and latch, and the plan projections of the seated
+# parts); estimated bottom and sides.
 # LEFT: the 1800 W and -48 V DC supplies, direct liquid cooling, the LCD bezel
 # and rear serial/VGA brackets (see the gaps).
 format: 1
@@ -109,29 +115,35 @@ provenance:
       numbered from ISM figure 27, the service label (a drive number, then "Bay 1 (0-7)", "Bay 2 (8-15)"): 0-15 left to right on
       the 16 E3.S front and, because the 2.5 inch bank is bay 1 (0-7), 8-23 on the 8 + 16 front.
   top:
-    confidence: estimated
+    confidence: measured
     note: >-
-      ESTIMATED. REAR AT y=0, FRONT AT y=866.74 - the library's plan convention, x left to right as the front faces you
-      (CPU 2 and CPU 4 left, CPU 1 and CPU 3 right). Dell holds no orthographic top view of the R960: ISM figures 12 to 15 are
-      photographs from above (1227 x 1854 px at 300 ppi, with the cover and shrouds progressively removed) and figures
-      95 and 96 are the two boards from above. They are not orthographic: measured against the chassis, they are 1.813 px/mm
-      across the 444 body and 1.863 px/mm down the 866.74 depth (2.7% apart), and a memory socket is drawn about 157 mm long
-      against the 133.4 the R660's service model measures for DDR5 - a 15% stretch down at the boards' height. So x is taken
-      from the width, y from the depth, the memory sockets keep 133.4, and every top-view position carries that uncertainty
-      (a few millimetres across, up to 15 mm down). What the figures give: the six fans (figure 12: 22..85, 85..150, 150..217, 234..298,
-      299..363 and 363..427 across), the fan cage, air shroud top and bottom covers, support bar, the four heatsinks (figures 14, 15), the two boards
-      and their 64 sockets (figures 95, 96: system board sockets A1-A16 and B1-B16, PEM sockets C1-C16 and D1-D16, named by
-      the labels the figures print), the drive cage cover. SEATED MODULES PROJECT INTO THIS VIEW through their rear bay's `plan:` - the
-      two upper supplies, the BOSS-N1 module, the OCP card, LOM, rear I/O board and risers - at positions mirrored from their
-      rear bays (plan x = 444 - rear x - w). The standing front drives do not project (a standing 2.5 inch drive is 7 mm wide;
-      the library's std/drive-25-plan@1 is a flat drive). NOT YET IN THIS VIEW: the cards, the backplane and the cabling.
+      measured, where it says so. REAR AT y=0, FRONT AT y=866.74 - the library's plan convention, x left to right as the front faces you
+      (CPU 2 and CPU 4 left, CPU 1 and CPU 3 right). MEASURED from Dell's R960 service model, working/intake/dell/3d-models/r960.glb, read with
+      glbparts.py: the positions come from the un-exploded `Main Assembly` node only (the scene also holds exploded copies under `Extra
+      content`), mapped as plan x = 228.0 - cad x1 (the system cover, cad x -216.0..228.0, is the 444 body) and plan y = 883.94 - cad z1 (the rear
+      wall: the model's chassis front face at cad z 17.2 plus the ISM's 866.74, where its `Hole` cubes stand at 883.6, and the supply handles end
+      2.56 past it against ISM table 7's 2.455). What the model gives, each part citing its node: the six fans and the fan cage (`R960_
+      CoolingFan`), the four heatsinks (`R960_ HeatSink SYS` and `R960_ HeatSink PEM`), the air shroud top cover (`R960_ AirShroudTopCover`) and the
+      shroud under it (`R960_ GPU_AirShroud`), the support bar (`R960_ SupportBar`), the system cover and its latch (`R960_ SystemCover`), the supplies
+      (`R960_ PSU Prefab`), the four risers (`Riser 1B - FL`, `Riser 2`, `Riser 3A - FL`, `Riser 4A - FL`) and the rows of the 64 memory sockets (`Memory
+      Module_SB`, `_PEM`). The model is one build: full-length risers, the GPU shroud and the full-length support bar, where ISM figure 12 is
+      the half-length build; see `top-view-model-vs-ism`. NOT FROM THE MODEL, still read off ISM figures 12 to 15, 95 and 96 (photographs from above,
+      1.813 px/mm across the 444 body and 1.863 px/mm down, 2.7% apart, with a memory socket drawn 157 long against 133.4 - a 15% stretch down): the
+      two boards' outlines (the model holds them, system board 425.7 x 558.4 at 9.1, 30.0 and PEM 430.4 x 288.1 at 6.8, 264.3, and they are not re-read
+      here), the sockets' x and their names (figures 95, 96: A1-A16 and B1-B16, C1-C16 and D1-D16, named by the labels the figures print) and the drive cage
+      cover. SEATED MODULES PROJECT INTO THIS VIEW through their rear bay's `plan:` - the two upper supplies, the BOSS-N1 module, the OCP card, LOM,
+      rear I/O board and risers - the supplies and risers at the model's positions, the rest mirrored from their rear bays (plan x = 444 - rear x - w).
+      The standing front drives do not project (a standing 2.5 inch drive is 7 mm wide; the library's std/drive-25-plan@1 is a flat drive). NOT YET IN
+      THIS VIEW: the cards, the backplane and the cabling.
   bezel:
-    confidence: estimated
+    confidence: measured
     note: >-
       DRAWN FITTED, as on the R740xd and R660, and taken off in the viewer: the optional security bezel (dell/r960-bezel@1)
       covers the body between the ears, and `for:` names the bays and parts behind it. Its openings are holes, so the drives
-      show through. THE SHAPE IS ESTIMATED from ISM figure 34, an oblique drawing of the LCD bezel: a honeycomb between a plain
-      end plate at each side. No straight-on bezel figure is held. The LCD bezel is not modelled.
+      show through. MEASURED from Dell's R960 service model, working/intake/dell/3d-models/r960.glb: `R960_ FrontBezel` in the `Main Assembly` node,
+      430.8 x 168.5 at front-face (25.5, 2.7), its plate's 42 openings found by decoding the mesh (large hexagons in a staggered grid, 38.5
+      by 44.45 apart) and its release button. The model's bezel is the LCD bezel and the security bezel's own shape is not in it; the ISM says
+      the mesh is the same (figure 34), and the lock's place is a guess (see `security-bezel-shape-estimated`). The LCD bezel is not modelled.
   sides-and-bottom:
     confidence: estimated
     note: >-
@@ -213,15 +225,58 @@ gaps:
       figure 104 say slots 4 and 9, and slot 3 is riser 1's. Slots 4 and 9 are used, slot 4 on the left by figure 104's callout order.
     wanted: >-
       a rear photograph of riser 2 with its slot numbers printed, or Dell's correction
-  - what: top-view-geometry-estimated
+  - what: top-view-model-vs-ism
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      the top view's parts are Dell's service model (r960.glb, the `Main Assembly` node), which is the full-length-riser build: `Riser 1B - FL`,
+      `Riser 3A - FL`, `Riser 4A - FL`, the GPU shroud and the full-length support bar. ISM figure 12 is the half-length build, read at 1.813 px/mm
+      across and 1.863 down (a 15% stretch down). They agree across and disagree down and by build: the support bar is 438.3 x 59.7 in the model
+      against 436.0 x 35.0 in the figure; the shroud under the top cover 438.5 x 327.9 against 426.0 x 93.0; the top cover 434.9 x 173.8 against 436.0 x
+      142.0; the heatsink 128.0 x 182.1 (a 78.9 x 120.6 block and a 126.8 x 49.3 fin pack) against 74.5 x 123.0 (the block, to 4.4 mm); a fan 62.7 x 88.2 against
+      64.0 x 86.0; the cover 444.0 x 754.1 against 440.0 x 745.0. The device draws the model's, which is one build; the half-length support
+      bar and bottom cover (ISM figures 39 and 40, 12) are not drawn.
+    wanted: >-
+      Dell's service model of the half-length build, or an orthographic drawing of the R960 from above with the cover off
+  - what: top-view-boards-not-reread
     scope: [top]
     reason: needs-drawing
     note: >-
-      no orthographic top view exists in the three documents; see provenance/top for the 2.7% and 15% disagreements between the
-      photographs' axes and the known sizes. The boards' outlines, shrouds, covers and support bar are rectangles read off
-      figure 12 and 15.
+      the model is held and gives the boards, `R960_ Systemboard` 425.7 x 558.4 at plan (9.1, 30.0) and `R960_ Processor Expansion Module` 430.4 x
+      288.1 at (6.8, 264.3), but the system board and PEM here are still the rectangles read off ISM figures 12 and 15 (427.0 x 560.0 at 8.5, 20.0 and 424.0 x
+      230.0 at 10.0, 296.0): they were not on the review's list and sit under the parts that were. The drive cage cover is also still the figure's.
     wanted: >-
-      a Dell service model or a drawing of the R960 from above with the cover off
+      the boards' and the cage cover's boxes read from r960.glb in a follow-up
+  - what: memory-sockets-model-vs-figure-95
+    scope: [top]
+    reason: sources-disagree
+    note: >-
+      the model holds 30 sockets on each board (`Memory Module_SB` and `_PEM`: 8 at a 7.5 pitch, then 14 at an 8.65 pitch across the middle, then 8) where ISM
+      figures 95 and 96 and the technical guide print 32 each (A1-A16 and B1-B16, C1-C16 and D1-D16). The outer banks agree to 0.6 mm (plan x 21.0 to
+      73.7 and 366.4 to 419.1 against 20.4 to 72.9 and 366.0 to 418.5); the model's middle 14 span 163.5 to 280.5 against the figure's 16, 162.6 to
+      278.9. The device keeps the ISM's 32 at the figure's pitch and moves every row to the model's y, 352.8 (133.4 long, as the model has them), 7.2
+      from the figure's.
+    wanted: >-
+      a Dell drawing of the memory sockets with the middle banks dimensioned
+  - what: psu-x-model-vs-figure-10
+    scope: [top, rear]
+    reason: sources-disagree
+    note: >-
+      the supplies' outer edges stand 11.4 in from the body wall in the model (`R960_ PSU Prefab`, plan x 346.3 and 11.8) and 16.9 in ISM figure 10
+      (rear x 16.9 and 341.4, which mirror to plan x 341.1 and 16.6): 5.2 and 4.8 mm. The top view draws the model's, which is a drawing of the machine from
+      above; the rear face keeps the photograph's, which is a photograph of the machine from behind at 3.374 px/mm, good to a millimetre.
+    wanted: >-
+      a rear photograph of the R960 with a rule across the supplies, or Dell's dimensioned rear drawing
+  - what: riser-length-model-vs-table-13
+    scope: [top, risers]
+    reason: sources-disagree
+    note: >-
+      the model calls riser 1 `Riser 1B - FL` and makes its board 357.0 long, where ISM table 13 gives riser 1B's three slots half length; riser 3A
+      (356.3, full length) agrees with the ISM, and the ISM states no length for riser 4A (357.0 in the model). The model's riser 1B and 4A are 159.9 and 148.4
+      wide in plan against the rear cages' 117.1 and 120.0. The top view draws the model's, and the half-length variants (1C, 3B, 4B, 4C) borrow
+      the nearest held riser's length marked estimated.
+    wanted: >-
+      Dell's statement of the length of riser 1B and a model of a half-length riser
   - what: front-lower-row-numbering-32-bay
     scope: [front-sff32]
     reason: needs-photo
@@ -252,10 +307,13 @@ gaps:
     scope: [front, front-sff8, front-sff24, front-sff32, front-e3s16, front-sff8-e3s16]
     reason: needs-photo
     note: >-
-      the honeycomb is read from ISM figure 34, an oblique drawing of the LCD bezel, as a regular grid; the security bezel's
-      own openings, its release button and its lock are not shown straight on. The LCD bezel is not modelled.
+      the model is held (r960.glb, `R960_ FrontBezel`) and gives the honeycomb, the bezel's box and the release button, which are drawn from it.
+      It does not answer for the security bezel: the model's is the LCD bezel (a display window, arrow and tick buttons, their numbers),
+      and Dell's guide shows no other. The ISM says the mesh is the same on both (figure 34), which is why the plate's cells stand; the
+      security bezel's own end plates, the cell where the LCD window is, and its keylock's place are not in any document held (the lock
+      is drawn on the left end plate by guess). The LCD bezel is not modelled.
     wanted: >-
-      a straight-on photograph of the R960 security bezel fitted
+      a Dell model or a straight-on photograph of the R960 security bezel fitted
   - what: psu-1800w-and-dc-not-modelled
     scope: [psus]
     reason: needs-photo
@@ -264,14 +322,17 @@ gaps:
       no R960 document shows either face, and the 60 mm supplies this device accepts are the R660's 1100 and 1400 W units.
     wanted: >-
       rear photographs of the 1800 W and -48 V DC supplies in an R960
-  - what: psu-adapter-side-and-86mm-depth
+  - what: psu-adapter-not-in-the-model
     scope: [psus]
     reason: needs-photo
     note: >-
-      the 26 mm adapter's side, its face and the 86 mm supplies' depth are not shown by any R960 document (ISM figures 199 and
-      200 draw the adapter's screws only); the adapter is at the left, the supplies' depth is the 60 mm supply's.
+      the 86 mm supplies' depth is answered by the model (r960.glb, `R960_ PSU Prefab`: the can runs 233.5 into the chassis and the handle stands
+      33.5 proud of the face, 2.6 past the rear wall; the face is recessed 30.9 inside it) and is drawn from it. The model holds ONE supply and no
+      adapter: the 26 mm adapter, its side, its face and a 60 mm supply seated in it are in no R960 document (ISM figures 199 and 200 draw the
+      adapter's screws only) and not in the model. The adapter is drawn at the left with the 60 mm supply's 222.0 depth, estimated, in a bay whose
+      can is 233.5.
     wanted: >-
-      a photograph of a 60 mm supply in its adapter from behind, and a side view of an 86 mm supply
+      a photograph of a 60 mm supply in its adapter from behind, and a side view of the adapter
   - what: full-height-slots-take-the-filler-only
     scope: [risers]
     reason: needs-drawing
@@ -479,8 +540,11 @@ views:
       - {at: [465.6, 24.9], path: M 0.6 0.42 L 0.85 0 L 1.1 0.42 Z M 0.63 2.42 H 1.07 V 2.83 H 0.63 Z M 1.26 1.0 H 1.58 V 1.32 H 1.26 Z, filled: true, fill: '#e6e8ea', for: usb-1}
       - {at: [464.9, 67.85], path: M -0.06 0.38 L 0.32 0.58 L 0.26 0.16 M 0.32 0.58 L 0.95 1.22 M 1.42 1.36 L 0.95 1.22 L 1.06 1.66, stroke-width: 0.22, fill: '#e6e8ea', for: idrac-direct}
       - {at: [27.5, 87.2], text: 'NVMe', font-size: 1.2, fill: '#9aa0a6'}
+      - {at: [75.5, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [79.9, 89.3], text: 'CPU4', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [324.5, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [328.9, 89.3], text: 'CPU2', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [431.6, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [436.0, 89.3], text: 'CPU1', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
       - {at: [35.02, 89.5], text: '0', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-0}
       - {at: [52.96, 89.5], text: '1', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-1}
@@ -561,7 +625,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, vga, mark-vga],
            hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15],
            group: covers, rel-pos: 3}
@@ -618,6 +682,7 @@ views:
       - {at: [336.6, 143.0], path: M 0 0 H 2.6 V 2.6 H 0 Z, stroke-width: 0.2, fill: '#2b2f33', for: psu-2}
       - {at: [336.6, 143.0], path: M 1.55 0.42 L 0.85 1.45 H 1.33 L 1.08 2.22 L 1.82 1.12 H 1.34 Z, filled: true, fill: '#2b2f33', for: psu-2}
       - {at: [340.0, 145.6], text: '2', font-size: 3.5, fill: '#2b2f33', for: psu-2}
+      # printed on the chassis under the BOSS bay, ISM figure 10
       - {at: [128.0, 60.0], text: 'MEST', font-size: 3.6, fill: '#9aa1a8'}
     components:
       bays:
@@ -628,14 +693,14 @@ views:
         - {id: psu-3, at: [16.9, 90.6], size: {w: 86.0, h: 40.4},
            accepts: [dell/r960-psu-2800w-ac@1, dell/r960-psu-2400w-ac@1, dell/r960-psu-adapter-60mm@1, dell/r960-psu-blank@1],
            default: dell/r960-psu-2800w-ac@1, group: psus, rel-pos: 3,
-           plan: {view: top, at: [341.1, 0.0], under: [system-cover]}}
+           plan: {view: top, at: [346.3, 30.9], under: [system-cover]}}
         - {id: psu-1, at: [16.9, 131.8], size: {w: 86.0, h: 40.4},
            accepts: [dell/r960-psu-2800w-ac@1, dell/r960-psu-2400w-ac@1, dell/r960-psu-adapter-60mm@1, dell/r960-psu-blank@1],
            default: dell/r960-psu-2800w-ac@1, group: psus, rel-pos: 1}
         - {id: psu-4, at: [341.4, 90.6], size: {w: 86.0, h: 40.4},
            accepts: [dell/r960-psu-2800w-ac@1, dell/r960-psu-2400w-ac@1, dell/r960-psu-adapter-60mm@1, dell/r960-psu-blank@1],
            default: dell/r960-psu-2800w-ac@1, group: psus, rel-pos: 4,
-           plan: {view: top, at: [16.6, 0.0], under: [system-cover]}}
+           plan: {view: top, at: [11.8, 30.9], under: [system-cover]}}
         - {id: psu-2, at: [341.4, 131.8], size: {w: 86.0, h: 40.4},
            accepts: [dell/r960-psu-2800w-ac@1, dell/r960-psu-2400w-ac@1, dell/r960-psu-adapter-60mm@1, dell/r960-psu-blank@1],
            default: dell/r960-psu-2800w-ac@1, group: psus, rel-pos: 2}
@@ -659,7 +724,7 @@ views:
         - {id: riser-2, at: [124.2, 132.0], size: {w: 149.7, h: 18.5},
            accepts: [dell/r960-riser-2@1], default: dell/r960-riser-2@1,
            group: risers, rel-pos: 2,
-           plan: {view: top, at: [170.1, 0.0], under: [system-cover]},
+           plan: {view: top, at: [168.7, 12.7], under: [system-cover]},
            only-in: [sff8-rc2-1b-2-3b-4b, sff8-rc3-1a-2-3a-4a, sff16-rc2-1b-2-3b-4b, sff16-rc3-1a-2-3a-4a, sff24-rc2-1b-2-3b-4b, sff24-rc3-1a-2-3a-4a, sff32-rc2-1b-2-3b-4b, sff32-rc3-1a-2-3a-4a, e3s16-rc2-1b-2-3b-4b, e3s16-rc3-1a-2-3a-4a, sff8-e3s16-rc2-1b-2-3b-4b, sff8-e3s16-rc3-1a-2-3a-4a]}
         - {id: riser-2-blank, at: [124.2, 132.0], size: {w: 149.7, h: 18.5},
            accepts: [dell/r960-riser-2-blank@1], default: dell/r960-riser-2-blank@1,
@@ -668,7 +733,7 @@ views:
         - {id: riser-3, at: [176.4, 9.0], size: {w: 104.3, h: 84.0},
            accepts: [dell/r960-riser-3b@1, dell/r960-riser-3b-scale-out@1, dell/r960-riser-3a@1], default: dell/r960-riser-3b@1,
            group: risers, rel-pos: 3,
-           plan: {view: top, at: [163.3, 0.0], under: [system-cover]},
+           plan: {view: top, at: [148.4, 1.1], under: [system-cover]},
            only-in: [sff8-rc1-1c-3b-4c, sff8-rc2-1b-2-3b-4b, sff8-rc3-1a-2-3a-4a, sff16-rc1-1c-3b-4c, sff16-rc2-1b-2-3b-4b, sff16-rc3-1a-2-3a-4a, sff24-rc1-1c-3b-4c, sff24-rc2-1b-2-3b-4b, sff24-rc3-1a-2-3a-4a, sff32-rc1-1c-3b-4c, sff32-rc2-1b-2-3b-4b, sff32-rc3-1a-2-3a-4a, e3s16-rc1-1c-3b-4c, e3s16-rc2-1b-2-3b-4b, e3s16-rc3-1a-2-3a-4a, sff8-e3s16-rc1-1c-3b-4c, sff8-e3s16-rc2-1b-2-3b-4b, sff8-e3s16-rc3-1a-2-3a-4a]}
         - {id: riser-3-blank, at: [176.4, 9.0], size: {w: 104.3, h: 84.0},
            accepts: [dell/r960-riser-3-blank@1], default: dell/r960-riser-3-blank@1,
@@ -677,15 +742,17 @@ views:
         - {id: riser-1, at: [5.0, 9.0], size: {w: 117.1, h: 63.0},
            accepts: [dell/r960-riser-1c@1, dell/r960-riser-1b@1, dell/r960-riser-1a@1], default: dell/r960-riser-1c@1,
            group: risers, rel-pos: 1,
-           plan: {view: top, at: [321.9, 0.0], under: [system-cover]}}
+           plan: {view: top, at: [280.2, 1.2], under: [system-cover]}}
         - {id: riser-4, at: [317.7, 9.0], size: {w: 120.0, h: 63.0},
            accepts: [dell/r960-riser-4c@1, dell/r960-riser-4b@1, dell/r960-riser-4a@1], default: dell/r960-riser-4c@1,
            group: risers, rel-pos: 4,
-           plan: {view: top, at: [6.3, 0.0], under: [system-cover]}}
+           plan: {view: top, at: [4.7, 1.1], under: [system-cover]}}
   top:
-    # REAR AT y=0, FRONT AT y=866.74 - the library's plan convention. Every
-    # position is read off Dell's photographs from above and is ESTIMATED
-    # (see provenance/top): x from the 444 width, y from the 866.74 depth.
+    # REAR AT y=0, FRONT AT y=866.74 - the library's plan convention. The
+    # fans, cage, heatsinks, shrouds, support bar, cover, supplies and risers
+    # are Dell's R960 service model (plan x = 228.0 - cad x1, plan y = 883.94
+    # - cad z1); the boards, the memory sockets' x and the drive cage cover are
+    # still read off Dell's photographs (see provenance/top).
     size: {w: 444.0, h: 866.74}
     panel:
       decor:
@@ -693,91 +760,91 @@ views:
         - {at: [0.0, 734.7], size: [444.0, 132.04], fill: '#2f3439'}
     components:
       bays:
-        - {id: fan-1, at: [21.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-1, at: [20.5, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 1, under: [system-cover, air-shroud-top]}
-        - {id: fan-2, at: [85.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-2, at: [84.9, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 2, under: [system-cover, air-shroud-top]}
-        - {id: fan-3, at: [150.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-3, at: [149.4, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 3, under: [system-cover, air-shroud-top]}
-        - {id: fan-4, at: [234.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-4, at: [233.6, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 4, under: [system-cover, air-shroud-top]}
-        - {id: fan-5, at: [298.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-5, at: [298.1, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 5, under: [system-cover, air-shroud-top]}
-        - {id: fan-6, at: [362.5, 553.0], size: {w: 64.0, h: 86.0},
+        - {id: fan-6, at: [362.5, 552.3], size: {w: 62.7, h: 88.2},
            accepts: [dell/r960-fan@1], default: dell/r960-fan@1,
            group: fans, rel-pos: 6, under: [system-cover, air-shroud-top]}
         # THE SYSTEM BOARD'S 32 SOCKETS, A (processor 1) and B (processor 2), in the order
         # ISM figure 95 prints them left to right; the PEM stands over them
-        - {id: dimm-b8, at: [20.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 1, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b16, at: [27.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 2, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b2, at: [35.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 3, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b10, at: [42.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 4, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b6, at: [50.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 5, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b14, at: [57.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 6, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b4, at: [65.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 7, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b12, at: [72.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 8, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b9, at: [162.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 9, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b1, at: [170.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 10, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b15, at: [177.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 11, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b7, at: [185.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 12, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b11, at: [192.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 13, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b3, at: [200.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 14, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b13, at: [207.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 15, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-b5, at: [215.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 16, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a8, at: [222.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 17, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a16, at: [230.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 18, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a2, at: [237.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 19, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a10, at: [245.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 20, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a6, at: [252.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 21, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a14, at: [260.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 22, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a4, at: [267.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 23, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a12, at: [275.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 24, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a9, at: [366.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 25, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a1, at: [373.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 26, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a15, at: [381.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 27, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a7, at: [388.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 28, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a11, at: [396.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 29, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a3, at: [403.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 30, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a13, at: [411.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 31, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {id: dimm-a5, at: [418.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 32, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b8, at: [20.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 1, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b16, at: [27.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 2, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b2, at: [35.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 3, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b10, at: [42.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 4, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b6, at: [50.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 5, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b14, at: [57.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 6, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b4, at: [65.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 7, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b12, at: [72.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 8, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b9, at: [162.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 9, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b1, at: [170.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 10, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b15, at: [177.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 11, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b7, at: [185.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 12, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b11, at: [192.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 13, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b3, at: [200.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 14, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b13, at: [207.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 15, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-b5, at: [215.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 16, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a8, at: [222.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 17, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a16, at: [230.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 18, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a2, at: [237.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 19, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a10, at: [245.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 20, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a6, at: [252.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 21, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a14, at: [260.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 22, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a4, at: [267.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 23, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a12, at: [275.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 24, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a9, at: [366.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 25, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a1, at: [373.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 26, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a15, at: [381.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 27, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a7, at: [388.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 28, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a11, at: [396.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 29, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a3, at: [403.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 30, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a13, at: [411.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 31, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
+        - {id: dimm-a5, at: [418.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory, rel-pos: 32, in: system-board, under: [system-cover, air-shroud-top, air-shroud-bottom, pem-board, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
         # THE PEM'S 32 SOCKETS, C (processor 3) and D (processor 4), as ISM figure 96 prints them
-        - {id: dimm-d8, at: [20.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 1, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d16, at: [27.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 2, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d2, at: [35.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 3, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d10, at: [42.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 4, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d6, at: [50.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 5, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d14, at: [57.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 6, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d4, at: [65.40, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 7, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d12, at: [72.90, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 8, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d9, at: [162.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 9, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d1, at: [170.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 10, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d15, at: [177.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 11, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d7, at: [185.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 12, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d11, at: [192.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 13, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d3, at: [200.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 14, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d13, at: [207.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 15, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-d5, at: [215.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 16, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c8, at: [222.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 17, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c16, at: [230.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 18, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c2, at: [237.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 19, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c10, at: [245.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 20, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c6, at: [252.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 21, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c14, at: [260.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 22, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c4, at: [267.60, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 23, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c12, at: [275.10, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 24, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c9, at: [366.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 25, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c1, at: [373.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 26, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c15, at: [381.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 27, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c7, at: [388.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 28, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c11, at: [396.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 29, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c3, at: [403.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 30, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c13, at: [411.00, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 31, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
-        - {id: dimm-c5, at: [418.50, 360.0], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 32, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d8, at: [20.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 1, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d16, at: [27.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 2, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d2, at: [35.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 3, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d10, at: [42.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 4, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d6, at: [50.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 5, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d14, at: [57.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 6, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d4, at: [65.40, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 7, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d12, at: [72.90, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 8, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d9, at: [162.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 9, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d1, at: [170.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 10, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d15, at: [177.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 11, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d7, at: [185.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 12, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d11, at: [192.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 13, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d3, at: [200.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 14, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d13, at: [207.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 15, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-d5, at: [215.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 16, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c8, at: [222.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 17, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c16, at: [230.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 18, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c2, at: [237.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 19, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c10, at: [245.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 20, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c6, at: [252.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 21, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c14, at: [260.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 22, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c4, at: [267.60, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 23, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c12, at: [275.10, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 24, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c9, at: [366.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 25, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c1, at: [373.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 26, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c15, at: [381.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 27, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c7, at: [388.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 28, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c11, at: [396.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 29, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c3, at: [403.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 30, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c13, at: [411.00, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 31, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
+        - {id: dimm-c5, at: [418.50, 352.8], size: {w: 3.8, h: 133.4}, accepts: [common/dimm-plan@1], default: common/dimm-plan@1, group: memory-expansion, rel-pos: 32, in: pem-board, under: [system-cover, air-shroud-top, air-shroud-bottom]}
       placements:
         - {ref: dell/r960-system-board@1, id: system-board, at: [8.5, 20.0],
            group: interior, rel-pos: 1,
@@ -785,24 +852,24 @@ views:
         - {ref: dell/r960-pem-board@1, id: pem-board, at: [10.0, 296.0],
            group: interior, rel-pos: 2,
            under: [heatsink-3, heatsink-4, air-shroud-top, air-shroud-bottom, support-bar, fan-cage, system-cover, cage-cover, fan-1, fan-2, fan-3, fan-4, fan-5, fan-6, dimm-d8, dimm-d16, dimm-d2, dimm-d10, dimm-d6, dimm-d14, dimm-d4, dimm-d12, dimm-d9, dimm-d1, dimm-d15, dimm-d7, dimm-d11, dimm-d3, dimm-d13, dimm-d5, dimm-c8, dimm-c16, dimm-c2, dimm-c10, dimm-c6, dimm-c14, dimm-c4, dimm-c12, dimm-c9, dimm-c1, dimm-c15, dimm-c7, dimm-c11, dimm-c3, dimm-c13, dimm-c5]}
-        - {ref: dell/r960-heatsink@1, id: heatsink-1, at: [284.0, 394.0],
-           group: processors, rel-pos: 1, in: system-board, under: [heatsink-3, pem-board, support-bar, air-shroud-top, system-cover]}
-        - {ref: dell/r960-heatsink@1, id: heatsink-2, at: [85.5, 394.0],
-           group: processors, rel-pos: 2, in: system-board, under: [heatsink-4, pem-board, support-bar, air-shroud-top, system-cover]}
-        - {ref: dell/r960-heatsink@1, id: heatsink-3, at: [284.0, 394.0],
+        - {ref: dell/r960-heatsink@1, id: heatsink-1, at: [235.3, 349.3],
+           group: processors, rel-pos: 1, in: system-board, under: [heatsink-3, pem-board, support-bar, air-shroud-top, air-shroud-bottom, system-cover]}
+        - {ref: dell/r960-heatsink@1, id: heatsink-2, at: [32.4, 349.3],
+           group: processors, rel-pos: 2, in: system-board, under: [heatsink-4, pem-board, support-bar, air-shroud-top, air-shroud-bottom, system-cover]}
+        - {ref: dell/r960-heatsink@1, id: heatsink-3, at: [235.3, 349.3],
            group: processors, rel-pos: 3, in: pem-board, under: [support-bar, system-cover, air-shroud-top, air-shroud-bottom]}
-        - {ref: dell/r960-heatsink@1, id: heatsink-4, at: [85.5, 394.0],
+        - {ref: dell/r960-heatsink@1, id: heatsink-4, at: [32.4, 349.3],
            group: processors, rel-pos: 4, in: pem-board, under: [support-bar, system-cover, air-shroud-top, air-shroud-bottom]}
-        - {ref: dell/r960-fan-cage@1, id: fan-cage, at: [9.5, 550.0],
+        - {ref: dell/r960-fan-cage@1, id: fan-cage, at: [8.7, 546.8],
            group: interior, rel-pos: 3, under: [system-cover],
            frames: [fan-1, fan-2, fan-3, fan-4, fan-5, fan-6]}
-        - {ref: dell/r960-air-shroud-bottom-cover@1, id: air-shroud-bottom, at: [8.5, 276.0],
-           group: interior, rel-pos: 4, under: [system-cover]}
-        - {ref: dell/r960-support-bar@1, id: support-bar, at: [4.0, 370.0],
+        - {ref: dell/r960-air-shroud-bottom-cover@1, id: air-shroud-bottom, at: [2.8, 224.1],
+           group: interior, rel-pos: 4, under: [support-bar, air-shroud-top, system-cover]}
+        - {ref: dell/r960-support-bar@1, id: support-bar, at: [2.8, 339.9],
            group: interior, rel-pos: 5, under: [system-cover]}
-        - {ref: dell/r960-air-shroud-top-cover@1, id: air-shroud-top, at: [4.0, 405.0],
-           group: interior, rel-pos: 6, under: [system-cover]}
-        - {ref: dell/r960-system-cover@1, id: system-cover, at: [2.0, 0.0],
+        - {ref: dell/r960-air-shroud-top-cover@1, id: air-shroud-top, at: [4.6, 362.3],
+           group: interior, rel-pos: 6, under: [support-bar, system-cover]}
+        - {ref: dell/r960-system-cover@1, id: system-cover, at: [0.0, 0.0],
            group: covers, rel-pos: 1, under: [cage-cover]}
         - {ref: dell/r960-drive-cage-cover@1, id: cage-cover, at: [1.0, 734.7],
            group: covers, rel-pos: 2}
@@ -865,9 +932,13 @@ views:
       - {at: [465.6, 24.9], path: M 0.6 0.42 L 0.85 0 L 1.1 0.42 Z M 0.63 2.42 H 1.07 V 2.83 H 0.63 Z M 1.26 1.0 H 1.58 V 1.32 H 1.26 Z, filled: true, fill: '#e6e8ea', for: usb-1}
       - {at: [464.9, 67.85], path: M -0.06 0.38 L 0.32 0.58 L 0.26 0.16 M 0.32 0.58 L 0.95 1.22 M 1.42 1.36 L 0.95 1.22 L 1.06 1.66, stroke-width: 0.22, fill: '#e6e8ea', for: idrac-direct}
       - {at: [27.5, 87.2], text: 'NVMe', font-size: 1.2, fill: '#9aa0a6'}
+      - {at: [75.8, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [80.2, 89.3], text: 'CPU4', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [182.8, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [187.2, 89.3], text: 'CPU2', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [290.7, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [295.1, 89.3], text: 'CPU1', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [397.7, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [402.1, 89.3], text: 'CPU3', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
       - {at: [35.02, 89.5], text: '0', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-0}
       - {at: [52.96, 89.5], text: '1', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-1}
@@ -932,7 +1003,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23, vga, mark-vga],
            hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23],
            group: covers, rel-pos: 3}
@@ -991,6 +1062,7 @@ views:
       - {at: [465.6, 24.9], path: M 0.6 0.42 L 0.85 0 L 1.1 0.42 Z M 0.63 2.42 H 1.07 V 2.83 H 0.63 Z M 1.26 1.0 H 1.58 V 1.32 H 1.26 Z, filled: true, fill: '#e6e8ea', for: usb-1}
       - {at: [464.9, 67.85], path: M -0.06 0.38 L 0.32 0.58 L 0.26 0.16 M 0.32 0.58 L 0.95 1.22 M 1.42 1.36 L 0.95 1.22 L 1.06 1.66, stroke-width: 0.22, fill: '#e6e8ea', for: idrac-direct}
       - {at: [27.5, 87.2], text: 'NVMe', font-size: 1.2, fill: '#9aa0a6'}
+      - {at: [75.5, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [79.9, 89.3], text: 'CPU4', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
       - {at: [35.02, 89.5], text: '0', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-0}
       - {at: [52.96, 89.5], text: '1', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-1}
@@ -1023,7 +1095,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, vga, mark-vga],
            hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7],
            group: covers, rel-pos: 3}
@@ -1114,7 +1186,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15, vga, mark-vga],
            hides: [e3s-0, e3s-1, e3s-2, e3s-3, e3s-4, e3s-5, e3s-6, e3s-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15],
            group: covers, rel-pos: 3}
@@ -1167,8 +1239,11 @@ views:
       - {at: [465.6, 24.9], path: M 0.6 0.42 L 0.85 0 L 1.1 0.42 Z M 0.63 2.42 H 1.07 V 2.83 H 0.63 Z M 1.26 1.0 H 1.58 V 1.32 H 1.26 Z, filled: true, fill: '#e6e8ea', for: usb-1}
       - {at: [464.9, 67.85], path: M -0.06 0.38 L 0.32 0.58 L 0.26 0.16 M 0.32 0.58 L 0.95 1.22 M 1.42 1.36 L 0.95 1.22 L 1.06 1.66, stroke-width: 0.22, fill: '#e6e8ea', for: idrac-direct}
       - {at: [27.5, 87.2], text: 'NVMe', font-size: 1.2, fill: '#9aa0a6'}
+      - {at: [75.3, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [79.7, 89.3], text: 'CPU4', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [324.2, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [328.6, 89.3], text: 'CPU2', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
+      - {at: [431.2, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [435.6, 89.3], text: 'CPU1', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
       - {at: [34.93, 89.5], text: '0', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-0}
       - {at: [53.11, 89.5], text: '1', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-1}
@@ -1233,7 +1308,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23, drive-24, drive-25, drive-26, drive-27, drive-28, drive-29, drive-30, drive-31, vga, mark-vga],
            hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, drive-8, drive-9, drive-10, drive-11, drive-12, drive-13, drive-14, drive-15, drive-16, drive-17, drive-18, drive-19, drive-20, drive-21, drive-22, drive-23, drive-24, drive-25, drive-26, drive-27, drive-28, drive-29, drive-30, drive-31],
            group: covers, rel-pos: 3}
@@ -1292,6 +1367,7 @@ views:
       - {at: [465.6, 24.9], path: M 0.6 0.42 L 0.85 0 L 1.1 0.42 Z M 0.63 2.42 H 1.07 V 2.83 H 0.63 Z M 1.26 1.0 H 1.58 V 1.32 H 1.26 Z, filled: true, fill: '#e6e8ea', for: usb-1}
       - {at: [464.9, 67.85], path: M -0.06 0.38 L 0.32 0.58 L 0.26 0.16 M 0.32 0.58 L 0.95 1.22 M 1.42 1.36 L 0.95 1.22 L 1.06 1.66, stroke-width: 0.22, fill: '#e6e8ea', for: idrac-direct}
       - {at: [27.5, 87.2], text: 'NVMe', font-size: 1.2, fill: '#9aa0a6'}
+      - {at: [75.5, 86.9], path: M 0 0 H 8.8 V 3.1 H 0 Z, stroke-width: 0.2, fill: '#9aa0a6'}
       - {at: [79.9, 89.3], text: 'CPU4', font-size: 1.9, anchor: middle, fill: '#9aa0a6'}
       - {at: [35.02, 89.5], text: '0', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-0}
       - {at: [52.96, 89.5], text: '1', font-size: 2.6, anchor: middle, fill: '#d5d9dd', for: drive-1}
@@ -1342,7 +1418,7 @@ views:
         - {ref: std/vga@1, id: vga, at: [463.27, 21.4], rotate: 270, group: ports, rel-pos: 3}
         - {ref: common/vga-symbol@1, id: mark-vga, at: [470.5, 13.55], for: vga, group: marks, rel-pos: 1}
         - {ref: dell/information-tag-1u-16g@1, id: info-tag, at: [392.5, 172.27], group: tags, rel-pos: 1}
-        - {ref: dell/r960-bezel@1, id: bezel, at: [24.4, 0.0],
+        - {ref: dell/r960-bezel@1, id: bezel, at: [25.5, 2.7],
            for: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15, e3s-16, e3s-17, e3s-18, e3s-19, e3s-20, e3s-21, e3s-22, e3s-23, vga, mark-vga],
            hides: [drive-0, drive-1, drive-2, drive-3, drive-4, drive-5, drive-6, drive-7, e3s-8, e3s-9, e3s-10, e3s-11, e3s-12, e3s-13, e3s-14, e3s-15, e3s-16, e3s-17, e3s-18, e3s-19, e3s-20, e3s-21, e3s-22, e3s-23],
            group: covers, rel-pos: 3}

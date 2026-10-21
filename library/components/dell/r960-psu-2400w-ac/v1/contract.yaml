@@ -29,25 +29,27 @@ provenance:
     procedures draw one 86 mm supply for both, and this part is drawn as that supply with its own
     label and a C19 socket. The two sockets differ by a notch the photograph cannot resolve.
   size: >-
-    photo-measured, as dell/r960-psu-2800w-ac@1: ISM figure 10, 86.0 x 40.5 mm plate; depth
-    estimated.
+    photo-measured, as dell/r960-psu-2800w-ac@1: ISM figure 10, 86.0 x 40.5 mm plate; the height 40.1 and the
+    depth are measured off Dell's R960 service model, working/intake/dell/3d-models/r960.glb, whose one 86 mm supply
+    is not told apart by wattage (see that part): the can runs 233.5 into the chassis from the face and the handle
+    stands 33.5 proud of it.
   power: >-
     power-output-w 2400 is the rating in ISM table 10: 2400 W Platinum at 100-240 V AC (1400 W
     at 100-120 V) or 240 V DC. A rating, not a draw.
-size: {w: 86.0, h: 40.1, d: 222.0}
+size: {w: 86.0, h: 40.1, d: 233.5}
 plan: {ref: dell/r960-psu-plan@1}
-size-confidence: {w: photo-measured, h: borrowed, d: estimated}
+size-confidence: {w: photo-measured, h: measured, d: measured}
 body:
-  depth: 222.0
+  depth: 233.5
   color: '#b9bec4'
 relief:
   wall: '#3a4045'
   features:
   - node: grip
-    uhandle: 35.7
+    uhandle: 33.5
     color: '#e9ecef'
-    confidence: estimated
-    source: borrowed from dell/psu-1400w-ac-60mm@1's handle stand-off, measured there
+    confidence: measured
+    source: r960.glb `Body_2_5.005`, the handle, from the face at cad z 853.0 to 886.5
   - node: latch
     out: 14.7
     color: '#d9661a'

@@ -35,8 +35,16 @@ provenance:
     photo-measured - ISM figure 10: the supply's plate 290 px wide and 135 px tall, 86.0 x 40.5
     mm; Dell's name for the form factor is 86 mm (ISM table 11: "Redundant 86 mm"), and 40.1 is the
     height every Dell 16th-generation supply of this family carries (dell/psu-1400w-ac-60mm@1,
-    measured off Dell's service model there). The depth is not stated by any R960 document;
-    see the gaps on the device. The figure puts it at 40.1 with a 0.4 shadow line.
+    measured off Dell's service model there). The figure puts it at 40.1 with a 0.4 shadow line. Dell's R960 service
+    model, working/intake/dell/3d-models/r960.glb, agrees: `Body_6.011`, the face, is 40.5 x 40.1 (the can,
+    `Body_5_2.005`, 86.3 x 40.7), so the height is measured. The model's one supply, `PEr960_
+    PowerSupplyUnit.STEP-1` under `R960_ PSU Prefab` in the `Main Assembly` node, is not told apart by wattage; both 86 mm
+    supplies take its form.
+  depth: >-
+    measured - r960.glb: the can runs 233.5 into the chassis from the face (cad z 619.5 to 853.0), and the handle
+    stands 33.5 proud of the face to cad z 886.5, 2.6 past the rear wall at 883.94 - ISM table 7's 2.455 between the rear
+    wall and the handle (Zc less Zb). So the face is recessed 30.9 inside the rear wall, which the rear view does not
+    show. The first pass borrowed 222.0 from the 60 mm supply.
   features: >-
     photo-measured - ISM figure 10 at 3.374 px/mm: the fan housing 5.0..43.6 across and 2.1..39.0
     down with a 19 mm hub centred at (23.7, 20.3) and four corner bosses; the translucent handle
@@ -56,22 +64,22 @@ provenance:
   power: >-
     power-output-w 2800 is the rating on the handle label and in ISM table 10: 2800 W Titanium at
     200-240 V AC or 240 V DC, N/A at 100-120 V. A rating, not a draw.
-size: {w: 86.0, h: 40.1, d: 222.0}
+size: {w: 86.0, h: 40.1, d: 233.5}
 plan: {ref: dell/r960-psu-plan@1}
-size-confidence: {w: photo-measured, h: borrowed, d: estimated}
+size-confidence: {w: photo-measured, h: measured, d: measured}
 body:
-  depth: 222.0
+  depth: 233.5
   color: '#b9bec4'
 relief:
   wall: '#3a4045'
   features:
   - node: grip
-    uhandle: 35.7
+    uhandle: 33.5
     color: '#e9ecef'
-    confidence: estimated
+    confidence: measured
     source: >-
-      borrowed from dell/psu-1400w-ac-60mm@1, the 16th-generation handle's 35.7 stand-off (measured
-      there off Dell's service model); no R960 figure shows the supply from the side
+      r960.glb `Body_2_5.005`, the handle, from the face at cad z 853.0 to 886.5; the first pass borrowed the
+      R660's 35.7 and the ISM's own table 7 gives 2.455 past the rear wall, which this agrees with
   - node: latch
     out: 14.7
     color: '#d9661a'

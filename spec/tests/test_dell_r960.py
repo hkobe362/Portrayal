@@ -298,8 +298,10 @@ def test_memory_sockets_run_between_the_banks_as_figure_95_shows():
     x = {b["id"]: b["at"][0] for b in bays_of("top") if b["id"].startswith("dimm-")}
     heat = {p["id"]: p["at"][0] for p in placements("top") if p["id"].startswith("heatsink-")}
     assert heat["heatsink-2"] < heat["heatsink-1"] and heat["heatsink-4"] < heat["heatsink-3"]
+    # a heatsink is placed by its prefab's corner (128 wide); its 78.9 fin block stands 48.7 in, between the banks
+    # (spec/tests/test_dell_r960_model.py reads the block against the sockets' edges)
     assert x["dimm-b8"] < heat["heatsink-2"] < x["dimm-b9"]
-    assert x["dimm-a12"] < heat["heatsink-1"] < x["dimm-a9"]
+    assert x["dimm-a12"] < heat["heatsink-1"] + 48.7 < x["dimm-a9"]
 
 
 # --- the DCIM exports: one device type per configuration ----------------------------
