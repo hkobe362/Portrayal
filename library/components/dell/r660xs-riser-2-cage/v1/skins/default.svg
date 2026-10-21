@@ -8,4 +8,11 @@
   <rect x="16.90" y="2.60" width="4.20" height="4.20" rx="0.3" fill="#16191c"/>
   <rect x="10.70" y="9.80" width="4.20" height="4.20" rx="0.3" fill="#16191c"/>
   <rect x="163.80" y="0.60" width="4.80" height="18.60" rx="0.3" fill="#aeb4ba"/>
+  <!-- the chassis print for PSU 1 as figure 7 draws it ON THIS STRIP: a boxed bolt
+       and the number. Glyph forms are original, measured as ink boxes. -->
+  <g id="silkscreen"><g id="psu-1-mark" fill="#2b2f33" stroke="none">
+    <rect x="164.30" y="11.40" width="2.63" height="2.63" fill="none" stroke="#2b2f33" stroke-width="0.20"/>
+    <path d="M 165.85 11.82 L 165.15 12.85 H 165.63 L 165.38 13.62 L 166.12 12.52 H 165.64 Z"/>
+    <text x="165.62" y="9.60" font-family="sans-serif" font-size="3.50" text-anchor="middle">1</text>
+  </g></g>
 </svg>

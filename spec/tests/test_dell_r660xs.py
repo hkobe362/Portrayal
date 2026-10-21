@@ -144,6 +144,125 @@ def test_the_riser_widths_are_table_95s():
     assert lanes("riser-2e") == {"slot-2": 16}
 
 
+# --- the chassis print on the rear: ISM figure 7 ---------------------------------
+
+def _num(tok):
+    return float(tok)
+
+
+def _path_box(d):
+    """The box a silkscreen path of absolute M, L, H, V, A and Z commands spans, from its origin."""
+    toks = d.replace(",", " ").split()
+    xs, ys, i, cmd, x, y = [0.0], [0.0], 0, None, 0.0, 0.0
+    while i < len(toks):
+        if toks[i].isalpha():
+            cmd = toks[i]
+            i += 1
+            if cmd == "Z":
+                continue
+        if cmd in "ML":
+            x, y = _num(toks[i]), _num(toks[i + 1]); i += 2
+        elif cmd == "H":
+            x = _num(toks[i]); i += 1
+        elif cmd == "V":
+            y = _num(toks[i]); i += 1
+        elif cmd == "A":
+            rx = _num(toks[i])
+            x, y = _num(toks[i + 5]), _num(toks[i + 6]); i += 7
+            xs += [x - rx, x + rx]; ys += [y - rx, y + rx]
+        else:
+            raise AssertionError(f"path command {cmd} is not read here: {d}")
+        xs.append(x); ys.append(y)
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _mark_box(m):
+    """The box one rear silkscreen mark covers, in the rear face's mm."""
+    x, y = m["at"]
+    if "path" in m:
+        x0, y0, x1, y1 = _path_box(m["path"])
+        return x + x0, y + y0, x + x1, y + y1
+    size = m.get("font-size", 2.2)
+    w = 0.62 * size * len(m["text"])
+    anchor = m.get("anchor", "middle")
+    left = x if anchor == "start" else x - w if anchor == "end" else x - w / 2
+    return left, y - size, left + w, y
+
+
+def _rear_bay_boxes(doc):
+    return [(b["id"], b["at"][0], b["at"][1], b["at"][0] + b["size"]["w"], b["at"][1] + b["size"]["h"])
+            for b in _bays(doc, "rear")]
+
+
+def test_no_chassis_print_is_under_a_bay(doc):
+    # a module paints over the chassis silkscreen, so a mark inside a bay's extent is hidden
+    # in every build that seats it: the PSU 1 bolt sat under riser 2's cage, "iDRAC" lost its i
+    bays = _rear_bay_boxes(doc)
+    buried = []
+    for m in doc["views"]["rear"]["silkscreen"]:
+        mx0, my0, mx1, my1 = _mark_box(m)
+        for bid, bx0, by0, bx1, by1 in bays:
+            if mx0 < bx1 and mx1 > bx0 and my0 < by1 and my1 > by0:
+                buried.append((m.get("text") or m["path"][:24], bid))
+    assert not buried, f"printed under a bay: {buried}"
+
+
+def _contrast(a, b):
+    def lum(h):
+        c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        c = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4 for v in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def test_the_rear_print_is_legible_on_the_light_wall_and_plate(doc):
+    panel = doc["views"]["rear"]["panel"]
+    plate = next(d["fill"] for d in panel["decor"] if d["size"] == [71.2, 15.93])
+    for m in doc["views"]["rear"]["silkscreen"]:
+        if m["fill"] == plate:
+            continue   # the i's knock-out, drawn in the plate's own colour on its dark disc
+        assert _contrast(m["fill"], plate) >= 4.5, m
+    # the kit's symbols are drawn in light ink for a dark panel: seated on the light plate they vanish
+    placed = {p["ref"] for p in doc["views"]["rear"]["components"]["placements"]}
+    assert "common/vga-symbol@1" not in placed
+
+
+def _marks_for(doc, target):
+    return [m for m in doc["views"]["rear"]["silkscreen"] if target in (m.get("for") if isinstance(m.get("for"), list) else [m.get("for")])]
+
+
+def test_the_rear_prints_the_icons_figure_7_draws(doc):
+    # the USB trident by SS (USB 3.0) and the one over the USB 2.0 port, the circled i by the ID button,
+    # and the VGA monitor mark; the LOM's link icons are in its skin
+    assert any("path" in m for m in _marks_for(doc, "usb-2")), "no trident by SS"
+    assert any("path" in m for m in _marks_for(doc, "usb-1")), "no trident by the USB 2.0 port"
+    assert any("path" in m for m in _marks_for(doc, "system-id")), "no i by the system ID button"
+    assert any("path" in m for m in _marks_for(doc, "video")), "no VGA mark"
+
+
+def test_idrac_clears_the_lom_bracket(doc):
+    mark = next(m for m in doc["views"]["rear"]["silkscreen"] if m.get("text") == "iDRAC")
+    lom = next(b for b in doc["views"]["rear"]["components"]["bays"] if b["id"] == "lom")
+    assert mark.get("anchor") == "start"
+    assert mark["at"][0] >= lom["at"][0] + lom["size"]["w"], "the word begins right of the LOM bracket"
+
+
+def _skin(name):
+    return ET.parse(LIB / "components" / "dell" / name / "v1" / "skins" / "default.svg").getroot()
+
+
+def test_the_lom_bracket_prints_the_link_icons_beside_1_and_2():
+    ids = {n.get("id") for n in _skin("r660xs-lom-2x1g").iter() if n.get("id")}
+    assert {"link-1", "link-2"} <= ids
+
+
+def test_riser_2s_cage_carries_the_psu_1_mark_on_its_latch_strip():
+    # figure 7 prints the bolt and the 1 on the cage's own end strip, so they belong to the cage
+    ids = {n.get("id") for n in _skin("r660xs-riser-2-cage").iter() if n.get("id")}
+    assert "psu-1-mark" in ids
+
+
 # --- the supplies --------------------------------------------------------------
 
 def test_the_supplies_stand_side_by_side_at_the_right(doc):
@@ -182,6 +301,47 @@ def test_the_top_view_shows_the_seated_parts_from_above():
     paths = _built_paths("sff10-rc1-1a2a.top")
     assert "system-board" in paths
     assert sum(1 for p in paths if p.startswith("fan-") and "/" not in p) == 7
+
+
+def test_the_top_face_has_no_opaque_decor_over_the_chassis(doc):
+    # decor is painted into the face the 3D viewer draws on the top: a floor rectangle the size of
+    # the chassis stood there as an opaque white lid. The floor is a part with an interior now,
+    # so the top is open over it (the R660's top has a cover or no decor at all)
+    top = doc["views"]["top"]
+    area = top["size"]["w"] * top["size"]["h"]
+    for d in (top.get("panel") or {}).get("decor", []):
+        assert d["size"][0] * d["size"][1] < 0.1 * area, d.get("id")
+    floor = next(p for p in top["components"]["placements"] if p["id"] == "chassis-floor")
+    comp = yaml.safe_load((LIB / "components" / "dell" / "r660xs-chassis-floor" / "v1" / "contract.yaml").read_text())
+    assert floor["ref"] == "dell/r660xs-chassis-floor@1"
+    assert (comp["size"]["w"], comp["size"]["h"]) == (top["size"]["w"], top["size"]["h"])
+    assert comp["relief"]["walls"] == "inside"
+
+
+def _gap(doc, what):
+    return next((g for g in doc["gaps"] if g["what"] == what), None)
+
+
+def test_the_top_view_declares_what_it_does_not_draw(doc):
+    # figure 8's fan cage is the frame round the seven fans; the air shroud's gap names it
+    shroud = _gap(doc, "air-shroud-covers-backplane-in-top-view")
+    assert "fan cage" in shroud["note"]
+    # the 4 x 3.5 inch bays carry no top `plan:`, so a fitted 3.5 inch drive never shows from above
+    lff = _gap(doc, "lff-drives-have-no-top-plan")
+    assert lff and lff["scope"] == ["top"]
+    assert not any("plan" in b for b in _bays(doc, "front-lff4") if b["id"].startswith("lff-drive-"))
+
+
+def test_the_supply_plans_reach_the_interposer_board():
+    # figure 8: the supplies' cans end where the power interposer board begins; they did not touch
+    top = yaml.safe_load(DEVICE.read_text())
+    board = next(p for p in top["views"]["top"]["components"]["placements"] if p["id"] == "system-board")
+    pib = yaml.safe_load((LIB / "components" / "dell" / "r660xs-system-board" / "v1" / "contract.yaml").read_text())["elements"]["pib"]
+    psu = yaml.safe_load((LIB / "components" / "dell" / "psu-60mm-plan" / "v1" / "contract.yaml").read_text())
+    for b in _bays(top, "rear"):
+        if b["id"] in ("psu-1", "psu-2"):
+            can_end = board["at"][1] + b["plan"]["at"][1] + psu["size"]["h"]
+            assert board["at"][1] + pib["at"][1] - can_end <= 0.5, b["id"]
 
 
 # --- the DCIM device types -----------------------------------------------------

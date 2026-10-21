@@ -17,7 +17,7 @@
 format: 1
 kind: device
 name: r660xs
-version: 0.1.0
+version: 1.0.0
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R660xs
@@ -325,9 +325,21 @@ gaps:
       and shows the drive backplane (item 9) and the front PERC (item 10) as a
       photograph of the parts, and the ISM draws none of them as a plan. The
       shroud (figures 27 and 28), the system cover (figures 23 and 24) and the
-      backplane cover (figures 25 and 26) are isometric figures only.
+      backplane cover (figures 25 and 26) are isometric figures only. The fan
+      cage, the frame that holds the seven fans (figure 8 item 1), is not drawn
+      either: only the fans stand in the view.
     wanted: >-
-      the shroud's and covers' outlines from above
+      the shroud's, the fan cage's and the covers' outlines from above
+  - what: lff-drives-have-no-top-plan
+    scope: [top]
+    reason: needs-drawing
+    note: >-
+      the 4 x 3.5 inch front's bays carry no `plan:`, so a fitted 3.5 inch drive
+      never shows from above. The 2.5 inch bays do project, as the carriers'
+      tops, but no figure draws a 3.5 inch carrier from above and its length is
+      not stated, so none is estimated.
+    wanted: >-
+      a 3.5 inch carrier seen from above, or its length
   - what: lom-and-boss-riser-plan-and-depth
     scope: [rear, top]
     reason: needs-drawing
@@ -490,7 +502,7 @@ groups:
     term: Part
     role: furniture
     index-origin: 1
-    description: the system board
+    description: the chassis floor and the system board
   covers:
     term: Cover
     role: furniture
@@ -833,13 +845,22 @@ views:
         # the plate behind the VGA connector and the system ID button
         - {at: [219.8, 24.71], size: [71.2, 15.93], fill: '#cdd1d5', rx: 0.8}
     silkscreen:
-      # THE CHASSIS PRINT, as figure 7 draws it: iDRAC over its port, SS beside the
-      # USB 3.0 port, a boxed bolt and the number by the first supply.
-      - {at: [69.2, 26.4], text: 'iDRAC', font-size: 2.3, fill: '#2b2f33', for: idrac}
+      # THE CHASSIS PRINT, as figure 7 draws it: iDRAC over its port, SS and the USB
+      # trident beside the USB 3.0 port, the trident over the USB 2.0 port, the
+      # monitor mark by the VGA connector and the circled i under the ID button.
+      # All in dark ink: the kit's symbols are light ink for a dark panel and vanish
+      # on this light wall and plate. The bolt and the 1 of PSU 1 are on riser 2's cage
+      # (dell/r660xs-riser-2-cage@1), where the figure prints them. Glyph forms are
+      # original; the figure resolves each icon to a few pixels.
+      - {at: [66.6, 26.4], text: 'iDRAC', font-size: 2.3, anchor: start, fill: '#2b2f33', for: idrac}
       - {at: [103.6, 38.35], text: 'SS', font-size: 2.3, fill: '#2b2f33', for: usb-2}
-      - {at: [298.9, 13.6], path: M 0 0 H 2.63 V 2.63 H 0 Z, stroke-width: 0.2, fill: '#2b2f33', for: psu-1}
-      - {at: [298.9, 13.6], path: M 1.55 0.42 L 0.85 1.45 H 1.33 L 1.08 2.22 L 1.82 1.12 H 1.34 Z, filled: true, fill: '#2b2f33', for: psu-1}
-      - {at: [298.9, 11.8], text: '1', font-size: 3.5, fill: '#2b2f33', for: psu-1}
+      - {at: [107.0, 36.45], path: M 0.7 1.0 H 3.5 M 1.7 1.0 L 2.3 0.35 H 2.9 M 1.3 1.0 L 1.9 1.65 H 2.5, stroke-width: 0.3, fill: '#2b2f33', for: usb-2}
+      - {at: [107.0, 36.45], path: M 3.3 0.6 L 4.1 1.0 L 3.3 1.4 Z M 2.9 0.05 H 3.5 V 0.65 H 2.9 Z M 0.05 1.0 A 0.4 0.4 0 1 1 0.85 1.0 A 0.4 0.4 0 1 1 0.05 1.0 Z M 2.55 1.65 A 0.35 0.35 0 1 1 3.25 1.65 A 0.35 0.35 0 1 1 2.55 1.65 Z, filled: true, fill: '#2b2f33', for: usb-2}
+      - {at: [106.0, 26.7], path: M 0.7 1.0 H 3.5 M 1.7 1.0 L 2.3 0.35 H 2.9 M 1.3 1.0 L 1.9 1.65 H 2.5, stroke-width: 0.3, fill: '#2b2f33', for: usb-1}
+      - {at: [106.0, 26.7], path: M 3.3 0.6 L 4.1 1.0 L 3.3 1.4 Z M 2.9 0.05 H 3.5 V 0.65 H 2.9 Z M 0.05 1.0 A 0.4 0.4 0 1 1 0.85 1.0 A 0.4 0.4 0 1 1 0.05 1.0 Z M 2.55 1.65 A 0.35 0.35 0 1 1 3.25 1.65 A 0.35 0.35 0 1 1 2.55 1.65 Z, filled: true, fill: '#2b2f33', for: usb-1}
+      - {at: [237.8, 35.7], path: M 1.55 0.55 H 4.45 V 2.85 H 1.55 Z M 0.55 1.2 V 2.2 M 5.45 1.2 V 2.2, stroke-width: 0.34, fill: '#2b2f33', for: video}
+      - {at: [282.5, 35.8], path: M 0 1.6 A 1.6 1.6 0 1 1 3.2 1.6 A 1.6 1.6 0 1 1 0 1.6 Z, filled: true, fill: '#2b2f33', for: system-id}
+      - {at: [282.5, 35.8], path: M 1.3 0.85 A 0.3 0.3 0 1 1 1.9 0.85 A 0.3 0.3 0 1 1 1.3 0.85 Z M 1.35 1.35 H 1.85 V 2.5 H 1.35 Z, filled: true, fill: '#cdd1d5', for: system-id}
     components:
       bays:
         - {id: psu-1, at: [305.0, 1.75], size: {w: 59.8, h: 40.1},
@@ -884,17 +905,15 @@ views:
         - {ref: std/usb-a@1, id: usb-1, at: [112.7, 27.0], skin: usb2, attrs: {usb: '2.0'}, group: rear-io, rel-pos: 2}
         - {ref: std/usb-a@1, id: usb-2, at: [112.7, 35.4], attrs: {usb: '3.0'}, group: rear-io, rel-pos: 3}
         - {ref: common/vga-receptacle@1, id: video, at: [245.1, 26.75], group: rear-io, rel-pos: 4}
-        - {ref: common/vga-symbol@1, id: mark-video, at: [237.8, 35.0], for: video, group: marks, rel-pos: 1}
         - {ref: dell/system-id-button-14g@1, id: system-id, at: [284.9, 27.6], for: chassis, group: rear-io, rel-pos: 5}
   top:
     # REAR AT y=0, FRONT AT y=699.1 - the library's plan convention, x left to right
     # as the front faces you. Every position is read off ISM figure 8 (see
     # provenance/top).
     size: {w: 434.0, h: 699.1}
-    panel:
-      decor:
-        # the floor of the chassis, light grey in figure 8, under everything
-        - {id: chassis-floor, at: [0.0, 0.0], size: [434.0, 699.1], fill: '#dfe3e6', confidence: drawing, source: "ISM figure 8: the floor round the parts is light grey, the cover off"}
+    # THE FLOOR IS A PART, NOT DECOR: a decor rectangle is painted into the face the
+    # 3D viewer draws on the top, and the old full-size floor stood there as an
+    # opaque lid. See dell/r660xs-chassis-floor@1.
     components:
       bays:
         - {id: dimm-b8, at: [139.55, 191.1], size: {w: 3.8, h: 133.4},
@@ -967,6 +986,9 @@ views:
            accepts: [dell/r660xs-fan@1], default: dell/r660xs-fan@1,
            group: fans, rel-pos: 7}
       placements:
+        - {ref: dell/r660xs-chassis-floor@1, id: chassis-floor, at: [0.0, 0.0],
+           group: interior, rel-pos: 0,
+           under: [system-board, heatsink-1, heatsink-2, fan-1, fan-2, fan-3, fan-4, fan-5, fan-6, fan-7, dimm-b8, dimm-b2, dimm-b6, dimm-b4, dimm-b1, dimm-b7, dimm-b3, dimm-b5, dimm-a8, dimm-a2, dimm-a6, dimm-a4, dimm-a1, dimm-a7, dimm-a3, dimm-a5]}
         - {ref: dell/r660xs-system-board@1, id: system-board, at: [5.5, 4.4],
            group: interior, rel-pos: 1,
            under: [heatsink-1, heatsink-2, fan-1, fan-2, fan-3, fan-4, fan-5, fan-6, fan-7, dimm-b8, dimm-b2, dimm-b6, dimm-b4, dimm-b1, dimm-b7, dimm-b3, dimm-b5, dimm-a8, dimm-a2, dimm-a6, dimm-a4, dimm-a1, dimm-a7, dimm-a3, dimm-a5]}

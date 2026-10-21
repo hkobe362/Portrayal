@@ -43,6 +43,11 @@ provenance:
     common/rj45-ganged-eth@1 keyway up (rotate 180) as the R660's are. The
     '1' and '2' marks sit between and just under them in the figure, so they are
     printed on this bracket.
+  link-icons: >-
+    drawing - figure 7 prints a small network-link icon left of each numeral
+    (about 4.5 mm centre to centre). The icons are drawn in the form the R660's
+    chassis print uses; the figure resolves each to a few pixels, so the form is
+    original and its place is the reading.
   power: >-
     NOT PUBLISHED - the R660xs ISM, technical guide and spec sheet give the
     card's port count and speed and no wattage.

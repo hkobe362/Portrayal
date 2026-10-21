@@ -214,7 +214,7 @@
    "dell/r660xs-fan@1"
   ]
  },
- "composed": "4337597a37198ce7",
+ "composed": "188609935c740470",
  "composed-refs": {
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
   "common/drive-blank-25@2": "2.0.0+af7efd33cf1a467a",
@@ -250,19 +250,20 @@
   "dell/psu-700w-ac-60mm@1": "1.1.0+a856b1721f7bce6e",
   "dell/psu-800w-ac-60mm@1": "1.1.0+715a72241a42ddf5",
   "dell/r660xs-boss-riser@1": "1.0.0+39493527224edf9f",
+  "dell/r660xs-chassis-floor@1": "1.0.0+019cdb3337d6b944",
   "dell/r660xs-fan@1": "1.0.0+b161f0c578ca9bfd",
-  "dell/r660xs-lom-2x1g@1": "1.0.0+16a32e4b4acc95e2",
+  "dell/r660xs-lom-2x1g@1": "1.0.0+80e1b45d133ee30e",
   "dell/r660xs-riser-1-cage@1": "1.0.0+1c5c5bd4fc3caf3e",
   "dell/r660xs-riser-1-plan@1": "1.0.0+2634478bdf4048ff",
   "dell/r660xs-riser-1a@1": "1.0.0+36909f37fd2a6385",
   "dell/r660xs-riser-1b@1": "1.0.0+9ce59aaef7c09551",
   "dell/r660xs-riser-2-blank@1": "1.0.0+7b43d7cc45a25980",
-  "dell/r660xs-riser-2-cage@1": "1.0.0+27366e750b649602",
+  "dell/r660xs-riser-2-cage@1": "1.0.0+05beaf32ad2c03e5",
   "dell/r660xs-riser-2-plan@1": "1.0.0+6dd0c364ffaa1f7e",
   "dell/r660xs-riser-2a@1": "1.0.0+179e016ad1ddb20b",
   "dell/r660xs-riser-2d@1": "1.0.0+524903e278c3a9c6",
   "dell/r660xs-riser-2e@1": "1.0.0+cb5b18769d5773e7",
-  "dell/r660xs-system-board@1": "1.0.0+b7d9b14de58514c2",
+  "dell/r660xs-system-board@1": "1.0.0+23f5b37b63414607",
   "dell/system-id-button-14g@1": "1.0.1+a453cf90c341d8d0",
   "nvidia/mcx4111a-lp@1": "1.0.0+eb651c58e0e70765",
   "nvidia/mcx4121a-lp@1": "1.0.0+4edd656656654de5",
@@ -315,7 +316,7 @@
   "sff8-rc6-1b2e"
  ],
  "format": 1,
- "gaps": "27be80735076b88e",
+ "gaps": "0d8f32ff18db42b7",
  "groups": [
   "boss",
   "covers",
@@ -415,7 +416,6 @@
   "rear/bays/riser-2",
   "rear/bays/riser-2-blank",
   "rear/placements/idrac",
-  "rear/placements/mark-video",
   "rear/placements/system-id",
   "rear/placements/usb-1",
   "rear/placements/usb-2",
@@ -443,11 +443,12 @@
   "top/bays/fan-5",
   "top/bays/fan-6",
   "top/bays/fan-7",
+  "top/placements/chassis-floor",
   "top/placements/heatsink-1",
   "top/placements/heatsink-2",
   "top/placements/system-board"
  ],
- "names": "925451e3afcdb89f",
+ "names": "eb811369f56572c7",
  "placement-addressing": {
   "for": {
    "front-lff4/bays/panel-left": [
@@ -519,9 +520,6 @@
    ],
    "front/placements/power-btn": [
     "chassis"
-   ],
-   "rear/placements/mark-video": [
-    "video"
    ],
    "rear/placements/system-id": [
     "chassis"
@@ -618,7 +616,6 @@
    "rear/bays/riser-2": 2,
    "rear/bays/riser-2-blank": 1,
    "rear/placements/idrac": 1,
-   "rear/placements/mark-video": 1,
    "rear/placements/system-id": 5,
    "rear/placements/usb-1": 2,
    "rear/placements/usb-2": 3,
@@ -646,13 +643,14 @@
    "top/bays/fan-5": 5,
    "top/bays/fan-6": 6,
    "top/bays/fan-7": 7,
+   "top/placements/chassis-floor": 0,
    "top/placements/heatsink-1": 1,
    "top/placements/heatsink-2": 2,
    "top/placements/system-board": 1
   }
  },
  "placement-attrs": "cb7c4341344fb475",
- "placement-geometry": "1ac2fa80503d3f7c",
+ "placement-geometry": "5d77f2fe398c3809",
  "placement-groups": {
   "front-lff4/bays/lff-drive-0": "drives-lff",
   "front-lff4/bays/lff-drive-1": "drives-lff",
@@ -714,7 +712,6 @@
   "rear/bays/riser-2": "risers",
   "rear/bays/riser-2-blank": "riser-blanks",
   "rear/placements/idrac": "rear-io",
-  "rear/placements/mark-video": "marks",
   "rear/placements/system-id": "rear-io",
   "rear/placements/usb-1": "rear-io",
   "rear/placements/usb-2": "rear-io",
@@ -742,12 +739,13 @@
   "top/bays/fan-5": "fans",
   "top/bays/fan-6": "fans",
   "top/bays/fan-7": "fans",
+  "top/placements/chassis-floor": "interior",
   "top/placements/heatsink-1": "processors",
   "top/placements/heatsink-2": "processors",
   "top/placements/system-board": "interior"
  },
  "placement-surface": "0b5a92b0ccf1ec74",
- "shape": "78a550c111cce1b8",
- "surface": "bfffdee199ed67f2",
- "version": "0.1.0"
+ "shape": "60765134accf8472",
+ "surface": "c010e13a8fd6053c",
+ "version": "1.0.0"
 }

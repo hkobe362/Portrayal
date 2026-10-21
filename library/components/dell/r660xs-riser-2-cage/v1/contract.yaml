@@ -42,6 +42,14 @@ provenance:
   latch: >-
     drawing - the strip at the right end, 4.8 wide, as the R660's riser cages
     carry theirs; the figure shows a tab there and its size is read by eye.
+  psu-mark: >-
+    drawing - figure 7 prints PSU 1's boxed bolt and the number 1 ON THE
+    CAGE'S END STRIP beside the supply, so they are the cage's print and not the
+    chassis wall's: the wall behind is hidden by the cage in every build that
+    seats it. The glyph forms are original; the bolt and the 1 are ink boxes
+    read at figure 7's resolution. The blank that stands for riser 2 in
+    configuration 3 and the rear drives of configuration 4 are not drawn with
+    this mark, because no figure shows those builds.
   numerals: >-
     drawing - THE FIGURE PRINTS NO SLOT NUMBER on this cage, so none is drawn;
     see dell/r660xs-riser-1-cage@1.
