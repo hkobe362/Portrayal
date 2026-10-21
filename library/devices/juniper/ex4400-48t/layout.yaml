@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-48t
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-48T
@@ -142,9 +142,9 @@ provenance:
     confidence: drawing
     note: >-
       Figure 35 callouts 1, 6, 10 and 15 are the serial number ID label, the CLEI code label, the
-      power supply rating label and the claim code label. They are drawn as plain label plates,
-      with nothing printed on them. The guide shows no content, and none is invented. The
-      plates are decor, because no model number belongs to them.
+      power supply rating label and the claim code label. They are stickers, not metal, so each
+      is a named region and is not drawn. The render shows them as blank plates, white for three
+      and slate for the rating label. The guide shows no content, and none is invented.
   grounding:
     confidence: datasheet
     note: >-
@@ -390,7 +390,7 @@ views:
       h: 43.7
     panel:
       decor:
-        - {id: logo-plate, at: [0.3, 0.3], size: [26.6, 9.3], rx: 0.8, fill: '#828282'}
+        - {id: top-left-plate, at: [0.3, 0.3], size: [26.6, 9.3], rx: 0.8, fill: '#828282'}
         - {id: vent-top, at: [27.0, 1.2], size: [331.0, 7.8], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
         - {id: vent-bottom, at: [3.5, 38.7], size: [356.0, 4.6], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
         - {id: plate-1, at: [5.71, 9.9], size: [87.1, 24.8], rx: 0.6, fill: '#cccdcf'}
@@ -520,10 +520,6 @@ views:
       h: 43.7
     panel:
       decor:
-        - {id: label-serial, at: [4.0, 3.0], size: [5.1, 20.7], fill: '#d8d8d6'}
-        - {id: label-claim, at: [4.0, 24.4], size: [15.1, 15.5], fill: '#d8d8d6'}
-        - {id: label-clei, at: [98.7, 2.5], size: [5.1, 28.8], fill: '#d8d8d6'}
-        - {id: label-rating, at: [431.3, 1.7], size: [7.7, 41.5], fill: '#4f5560'}
         - {id: ground-plate, at: [27.8, 27.6], size: [33.9, 12.1], rx: 0.6, fill: '#666666'}
         - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
         - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
@@ -596,6 +592,11 @@ views:
            attrs: {stud-size: '10-32'}}
         - {id: ground-mark, ref: common/ground-symbol@1, at: [21.4, 31.0], for: chassis, group: grounding, rel-pos: 2}
         - {id: esd-jack, ref: common/esd-jack@1, at: [98.1, 33.0], for: chassis, group: esd, rel-pos: 0}
+    regions:
+      - {id: label-serial, at: [4.0, 3.0], size: {w: 5.1, h: 20.7}, label: 'Serial number ID label; not drawn'}
+      - {id: label-claim, at: [4.0, 24.4], size: {w: 15.1, h: 15.5}, label: 'Claim code label; not drawn'}
+      - {id: label-clei, at: [98.7, 2.5], size: {w: 5.1, h: 28.8}, label: 'CLEI code label; not drawn'}
+      - {id: label-rating, at: [431.3, 1.7], size: {w: 7.7, h: 41.5}, label: 'Power supply rating label; not drawn'}
   left:
     size:
       w: 399.0
