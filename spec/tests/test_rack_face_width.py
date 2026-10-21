@@ -96,6 +96,9 @@ def test_only_a_rack_face_is_wider_than_its_plane():
     # with the rack holes at its ends, and its four FHD modules mount on it
     # across 440 - wider than the 430 body - so its front is the whole plate.
     # r660: the R740xd's case in 1U - both control panels sit in the ears.
+    # r6615: the R660's case on the R6615 - both control panels sit in the ears.
+    # r6625: the R660's 1U chassis again - the same two control panels in the ears
+    # (ISM tables 1 to 5), on each of its six fronts.
     # lmfs-f: the Lightspan MF-8's left flange carries the dual-stud grounding
     # point, the front-cover hook and the ESD point (UDS s2.4), so its front is
     # the 481 rack face over a 448 body.
@@ -109,6 +112,10 @@ def test_only_a_rack_face_is_wider_than_its_plane():
     assert set(wide) <= {"r740xd:front", "r740xd:front-lff-12", "fhd-1ufmt-n:front",
                          "r660:front", "r660:front-sff8sf", "r660:front-nobp",
                          "r660:front-e3s16", "r660:front-e3s14", "lmfs-f:front",
+                         "r6615:front", "r6615:front-sff8", "r6615:front-lff4",
+                         "r6615:front-e3s16", "r6615:front-e3s14",
+                         "r6625:front", "r6625:front-sff8sf", "r6625:front-lff4",
+                         "r6625:front-nobp", "r6625:front-e3s16", "r6625:front-e3s14",
                          # r960: the R660's case in 4U - both control panels sit in the ears (R960 ISM table 7: 482.0 over 444.0)
                          "r960:front", "r960:front-sff8", "r960:front-sff24", "r960:front-sff32",
                          "r960:front-e3s16", "r960:front-sff8-e3s16",
