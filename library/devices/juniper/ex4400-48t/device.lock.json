@@ -29,7 +29,7 @@
    "juniper/jpsu-550-c-dc-afo@1"
   ]
  },
- "composed": "f7b506611fa09850",
+ "composed": "d49c1587a8266130",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/ground-screw-10-32@1": "1.0.0+f0abf79f91058854",
@@ -39,17 +39,17 @@
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
   "juniper/ex4400-em-1c@1": "1.0.0+3ec1681fad47a2b6",
-  "juniper/ex4400-em-4s@1": "1.0.0+c121e7b27293d435",
-  "juniper/ex4400-em-4y@1": "1.0.0+a19176105c8767a0",
+  "juniper/ex4400-em-4s@1": "1.0.0+138075b681ecb061",
+  "juniper/ex4400-em-4y@1": "1.0.0+81e951df3054e76f",
   "juniper/ex4400-em-cover@1": "1.0.0+a9c26eb9fb15bc41",
-  "juniper/ex4400-fan-afi@1": "1.0.0+eca5f8ee5b70a14e",
-  "juniper/ex4400-fan-afo@1": "1.0.0+6a5a5c03d811058d",
+  "juniper/ex4400-fan-afi@1": "1.0.0+d4b2e14eea63e6b1",
+  "juniper/ex4400-fan-afo@1": "1.0.0+b7b572edb3925779",
   "juniper/ex4400-mode-button@1": "1.0.0+d19be0db4f2ecbc3",
   "juniper/ex4400-psu-cover@1": "1.0.0+46adbaf5fa29dc20",
   "juniper/jpsu-550-c-ac-afi@1": "1.0.0+6431bbcbba7d7339",
   "juniper/jpsu-550-c-ac-afo@1": "1.0.0+3a57466795291bf5",
   "juniper/jpsu-550-c-dc-afi@1": "1.0.0+e4d5bb58e3551f26",
-  "juniper/jpsu-550-c-dc-afo@1": "1.0.0+7cb7fcdac04deef0",
+  "juniper/jpsu-550-c-dc-afo@1": "1.0.0+fe08b42951e49b5e",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp28@1": "1.4.1+f836f540ce576bbc",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
@@ -470,6 +470,6 @@
  },
  "placement-surface": "6bea9dd9d19a30b6",
  "shape": "19729fb1d8ed86c7",
- "surface": "7e3190f017ee0e35",
- "version": "0.1.0"
+ "surface": "8ded3a07984f13e4",
+ "version": "0.1.1"
 }

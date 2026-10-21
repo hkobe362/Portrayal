@@ -10,9 +10,9 @@ description: >-
   switches. The guide lists it for every EX4400 model, and from Junos OS
   24.2R1-S1 for the EX4400-48XP and -48MXP as well. It seats horizontally in
   the extension module slot at the front right. It has four SFP+ cages in one
-  row, numbered 0 to 3, each with a link activity lamp and a status lamp, and
-  two captive screws. It takes up to four 1GbE SFP or four 10GbE SFP+
-  transceivers. Do not mix SFP and SFP+ in the module. It runs at 10 Gbps by
+  row, numbered 0 to 3. Each cage has a link activity lamp and a status lamp.
+  Two captive screws hold the module. It takes up to four 1GbE SFP or four
+  10GbE SFP+ transceivers. Do not mix SFP and SFP+ in the module. It runs at 10 Gbps by
   default.
 attrs:
   model: EX4400-EM-4S

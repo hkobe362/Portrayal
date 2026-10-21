@@ -10,9 +10,9 @@ description: >-
   The guide names this unit for the EX4400-24T, -24P, -24MP, -24X, -48T,
   -48P, -48XP, -48MP, -48MXP and -48F. Two fit side by side at the rear, in
   slots 0 and 1. Cold air enters at the front panel and leaves through this
-  face. The face is an orange (gold) square with a hexagon grille, a captive
-  screw at the top left and a handle bar with an AIR OUT chip across the
-  middle. A status lamp sits at the lower right. Do not mix this unit with
+  face. The face is an orange (gold) square with a hexagon grille and a
+  captive screw at the top left. A handle bar with an AIR OUT chip runs across
+  the middle. A status lamp sits at the lower right. Do not mix this unit with
   back-to-front fans or power supplies in one chassis.
 attrs:
   model: EX4400 fan module, airflow out (AFO)

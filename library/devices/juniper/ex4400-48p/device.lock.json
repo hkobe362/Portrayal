@@ -23,7 +23,7 @@
    "juniper/jpsu-2000-c-dc-afo@1"
   ]
  },
- "composed": "b9ee7cd5e27b27b2",
+ "composed": "5290af1074f85875",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/ground-screw-10-32@1": "1.0.0+f0abf79f91058854",
@@ -33,10 +33,10 @@
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
   "juniper/ex4400-em-1c@1": "1.0.0+3ec1681fad47a2b6",
-  "juniper/ex4400-em-4s@1": "1.0.0+c121e7b27293d435",
-  "juniper/ex4400-em-4y@1": "1.0.0+a19176105c8767a0",
+  "juniper/ex4400-em-4s@1": "1.0.0+138075b681ecb061",
+  "juniper/ex4400-em-4y@1": "1.0.0+81e951df3054e76f",
   "juniper/ex4400-em-cover@1": "1.0.0+a9c26eb9fb15bc41",
-  "juniper/ex4400-fan-afo@1": "1.0.0+6a5a5c03d811058d",
+  "juniper/ex4400-fan-afo@1": "1.0.0+b7b572edb3925779",
   "juniper/ex4400-mode-button@1": "1.0.0+d19be0db4f2ecbc3",
   "juniper/ex4400-psu-cover@1": "1.0.0+46adbaf5fa29dc20",
   "juniper/jpsu-1600-c-ac-afo@1": "1.0.0+443082d1fe558324",
@@ -56,7 +56,7 @@
   "s"
  ],
  "format": 1,
- "gaps": "6df2f09f1d382b98",
+ "gaps": "181e070e52eef598",
  "groups": [
   "esd",
   "extension",
@@ -465,6 +465,6 @@
  },
  "placement-surface": "c4a16b09a6b43553",
  "shape": "42a6de0662c3f54c",
- "surface": "fac968c47f53a7c2",
- "version": "0.1.0"
+ "surface": "ee584fb3dcbc4e3b",
+ "version": "0.1.1"
 }

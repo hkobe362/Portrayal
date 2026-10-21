@@ -10,8 +10,8 @@ description: >-
   front-to-back airflow (AFO). The guide takes it for the DC-powered EX4400-24T,
   -24X, -48T and -48F. Up to two fit in the rear slots 0 and 1, and a second
   unit gives 1+1 redundancy. The face has the supply fan with an orange handle
-  across it, a D-sub 3W3 DC input with two jackscrew standoffs, a DC OK lamp
-  and an ejector lever. Do not mix AC and DC supplies, or supplies with
+  across it. It also has a D-sub 3W3 DC input with two jackscrew standoffs, a
+  DC OK lamp and an ejector lever. Do not mix AC and DC supplies, or supplies with
   different airflow, in one chassis.
 attrs:
   role: dc-power-supply

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-24t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-24T
@@ -391,8 +391,9 @@ views:
       h: 43.7
     panel:
       decor:
-        - {id: vent-top, at: [27.0, 1.2], size: [331.0, 7.8], pattern: vent, vent: 1.0}
-        - {id: vent-bottom, at: [3.5, 38.7], size: [356.0, 4.6], pattern: vent, vent: 1.0}
+        - {id: logo-plate, at: [0.3, 0.3], size: [26.6, 9.3], rx: 0.8, fill: '#828282'}
+        - {id: vent-top, at: [27.0, 1.2], size: [331.0, 7.8], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
+        - {id: vent-bottom, at: [3.5, 38.7], size: [356.0, 4.6], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
         - {id: plate-1, at: [5.71, 9.9], size: [87.1, 24.8], rx: 0.6, fill: '#cccdcf'}
         - {id: plate-2, at: [94.97, 9.9], size: [87.1, 24.8], rx: 0.6, fill: '#cccdcf'}
         - {id: status-plate, at: [361.2, 1.4], size: [78.3, 14.1], rx: 0.8, fill: '#50575f'}
@@ -456,7 +457,7 @@ views:
           number-from: 0
           cutouts: true
           rotate: {top: 180}
-          numerals: {dx-by-row: [4.05, 8.65], dy-top: 28.4, dy-bottom: 13.85, font-size: 1.7, anchor: end, fill: '#e1e3e5'}
+          numerals: {dx-by-row: [4.05, 8.65], dy-top: 28.4, dy-bottom: 13.85, font-size: 2.0, anchor: end, fill: '#e1e3e5'}
       bays:
         - {id: ext-module, at: [363.8, 17.7], size: {w: 74.0, h: 23.5},
            accepts: [juniper/ex4400-em-cover@1, juniper/ex4400-em-4s@1, juniper/ex4400-em-4y@1, juniper/ex4400-em-1c@1],
@@ -499,8 +500,8 @@ views:
         - {id: label-clei, at: [98.7, 2.5], size: [5.1, 28.8], fill: '#d8d8d6'}
         - {id: label-rating, at: [431.3, 1.7], size: [7.7, 41.5], fill: '#4f5560'}
         - {id: ground-plate, at: [27.8, 27.6], size: [33.9, 12.1], rx: 0.6, fill: '#666666'}
-        - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, vent: 1.0}
-        - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, vent: 1.0}
+        - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
+        - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
       cutouts:
         - {id: con, at: [10.45, 7.0], size: [15.8, 13.2], shape: rect}
         - {id: mgmt, at: [31.7, 7.0], size: [15.8, 13.2], shape: rect}

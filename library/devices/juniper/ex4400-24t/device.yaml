@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-24t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-24T
@@ -370,8 +370,11 @@ views:
     size: {w: 441.7, h: 43.7}
     panel:
       decor:
-      - {id: vent-top, at: [27.0, 1.2], size: [331.0, 7.8], pattern: vent, vent: 1.0}
-      - {id: vent-bottom, at: [3.5, 38.7], size: [356.0, 4.6], pattern: vent, vent: 1.0}
+      - {id: logo-plate, at: [0.3, 0.3], size: [26.6, 9.3], rx: 0.8, fill: '#828282'}
+      - {id: vent-top, at: [27.0, 1.2], size: [331.0, 7.8], pattern: vent, pattern-pitch: [5.5, 5.4],
+        vent: 1.0}
+      - {id: vent-bottom, at: [3.5, 38.7], size: [356.0, 4.6], pattern: vent, pattern-pitch: [5.5, 5.4],
+        vent: 1.0}
       - {id: plate-1, at: [5.71, 9.9], size: [87.1, 24.8], rx: 0.6, fill: '#cccdcf'}
       - {id: plate-2, at: [94.97, 9.9], size: [87.1, 24.8], rx: 0.6, fill: '#cccdcf'}
       - {id: status-plate, at: [361.2, 1.4], size: [78.3, 14.1], rx: 0.8, fill: '#50575f'}
@@ -410,30 +413,30 @@ views:
       - {id: led-en, at: [409.1, 8.7], size: [2.0, 2.0], shape: circle}
       - {id: mode-button, at: [420.4, 5.9], size: [5.4, 5.4], shape: circle}
     silkscreen:
-    - {at: [12.0, 37.9], text: '0', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-0}
-    - {at: [16.6, 37.9], text: '1', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-1}
-    - {at: [25.97, 37.9], text: '2', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-2}
-    - {at: [30.57, 37.9], text: '3', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-3}
-    - {at: [39.94, 37.9], text: '4', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-4}
-    - {at: [44.54, 37.9], text: '5', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-5}
-    - {at: [53.91, 37.9], text: '6', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-6}
-    - {at: [58.51, 37.9], text: '7', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-7}
-    - {at: [67.88, 37.9], text: '8', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-8}
-    - {at: [72.48, 37.9], text: '9', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-9}
-    - {at: [81.85, 37.9], text: '10', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-10}
-    - {at: [86.45, 37.9], text: '11', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-11}
-    - {at: [101.26, 37.9], text: '12', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-12}
-    - {at: [105.86, 37.9], text: '13', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-13}
-    - {at: [115.23, 37.9], text: '14', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-14}
-    - {at: [119.83, 37.9], text: '15', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-15}
-    - {at: [129.2, 37.9], text: '16', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-16}
-    - {at: [133.8, 37.9], text: '17', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-17}
-    - {at: [143.17, 37.9], text: '18', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-18}
-    - {at: [147.77, 37.9], text: '19', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-19}
-    - {at: [157.14, 37.9], text: '20', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-20}
-    - {at: [161.74, 37.9], text: '21', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-21}
-    - {at: [171.11, 37.9], text: '22', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-22}
-    - {at: [175.71, 37.9], text: '23', font-size: 1.7, anchor: end, fill: '#e1e3e5', for: port-23}
+    - {at: [12.0, 37.9], text: '0', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-0}
+    - {at: [16.6, 37.9], text: '1', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-1}
+    - {at: [25.97, 37.9], text: '2', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-2}
+    - {at: [30.57, 37.9], text: '3', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-3}
+    - {at: [39.94, 37.9], text: '4', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-4}
+    - {at: [44.54, 37.9], text: '5', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-5}
+    - {at: [53.91, 37.9], text: '6', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-6}
+    - {at: [58.51, 37.9], text: '7', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-7}
+    - {at: [67.88, 37.9], text: '8', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-8}
+    - {at: [72.48, 37.9], text: '9', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-9}
+    - {at: [81.85, 37.9], text: '10', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-10}
+    - {at: [86.45, 37.9], text: '11', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-11}
+    - {at: [101.26, 37.9], text: '12', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-12}
+    - {at: [105.86, 37.9], text: '13', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-13}
+    - {at: [115.23, 37.9], text: '14', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-14}
+    - {at: [119.83, 37.9], text: '15', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-15}
+    - {at: [129.2, 37.9], text: '16', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-16}
+    - {at: [133.8, 37.9], text: '17', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-17}
+    - {at: [143.17, 37.9], text: '18', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-18}
+    - {at: [147.77, 37.9], text: '19', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-19}
+    - {at: [157.14, 37.9], text: '20', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-20}
+    - {at: [161.74, 37.9], text: '21', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-21}
+    - {at: [171.11, 37.9], text: '22', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-22}
+    - {at: [175.71, 37.9], text: '23', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-23}
     - {at: [393.4, 5.0], text: EX4400, font-size: 2.8, anchor: middle, fill: '#e6e8ea', for: chassis}
     - {at: [404.1, 4.4], text: SYS, font-size: 1.9, anchor: end, fill: '#dfe2e6', for: led-sys}
     - {at: [404.1, 7.4], text: ALM, font-size: 1.9, anchor: end, fill: '#dfe2e6', for: led-alm}
@@ -642,8 +645,10 @@ views:
       - {id: label-clei, at: [98.7, 2.5], size: [5.1, 28.8], fill: '#d8d8d6'}
       - {id: label-rating, at: [431.3, 1.7], size: [7.7, 41.5], fill: '#4f5560'}
       - {id: ground-plate, at: [27.8, 27.6], size: [33.9, 12.1], rx: 0.6, fill: '#666666'}
-      - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, vent: 1.0}
-      - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, vent: 1.0}
+      - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, pattern-pitch: [5.5, 5.4],
+        vent: 1.0}
+      - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, pattern-pitch: [5.5,
+          5.4], vent: 1.0}
       cutouts:
       - {id: con, at: [10.45, 7.0], size: [15.8, 13.2], shape: rect}
       - {id: mgmt, at: [31.7, 7.0], size: [15.8, 13.2], shape: rect}
