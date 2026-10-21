@@ -5,6 +5,7 @@ PoE+ printing on the P models). The guide's Table 3 gives one chassis for the wh
 the envelope is the same for every model; Tables 1 and 12 give the port counts and the power
 supply each model ships with, and Table 10 gives the airflow.
 """
+import re
 from pathlib import Path
 
 import pytest
@@ -219,3 +220,47 @@ def test_dcim_export_has_one_device_type_per_orderable_configuration(name):
 def test_module_types_are_exported_under_their_part_numbers(pn):
     doc = yaml.safe_load((EXPORTS / f"module-types/Juniper/{pn}.yaml").read_text())
     assert doc["part_number"] == pn
+
+
+def silk_texts(d):
+    """Every printed string on every face of a device, with its entry."""
+    out = []
+    for view in d["views"].values():
+        out += [s for s in (view.get("silkscreen") or []) if "text" in s]
+    return out
+
+
+@pytest.mark.parametrize("name", MODELS)
+def test_no_face_draws_the_vendor_wordmark(name):
+    # The logo is a trademark, so the layout reserves a `logo-zone` and prints nothing in it.
+    # "EX3400" and "PoE+" are the model's own printing and stay.
+    texts = {s["text"] for s in silk_texts(load(name))}
+    assert not {t for t in texts if t.upper() in ("JUNIPER", "NETWORKS")}, texts
+    assert "EX3400" in texts
+    assert ("PoE+" in texts) == MODELS[name][3]
+
+
+# The 48T photograph (ex3400-48t-front-high) prints the port numerals light grey: the lightest
+# pixels of the numeral row, median of the 20 brightest, are (193, 188, 186). The 48P photograph
+# prints them orange. The ink is thin, so the photograph's value is a floor on the true one.
+NUMERAL_FILL = {"ex3400-24t": "#c1bcba", "ex3400-48t": "#c1bcba",
+                "ex3400-24p": "#e8603a", "ex3400-48p": "#e8603a"}
+
+
+@pytest.mark.parametrize("name", MODELS)
+def test_port_numerals_take_the_colour_their_photograph_prints(name):
+    d = load(name)
+    numerals = [s for s in silk_texts(d) if s.get("for", "").startswith("port-")]
+    assert len(numerals) == MODELS[name][0]
+    assert {s["fill"] for s in numerals} == {NUMERAL_FILL[name]}
+
+
+def test_the_blank_panels_finger_holes_are_d_shaped_recesses_with_a_lip():
+    # Figure 3 callout 11 and the EX3400-48P rear photograph: a flat edge on the outer side, a
+    # round end toward the middle of the plate, and an inner lip around the well.
+    svg = (COMPONENTS / "ex3400-psu-blank/v1/skins/default.svg").read_text()
+    for side in ("left", "right"):
+        hole = re.search(rf'<path id="grip-{side}"[^>]*\bd="([^"]*)"', svg)
+        assert hole and " A" in hole.group(1), f"grip-{side} is not an arc-ended path"
+        assert f'id="grip-{side}-lip"' in svg
+    assert 'rx="10.0"' not in svg, "a stadium oval is still drawn"

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex3400-24p
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX3400-24P
@@ -412,8 +412,6 @@ views:
     - {at: [385.05, 40.3], text: '1', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-1}
     - {at: [399.3, 40.3], text: '2', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-2}
     - {at: [413.55, 40.3], text: '3', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-3}
-    - {at: [7.4, 6.8], text: JUNIPER, font-size: 5.0, anchor: start, for: chassis}
-    - {at: [29.6, 9.1], text: NETWORKS, font-size: 1.6, anchor: end, for: chassis}
     - {at: [366.9, 6.4], text: EX3400, font-size: 3.2, anchor: start, for: chassis}
     - {at: [379.2, 6.4], text: PoE+, font-size: 3.2, anchor: start, fill: '#e8603a', for: chassis}
     - {at: [424.2, 6.8], text: SYS, font-size: 2.1, anchor: end, for: led-sys}

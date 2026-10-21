@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex3400-48t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX3400-48T
@@ -85,7 +85,10 @@ provenance:
       The EX3400-48T photograph prints "EX3400", with no PoE+ mark, and still prints the POE mode legend
       and lamp. Figure 1 and the front panel topic say the PoE lamp is present only on models with PoE,
       and Table 8 says it is not available without PoE. The legend and lamp are drawn as photographed,
-      and the lamp is never lit on this model.
+      and the lamp is never lit on this model. The port numerals print light grey on this photograph,
+      not orange as on the PoE models: #c1bcba, the median of the 20 brightest pixels in the numeral row
+      below the jacks (193, 188, 186; the surrounding face is about 150, 152, 155). The ink is thin, so
+      the sample is a floor on its true value.
   rear:
     confidence: photo-measured
     note: >-
@@ -425,60 +428,58 @@ views:
       - {id: led-uplink-3-act, at: [408.95, 37.9], size: [2.6, 4.6], shape: rect}
       - {id: led-uplink-3-status, at: [416.15, 37.9], size: [2.6, 4.6], shape: rect}
     silkscreen:
-    - {at: [14.9, 39.4], text: '0', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-0}
-    - {at: [17.2, 40.4], text: '1', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-1}
-    - {at: [28.87, 39.4], text: '2', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-2}
-    - {at: [31.17, 40.4], text: '3', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-3}
-    - {at: [42.84, 39.4], text: '4', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-4}
-    - {at: [45.14, 40.4], text: '5', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-5}
-    - {at: [56.81, 39.4], text: '6', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-6}
-    - {at: [59.11, 40.4], text: '7', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-7}
-    - {at: [70.78, 39.4], text: '8', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-8}
-    - {at: [73.08, 40.4], text: '9', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-9}
-    - {at: [84.75, 39.4], text: '10', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-10}
-    - {at: [87.05, 40.4], text: '11', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-11}
-    - {at: [103.66, 39.4], text: '12', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-12}
-    - {at: [105.96, 40.4], text: '13', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-13}
-    - {at: [117.63, 39.4], text: '14', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-14}
-    - {at: [119.93, 40.4], text: '15', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-15}
-    - {at: [131.6, 39.4], text: '16', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-16}
-    - {at: [133.9, 40.4], text: '17', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-17}
-    - {at: [145.57, 39.4], text: '18', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-18}
-    - {at: [147.87, 40.4], text: '19', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-19}
-    - {at: [159.54, 39.4], text: '20', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-20}
-    - {at: [161.84, 40.4], text: '21', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-21}
-    - {at: [173.51, 39.4], text: '22', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-22}
-    - {at: [175.81, 40.4], text: '23', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-23}
-    - {at: [192.42, 39.4], text: '24', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-24}
-    - {at: [194.72, 40.4], text: '25', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-25}
-    - {at: [206.39, 39.4], text: '26', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-26}
-    - {at: [208.69, 40.4], text: '27', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-27}
-    - {at: [220.36, 39.4], text: '28', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-28}
-    - {at: [222.66, 40.4], text: '29', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-29}
-    - {at: [234.33, 39.4], text: '30', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-30}
-    - {at: [236.63, 40.4], text: '31', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-31}
-    - {at: [248.3, 39.4], text: '32', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-32}
-    - {at: [250.6, 40.4], text: '33', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-33}
-    - {at: [262.27, 39.4], text: '34', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-34}
-    - {at: [264.57, 40.4], text: '35', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-35}
-    - {at: [281.18, 39.4], text: '36', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-36}
-    - {at: [283.48, 40.4], text: '37', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-37}
-    - {at: [295.15, 39.4], text: '38', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-38}
-    - {at: [297.45, 40.4], text: '39', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-39}
-    - {at: [309.12, 39.4], text: '40', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-40}
-    - {at: [311.42, 40.4], text: '41', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-41}
-    - {at: [323.09, 39.4], text: '42', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-42}
-    - {at: [325.39, 40.4], text: '43', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-43}
-    - {at: [337.06, 39.4], text: '44', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-44}
-    - {at: [339.36, 40.4], text: '45', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-45}
-    - {at: [351.03, 39.4], text: '46', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-46}
-    - {at: [353.33, 40.4], text: '47', font-size: 2.4, anchor: middle, fill: '#e8603a', for: port-47}
+    - {at: [14.9, 39.4], text: '0', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-0}
+    - {at: [17.2, 40.4], text: '1', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-1}
+    - {at: [28.87, 39.4], text: '2', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-2}
+    - {at: [31.17, 40.4], text: '3', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-3}
+    - {at: [42.84, 39.4], text: '4', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-4}
+    - {at: [45.14, 40.4], text: '5', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-5}
+    - {at: [56.81, 39.4], text: '6', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-6}
+    - {at: [59.11, 40.4], text: '7', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-7}
+    - {at: [70.78, 39.4], text: '8', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-8}
+    - {at: [73.08, 40.4], text: '9', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-9}
+    - {at: [84.75, 39.4], text: '10', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-10}
+    - {at: [87.05, 40.4], text: '11', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-11}
+    - {at: [103.66, 39.4], text: '12', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-12}
+    - {at: [105.96, 40.4], text: '13', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-13}
+    - {at: [117.63, 39.4], text: '14', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-14}
+    - {at: [119.93, 40.4], text: '15', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-15}
+    - {at: [131.6, 39.4], text: '16', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-16}
+    - {at: [133.9, 40.4], text: '17', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-17}
+    - {at: [145.57, 39.4], text: '18', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-18}
+    - {at: [147.87, 40.4], text: '19', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-19}
+    - {at: [159.54, 39.4], text: '20', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-20}
+    - {at: [161.84, 40.4], text: '21', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-21}
+    - {at: [173.51, 39.4], text: '22', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-22}
+    - {at: [175.81, 40.4], text: '23', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-23}
+    - {at: [192.42, 39.4], text: '24', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-24}
+    - {at: [194.72, 40.4], text: '25', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-25}
+    - {at: [206.39, 39.4], text: '26', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-26}
+    - {at: [208.69, 40.4], text: '27', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-27}
+    - {at: [220.36, 39.4], text: '28', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-28}
+    - {at: [222.66, 40.4], text: '29', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-29}
+    - {at: [234.33, 39.4], text: '30', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-30}
+    - {at: [236.63, 40.4], text: '31', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-31}
+    - {at: [248.3, 39.4], text: '32', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-32}
+    - {at: [250.6, 40.4], text: '33', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-33}
+    - {at: [262.27, 39.4], text: '34', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-34}
+    - {at: [264.57, 40.4], text: '35', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-35}
+    - {at: [281.18, 39.4], text: '36', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-36}
+    - {at: [283.48, 40.4], text: '37', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-37}
+    - {at: [295.15, 39.4], text: '38', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-38}
+    - {at: [297.45, 40.4], text: '39', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-39}
+    - {at: [309.12, 39.4], text: '40', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-40}
+    - {at: [311.42, 40.4], text: '41', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-41}
+    - {at: [323.09, 39.4], text: '42', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-42}
+    - {at: [325.39, 40.4], text: '43', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-43}
+    - {at: [337.06, 39.4], text: '44', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-44}
+    - {at: [339.36, 40.4], text: '45', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-45}
+    - {at: [351.03, 39.4], text: '46', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-46}
+    - {at: [353.33, 40.4], text: '47', font-size: 2.4, anchor: middle, fill: '#c1bcba', for: port-47}
     - {at: [370.8, 40.3], text: '0', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-0}
     - {at: [385.05, 40.3], text: '1', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-1}
     - {at: [399.3, 40.3], text: '2', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-2}
     - {at: [413.55, 40.3], text: '3', font-size: 2.4, anchor: middle, fill: '#e8eaec', for: uplink-3}
-    - {at: [7.4, 6.8], text: JUNIPER, font-size: 5.0, anchor: start, for: chassis}
-    - {at: [29.6, 9.1], text: NETWORKS, font-size: 1.6, anchor: end, for: chassis}
     - {at: [366.9, 6.4], text: EX3400, font-size: 3.2, anchor: start, for: chassis}
     - {at: [424.2, 6.8], text: SYS, font-size: 2.1, anchor: end, for: led-sys}
     - {at: [424.2, 11.3], text: ALM, font-size: 2.1, anchor: end, for: led-alm}

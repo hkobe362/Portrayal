@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex3400-48t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX3400-48T
@@ -90,7 +90,10 @@ provenance:
       legend. The EX3400-48T photograph prints "EX3400", with no PoE+ mark, and still prints the
       POE mode legend and lamp. Figure 1 and the front panel topic say the PoE lamp is present
       only on models with PoE, and Table 8 says it is not available without PoE. The legend and
-      lamp are drawn as photographed, and the lamp is never lit on this model.
+      lamp are drawn as photographed, and the lamp is never lit on this model. The port numerals
+      print light grey on this photograph, not orange as on the PoE models: #c1bcba, the median of
+      the 20 brightest pixels in the numeral row below the jacks (193, 188, 186; the surrounding
+      face is about 150, 152, 155). The ink is thin, so the sample is a floor on its true value.
   rear:
     confidence: photo-measured
     note: >-
@@ -363,8 +366,6 @@ views:
     silkscreen:
     - {block: rj45}
     - {block: sfp-plus}
-    - {at: [7.4, 6.8], text: JUNIPER, font-size: 5.0, anchor: start, for: chassis}
-    - {at: [29.6, 9.1], text: NETWORKS, font-size: 1.6, anchor: end, for: chassis}
     - {at: [366.9, 6.4], text: EX3400, font-size: 3.2, anchor: start, for: chassis}
     - {at: [424.2, 6.8], text: SYS, font-size: 2.1, anchor: end, for: led-sys}
     - {at: [424.2, 11.3], text: ALM, font-size: 2.1, anchor: end, for: led-alm}
@@ -392,7 +393,7 @@ views:
         number-from: 0
         cutouts: true
         rotate: {top: 180}
-        numerals: {dx-by-row: [5.9, 8.2], dy-top: 28.66, dy-bottom: 15.66, font-size: 2.4, anchor: middle, fill: '#e8603a'}
+        numerals: {dx-by-row: [5.9, 8.2], dy-top: 28.66, dy-bottom: 15.66, font-size: 2.4, anchor: middle, fill: '#c1bcba'}
       - id: sfp-plus
         ref: std/sfp-ganged@1
         at: [363.7, 25.8]
