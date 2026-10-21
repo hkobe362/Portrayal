@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="71.2mm" height="39.0mm" viewBox="0 0 71.2 39.0">
+  <rect id="face" x="0" y="0" width="71.2" height="39.0" rx="1.0" fill="#5d6065" stroke="#3f4246" stroke-width="0.4"/>
+  <rect id="grip-left" x="2.0" y="6.0" width="20.0" height="27.0" rx="10.0" fill="#1b1d20"/>
+  <rect id="grip-left-inner" x="3.4" y="7.8" width="14.0" height="23.4" rx="6.0" fill="#2d3034"/>
+  <rect id="grip-right" x="49.2" y="6.0" width="20.0" height="27.0" rx="10.0" fill="#1b1d20"/>
+  <rect id="grip-right-inner" x="52.8" y="7.8" width="14.0" height="23.4" rx="6.0" fill="#2d3034"/>
+</svg>
