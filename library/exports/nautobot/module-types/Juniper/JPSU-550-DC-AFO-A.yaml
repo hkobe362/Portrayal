@@ -11,8 +11,8 @@ power-ports:
 comments: 'Juniper JPSU-550-DC-AFO-A, the 550 W DC power supply of the EX4300 switches, labelled AIR OUT
   (AFO): front-to-back airflow. It ships in the EX4300-48T-DC and seats in the PSU 0 and PSU 1 slots of
   the DC-capable models. Hot-insertable and hot-removable; IN OK and OUT OK lamps, a honeycomb vent, a
-  loop handle and a four-way screw terminal block with a cord retainer. It does not supply Power over
-  Ethernet.
+  loop handle and a five-terminal screw block printed + - earth - + with a cord retainer. It does not
+  supply Power over Ethernet.
 
 
   Facts carried in the model that this schema has no field for:

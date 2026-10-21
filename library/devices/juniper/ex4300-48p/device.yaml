@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4300-48p
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4300-48P
@@ -473,8 +473,6 @@ views:
     - {at: [338.78, 40.0], text: '45', font-size: 1.7, anchor: middle, fill: '#e4e6e9', for: port-45}
     - {at: [350.45, 39.2], text: '46', font-size: 1.7, anchor: middle, fill: '#e4e6e9', for: port-46}
     - {at: [352.75, 40.0], text: '47', font-size: 1.7, anchor: middle, fill: '#e4e6e9', for: port-47}
-    - {at: [7.0, 6.4], text: JUNIPER, font-size: 4.4, anchor: start, fill: '#e4e6e9', for: chassis}
-    - {at: [29.2, 8.4], text: NETWORKS, font-size: 1.4, anchor: end, fill: '#e4e6e9', for: chassis}
     - {at: [395.4, 4.9], text: EX4300, font-size: 2.4, anchor: middle, fill: '#e4e6e9', for: chassis}
     - {at: [352.1, 6.26], text: CON1, font-size: 1.5, anchor: middle, fill: '#e4e6e9', for: console}
     components:
@@ -858,6 +856,11 @@ views:
           blinking backup, unlit line card
       - {ref: common/screw-head@1, id: face-screw-l, at: [365.6, 11.0], group: furniture, rel-pos: 0}
       - {ref: common/screw-head@1, id: face-screw-r, at: [434.2, 11.3], group: furniture, rel-pos: 1}
+    regions:
+    - id: logo-zone
+      at: [6.5, 1.7]
+      size: {w: 23.0, h: 6.4}
+      label: Vendor logo; not drawn
   rear:
     size: {w: 441.0, h: 43.7}
     panel:

@@ -9,6 +9,8 @@ YAML a contributor edits, or the generated export a DCIM user imports; none read
 exporter holds, because a table that says so proves nothing about the file.
 """
 import pathlib
+import re
+import xml.etree.ElementTree as ET
 
 import pytest
 import yaml
@@ -169,7 +171,7 @@ def test_the_front_carries_the_console_lcd_buttons_lamps_and_the_uplink_slot(dev
     for lamp in ("led-alm", "led-sys", "led-mst"):
         assert ids[lamp] == "common/led-dot@1"
     legends = {s["text"] for s in d["views"]["front"]["silkscreen"]}
-    assert {"JUNIPER", "EX4300", "CON1"} <= legends
+    assert {"EX4300", "CON1"} <= legends
     # the photograph prints no legend by the chassis lamps; the guide's names are not invented
     assert not legends & {"ALM", "SYS", "MST"}
     slot = bays(d, "front")["uplink"]
@@ -366,3 +368,126 @@ def test_each_component_states_where_its_size_came_from(comp):
     c = contract(comp)
     assert c["size-confidence"]
     assert all(isinstance(v, str) for v in c["provenance"].values())
+
+
+# ------------------------------------------------- review fixes: logo, DC face, airflow label
+
+
+def skin(comp):
+    text = (LIB / "components/juniper" / comp / "v1/skins/default.svg").read_text()
+    return ET.fromstring(text.replace(' xmlns="http://www.w3.org/2000/svg"', "", 1))
+
+
+def nums(s):
+    return [float(v) for v in re.findall(r"-?\d+(?:\.\d+)?", s)]
+
+
+@pytest.mark.parametrize("dev", DEVICES)
+def test_no_face_draws_the_vendor_logo_and_the_front_reserves_its_place(dev):
+    """A vendor logo is never drawn; the front holds a logo-zone over where the mark sits, and the
+    plain EX4300 legend stays."""
+    d = load(dev)
+    for name, view in d["views"].items():
+        drawn = [i for k in ("silkscreen",) for i in view.get(k) or []]
+        drawn += (view.get("panel") or {}).get("decor") or []
+        words = {str(i.get("text", "")).upper() for i in drawn}
+        assert not words & {"JUNIPER", "NETWORKS"}, name
+    front = d["views"]["front"]
+    zones = [r for r in front.get("regions") or [] if r["id"] == "logo-zone"]
+    assert len(zones) == 1
+    z = zones[0]
+    x, y = z["at"]
+    # the mark in the 24T photograph: about 6.5 to 29.6 mm across, 1.5 to 8.1 mm down
+    assert 5.5 <= x <= 7.5 and 1.0 <= y <= 2.5
+    assert 22.0 <= z["size"]["w"] <= 24.5 and 5.5 <= z["size"]["h"] <= 7.5
+    assert x + z["size"]["w"] <= 29.8 and y + z["size"]["h"] <= 10.3
+    assert "not drawn" in z["label"]
+    assert "EX4300" in {s.get("text") for s in front["silkscreen"]}
+
+
+DC_SUPPLIES = ["ex4300-jpsu-550-dc-afo", "ex4300-jpsu-550-dc-afi"]
+
+
+@pytest.mark.parametrize("comp", DC_SUPPLIES)
+def test_the_dc_supply_has_the_five_terminals_figure_45_prints(comp):
+    """Figure 45 (g022081): a five-way block printed + - earth - +."""
+    root = skin(comp)
+    block = root.find(".//g[@id='terminal-block']")
+    screws = block.findall(".//circle[@class='terminal']")
+    assert len(screws) == 5
+    xs = [float(c.get("cx")) for c in screws]
+    assert xs == sorted(xs)
+    marks = [(float(t.get("x")), t.text) for t in root.iter("text")
+             if t.get("class") == "polarity"]
+    earth = block.find("g[@id='earth']")
+    marks.append((nums(earth.get("transform"))[0], "earth"))
+    marks.sort()
+    assert [m for _, m in marks] == ["+", "−", "earth", "−", "+"]
+    for (mx, _), sx in zip(marks, xs):
+        assert abs(mx - sx) < 0.5
+    pitch = [b - a for a, b in zip(xs, xs[1:])]
+    assert max(pitch) - min(pitch) < 0.5
+    c = contract(comp)
+    assert c["elements"]["terminal-block"]["size"][0] > 40.0
+    prov = " ".join(c["provenance"].values()) + c["description"]
+    assert "Figure 45" in prov and "five" in prov
+    for stale in ("no DC rear drawing", "four screw terminals", "four-way", "not legible"):
+        assert stale not in prov
+
+
+def _text_box(t):
+    fs = float(t.get("font-size"))
+    w = 0.62 * fs * len(t.text) * (1.08 if t.get("font-weight") == "bold" else 1.0)
+    x, y, a = float(t.get("x")), float(t.get("y")), t.get("text-anchor", "start")
+    x0 = x - w / 2 if a == "middle" else x
+    x1, y0, y1 = x0 + w, y - 0.75 * fs, y + 0.25 * fs
+    tr = t.get("transform")
+    if tr and tr.startswith("rotate"):
+        _, px, py = nums(tr)
+        pts = [(px + (yy - py), py - (xx - px)) for xx in (x0, x1) for yy in (y0, y1)]
+        return (min(p[0] for p in pts), min(p[1] for p in pts),
+                max(p[0] for p in pts), max(p[1] for p in pts))
+    return (x0, y0, x1, y1)
+
+
+def _label_parts(comp):
+    root = skin(comp)
+    face = root.find(".//rect[@id='face']")
+    group = root.find(".//g[@id='airflow-label']")
+    plate = group.find("rect[@id='plate']")
+    rect = lambda r: (float(r.get("x")), float(r.get("y")),
+                      float(r.get("x")) + float(r.get("width")),
+                      float(r.get("y")) + float(r.get("height")))
+    glyph = group.find("g[@id='fan-glyph']")
+    gx, gy, s = nums(glyph.get("transform"))
+    texts = [t for t in root.iter("text") if t.get("class") == "airflow"]
+    boxes = [_text_box(t) for t in texts]
+    boxes.append((gx - 0.9 * s, gy - 0.9 * s, gx + 0.9 * s, gy + 0.9 * s))
+    return root, texts, rect(face), rect(plate), boxes
+
+
+@pytest.mark.parametrize("comp", sorted(PSUS) + sorted(FANS))
+def test_the_airflow_label_is_the_guides_two_line_box_with_a_fan_glyph(comp):
+    """Figures 38, 43 and 45: AIR OUT over (AFO), or AIR IN over (AFI), a fan glyph at the start
+    of the second line; inside its plate and touching nothing."""
+    out = (PSUS.get(comp) or FANS[comp])[-2 if comp in PSUS else -1] == "front-to-back"
+    root, texts, face, plate, boxes = _label_parts(comp)
+    want = ["AIR OUT", "(AFO)"] if out else ["AIR IN", "(AFI)"]
+    assert [t.text for t in texts] == want
+    assert len(root.findall(".//g[@id='airflow-label']/g[@id='fan-glyph']")) == 1
+    # printed text sits in a silkscreen group, as the lint requires
+    silk = {id(t) for g in root.iter("g") if g.get("id") == "silkscreen" for t in g.iter("text")}
+    assert all(id(t) in silk for t in root.iter("text"))
+    everything = "".join(t.text or "" for t in root.iter("text"))
+    assert "⊕" not in everything and "+" not in "".join(t.text for t in texts)
+    assert not any(" (AF" in (t.text or "") for t in root.iter("text"))
+    assert plate[0] >= face[0] and plate[1] >= face[1]
+    assert plate[2] <= face[2] and plate[3] <= face[3]
+    for b in boxes:
+        assert b[0] >= plate[0] + 0.2 and b[1] >= plate[1] + 0.2
+        assert b[2] <= plate[2] - 0.2 and b[3] <= plate[3] - 0.2
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            gap_x = max(a[0] - b[2], b[0] - a[2])
+            gap_y = max(a[1] - b[3], b[1] - a[3])
+            assert max(gap_x, gap_y) >= 0.3, (a, b)

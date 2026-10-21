@@ -34,10 +34,12 @@ provenance:
     datasheet - guide Table 47: 2.43 lb (1.1 kg)
   size: >-
     estimated - the AIR OUT DC supply's aperture, 84.0 x 42.0 mm (see juniper/ex4300-jpsu-550-dc-afo);
-    no DC rear drawing and no AIR IN supply drawing was found
+    no AIR IN supply drawing was found
   face: >-
-    estimated - the AIR OUT DC supply's art with the printed label changed to AIR IN (AFI); no figure
-    shows an AIR IN supply of either kind
+    drawing - the AIR OUT DC supply's face, measured from the guide's flat DC faceplate drawing
+    (Figure 45, g022081, p.121): a block of five screw terminals printed + - earth - +, as the
+    guide's text says: five terminals. The printed label is changed to AIR IN (AFI); no figure shows
+    an AIR IN supply of either kind
   leds: >-
     datasheet - guide Figure 45 and Table 52: IN OK green when the supply is receiving power; OUT OK
     green when functioning correctly, red when the supply has failed; each unlit otherwise
@@ -49,14 +51,14 @@ states:
 - absent
 elements:
   led-in-ok:
-    at: [6.8, 7.5]
+    at: [56.1, 6.3]
     size: [2.2, 2.2]
     class: led
     states:
     - {name: green, color: '#39b54a'}
     - 'off'
   led-out-ok:
-    at: [18.1, 7.5]
+    at: [67.9, 6.3]
     size: [2.2, 2.2]
     class: led
     states:
@@ -64,12 +66,12 @@ elements:
     - {name: red, color: '#ef4444'}
     - 'off'
   latch:
-    at: [32.8, 3.4]
-    size: [5.6, 35.0]
+    at: [12.6, 2.0]
+    size: [6.5, 38.0]
     class: latch
   terminal-block:
-    at: [43.0, 14.0]
-    size: [28.0, 20.0]
+    at: [26.1, 19.6]
+    size: [44.0, 17.2]
     class: terminal
 size:
   w: 84.0
