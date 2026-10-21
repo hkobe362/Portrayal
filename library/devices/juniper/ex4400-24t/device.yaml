@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-24t
-version: 0.1.4
+version: 0.1.5
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-24T
@@ -92,8 +92,8 @@ provenance:
     confidence: drawing
     note: >-
       Figure 11 callouts 2 to 5 and Figure 54 (g022614), measured on the render of Figure 8. A dark plate
-      361.2 to 439.5 across and 1.4 to 15.5 down. The model name EX4400 is printed over the USB-C port,
-      with no PoE++ mark and no POE lamp. The USB-C console port is centred at 393.7, 8.3 with the USB
+      361.2 to 439.5 across and 1.4 to 15.5 down. The model name EX4400 is printed up and to the left of the
+      USB-C port, spanning 374.3 to 385.2 across (centre 379.8), with no PoE++ mark and no POE lamp. The USB-C console port is centred at 393.7, 8.3 with the USB
       symbol below it. Two columns of lamps sit at 406.2 and 410.1 across: SYS, ALM, MST and CLD on the
       left with their legends, and SPD, DX and EN on the right (the CLD row has no right-hand lamp). The
       rows are at 3.8, 6.8, 9.7 and 12.8 down; the render scatters them by up to 0.5 mm and they are aligned.
@@ -424,7 +424,7 @@ views:
     - {at: [161.74, 37.9], text: '21', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-21}
     - {at: [171.11, 37.9], text: '22', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-22}
     - {at: [175.71, 37.9], text: '23', font-size: 2.0, anchor: end, fill: '#e1e3e5', for: port-23}
-    - {at: [393.4, 5.0], text: EX4400, font-size: 2.8, anchor: middle, fill: '#e6e8ea', for: chassis}
+    - {at: [379.8, 5.0], text: EX4400, font-size: 2.8, anchor: middle, fill: '#e6e8ea', for: chassis}
     - {at: [404.1, 4.4], text: SYS, font-size: 1.9, anchor: end, fill: '#dfe2e6', for: led-sys}
     - {at: [404.1, 7.4], text: ALM, font-size: 1.9, anchor: end, fill: '#dfe2e6', for: led-alm}
     - {at: [404.1, 10.3], text: MST, font-size: 1.9, anchor: end, fill: '#dfe2e6', for: led-mst}

@@ -13,6 +13,6 @@
   `juniper/ex4400-fan-afi`; the extension modules `juniper/ex4400-em-4s`, `juniper/ex4400-em-4y`
   and `juniper/ex4400-em-1c`; the slot covers `juniper/ex4400-psu-cover` and
   `juniper/ex4400-em-cover`; and the front `juniper/ex4400-mode-button`. The other EX4400 models
-  take the same parts.
+  share these parts where the guide lists them.
 - The DCIM exports gain one device type for each of the 14 orderable EX4400 configurations, and 14
   module types: one for each power supply, fan module, extension module and slot cover.

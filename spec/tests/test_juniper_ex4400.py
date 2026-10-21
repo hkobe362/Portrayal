@@ -127,6 +127,19 @@ def test_front_has_the_status_block_and_the_extension_slot(name):
     assert bays[0]["default"] == "juniper/ex4400-em-cover@1"
 
 
+@pytest.mark.parametrize("name", ["ex4400-24t", "ex4400-48t"])
+def test_front_wordmark_sits_left_of_the_usb_c_port(name):
+    """Figures 8 and 31 (g022643, g022662) print EX4400 at 374.3 to 385.2 mm, centre about 379.8.
+
+    The USB-C port is centred at 393.7, so the wordmark is up and to the left of it, not over it.
+    """
+    d = load(name)
+    marks = [s for s in d["views"]["front"]["silkscreen"] if s.get("text") == "EX4400"]
+    assert len(marks) == 1 and marks[0]["anchor"] == "middle"
+    assert marks[0]["at"][0] == pytest.approx(379.8, abs=0.5)
+    assert marks[0]["at"][0] < 393.7 - 10
+
+
 @pytest.mark.parametrize("name", NAMES)
 def test_rear_ports_and_slots(name):
     d = load(name)
