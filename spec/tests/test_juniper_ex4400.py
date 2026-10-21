@@ -135,7 +135,10 @@ def test_rear_ports_and_slots(name):
     assert sorted(p["id"] for p in qsfp) == ["qsfp-0", "qsfp-1"]       # 100GbE QSFP28 ports: 2
     assert d["groups"]["qsfp28"]["attrs"]["speed"] == "100g"
     ids = {p["id"] for p in placements}
-    assert {"con", "mgmt", "usb", "reset", "ground-1", "ground-2", "esd-jack"} <= ids
+    assert {"con", "mgmt", "usb", "reset", "ground-mark", "esd-jack"} <= ids
+    # Figure 7 callout 14 - a two-hole protective earthing terminal, two dark holes on a plate
+    decor = {x["id"] for x in d["views"]["rear"]["panel"]["decor"]}
+    assert {"ground-plate", "ground-hole-1", "ground-hole-2"} <= decor
     # four lamps for each QSFP28 port, in two rows of two (Figure 55)
     assert sum(1 for p in placements if p["id"].startswith("led-qsfp-")) == 8
     assert [b["id"] for b in bays] == ["fan-0", "fan-1", "psu-0", "psu-1"]   # slots numbered 0 and 1

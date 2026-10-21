@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-48p
-version: 0.1.2
+version: 0.1.4
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-48P
@@ -13,19 +13,10 @@ description: >-
   IEEE 802.3bt PoE of up to 90 W per port. The front also holds a USB-C console port, the
   chassis and port mode lamps, a mode button and one extension module slot. The rear holds two
   100GbE QSFP28 ports, console, management and USB-A ports, two fan modules and two power
-  supply slots. It ships with one 1600 W AC supply, two front-to-back fan modules and covers on
-  the empty slots.
+  supply slots. A shipped switch carries one supply, two front-to-back fan modules and covers on
+  the empty slots. The default configuration names a 1600 W AC supply, and the -S spare ships
+  with no supply and no fans.
 profile: networking
-lint:
-  waive:
-    L61: >-
-      The eight rear QSFP28 lamps stand in a 2 x 2 block beside each cage, as the guide's
-      Figure 55 draws them. The lower pair of each block is 1.5 to 1.7 mm below the cage centre by
-      measurement, which is the drawing's layout and not an attempt to line up with the cage.
-    L119: >-
-      The -S spare ships with no supply, so its configuration seats none and no feed follows from
-      what is seated. The guide lists a 2000 W DC supply for it in Table 22, so the feed is the
-      buyer's choice and no single value is true.
 provenance:
   sources:
     confidence: datasheet
@@ -38,15 +29,17 @@ provenance:
       (g022647 and the rear render shared with the 24T) are renders of the real product and are
       the pictures measured here. The HPE datasheet a00150783enw (Juniper's own address
       redirects to it) was tried once and did not answer. The community NetBox elevations of the
-      EX4400-48F were used only to cross-check the rear counts and positions.
-  photographs-tried:
-    note: >-
-      Juniper's image library (www.juniper.net/content/dam/www/assets/images/us/en/image-library/ex-series/)
-      answered for ex4400-24x/ex4400-24x-front-high.jpg only (a JPEG, 1500 x 236). The same pattern
-      for the 24T, 24P, 48T and 48P (front-high and rear-high, each once) and ex4400-24x rear-high
-      all returned an HTML 404 page. So there is no studio photograph of the 48P in the sources,
-      and the guide's renders are the only picture of each face. The 24X photograph confirms the
-      colour and finish of the face, the status block and the extension module cover.
+      EX4400-48F were used only to cross-check the rear counts and positions. Juniper's image
+      library
+      (www.juniper.net/content/dam/www/assets/images/us/en/image-library/ex-series/) answered for
+      ex4400-24x/ex4400-24x-front-high.jpg only (a JPEG, 1500 x 236). The same pattern for the
+      24T, 24P, 48T and 48P (front-high and rear-high, each once) and ex4400-24x rear-high all
+      returned an HTML 404 page. So there is no studio photograph of the 48P in the sources, and
+      the guide's renders are the only picture of each face. The 24X photograph confirms the
+      colour and finish of the face, the status block and the extension module cover. An
+      end-of-life search made 2026-10-20 found no end-of-life or end-of-sale notice for the
+      EX4400 line, so the lifecycle is none-announced. The one aggregator that lists the
+      EX4400-48P shows it as supported with no date.
   gate-1:
     confidence: measured
     note: >-
@@ -153,8 +146,9 @@ provenance:
       Connect Earth Ground to an EX4400 Switch - a 2-hole protective grounding terminal on the
       rear panel, used with 10-32 x 0.25 in screws and the lugs LCD10-10AF-L, LCD8-10AF-L or
       LCD6-10AF-L. The guide gives no hole spacing. The 15.0 mm spacing is measured on the
-      render and is estimated. The render shows bare holes where the part is the 10-32 screw
-      head, so the screws are drawn as the seat for a lug.
+      render and is estimated. The render shows two bare holes, so they are drawn as dark holes
+      on the plate and not as screws. A two-hole lug is the seat of a pair of holes, and the
+      library has no pair part for 10-32 holes at this spacing, so no lug seat is offered.
   stack-orientation:
     confidence: estimated
     note: >-
@@ -214,16 +208,6 @@ provenance:
       Table 114 - the CLI addresses the switch as FPC 0, the built-in ports as PIC 0 ports 0 to
       47, the two rear QSFP28 ports as PIC 1 ports 0 and 1, and the extension module as PIC 2. The
       names are not printed on the metal, so no interfaces block is written.
-  lifecycle:
-    note: >-
-      Searched 2026-10-20 for an end-of-life or end-of-sale notice for the EX4400 line and found
-      none. The one aggregator that lists the EX4400-48P shows it as supported with no
-      date. Absence of a result is recorded as none-announced.
-  other-faces:
-    note: >-
-      The top, bottom and sides are not drawn by any source. The guide shows the two-post
-      brackets and the rubber feet only in perspective figures. Each carries an `empty:`
-      sentence and the axis conventions are those of the library.
 attrs:
   physical:
     weight: 7.22 kg with no power supply, fan module or extension module (EX4400-48P); 5.88 kg for the -S
@@ -234,7 +218,7 @@ attrs:
   power:
     poe-standard: IEEE 802.3bt (PoE-bt), fast PoE and perpetual PoE, up to 90 W per port on 48 ports
     poe-budget-1600w: 773 W at 110 V and 1310 W at 230 V with one supply, 1796 W and 2200 W with two
-    poe-budget-earlier-junos: 768 W at 110 V and 1290 W at 230 V with one supply, 1440 W and 1800 W with two (Junos OS 22.2R1 and earlier)
+    poe-budget-earlier-junos: With Junos OS 22.2R1 and earlier, 768 W at 110 V and 1290 W at 230 V with one supply. 1440 W and 1800 W with two
     power-redundancy: 1+1 with two supplies of one rating
   thermal:
     heat-dissipation: 456.94 BTU/hr idle and 470.58 at 100 percent traffic with a 1600 W AC supply; 6693.83 and 6707.47 with PoE
@@ -324,12 +308,13 @@ gaps:
       direction. No ordering code is stated for the fan modules.
     wanted: the ordering codes of the front-to-back and back-to-front fan modules
   - what: ground-spacing
-    scope: [ground-1, ground-2]
+    scope: [rear]
     reason: vendor-silent
     note: >-
       The guide states the screw size and lug codes but not the spacing of the two grounding
-      holes. The 15.0 mm spacing is estimated from the render.
-    wanted: the spacing of the two-hole protective earthing terminal
+      holes. The 15.0 mm spacing is estimated from the render. The holes are drawn as decor, so
+      no two-hole lug can be seated on them.
+    wanted: the spacing of the two-hole protective earthing terminal, and a 10-32 pair part for it
   - what: supported-optics
     scope: [qsfp28, extension]
     reason: vendor-silent
@@ -354,10 +339,11 @@ groups:
     attrs:
       media: rj45
       speed: 1g
-      speeds: [10m, 100m, 1g]
       poe: ieee-802.3bt
       poe-max-w: '90'
-    description: 48 ports, numbered 0 to 47 as printed, upper jack of each column even
+    description: >-
+      48 ports, numbered 0 to 47 as printed, upper jack of each column even. Each port runs at
+      10, 100 or 1000 Mbps
   extension:
     term: Slot
     role: traffic
@@ -376,10 +362,9 @@ groups:
     attrs:
       media: qsfp28
       speed: 100g
-      speeds: [40g, 100g]
     description: >-
       Two rear ports numbered 0 and 1. They are Virtual Chassis ports by default and can run as
-      network ports
+      network ports. Each takes a 100G or a 40G transceiver
   qsfp28-leds:
     term: LED
     role: indicator
@@ -398,6 +383,9 @@ groups:
     index-origin: 0
     attrs:
       redundancy: '1+1'
+      redundancy-note: >-
+        Cooling System and Airflow in an EX4400 Switch - "We ship EX4400 switches with two fan
+        modules (1+1 redundancy) preinstalled in the rear panel of the switch."
   psus:
     term: PSU
     role: service
@@ -561,6 +549,8 @@ views:
     panel:
       decor:
         - {id: ground-plate, at: [27.8, 27.6], size: [33.9, 12.1], rx: 0.6, fill: '#666666'}
+        - {id: ground-hole-1, at: [36.7, 30.9], size: [5.6, 5.6], rx: 2.8, fill: '#0e0f10'}
+        - {id: ground-hole-2, at: [51.7, 30.9], size: [5.6, 5.6], rx: 2.8, fill: '#0e0f10'}
         - {id: vent-rear-top, at: [62.5, 1.0], size: [26.0, 7.5], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
         - {id: vent-rear-bottom, at: [62.5, 34.0], size: [26.0, 7.0], pattern: vent, pattern-pitch: [5.5, 5.4], vent: 1.0}
       cutouts:
@@ -622,11 +612,7 @@ views:
         - {id: led-qsfp-1-1, ref: common/led-dot@1, at: [93.3, 23.9], for: qsfp-1, group: qsfp28-leds, rel-pos: 5}
         - {id: led-qsfp-1-2, ref: common/led-dot@1, at: [88.4, 28.9], for: qsfp-1, group: qsfp28-leds, rel-pos: 6}
         - {id: led-qsfp-1-3, ref: common/led-dot@1, at: [93.3, 28.9], for: qsfp-1, group: qsfp28-leds, rel-pos: 7}
-        - {id: ground-1, ref: common/ground-screw-10-32@1, at: [34.77, 28.97], for: chassis, group: grounding, rel-pos: 0,
-           attrs: {stud-size: '10-32'}}
-        - {id: ground-2, ref: common/ground-screw-10-32@1, at: [49.77, 28.97], for: chassis, group: grounding, rel-pos: 1,
-           attrs: {stud-size: '10-32'}}
-        - {id: ground-mark, ref: common/ground-symbol@1, at: [21.4, 31.0], for: chassis, group: grounding, rel-pos: 2}
+        - {id: ground-mark, ref: common/ground-symbol@1, at: [21.4, 31.0], for: chassis, group: grounding, rel-pos: 0}
         - {id: esd-jack, ref: common/esd-jack@1, at: [98.1, 33.0], for: chassis, group: esd, rel-pos: 0}
     regions:
       - {id: label-serial, at: [4.0, 3.0], size: {w: 5.1, h: 20.7}, label: 'Serial number ID label; not drawn'}

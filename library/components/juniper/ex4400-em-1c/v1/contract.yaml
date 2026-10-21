@@ -61,7 +61,6 @@ groups:
     attrs:
       media: qsfp28
       speed: 100g
-      speeds: [40g, 100g]
   port-leds:
     term: LED
     role: indicator

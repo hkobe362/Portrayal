@@ -549,7 +549,14 @@ def test_the_comparison_layer_can_now_reach_them():
     its User Guide's fan mode behaviour (the redundant fan kit adds one fan, and
     in redundant mode one rotor failure leaves the system running). Its bays are
     in the top view too.
+
+    EIGHTY-FOUR TO EIGHTY-SEVEN ARE THE JUNIPER EX4400-24T, -24P, -48T AND -48P, 1+1
+    over two module bays each, from the hardware guide's Cooling System and Airflow
+    topic ("We ship EX4400 switches with two fan modules (1+1 redundancy) preinstalled
+    in the rear panel of the switch"). The four share one fan part, and the bays are
+    on the rear face, numbered 0 and 1. The sentence is quoted in each device's fans
+    group.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 83, n
+    assert n == 87, n

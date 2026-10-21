@@ -67,7 +67,6 @@ groups:
     attrs:
       media: sfp-plus
       speed: 10g
-      speeds: [1g, 10g]
   port-leds:
     term: LED
     role: indicator

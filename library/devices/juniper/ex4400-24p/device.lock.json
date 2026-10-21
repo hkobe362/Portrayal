@@ -25,18 +25,17 @@
    "juniper/jpsu-2000-c-dc-afo@1"
   ]
  },
- "composed": "2a4baf9c6431eeaa",
+ "composed": "ffb71a2b79caa359",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
-  "common/ground-screw-10-32@1": "1.0.0+f0abf79f91058854",
   "common/ground-symbol@1": "1.0.0+938c617ba0a96a89",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
-  "juniper/ex4400-em-1c@1": "1.0.0+3ec1681fad47a2b6",
-  "juniper/ex4400-em-4s@1": "1.0.0+138075b681ecb061",
-  "juniper/ex4400-em-4y@1": "1.0.0+81e951df3054e76f",
+  "juniper/ex4400-em-1c@1": "1.0.0+ad8e8d1a7785b79b",
+  "juniper/ex4400-em-4s@1": "1.0.0+bdb3d70d920caa8c",
+  "juniper/ex4400-em-4y@1": "1.0.0+9ca84a7289860212",
   "juniper/ex4400-em-cover@1": "1.0.0+a9c26eb9fb15bc41",
   "juniper/ex4400-fan-afo@1": "1.0.0+b7b572edb3925779",
   "juniper/ex4400-mode-button@1": "1.0.0+d19be0db4f2ecbc3",
@@ -59,7 +58,7 @@
   "s"
  ],
  "format": 1,
- "gaps": "79d6d2768ddfb988",
+ "gaps": "b54426267c35c0b0",
  "groups": [
   "esd",
   "extension",
@@ -162,8 +161,6 @@
   "rear/cutout/usb",
   "rear/placements/con",
   "rear/placements/esd-jack",
-  "rear/placements/ground-1",
-  "rear/placements/ground-2",
   "rear/placements/ground-mark",
   "rear/placements/led-qsfp-0-0",
   "rear/placements/led-qsfp-0-1",
@@ -179,7 +176,7 @@
   "rear/placements/reset",
   "rear/placements/usb"
  ],
- "names": "ea626f85036b03f5",
+ "names": "2e64b53895eee81b",
  "placement-addressing": {
   "for": {
    "front/placements/led-alm": [
@@ -210,12 +207,6 @@
     "chassis"
    ],
    "rear/placements/esd-jack": [
-    "chassis"
-   ],
-   "rear/placements/ground-1": [
-    "chassis"
-   ],
-   "rear/placements/ground-2": [
     "chassis"
    ],
    "rear/placements/ground-mark": [
@@ -291,9 +282,7 @@
    "rear/bays/psu-1": 1,
    "rear/placements/con": 2,
    "rear/placements/esd-jack": 0,
-   "rear/placements/ground-1": 0,
-   "rear/placements/ground-2": 1,
-   "rear/placements/ground-mark": 2,
+   "rear/placements/ground-mark": 0,
    "rear/placements/led-qsfp-0-0": 0,
    "rear/placements/led-qsfp-0-1": 1,
    "rear/placements/led-qsfp-0-2": 2,
@@ -309,7 +298,7 @@
    "rear/placements/usb": 4
   }
  },
- "placement-attrs": "92820e67dbdc9ca8",
+ "placement-attrs": "7aeeaa4470e4b686",
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
   "front/bays/ext-module": "extension",
@@ -353,8 +342,6 @@
   "rear/bays/psu-1": "psus",
   "rear/placements/con": "mgmt",
   "rear/placements/esd-jack": "esd",
-  "rear/placements/ground-1": "grounding",
-  "rear/placements/ground-2": "grounding",
   "rear/placements/ground-mark": "grounding",
   "rear/placements/led-qsfp-0-0": "qsfp28-leds",
   "rear/placements/led-qsfp-0-1": "qsfp28-leds",
@@ -371,7 +358,7 @@
   "rear/placements/usb": "mgmt"
  },
  "placement-surface": "c4a16b09a6b43553",
- "shape": "caaddeade26422fd",
- "surface": "2480638941a83138",
- "version": "0.1.3"
+ "shape": "367a21495f33e368",
+ "surface": "b527c838a3ad5a06",
+ "version": "0.1.5"
 }
