@@ -972,7 +972,9 @@ def plan_cases():
     # A CARD'S BOARD IS NOT ITS BRACKET. These three are drawn from above as
     # the board behind the bracket, which is wider than it or set to one side
     # (3.8, 0.4 and 2.1 mm), so their two figures are not one opening.
-    boards = {"dell/r660 lom", "dell/r660 rio", "dell/r660 ocp"}
+    # The R6615's LOM, rear I/O and OCP bays are the R660's, with the same boards.
+    boards = {"dell/r660 lom", "dell/r660 rio", "dell/r660 ocp",
+              "dell/r6615 lom", "dell/r6615 rio", "dell/r6615 ocp"}
     cases = []
     # read-only: libdata's documents are shared by the whole session
     for slug, data in libdata.devices():
