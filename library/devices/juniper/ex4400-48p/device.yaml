@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-48p
-version: 0.1.4
+version: 0.1.6
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-48P
@@ -203,8 +203,8 @@ attrs:
     poe-standard: IEEE 802.3bt (PoE-bt), fast PoE and perpetual PoE, up to 90 W per port on 48 ports
     poe-budget-1600w: 773 W at 110 V and 1310 W at 230 V with one supply, 1796 W and 2200 W with two
     poe-budget-earlier-junos: >-
-      With Junos OS 22.2R1 and earlier, 768 W at 110 V and 1290 W at 230 V with one supply. 1440 W and
-      1800 W with two
+      Junos OS 22.2R1 and earlier: 768 W at 110 V and 1290 W at 230 V with one supply. Two supplies give
+      1440 W and 1800 W.
     power-redundancy: 1+1 with two supplies of one rating
   thermal:
     heat-dissipation: >-

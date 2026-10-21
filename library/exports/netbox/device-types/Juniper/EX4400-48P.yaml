@@ -204,8 +204,8 @@ comments: 'Juniper EX4400-48P campus access switch, 1RU. It has 48 10/100/1000BA
   - power.poe-budget-1600w: 773 W at 110 V and 1310 W at 230 V with one supply, 1796 W and 2200 W with
   two
 
-  - power.poe-budget-earlier-junos: With Junos OS 22.2R1 and earlier, 768 W at 110 V and 1290 W at 230
-  V with one supply. 1440 W and 1800 W with two
+  - power.poe-budget-earlier-junos: Junos OS 22.2R1 and earlier: 768 W at 110 V and 1290 W at 230 V with
+  one supply. Two supplies give 1440 W and 1800 W.
 
   - power.poe-standard: IEEE 802.3bt (PoE-bt), fast PoE and perpetual PoE, up to 90 W per port on 48 ports
 
@@ -215,7 +215,7 @@ comments: 'Juniper EX4400-48P campus access switch, 1RU. It has 48 10/100/1000BA
   6693.83 and 6707.47 with PoE
 
 
-  Drawing version 0.1.4. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.6. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'
