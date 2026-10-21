@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52.6mm" height="17.5mm" viewBox="0 0 52.6 17.5">
+  <rect id="plate" x="0" y="0" width="52.6" height="17.5" rx="0.6" fill="#6f7479" stroke="#4a4f54" stroke-width="0.2"/>
+  <rect id="strip" x="1.0" y="2.2" width="50.6" height="13.0" rx="0.4" fill="#1b1d20"/>
+  <circle id="mount-left" cx="5.9" cy="8.7" r="3.2" fill="#2b2e32" stroke="#555a60" stroke-width="0.2"/>
+  <circle cx="5.9" cy="8.7" r="1.9" fill="#b9bec4" stroke="#6b7076" stroke-width="0.15"/>
+  <path d="M 4.6 8.7 H 7.2 M 5.9 7.4 V 10.0" stroke="#6b7076" stroke-width="0.25"/>
+  <circle id="mount-right" cx="46.7" cy="8.7" r="3.2" fill="#2b2e32" stroke="#555a60" stroke-width="0.2"/>
+  <circle cx="46.7" cy="8.7" r="1.9" fill="#b9bec4" stroke="#6b7076" stroke-width="0.15"/>
+  <path d="M 45.4 8.7 H 48.0 M 46.7 7.4 V 10.0" stroke="#6b7076" stroke-width="0.25"/>
+  <rect id="pole-1" x="11.4" y="4.3" width="6.8" height="8.9" rx="0.3" fill="#d9dcdf" stroke="#6b7076" stroke-width="0.18"/>
+  <rect id="pole-2" x="19.7" y="4.3" width="6.8" height="8.9" rx="0.3" fill="#d9dcdf" stroke="#6b7076" stroke-width="0.18"/>
+  <rect id="pole-3" x="27.8" y="4.3" width="6.8" height="8.9" rx="0.3" fill="#d9dcdf" stroke="#6b7076" stroke-width="0.18"/>
+  <rect id="pole-4" x="36.0" y="4.3" width="6.8" height="8.9" rx="0.3" fill="#d9dcdf" stroke="#6b7076" stroke-width="0.18"/>
+  <circle cx="14.8" cy="8.75" r="2.2" fill="#a7acb2" stroke="#6b7076" stroke-width="0.15"/>
+  <circle cx="23.1" cy="8.75" r="2.2" fill="#a7acb2" stroke="#6b7076" stroke-width="0.15"/>
+  <circle cx="31.2" cy="8.75" r="2.2" fill="#a7acb2" stroke="#6b7076" stroke-width="0.15"/>
+  <circle cx="39.4" cy="8.75" r="2.2" fill="#a7acb2" stroke="#6b7076" stroke-width="0.15"/>
+  <path d="M 13.3 8.75 H 16.3 M 21.6 8.75 H 24.6 M 29.7 8.75 H 32.7 M 37.9 8.75 H 40.9" stroke="#6b7076" stroke-width="0.25"/>
+</svg>
