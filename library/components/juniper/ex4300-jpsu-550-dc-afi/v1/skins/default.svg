@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="84.0mm" height="42.0mm" viewBox="0 0 84.0 42.0">
+  <defs>
+    <pattern id="hex" x="0" y="0" width="3.2" height="2.77" patternUnits="userSpaceOnUse">
+      <polygon points="1.6,0.2 2.9,0.95 2.9,2.45 1.6,3.2 0.3,2.45 0.3,0.95" fill="#0e1012" transform="scale(0.85) translate(0.1 -0.2)"/>
+    </pattern>
+  </defs>
+  <rect id="face" x="0" y="0" width="84.0" height="42.0" rx="0.8" fill="#6e737a" stroke="#3d4147" stroke-width="0.4"/>
+  <g id="vents">
+    <rect x="3.0" y="20.5" width="28.0" height="19.0" rx="0.6" fill="#1c1f22"/>
+    <rect x="3.0" y="20.5" width="28.0" height="19.0" rx="0.6" fill="url(#hex)"/>
+    <rect x="73.0" y="14.0" width="9.0" height="26.0" rx="0.6" fill="#1c1f22"/>
+    <rect x="73.0" y="14.0" width="9.0" height="26.0" rx="0.6" fill="url(#hex)"/>
+  </g>
+  <g id="label-plate">
+    <rect x="3.0" y="13.6" width="13.0" height="6.0" rx="0.5" fill="#d6d9dc" stroke="#9ba0a6" stroke-width="0.25"/>
+  </g>
+  <g id="lamps">
+    <circle id="led-in-ok" cx="7.9" cy="8.6" r="1.1" fill="var(--led-color, #0f1113)" stroke="#3a3e43" stroke-width="0.3"/>
+    <circle id="led-out-ok" cx="19.2" cy="8.6" r="1.1" fill="var(--led-color, #0f1113)" stroke="#3a3e43" stroke-width="0.3"/>
+  </g>
+  <g id="latch">
+    <rect x="32.8" y="3.4" width="5.6" height="35.0" rx="2.4" fill="#2b2e35" stroke="#15171a" stroke-width="0.35"/>
+    <rect x="34.2" y="6.0" width="2.8" height="29.8" rx="1.2" fill="#3a3f45"/>
+  </g>
+  <g id="terminal-block">
+    <rect x="43.0" y="14.0" width="28.0" height="20.0" rx="0.8" fill="#2f3338" stroke="#15171a" stroke-width="0.35"/>
+    <g fill="#c9ccd0" stroke="#7a7f86" stroke-width="0.3">
+      <rect x="44.2" y="16.0" width="5.6" height="16.0" rx="0.6"/>
+      <rect x="50.8" y="16.0" width="5.6" height="16.0" rx="0.6"/>
+      <rect x="57.4" y="16.0" width="5.6" height="16.0" rx="0.6"/>
+      <rect x="64.0" y="16.0" width="5.6" height="16.0" rx="0.6"/>
+    </g>
+    <g fill="#8d9298" stroke="#555a61" stroke-width="0.3">
+      <circle cx="47.0" cy="21.0" r="1.9"/>
+      <circle cx="53.6" cy="21.0" r="1.9"/>
+      <circle cx="60.2" cy="21.0" r="1.9"/>
+      <circle cx="66.8" cy="21.0" r="1.9"/>
+    </g>
+  </g>
+  <g id="silkscreen" font-family="sans-serif" fill="#1d2023">
+    <text x="7.9" y="5.7" font-size="1.5" text-anchor="middle">IN OK</text>
+    <text x="19.2" y="5.7" font-size="1.5" text-anchor="middle">OUT OK</text>
+    <text x="9.8" y="16.9" font-size="1.5" font-weight="bold" text-anchor="middle">AIR IN (AFI)</text>
+    <path d="M 4.6 18.9 m -0.9 0 h 1.8 M 4.6 18.0 v 1.8" stroke="#1d2023" stroke-width="0.3"/>
+  </g>
+</svg>
