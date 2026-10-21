@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5120-48y
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5120-48Y
@@ -126,7 +126,9 @@ provenance:
     note: >-
       The guide's figure 33 draws the fan slots with AIR IN labels (a back-to-front unit); the
       studio photograph shows AIR OUT with orange (Juniper Gold) handles. The photograph is the
-      front-to-back build, which is the default configuration here.
+      front-to-back build, which is the default configuration here. Table 7 (the fan airflow table)
+      and Table 26 settle the labels: AIR OUT with Gold handles for front-to-back, AIR IN with Azure
+      Blue handles for back-to-front.
   modules:
     confidence: datasheet
     note: >-
@@ -220,7 +222,10 @@ gaps:
 - what: usb-generation
   scope: [rear]
   reason: vendor-silent
-  wanted: The USB revision. The guide names one USB port and gives no generation.
+  wanted: >-
+    The USB revision. The guide names one USB port and gives no generation. The port is drawn with the
+    kit's neutral usb2 skin because the tongue colour follows the photograph (qfx5120-48y-rear-high.jpg),
+    which shows a black tongue, not the blue of a USB 3.0 port.
 - what: rating-label
   scope: [rear]
   reason: needs-photo
@@ -588,7 +593,7 @@ views:
          description: 'Table 11 - blue blinking: the beacon feature is enabled (request chassis beacon); unlit: not enabled'}
       - {ref: std/rj45-ganged@2, id: console, at: [16.5, 14.3], rotate: 180, group: mgmt, rel-pos: 0,
          attrs: {media: rj45-serial, role: console}}
-      - {ref: std/usb-a@1, id: usb, at: [16.8, 29.8], group: mgmt, rel-pos: 1, attrs: {media: usb-a}}
+      - {ref: std/usb-a@1, id: usb, at: [16.8, 29.8], skin: usb2, group: mgmt, rel-pos: 1, attrs: {media: usb-a}}
       - {ref: common/rj45-ganged-eth@1, id: mgmt-c0, at: [37.95, 10.4], rotate: 180, group: mgmt, rel-pos: 2,
          attrs: {media: rj45, speed: 1g, role: mgmt},
          states: {led-a: ['off', {name: 1000m, color: '#22c55e'}, {name: 100m, color: '#f59e0b'}],
@@ -613,7 +618,9 @@ views:
     size: {w: 440.9, h: 520.2}
     empty: >-
       Not drawn by any source held. The guide gives no figure of the lid except the CLEI label location
-      for the 48YM (figure 40); the photographs are straight-on of the front and rear only.
+      for the 48YM (figure 40). qfx5120-48y-frontwtop-high.jpg shows it as a plain grey lid with only a
+      debossed wordmark, which is not drawn per L172; the other photographs are straight-on of the front
+      and rear only.
   bottom:
     size: {w: 440.9, h: 520.2}
     empty: >-

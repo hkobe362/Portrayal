@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5120-48ym
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5120-48YM
@@ -233,7 +233,10 @@ gaps:
   scope:
   - rear
   reason: vendor-silent
-  wanted: The USB revision. The guide names one USB port and gives no generation.
+  wanted: >-
+    The USB revision. The guide names one USB port and gives no generation. The port is drawn with the
+    kit's neutral usb2 skin because the tongue colour follows the photograph (qfx5120-48ym-rear-high.jpg),
+    which shows a black tongue, not the blue of a USB 3.0 port.
 - what: rating-label
   scope:
   - rear
@@ -983,6 +986,7 @@ views:
       - ref: std/usb-a@1
         id: usb
         at: [15.95, 23.85]
+        skin: usb2
         group: mgmt
         rel-pos: 1
         attrs: {media: usb-a}

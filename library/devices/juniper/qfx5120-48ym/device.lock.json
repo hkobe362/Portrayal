@@ -29,7 +29,7 @@
    "juniper/jpsu-850w-ac-afo@1"
   ]
  },
- "composed": "b1b910359fa27f4e",
+ "composed": "993234a0e0cd458b",
  "composed-refs": {
   "common/din-1-0-2-3-jack@1": "1.0.0+2a7e92cc3e787bb8",
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
@@ -37,9 +37,9 @@
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
-  "juniper/jpsu-850w-ac-afi@1": "1.0.0+d37a358be6b61223",
+  "juniper/jpsu-850w-ac-afi@1": "1.0.0+3cbf87862af5bafe",
   "juniper/jpsu-850w-ac-afo@1": "1.0.0+eae45fca039d4471",
-  "juniper/qfx5110-fanafi@1": "1.0.0+18660938d1c198a2",
+  "juniper/qfx5110-fanafi@1": "1.0.0+4988fa14a41cd849",
   "juniper/qfx5110-fanafo@1": "1.0.0+5c47a99140587d6f",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/din-1-0-2-3@1": "1.0.0+8fbbc1a6aef10869",
@@ -53,7 +53,7 @@
   "ac-f2b"
  ],
  "format": 1,
- "gaps": "f15e4a1e8c22cd5f",
+ "gaps": "51a69d2e4505064a",
  "groups": [
   "esd",
   "fan-leds",
@@ -824,6 +824,6 @@
  },
  "placement-surface": "3b1a16c100c5c8f2",
  "shape": "091e6cff897aea1a",
- "surface": "020c81452b13fc62",
- "version": "0.1.0"
+ "surface": "d543373e6167060a",
+ "version": "0.1.1"
 }

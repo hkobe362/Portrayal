@@ -88,6 +88,6 @@ relief:
   features:
   - node: latch
     out: 1.6
-    color: '#2f8fd8'
+    color: '#2a8bd8'
     confidence: estimated
     source: photo of the orange sibling - the handle stands proud of the face; not measured

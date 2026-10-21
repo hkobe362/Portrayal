@@ -58,7 +58,7 @@ relief:
   features:
   - node: handle
     out: 2.0
-    color: '#2f8fd8'
+    color: '#2a8bd8'
     confidence: estimated
     source: photo of the orange sibling - the handle band stands proud of the grilles; not measured
   - node: screw
