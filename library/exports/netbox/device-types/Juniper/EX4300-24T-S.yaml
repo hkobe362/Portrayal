@@ -7,6 +7,8 @@ is_full_depth: true
 airflow: front-to-rear
 description: Juniper EX4300-24T - a fixed 1RU Gigabit Ethernet access switch with 24 10/100/1000BASE-T
   ports (no PoE) and four built-in 40-Gigabit QSFP+ ports on the rear panel that are Virtual Chassis ports...
+front_image: true
+rear_image: true
 console-ports:
   - name: Console (mini-USB)
     type: usb-mini-b
