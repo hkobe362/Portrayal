@@ -25,7 +25,7 @@
   "vc"
  ],
  "format": 1,
- "gaps": "7cc4accd6f83d81b",
+ "gaps": "e5d2608291725ad7",
  "groups": [
   "controls",
   "esd",
@@ -155,10 +155,19 @@
   "rear/placements/esd-mark",
   "rear/placements/esd-rear-jack",
   "rear/placements/mgmt",
+  "rear/placements/rear-screw-0",
+  "rear/placements/rear-screw-1",
+  "rear/placements/rear-screw-2",
+  "rear/placements/rear-screw-3",
+  "rear/placements/rear-screw-4",
+  "rear/placements/rear-screw-5",
+  "rear/placements/rear-screw-6",
+  "rear/placements/rear-screw-7",
+  "rear/placements/rear-screw-8",
   "rear/placements/usb",
   "rear/placements/usb-mark"
  ],
- "names": "106a88d979ccc97e",
+ "names": "5b32ab9167e4ba97",
  "placement-addressing": {
   "for": {
    "front/placements/btn-mode": [
@@ -293,6 +302,15 @@
    "rear/placements/esd-mark": 2,
    "rear/placements/esd-rear-jack": 0,
    "rear/placements/mgmt": 1,
+   "rear/placements/rear-screw-0": 3,
+   "rear/placements/rear-screw-1": 4,
+   "rear/placements/rear-screw-2": 5,
+   "rear/placements/rear-screw-3": 6,
+   "rear/placements/rear-screw-4": 7,
+   "rear/placements/rear-screw-5": 8,
+   "rear/placements/rear-screw-6": 9,
+   "rear/placements/rear-screw-7": 10,
+   "rear/placements/rear-screw-8": 11,
    "rear/placements/usb": 2,
    "rear/placements/usb-mark": 0
   }
@@ -364,11 +382,20 @@
   "rear/placements/esd-mark": "furniture",
   "rear/placements/esd-rear-jack": "esd",
   "rear/placements/mgmt": "mgmt",
+  "rear/placements/rear-screw-0": "furniture",
+  "rear/placements/rear-screw-1": "furniture",
+  "rear/placements/rear-screw-2": "furniture",
+  "rear/placements/rear-screw-3": "furniture",
+  "rear/placements/rear-screw-4": "furniture",
+  "rear/placements/rear-screw-5": "furniture",
+  "rear/placements/rear-screw-6": "furniture",
+  "rear/placements/rear-screw-7": "furniture",
+  "rear/placements/rear-screw-8": "furniture",
   "rear/placements/usb": "mgmt",
   "rear/placements/usb-mark": "furniture"
  },
  "placement-surface": "c226bc8590799548",
- "shape": "8d227ff8223ef24f",
- "surface": "c3792100cbf7ef77",
- "version": "0.1.0"
+ "shape": "1f271ce25aebdb16",
+ "surface": "29c207d428376997",
+ "version": "0.2.0"
 }

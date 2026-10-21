@@ -1,6 +1,6 @@
 {
  "bay-accepts": {},
- "composed": "147d6a217be94ee3",
+ "composed": "aaa2542608dba495",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/esd-warning@1": "1.0.0+630c20786ff1f896",
@@ -9,6 +9,7 @@
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
+  "common/screw-head@1": "1.1.0+0f38d482bcc27ec9",
   "common/usb-symbol@1": "1.0.0+fbb7f12a15136c0d",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
@@ -22,7 +23,7 @@
   "vc"
  ],
  "format": 1,
- "gaps": "520d8cfb935cff90",
+ "gaps": "4a9669660b824a8e",
  "groups": [
   "controls",
   "esd",
@@ -180,10 +181,15 @@
   "rear/placements/esd-mark",
   "rear/placements/esd-rear-jack",
   "rear/placements/mgmt",
+  "rear/placements/rear-screw-0",
+  "rear/placements/rear-screw-1",
+  "rear/placements/rear-screw-2",
+  "rear/placements/rear-screw-3",
+  "rear/placements/rear-screw-4",
   "rear/placements/usb",
   "rear/placements/usb-mark"
  ],
- "names": "dde409e99183faf9",
+ "names": "cc6475a3f0c048d2",
  "placement-addressing": {
   "for": {
    "front/placements/btn-mode": [
@@ -314,6 +320,11 @@
    "rear/placements/esd-mark": 2,
    "rear/placements/esd-rear-jack": 0,
    "rear/placements/mgmt": 1,
+   "rear/placements/rear-screw-0": 3,
+   "rear/placements/rear-screw-1": 4,
+   "rear/placements/rear-screw-2": 5,
+   "rear/placements/rear-screw-3": 6,
+   "rear/placements/rear-screw-4": 7,
    "rear/placements/usb": 2,
    "rear/placements/usb-mark": 0
   }
@@ -393,11 +404,16 @@
   "rear/placements/esd-mark": "furniture",
   "rear/placements/esd-rear-jack": "esd",
   "rear/placements/mgmt": "mgmt",
+  "rear/placements/rear-screw-0": "furniture",
+  "rear/placements/rear-screw-1": "furniture",
+  "rear/placements/rear-screw-2": "furniture",
+  "rear/placements/rear-screw-3": "furniture",
+  "rear/placements/rear-screw-4": "furniture",
   "rear/placements/usb": "mgmt",
   "rear/placements/usb-mark": "furniture"
  },
  "placement-surface": "16acb4c34ad21458",
- "shape": "d784928e333e8eef",
- "surface": "9b296be18a244e14",
- "version": "0.1.0"
+ "shape": "b4239a594b49041b",
+ "surface": "1dabcfcefc9153ab",
+ "version": "0.2.0"
 }

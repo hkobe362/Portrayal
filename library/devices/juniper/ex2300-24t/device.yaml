@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex2300-24t
-version: 0.1.0
+version: 0.2.0
 maturity: modelled
 manufacturer: Juniper
 model: EX2300-24T
@@ -29,7 +29,10 @@ provenance:
       which shows the DC terminal block and a single fan, so it is the EX2300-24T-DC rear and not the
       24P). The maker's image library holds no photograph of the EX2300-24T itself (the 48T front address
       was tried and returned a page, not an image). The HPE PSNow datasheet (a00151236enw) did not answer
-      when fetched, so no datasheet is cited.
+      when fetched, so no datasheet is cited. The held NetBox elevations of the 24T (juniper-ex2300-24t.front.png,
+      530 x 49 px, and juniper-ex2300-24t.rear.png, 530 x 50 px) are the only pictures held of the EX2300-24T
+      itself: the front confirms the 24-port jacks-on-the-right layout and the rear the AC arrangement
+      and its edge screws. They are too small to measure from and no position is read off the front.
   gate-1:
     confidence: measured
     note: >-
@@ -107,8 +110,15 @@ provenance:
       Figure 11 shows at the same places on the 24-port non-PoE AC model. The single exhaust fan sits
       at 0.308 of the width (136.1 mm) in Figure 11, read off the drawing. The guide's drawing puts a
       serial number label and a CLEI label on the rear; the studio photographs show neither, so none is
-      drawn. The photographs show screws along the lower edge of the 48P and DC rears but no photograph
-      shows this AC rear, so none is drawn.
+      drawn. The nine edge screws are read off Figure 11 (the body 874 px across at 1.978 px per mm; the
+      first at 51.6 mm, the last at 424.7 mm, centres, drawn at y 37.4 as on the DC rear) and are estimated.
+      The held NetBox 24T rear elevation (juniper-ex2300-24t.rear.png, 530 x 50 px, the only picture held
+      of this AC rear) draws the same nine in the same grouping, two left of the fan, five between the
+      fan and the label area and two beside the inlet, with each within about 8 mm of Figure 11 except
+      the second, which is about 18 mm further left; the figure's positions are kept because the elevation
+      is too small to measure closer. Figure 11 prints 12A Max above the inlet where Table 15 gives 2.5
+      A at 100 VAC for the 24T; the legend is drawn as 2.5A Max, the 12A Max being likely a copy of the
+      48P legend in the figure.
   rear-dc:
     confidence: photo-measured
     note: >-
@@ -117,13 +127,15 @@ provenance:
       ESD symbol and point lower and to the right of the plate (64.4 and 77.5 mm, 21 mm down) instead
       of beside it, the single fan at 115.7 mm, nine screws along the lower edge, no earth symbol left
       of the plate, and a four-pole DC terminal block 52.6 mm wide at 377.3 mm in place of the AC inlet.
-      Figure 13 draws the same arrangement. The block is drawn as chassis art (a plate, a dark strip,
-      two mounting screws and four terminals, sized off the photograph) and is not a component, because
-      the DCIM export has no row for a part of that kind and a placed part would export nothing. The legend
-      printed over the block reads DC INPUT : -44V- -72V, a DC symbol, 3.7A Max; the guide's Table 16
-      gives -48 through -60 VDC at 2.8 A maximum (the printed range is the wider), both are recorded and
-      the printed text is drawn without the DC symbol. The guide's figure labels the poles INPUT 1 and
-      INPUT 2 under the block; the photograph shows no label there and none is drawn.
+      Figure 13 draws the earth symbol beside the plate while the photograph does not, so the two disagree
+      on that one mark and the photograph won; the rest of Figure 13's arrangement matches the photograph.
+      The block is drawn as chassis art (a plate, a dark strip, two mounting screws and four terminals,
+      sized off the photograph) and is not a component, because the DCIM export has no row for a part
+      of that kind and a placed part would export nothing. The legend printed over the block reads DC
+      INPUT : -44V- -72V, a DC symbol, 3.7A Max; the guide's Table 16 gives -48 through -60 VDC at 2.8
+      A maximum (the printed range is the wider), both are recorded and the printed text is drawn with
+      the DC symbol the photograph and Figure 13 both print. The guide's figure labels the poles INPUT
+      1 and INPUT 2 under the block; the photograph shows no label there and none is drawn.
   built-in-power-and-fans:
     confidence: datasheet
     note: >-
@@ -199,7 +211,8 @@ gaps:
   reason: needs-photo
   note: >-
     No photograph of the non-PoE AC rear exists in the maker's library; its rear is the 48P's photographed
-    parts at the positions of the guide's Figure 11, without the second fan.
+    parts at the positions of the guide's Figure 11, without the second fan, and the edge screws placed
+    from that figure (estimated; the held NetBox elevation agrees on their count and grouping).
   wanted: A straight-on studio photograph of the EX2300-24T AC rear.
 - what: jack-lamp-meaning
   scope:
@@ -335,8 +348,6 @@ views:
     - {at: [385.98, 42.3], text: '1', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-1}
     - {at: [400.23, 42.3], text: '2', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-2}
     - {at: [414.48, 42.3], text: '3', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-3}
-    - {at: [6.9, 7.0], text: JUNIPER, font-size: 5.0, anchor: start, fill: '#e4e6e9', for: chassis}
-    - {at: [29.4, 9.4], text: NETWORKS, font-size: 1.4, anchor: end, fill: '#e4e6e9', for: chassis}
     - {at: [366.6, 6.6], text: EX2300, font-size: 3.4, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [394.2, 6.6], text: RUNNING JUNOS, font-size: 2.3, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [425.0, 7.4], text: SYS, font-size: 1.7, anchor: end, fill: '#e4e6e9', for: led-sys}
@@ -613,6 +624,11 @@ views:
         group: controls
         rel-pos: 0
         attrs: {function: Factory Reset/Mode}
+    regions:
+    - id: logo-zone
+      at: [6.4, 2.6]
+      size: {w: 23.5, h: 7.2}
+      label: Vendor logo; not drawn
   rear:
     size: {w: 441.9, h: 44.45}
     panel:
@@ -667,6 +683,15 @@ views:
         rel-pos: 2}
       - {ref: common/esd-jack@1, id: esd-rear-jack, at: [99.9, 4.8], for: chassis, group: esd, rel-pos: 0}
       - {ref: std/c14-inlet@1, id: ac-inlet, at: [388.6, 11.6], group: power-input, rel-pos: 0}
+      - {ref: common/screw-head@1, id: rear-screw-0, at: [49.8, 37.4], group: furniture, rel-pos: 3}
+      - {ref: common/screw-head@1, id: rear-screw-1, at: [106.9, 37.4], group: furniture, rel-pos: 4}
+      - {ref: common/screw-head@1, id: rear-screw-2, at: [167.1, 37.4], group: furniture, rel-pos: 5}
+      - {ref: common/screw-head@1, id: rear-screw-3, at: [203.0, 37.4], group: furniture, rel-pos: 6}
+      - {ref: common/screw-head@1, id: rear-screw-4, at: [244.4, 37.4], group: furniture, rel-pos: 7}
+      - {ref: common/screw-head@1, id: rear-screw-5, at: [280.3, 37.4], group: furniture, rel-pos: 8}
+      - {ref: common/screw-head@1, id: rear-screw-6, at: [317.2, 37.4], group: furniture, rel-pos: 9}
+      - {ref: common/screw-head@1, id: rear-screw-7, at: [378.0, 37.4], group: furniture, rel-pos: 10}
+      - {ref: common/screw-head@1, id: rear-screw-8, at: [422.9, 37.4], group: furniture, rel-pos: 11}
   rear-dc:
     face: rear
     size: {w: 441.9, h: 44.45}
@@ -705,8 +730,8 @@ views:
     silkscreen:
     - {at: [26.0, 7.2], text: MGMT, font-size: 1.9, anchor: middle, fill: '#f2f4f6', for: mgmt}
     - {at: [45.7, 14.1], text: CON, font-size: 1.9, anchor: middle, fill: '#f2f4f6', for: console-rj45}
-    - {at: [403.6, 8.3], text: 'DC INPUT : -44V - -72V  3.7A Max', font-size: 2.4, anchor: middle, fill: '#f2f4f6',
-      for: chassis}
+    - {at: [403.6, 8.3], text: 'DC INPUT : -44V - -72V  ⎓  3.7A Max', font-size: 2.4, anchor: middle,
+      fill: '#f2f4f6', for: chassis}
     components:
       placements:
       - ref: common/rj45-eth@1

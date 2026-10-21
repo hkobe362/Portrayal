@@ -1,6 +1,6 @@
 {
  "bay-accepts": {},
- "composed": "2c0158d544f4b633",
+ "composed": "43ff78bdb2495538",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/esd-warning@1": "1.0.0+630c20786ff1f896",
@@ -10,6 +10,7 @@
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
+  "common/screw-head@1": "1.1.0+0f38d482bcc27ec9",
   "common/usb-symbol@1": "1.0.0+fbb7f12a15136c0d",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
@@ -23,7 +24,7 @@
   "vc"
  ],
  "format": 1,
- "gaps": "b29609cd1b15dc03",
+ "gaps": "75d4cd97b9d26339",
  "groups": [
   "controls",
   "esd",
@@ -136,10 +137,18 @@
   "rear/placements/esd-mark",
   "rear/placements/esd-rear-jack",
   "rear/placements/mgmt",
+  "rear/placements/rear-screw-0",
+  "rear/placements/rear-screw-1",
+  "rear/placements/rear-screw-2",
+  "rear/placements/rear-screw-3",
+  "rear/placements/rear-screw-4",
+  "rear/placements/rear-screw-5",
+  "rear/placements/rear-screw-6",
+  "rear/placements/rear-screw-7",
   "rear/placements/usb",
   "rear/placements/usb-mark"
  ],
- "names": "4523f67a86cb1f00",
+ "names": "cf935d50af7e286a",
  "placement-addressing": {
   "for": {
    "front/placements/btn-mode": [
@@ -254,6 +263,14 @@
    "rear/placements/esd-mark": 2,
    "rear/placements/esd-rear-jack": 0,
    "rear/placements/mgmt": 1,
+   "rear/placements/rear-screw-0": 3,
+   "rear/placements/rear-screw-1": 4,
+   "rear/placements/rear-screw-2": 5,
+   "rear/placements/rear-screw-3": 6,
+   "rear/placements/rear-screw-4": 7,
+   "rear/placements/rear-screw-5": 8,
+   "rear/placements/rear-screw-6": 9,
+   "rear/placements/rear-screw-7": 10,
    "rear/placements/usb": 2,
    "rear/placements/usb-mark": 0
   }
@@ -311,11 +328,19 @@
   "rear/placements/esd-mark": "furniture",
   "rear/placements/esd-rear-jack": "esd",
   "rear/placements/mgmt": "mgmt",
+  "rear/placements/rear-screw-0": "furniture",
+  "rear/placements/rear-screw-1": "furniture",
+  "rear/placements/rear-screw-2": "furniture",
+  "rear/placements/rear-screw-3": "furniture",
+  "rear/placements/rear-screw-4": "furniture",
+  "rear/placements/rear-screw-5": "furniture",
+  "rear/placements/rear-screw-6": "furniture",
+  "rear/placements/rear-screw-7": "furniture",
   "rear/placements/usb": "mgmt",
   "rear/placements/usb-mark": "furniture"
  },
  "placement-surface": "cdd99aa9a0ccff2b",
- "shape": "a982e693f9aee27c",
- "surface": "0c96d72307e3bd37",
- "version": "0.1.0"
+ "shape": "9ab30e10bf45ba96",
+ "surface": "47ba0c7b4824b040",
+ "version": "0.2.0"
 }

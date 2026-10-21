@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex2300-48p
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX2300-48P
@@ -25,8 +25,11 @@ provenance:
       Figure 3 and Figure 4 (front panels), Figure 9 to Figure 13 (rear panels), Table 1 (models), Table
       3 (chassis size and weight), Tables 4 to 12 (LEDs), the cooling system section, Tables 14 to 16
       (power) and Table 34 (parts list). Juniper's own straight-on studio photographs of the EX2300-48P
-      front (ex2300-48p-front-high.jpg) and rear (ex2300-48p-rear-high.jpg), and of the EX2300-24P front.
-      The HPE PSNow datasheet (a00151236enw) did not answer when fetched, so no datasheet is cited.
+      front (ex2300-48p-front-high.jpg) and rear (ex2300-48p-rear-high.jpg), and of the EX2300-24P front,
+      and the held NetBox elevations juniper-ex2300-48p.front.png (1427 x 136 px) and juniper-ex2300-48p.rear.png
+      (1428 x 141 px), which agree with the studio photographs on the jack layout, the five rear screws,
+      the two fans and the 12A Max legend and add no position of their own. The HPE PSNow datasheet (a00151236enw)
+      did not answer when fetched, so no datasheet is cited.
   gate-1:
     confidence: measured
     note: >-
@@ -344,8 +347,6 @@ views:
     - {at: [385.98, 42.3], text: '1', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-1}
     - {at: [400.23, 42.3], text: '2', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-2}
     - {at: [414.48, 42.3], text: '3', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-3}
-    - {at: [6.9, 7.0], text: JUNIPER, font-size: 5.0, anchor: start, fill: '#e4e6e9', for: chassis}
-    - {at: [29.4, 9.4], text: NETWORKS, font-size: 1.4, anchor: end, fill: '#e4e6e9', for: chassis}
     - {at: [366.6, 6.6], text: EX2300, font-size: 3.4, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [381.5, 6.6], text: PoE+, font-size: 3.4, anchor: start, fill: '#ea6a3c', for: chassis}
     - {at: [375.8, 9.6], text: RUNNING, font-size: 1.5, anchor: start, fill: '#e4e6e9', for: chassis}
@@ -791,6 +792,11 @@ views:
         group: controls
         rel-pos: 0
         attrs: {function: Factory Reset/Mode}
+    regions:
+    - id: logo-zone
+      at: [6.4, 2.6]
+      size: {w: 23.5, h: 7.2}
+      label: Vendor logo; not drawn
   rear:
     size: {w: 441.9, h: 44.45}
     panel:
@@ -855,8 +861,10 @@ views:
   top:
     size: {w: 441.9, h: 309.8}
     empty: >-
-      Not drawn flat by any source held. The guide's Figures 1 to 4 show the lid in perspective only;
-      the EX2300 has no top vents (Figure 35 shows front-to-back airflow).
+      Not drawn flat by any source held. The guide's Figures 1 to 4 show the lid in perspective only,
+      and the studio photograph ex2300-48p-frontwtop-high.jpg shows the lid in perspective as a plain
+      flat plate with no vents or marks, so no plan can be measured from it; the EX2300 has no top vents
+      (Figure 35 shows front-to-back airflow).
   bottom:
     size: {w: 441.9, h: 309.8}
     empty: >-

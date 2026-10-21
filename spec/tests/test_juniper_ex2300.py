@@ -270,6 +270,85 @@ def test_the_dcim_device_types_export_one_per_configuration(name, cid, part):
         assert not doc.get("module-bays")
 
 
+# --- review of the first look: the logo, the DC symbol, the screws, the sources ----------
+
+def silk_texts(dev, view):
+    return [s.get("text") for s in dev["views"][view].get("silkscreen") or [] if s.get("text")]
+
+
+def layout_of(name):
+    return yaml.safe_load((DEV / name / "layout.yaml").read_text())
+
+
+@pytest.mark.parametrize("name", DEVICES)
+def test_the_vendor_wordmark_is_a_reserved_zone_not_text(name):
+    """The maker's lockup is a logo, so it is reserved with a logo-zone and never typed as text."""
+    d = load_device(name)
+    drawn = [t.upper() for t in silk_texts(d, "front")]
+    assert not any("JUNIPER" in t and "RUNNING" not in t for t in drawn)
+    assert "NETWORKS" not in drawn
+    for x in d["views"]["front"]["panel"].get("decor") or []:
+        assert "JUNIPER" not in str(x.get("text", "")).upper() and "NETWORKS" not in str(x.get("text", "")).upper()
+    zones = [r for r in d["views"]["front"].get("regions") or [] if r.get("id") == "logo-zone"]
+    assert len(zones) == 1
+    z = zones[0]
+    assert z["at"][0] < 10 and z["at"][1] < 6
+    assert 18 <= z["size"]["w"] <= 30 and 5 <= z["size"]["h"] <= 9
+    # what the unit prints as type stays
+    assert "EX2300" in drawn and any(t.startswith("RUNNING") for t in drawn)
+    if MODELS[name]["poe"]:
+        assert "POE+" in [t.upper() for t in drawn]
+
+
+def test_the_dc_legend_carries_the_dc_symbol():
+    d = load_device("ex2300-24t")
+    legend = [t for t in silk_texts(d, "rear-dc") if t.startswith("DC INPUT")]
+    assert len(legend) == 1 and "⎓" in legend[0]
+
+
+def test_the_dc_note_records_the_figure_13_conflict_and_the_winner():
+    note = " ".join(load_device("ex2300-24t")["provenance"]["rear-dc"]["note"].split())
+    assert "Figure 13 draws the earth symbol beside the plate" in note
+    assert "the photograph does not" in note and "the photograph won" in note
+    assert "Figure 13 draws the same arrangement" not in note
+
+
+# the nine, eight and five screws the guide draws along the lower edge of the AC rears (Figures 11, 9, 12)
+AC_SCREWS = {"ex2300-24t": 9, "ex2300-24p": 8, "ex2300-48t": 5}
+
+
+@pytest.mark.parametrize("name,count", sorted(AC_SCREWS.items()))
+def test_the_ac_rear_has_the_guides_edge_screws(name, count):
+    d = load_device(name)
+    screws = [p for p in placements(d, "rear") if p["ref"] == "common/screw-head@1"]
+    assert len(screws) == count
+    xs = [p["at"][0] for p in screws]
+    assert xs == sorted(xs)
+    assert all(36 <= p["at"][1] <= 39 for p in screws)
+    assert all(0 < x < d["views"]["rear"]["size"]["w"] - 3.6 for x in xs)
+    note = " ".join(d["provenance"]["rear-layout"]["note"].split())
+    assert "estimated" in note and "edge screws" in note
+
+
+@pytest.mark.parametrize("name,photo", [
+    ("ex2300-24t", "juniper-ex2300-24t.front.png"),
+    ("ex2300-24t", "juniper-ex2300-24t.rear.png"),
+    ("ex2300-48p", "juniper-ex2300-48p.front.png"),
+    ("ex2300-48p", "juniper-ex2300-48p.rear.png"),
+])
+def test_the_held_netbox_elevations_are_cited(name, photo):
+    text = " ".join(str(v) for v in load_device(name)["provenance"].values())
+    assert photo in text
+
+
+def test_the_24t_ac_legend_discrepancy_and_the_top_face_photo_are_noted():
+    prov = load_device("ex2300-24t")["provenance"]
+    text = " ".join(" ".join(str(v) for v in prov.values()).split())
+    assert "12A Max" in text and "2.5 A" in text
+    top = " ".join(load_device("ex2300-48p")["views"]["top"]["empty"].split())
+    assert "ex2300-48p-frontwtop-high.jpg" in top
+
+
 # --- the components ----------------------------------------------------------
 
 def test_this_slice_adds_no_component():

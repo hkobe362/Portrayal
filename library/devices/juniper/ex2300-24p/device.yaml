@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex2300-24p
-version: 0.1.0
+version: 0.2.0
 maturity: modelled
 manufacturer: Juniper
 model: EX2300-24P
@@ -102,7 +102,10 @@ provenance:
       which Figure 9 shows at the same places on the 24-port PoE model: the second fan sits at 0.78 of
       the width in Figure 9 (344.7 mm) where the 48P's sits next to the first. The guide's drawing puts
       a serial number label and a CLEI label on the rear; the studio photographs show neither, so none
-      is drawn.
+      is drawn. The eight edge screws are read off Figure 9 (the body 874 px across at 1.978 px per mm,
+      the first at 51.6 mm and the last at 424.7 mm, centres, drawn at y 37.4 as on the DC rear) and are
+      estimated; no photograph of this rear is held, and the held NetBox 24T rear elevation shows the
+      non-PoE rear, not this one.
   built-in-power-and-fans:
     confidence: datasheet
     note: >-
@@ -163,7 +166,9 @@ gaps:
   scope:
   - rear
   reason: needs-photo
-  note: The maker's image library holds no EX2300-24P rear photograph; its rear is the 48P's.
+  note: >-
+    The maker's image library holds no EX2300-24P rear photograph; its rear is the 48P's, with the edge
+    screws placed from the guide's Figure 9 (estimated).
   wanted: A straight-on studio photograph of the EX2300-24P rear.
 - what: jack-lamp-meaning
   scope:
@@ -300,8 +305,6 @@ views:
     - {at: [385.98, 42.3], text: '1', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-1}
     - {at: [400.23, 42.3], text: '2', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-2}
     - {at: [414.48, 42.3], text: '3', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-3}
-    - {at: [6.9, 7.0], text: JUNIPER, font-size: 5.0, anchor: start, fill: '#e4e6e9', for: chassis}
-    - {at: [29.4, 9.4], text: NETWORKS, font-size: 1.4, anchor: end, fill: '#e4e6e9', for: chassis}
     - {at: [366.6, 6.6], text: EX2300, font-size: 3.4, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [381.5, 6.6], text: PoE+, font-size: 3.4, anchor: start, fill: '#ea6a3c', for: chassis}
     - {at: [394.2, 6.6], text: RUNNING JUNOS, font-size: 2.3, anchor: start, fill: '#e4e6e9', for: chassis}
@@ -590,6 +593,11 @@ views:
         group: controls
         rel-pos: 0
         attrs: {function: Factory Reset/Mode}
+    regions:
+    - id: logo-zone
+      at: [6.4, 2.6]
+      size: {w: 23.5, h: 7.2}
+      label: Vendor logo; not drawn
   rear:
     size: {w: 441.9, h: 44.45}
     panel:
@@ -646,6 +654,14 @@ views:
         rel-pos: 2}
       - {ref: common/esd-jack@1, id: esd-rear-jack, at: [99.9, 4.8], for: chassis, group: esd, rel-pos: 0}
       - {ref: std/c14-inlet@1, id: ac-inlet, at: [388.6, 11.6], group: power-input, rel-pos: 0}
+      - {ref: common/screw-head@1, id: rear-screw-0, at: [49.8, 37.4], group: furniture, rel-pos: 3}
+      - {ref: common/screw-head@1, id: rear-screw-1, at: [106.4, 37.4], group: furniture, rel-pos: 4}
+      - {ref: common/screw-head@1, id: rear-screw-2, at: [167.1, 37.4], group: furniture, rel-pos: 5}
+      - {ref: common/screw-head@1, id: rear-screw-3, at: [205.5, 37.4], group: furniture, rel-pos: 6}
+      - {ref: common/screw-head@1, id: rear-screw-4, at: [244.4, 37.4], group: furniture, rel-pos: 7}
+      - {ref: common/screw-head@1, id: rear-screw-5, at: [317.1, 37.4], group: furniture, rel-pos: 8}
+      - {ref: common/screw-head@1, id: rear-screw-6, at: [370.3, 37.4], group: furniture, rel-pos: 9}
+      - {ref: common/screw-head@1, id: rear-screw-7, at: [422.9, 37.4], group: furniture, rel-pos: 10}
   top:
     size: {w: 441.9, h: 309.8}
     empty: >-

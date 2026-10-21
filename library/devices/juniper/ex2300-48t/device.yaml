@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex2300-48t
-version: 0.1.0
+version: 0.2.0
 maturity: modelled
 manufacturer: Juniper
 model: EX2300-48T
@@ -104,8 +104,10 @@ provenance:
       the DC rear photograph does, so the ESD symbol and point and the fan take that photograph's positions;
       no earth symbol is drawn because the DC photograph shows none and no photograph shows this rear.
       The guide's drawing puts a serial number label and a CLEI label on the rear; the studio photographs
-      show neither, so none is drawn. The photographs show screws along the lower edge of the 48P and
-      DC rears but no photograph shows this rear, so none is drawn. The AC legend is drawn from the guide's
+      show neither, so none is drawn. The five edge screws are read off Figure 12 (the body 874 px across
+      at 1.978 px per mm, the first at 52.1 mm and the last at 386.7 mm, centres, drawn at y 37.4 as on
+      the DC rear) and are estimated; no photograph of this rear is held, and the held NetBox 24T rear
+      elevation shows the 24-port non-PoE rear, which carries nine. The AC legend is drawn from the guide's
       Table 15 (1.2 A at 100 VAC for this model) and not read off a figure.
   built-in-power-and-fans:
     confidence: datasheet
@@ -175,7 +177,8 @@ gaps:
   reason: needs-photo
   note: >-
     No photograph of the 48-port non-PoE rear exists in the maker's library; its rear is the 48P's photographed
-    parts at the positions of the guide's Figure 12, with one fan.
+    parts at the positions of the guide's Figure 12, with one fan; the edge screws are placed from that
+    figure (estimated).
   wanted: A straight-on studio photograph of the EX2300-48T rear.
 - what: jack-lamp-meaning
   scope:
@@ -361,8 +364,6 @@ views:
     - {at: [385.98, 42.3], text: '1', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-1}
     - {at: [400.23, 42.3], text: '2', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-2}
     - {at: [414.48, 42.3], text: '3', font-size: 2.0, anchor: middle, fill: '#eef0f2', for: uplink-3}
-    - {at: [6.9, 7.0], text: JUNIPER, font-size: 5.0, anchor: start, fill: '#e4e6e9', for: chassis}
-    - {at: [29.4, 9.4], text: NETWORKS, font-size: 1.4, anchor: end, fill: '#e4e6e9', for: chassis}
     - {at: [366.6, 6.6], text: EX2300, font-size: 3.4, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [375.8, 9.6], text: RUNNING, font-size: 1.5, anchor: start, fill: '#e4e6e9', for: chassis}
     - {at: [374.2, 14.3], text: JUNOS, font-size: 4.8, anchor: start, fill: '#e4e6e9', for: chassis}
@@ -796,6 +797,11 @@ views:
         group: controls
         rel-pos: 0
         attrs: {function: Factory Reset/Mode}
+    regions:
+    - id: logo-zone
+      at: [6.4, 2.6]
+      size: {w: 23.5, h: 7.2}
+      label: Vendor logo; not drawn
   rear:
     size: {w: 441.9, h: 44.45}
     panel:
@@ -848,6 +854,11 @@ views:
         rel-pos: 2}
       - {ref: common/esd-jack@1, id: esd-rear-jack, at: [74.5, 18.1], for: chassis, group: esd, rel-pos: 0}
       - {ref: std/c14-inlet@1, id: ac-inlet, at: [388.6, 11.6], group: power-input, rel-pos: 0}
+      - {ref: common/screw-head@1, id: rear-screw-0, at: [50.3, 37.4], group: furniture, rel-pos: 3}
+      - {ref: common/screw-head@1, id: rear-screw-1, at: [156.4, 37.4], group: furniture, rel-pos: 4}
+      - {ref: common/screw-head@1, id: rear-screw-2, at: [232.3, 37.4], group: furniture, rel-pos: 5}
+      - {ref: common/screw-head@1, id: rear-screw-3, at: [308.6, 37.4], group: furniture, rel-pos: 6}
+      - {ref: common/screw-head@1, id: rear-screw-4, at: [384.9, 37.4], group: furniture, rel-pos: 7}
   top:
     size: {w: 441.9, h: 259.0}
     empty: >-
