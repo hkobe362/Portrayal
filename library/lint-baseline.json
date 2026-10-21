@@ -1864,7 +1864,8 @@
  "devices/dell/r660xs/device.yaml": {
   "L145": 1,
   "L21": 12,
-  "L29": 18
+  "L29": 18,
+  "L69": 1
  },
  "devices/dell/r740xd/device.yaml": {
   "L113": 1,

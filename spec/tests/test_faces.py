@@ -133,7 +133,8 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
              if F.face_ref(yaml.safe_load(p.read_text()) or {}, "plan")]
     # 86 since the Fibrain XCU10's drawer, seen from above under the shell top.
     # 87 since the NVIDIA A100 80GB PCIe, whose plan face is its top edge.
-    assert len(named) == 87, \
+    # 92 since the R660xs's five risers (1a, 1b, 2a, 2d, 2e) name plans
+    assert len(named) == 92, \
         f"expected 87 parts naming a plan drawing, found {len(named)}"
 
 
@@ -261,7 +262,8 @@ def test_the_index_carries_a_parts_other_faces():
     # 142 since the FHD RJ45 module's punch-down rear;
     # 143 since nvidia/a100-pcie-80gb@1 declares its far end as a rear face.
     with_faces = [e for e in entries if e.get("faces")]
-    assert len(with_faces) == 143, \
+    # 148 since the R660xs's five risers
+    assert len(with_faces) == 148, \
         f"expected exactly 143 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 

@@ -66,7 +66,8 @@ def test_nothing_else_in_the_library_carries_data_hides():
         for n in ET.parse(svg).iter():
             if n.get("data-hides") is not None:
                 carriers.add((svg.name.split(".")[0], n.get("id")))
-    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel")}, carriers
+    # the R660xs seats the R660's security bezel
+    assert carriers == {("c40g", "psu-cover"), ("r660", "bezel"), ("r660xs", "bezel")}, carriers
 
 
 # --- L196 --------------------------------------------------------------------

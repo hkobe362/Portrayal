@@ -853,7 +853,7 @@ views:
         # the OCP card before the risers: seen from above, riser 2's cage is over it
         - {id: ocp, at: [138.4, 24.7], size: {w: 71.8, h: 15.1},
            accepts: [dell/ocp3-blank-16g@1, dell/ocp3-4x1g-rj45@1, dell/ocp3-2x10g-rj45@1, dell/ocp3-4x10g-rj45@1, dell/ocp3-2x25g-sfp28@1, dell/ocp3-4x25g-sfp28@1, dell/ocp3-2x100g-qsfp56@1], default: dell/ocp3-blank-16g@1, group: ocp, rel-pos: 1,
-           plan: {view: top, at: [221.7, 0.6], in: system-board}}
+           plan: {view: top, at: [223.8, 0.6], in: system-board}}
         - {id: boss, at: [87.3, 1.5], size: {w: 42.0, h: 22.0},
            accepts: [dell/r660xs-boss-riser@1], default: dell/r660xs-boss-riser@1, group: boss, rel-pos: 1}
         # THE SLOTS ARE THE RISERS'. Each riser brings its slot bays and the cage
