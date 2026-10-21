@@ -332,6 +332,16 @@ def test_the_exported_type_lists_the_jacks_and_the_qsfp_ports(dev):
     assert not {f"port-{k}" for k in range(n, 48)} & names
 
 
+@pytest.mark.parametrize("target", ["netbox", "nautobot"])
+@pytest.mark.parametrize("dev", DEVICES)
+def test_the_exported_type_lists_both_consoles(target, dev):
+    """CON1 on the front is a mini-USB console and CON2 on the rear an RJ-45 one."""
+    doc = yaml.safe_load(
+        (LIB / "exports" / target / "device-types/Juniper" / f"{DEVICES[dev][0]}.yaml").read_text())
+    consoles = {(c["name"], c["type"]) for c in doc["console-ports"]}
+    assert consoles == {("Console (mini-USB)", "usb-mini-b"), ("Console", "rj-45")}
+
+
 # ------------------------------------------------------------- the components
 
 

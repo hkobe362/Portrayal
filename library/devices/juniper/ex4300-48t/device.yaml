@@ -200,18 +200,21 @@ provenance:
       photograph, #898d94. The supply and fan faces are a tone darker and their tone is taken from the
       community NetBox elevation (estimated); see the components.
   interface-names:
+    confidence: datasheet
     note: >-
       Not printed and not modelled. The guide's configuration examples name the 48-port switch's jacks
       ge-0/0/0 to ge-0/0/47 and the uplink module's ports ge-0/2/0 to ge-0/2/3 and xe-0/2/0 to xe-0/2/3.
       The built-in QSFP+ ports' names are stated nowhere held. No table gives the numbering rule, so the
       names stay out of the file as a block and go here.
   lifecycle:
+    confidence: estimated
     note: >-
       Searched Juniper's end-of-life notices and third-party trackers on 2026-10-21. Trackers list end-of-life
       notices for the EX4300-32F (last order 2026-03-31) and the EX4300-48MP (last order 2026-12-29) and
       for older bundle SKUs (2020), and none for the EX4300-24T, -24P, -48T or -48P; Juniper's own milestones
       page did not render for the search, so the absence is unconfirmed. Recorded as none-announced.
   other-faces:
+    confidence: drawing
     note: >-
       No source draws the top, bottom or sides flat: the guide's front and rear figures show them in perspective
       with a logo on the lid and mounting holes in the sides. Each carries an `empty` sentence.
@@ -351,7 +354,11 @@ groups:
     term: PSU
     role: service
     index-origin: 0
-    attrs: {redundancy: N+0 or N+N, redundancy-note: one supply carries the switch; up to two seat}
+    attrs:
+      redundancy: n+n
+      redundancy-note: >-
+        Hardware guide, AC and DC Power Supply: two redundancy configurations, N+0 (no power is reserved)
+        and N+N (a full second supply is reserved); one supply carries the switch and up to two seat
   esd: {term: Point, role: furniture, index-origin: 0}
   furniture: {term: Item, role: furniture, index-origin: 0}
 views:

@@ -8,6 +8,8 @@ airflow: front-to-rear
 description: Juniper EX4300-48T - a fixed 1RU Gigabit Ethernet access switch with 48 10/100/1000BASE-T
   ports (no PoE) and four built-in 40-Gigabit QSFP+ ports on the rear panel that are Virtual Chassis ports...
 console-ports:
+  - name: Console (mini-USB)
+    type: usb-mini-b
   - name: Console
     type: rj-45
 interfaces:
