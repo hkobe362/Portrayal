@@ -549,7 +549,11 @@ def test_the_comparison_layer_can_now_reach_them():
     its User Guide's fan mode behaviour (the redundant fan kit adds one fan, and
     in redundant mode one rotor failure leaves the system running). Its bays are
     in the top view too.
+
+    EIGHTY-FOUR IS THE DELL R6625, n+1 over four dual-rotor modules, from its
+    technical guide's thermal features ("The PowerEdge R6625 allows N+1 fan
+    redundancy").
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 83, n
+    assert n == 84, n
