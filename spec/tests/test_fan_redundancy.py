@@ -243,7 +243,8 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     assert "edgecore/cor580" in unstated and "edgecore/dcs510" in unstated
     assert {"cisco/asr-9901", "cisco/asr-9902", "cisco/asr-9903"} <= set(unstated)
     assert "cisco/n9k-c93180yc-ex" in unstated
-    assert len(unstated) == 28, unstated
+    # 29 since the Dell R660xs, whose documents say 'hot-plug redundant cooling' and no scheme
+    assert len(unstated) == 29, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
