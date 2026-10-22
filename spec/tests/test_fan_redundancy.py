@@ -248,7 +248,11 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # and working, and names no N+1 form, so each group quotes the sentence and states no form.
     assert {"juniper/ex3400-24t", "juniper/ex3400-24p", "juniper/ex3400-48t",
             "juniper/ex3400-48p"} <= set(unstated)
-    assert len(unstated) == 33, unstated
+    # THE JUNIPER QFX5200-32C AND -48Y MADE IT THIRTY-FIVE: the guide says every fan module must be
+    # installed for optimal operation and that the switch runs 30 seconds without thermal shutdown
+    # while one is replaced, and names no N+1 form, so each group quotes that and states no form.
+    assert {"juniper/qfx5200-32c", "juniper/qfx5200-48y"} <= set(unstated)
+    assert len(unstated) == 35, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
