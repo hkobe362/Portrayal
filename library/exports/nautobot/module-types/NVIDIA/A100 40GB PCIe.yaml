@@ -6,7 +6,7 @@ weight_unit: kg
 description: NVIDIA A100 40GB PCIe GPU, a passive dual-slot full-height full-length card and the 80GB
   card's sibling
 power-ports:
-  - name: '{module}/aux-power'
+  - name: '{module.parent}/{module}/aux-power'
     type: other
     label: EPS12V 8-pin (CPU 8-pin)
 comments: 'NVIDIA A100 40GB PCIe GPU, a passive dual-slot full-height full-length card and the 80GB card''s
