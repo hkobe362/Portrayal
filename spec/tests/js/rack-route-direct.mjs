@@ -87,15 +87,17 @@ const mm = l => Math.round(l.measured * 10000) / 10;
 const OWNER = {
   c1: [[4], 514.2, 1], c2: [[4], 499.8, 0.5], c3: [[4], 502.7, 0.5], c4: [[4], 491.4, 0.5],
   c5: [[4], 522, 1], c6: [[4], 515, 1], c7: [[4], 505.8, 0.5], c8: [[4], 547, 1],
-  c9: [[3], 485.5, 0.5], c10: [[3], 490.8, 0.5], c11: [[3], 486.8, 0.5], c12: [[3], 497.7, 0.5],
-  c13: [[4], 645.5, 1], c14: [[4], 616.9, 1], c15: [[4], 450, 0.5], c16: [[4], 576.3, 1],
+  // c9 to c12 and c15 rose through the gap behind the tray under #966 (485.5, 490.8, 486.8,
+  // 497.7 and 450 mm, 0.5 m cords). CHANGED, drawable geometry, owner's option A,
+  // 2026-10-22, P-0218-2: the rise cannot be drawn (9.8 mm for a bend of 25), so they go
+  // round the front edge again, 125.7, 122.4, 129.3, 125.7 and 198 mm longer, 1 m cords
+  c9: [[3], 611.2, 1], c10: [[3], 613.2, 1], c11: [[3], 616.1, 1], c12: [[3], 623.4, 1],
+  c13: [[4], 645.5, 1], c14: [[4], 616.9, 1], c15: [[4], 648, 1], c16: [[4], 576.3, 1],
 };
 const LOWER = ['c9', 'c10', 'c11', 'c12', 'c13', 'c14', 'c15', 'c16'];
-// The lower leaf's cords that rise through the gap behind the tray (#966):
-// 125.7, 122.4, 129.3, 125.7 and 198 mm shorter than round the front edge
-// (611.2, 613.2, 616.1, 623.4 and 648 mm before). The other three stay round
-// it: through the gap c13 would leave a corner 3.2 mm short of its room.
-const RISE = ['c9', 'c10', 'c11', 'c12', 'c15'];
+// The lower leaf's cords that rise through the gap behind the tray (#966): none now
+// (see OWNER above); five did
+const RISE = [];
 
 test('the reference rack of #949: each cord runs along the lacer through a ring, with no lane', () => {
   const r = F.rack(), ctx = F.ctxOf(r);
@@ -304,9 +306,10 @@ test('ends on two managers still take the lane; on opposite sides, the shorter s
   // the tray into its first ring, #966: 125.7 mm shorter than round the front
   // edge. `len` writes the route by hand, and a hand-edited route never uses
   // the gap, so it measures the front edge, 1926.6; the cable itself, on its
-  // own route, rises: 1800.9)
+  // own route, rose: 1800.9. CHANGED, drawable geometry, owner's option A,
+  // 2026-10-22, P-0218-2: the rise cannot be drawn, so it is the front edge, 1926.6)
   assert.deepEqual([len(left), len(right)], [1926.6, 2190.2]);
-  assert.equal(mm(R.routedLength(r, c, ctx)), 1800.9);
+  assert.equal(mm(R.routedLength(r, c, ctx)), 1926.6);
   // written the other way round, the same side
   const back = {...c, a: c.b, b: c.a};
   assert.deepEqual(R.autoRoute(r, back, ctx), left.toReversed());
