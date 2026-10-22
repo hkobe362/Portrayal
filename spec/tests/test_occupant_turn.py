@@ -394,7 +394,9 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # more device.
 # The seven ReadyLinks GL-x siblings (#763) each place the GL-12xB-240D's rear
 # stud again, seven more seats (down) on seven more devices.
-WANT = {"down": 115, "left": 27, "up": 8, "right": 21}
+# The Arista 7010TX-48's DC rear (#1204) places two arista/7010tx-dc-terminal@1 blocks, each
+# composing two terminal screws that a ring lug lands on: four more seats (down), no new device.
+WANT = {"down": 119, "left": 27, "up": 8, "right": 21}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -404,7 +406,9 @@ WANT = {"down": 115, "left": 27, "up": 8, "right": 21}
 # (#918) and the S9501-18SMT's two M4 pairs, one leading left and one right,
 # which brought the pair seats to 61 on 34 devices; their four studs are
 # still ring-lug seats, as the four lugs they replace were
-WANT_PAIRS = {"down": 45, "left": 13, "up": 1, "right": 2}
+# The Arista 7010TX-48's grounding pair (#1204), one on its AC rear and one on its DC rear,
+# each leading its wire left: two more pair seats on one more device, 35.
+WANT_PAIRS = {"down": 45, "left": 15, "up": 1, "right": 2}
 NAMES = {0: "right", 90: "down", 180: "left", 270: "up"}
 LEADS = {"right": 0, "down": 90, "left": 180, "up": 270}
 PAIR_IFACES = ("stud-pair-5-8", "stud-pair-3-4", "stud-pair-1")
@@ -467,9 +471,9 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 73   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, and the seven ReadyLinks GL-x siblings
+    assert len({k[0] for k in ring}) == 74   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, and the Arista 7010TX-48
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
-    assert len({k[0] for k in pairs}) == 34
+    assert len({k[0] for k in pairs}) == 35
     # a pair is turned only along itself
     assert {r["turn"] for r in pairs.values()} == {0, 180}
 

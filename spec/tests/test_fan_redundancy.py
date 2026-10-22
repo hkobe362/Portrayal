@@ -581,7 +581,11 @@ def test_the_comparison_layer_can_now_reach_them():
     fan modules must be installed for optimal functioning of the switch"; the switch runs
     30 seconds without thermal shutdown while one is replaced). The guide states no N+1
     form, so the figure says that no spare fan is claimed.
+
+    NINETY-SEVEN IS THE ARISTA 7010TX-48, n+0 over its one reversible fan module of two inline
+    fans: the quick start guide says the switch shuts down if the module is disconnected for more
+    than a minute and names no spare fan.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 96, n
+    assert n == 97, n
