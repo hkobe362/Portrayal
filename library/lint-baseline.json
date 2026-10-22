@@ -5,6 +5,9 @@
  "components/amphenol-ns/nrg-oled/v1/contract.yaml": {
   "L27": 1
  },
+ "components/arista/7010tx-fan/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/casa/bdm/v1/contract.yaml": {
   "L97": 1
  },
@@ -1748,6 +1751,11 @@
   "L27": 1,
   "L97": 1
  },
+ "devices/arista/7010tx-48/device.yaml": {
+  "L29": 1,
+  "L57": 1,
+  "L61": 10
+ },
  "devices/casa/c100g/device.yaml": {
   "L119": 1,
   "L29": 2,
@@ -1908,7 +1916,7 @@
   "L21": 8,
   "L29": 18,
   "L69": 1
-  },
+ },
  "devices/dell/r6615/device.yaml": {
   "L145": 1,
   "L29": 27
