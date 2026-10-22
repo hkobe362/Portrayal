@@ -21,9 +21,9 @@
    "arista/7280r3-pwr-500-dc@1"
   ]
  },
- "composed": "c664171020552806",
+ "composed": "5192eaadfebe4a3e",
  "composed-refs": {
-  "arista/7280r3-fan-m-rev@1": "1.0.0+9984127a200fc62e",
+  "arista/7280r3-fan-m-rev@1": "1.0.0+fc51720939894892",
   "arista/7280r3-fan-m@1": "1.0.0+c69eb1148518a52e",
   "arista/7280r3-pwr-500-ac-rev@1": "1.0.0+5b36e80dc5e4cef5",
   "arista/7280r3-pwr-500-ac@1": "1.0.0+28bb4c32127e71cc",

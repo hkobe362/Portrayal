@@ -612,4 +612,7 @@ def test_the_comparison_layer_can_now_reach_them():
     # 102 with the Juniper QFX5100-48S and -48T: N+1 over five modules (datasheet, "Redundant (N+1)")
     # 103 with the Juniper QFX5130-32CD: 5+1 over six rear fan modules (hardware guide, QFX5130
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
-    assert n == 103, n
+    # 110 with the seven Arista 7280R3 models (#1204): N+1 over three fan modules on the PR3-24, DR3-24 and
+    # CR3-32P4, 1+1 over two on the CR3-36S, N+1 over two on the SR3-48YC8 and SR3-40YC6, and N+1 over four on
+    # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
+    assert n == 110, n
