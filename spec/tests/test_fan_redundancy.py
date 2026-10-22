@@ -585,8 +585,13 @@ def test_the_comparison_layer_can_now_reach_them():
     fan modules must be installed for optimal functioning of the switch"; the switch runs
     30 seconds without thermal shutdown while one is replaced). The guide states no N+1
     form, so the figure says that no spare fan is claimed.
+
+    NINETY-EIGHT AND NINETY-NINE ARE THE JUNIPER QFX5100-48S AND QFX5100-48T, N+1 over
+    five rear fan modules, from the QFX5100 datasheet (July 2024): "Redundant (N+1) and
+    hot-pluggable fan modules". The hardware guide gives the five slots.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
     # 97 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
-    assert n == 97, n
+    # 99 since the Juniper QFX5100-48S and -48T: N+1 over five modules (datasheet, "Redundant (N+1)")
+    assert n == 99, n
