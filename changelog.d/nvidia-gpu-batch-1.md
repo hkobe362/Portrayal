@@ -1,8 +1,8 @@
 ### Added
 - Five NVIDIA data-center GPU cards, the first batch after the A100 80GB pilot
-  (#877). Each carries the same drawn frame as the pilot: a bracket face, a 3D
-  body at the dimensions of NVIDIA's product brief, an east-end face and a
-  NetBox and Nautobot module type. None is seated yet: no bay lists them in its
+  (#877). Each carries the pilot's frame: a bracket face, a 3D body at the
+  dimensions of NVIDIA's product brief and a NetBox and Nautobot module type;
+  the four larger cards also have an east-end face (the L4 has none). None is seated yet: no bay lists them in its
   `accepts`, so each says `unplaced`, and the one line a riser needs is named in it.
   - `nvidia/a100-pcie-40gb@1`, two slots wide (`slot-width: 2`), with its top
     edge face `nvidia/a100-pcie-40gb-top@1` (three NVLink connectors) and the

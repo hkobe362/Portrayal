@@ -220,7 +220,7 @@ provenance:
     brief's table 1 gives the board SKU "PG133 SKU 242 NVPN: 669-2G133-242-xxx",
     printed with a 669 where the other briefs have 699. PNY's line card prints
     NVIDIA PN 900-2G133-0080-000 for BOTH the L40S and the RTX PRO 6000
-    Blackwell Server Edition (the intake's coverage review noted one is wrong),
+    Blackwell Server Edition (one of the two must be wrong),
     so no NVIDIA order code is written.
   nvlink: >-
     datasheet - PB-11470 table 1: "NVIDIA NVLink: Not supported". The card has

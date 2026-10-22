@@ -73,7 +73,7 @@ provenance:
     facts are transcribed and none of its figures is copied.
   reference-photos: >-
     reference - PNY's product images for the 40GB card, which are the same
-    files as the 80GB card's (the intake found them byte-identical on both
+    files as the 80GB card's (the same bytes are served on both
     product pages): a100pcie_fr.png (broad side), a100pcie_top.png and
     a100pcie_top-2.png (top edge) and a100-pcie-3qtr.png, under
     https://d2vfia6k6wrouk.cloudfront.net/productimages/4ffc5dc6-2cd9-4629-ae48-acf0011aef4b/images/.
