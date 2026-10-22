@@ -1908,7 +1908,7 @@
   "L21": 8,
   "L29": 18,
   "L69": 1
-  },
+ },
  "devices/dell/r6615/device.yaml": {
   "L145": 1,
   "L29": 27
@@ -2290,6 +2290,10 @@
   "L29": 2,
   "L57": 1,
   "L61": 52
+ },
+ "devices/juniper/qfx5130-32cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
