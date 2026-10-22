@@ -394,7 +394,8 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # more device.
 # The seven ReadyLinks GL-x siblings (#763) each place the GL-12xB-240D's rear
 # stud again, seven more seats (down) on seven more devices.
-WANT = {"down": 115, "left": 27, "up": 8, "right": 21}
+# the four Juniper EX3400 earthing plates add eight ring-lug seats, four left and four right
+WANT = {"down": 115, "left": 31, "up": 8, "right": 25}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -404,7 +405,8 @@ WANT = {"down": 115, "left": 27, "up": 8, "right": 21}
 # (#918) and the S9501-18SMT's two M4 pairs, one leading left and one right,
 # which brought the pair seats to 61 on 34 devices; their four studs are
 # still ring-lug seats, as the four lugs they replace were
-WANT_PAIRS = {"down": 45, "left": 13, "up": 1, "right": 2}
+# and one two-hole lug on each EX3400, leading its wire right
+WANT_PAIRS = {"down": 45, "left": 13, "up": 1, "right": 6}
 NAMES = {0: "right", 90: "down", 180: "left", 270: "up"}
 LEADS = {"right": 0, "down": 90, "left": 180, "up": 270}
 PAIR_IFACES = ("stud-pair-5-8", "stud-pair-3-4", "stud-pair-1")
@@ -419,7 +421,13 @@ RESIDUAL = {("ufispace/s9600-102xc", "rear", "ground-2"): ("down", 0, 1),
 # MX150's ESD jack (y 10.4) starts under the tongue of a lug 10.67 wide across
 # studs at y 6.5, and the MX480's pair stands 0.34 inside the PEM3 bay's edge.
 HARD_RESIDUAL = {("juniper/mx150", "rear", "ground-studs"): ("left", 1, 0),
-                 ("juniper/mx480", "rear", "ground-studs"): ("down", 1, 0)}
+                 ("juniper/mx480", "rear", "ground-studs"): ("down", 1, 0),
+                 # the EX3400's earthing pair is photograph geometry: the least bad direction along
+                 # the pair still crosses a neighbouring part (not the rule's doing)
+                 ("juniper/ex3400-24p", "rear", "ground-pair"): ("right", 1, 0),
+                 ("juniper/ex3400-24t", "rear", "ground-pair"): ("right", 1, 0),
+                 ("juniper/ex3400-48p", "rear", "ground-pair"): ("right", 1, 0),
+                 ("juniper/ex3400-48t", "rear", "ground-pair"): ("right", 1, 0)}
 # the crossings the seat's own direction made, which the default must not.
 # The MX150's second stud is `ground-stud-1` of main, one level into its pair.
 CROSSED_BEFORE = {("supermicro/sys-111e-fwtr", "front", "ground-stud"),
@@ -467,9 +475,9 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 73   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, and the seven ReadyLinks GL-x siblings
+    assert len({k[0] for k in ring}) == 77   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings and the four Juniper EX3400
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
-    assert len({k[0] for k in pairs}) == 34
+    assert len({k[0] for k in pairs}) == 38
     # a pair is turned only along itself
     assert {r["turn"] for r in pairs.values()} == {0, 180}
 
@@ -514,7 +522,8 @@ def test_the_four_crossings_the_seat_gave_are_gone(census):
     # lug at its seat's own direction lying across the plate's OTHER screw, 16
     # to 17 away; which screw draws the earth symbol does not move them.
     crossed = {k for k, r in _ring(census).items() if r["hard0"]}
-    assert len(crossed) == 17 and not [k for k in crossed if census[k]["hard"]]
+    # and both screws of each of the four EX3400 earthing pairs, 16 away from each other
+    assert len(crossed) == 25 and not [k for k in crossed if census[k]["hard"]]
 
 
 def test_a_barrier_block_pole_is_no_turnable_seat():

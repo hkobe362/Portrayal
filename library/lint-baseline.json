@@ -1150,6 +1150,12 @@
  "components/hpe/sff-sc-carrier/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex3400-fan-afi/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/juniper/ex3400-fan-afo/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/ex4300-fan-afi/v1/contract.yaml": {
   "L27": 1
  },
@@ -2119,6 +2125,30 @@
  "devices/hpe/dl160-gen10/device.yaml": {
   "L21": 6,
   "L29": 11
+ },
+ "devices/juniper/ex3400-24p/device.yaml": {
+  "L29": 1,
+  "L57": 1,
+  "L61": 35,
+  "L69": 1
+ },
+ "devices/juniper/ex3400-24t/device.yaml": {
+  "L29": 1,
+  "L57": 1,
+  "L61": 35,
+  "L69": 1
+ },
+ "devices/juniper/ex3400-48p/device.yaml": {
+  "L29": 1,
+  "L57": 1,
+  "L61": 59,
+  "L69": 1
+ },
+ "devices/juniper/ex3400-48t/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 59,
+  "L69": 1
  },
  "devices/juniper/ex4300-24p/device.yaml": {
   "L29": 2,
