@@ -1,0 +1,114 @@
+format: 1
+kind: module
+name: qfx10002-jpsu-1600w-dc-afo
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  Juniper JPSU-1600W-DC-AFO, the 1600 W DC power supply of the QFX10002-36Q-DC and
+  QFX10002-72Q-DC, with port-to-FRU (AFO, front-to-back) airflow. The same 1U module as the AC
+  supply with the fan behind an orange handle at the left, a vertical D-sub 3W3 power connector
+  with two thumbscrew standoffs and a cord clamp at the right, an ejector lever and a power lamp.
+  Do not mix AC and DC supplies in one chassis.
+attrs:
+  role: dc-power-supply
+  inlet: other
+  power-output-w: 1600
+  airflow: front-to-back
+  input-voltage: -48 to -60 VDC rated, -40 to -72 VDC operating range
+  input-current: 40 A maximum
+  connector: D-sub 3W3 (-48 VDC input, return, ground)
+  output: 12 VDC with a 12 VDC standby output
+  hot-swap: 'yes'
+part-numbers:
+  JPSU-1600W-DC-AFO: {part: JPSU-1600W-DC-AFO}
+provenance:
+  sources: >-
+    datasheet - QFX10002 Switch Hardware Guide (Juniper Networks, published 2026-02-11). Topic
+    QFX10002 DC Power Supply Description, Figure 29 (g050378, the isometric of the supply),
+    Tables 24, 25 and 26, Table 27 and Figure 31 (the lamp), the DC connection topic and its
+    Figures 41 to 43, and Removing and Installing a Power Supply in a QFX10002. THE GUIDE DRAWS THIS
+    SUPPLY ONLY IN PERSPECTIVE. Searched Figures 4, 5, 12, 18, 19 and 28 to 31 and the install
+    figures for a flat elevation of a DC supply and found none: Figures 4 and 5 show AC supplies,
+    and the 36Q photograph shows AC supplies. The connector side of this face is therefore read off
+    the perspective Figures 29, 40, 41, 42 and 43 and is estimated.
+  size: >-
+    drawing - the same bay frame as the AC supply, 74.1 x 40.6 mm, measured on Figure 4
+    (g050372). The guide gives no dimensions for the supplies, and Figure 29 draws the DC module in
+    the same outline as the AC one.
+  depth: >-
+    estimated - 185 mm, the same value as the AC supply and for the same reason: the guide states
+    no depth.
+  face: >-
+    estimated - the left half (fan housing, corner screws and handle) is the AC supply's, because
+    the perspective figures draw the same fan and handle and the same screws. The right half is
+    placed by eye from Figures 29 and 42: a vertical D-sub 3W3 shell centred at 54.5, 19.0 and
+    9.0 x 27.0 mm, a hex standoff above and below it for the cable plug's thumbscrews, a lamp above
+    and to the right, and the ejector lever on the right edge. The perspective cannot be measured,
+    so each of these is good to about 2 mm.
+  handle-colour: >-
+    photo-measured - as the AC supply. The guide's Table 24 says Juniper Gold; the studio
+    photograph of the AC supply shows orange, and the same handle is drawn on this unit.
+  airflow: >-
+    datasheet - Table 24 and the description: port-to-FRU, also known as airflow out (AFO), with a
+    gold handle and an AFO label.
+  power: >-
+    datasheet - Table 24 gives the wattage 1600 W; each supply provides 12 VDC output with a
+    standby voltage of 12 VDC. The DC description says the two supplies of a 36Q supply 1200 W to
+    the chassis and the four of a 72Q 2400 W; that is a derated figure for the chassis and is not
+    the module's rating. The guide gives no draw or loss figure for the unit.
+  connector: >-
+    datasheet - DC Power Cable Specifications: the supply takes a D-sub 3W3 connector, whose three
+    pins carry -48 VDC input, return and ground. The supplied cable CBL-JNP-PWR-DSUB is straight;
+    the optional right-angle cables CBL-JNP-PWR-DSUB2 and -DSUB3 carry no ground wire. The library
+    has no 3W3 connector standard, so the shell is drawn in the skin and presents no seat.
+  led: >-
+    datasheet - Table 27 and Figure 31: one bicolour lamp, with the same states as the AC
+    supply. Figure 29 callout 1 points at a round window above the connector, so the lamp is drawn
+    there. The position is read off an isometric and is estimated.
+  relief: >-
+    estimated - the handle stands proud of the fan in Figure 29. Its projection is not stated or
+    measured.
+states:
+  - ok
+  - fault
+  - absent
+elements:
+  led:
+    at: [59.0, 3.2]
+    size: [2.0, 2.0]
+    class: led
+    states:
+      - 'off'
+      - {name: ok, color: '#22c55e'}
+      - {name: standby, color: '#22c55e', behavior: blinking}
+      - {name: warning, color: '#f59e0b', behavior: blinking}
+      - {name: fault, color: '#f59e0b'}
+  handle: {at: [2.5, 28.7], size: [39.9, 10.6], class: handle}
+  latch: {at: [62.6, 12.2], size: [10.1, 17.9], class: latch}
+fields:
+  handle-finish: {label: Handle colour, type: text, default: '#f2581a'}
+size: {w: 74.1, h: 40.6, d: 185.0}
+size-confidence: {w: drawing, h: drawing, d: estimated}
+relief:
+  features:
+    - node: handle
+      out: 6.0
+      confidence: estimated
+      source: >-
+        qfx10002-jpsu-1600w-dc-afo@1 provenance.relief - the handle stands proud of the fan in
+        Figure 29 (g050378). The projection is not stated or measured.
+    - node: latch
+      out: 1.4
+      color: '#9a9b9d'
+      confidence: estimated
+      source: >-
+        qfx10002-jpsu-1600w-dc-afo@1 provenance.relief - the ejector lever stands proud of the face
+        in Figure 29. The projection is not stated or measured.
+connection-points:
+  power: {at: [54.5, 19.0], direction: rear}
+body:
+  depth: 185.0
+  color: '#b9bec4'
+skins: [default]
