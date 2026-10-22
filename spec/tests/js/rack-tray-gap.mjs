@@ -20,6 +20,17 @@ const r1 = v => Math.round(v * 10) / 10;
 const mm = p => r1(R.pathLength(p).measured * 1000);
 // the reference rack of #949, an FHD-CMP5DR above a panel, a switch above and a switch below
 const owner = () => ({rack: {...F.ownerRack(), cables: F.OWNER_CABLES}, ctx: F.ctxOf()});
+// THE GAP IS TAKEN ONLY WHERE THE CORD CAN BE DRAWN THROUGH IT (P-0218-2, owner's option A,
+// 2026-10-22): out of a plug, the cord goes straight to the reach point and then turns onto the
+// rise with a bend of at least its radius (25), all clear of the strip's front edge. The gap is
+// 48.8 deep and the rise stands 6.5 (radius and CLEAR) short of the strip, at 42.3 from the
+// rail: so a reach of 17.3 mm or less leaves the 25 to bend in. The LC plug's 27.6 does not,
+// and c2 (#1185) goes round the front edge. These tests of the gap's other rules (what it is
+// held to, who may use it) need a cord that does rise, so they give the cords a plug of
+// SHORT mm, which can.
+const SHORT = 10;
+const shortPlug = (extra = {}) => F.ctxOf({...extra, ctx: {plugReachOf: () => SHORT, ...(extra.ctx || {})}});
+const shortOwner = () => ({rack: {...F.ownerRack(), cables: F.OWNER_CABLES}, ctx: shortPlug()});
 const ids = list => Object.fromEntries(list.map(c => [c.id, c]));
 const pts = d => d.points.map(q => [r1(q.x), r1(q.y), r1(q.z)]);
 
@@ -46,28 +57,52 @@ test('a tray\'s gap is found from the floors it publishes: the strip\'s back edg
   assert.deepEqual([h.away, h.width, h.z0, h.z1, h.edge].map(r1), [-1, 48.8, -788.8, -740, -788.8]);
 });
 
-test('on the FHD-CMP5DR a cord from the device below rises through the gap, and is shorter than round the front edge', () => {
+test('on the FHD-CMP5DR c2 does NOT rise through the gap: its LC plug leaves no room to draw the bend there', () => {
+  // CHANGED from #1185's "c2 rises through the gap" (480 mm): drawable geometry, owner's option
+  // A, 2026-10-22. c2 is the switch below's port 100 to the panel, through ring 2: out of its
+  // plug (27.6 out of the rail plane, 14.7 short of the 42.3 the rise would stand at, where
+  // 25 is needed for the bend), so it goes round the front edge, as it did before #1185.
   const {rack, ctx} = owner();
   const c = ids(rack.cables);
   const p = R.routePath(rack, c.c2, ctx);
-  // c2 is the switch below's port 100 to the panel, through ring 2: out of its plug
-  // (27.6 out of the rail plane), up behind the strip's back edge at 48.8 and across the
+  const [d] = p.detours;
+  assert.equal(p.detours.length, 1);
+  assert.deepEqual(d.between, [{end: 'a'}, {item: 'i3', via: 'guide-3'}]);
+  assert.deepEqual(pts(d), [[-100, 466.7, 123.7], [-28.4, 499.3, 123.7]]);
+  assert.ok(d.points.every(q => q.z > 110), JSON.stringify(d.points));
+  assert.deepEqual([p.bends, p.crossings], [[], []]);
+  // #1185 had it at 483.6 mm through the gap; round the front edge it is 610.6 mm, 127.0 longer
+  assert.equal(mm(p), 610.6);
+  assert.equal(r1(610.6 - 483.6), 127);
+  assert.equal(R.routedLength(rack, c.c2, ctx).value, 1);
+  // and no cord of this rack rises: c1 and c3 stay round the front edge, c4 and c5 come from
+  // above and meet no floor
+  const rose = rack.cables.filter(x => R.routePath(rack, x, ctx).detours.some(e => e.points.every(q => q.z < 48.8))).map(x => x.id);
+  assert.deepEqual(rose, []);
+});
+
+test('on the FHD-CMP5DR a cord whose plug leaves the room for the bend rises through the gap, and is shorter than round the front edge', () => {
+  // (#1185's c2 test, on a plug 10 mm out, where 32.3 mm are left to bend in: SHORT, above)
+  const {rack, ctx} = shortOwner();
+  const c = ids(rack.cables);
+  const p = R.routePath(rack, c.c2, ctx);
+  // out of its plug (10 out of the rail plane), up behind the strip's back edge at 48.8 and across the
   // strip to the ring's approach point. The point stands the cord's radius and CLEAR (6.5) short of the edge
   const [d] = p.detours;
   assert.equal(p.detours.length, 1);
   assert.deepEqual(d.between, [{end: 'a'}, {item: 'i3', via: 'guide-3'}]);
-  assert.deepEqual(pts(d), [[-62.2, 498.7, 42.3]]);
+  assert.deepEqual(pts(d), [[-61, 498.7, 42.3]]);
   assert.ok(d.points.every(q => q.z > 0 && q.z < 48.8 - 1.5 - S.CLEAR + 1e-9), JSON.stringify(d.points));
   assert.deepEqual([p.bends, p.crossings], [[], []]);
-  // on main it went out in front of the tray (110 + 1.5 + CLEAR and the room for its turn,
-  // 123.7 out), up, and back in: 610.6 mm. Through the gap it is 483.6, 127.0 mm shorter
-  assert.equal(mm(p), 483.6);
-  assert.equal(r1(610.6 - mm(p)), 127);
+  // the rise stands 32.3 out of the reach point, the 25 of the bend and more
+  assert.ok(d.points[0].z - SHORT >= 25);
+  assert.equal(mm(p), 479.8);
   assert.equal(R.routedLength(rack, c.c2, ctx).value, 0.5);
-  // and it is the only cord of this rack that does: c1 and c3 stay round the front
-  // edge (below), c4 and c5 come from above and meet no floor
-  const rose = rack.cables.filter(x => R.routePath(rack, x, ctx).detours.some(e => e.points.every(q => q.z < 48.8))).map(x => x.id);
-  assert.deepEqual(rose, ['c2']);
+  // the reach is the line: a plug that stands 17.4 out (0.1 mm short of the 25) does not
+  const near = shortPlug({ctx: {plugReachOf: () => 17.4}});
+  assert.ok(R.routePath(rack, c.c2, near).detours[0].points.every(q => q.z > 110));
+  const far = shortPlug({ctx: {plugReachOf: () => 17.3}});
+  assert.ok(R.routePath(rack, c.c2, far).detours[0].points.every(q => q.z < 48.8));
 });
 
 test('a cord too thick for the gap keeps the front-edge detour; one that fits does not', () => {
@@ -93,7 +128,8 @@ test('a cord too thick for the gap keeps the front-edge detour; one that fits do
 });
 
 test('a bundle fits the gap by its diameter, as a cable does: a wide one keeps the front-edge detour', () => {
-  const {rack: base} = owner();
+  // (on a short plug: the cords rise only where the bend can be drawn, P-0218-2, owner's option A, 2026-10-22)
+  const {rack: base} = shortOwner();
   const c2 = base.cables[1];
   // twelve-millimetre cords, the cord c2 and n-1 more like it, bundled
   const bundled = n => {
@@ -101,14 +137,22 @@ test('a bundle fits the gap by its diameter, as a cable does: a wide one keeps t
     return {...base, cables: [...base.cables, ...extra],
       bundles: [{id: 'b1', number: 1, label: 'B', members: [c2, ...extra].map(c => ({cable: c.id})), route: []}]};
   };
-  const ctx = F.ctxOf({ctx: {diameterOf: () => 12}});
+  const ctx = shortPlug({ctx: {diameterOf: () => 12}});
   const run = rack => R.routePath(rack, rack.cables[1], ctx);
   // alone, a 12 mm cord rises through the gap
   const alone = run(base);
-  assert.deepEqual(pts(alone.detours[0]), [[-65.4, 503.2, 37.8]]);
-  // eight in a bundle are 37.9 mm across (sqrt(8 x 144 / 0.8)), which fits
+  assert.deepEqual(pts(alone.detours[0]), [[-64.6, 503.2, 37.8]]);
+  // eight in a bundle are 37.9 mm across (sqrt(8 x 144 / 0.8)), which fits the gap's 48.8; but
+  // CHANGED (drawable geometry, owner's option A, 2026-10-22): the rise would stand 24.8 from
+  // the rail, 14.8 mm out of a 10 mm plug, short of the 25 to bend in, so the bundle goes round
+  // the front edge. #1185 had it through the gap, at [-53.4, 503.8, 24.8]
   assert.equal(r1(Math.sqrt(8 * 144 / 0.8)), 37.9);
-  assert.deepEqual(pts(run(bundled(8)).detours[0]), [[-53.4, 503.8, 24.8]]);
+  const eight = run(bundled(8));
+  assert.ok(eight.detours[0].points.every(q => q.z > 110), JSON.stringify(eight.detours));
+  // (a plug on the rail plane has the room: the fit by diameter is the router's, with no plug in the way)
+  const rail = (x, y) => ({x, y, z: 0});
+  const open = S.detour(rail(-55, 200), {x: -55, y: 600, z: 100}, S.solidsOf(base, ctx), {diameter: 37.9, lanes: [], room: 50, gaps: S.gapsOf(base, ctx)});
+  assert.ok(open.every(q => q.z < 48.8), JSON.stringify(open));
   // fourteen are 50.2 mm: wider than the gap, so the bundle goes round the front edge
   assert.equal(r1(Math.sqrt(14 * 144 / 0.8)), 50.2);
   const wide = run(bundled(14));
@@ -141,7 +185,8 @@ test('a tray with no gap behind it keeps today\'s route, to the millimetre', () 
 });
 
 test('the turn in the gap keeps its bend radius: through it only where its corners have their room', () => {
-  const {rack, ctx} = owner();
+  // (on a short plug, as c2's own is too long to be drawn through the gap: P-0218-2, owner's option A, 2026-10-22)
+  const {rack, ctx} = shortOwner();
   const p = R.routePath(rack, rack.cables[1], ctx);
   const need = 25;
   // no corner of the cord, the two turns of the rise among them, is short of 25 mm
@@ -216,7 +261,8 @@ const asMain = ctx => {
 const rose = (rack, c, ctx) => mm(R.routePath(rack, c, asMain(ctx))) - mm(R.routePath(rack, c, ctx)) > 1;
 
 test('a hand-edited route never uses the gap: no leg of it, those between its waypoints too, is offered one', () => {
-  const {rack: base, ctx} = owner();
+  // (on a short plug, so that the automatic cord does rise: P-0218-2, owner's option A, 2026-10-22)
+  const {rack: base, ctx} = shortOwner();
   const main = asMain(ctx);
   const ring3 = {item: 'i3', via: 'guide-3'}, ring2 = {item: 'i3', via: 'guide-2'};
   // the same cord, c2, written by hand: one waypoint, and two in either order
@@ -234,17 +280,18 @@ test('a hand-edited route never uses the gap: no leg of it, those between its wa
     assert.deepEqual([p.detours, p.bends, p.crossings], [m.detours, m.bends, m.crossings], text);
     assert.equal(mm(p), mm(m), text);
   }
-  // the front-edge detour of one waypoint is main's 610.6 mm, 123.7 out; the automatic cord is 483.6
+  // the front-edge detour of one waypoint is main's, 123.7 out: 610.2 mm on this plug; the automatic cord is 479.8
   const one = {...base.cables[1], route: [ring3], routeEdited: true};
   const p = R.routePath({...base, cables: [one]}, one, ctx);
   assert.equal(p.detours.length, 1);
   assert.deepEqual(p.detours[0].between, [{end: 'a'}, ring3]);
   assert.ok(p.detours[0].points.every(q => q.z > 110));
-  assert.equal(mm(p), 610.6);
+  assert.equal(mm(p), 610.2);
 });
 
 test('a route written by the route command is hand-edited, and never uses the gap', () => {
-  const {rack: base, ctx} = owner();
+  // (on a short plug, so that the automatic cord does rise: P-0218-2, owner's option A, 2026-10-22)
+  const {rack: base, ctx} = shortOwner();
   const before = R.routePath(base, base.cables[1], ctx);
   assert.equal(rose(base, base.cables[1], ctx), true);
   const done = apply(base, {op: 'cable.route', id: 'c2', route: [{item: 'i3', via: 'guide-3'}]}, ctx);
@@ -254,7 +301,7 @@ test('a route written by the route command is hand-edited, and never uses the ga
   const p = R.routePath(done.rack, c, ctx);
   assert.equal(rose(done.rack, c, ctx), false);
   assert.deepEqual(p.points, R.routePath(done.rack, c, asMain(ctx)).points);
-  assert.equal(mm(p), 610.6);
+  assert.equal(mm(p), 610.2);
   // and the cord is put back on its own route: it rises through the gap again
   const back = apply(done.rack, {op: 'cable.route.reset', id: 'c2'}, ctx);
   assert.equal(back.error, undefined);
@@ -264,19 +311,21 @@ test('a route written by the route command is hand-edited, and never uses the ga
 });
 
 test('on one rack the automatic cord rises through the gap and the hand-edited one beside it goes round', () => {
-  const {rack: base, ctx} = owner();
+  // (on a short plug, so that the automatic cord does rise: P-0218-2, owner's option A, 2026-10-22)
+  const {rack: base, ctx} = shortOwner();
   const hand = {...base.cables[1], id: 'h2', a: {...base.cables[1].a, path: 'p140'}, b: {...base.cables[1].b, path: 'bay4'}, route: [{item: 'i3', via: 'guide-4'}], routeEdited: true};
   const rack = {...base, cables: [base.cables[1], hand]};
   const auto = R.routePath(rack, rack.cables[0], ctx);
   assert.equal(rose(rack, rack.cables[0], ctx), true);
-  assert.equal(mm(auto), 483.6);
+  assert.equal(mm(auto), 479.8);
   const p = R.routePath(rack, hand, ctx);
   assert.equal(rose(rack, hand, ctx), false);
   assert.deepEqual(p.points, R.routePath(rack, hand, asMain(ctx)).points);
 });
 
 test('a bundle with a trunk drawn by hand, or a member routed by hand, uses no gap; one the kit routes does', () => {
-  const {rack: base, ctx} = owner();
+  // (on a short plug, so that the automatic cord does rise: P-0218-2, owner's option A, 2026-10-22)
+  const {rack: base, ctx} = shortOwner();
   const c2 = base.cables[1];
   const more = {...c2, id: 'x0'};
   const bundle = (route, members = [c2, more]) => ({id: 'b1', number: 1, label: 'B', members: members.map(c => ({cable: c.id})), route});

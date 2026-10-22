@@ -30,14 +30,39 @@ const laid = Object.fromEntries(L.RACK.cables.map(c => {
     found: R.bendFindingsOf(L.RACK, c, L.ctx, id => id, path)}];
 }));
 
-test('the rack is the site\'s, and c9 to c12 rise through the gap on main, onto 0.5 m stock', () => {
+test('the rack is the site\'s, and c9 to c12 no longer rise through the gap: round the front edge, onto 1 m stock', () => {
   assert.equal(L.RACK.cables.length, 16);
   assert.equal(S.gapsOf(L.RACK, L.ctx).length, 1);
   assert.equal(floors.length, 3);
   // (the gap is the 48.8 mm behind the strip, and the plate 1.5 thick)
   assert.deepEqual(floors.map(f => r1(f.box.y1 - f.box.y0)), [1.5, 1.5, 1.5]);
-  assert.ok(laid.c9.rose, 'c9 rises through the gap');
-  assert.equal(R.routedLength(L.RACK, L.RACK.cables[8], L.ctx).value, 0.5);
+  // CHANGED from "c9 to c12 rise through the gap on main (488.6 to 501.5 mm, 0.5 m stock)":
+  // drawable geometry, owner's option A, 2026-10-22. The plug reaches 32.5 mm and the rise
+  // would stand at 42.3 from the rail, 9.8 mm for a bend of 25: not drawable, so the route
+  // goes round the front edge, longer (610.9, 611.3, 615.8 and 623.3 mm) and onto 1 m stock.
+  assert.ok(Object.values(laid).every(x => !x.rose), 'no cord rises through the gap');
+  const lens = ['c9', 'c10', 'c11', 'c12'].map(id => r1(R.pathLength(laid[id].path).measured * 1000));
+  assert.deepEqual(lens, [610.9, 611.3, 615.8, 623.3]);
+  for (const k of [8, 9, 10, 11]) assert.equal(R.routedLength(L.RACK, L.RACK.cables[k], L.ctx).value, 1);
+});
+
+test('a cord whose plug leaves the room for the bend still rises through the gap, clear of the plate, the rise a bend radius beyond its plug', () => {
+  // (the same rack, the plugs 10 mm out: the rise stands 32.3 mm beyond the reach point, the 25 and more)
+  const ctx = {...L.ctx, plugReachOf: () => 10};
+  const rising = L.RACK.cables.map(c => {
+    const path = R.routePath(L.RACK, c, ctx);
+    return {id: c.id, path, drawn: drawn(path, NEED, bodies, OUT),
+      rose: path.detours.some(d => d.points.every(q => q.z > 0 && q.z < 48.8))};
+  }).filter(x => x.rose);
+  assert.ok(rising.length > 0, 'a cord rises');
+  for (const x of rising) {
+    // the rise stands the bend radius (25) or more beyond the plug's reach point (10): the rule
+    // taken (solids.js gapWays). (How tight the slanted rise's own corners are drawn, where two
+    // legs share, is the kit's bend check's as before: not asserted here.)
+    const rise = x.path.detours.find(d => d.points.every(q => q.z > 0 && q.z < 48.8));
+    assert.ok(rise.points.every(q => q.z - 10 >= NEED - 1e-6), `${x.id}: ${JSON.stringify(rise.points)}`);
+    assert.ok(!x.drawn.curve.some(q => floors.some(f => inside(q, f.box, RADIUS))), x.id);
+  }
 });
 
 test('no cord\'s centre line, drawn, enters a tray\'s floor plate (its thickness and the cord\'s radius)', () => {
