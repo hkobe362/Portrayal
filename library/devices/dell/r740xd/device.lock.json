@@ -388,7 +388,7 @@
    "std/drive-25-plan@1"
   ]
  },
- "composed": "f4ce0e6bfcd00894",
+ "composed": "eaf5fbf6d0489c7d",
  "composed-refs": {
   "common/db9-receptacle@1": "1.1.0+92f8de85b306faeb",
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
@@ -442,7 +442,7 @@
   "dell/riser-1-plate-14g@1": "1.0.1+d076042ef89d2c64",
   "dell/riser-1-shroud-14g@1": "1.5.1+f2d9dd2f1e75532b",
   "dell/riser-1-top-shelf-14g@1": "1.0.0+9d90cb5c14d0f396",
-  "dell/riser-1a-14g@2": "2.3.0+bddf1b27e6d9b433",
+  "dell/riser-1a-14g@2": "2.4.0+5ec6f71ed275efd9",
   "dell/riser-1b-14g@2": "2.1.0+08bbd0ae107598e4",
   "dell/riser-1d-14g@2": "2.1.0+bfa19facec9a22e7",
   "dell/riser-2-3-blank-14g@1": "1.0.0+b788aa3078c7cbee",
@@ -467,9 +467,12 @@
   "dell/system-cover-14g@1": "1.2.0+23252204f846e558",
   "dell/system-id-button-14g@1": "1.0.1+a453cf90c341d8d0",
   "dell/thumbscrew-blue-14g@1": "1.0.1+bc5ef4e4f02c7172",
+  "nvidia/a100-pcie-40gb-top@1": "1.0.0+0f168bf128e259f7",
+  "nvidia/a100-pcie-40gb@1": "1.0.0+510e03a65d723a52",
   "nvidia/a100-pcie-80gb-tail@1": "1.0.0+c3a52d79a0cbfd05",
   "nvidia/a100-pcie-80gb-top@1": "1.0.0+792a4ce3b347dbf9",
   "nvidia/a100-pcie-80gb@1": "1.0.0+afed552c21f5169a",
+  "nvidia/l4@1": "1.0.0+27d8086177431c41",
   "nvidia/mcx4111a-fh@1": "1.0.0+3d2e493312d6ceb2",
   "nvidia/mcx4111a-lp@1": "1.0.0+eb651c58e0e70765",
   "nvidia/mcx4121a-fh@1": "1.0.0+b144ba6a51d9b6f8",
@@ -1242,5 +1245,5 @@
  "placement-surface": "9098751ab9b6ebfd",
  "shape": "e40c5ceb31eadd56",
  "surface": "0a0539a1f1059621",
- "version": "29.0.1"
+ "version": "29.0.2"
 }

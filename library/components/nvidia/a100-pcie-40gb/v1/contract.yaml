@@ -17,13 +17,6 @@ description: >-
 slot-width: 2
 size: {w: 120.02, h: 41.91, d: 266.70}
 size-confidence: {w: registry, h: registry, d: drawing}
-unplaced: >-
-  no bay in the library lists this card in `accepts`. A riser bay names each
-  card it takes by hand (docs/cards-by-interface-design.md counts 1,061 entries
-  in 54 bays), so seating it means adding `nvidia/a100-pcie-40gb@1` to a riser
-  that spans, such as dell/riser-1a-14g@2's `slot-1`, which is an edit to a
-  part this change does not touch. The card states `slot-width: 2` and its face
-  is the two-slot bracket, so that one line in the riser is all that is missing.
 attrs:
   model: 'A100 40GB PCIe'
   board-sku: 'P1001 SKU 200, NVPN 699-21001-0200-xxx'

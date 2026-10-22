@@ -8,6 +8,15 @@
  "components/arista/7010tx-fan/v1/contract.yaml": {
   "L27": 1
  },
+ "components/arista/7280cr3-fan-rev/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/arista/7280cr3-fan/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/arista/7280dr3a-fan/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/casa/bdm/v1/contract.yaml": {
   "L97": 1
  },
@@ -1756,6 +1765,12 @@
   "L57": 1,
   "L61": 10
  },
+ "devices/arista/7280cr3-32d4/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280dr3a-36/device.yaml": {
+  "L29": 1
+ },
  "devices/casa/c100g/device.yaml": {
   "L119": 1,
   "L29": 2,
@@ -2290,6 +2305,15 @@
   "L29": 1,
   "L93": 1
  },
+ "devices/juniper/qfx5100-48s/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 11
+ },
+ "devices/juniper/qfx5100-48t/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
  "devices/juniper/qfx5120-48y/device.yaml": {
   "L29": 2,
   "L57": 1
@@ -2298,6 +2322,22 @@
   "L29": 2,
   "L57": 1,
   "L61": 52
+ },
+ "devices/juniper/qfx5130-32cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5200-32c/device.yaml": {
+  "L29": 2,
+  "L40": 1,
+  "L57": 1,
+  "L69": 1
+ },
+ "devices/juniper/qfx5200-48y/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 3,
+  "L69": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,

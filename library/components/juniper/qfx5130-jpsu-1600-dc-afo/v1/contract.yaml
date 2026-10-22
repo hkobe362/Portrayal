@@ -1,0 +1,111 @@
+format: 1
+kind: module
+name: qfx5130-jpsu-1600-dc-afo
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  JPSU-1600W-1UDCAFO, a 1600 W DC power supply with front-to-back airflow (AIR OUT, port-to-FRU). It is a
+  field-replaceable unit, hot-removable and hot-insertable, installed at the factory. The QFX5130 hardware
+  guide says the QFX5130-32CD, QFX5130-48C and QFX5130-48CM take it; the switch ships with two. It has a
+  single feed, so source redundancy comes from two supplies on feeds A and B. The face carries two screw
+  terminals, V+ at the left and V- beside it, under a clear terminal-block cover that is not drawn; a
+  Juniper gold handle in the form of a rounded slot; three lamps (IN, OUT and !); an unused blanked
+  position at the upper left; and a release latch. The AIR IN sibling is JPSU-1600W-1UDCAFI. AC and DC
+  supplies, and supplies of different airflow direction, are never mixed in one chassis. The datasheet lists
+  the part as the "QFX5220-32CD 1600W 1U DC PSU AFO".
+attrs:
+  model: JPSU-1600W-1UDCAFO
+  role: dc-power-supply
+  inlet: dc-terminal
+  power-output-w: 1600
+  airflow: front-to-back
+  input: rated -48 to -60 VDC, operating -40 to -72 VDC; 35 A maximum (QFX5130-32CD) or 40 A (QFX5130-48C and -48CM), guide Tables 26, 27
+provenance:
+  size: >-
+    drawing - the guide's figure 105 (QFX5130 Faceplate) is a flat elevation of the DC supply face. Its
+    outline is 1197 by 905 px, an aspect of 1.32, against 1.34 for the AC supply's measured 55.0 by 41.1 mm
+    (1 percent out), so the DC face is the same size as the AC supply, which the photographs measure, and
+    the figure is scaled to it. No document gives the supply's size in millimetres.
+  depth: >-
+    not stated. The guide's figure 45 is an isometric with no scale, and neither the guide nor the
+    datasheet gives a depth or weight for the supply. No depth is written.
+  face: >-
+    drawing - guide figure 105 (callouts 1 to 6) at 600 dpi, scaled to 55.0 mm: the blanked "not used"
+    position at x 9.4, y 8.4; the V+ screw at x 9.6 and the V- screw at x 24.1, both at y 26.0 and 4.4 mm
+    in radius; the handle slot 6.2 mm wide at x 32.8; three lamps at x 48.3 and y 5.9, 11.8 and 17.8 with
+    the legends IN, OUT and !; the release latch at x 47.6. The figure prints the legend under the V-
+    terminal as "V-V", which is taken for a drawing artefact: the legend is drawn as a minus sign. No
+    photograph of the DC supply is held, so the colours are those of the AC supply's photograph and the
+    positions are estimated to about 0.5 mm. The figure overdraws the latch 1.1 mm past the face; the
+    latch is drawn to the face edge.
+  power-output-w: >-
+    datasheet - the part number and the guide's text call it a 1600-W supply ("The DC PSMs in QFX5130
+    switches are 1600 watt (W)"). An OUTPUT, since a supply provides power.
+  leds: >-
+    datasheet - guide, QFX5130 DC Power Supply LED (Table 28, figure 46): Input OK is green when there is
+    DC output power and amber when only one of the two supplies is powered; Output OK is green when the
+    supply works, blinks green when it is disabled and is unlit at the power limit or over current; Fault
+    is amber on an error and blinks when the supply is disabled.
+  airflow: >-
+    datasheet - guide Tables 24 and 25: JPSU-1600W-1UDCAFO is port-to-FRU with a Juniper gold handle. Table
+    24 prints this row for the 32CD as "Airflow In (port-to-FRU)", a typographical error: port-to-FRU is
+    front-to-back (AIR OUT), as Tables 3, 4 and 25 say.
+  input: >-
+    datasheet - guide Table 26 (QFX5130-32CD) and Table 27 (QFX5130-48C and -48CM): rated operating voltage
+    -48 to -60 VDC, operating range -40 to -72 VDC; 35 A and 40 A maximum.
+states:
+- ok
+- fault
+- absent
+elements:
+  led-input:
+    at: [47.15, 4.75]
+    size: [2.3, 2.3]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - {name: amber, color: '#f5a623'}
+    - 'off'
+  led-output:
+    at: [47.15, 10.65]
+    size: [2.3, 2.3]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - 'off'
+  led-fault:
+    at: [47.15, 16.65]
+    size: [2.3, 2.3]
+    class: led
+    states:
+    - {name: amber, color: '#f5a623'}
+    - 'off'
+  terminal-pos:
+    at: [5.2, 21.6]
+    size: [8.8, 8.8]
+    class: screw
+  terminal-neg:
+    at: [19.7, 21.6]
+    size: [8.8, 8.8]
+    class: screw
+  latch:
+    at: [32.8, 1.6]
+    size: [6.2, 37.2]
+    class: latch
+  release-latch:
+    at: [47.6, 20.9]
+    size: [7.3, 20.2]
+    class: latch
+size:
+  w: 55.0
+  h: 41.1
+size-confidence: {w: drawing, h: drawing}
+relief:
+  features:
+  - node: latch
+    out: 1.6
+    color: '#e8731f'
+    confidence: estimated
+    source: drawing - the handle stands proud of the face; its projection is not measured

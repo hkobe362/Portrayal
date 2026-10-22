@@ -300,6 +300,10 @@ THREE_HIGH = {
     # pair. The 2x2 block is the stack; the column is single (#738).
     "aurcore/ais2004": {"port-19", "port-20"},
     "aurcore/ais2004p": {"port-19", "port-20"},
+    # the QFX5200-48Y's six QSFP28 cages are two columns of three: ports 48 and 49 are
+    # the stack, with a lamp band between them, and 50 is a single cage below (51 and 52,
+    # 53 likewise), as guide figure 16's callouts 2 (four cages) and 5 (two cages) say
+    "juniper/qfx5200-48y": {"port-50", "port-53"},
 }
 
 

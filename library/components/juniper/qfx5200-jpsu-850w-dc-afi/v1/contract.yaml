@@ -1,0 +1,122 @@
+format: 1
+kind: module
+name: qfx5200-jpsu-850w-dc-afi
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  JPSU-850W-DC-AFI, a DC power supply with back-to-front (FRU-to-port) airflow (AIR IN). It is a
+  field-replaceable unit, hot-removable and hot-insertable, and load-shares with its twin. The QFX5200
+  hardware guide says the QFX5200-32C takes it (the -32C-L takes AC supplies only), two to a switch, in the
+  slots at the right of the FRU panel. The face is that of the front-to-back supply with a Juniper Azure Blue
+  latch: four terminal studs in a row labelled V-, V-, V+ and V+, a protective earthing screw, three lamps
+  labelled IN, OUT and !, and an ejector lever. The front-to-back sibling is JPSU-850W-DC-AFO. AC and DC
+  supplies are never mixed in one 32C chassis, and supplies of different airflow direction are never mixed in any.
+attrs:
+  model: JPSU-850W-DC-AFI
+  role: dc-power-supply
+  inlet: dc-terminal
+  power-output-w: 850
+  airflow: back-to-front
+  input: rated -48 to -60 VDC, operating range -40 to -72 VDC, 10 A maximum (QFX5200-32C, guide Table 25)
+provenance:
+  size: >-
+    estimated - the guide gives this supply no size. It seats in the bay of the AC supply, so the bay's size
+    (54.8 x 40.2 mm, itself estimated) is used: the module is drawn to fill it.
+  depth: >-
+    not stated. The guide's figure 39 is an isometric drawing with no scale and its tables give no depth.
+  face: >-
+    drawing - that of qfx5200-jpsu-850w-dc-afo@1 (the guide's figure 41, fractions of the bay, estimated). The guide
+    draws one DC supply and says the AFI supply differs by airflow and colour.
+  power-output-w: >-
+    the part number says 850 W; the guide's text says the DC power supply in the QFX5200-32C is 1100 W. See
+    qfx5200-jpsu-850w-dc-afo@1: the part number is used. An OUTPUT, since a supply provides power.
+  leds: >-
+    datasheet - guide Table 26 (DC power supply LEDs on a QFX5200-32C): Input green when power is coming in; Output green
+    when the supply sends out power correctly; Fault amber on an error (replace it and leave it seated for airflow).
+  airflow: >-
+    datasheet - guide Table 3: JPSU-850W-DC-AFI is FRUs-to-ports airflow (back-to-front), CLI "DC AFI 850W PSU". The guide
+    gives no handle colour for the DC supply; the Azure Blue latch is carried from the AC supply by the same name
+    (Table 19).
+  colour: >-
+    borrowed - the blue the library already carries for Juniper Azure Blue on juniper/jpsu-850w-ac-afi@1; estimated.
+states:
+- ok
+- fault
+- absent
+elements:
+  led-in:
+    at: [16.4, 16.0]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - 'off'
+  led-out:
+    at: [23.6, 16.0]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - 'off'
+  led-fault:
+    at: [30.8, 16.0]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: amber, color: '#f5a623'}
+    - 'off'
+  latch:
+    at: [0.7, 1.5]
+    size: [10.3, 22.3]
+    class: latch
+  lever:
+    at: [48.6, 17.0]
+    size: [6.0, 20.0]
+    class: latch
+  terminals:
+    at: [11.8, 5.6]
+    size: [33.0, 10.2]
+    class: terminal
+size:
+  w: 54.8
+  h: 40.2
+size-confidence: {w: estimated, h: estimated}
+size-notes: the bay's size in the QFX5200-32C rear figure and the QFX5120's photograph; no document gives this module's own size
+relief:
+  features:
+  - node: latch
+    out: 1.6
+    color: '#2a8bd8'
+    confidence: estimated
+    source: AC sibling - the latch stands proud of the face; its projection and colour are not measured for this module
+  - node: terminals
+    out: 2.2
+    color: '#111316'
+    confidence: estimated
+    source: guide figure 41 - the terminal block stands proud of the face; not dimensioned
+  - node: stud-0
+    cyl: 5.0
+    thread: 1.0
+    lift: 2.2
+    confidence: estimated
+    source: guide figure 41 - threaded studs; height not dimensioned
+  - node: stud-1
+    cyl: 5.0
+    thread: 1.0
+    lift: 2.2
+    confidence: estimated
+    source: guide figure 41 - as stud-0
+  - node: stud-2
+    cyl: 5.0
+    thread: 1.0
+    lift: 2.2
+    confidence: estimated
+    source: guide figure 41 - as stud-0
+  - node: stud-3
+    cyl: 5.0
+    thread: 1.0
+    lift: 2.2
+    confidence: estimated
+    source: guide figure 41 - as stud-0
