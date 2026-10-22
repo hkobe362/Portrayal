@@ -52,7 +52,6 @@ def test_the_envelope_is_the_guides_table_1():
     assert c["ru"] == 1
     assert c["width"] == pytest.approx(439.0, abs=0.5)
     assert c["height"] == pytest.approx(43.5, abs=0.5)
-    assert c["height"] == pytest.approx(44.0, abs=1.0)
     assert c["depth"] == pytest.approx(258.0, abs=0.5)
     # the ears carry the body from 439 out to the guide's 483 across the rack face
     assert (483.0 - c["width"]) / 2 == pytest.approx(22.0, abs=0.5)
@@ -229,7 +228,10 @@ def test_the_configurations_are_the_four_builds_with_the_datasheets_part_numbers
         c = cf[name]
         assert c["kind"] == "orderable"
         assert sorted(c["part-numbers"]) == sorted(pns), name
-        assert c.get("airflow", "front-to-back") == airflow, name
+        if airflow == "back-to-front":
+            assert c["airflow"] == airflow, name   # a reversed build must say so
+        else:
+            assert c.get("airflow", "front-to-back") == "front-to-back", name
         assert c.get("power", "ac") == feed, name
     assert [n for n, c in cf.items() if c.get("default")] == ["ac-f"]
 
@@ -239,7 +241,10 @@ def test_each_build_seats_the_fan_turned_to_its_airflow_and_the_dc_ones_use_the_
     for name, (airflow, feed, _) in CONFIGS.items():
         c = cf[name]
         attrs = (c.get("bay-attrs") or {}).get("fan") or {}
-        assert attrs.get("airflow", "front-to-back") == airflow, name
+        if airflow == "back-to-front":
+            assert attrs["airflow"] == airflow, name   # the fan is turned only by saying so
+        else:
+            assert attrs.get("airflow", "front-to-back") == "front-to-back", name
         views = c.get("views") or {}
         assert views.get("rear", "rear") == ("rear-dc" if feed == "dc" else "rear"), name
         assert "front" not in views, name

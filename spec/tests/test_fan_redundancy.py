@@ -244,7 +244,11 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     assert {"cisco/asr-9901", "cisco/asr-9902", "cisco/asr-9903"} <= set(unstated)
     assert "cisco/n9k-c93180yc-ex" in unstated
     # 29 since the Dell R660xs, whose documents say 'hot-plug redundant cooling' and no scheme
-    assert len(unstated) == 29, unstated
+    # THE FOUR JUNIPER EX3400 MADE IT THIRTY-THREE: the guide says both fan modules must be installed
+    # and working, and names no N+1 form, so each group quotes the sentence and states no form.
+    assert {"juniper/ex3400-24t", "juniper/ex3400-24p", "juniper/ex3400-48t",
+            "juniper/ex3400-48p"} <= set(unstated)
+    assert len(unstated) == 33, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -582,10 +586,16 @@ def test_the_comparison_layer_can_now_reach_them():
     30 seconds without thermal shutdown while one is replaced). The guide states no N+1
     form, so the figure says that no spare fan is claimed.
 
-    NINETY-SEVEN IS THE ARISTA 7010TX-48, n+0 over its one reversible fan module of two inline
-    fans: the quick start guide says the switch shuts down if the module is disconnected for more
-    than a minute and names no spare fan.
+    NINETY-SEVEN IS THE DELL R960, N+1 over six dual-rotor modules (technical guide, thermal
+    features).
+
+    NINETY-EIGHT IS THE ARISTA 7010TX-48, n+0 over its one reversible fan module of two inline
+    fans: the quick start guide (Appendix E) says the switch shuts down if the module is
+    disconnected for more than a minute and names no spare fan. The data sheet's "Redundant &
+    hot-swappable fans" and "Redundant and reversible dual inline fan module" mean the two inline
+    fans inside the one module; the module itself is a single point, so no spare module is claimed.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 97, n
+    # 98 since the Arista 7010TX-48: n+0 over one module of two inline fans
+    assert n == 98, n

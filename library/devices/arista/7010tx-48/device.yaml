@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7010tx-48
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Arista
 model: 7010TX-48
@@ -33,8 +33,7 @@ provenance:
       and 7010TX-48-DC) and of the rear (rear-to-front AC, front-to-rear AC and DC), which are what every
       position below was read from. The guide's own panel figures are small low-resolution rasters (about
       1.4 px per mm), used for counts, numbering and callouts only. Arista publishes no 3D or CAD model,
-      and the Visio stencil set could not be fetched, so no drawing or model is held: intake COVERAGE.md
-      and SOURCES.md were read first. No drawing, photograph or logo is copied into the library, only
+      and the Visio stencil set could not be fetched, so no drawing or model is held. No drawing, photograph or logo is copied into the library, only
       transcribed facts and new drawings. 7010T-48 (Figure C-1, a different front with SFP+ cages and
       two supply lamps) and the 7010TX-48C-DC-RV3 and -RV3A rack builds are in the same guide and are
       left for a later slice, as the guide describes.
@@ -64,9 +63,9 @@ provenance:
       fans". The width: 48.3 cm is over the mounting ears, so the body between them, which is what is
       modelled, is the datasheet's 43.9 cm (439.0), a 22.0 mm ear each side. The height is the datasheet's
       43.5 mm (the guide rounds it to 4.4 cm, which is also the 1RU 44.45 less clearance). The depth is
-      the guide's 258.0: the datasheet's 276 is a different measure (it says "incl. fans") and the two
-      are recorded in the `sources-disagree` gap `depth`, with the guide's figure used because the brief
-      for this device names it and it is the newer document by two months. 1RU.
+      the guide's 258.0: Table 1 gives 25.8 cm as the chassis depth, while the datasheet's 27.6 cm is
+      stated "incl. fans" (Technical Specifications, Size row), so it is a different measure. The two
+      are recorded in the `sources-disagree` gap `depth`, and the chassis depth is the one modelled. 1RU.
   ears:
     confidence: datasheet
     note: >-
@@ -465,7 +464,10 @@ groups:
       redundancy: n+0
       redundancy-note: >-
         Guide Appendix E: the switch shuts down if the fan module is disconnected for more than a minute;
-        the one module carries two fans inline, and the guide gives no spare fan
+        the one module carries two fans inline, and the guide gives no spare fan. The data sheet calls them
+        "Redundant & hot-swappable fans" (feature list, p.1) and a "Redundant and reversible dual inline fan
+        module" (High Availability, p.1-2); that redundancy is the two inline fans inside the one module,
+        and the module itself is a single point, so no spare module is claimed
   grounding: {term: Point, role: furniture, index-origin: 1, description: 'the rear grounding pair, two
       tapped holes for a two-hole lug'}
   furniture: {term: Item, role: furniture, index-origin: 1}

@@ -974,9 +974,13 @@ def plan_cases():
     # (3.8, 0.4 and 2.1 mm), so their two figures are not one opening.
     # The R6615's LOM, rear I/O and OCP bays are the R660's, with the same boards.
     # The R6625's lom, rio and ocp bays are the R660's, drawn from above as boards the same way.
+    # The R960's LOM, rear I/O board and OCP card are the same case: their plans are wider than their windows,
+    # and so are the R960's risers 1, 3 and 4, whose plans are the service model's boards (160, 135 and 148 wide) behind cages 117, 104 and 120 wide.
     boards = {"dell/r660 lom", "dell/r660 rio", "dell/r660 ocp",
               "dell/r6615 lom", "dell/r6615 rio", "dell/r6615 ocp",
-              "dell/r6625 lom", "dell/r6625 rio", "dell/r6625 ocp"}
+              "dell/r6625 lom", "dell/r6625 rio", "dell/r6625 ocp",
+              "dell/r960 lom", "dell/r960 rio", "dell/r960 ocp",
+              "dell/r960 riser-1", "dell/r960 riser-3", "dell/r960 riser-4"}
     cases = []
     # read-only: libdata's documents are shared by the whole session
     for slug, data in libdata.devices():
