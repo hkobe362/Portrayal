@@ -1,0 +1,76 @@
+format: 1
+kind: module
+name: 7050x4-pwr-500-dc
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  The 500 W DC power supply of the Arista 7050X4-48Y-4DF, PWR-511-DC-RED (forward airflow, red handle).
+  It is a 1RU module, 73.5 mm wide, with the fan guard and red diagonal handle of the AC supply and a
+  terminal block in place of its inlet. The block has the two poles the guide's section 4.4.2.2 names,
+  negative (-48V) and positive (RTN). The protective earth terminal is not drawn.
+size: {w: 73.5, h: 40.0}
+size-confidence: {w: datasheet, h: estimated}
+part-numbers:
+  PWR-511-DC-RED: {part: PWR-511-DC-RED}
+attrs:
+  power-output-w: 500
+  input: dc
+  inlet: dc-terminal
+  airflow: front-to-back
+  input-note: '-48 to -60 VDC, 11.8 A max'
+provenance:
+  size: >-
+    datasheet for the width, estimated for the height, as arista/7050x4-pwr-500-ac: the 7050X4 Series
+    Data Sheet (03-0057-27) describes the part as "PWR-511-DC-RED  Arista PSU, 1RU. DC/DC, 500W,
+    FORWARD, 73.5MM".
+  part-number: >-
+    datasheet - optional components and spares: "PWR-511-DC-RED  Arista PSU, 1RU. DC/DC, 500W,
+    FORWARD, 73.5MM", and the model comparison's "PWR-511-DC-RED/BLUE" for the 7050X4-48Y-4DF. The
+    guide's table 3 and table 4 list only PWR-511-AC for it and no PWR-511-DC (its table 7 has no
+    PWR-511-DC row either). The datasheet lists no DC SKU of the switch: the "#" order takes the
+    supply.
+  power-output: >-
+    datasheet - the "500W" of the ordering description and "Output Power 500W" in the power supply
+    table. An output.
+  input: >-
+    datasheet - the power supply table: "-48 to -60V DC", "11.8A Max (-48V)", 92 percent efficiency,
+    input connector "AWG #14 Max".
+  face: >-
+    estimated, AND NOT FROM THIS MODULE. No picture of a PWR-511-DC is held; the guide's isometric DC
+    figures carry no measure. The guard, handle, latch and lamp are the AC supply's, and the terminal
+    block is a plain two-pole block, as arista/7280cr3-pwr-1000-dc draws its own.
+  airflow: >-
+    datasheet - the part number's RED and "FORWARD".
+  handle-finish: >-
+    A field, `handle-finish`, default `#a32a38`.
+  power: >-
+    No supply figure other than the rating is stated; nothing is written.
+skins: [default]
+states: [absent]
+elements:
+  handle: {at: [1.0, 1.0], size: [41.0, 38.0], class: handle}
+  latch: {at: [68.0, 10.4], size: [5.0, 12.8], class: latch}
+  status: {at: [66.4, 2.6], size: [4.8, 4.8], class: led, states: ['off', 'ok', 'fault']}
+fields:
+  handle-finish: {label: Handle colour, type: text, default: '#a32a38'}
+parts:
+  - {ref: common/terminal-screw-34@1, id: pole-neg, at: [49.5, 12.3]}
+  - {ref: common/terminal-screw-34@1, id: pole-pos, at: [49.5, 27.1]}
+relief:
+  features:
+    - node: handle
+      bar: 5.0
+      confidence: estimated
+      source: >-
+        A diagonal bar across the fan guard, anchored at both ends. How far it stands off the
+        module is not dimensioned; 5.0 is its drawn width.
+    - node: latch
+      out: 1.2
+      confidence: estimated
+      source: 'As the library''s other supply latches: drawn, not dimensioned.'
+body:
+  depth: 210
+  color: '#8c8f94'
+  footprint: {at: [0, 0], size: [73.5, 40.0]}

@@ -1,0 +1,20 @@
+---
+manufacturer: Arista
+model: FAN-7011M-R
+part_number: FAN-7011M-R
+description: The 1RU enhanced-speed hot-swap fan module of the Arista 7050X4-48Y-4DF for rear-to-front
+  air, spare FAN-7011M-R (reverse airflow, blue)
+comments: 'The 1RU enhanced-speed hot-swap fan module of the Arista 7050X4-48Y-4DF for rear-to-front air,
+  spare FAN-7011M-R (reverse airflow, blue). It is the FAN-7011M-F housing with the rotor turned the other
+  way. The module has a blue frame and a honeycomb grille. A grey release rail with a slider runs down
+  the middle, with a blue label tab at its top. A status lamp is at the bottom centre. Three fill the
+  1RU rear.
+
+
+  Facts carried in the model that this schema has no field for:
+
+  - airflow: back-to-front
+
+  - role: fan
+
+  Contract version 1.0.0 (arista/7050x4-fan-7011m-rev).'

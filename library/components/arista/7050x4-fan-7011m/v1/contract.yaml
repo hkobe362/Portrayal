@@ -1,0 +1,75 @@
+format: 1
+kind: module
+name: 7050x4-fan-7011m
+version: 1.0.0
+class: fan
+behaviour: fills
+profile: networking
+description: >-
+  The 1RU enhanced-speed hot-swap fan module of the Arista 7050SDX4-48D8, 7050SPX4-48D8 and
+  7050X4-48Y-4DF, spare FAN-7011M-F (front-to-rear airflow, red). The module has a red frame and a
+  honeycomb grille. A grey release rail with a slider runs down the middle, with a red label tab at
+  its top. A status lamp is at the bottom centre. Three fill the 1RU rear between the management
+  ports and the right power supply. The module is hot-swappable.
+size: {w: 78.6, h: 38.6}
+size-confidence: {w: estimated, h: estimated}
+part-numbers:
+  FAN-7011M-F: {part: FAN-7011M-F}
+attrs:
+  airflow: front-to-back
+  role: fan
+provenance:
+  size: >-
+    estimated - the 7050X4 Quick Start Guide (DOC-06569-02) figure D-1 draws three 1RU fan modules
+    in a 552 px raster at 1.23 px/mm (the chassis edges over the 440 mm body); each frame with its
+    bezel line measures about 82 mm wide on a 85 mm pitch, to within a pixel (0.8 mm). The guide draws
+    one module for all 1RU models. The frame is taken as arista/7280cr3-fan's 78.6 x 38.6 (the same
+    drawing of the same slot in the same series of switch, whose figure resolves the frame without its
+    bezel line), because no document dimensions the module.
+  part-number: >-
+    datasheet - the 7050X4 Series Data Sheet (03-0057-27, Aug 27th, 2025), optional components and
+    spares: "FAN-7011M-F  Spare fan module for Arista 7000 Series 1RU Enhanced Fan Speed
+    (front-to-rear airflow)", and the model comparison's "Fan Tray" row for the 7050SDX4-48D8,
+    7050SPX4-48D8 and 7050X4-48Y-4DF. The 7280R3 data sheet lists the same part for the 7280SR3.
+  airflow: >-
+    datasheet - "front-to-rear airflow". The guide's appendix D says "Handle or bezel color
+    indicates airflow direction"; red is the library's colour of an air-exit module.
+  face: >-
+    estimated - figure D-1 of the guide draws the red 1RU module with a honeycomb grille, a grey rail
+    and slider down its middle, a red tab at its top and a lamp at its foot; the datasheet's rear
+    photograph shows a different module with two rotors (a "7050X4 1RU Rear View" photograph, front
+    to rear airflow). The figure is followed. Nothing held distinguishes the enhanced-speed module
+    (7011M) from the high-speed one (7011H) in outline, so the two are drawn alike. The lamp is the fan
+    module's status lamp (guide figure A-3, table 11: off not detected, green normal, red failed).
+  handle-finish: >-
+    The red of the frame is a field, `handle-finish`, default `#e0332e`.
+  power: >-
+    NOT STATED. Neither the guide nor the datasheet gives a power draw for the FAN-7011M, so none is
+    written and the lint warning for a fan without one stands.
+states: [absent]
+elements:
+  grille: {at: [3.0, 3.2], size: [72.6, 29.4], class: vent}
+  handle: {at: [32.4, 0.4], size: [13.8, 33.4], class: handle}
+  status: {at: [36.6, 32.4], size: [5.2, 5.2], class: led, states: ['off', 'ok', 'fault']}
+fields:
+  handle-finish: {label: Handle colour, type: text, default: '#e0332e'}
+relief:
+  wall: '#3a3a36'
+  features:
+    - node: grille
+      vent: 14
+      confidence: estimated
+      source: >-
+        The grille is open and the rotor is not drawn, but no document gives a depth. 14 is the
+        order of what this library gives other 1RU fan modules.
+    - node: handle
+      bar: 3.0
+      confidence: estimated
+      source: >-
+        The release rail stands off the grille along its length; how far is not dimensioned
+        anywhere, so 3.0 is the rail's own drawn width.
+skins: [default]
+body:
+  depth: 190
+  color: '#2e2b26'
+  footprint: {at: [0, 0], size: [78.6, 38.6]}
