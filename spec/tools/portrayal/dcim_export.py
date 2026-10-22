@@ -1526,6 +1526,11 @@ def device_console_row(p, a):
     if (ref.split("@")[0] == MICRO_USB_REF
             and DB9_CONSOLE.search(db9_words({**p, "attrs": a}))):
         return {"name": "Console (Micro-USB)", "type": "usb-micro-b"}
+    # THE EX4300'S MINI-USB CONSOLE (CON1) has its own part because the registry holds
+    # no mini-USB receptacle; the part is a console by what it is, so it needs no role
+    # on the placement. `usb-mini-b` is a console-port type in both targets.
+    if ref.split("@")[0] == "juniper/ex4300-console-usb-mini":
+        return {"name": "Console (mini-USB)", "type": "usb-mini-b"}
     return None
 
 
