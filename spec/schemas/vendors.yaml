@@ -56,6 +56,11 @@ vendors:
 
   # ---- hardware manufacturers, in the library today ----
 
+  arista:
+    display: Arista Networks
+    aka: [Arista]
+    role: both
+    source: 'the name on the metal; EOS makes it a software vendor too'
   aurcore:
     display: AurCore
     role: hardware
