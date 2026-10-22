@@ -187,18 +187,19 @@ test('every ring is entered from an approach point, and no detour ends at the ri
   // 65 mm back along the leaf's face to reach it); and c16's, 12.5 mm from it,
   // where the detour round the tray's edge has its room with the point 21.5
   // mm to the ring's side of the port, and would need it 55 mm out on the other;
-  // and, since #966, c15's, 6.5 mm from ring 2: the cord rises through the gap
-  // behind the tray and crosses the strip slanted to it, so it reaches the
-  // approach point with the leg it needs there
+  // (and, under #966, c15's, 6.5 mm from ring 2, while the cord rose through
+  // the gap behind the tray: CHANGED, drawable geometry, owner's option A,
+  // 2026-10-22, P-0218-2; it goes round the front edge now and is not short)
   assert.equal(offs.length, 32);
-  assert.deepEqual(offs.filter(v => v < 25 - 1e-6).map(v => Math.round(v * 10) / 10), [6.5, 6.5, 12.5]);
+  assert.deepEqual(offs.filter(v => v < 25 - 1e-6).map(v => Math.round(v * 10) / 10), [6.5, 12.5]);
   // ten detours (thirteen before #973, when five upper cords went over
   // their ring: four are led square to its approach point now, and c7
   // still goes over it); nine since #987, c8 no longer coming back round
   // the front of the tray from ring 5
   assert.equal(detoured, 9);
-  // and five of the nine rise through the gap behind the tray (#966)
-  assert.equal(rose, 5);
+  // and none of the nine rises through the gap behind the tray now (five did, #966;
+  // CHANGED, drawable geometry, owner's option A, 2026-10-22, P-0218-2)
+  assert.equal(rose, 0);
 });
 
 test('a detour that ends at the ring\'s centre, or its face, is a fault', () => {

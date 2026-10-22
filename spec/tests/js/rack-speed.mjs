@@ -51,6 +51,11 @@ const WANT = JSON.parse(readFileSync(GOLDENS, 'utf8'));
 // nine bundled cables of the speed racks on the front edge. Listed before they
 // were recorded, by running this file's digests with --exact on the kit before
 // and after over the same racks: no answer moved for any other reason.
+// RECORDED AGAIN FOR P-0218-2 (owner's option A, 2026-10-22): a cable rises through
+// a tray's gap only where its bend can be drawn there, so a cord from a plug that
+// reaches too far to leave the radius goes round the front edge again, as before
+// #966. The answers moved are those of the cords that rose through a gap on a
+// plug that cannot be bent in the gap's depth, in the racks that have them.
 test('every answer for every rack is the one recorded', async () => {
   const {digests, count} = await digestsOf(K);
   assert.deepEqual(differences(digests, WANT.digests), []);
@@ -144,12 +149,14 @@ test('spareOf takes the path it is handed, and reads the one kept without', () =
 // With the way up through a tray's gap (#966) a cable that tried one is laid
 // again without it, and the counter counts both lays: it reads 101 and 38
 // (87 and 34 before the gap; 102 and 38 before a hand-edited route was kept
-// from the gap, and with it a bundle's cables: one lay fewer is tried).
-test('at 300 cables: run-outs are tried at 101 lead ends, not 1,202, and 38 are taken', () => {
+// from the gap, and with it a bundle's cables: one lay fewer is tried). It reads
+// 88 and 34 since the gap is taken only where the bend can be drawn (P-0218-2,
+// owner's option A, 2026-10-22): fewer lays rise, so fewer are laid twice.
+test('at 300 cables: run-outs are tried at 88 lead ends, not 1,202, and 34 are taken', () => {
   const made = speedRack(M, F, {cables: 300, bundles: 4, seed: 11}), rack = made.rack, ctx = made.ctxOf(rack);
   R.RUN_OUTS.tried = R.RUN_OUTS.taken = 0;
   for (const c of rack.cables) R.routePath(rack, c, ctx);
-  assert.deepEqual({...R.RUN_OUTS}, {tried: 101, taken: 38});
+  assert.deepEqual({...R.RUN_OUTS}, {tried: 88, taken: 34});
 });
 
 // ── the budgets ──────────────────────────────────────────────────────────
