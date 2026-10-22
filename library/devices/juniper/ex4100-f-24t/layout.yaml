@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4100-f-24t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4100-F-24T
@@ -368,8 +368,8 @@ views:
     - {at: [431.6, 21.75], text: EN, font-size: 2.2, anchor: middle, fill: '#dfe2e6', for: led-en}
     - {id: mode-icon, at: [434.7, 33.0], path: 'M -1.6 -0.9 H 1.8 M -1.6 0 H 1.8 M -1.6 0.9 H 1.8', filled: false, stroke-width: 0.3, fill: '#dfe2e6', for: btn-mode}
     - {at: [435.6, 40.44], text: CON, font-size: 1.8, anchor: start, fill: '#dfe2e6', for: usb-c}
-    - {at: [405.8, 41.4], text: UPLINK, font-size: 1.8, anchor: middle, fill: '#dfe2e6', for: uplink-0}
-    - {id: uplink-bracket, at: [391.3, 40.8], path: 'M 0 -2.0 V 0 H 9.6 M 19.6 0 H 28.9 V -2.0', filled: false, stroke-width: 0.2, fill: '#dfe2e6', for: [uplink-0, uplink-1, uplink-2, uplink-3]}
+    - {at: [405.8, 42.5], text: UPLINK, font-size: 1.8, anchor: middle, fill: '#dfe2e6', for: uplink-0}
+    - {id: uplink-bracket, at: [391.3, 41.2], path: 'M 0 -2.0 V 0 H 9.6 M 19.6 0 H 28.9 V -2.0', filled: false, stroke-width: 0.2, fill: '#dfe2e6', for: [uplink-0, uplink-1, uplink-2, uplink-3]}
     - {at: [363.4, 40.5], text: '0', font-size: 2.5, anchor: end, fill: '#eef0f2', for: vcp-0}
     - {at: [364.5, 39.9], mark: arrow-up, size: 1.5, fill: '#eef0f2', for: vcp-0}
     - {at: [368.5, 39.9], mark: arrow-down, size: 1.5, fill: '#eef0f2', for: vcp-1}
