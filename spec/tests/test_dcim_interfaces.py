@@ -834,6 +834,8 @@ ANCHORED = {
 PASS_THROUGH = {
     # the Dell R760's PSU adapter: its one bay takes the 60 mm supplies the R660 seats directly in a chassis bay
     "Dell/psu-adapter-60mm-2u-16g": ["psu"],
+    # the Dell R960's 26 mm supply adapter: its `psu` bay takes the 60 mm supplies the R660 also seats directly
+    "Dell/r960-psu-adapter-60mm": ["psu"],
     "Juniper/MX2000-LC-ADAPTER": ["mpc"],
 }
 
