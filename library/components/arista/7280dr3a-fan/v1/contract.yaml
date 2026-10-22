@@ -16,7 +16,6 @@ size-confidence: {w: estimated, h: estimated}
 part-numbers:
   FAN-7012H-RED: {part: FAN-7012H-RED}
 attrs:
-  rotors: 1
   airflow: front-to-back
   role: fan
 provenance:

@@ -21,9 +21,9 @@
    "arista/7280dr3a-pwr-2400-dc@1"
   ]
  },
- "composed": "b4ac26ec9c9af397",
+ "composed": "291a50c5c11fc9f6",
  "composed-refs": {
-  "arista/7280dr3a-fan@1": "1.0.0+73bc0895e933fc03",
+  "arista/7280dr3a-fan@1": "1.0.0+0934e19cd23f017e",
   "arista/7280dr3a-pwr-2400-ac@1": "1.0.0+4a372f132a539853",
   "arista/7280dr3a-pwr-2400-dc@1": "1.0.0+43f11745628e10e7",
   "common/ground-screw-m4@1": "1.0.1+4793ba55a2d2f342",
@@ -558,5 +558,5 @@
  "placement-surface": "56edd1a7ad8ae9d0",
  "shape": "9d6f6a714356da70",
  "surface": "cf1862e70b784982",
- "version": "0.1.0"
+ "version": "0.1.1"
 }

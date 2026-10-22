@@ -17,6 +17,4 @@ comments: 'The 2RU high-speed hot-swap fan module of the Arista 7280DR3A-36, spa
 
   - role: fan
 
-  - rotors: 1
-
   Contract version 1.0.0 (arista/7280dr3a-fan).'
