@@ -17,13 +17,13 @@ slot-width: 2
 size: {w: 120.02, h: 41.91, d: 268.60}
 size-confidence: {w: registry, h: registry, d: drawing}
 unplaced: >-
-  no bay in the library lists this card in `accepts`. A riser bay names each
-  card it takes by hand (docs/cards-by-interface-design.md counts 1,061 entries
-  in 54 bays), so seating it means adding `nvidia/h100-nvl@1` to a riser that
-  spans, such as dell/riser-1a-14g@2's `slot-1`, which is an edit to a part this
-  change does not touch. The card states `slot-width: 2`, so that one line in
-  the riser is all that is missing; whether that Dell riser and its server
-  support an H100 NVL at all was not read.
+  no bay in the library lists this card in `accepts`. The one riser that spans,
+  dell/riser-1a-14g@2's `slot-1`, is the Dell R740xd's, and that server's
+  documents cap a double-width GPU at 300 W (spec sheet, "Accelerator options")
+  against this card's 400 W. The other Dell risers with a double-width slot
+  model it as one bay with no `span`, or only as a half-length riser, so none
+  takes a card two slots wide. A server whose documents list this card, and a
+  riser bay that spans for it, would seat it.
 attrs:
   model: 'H100 NVL'
   part-numbers: 'PNY NVH100NVLTCGPU-KIT'

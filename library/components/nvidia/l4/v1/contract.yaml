@@ -13,13 +13,6 @@ description: >-
   bracket the brief also dimensions is not modelled.
 size: {w: 120.02, h: 21.59, d: 168.54}
 size-confidence: {w: registry, h: registry, d: drawing}
-unplaced: >-
-  no bay in the library lists this card in `accepts`. A riser bay names each
-  card it takes by hand (docs/cards-by-interface-design.md counts 1,061 entries
-  in 54 bays), so seating it means adding `nvidia/l4@1` to the `accepts` of a
-  riser slot that takes a full-height card, which is an edit to a part this
-  change does not touch. The card is one slot wide and needs no span; whether a
-  given Dell riser and server support an L4 at all was not read.
 attrs:
   model: 'L4'
   part-numbers: 'PNY NVL4TCGPU-KIT'
