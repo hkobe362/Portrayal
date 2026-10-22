@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5100-48t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5100-48T
@@ -169,7 +169,7 @@ attrs:
     depth-note: 21.47 in (54.5 cm) (Table 3)
   performance:
     switching-capacity: 1.44 Tbps, 1.08 Bpps (datasheet); the guide gives 720 Gbps full duplex
-    buffer: 12 MB shared packet buffer (datasheet)
+    shared-packet-buffer: 12 MB shared packet buffer (datasheet)
     rj45-speeds: 10 GbE, 1 GbE or 100 Mbps over shielded twisted pair, up to 100 m
     qsfp-plus-speeds: 40 GbE; or four 10 GbE with a breakout cable
   power:

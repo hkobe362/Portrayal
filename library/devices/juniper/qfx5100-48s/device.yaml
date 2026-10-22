@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5100-48s
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5100-48S
@@ -161,9 +161,9 @@ attrs:
   physical:
     weight-note: 21.8 lb (9.8 kg per the guide, 9.9 kg per the datasheet) with FRUs installed (Table 3)
     depth-note: 20.48 in (52 cm) (Table 3)
-  performance: {switching-capacity: '1.44 Tbps, 1.08 Bpps (datasheet)', buffer: 12 MB shared packet buffer
-      (datasheet), sfp-plus-speeds: 10 GbE with SFP+ optics; 1 GbE or 100 Mbps with SFP optics, qsfp-plus-speeds: 40
-      GbE; or four 10 GbE with a breakout cable}
+  performance: {switching-capacity: '1.44 Tbps, 1.08 Bpps (datasheet)', shared-packet-buffer: 12 MB shared
+      packet buffer (datasheet), sfp-plus-speeds: 10 GbE with SFP+ optics; 1 GbE or 100 Mbps with SFP
+      optics, qsfp-plus-speeds: 40 GbE; or four 10 GbE with a breakout cable}
   power:
     power-typical-w: 230
     power-max-w: 365

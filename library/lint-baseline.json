@@ -1908,7 +1908,7 @@
   "L21": 8,
   "L29": 18,
   "L69": 1
-  },
+ },
  "devices/dell/r6615/device.yaml": {
   "L145": 1,
   "L29": 27
@@ -2281,6 +2281,15 @@
   "L119": 1,
   "L29": 1,
   "L93": 1
+ },
+ "devices/juniper/qfx5100-48s/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 11
+ },
+ "devices/juniper/qfx5100-48t/device.yaml": {
+  "L29": 2,
+  "L57": 1
  },
  "devices/juniper/qfx5120-48y/device.yaml": {
   "L29": 2,

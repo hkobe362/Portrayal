@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5100-48s
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5100-48S
@@ -170,7 +170,7 @@ attrs:
     depth-note: 20.48 in (52 cm) (Table 3)
   performance:
     switching-capacity: 1.44 Tbps, 1.08 Bpps (datasheet)
-    buffer: 12 MB shared packet buffer (datasheet)
+    shared-packet-buffer: 12 MB shared packet buffer (datasheet)
     sfp-plus-speeds: 10 GbE with SFP+ optics; 1 GbE or 100 Mbps with SFP optics
     qsfp-plus-speeds: 40 GbE; or four 10 GbE with a breakout cable
   power:
