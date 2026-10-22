@@ -819,6 +819,7 @@ WITHHELD = {
 # until this rule; its slot-1 was always given, plainly.
 ANCHORED = {
     "Dell/riser-2s-16g": ("riser-2", ["e3s-0", "e3s-1"]),
+    "Dell/r6615-riser-2u": ("riser-2", ["e3s-0", "e3s-1"]),  # the R6615's riser 2U, the same carrier
     # the Dell R760's three rear drive modules, each with one seat (riser 3's place, riser 1's for the 4 x 2.5 inch one)
     "Dell/rear-drive-2x25-2u-16g": ("riser-3", ["drive-0", "drive-1"]),
     "Dell/rear-drive-4e3s-2u-16g": ("riser-3", ["e3s-0", "e3s-1", "e3s-2", "e3s-3"]),
