@@ -1,15 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="86.7mm" height="43.2mm" viewBox="0 0 86.7 43.2">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="86.7mm" height="43.2mm" viewBox="0 0 86.7 43.2">
   <defs>
-    <pattern id="hexrow-top" x="14.5" y="0.8" width="5.8" height="4.4" patternUnits="userSpaceOnUse">
-      <polygon points="5.1,2.2 3.95,4.2 1.65,4.2 0.5,2.2 1.65,0.2 3.95,0.2" fill="#0e1012"/>
-    </pattern>
-    <pattern id="hexrow-bottom" x="6.0" y="38.4" width="5.8" height="4.4" patternUnits="userSpaceOnUse">
-      <polygon points="5.1,2.2 3.95,4.2 1.65,4.2 0.5,2.2 1.65,0.2 3.95,0.2" fill="#0e1012"/>
-    </pattern>
+    <polygon id="hex" points="4.6,2.0 3.45,4.0 1.15,4.0 0,2.0 1.15,0 3.45,0" fill="#0e1012"/>
   </defs>
   <rect id="face" x="0" y="0" width="86.7" height="43.2" rx="0.6" fill="#6f7378" stroke="#3f4247" stroke-width="0.4"/>
-  <rect id="vents-top" x="14.5" y="0.8" width="57.8" height="4.4" fill="url(#hexrow-top)"/>
-  <rect id="vents-bottom" x="6.0" y="38.4" width="75.4" height="4.4" fill="url(#hexrow-bottom)"/>
+  <g id="vents-top" transform="translate(15.0 1.0)">
+    <use xlink:href="#hex" x="0"/>
+    <use xlink:href="#hex" x="5.8"/>
+    <use xlink:href="#hex" x="11.6"/>
+    <use xlink:href="#hex" x="17.4"/>
+    <use xlink:href="#hex" x="23.2"/>
+    <use xlink:href="#hex" x="29.0"/>
+    <use xlink:href="#hex" x="34.8"/>
+    <use xlink:href="#hex" x="40.6"/>
+    <use xlink:href="#hex" x="46.4"/>
+    <use xlink:href="#hex" x="52.2"/>
+  </g>
+  <g id="vents-bottom" transform="translate(6.5 38.6)">
+    <use xlink:href="#hex" x="0"/>
+    <use xlink:href="#hex" x="5.8"/>
+    <use xlink:href="#hex" x="11.6"/>
+    <use xlink:href="#hex" x="17.4"/>
+    <use xlink:href="#hex" x="23.2"/>
+    <use xlink:href="#hex" x="29.0"/>
+    <use xlink:href="#hex" x="34.8"/>
+    <use xlink:href="#hex" x="40.6"/>
+    <use xlink:href="#hex" x="46.4"/>
+    <use xlink:href="#hex" x="52.2"/>
+    <use xlink:href="#hex" x="58.0"/>
+    <use xlink:href="#hex" x="63.8"/>
+    <use xlink:href="#hex" x="69.6"/>
+  </g>
   <g id="screw-left">
     <circle cx="4.2" cy="3.2" r="2.2" fill="#b9bdc2" stroke="#6f7378" stroke-width="0.3"/>
     <path d="M 3.0 3.2 H 5.4 M 4.2 2.0 V 4.4" stroke="#6f7378" stroke-width="0.4"/>
