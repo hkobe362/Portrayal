@@ -8,10 +8,10 @@ profile: networking
 description: >-
   The 1000 W DC power supply of the Arista 7280CR3-32D4 for rear-to-front air, PWR-1011-DC-BLUE
   (reverse airflow, blue handle). It is the PWR-1011-DC-RED housing with the fan turned the other
-  way: a 1RU, 73.5 mm wide module with a round fan guard and a blue diagonal handle across it at
-  the left, and a terminal block in place of an inlet. The block is drawn with the two poles the
-  guide's section 4.4.2.2 names, negative (-48V) and positive (RTN). The protective earth
-  terminal is on the other side of the module and is not drawn.
+  way. It is a 1RU module, 73.5 mm wide, with a blue diagonal handle on the fan guard and a
+  terminal block in place of an inlet. The block has the two poles the guide's section 4.4.2.2
+  names, negative (-48V) and positive (RTN). The protective earth terminal is on the other side
+  of the module and is not drawn.
 size: {w: 73.5, h: 40.0}
 size-confidence: {w: datasheet, h: estimated}
 part-numbers:

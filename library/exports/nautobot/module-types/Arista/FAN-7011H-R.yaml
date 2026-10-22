@@ -5,11 +5,11 @@ part_number: FAN-7011H-R
 description: The 1RU high-speed hot-swap fan module of the Arista 7280CR3-32D4 for rear-to-front air,
   spare FAN-7011H-R (reverse airflow, blue)
 comments: 'The 1RU high-speed hot-swap fan module of the Arista 7280CR3-32D4 for rear-to-front air, spare
-  FAN-7011H-R (reverse airflow, blue). It is the FAN-7011H-F housing with the rotor turned the other way:
-  a blue-framed module with a honeycomb grille, a grey release rail with a slider in the middle of the
-  grille and a blue label tab at its top, and a status lamp at the bottom centre. Three of them fill the
-  rear between the management ports and the right power supply. The module is hot-swappable, and its release
-  is the slider.
+  FAN-7011H-R (reverse airflow, blue). It is the FAN-7011H-F housing with the rotor turned the other way.
+  The module has a blue frame and a honeycomb grille. A grey release rail with a slider runs down the
+  middle, with a blue label tab at its top. A status lamp is at the bottom centre. Three of them fill
+  the rear between the management ports and the right power supply. The module is hot-swappable, and its
+  release is the slider.
 
 
   Facts carried in the model that this schema has no field for:

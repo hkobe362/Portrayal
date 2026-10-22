@@ -25,14 +25,14 @@
    "arista/7280cr3-pwr-1000-dc@1"
   ]
  },
- "composed": "514edd62fa9ad3dc",
+ "composed": "cb60c23858242b9d",
  "composed-refs": {
-  "arista/7280cr3-fan-rev@1": "1.0.0+f1d6a7bc56a57f95",
-  "arista/7280cr3-fan@1": "1.0.0+c94337a098ba161c",
-  "arista/7280cr3-pwr-1000-ac-rev@1": "1.0.0+2403ed165de90176",
-  "arista/7280cr3-pwr-1000-ac@1": "1.0.0+3e1344bc9344777a",
-  "arista/7280cr3-pwr-1000-dc-rev@1": "1.0.0+119f53176f0e1531",
-  "arista/7280cr3-pwr-1000-dc@1": "1.0.0+4003dca53317b8a5",
+  "arista/7280cr3-fan-rev@1": "1.0.0+b8f46ec0dd5258b7",
+  "arista/7280cr3-fan@1": "1.0.0+f362d1f85cb0648b",
+  "arista/7280cr3-pwr-1000-ac-rev@1": "1.0.0+e3bcd185b1d111ef",
+  "arista/7280cr3-pwr-1000-ac@1": "1.0.0+388f430449719692",
+  "arista/7280cr3-pwr-1000-dc-rev@1": "1.0.0+65d98344a772182e",
+  "arista/7280cr3-pwr-1000-dc@1": "1.0.0+769c8da893bd5251",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/terminal-screw-34@1": "1.0.1+a05c552610f166f2",
@@ -530,6 +530,6 @@
  },
  "placement-surface": "fd9d49729a48e8d2",
  "shape": "1d2af6b2f0908224",
- "surface": "334a58bfc372d185",
+ "surface": "c4781c338ddd0f63",
  "version": "0.1.0"
 }

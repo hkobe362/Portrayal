@@ -7,6 +7,8 @@ is_full_depth: true
 airflow: rear-to-front
 description: Arista 7280CR3-32D4 - a fixed 1RU data-centre switch router with 32 x 100G QSFP ports and
   4 x 400G QSFP-DD ports, running EOS
+front_image: true
+rear_image: true
 console-ports:
   - name: Console
     type: rj-45
@@ -103,19 +105,20 @@ module-bays:
     position: psu-2
     description: 'Accepts: 7280cr3-pwr-1000-ac, 7280cr3-pwr-1000-ac-rev, 7280cr3-pwr-1000-dc, 7280cr3-pwr-1000-dc-rev'
 comments: "Arista 7280CR3-32D4 - a fixed 1RU data-centre switch router with 32 x 100G QSFP ports and 4\
-  \ x 400G QSFP-DD ports, running EOS. The front carries the 100G cages in two stacked rows (the odd number\
-  \ on top) in two blocks of eight columns, the four 400G cages as two stacked columns between the blocks,\
-  \ a status lamp at each port and four system lamps (system, fan, PS1, PS2) at the right. The rear carries\
-  \ two hot-swap power supplies at the ends, three hot-swap fan modules, and the RJ-45 management port,\
-  \ USB port and RJ-45 console port. The same panel is ordered with front-to-rear air (-F) or rear-to-front\
-  \ air (-R), as the 7280CR3, the 7280CR3K (more memory and routes) and the 7280CR3K-32D4A (the same,\
-  \ with an eight-core CPU).\n\nConfiguration `k-a-r`: The 7280CR3K-32D4A with rear-to-front air, drawing\
-  \ 543 W typical and 865 W maximum. Ordered as DCS-7280CR3K-32D4A-R.\n\nDatasheet: 7280R3 Series Data\
-  \ Center Switch Router Data Sheet (Arista Networks, 03-0045-59, August 11th, 2025)\n  https://www.arista.com/assets/data/pdf/Datasheets/7280R3-Data-Sheet.pdf\n\
-  \nFacts carried in the model that this schema has no field for:\n- compliance.certifications: BSMI,\
-  \ CE, KCC, NRTL, RCM, UKCA, VCCI, TEC, ANATEL, ICASA (data sheet)\n- compliance.emc: FCC Class A, ICES-003,\
-  \ EN 55032, EN IEC 61000-3-2:2019, EN 61000-3-3, EN 55035, EN 300 386\n- compliance.rohs: RoHS 2011/65/EU\
-  \ and 2015/863/EU (data sheet, Directives)\n- compliance.safety: EN 62368-1, IEC 62368-1, CSA/UL 62368-1\n\
+  \ x 400G QSFP-DD ports, running EOS. The front carries the 100G cages in two stacked rows, the odd number\
+  \ on top, in two blocks of eight columns. The four 400G cages are two stacked columns between the blocks.\
+  \ Each port has a status lamp. Four system lamps (system, fan, PS1, PS2) are at the right. The rear\
+  \ carries two hot-swap power supplies at the ends and three hot-swap fan modules. It also carries the\
+  \ RJ-45 management port, the USB port and the RJ-45 console port. The same panel is ordered with front-to-rear\
+  \ air (-F) or rear-to-front air (-R). It is sold as the 7280CR3, as the 7280CR3K with more memory and\
+  \ routes, and as the 7280CR3K-32D4A with an eight-core CPU.\n\nConfiguration `k-a-r`: The 7280CR3K-32D4A\
+  \ with rear-to-front air, drawing 543 W typical and 865 W maximum. Ordered as DCS-7280CR3K-32D4A-R.\n\
+  \nDatasheet: 7280R3 Series Data Center Switch Router Data Sheet (Arista Networks, 03-0045-59, August\
+  \ 11th, 2025)\n  https://www.arista.com/assets/data/pdf/Datasheets/7280R3-Data-Sheet.pdf\n\nFacts carried\
+  \ in the model that this schema has no field for:\n- compliance.certifications: BSMI, CE, KCC, NRTL,\
+  \ RCM, UKCA, VCCI, TEC, ANATEL, ICASA (data sheet)\n- compliance.emc: FCC Class A, ICES-003, EN 55032,\
+  \ EN IEC 61000-3-2:2019, EN 61000-3-3, EN 55035, EN 300 386\n- compliance.rohs: RoHS 2011/65/EU and\
+  \ 2015/863/EU (data sheet, Directives)\n- compliance.safety: EN 62368-1, IEC 62368-1, CSA/UL 62368-1\n\
   - environmental.altitude: 0 to 3,000 m (10,000 ft) operating\n- environmental.humidity: 5 to 90 percent\
   \ non-condensing (guide Table 2); the data sheet says 5 to 95 percent\n- environmental.operating-temp:\
   \ 0 to 40 C (32 to 104 F)\n- environmental.storage-temp: -25 to 70 C (guide Table 2); the data sheet\

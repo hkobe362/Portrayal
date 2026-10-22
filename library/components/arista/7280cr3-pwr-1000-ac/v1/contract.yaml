@@ -7,9 +7,9 @@ behaviour: fills
 profile: networking
 description: >-
   The 1000 W AC power supply of the Arista 7280CR3-32D4, PWR-1011-AC-RED (forward airflow, red
-  handle): a 1RU, 73.5 mm wide module with a round fan guard and a red diagonal handle across it
-  at the left, an IEC C14 inlet at the right, a latch beside the inlet, and a status lamp at its
-  top right. Two seat at the ends of the rear. The pair is 1+1 redundant and hot-swappable.
+  handle). It is a 1RU module, 73.5 mm wide. A round fan guard with a red diagonal handle is at the
+  left. An IEC C14 inlet, a latch and a status lamp are at the right. Two seat at the ends of the
+  rear. The pair is 1+1 redundant and hot-swappable.
 size: {w: 73.5, h: 40.0}
 size-confidence: {w: datasheet, h: estimated}
 part-numbers:
