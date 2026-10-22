@@ -26,12 +26,11 @@ provenance:
       and are the pictures measured here, extracted from the PDF. The maker's image library holds no photograph
       of the EX4100-F-24T (ex4100-f-24t-front-high.jpg returned an HTML 404 page, tried once), so the
       48T's photographs were used only to cross-check the parts the two share. The HPE PSNow datasheet
-      (a00150781enw) was tried once and did not answer from this host, so no datasheet figure is used.
-      Nothing of the guide is copied here: every face is drawn new from measurements. No intake folder
-      holding Juniper EX material, Visio stencils or 3D models is readable from the host this was built
-      on, so none was used. End of life was searched 2026-10-22: no Juniper notice for the EX4100-F was
-      found (a reseller tracker lists the EX4100 family as supported with no dates), so the lifecycle
-      is none announced.
+      (a00150781enw) was tried once and did not answer, so no datasheet figure is used. Nothing of the
+      guide is copied here: every face is drawn new from measurements. No Visio stencil, 3D model or other
+      held photograph of the EX4100-F was available, so none was used. End of life was searched 2026-10-22:
+      no Juniper notice for the EX4100-F was found (a reseller tracker lists the EX4100 family as supported
+      with no dates), so the lifecycle is none announced.
   chassis:
     confidence: datasheet
     note: >-
