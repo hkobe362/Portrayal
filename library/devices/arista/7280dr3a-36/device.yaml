@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-36
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-36
@@ -260,8 +260,18 @@ attrs:
     regulatory-model-number: AN1760 (DCS-7280DR3A-36, DCS-7280DR3AM-36, DCS-7280DR3AK-36), guide Table
       14
   lifecycle: {eol: none-announced}
-chassis: {width: 440.0, height: 87.9, depth: 611.8, ru: 2, weight-kg: 24.1, color: '#bcbdc0', airflow: front-to-back,
-  power: ac}
+chassis:
+  width: 440.0
+  height: 87.9
+  depth: 611.8
+  ru: 2
+  weight-kg: 24.1
+  color: '#bcbdc0'
+  airflow: front-to-back
+  power: ac
+  ears:
+    positions:
+    - {name: flush, label: flush with the front and rear panels, racks: [4-post]}
 gaps:
 - what: front-faces-of-the-variants
   scope:
@@ -353,12 +363,18 @@ gaps:
   - front
   reason: needs-drawing
   wanted: >-
-    THE EARS AND THE KITS. Chapter 3 and appendix B name the positions of a 1RU two-post bracket (flush
-    with the front, flush with the rear, or neither, centre mount recommended) and the kits KIT-7001,
-    KIT-7002, KIT-7201 and KIT-7203; the data sheet lists KIT-7202 and KIT-7004-2UL as the DR3A-36's.
-    The guide's mounting figures are isometric drawings of a different switch (the 7050 and the 7050SX-128),
-    so no ear position carries a figure of this chassis, and the kit contracts (rail ranges per kit) are
-    a slice of their own. `chassis.ears` and `chassis.kits` are left out.
+    THE KITS, AND THE EAR POSITION THAT IS NOT FLUSH. `chassis.ears` states the one position the guide
+    names for a 2RU switch: section 3.5 says the bracket sits "either flush with the front and rear panels,
+    or not flush with the panels", and section 3.4 gives no two-post mounting for the 2RU switches, so
+    the position is `4-post` only. It has no `at` (the guide's mounting figures are isometric drawings
+    of other switches, the 7050 and the 7050SX-128), no `default` (no figure shows the ears as shipped)
+    and the "not flush" case is left out because the guide does not say which way it sits. The data sheet's
+    ordering information lists KIT-7202 (spare tool-free accessory kit v2 for 2RU, 4-post mount, 2x C19-C20)
+    and KIT-7004-2UL (extended tool-free 4-post kit for 2-4RU) for the DR3A-36. Guide appendix B.1 gives
+    KIT-7202 "rack depths of twenty two to thirty two inches" (558.8 to 812.8 mm) and its parts (ASY-06132
+    rack ear, ASY-03765 front rail, ASY-03767 rear sliding rail, two of each), but no document dimensions
+    any of those parts, and none gives KIT-7004-2UL a range or a parts list. A kit contract needs its
+    parts as components with a size, so neither kit is modelled and `chassis.kits` is left out.
 - what: fan-and-supply-power
   scope:
   - rear

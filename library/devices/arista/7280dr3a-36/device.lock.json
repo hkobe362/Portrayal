@@ -47,7 +47,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "b9bf4def2c5a31c9",
+ "gaps": "180ef9bdbf87618f",
  "groups": [
   "fans",
   "grounding",
@@ -557,6 +557,6 @@
  },
  "placement-surface": "56edd1a7ad8ae9d0",
  "shape": "9d6f6a714356da70",
- "surface": "cf1862e70b784982",
- "version": "0.1.1"
+ "surface": "3e3c0d75975f761c",
+ "version": "0.1.2"
 }

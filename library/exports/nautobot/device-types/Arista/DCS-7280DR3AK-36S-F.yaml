@@ -139,6 +139,9 @@ comments: 'Arista 7280DR3A-36 - a fixed 2RU data-centre router switch with 36 40
   Also sold or listed as: DCS-7280DR3A-36
 
 
+  Rack mounting positions: flush ("flush with the front and rear panels"; 4-post only).
+
+
   Facts carried in the model that this schema has no field for:
 
   - compliance.emissions: FCC Class A, ICES-003 Issue 7, EN 55032:2015, VCCI-CISPR 32:2016, AS/NZS CISPR
@@ -224,7 +227,7 @@ comments: 'Arista 7280DR3A-36 - a fixed 2RU data-centre router switch with 36 40
   - thermal.airflow: front-to-back
 
 
-  Drawing version 0.1.1. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.2. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'

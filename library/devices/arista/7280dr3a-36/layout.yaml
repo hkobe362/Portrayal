@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-36
-version: 0.1.0
+version: 0.1.2
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-36
