@@ -38,7 +38,7 @@
   "ac"
  ],
  "format": 1,
- "gaps": "48778804a01ac619",
+ "gaps": "92be57a57bb10295",
  "groups": [
   "esd",
   "fan-leds",
@@ -522,6 +522,6 @@
  },
  "placement-surface": "22205343f15c1197",
  "shape": "42ab05fc50d9f5aa",
- "surface": "393e7a41080b7a8d",
- "version": "0.1.0"
+ "surface": "e0c47f4210a33ef8",
+ "version": "0.1.1"
 }

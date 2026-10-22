@@ -42,7 +42,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "efed292e273bcd6e",
+ "gaps": "57d4299f6ee11c20",
  "groups": [
   "esd",
   "fan-leds",
@@ -424,6 +424,6 @@
  },
  "placement-surface": "daedb3012c24e68d",
  "shape": "685a5b7eefc1be4c",
- "surface": "79a7ac99b2b554bb",
- "version": "0.1.0"
+ "surface": "ae8d0482945610b9",
+ "version": "0.1.1"
 }

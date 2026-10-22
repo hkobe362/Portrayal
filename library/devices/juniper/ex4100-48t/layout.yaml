@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4100-48t
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4100-48T
@@ -26,10 +26,9 @@ provenance:
       the EX4100-48T), Figures 29 to 32 (the lamps) and Figures 50 to 61 (mounting). The guide is copyright
       Juniper Networks and Hewlett Packard Enterprise; no terms of use are printed in it. Nothing of it is copied
       here, since every face is drawn new from measurements. The HPE PSNow datasheet (a00150781enw) did not answer
-      from this host (an HTTP/2 stream error on the one try), so no datasheet figure is used and the guide is the only
+      (an HTTP/2 stream error on the one try), so no datasheet figure is used and the guide is the only
       maker source for the numbers. Juniper's image-library paths (ex4100-48t-front-high.jpg and the rear and the
-      same for the 24P, 24T and 48P) all returned a 404 page, so no studio photograph is held. The held-source
-      folders under working/intake/juniper were not readable from this host. The community NetBox elevation of the
+      same for the 24P, 24T and 48P) all returned a 404 page, so no studio photograph is held. The community NetBox elevation of the
       EX4100-48T front and rear was fetched and used only to cross-check the three blocks of eight columns; no
       dimension is taken from it. End of life was searched on 2026-10-22 and no Juniper notice for
       the EX4100 was found, so the lifecycle is recorded as none announced.
@@ -190,7 +189,7 @@ gaps:
   scope: [psus]
   reason: vendor-silent
   wanted: >-
-    The HPE PSNow datasheet for the EX4100 line (a00150781enw) did not answer from this host. It would carry the maximum power
+    The HPE PSNow datasheet for the EX4100 line (a00150781enw) did not answer when fetched. It would carry the maximum power
     consumption and the thermal output that the hardware guide does not state.
 - what: studio-photograph
   scope: [front, rear]
