@@ -104,6 +104,8 @@ def test_only_a_rack_face_is_wider_than_its_plane():
     # the 481 rack face over a 448 body.
     # cmh-6dr1u: the CMH-6DR1U's ears carry its end rings (#865), so its front
     # is the 482.6 rack face over the 430 panel.
+    # r760: the R740xd's case in 2U again - both control panels sit in the ears
+    # (ISM figures 1 to 6), six fronts.
     # dinrail2u / dinrail4u: FS's DIN rail brackets are an open frame whose ears
     # are the front ends of the two side brackets folded out, one piece with
     # them (the rule decided 2026-10-09: built-in ears are part of the face),
@@ -116,5 +118,7 @@ def test_only_a_rack_face_is_wider_than_its_plane():
                          "r6615:front-e3s16", "r6615:front-e3s14",
                          "r6625:front", "r6625:front-sff8sf", "r6625:front-lff4",
                          "r6625:front-nobp", "r6625:front-e3s16", "r6625:front-e3s14",
-                         "cmh-6dr1u:front", "dinrail2u:front", "dinrail4u:front"}, \
+                         "cmh-6dr1u:front", "dinrail2u:front", "dinrail4u:front",
+                         "r760:front", "r760:front-sff16", "r760:front-sff8",
+                         "r760:front-lff12", "r760:front-e3s16", "r760:front-e3s16r"}, \
         f"a face is wider than its plane and is not a known rack face: {wide}"

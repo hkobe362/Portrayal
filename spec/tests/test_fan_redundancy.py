@@ -569,7 +569,12 @@ def test_the_comparison_layer_can_now_reach_them():
     (4+1 redundancy)" and numbers the slots 0 to 4. The two share one fan module
     pair (QFX5110-FANAFO and -FANAFI, by airflow), so this is two devices on one
     cooling part, counted twice because the guide states it for both.
+
+    NINETY-TWO IS THE DELL R760, n+1 over six fan modules, from its technical
+    guide's thermal features ("The R760 allows N+1 fan redundancy, allowing
+    continuous operation with one fan failure in the system"). Its six bays are in
+    the top view, as the R660's four are.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 91, n
+    assert n == 92, n
