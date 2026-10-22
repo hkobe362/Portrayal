@@ -133,8 +133,13 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
              if F.face_ref(yaml.safe_load(p.read_text()) or {}, "plan")]
     # 86 since the Fibrain XCU10's drawer, seen from above under the shell top.
     # 87 since the NVIDIA A100 80GB PCIe, whose plan face is its top edge.
-    assert len(named) == 87, \
-        f"expected 87 parts naming a plan drawing, found {len(named)}"
+    # 92 since the R660xs's five risers (1a, 1b, 2a, 2d, 2e) name plans
+    # 95 since the R6615's eight risers (r6615-riser-1q, -2a, -2t, -2u, -3a, -3p, -3s, -4p).
+    # 108 since the Dell R760's eleven 2U risers, BOSS-N1 module and 86 mm supply name plans.
+    # 113 with the R660xs's five risers counted on top of the R6615's and the R760's.
+    # 127 since the Dell R960's fourteen: its 2400 W and 2800 W supplies and the adapter, the rear I/O board, ten risers.
+    assert len(named) == 127, \
+        f"expected 127 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -260,9 +265,14 @@ def test_the_index_carries_a_parts_other_faces():
     # 141 since its ten LC holders and six multimode SC ones, each with a rear;
     # 142 since the FHD RJ45 module's punch-down rear;
     # 143 since nvidia/a100-pcie-80gb@1 declares its far end as a rear face.
+    # 164 since the Dell R760's eleven 2U risers, BOSS-N1 module and 86 mm supply name plans.
     with_faces = [e for e in entries if e.get("faces")]
-    assert len(with_faces) == 143, \
-        f"expected exactly 143 of {len(entries)} entries to carry a faces " \
+    # 148 since the R660xs's five risers
+    # 151 since the R6615's eight risers each carry the plan of the R660 riser they match.
+    # 169 with the R660xs's five risers counted on top of the R6615's and the R760's.
+    # 183 since the Dell R960's fourteen modules that name a plan (see the count above).
+    assert len(with_faces) == 183, \
+        f"expected exactly 183 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 

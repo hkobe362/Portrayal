@@ -243,7 +243,12 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     assert "edgecore/cor580" in unstated and "edgecore/dcs510" in unstated
     assert {"cisco/asr-9901", "cisco/asr-9902", "cisco/asr-9903"} <= set(unstated)
     assert "cisco/n9k-c93180yc-ex" in unstated
-    assert len(unstated) == 28, unstated
+    # 29 since the Dell R660xs, whose documents say 'hot-plug redundant cooling' and no scheme
+    # THE FOUR JUNIPER EX3400 MADE IT THIRTY-THREE: the guide says both fan modules must be installed
+    # and working, and names no N+1 form, so each group quotes the sentence and states no form.
+    assert {"juniper/ex3400-24t", "juniper/ex3400-24p", "juniper/ex3400-48t",
+            "juniper/ex3400-48p"} <= set(unstated)
+    assert len(unstated) == 33, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -549,7 +554,39 @@ def test_the_comparison_layer_can_now_reach_them():
     its User Guide's fan mode behaviour (the redundant fan kit adds one fan, and
     in redundant mode one rotor failure leaves the system running). Its bays are
     in the top view too.
+
+    EIGHTY-FOUR IS THE DELL R6615, n+1 over the same four dual-rotor modules, from
+    its technical guide's thermal section.
+
+    EIGHTY-FIVE TO EIGHTY-EIGHT ARE THE JUNIPER EX4400-24T, -24P, -48T AND -48P, 1+1
+    over two module bays each, from the hardware guide's Cooling System and Airflow
+    topic ("We ship EX4400 switches with two fan modules (1+1 redundancy) preinstalled
+    in the rear panel of the switch"). The four share one fan part, and the bays are
+    on the rear face, numbered 0 and 1. The sentence is quoted in each device's fans
+    group.
+
+    EIGHTY-NINE IS THE DELL R6625, n+1 over four dual-rotor modules, from its
+    technical guide's thermal features ("The PowerEdge R6625 allows N+1 fan
+    redundancy").
+
+    NINETY AND NINETY-ONE ARE THE JUNIPER QFX5120-48Y AND QFX5120-48YM,
+    4+1 over five rear bays: the hardware guide ships both with "five fan modules
+    (4+1 redundancy)" and numbers the slots 0 to 4. The two share one fan module
+    pair (QFX5110-FANAFO and -FANAFI, by airflow), so this is two devices on one
+    cooling part, counted twice because the guide states it for both.
+
+    NINETY-TWO IS THE DELL R760, n+1 over six fan modules, from its technical
+    guide's thermal features ("The R760 allows N+1 fan redundancy, allowing
+    continuous operation with one fan failure in the system"). Its six bays are in
+    the top view, as the R660's four are.
+
+    NINETY-THREE TO NINETY-SIX ARE THE JUNIPER EX4300-24T, -24P, -48T AND -48P, n+0
+    over two fan modules each, from the hardware guide's Fan Modules section ("Both the
+    fan modules must be installed for optimal functioning of the switch"; the switch runs
+    30 seconds without thermal shutdown while one is replaced). The guide states no N+1
+    form, so the figure says that no spare fan is claimed.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    assert n == 83, n
+    # 97 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
+    assert n == 97, n

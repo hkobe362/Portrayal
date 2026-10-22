@@ -1,0 +1,37 @@
+format: 1
+kind: component
+name: riser-1-cage-2u-16g
+version: 1.0.0
+class: riser
+profile: server
+description: >-
+  the riser 1 cage of a 16th-generation 2U PowerEdge (R760) - two stacked full-height windows, a left lug with its blue thumbscrew; shared by risers 1B, 1P, 1Q and 1R
+attrs:
+  power-absent: not-applicable
+provenance:
+  power: >-
+    NOT APPLICABLE - sheet metal; the riser that composes it carries the power record.
+  why-this-is-its-own-part: >-
+    THE METAL IS SHARED AND THE WIRING IS NOT. Risers 1B, 1P, 1Q and 1R (R760 ISM figures 208-213) differ in which PCIe generation and width each slot carries (ISM table 153) and, for 1P, in having one slot; none of that shows on the rear, so the face is drawn once here and each riser composes it. Authored for the R760 as the batch's shared 2U 16G part; the R660's riser cages (dell/riser-2-lp-cage-16g, dell/riser-1-fh-cage-16g) are 1U and are not reusable.
+  sources: >-
+    photo-measured - R760 Installation and Service Manual (ISM) figure 10, rear view of the system, the embedded 1529 x 528 image, read at 3.36 px/mm (the 434 body against the figure's width, and the height 86.8 against 291 px; the figure is not strictly orthographic - its aspect is about 2% out - so positions carry about 1.5 mm). Facts read, art not traced.
+  size: >-
+    photo-measured - 125.0 x 44.0 from rear-face x 0, y 1.0: the riser's extent from the left wall to the BOSS bay, from the lid edge to the top of the PSU bay (y 45.0).
+  windows: >-
+    photo-measured - the two windows 84.2 wide at x 26.8..111.0 and 11.3 tall at y 6.1..17.4 and 26.7..37.7 (rear-face y 7.1..18.4 and 27.7..38.7). Each is the visible part of a full-height bracket's vent field (dell/pcie-filler-fh-16g@1: vents from 27.08 to about 110, centred 68.5 in the bracket), so a bracket sits behind the cage with its centre line on the window's.
+  lug: >-
+    photo-measured - the left lug x 0..12.0 carries the blue thumbscrew that holds the riser; its knob is centred 5.5 from the wall and its diameter (about 8.0) is an estimate, the knob being foreshortened in the figure.
+  numerals: >-
+    NONE PRINTED IN THE FIGURE. ISM figure 10 resolves no slot numeral on riser 1 at 3.36 px/mm (a 3 mm glyph would span 10 px); slots are numbered by the ISM's tables (slot 1 lower, slot 2 upper, read from figures 208-211), not by anything drawn here.
+size: {w: 125.0, h: 44.0}
+size-confidence: {w: photo-measured, h: photo-measured}
+relief:
+  features:
+  - node: plate
+    out: 20.0
+    shape: true
+    color: '#cfd3d7'
+    confidence: estimated
+    source: >-
+      estimated by analogy with the 1U R660 risers' cages, 20 mm proud in Dell's R660 service model; no ISM figure gives the cage's depth, and Dell's R760 service model (r760.glb, `R760_ ExpansionCardRiser1`) is held but the depth was not read from it in the change that measured the covers and fans. Its windows are cut through it, so a bracket's face is seen down them.
+skins: [default]
