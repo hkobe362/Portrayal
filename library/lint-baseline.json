@@ -17,6 +17,12 @@
  "components/arista/7280dr3a-fan/v1/contract.yaml": {
   "L27": 1
  },
+ "components/arista/7280r3-fan-m-rev/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/arista/7280r3-fan-m/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/casa/bdm/v1/contract.yaml": {
   "L97": 1
  },
@@ -1768,8 +1774,29 @@
  "devices/arista/7280cr3-32d4/device.yaml": {
   "L29": 2
  },
+ "devices/arista/7280cr3-32p4/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3-36s/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3-96/device.yaml": {
+  "L29": 1
+ },
+ "devices/arista/7280dr3-24/device.yaml": {
+  "L29": 1
+ },
  "devices/arista/7280dr3a-36/device.yaml": {
   "L29": 1
+ },
+ "devices/arista/7280pr3-24/device.yaml": {
+  "L29": 1
+ },
+ "devices/arista/7280sr3-40yc6/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280sr3-48yc8/device.yaml": {
+  "L29": 2
  },
  "devices/casa/c100g/device.yaml": {
   "L119": 1,

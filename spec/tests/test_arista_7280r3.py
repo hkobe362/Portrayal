@@ -468,9 +468,5 @@ def test_the_exported_type_lists_every_port_once(dev):
 def test_the_new_modules_export_as_module_types(target):
     for name, (pn, *_rest) in NEW_COMPONENTS.items():
         path = LIB / "exports" / target / "module-types/Arista" / f"{pn}.yaml"
-        if not path.is_file():
-            # a module no configuration seats has no export of its own
-            assert pn.endswith(("DC-BLUE",)), pn
-            continue
         mod = yaml.safe_load(path.read_text())
         assert mod["manufacturer"] == "Arista" and mod["part_number"] == pn
