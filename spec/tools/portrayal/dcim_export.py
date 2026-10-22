@@ -592,6 +592,9 @@ PART_POWER = {
     # name for exactly that.
     "common/dc-terminal-27": "dc-terminal",
     "common/dc-terminal-24": "dc-terminal",
+    # AND THE ARISTA 7010TX-48-DC's TWO-POLE BARRIER BLOCK under a clear cover, one per internal
+    # supply: -48 V and RTN landed on ring lugs, the same row for the same reason.
+    "arista/7010tx-dc-terminal": "dc-terminal",
     # A PLUGGABLE TWO-POLE BLOCK IS WHERE THE WIRE LANDS TOO, so the same row: the
     # ECS4530-54CSFP-DC-I takes -48 V in a screw-clamp plug seated in a header, the
     # plug pulled out whole rather than lugs lifted off screws.

@@ -45,7 +45,7 @@
    "juniper/ex4600-psu-blank@1"
   ]
  },
- "composed": "5c30d718f7e7a3eb",
+ "composed": "7c7a19145e35c8dd",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
@@ -53,7 +53,7 @@
   "common/rj45-ganged-eth@1": "1.2.0+2a9b24f6f8d2aaa7",
   "juniper/ex4600-em-4q@1": "1.0.0+0b9058cd06a81aad",
   "juniper/ex4600-em-8f@1": "1.0.0+076b7d66d57c0d80",
-  "juniper/ex4600-em-blnk@1": "1.0.0+ce857f5b46f8c12f",
+  "juniper/ex4600-em-blnk@1": "1.0.0+86fe47a7c7fa1260",
   "juniper/ex4600-fan-afi@1": "1.0.0+b2534084ecdfa95e",
   "juniper/ex4600-fan-afo@1": "1.0.0+58fdeefee2370512",
   "juniper/ex4600-jpsu-650-ac-afi@1": "1.0.0+bbeb728ce4155cc5",
