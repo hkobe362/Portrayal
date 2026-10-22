@@ -1,0 +1,86 @@
+format: 1
+kind: module
+name: ex4300-jpsu-550-dc-afi
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  Juniper JPSU-550-DC-AFI-A, the 550 W DC power supply of the EX4300 switches labelled AIR IN
+  (AFI): back-to-front airflow. It ships in the EX4300-48T-DC-AFI and seats in the PSU 0 and
+  PSU 1 slots of the DC-capable models with EX4300-FAN-AFI fan modules. The same face as the AIR
+  OUT DC supply with the opposite airflow label. It does not supply Power over Ethernet.
+attrs:
+  model: JPSU-550-DC-AFI-A
+  part-number: JPSU-550-DC-AFI-A
+  role: dc-power-supply
+  power-output-w: 550
+  input-voltage: -40.8 through -60 VDC (-43.5 +/- 0.5 VDC minimum to power on)
+  input-current: 14.2 A
+  inlet: dc-terminal
+  airflow: back-to-front
+  airflow-label: AIR IN (AFI)
+  weight-kg: 1.1
+provenance:
+  part-number: >-
+    datasheet - EX4300 Switch Hardware Guide (published 2025-08-12), Table 47 and Table 48:
+    JPSU-550-DC-AFI-A, label AIR IN (AFI), back-to-front. The datasheet's ordering table writes
+    JPSU-550-DC-AFI, and the slice brief wrote it the same way; the guide's -A form is carried. The
+    EX4300-48T-DC-AFI ships with it (Table 3, Table 28)
+  power-output-w: >-
+    datasheet - guide Table 47, which does not separate the two airflow models: 550 W DC supply,
+    input current 14.2 A, operating range -40.8 through -60 VDC
+  weight: >-
+    datasheet - guide Table 47: 2.43 lb (1.1 kg)
+  size: >-
+    estimated - the AIR OUT DC supply's aperture, 84.0 x 42.0 mm (see juniper/ex4300-jpsu-550-dc-afo);
+    no AIR IN supply drawing was found
+  face: >-
+    drawing - the AIR OUT DC supply's face, measured from the guide's flat DC faceplate drawing
+    (Figure 45, g022081, p.121): a block of five screw terminals printed + - earth - +, as the
+    guide's text says: five terminals. The printed label is changed to AIR IN (AFI); no figure shows
+    an AIR IN supply of either kind
+  leds: >-
+    datasheet - guide Figure 45 and Table 52: IN OK green when the supply is receiving power; OUT OK
+    green when functioning correctly, red when the supply has failed; each unlit otherwise
+  power-draw: >-
+    NOT APPLICABLE - a supply states its output
+states:
+- ok
+- fault
+- absent
+elements:
+  led-in-ok:
+    at: [56.1, 6.3]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - 'off'
+  led-out-ok:
+    at: [67.9, 6.3]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - {name: red, color: '#ef4444'}
+    - 'off'
+  latch:
+    at: [12.6, 2.0]
+    size: [6.5, 38.0]
+    class: latch
+  terminal-block:
+    at: [26.1, 19.6]
+    size: [44.0, 17.2]
+    class: terminal
+size:
+  w: 84.0
+  h: 42.0
+size-confidence: {w: estimated, h: estimated}
+relief:
+  features:
+  - node: latch
+    out: 2.0
+    color: '#2b2e35'
+    confidence: estimated
+    source: guide Figure 44 - the loop handle stands proud of the face; projection not measured
