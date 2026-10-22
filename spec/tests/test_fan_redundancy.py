@@ -594,6 +594,10 @@ def test_the_comparison_layer_can_now_reach_them():
     disconnected for more than a minute and names no spare fan. The data sheet's "Redundant &
     hot-swappable fans" and "Redundant and reversible dual inline fan module" mean the two inline
     fans inside the one module; the module itself is a single point, so no spare module is claimed.
+
+    ONE HUNDRED AND ONE AND ONE HUNDRED AND TWO ARE THE JUNIPER QFX5100-48S AND QFX5100-48T,
+    N+1 over five rear fan modules, from the QFX5100 datasheet (July 2024): "Redundant (N+1)
+    and hot-pluggable fan modules". The hardware guide gives the five slots.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -601,4 +605,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 98 since the Arista 7010TX-48: n+0 over one module of two inline fans
     # 99 since the Arista 7280DR3A-36: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
     # 100 since the Arista 7280CR3-32D4: N+1 over three fan modules (data sheet, comparison table)
-    assert n == 100, n
+    # 102 with the Juniper QFX5100-48S and -48T: N+1 over five modules (datasheet, "Redundant (N+1)")
+    assert n == 102, n
