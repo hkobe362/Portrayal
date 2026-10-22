@@ -99,6 +99,7 @@ IFACE_TYPE = {
     ("sfp", "10g"): "10gbase-x-sfpp",
     ("sfp", "1g"): "1000base-x-sfp",
     ("osfp", "800g"): "800gbase-x-osfp",    # s9321-64eo - the 'o' in the model
+    ("osfp", "400g"): "400gbase-x-osfp",    # arista 7280dr3a-36's two OSFP-LS line-system ports
     # A 1.6T OSFP IS `other`, BECAUSE THE TWO TARGETS SPELL IT DIFFERENTLY - the SFP112
     # case again. NetBox has TYPE_1TE_OSFP1600 = '1.6tbase-x-osfp1600'
     # (netbox-community/netbox netbox/dcim/choices.py at 9bcfd739) and Nautobot
@@ -1077,6 +1078,9 @@ MGMT_NOT_A_DCIM_PORT = {
                          "unknown - and an unknown job is not exported as a console",
     ("std/usb-c", "storage"): "a USB-C storage port (the AIS800s, the CSR440); not a console, and no "
                               "device-type field holds a USB data port",
+    ("std/usb-c", "time-of-day"): "the Arista 7280DR3A-36's Time-of-Day connector, a USB-C whose mate "
+                                  "is the CAB-SYNCE-RJ adapter to two RJ-45; a timing input, not a "
+                                  "console, and no device-type field holds it",
     ("std/rj45", None): "the MX104's ext-ref-clock, a bare RJ-48 timing input that states neither "
                         "a speed nor a timing word; iface_type's guard refuses it, and it has "
                         "never exported",

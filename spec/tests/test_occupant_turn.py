@@ -395,7 +395,8 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # The seven ReadyLinks GL-x siblings (#763) each place the GL-12xB-240D's rear
 # stud again, seven more seats (down) on seven more devices.
 # the four Juniper EX3400 earthing plates add eight ring-lug seats, four left and four right
-WANT = {"down": 115, "left": 31, "up": 8, "right": 25}
+# the Arista 7280DR3A-36's two rear grounding screws, 19.2 apart, add one seat down and one up
+WANT = {"down": 116, "left": 31, "up": 9, "right": 25}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -475,7 +476,7 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 77   # 63, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings and the four Juniper EX3400
+    assert len({k[0] for k in ring}) == 78   # 63, the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings and the four Juniper EX3400
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
     assert len({k[0] for k in pairs}) == 38
     # a pair is turned only along itself
@@ -523,7 +524,8 @@ def test_the_four_crossings_the_seat_gave_are_gone(census):
     # to 17 away; which screw draws the earth symbol does not move them.
     crossed = {k for k, r in _ring(census).items() if r["hard0"]}
     # and both screws of each of the four EX3400 earthing pairs, 16 away from each other
-    assert len(crossed) == 25 and not [k for k in crossed if census[k]["hard"]]
+    # and one of the 7280DR3A-36's two rear grounding screws, 19.2 away from its neighbour
+    assert len(crossed) == 26 and not [k for k in crossed if census[k]["hard"]]
 
 
 def test_a_barrier_block_pole_is_no_turnable_seat():

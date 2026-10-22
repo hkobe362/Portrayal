@@ -589,4 +589,5 @@ def test_the_comparison_layer_can_now_reach_them():
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
     # 97 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
-    assert n == 97, n
+    # 98 with the Arista 7280DR3A-36: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
+    assert n == 98, n
