@@ -600,4 +600,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 97 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
     # 98 since the Arista 7010TX-48: n+0 over one module of two inline fans
     # 99 since the Arista 7280DR3A-36: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
-    assert n == 99, n
+    # 100 since the Arista 7280CR3-32D4: N+1 over three fan modules (data sheet, comparison table)
+    assert n == 100, n

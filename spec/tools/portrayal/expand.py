@@ -227,6 +227,7 @@ def block_items(block, library, standards):
 
     placements, cutouts, silks, lamps = [], [], [], []
     led = block.get("led")
+    leds = led if isinstance(led, list) else ([led] if led else [])
     num = block.get("numerals")
 
     for i in range(count):
@@ -305,7 +306,11 @@ def block_items(block, library, standards):
                 "anchor": anchor,
                 "fill": num.get("fill", "#1a1d1f"), "for": pid})
 
-        if led:
+        for led in leds:
+            # A PORT CAN CARRY MORE THAN ONE LAMP. `led` is then a list, one
+            # entry per lamp, each with its own `id-format` and offsets; every
+            # lamp of a port is `for` that port.
+            #
             # A LAMP IS NOT ALWAYS OFFSET FROM ITS OWN PORT. On a ganged block
             # the lamps commonly BRACKET the shell - the left column's lamp
             # sitting outside it to the left, the right column's outside to the
@@ -341,7 +346,10 @@ def block_items(block, library, standards):
                 lp["states"] = led["states"]
             lp["for"] = pid
             lp["group"] = led.get("group", "port-leds")
-            lp["rel-pos"] = n
+            # A group position names ONE member, so a port's lamps cannot all
+            # carry the port's number: `rel-pos-stride` and `rel-pos-offset`
+            # (a pair of lamps: stride 2, offset -1 and 0) give each its own.
+            lp["rel-pos"] = n * led.get("rel-pos-stride", 1) + led.get("rel-pos-offset", 0)
             lamps.append(lp)
 
             # A LAMP IS A HOLE TOO - but ONLY WHERE THE PART DECLARES ONE HOLE.
