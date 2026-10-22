@@ -406,7 +406,7 @@ groups:
     term: Fan
     role: service
     index-origin: 1
-    attrs: {redundancy: n+1}
+    attrs: {redundancy: n+1, redundancy-note: 'Data sheet: "Hot-swappable Fans 3 (N+1 redundant)"'}
     description: the three hot-swap fan modules
 views:
   front:

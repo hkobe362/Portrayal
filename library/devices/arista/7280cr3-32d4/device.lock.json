@@ -25,9 +25,9 @@
    "arista/7280cr3-pwr-1000-dc@1"
   ]
  },
- "composed": "cb60c23858242b9d",
+ "composed": "e70bd545132f1868",
  "composed-refs": {
-  "arista/7280cr3-fan-rev@1": "1.0.0+b8f46ec0dd5258b7",
+  "arista/7280cr3-fan-rev@1": "1.0.0+e82600fd5ce7ef43",
   "arista/7280cr3-fan@1": "1.0.0+f362d1f85cb0648b",
   "arista/7280cr3-pwr-1000-ac-rev@1": "1.0.0+e3bcd185b1d111ef",
   "arista/7280cr3-pwr-1000-ac@1": "1.0.0+388f430449719692",
@@ -530,6 +530,6 @@
  },
  "placement-surface": "fd9d49729a48e8d2",
  "shape": "1d2af6b2f0908224",
- "surface": "c4781c338ddd0f63",
+ "surface": "2d24ff5a921da698",
  "version": "0.1.0"
 }

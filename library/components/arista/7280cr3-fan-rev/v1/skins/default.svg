@@ -9,7 +9,7 @@
     </pattern>
   </defs>
   <rect id="body" x="0" y="0" width="78.6" height="38.6" rx="3.0"
-    fill="#3d7bd6" stroke="#234b8c" stroke-width="0.4" data-fill-from="handle-finish" data-stroke-derive="handle-finish"/>
+    fill="#3d7bd6" stroke="#254b83" stroke-width="0.4" data-fill-from="handle-finish" data-stroke-derive="handle-finish"/>
   <g id="grille">
     <rect id="grille-back" x="3.0" y="3.2" width="72.6" height="29.4" rx="0.6" fill="#4a4538"/>
     <rect id="grille-holes" x="3.0" y="3.2" width="72.6" height="29.4" fill="url(#cr3-fanrev-mesh)"/>
