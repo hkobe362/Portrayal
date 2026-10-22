@@ -211,8 +211,9 @@ def test_the_dc_terminal_has_two_poles():
 
 def test_the_new_components_are_family_prefixed_and_cite_a_size():
     root = LIB / "components/arista"
-    names = sorted(p.name for p in root.iterdir())
-    assert names and all(n.startswith("7010tx-") for n in names), names
+    # other Arista families add their own folders; only this family's are checked here
+    names = sorted(p.name for p in root.iterdir() if p.name.startswith("7010tx-"))
+    assert names, "no 7010tx- component folders"
     for n in names:
         c = contract(n)
         assert "size" in (c.get("provenance") or {}), n
@@ -262,8 +263,9 @@ def test_the_dcim_types_export_one_per_orderable_configuration_one_u_high(target
             if v["kind"] == "orderable"}
     assert want == {"DCS-7010TX-48-F", "DCS-7010TX-48-R", "DCS-7010TX-48-DC-F", "DCS-7010TX-48-DC-R"}
     folder = LIB / "exports" / target / "device-types" / "Arista"
+    # other Arista families export beside these four; they must all be present, not alone
     got = {p.stem for p in folder.glob("*.yaml")}
-    assert want == got
+    assert want <= got, want - got
     mod = yaml.safe_load((LIB / "exports" / target / "module-types/Arista/FAN-7010X.yaml").read_text())
     assert mod["manufacturer"] == "Arista" and mod["part_number"] == "FAN-7010X"
     for pn in want:
