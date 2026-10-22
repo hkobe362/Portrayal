@@ -173,12 +173,13 @@ test('the reach is in the length once, as path, and the end allowance is the OM4
 // 546.9 and 552.6 before), and still a 1 m cord.
 // (c9 611.1, c13 645.7, c14 617.4, c15 648.2 and c16 575.8 before the lacer
 // stood centred in its unit, 0.225 mm up: fit.js itemBox)
-// THE GAP BEHIND THE TRAY (#966): c10, c11 and c12 (with the optic's plug) rise
-// through the gap between the strip's back edge and the rail instead, 613.2,
-// 616.1 and 623.4 before: 106.8, 114.1 and 103.9 mm shorter. The others keep
-// the front edge: c9's turn in the gap would not keep the bend radius.
-const OVER_THE_EDGE = {c9: 611.2, c13: 645.5, c14: 616.9, c15: 648, c16: 576.3};
-const THROUGH_THE_GAP = {c10: 506.4, c11: 502, c12: 519.5};
+// THE GAP BEHIND THE TRAY (#966) was taken by c10, c11 and c12 (with the optic's
+// plug), 506.4, 502 and 519.5 mm. CHANGED: drawable geometry, owner's option A,
+// 2026-10-22 (P-0218-2). Their plug leaves 9.8 mm for a bend of 25 before the
+// rise, which cannot be drawn, so they go round the front edge again, as
+// before #966: 613.2, 616.1 and 623.4 mm, and a 1 m cord.
+const OVER_THE_EDGE = {c9: 611.2, c10: 613.2, c11: 616.1, c12: 623.4, c13: 645.5, c14: 616.9, c15: 648, c16: 576.3};
+const THROUGH_THE_GAP = {};
 
 test('a cord that must clear its plug goes round the tray\'s front edge, and is measured that way', () => {
   const r = F.rack(), ctx = optics(F.ctxOf(r));
@@ -187,8 +188,6 @@ test('a cord that must clear its plug goes round the tray\'s front edge, and is 
   assert.deepEqual(Object.fromEntries(lower.map(id => [id, mm(R.pathLength(got[id]))])), OVER_THE_EDGE);
   assert.deepEqual(Object.fromEntries(Object.keys(THROUGH_THE_GAP).map(id => [id, mm(R.pathLength(got[id]))])), THROUGH_THE_GAP);
   assert.ok(lower.every(id => R.pathLength(got[id]).value === 1));
-  // (c10 and c11 are a 0.5 m cord now, 1 m before; c12 is still a 1 m cord)
-  assert.deepEqual(Object.keys(THROUGH_THE_GAP).map(id => R.pathLength(got[id]).value), [0.5, 0.5, 1]);
   for (const id of lower) {
     const p = got[id];
     // one detour, from the leaf end's reach point to its first ring, over
@@ -288,11 +287,10 @@ test('the drawn path is the measured one: nothing to go round again, and each de
       assert.deepEqual(xyz(got.built), xyz(taut), `${name} ${c.id}`);
       assert.equal(p.detours.reduce((n, d) => n + d.points.length, 0), taut.length - stops.length, `${name} ${c.id}`);
     }
-    // it looked: the lower leaf's eight go round the tray's front edge or up
-    // through its gap (five of them with the default plug, three with the
-    // optic's), and c7 over ring 4 (c8 too, back to its panel port from ring 5, until #987)
+    // it looked: the lower leaf's eight go round the tray's front edge (none
+    // up through its gap now: owner's option A, 2026-10-22), and c7 over ring 4 (c8 too, back to its panel port from ring 5, until #987)
     assert.equal(detoured, 8 + 1, name);
-    assert.equal(gapped, name === 'default' ? 5 : 3, name);
+    assert.equal(gapped, 0, name);
     assert.ok(legs > 100, `${name}: ${legs} legs`);
   }
 });
