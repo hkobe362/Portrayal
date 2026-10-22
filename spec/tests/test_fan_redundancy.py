@@ -585,8 +585,12 @@ def test_the_comparison_layer_can_now_reach_them():
     fan modules must be installed for optimal functioning of the switch"; the switch runs
     30 seconds without thermal shutdown while one is replaced). The guide states no N+1
     form, so the figure says that no spare fan is claimed.
+
+    NINETY-EIGHT IS THE JUNIPER EX4600-40F, 4+1 over five rear bays: the datasheet lists
+    "Redundant (N+1) and hot-pluggable fan modules" and the hardware guide ships five fan
+    modules numbered 0 to 4. The guide states no form of its own, so N is the five less one.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
-    # 97 since the Dell R960: N+1 over six dual-rotor modules (technical guide, thermal features)
-    assert n == 97, n
+    # 98 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
+    assert n == 98, n

@@ -1177,6 +1177,12 @@
  "components/juniper/ex4400-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex4600-em-4q/v1/contract.yaml": {
+  "L27": 1
+ },
+ "components/juniper/ex4600-em-8f/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/jnp-mic1/v1/contract.yaml": {
   "L96": 1,
   "L97": 1
@@ -1908,7 +1914,7 @@
   "L21": 8,
   "L29": 18,
   "L69": 1
-  },
+ },
  "devices/dell/r6615/device.yaml": {
   "L145": 1,
   "L29": 27
@@ -2189,6 +2195,11 @@
   "L29": 5,
   "L57": 1,
   "L61": 42
+ },
+ "devices/juniper/ex4600-40f/device.yaml": {
+  "L29": 4,
+  "L57": 1,
+  "L61": 48
  },
  "devices/juniper/mx10003/device.yaml": {
   "L119": 1,
