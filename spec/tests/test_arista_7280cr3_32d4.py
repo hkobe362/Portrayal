@@ -134,14 +134,17 @@ def test_the_four_400g_qsfp_dd_cages_are_two_stacked_columns_numbered_33_to_36()
     assert d["groups"]["qsfpdd-400g"]["attrs"] == {"media": "qsfp-dd", "speed": "400g"}
 
 
-def test_every_cage_has_its_numeral_and_a_lamp():
+def test_every_cage_has_its_numeral_and_a_pair_of_lamps():
     d = load()
     printed = {s["for"]: s["text"] for s in d["views"]["front"]["silkscreen"]
                if str(s.get("for", "")).startswith("port-") and s.get("text")}
     assert printed == {f"port-{n}": str(n) for n in range(1, 37)}
     lamps = [p for p in placements(d, "front") if p["id"].startswith("led-port-")]
-    assert len(lamps) == 36
+    # figure C-4 draws two dots under each column, so two lamps a port
+    assert len(lamps) == 72
     assert {p["for"] for p in lamps} == {f"port-{n}" for n in range(1, 37)}
+    assert sorted(p["rel-pos"] for p in lamps) == list(range(1, 73))
+    assert {p["id"][-1] for p in lamps} == {"a", "b"}
 
 
 def test_the_front_carries_four_status_lamps_and_no_management_ports():

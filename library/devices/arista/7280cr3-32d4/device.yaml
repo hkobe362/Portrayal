@@ -105,10 +105,11 @@ provenance:
     note: >-
       Guide Appendix A.1.2, Table 10: "Port LEDs near their corresponding ports provide a link and operational
       status": off the link is down, green link up, yellow software disabled, flashing yellow failed diagnostics.
-      The figure shows small dark dots above each upper cage and below each lower one, two or more a cage,
-      which cannot be counted at 1.27 px/mm (the guide's Figure A-3 captions them "Port 4 LEDs"). ONE
-      LAMP A PORT is modelled, above the upper cage and below the lower one, and the count per port is
-      the gap port-lamp-count.
+      Figure C-4 draws a pair of small dark dots above each upper cage column and below each lower one
+      (the guide's Figure A-3 captions them "Port 4 LEDs"). TWO LAMPS A PORT are modelled, a and b, centred
+      on the column and 2.0 mm apart (the figure's dots sit nearer, about 1.5 mm, but two 2.0 mm holes
+      cannot overlap), and the 400G cages carry the same pair. Table 10 gives one set of states, so both
+      lamps carry it; what each of the two means is the gap port-lamp-count.
   speed-strips:
     confidence: estimated
     note: >-
@@ -306,10 +307,9 @@ gaps:
   - front
   reason: needs-photo
   note: >-
-    The figure shows two or more dots a port above the upper row and below the lower row, which cannot
-    be counted at 1.27 px/mm. One lamp a port is modelled, and the guide's Figure A-3 captions "Port N
-    LEDs" in the plural.
-  wanted: a photograph of the face at a resolution that resolves the lamps.
+    Figure C-4 draws a pair of dots a port, but Table 10 describes one port LED and does not say what
+    the second lamp of the pair shows. Both are given Table 10's states.
+  wanted: the guide's account of the two port lamps, or a photograph of the lit face.
 - what: front-legends
   scope:
   - front
@@ -332,7 +332,8 @@ gaps:
   - rear
   reason: needs-photo
   note: >-
-    The management block's two arrow marks and its console legend are drawn as read; the order of the
+    The management block's two arrow marks and its console symbol (a small outlined box with three ticks,
+    as the figure draws it; the figure does not resolve it further) are drawn as read; the order of the
     three ports (management over USB over console) follows the datasheet's rear view and the library's
     other Arista stacks, and the figure's 1.24 px/mm resolves it only as three stacked ports. The lamps
     on the management jack are the library's single Ethernet jack's.
@@ -379,7 +380,7 @@ groups:
     term: LED
     role: indicator
     index-origin: 1
-    description: one status lamp for each port, above an upper cage and below a lower one
+    description: a pair of status lamps for each port, above an upper cage and below a lower one
   status-leds:
     term: LED
     role: indicator
@@ -435,77 +436,113 @@ views:
       - {at: [9.0, 42.3], size: [420.0, 1.2], pattern: vent, vent: 1.0}
       cutouts:
       - {id: port-1, at: [14.75, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-1, at: [23.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-1a, at: [22.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-1b, at: [24.0, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-2, at: [14.75, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-2, at: [23.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-2a, at: [22.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-2b, at: [24.0, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-3, at: [33.75, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-3, at: [42.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-3a, at: [41.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-3b, at: [43.0, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-4, at: [33.75, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-4, at: [42.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-4a, at: [41.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-4b, at: [43.0, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-5, at: [52.75, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-5, at: [61.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-5a, at: [60.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-5b, at: [62.0, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-6, at: [52.75, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-6, at: [61.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-6a, at: [60.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-6b, at: [62.0, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-7, at: [71.75, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-7, at: [80.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-7a, at: [79.0, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-7b, at: [81.0, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-8, at: [71.75, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-8, at: [80.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-8a, at: [79.0, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-8b, at: [81.0, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-9, at: [104.35, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-9, at: [112.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-9a, at: [111.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-9b, at: [113.6, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-10, at: [104.35, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-10, at: [112.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-10a, at: [111.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-10b, at: [113.6, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-11, at: [123.35, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-11, at: [131.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-11a, at: [130.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-11b, at: [132.6, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-12, at: [123.35, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-12, at: [131.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-12a, at: [130.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-12b, at: [132.6, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-13, at: [142.35, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-13, at: [150.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-13a, at: [149.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-13b, at: [151.6, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-14, at: [142.35, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-14, at: [150.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-14a, at: [149.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-14b, at: [151.6, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-15, at: [161.35, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-15, at: [169.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-15a, at: [168.6, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-15b, at: [170.6, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-16, at: [161.35, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-16, at: [169.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-16a, at: [168.6, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-16b, at: [170.6, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-17, at: [257.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-17, at: [266.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-17a, at: [265.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-17b, at: [267.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-18, at: [257.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-18, at: [266.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-18a, at: [265.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-18b, at: [267.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-19, at: [276.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-19, at: [285.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-19a, at: [284.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-19b, at: [286.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-20, at: [276.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-20, at: [285.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-20a, at: [284.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-20b, at: [286.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-21, at: [295.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-21, at: [304.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-21a, at: [303.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-21b, at: [305.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-22, at: [295.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-22, at: [304.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-22a, at: [303.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-22b, at: [305.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-23, at: [314.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-23, at: [323.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-23a, at: [322.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-23b, at: [324.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-24, at: [314.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-24, at: [323.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-24a, at: [322.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-24b, at: [324.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-25, at: [346.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-25, at: [355.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-25a, at: [354.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-25b, at: [356.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-26, at: [346.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-26, at: [355.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-26a, at: [354.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-26b, at: [356.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-27, at: [365.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-27, at: [374.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-27a, at: [373.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-27b, at: [375.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-28, at: [365.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-28, at: [374.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-28a, at: [373.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-28b, at: [375.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-29, at: [384.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-29, at: [393.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-29a, at: [392.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-29b, at: [394.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-30, at: [384.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-30, at: [393.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-30a, at: [392.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-30b, at: [394.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-31, at: [403.85, 12.4], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-31, at: [412.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-31a, at: [411.1, 8.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-31b, at: [413.1, 8.8], size: [2.0, 2.0], shape: circle}
       - {id: port-32, at: [403.85, 27.7], size: [18.5, 9.58], shape: rect}
-      - {id: led-port-32, at: [412.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-32a, at: [411.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-32b, at: [413.1, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: port-33, at: [191.6, 12.4], size: [19.0, 10.0], shape: rect}
       - {id: port-34, at: [191.6, 27.7], size: [19.0, 10.0], shape: rect}
       - {id: port-35, at: [227.2, 12.4], size: [19.0, 10.0], shape: rect}
       - {id: port-36, at: [227.2, 27.7], size: [19.0, 10.0], shape: rect}
-      - {id: led-port-33, at: [200.1, 9.8], size: [2.0, 2.0], shape: circle}
-      - {id: led-port-34, at: [200.1, 37.9], size: [2.0, 2.0], shape: circle}
-      - {id: led-port-35, at: [235.7, 9.8], size: [2.0, 2.0], shape: circle}
-      - {id: led-port-36, at: [235.7, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-33a, at: [199.1, 9.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-33b, at: [201.1, 9.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-34a, at: [199.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-34b, at: [201.1, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-35a, at: [234.7, 9.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-35b, at: [236.7, 9.8], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-36a, at: [234.7, 37.9], size: [2.0, 2.0], shape: circle}
+      - {id: led-port-36b, at: [236.7, 37.9], size: [2.0, 2.0], shape: circle}
       - {id: led-system, at: [430.1, 10.2], size: [2.0, 2.0], shape: circle}
       - {id: led-fan, at: [430.1, 13.5], size: [2.0, 2.0], shape: circle}
       - {id: led-ps1, at: [430.1, 16.8], size: [2.0, 2.0], shape: circle}
@@ -667,8 +704,8 @@ views:
         rel-pos: 16
         attrs: {media: qsfp28, speed: 100g}
       - ref: common/led-dot@1
-        id: led-port-1
-        at: [23.0, 8.8]
+        id: led-port-1a
+        at: [22.0, 8.8]
         states: &id001
         - 'off'
         - {name: link, color: '#22c55e'}
@@ -678,110 +715,226 @@ views:
         group: port-leds
         rel-pos: 1
       - ref: common/led-dot@1
-        id: led-port-2
-        at: [23.0, 37.9]
-        states: *id001
-        for: port-2
+        id: led-port-1b
+        at: [24.0, 8.8]
+        states: &id002
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        for: port-1
         group: port-leds
         rel-pos: 2
       - ref: common/led-dot@1
-        id: led-port-3
-        at: [42.0, 8.8]
+        id: led-port-2a
+        at: [22.0, 37.9]
         states: *id001
-        for: port-3
+        for: port-2
         group: port-leds
         rel-pos: 3
       - ref: common/led-dot@1
-        id: led-port-4
-        at: [42.0, 37.9]
-        states: *id001
-        for: port-4
+        id: led-port-2b
+        at: [24.0, 37.9]
+        states: *id002
+        for: port-2
         group: port-leds
         rel-pos: 4
       - ref: common/led-dot@1
-        id: led-port-5
-        at: [61.0, 8.8]
+        id: led-port-3a
+        at: [41.0, 8.8]
         states: *id001
-        for: port-5
+        for: port-3
         group: port-leds
         rel-pos: 5
       - ref: common/led-dot@1
-        id: led-port-6
-        at: [61.0, 37.9]
-        states: *id001
-        for: port-6
+        id: led-port-3b
+        at: [43.0, 8.8]
+        states: *id002
+        for: port-3
         group: port-leds
         rel-pos: 6
       - ref: common/led-dot@1
-        id: led-port-7
-        at: [80.0, 8.8]
+        id: led-port-4a
+        at: [41.0, 37.9]
         states: *id001
-        for: port-7
+        for: port-4
         group: port-leds
         rel-pos: 7
       - ref: common/led-dot@1
-        id: led-port-8
-        at: [80.0, 37.9]
-        states: *id001
-        for: port-8
+        id: led-port-4b
+        at: [43.0, 37.9]
+        states: *id002
+        for: port-4
         group: port-leds
         rel-pos: 8
       - ref: common/led-dot@1
-        id: led-port-9
-        at: [112.6, 8.8]
+        id: led-port-5a
+        at: [60.0, 8.8]
         states: *id001
-        for: port-9
+        for: port-5
         group: port-leds
         rel-pos: 9
       - ref: common/led-dot@1
-        id: led-port-10
-        at: [112.6, 37.9]
-        states: *id001
-        for: port-10
+        id: led-port-5b
+        at: [62.0, 8.8]
+        states: *id002
+        for: port-5
         group: port-leds
         rel-pos: 10
       - ref: common/led-dot@1
-        id: led-port-11
-        at: [131.6, 8.8]
+        id: led-port-6a
+        at: [60.0, 37.9]
         states: *id001
-        for: port-11
+        for: port-6
         group: port-leds
         rel-pos: 11
       - ref: common/led-dot@1
-        id: led-port-12
-        at: [131.6, 37.9]
-        states: *id001
-        for: port-12
+        id: led-port-6b
+        at: [62.0, 37.9]
+        states: *id002
+        for: port-6
         group: port-leds
         rel-pos: 12
       - ref: common/led-dot@1
-        id: led-port-13
-        at: [150.6, 8.8]
+        id: led-port-7a
+        at: [79.0, 8.8]
         states: *id001
-        for: port-13
+        for: port-7
         group: port-leds
         rel-pos: 13
       - ref: common/led-dot@1
-        id: led-port-14
-        at: [150.6, 37.9]
-        states: *id001
-        for: port-14
+        id: led-port-7b
+        at: [81.0, 8.8]
+        states: *id002
+        for: port-7
         group: port-leds
         rel-pos: 14
       - ref: common/led-dot@1
-        id: led-port-15
-        at: [169.6, 8.8]
+        id: led-port-8a
+        at: [79.0, 37.9]
         states: *id001
-        for: port-15
+        for: port-8
         group: port-leds
         rel-pos: 15
       - ref: common/led-dot@1
-        id: led-port-16
-        at: [169.6, 37.9]
+        id: led-port-8b
+        at: [81.0, 37.9]
+        states: *id002
+        for: port-8
+        group: port-leds
+        rel-pos: 16
+      - ref: common/led-dot@1
+        id: led-port-9a
+        at: [111.6, 8.8]
+        states: *id001
+        for: port-9
+        group: port-leds
+        rel-pos: 17
+      - ref: common/led-dot@1
+        id: led-port-9b
+        at: [113.6, 8.8]
+        states: *id002
+        for: port-9
+        group: port-leds
+        rel-pos: 18
+      - ref: common/led-dot@1
+        id: led-port-10a
+        at: [111.6, 37.9]
+        states: *id001
+        for: port-10
+        group: port-leds
+        rel-pos: 19
+      - ref: common/led-dot@1
+        id: led-port-10b
+        at: [113.6, 37.9]
+        states: *id002
+        for: port-10
+        group: port-leds
+        rel-pos: 20
+      - ref: common/led-dot@1
+        id: led-port-11a
+        at: [130.6, 8.8]
+        states: *id001
+        for: port-11
+        group: port-leds
+        rel-pos: 21
+      - ref: common/led-dot@1
+        id: led-port-11b
+        at: [132.6, 8.8]
+        states: *id002
+        for: port-11
+        group: port-leds
+        rel-pos: 22
+      - ref: common/led-dot@1
+        id: led-port-12a
+        at: [130.6, 37.9]
+        states: *id001
+        for: port-12
+        group: port-leds
+        rel-pos: 23
+      - ref: common/led-dot@1
+        id: led-port-12b
+        at: [132.6, 37.9]
+        states: *id002
+        for: port-12
+        group: port-leds
+        rel-pos: 24
+      - ref: common/led-dot@1
+        id: led-port-13a
+        at: [149.6, 8.8]
+        states: *id001
+        for: port-13
+        group: port-leds
+        rel-pos: 25
+      - ref: common/led-dot@1
+        id: led-port-13b
+        at: [151.6, 8.8]
+        states: *id002
+        for: port-13
+        group: port-leds
+        rel-pos: 26
+      - ref: common/led-dot@1
+        id: led-port-14a
+        at: [149.6, 37.9]
+        states: *id001
+        for: port-14
+        group: port-leds
+        rel-pos: 27
+      - ref: common/led-dot@1
+        id: led-port-14b
+        at: [151.6, 37.9]
+        states: *id002
+        for: port-14
+        group: port-leds
+        rel-pos: 28
+      - ref: common/led-dot@1
+        id: led-port-15a
+        at: [168.6, 8.8]
+        states: *id001
+        for: port-15
+        group: port-leds
+        rel-pos: 29
+      - ref: common/led-dot@1
+        id: led-port-15b
+        at: [170.6, 8.8]
+        states: *id002
+        for: port-15
+        group: port-leds
+        rel-pos: 30
+      - ref: common/led-dot@1
+        id: led-port-16a
+        at: [168.6, 37.9]
         states: *id001
         for: port-16
         group: port-leds
-        rel-pos: 16
+        rel-pos: 31
+      - ref: common/led-dot@1
+        id: led-port-16b
+        at: [170.6, 37.9]
+        states: *id002
+        for: port-16
+        group: port-leds
+        rel-pos: 32
       - ref: std/qsfp-ganged@1
         id: port-17
         at: [257.85, 12.4]
@@ -887,131 +1040,247 @@ views:
         rel-pos: 32
         attrs: {media: qsfp28, speed: 100g}
       - ref: common/led-dot@1
-        id: led-port-17
-        at: [266.1, 8.8]
-        states: &id002
+        id: led-port-17a
+        at: [265.1, 8.8]
+        states: &id003
         - 'off'
         - {name: link, color: '#22c55e'}
         - {name: disabled, color: '#eab308'}
         - {name: failed, color: '#eab308', behavior: blinking}
         for: port-17
         group: port-leds
-        rel-pos: 17
+        rel-pos: 33
       - ref: common/led-dot@1
-        id: led-port-18
-        at: [266.1, 37.9]
-        states: *id002
+        id: led-port-17b
+        at: [267.1, 8.8]
+        states: &id004
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        for: port-17
+        group: port-leds
+        rel-pos: 34
+      - ref: common/led-dot@1
+        id: led-port-18a
+        at: [265.1, 37.9]
+        states: *id003
         for: port-18
         group: port-leds
-        rel-pos: 18
+        rel-pos: 35
       - ref: common/led-dot@1
-        id: led-port-19
-        at: [285.1, 8.8]
-        states: *id002
+        id: led-port-18b
+        at: [267.1, 37.9]
+        states: *id004
+        for: port-18
+        group: port-leds
+        rel-pos: 36
+      - ref: common/led-dot@1
+        id: led-port-19a
+        at: [284.1, 8.8]
+        states: *id003
         for: port-19
         group: port-leds
-        rel-pos: 19
+        rel-pos: 37
       - ref: common/led-dot@1
-        id: led-port-20
-        at: [285.1, 37.9]
-        states: *id002
+        id: led-port-19b
+        at: [286.1, 8.8]
+        states: *id004
+        for: port-19
+        group: port-leds
+        rel-pos: 38
+      - ref: common/led-dot@1
+        id: led-port-20a
+        at: [284.1, 37.9]
+        states: *id003
         for: port-20
         group: port-leds
-        rel-pos: 20
+        rel-pos: 39
       - ref: common/led-dot@1
-        id: led-port-21
-        at: [304.1, 8.8]
-        states: *id002
+        id: led-port-20b
+        at: [286.1, 37.9]
+        states: *id004
+        for: port-20
+        group: port-leds
+        rel-pos: 40
+      - ref: common/led-dot@1
+        id: led-port-21a
+        at: [303.1, 8.8]
+        states: *id003
         for: port-21
         group: port-leds
-        rel-pos: 21
+        rel-pos: 41
       - ref: common/led-dot@1
-        id: led-port-22
-        at: [304.1, 37.9]
-        states: *id002
+        id: led-port-21b
+        at: [305.1, 8.8]
+        states: *id004
+        for: port-21
+        group: port-leds
+        rel-pos: 42
+      - ref: common/led-dot@1
+        id: led-port-22a
+        at: [303.1, 37.9]
+        states: *id003
         for: port-22
         group: port-leds
-        rel-pos: 22
+        rel-pos: 43
       - ref: common/led-dot@1
-        id: led-port-23
-        at: [323.1, 8.8]
-        states: *id002
+        id: led-port-22b
+        at: [305.1, 37.9]
+        states: *id004
+        for: port-22
+        group: port-leds
+        rel-pos: 44
+      - ref: common/led-dot@1
+        id: led-port-23a
+        at: [322.1, 8.8]
+        states: *id003
         for: port-23
         group: port-leds
-        rel-pos: 23
+        rel-pos: 45
       - ref: common/led-dot@1
-        id: led-port-24
-        at: [323.1, 37.9]
-        states: *id002
+        id: led-port-23b
+        at: [324.1, 8.8]
+        states: *id004
+        for: port-23
+        group: port-leds
+        rel-pos: 46
+      - ref: common/led-dot@1
+        id: led-port-24a
+        at: [322.1, 37.9]
+        states: *id003
         for: port-24
         group: port-leds
-        rel-pos: 24
+        rel-pos: 47
       - ref: common/led-dot@1
-        id: led-port-25
-        at: [355.1, 8.8]
-        states: *id002
+        id: led-port-24b
+        at: [324.1, 37.9]
+        states: *id004
+        for: port-24
+        group: port-leds
+        rel-pos: 48
+      - ref: common/led-dot@1
+        id: led-port-25a
+        at: [354.1, 8.8]
+        states: *id003
         for: port-25
         group: port-leds
-        rel-pos: 25
+        rel-pos: 49
       - ref: common/led-dot@1
-        id: led-port-26
-        at: [355.1, 37.9]
-        states: *id002
+        id: led-port-25b
+        at: [356.1, 8.8]
+        states: *id004
+        for: port-25
+        group: port-leds
+        rel-pos: 50
+      - ref: common/led-dot@1
+        id: led-port-26a
+        at: [354.1, 37.9]
+        states: *id003
         for: port-26
         group: port-leds
-        rel-pos: 26
+        rel-pos: 51
       - ref: common/led-dot@1
-        id: led-port-27
-        at: [374.1, 8.8]
-        states: *id002
+        id: led-port-26b
+        at: [356.1, 37.9]
+        states: *id004
+        for: port-26
+        group: port-leds
+        rel-pos: 52
+      - ref: common/led-dot@1
+        id: led-port-27a
+        at: [373.1, 8.8]
+        states: *id003
         for: port-27
         group: port-leds
-        rel-pos: 27
+        rel-pos: 53
       - ref: common/led-dot@1
-        id: led-port-28
-        at: [374.1, 37.9]
-        states: *id002
+        id: led-port-27b
+        at: [375.1, 8.8]
+        states: *id004
+        for: port-27
+        group: port-leds
+        rel-pos: 54
+      - ref: common/led-dot@1
+        id: led-port-28a
+        at: [373.1, 37.9]
+        states: *id003
         for: port-28
         group: port-leds
-        rel-pos: 28
+        rel-pos: 55
       - ref: common/led-dot@1
-        id: led-port-29
-        at: [393.1, 8.8]
-        states: *id002
+        id: led-port-28b
+        at: [375.1, 37.9]
+        states: *id004
+        for: port-28
+        group: port-leds
+        rel-pos: 56
+      - ref: common/led-dot@1
+        id: led-port-29a
+        at: [392.1, 8.8]
+        states: *id003
         for: port-29
         group: port-leds
-        rel-pos: 29
+        rel-pos: 57
       - ref: common/led-dot@1
-        id: led-port-30
-        at: [393.1, 37.9]
-        states: *id002
+        id: led-port-29b
+        at: [394.1, 8.8]
+        states: *id004
+        for: port-29
+        group: port-leds
+        rel-pos: 58
+      - ref: common/led-dot@1
+        id: led-port-30a
+        at: [392.1, 37.9]
+        states: *id003
         for: port-30
         group: port-leds
-        rel-pos: 30
+        rel-pos: 59
       - ref: common/led-dot@1
-        id: led-port-31
-        at: [412.1, 8.8]
-        states: *id002
+        id: led-port-30b
+        at: [394.1, 37.9]
+        states: *id004
+        for: port-30
+        group: port-leds
+        rel-pos: 60
+      - ref: common/led-dot@1
+        id: led-port-31a
+        at: [411.1, 8.8]
+        states: *id003
         for: port-31
         group: port-leds
-        rel-pos: 31
+        rel-pos: 61
       - ref: common/led-dot@1
-        id: led-port-32
-        at: [412.1, 37.9]
-        states: *id002
+        id: led-port-31b
+        at: [413.1, 8.8]
+        states: *id004
+        for: port-31
+        group: port-leds
+        rel-pos: 62
+      - ref: common/led-dot@1
+        id: led-port-32a
+        at: [411.1, 37.9]
+        states: *id003
         for: port-32
         group: port-leds
-        rel-pos: 32
+        rel-pos: 63
+      - ref: common/led-dot@1
+        id: led-port-32b
+        at: [413.1, 37.9]
+        states: *id004
+        for: port-32
+        group: port-leds
+        rel-pos: 64
       - {ref: std/qsfp-dd@1, id: port-33, at: [191.6, 12.4], group: qsfpdd-400g, rel-pos: 33}
       - {ref: std/qsfp-dd@1, id: port-34, at: [191.6, 27.7], rotate: 180, group: qsfpdd-400g, rel-pos: 34}
       - {ref: std/qsfp-dd@1, id: port-35, at: [227.2, 12.4], group: qsfpdd-400g, rel-pos: 35}
       - {ref: std/qsfp-dd@1, id: port-36, at: [227.2, 27.7], rotate: 180, group: qsfpdd-400g, rel-pos: 36}
       - ref: common/led-dot@1
-        id: led-port-33
-        at: [200.1, 9.8]
+        id: led-port-33a
+        at: [199.1, 9.8]
         for: port-33
         group: port-leds
-        rel-pos: 33
+        rel-pos: 65
         states:
         - 'off'
         - {name: link, color: '#22c55e'}
@@ -1021,11 +1290,25 @@ views:
           Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
           failed diagnostics
       - ref: common/led-dot@1
-        id: led-port-34
-        at: [200.1, 37.9]
+        id: led-port-33b
+        at: [201.1, 9.8]
+        for: port-33
+        group: port-leds
+        rel-pos: 66
+        states:
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        description: >-
+          Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
+          failed diagnostics
+      - ref: common/led-dot@1
+        id: led-port-34a
+        at: [199.1, 37.9]
         for: port-34
         group: port-leds
-        rel-pos: 34
+        rel-pos: 67
         states:
         - 'off'
         - {name: link, color: '#22c55e'}
@@ -1035,11 +1318,25 @@ views:
           Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
           failed diagnostics
       - ref: common/led-dot@1
-        id: led-port-35
-        at: [235.7, 9.8]
+        id: led-port-34b
+        at: [201.1, 37.9]
+        for: port-34
+        group: port-leds
+        rel-pos: 68
+        states:
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        description: >-
+          Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
+          failed diagnostics
+      - ref: common/led-dot@1
+        id: led-port-35a
+        at: [234.7, 9.8]
         for: port-35
         group: port-leds
-        rel-pos: 35
+        rel-pos: 69
         states:
         - 'off'
         - {name: link, color: '#22c55e'}
@@ -1049,11 +1346,39 @@ views:
           Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
           failed diagnostics
       - ref: common/led-dot@1
-        id: led-port-36
-        at: [235.7, 37.9]
+        id: led-port-35b
+        at: [236.7, 9.8]
+        for: port-35
+        group: port-leds
+        rel-pos: 70
+        states:
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        description: >-
+          Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
+          failed diagnostics
+      - ref: common/led-dot@1
+        id: led-port-36a
+        at: [234.7, 37.9]
         for: port-36
         group: port-leds
-        rel-pos: 36
+        rel-pos: 71
+        states:
+        - 'off'
+        - {name: link, color: '#22c55e'}
+        - {name: disabled, color: '#eab308'}
+        - {name: failed, color: '#eab308', behavior: blinking}
+        description: >-
+          Table 10 - Port LED: off link down; green link up; yellow software disabled; flashing yellow
+          failed diagnostics
+      - ref: common/led-dot@1
+        id: led-port-36b
+        at: [236.7, 37.9]
+        for: port-36
+        group: port-leds
+        rel-pos: 72
         states:
         - 'off'
         - {name: link, color: '#22c55e'}
@@ -1130,7 +1455,11 @@ views:
       - {id: usb, at: [85.2, 19.6], size: [12.0, 4.5], shape: rect}
       - {id: console, at: [84.1, 24.3], size: [15.8, 13.2], shape: rect}
     silkscreen:
-    - {at: [92.0, 41.6], text: '10101', font-size: 1.9, anchor: middle, fill: '#23262b', for: console}
+    - at: [92.0, 41.0]
+      path: M -2.6 -1.1 H 2.6 V 1.1 H -2.6 Z M -1.3 -0.5 V 0.5 M 0 -0.5 V 0.5 M 1.3 -0.5 V 0.5
+      stroke-width: 0.3
+      fill: '#1f3a6e'
+      for: console
     components:
       bays:
       - id: psu-1
