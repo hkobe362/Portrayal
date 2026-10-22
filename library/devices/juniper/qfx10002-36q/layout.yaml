@@ -354,13 +354,6 @@ gaps:
       The DC supply takes a D-sub 3W3 connector and the library has no 3W3 standard, so the DC supply draws
       the shell in its skin and offers no seat for the cable plug.
     wanted: a D-sub 3W3 connector in the connector registry
-  - what: dc-supply-face
-    scope: [psu-0, psu-1, psu-2, psu-3]
-    reason: needs-drawing
-    note: >-
-      The guide draws the DC supply only in perspective (Figures 29 and 40 to 43), so the connector side of its
-      face is placed by eye and is estimated. The fan, screws and handle are the AC supply's.
-    wanted: a flat elevation of the DC supply
   - what: console-lamp
     scope: [con]
     reason: vendor-silent

@@ -18,13 +18,14 @@
     <circle cx="54.5" cy="11.4" r="1.1" fill="#d4d6d8"/>
     <circle cx="54.5" cy="19.0" r="2.2" fill="#d4d6d8" stroke="#6b6e70" stroke-width="0.3"/>
     <circle cx="54.5" cy="26.6" r="1.1" fill="#d4d6d8"/>
-    <path d="M 54.5 2.2 l 1.6 0.9 v 1.8 l -1.6 0.9 l -1.6 -0.9 v -1.8 Z M 54.5 33.2 l 1.6 0.9 v 1.8 l -1.6 0.9 l -1.6 -0.9 v -1.8 Z" fill="#b9bbbe" stroke="#6b6e70" stroke-width="0.3"/>
+    <path d="M 54.5 2.2 l 1.6 0.9 v 1.8 l -1.6 0.9 l -1.6 -0.9 v -1.8 Z M 54.5 35.2 l 1.6 0.9 v 1.8 l -1.6 0.9 l -1.6 -0.9 v -1.8 Z" fill="#b9bbbe" stroke="#6b6e70" stroke-width="0.3"/>
   </g>
+  <circle id="fixing" cx="44.0" cy="18.5" r="1.4" fill="#c9cacc" stroke="#7c7d80" stroke-width="0.3"/>
   <g id="latch">
     <rect x="62.6" y="12.2" width="3.8" height="17.9" rx="1.6" fill="#1d1d1d" stroke="#0b0b0b" stroke-width="0.3"/>
     <rect x="66.6" y="13.2" width="6.1" height="15.7" fill="#c0c2c4" stroke="#8d8f91" stroke-width="0.3"/>
   </g>
-  <circle id="led" cx="60.0" cy="4.2" r="1.0" fill="var(--led-color, #3a4a3a)" stroke="#5c5e60" stroke-width="0.25"/>
+  <circle id="led" cx="66.4" cy="7.4" r="1.0" fill="var(--led-color, #3a4a3a)" stroke="#5c5e60" stroke-width="0.25"/>
   <g id="silkscreen" font-family="sans-serif" font-weight="bold" fill="#1f5f70" text-anchor="middle">
     <text x="22.3" y="18.2" font-size="2.6">ACDC</text>
     <text x="22.3" y="21.6" font-size="2.6">1600W</text>

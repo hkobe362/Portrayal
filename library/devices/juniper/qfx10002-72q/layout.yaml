@@ -93,8 +93,8 @@ provenance:
       67 and 71 below it. Each column holds the even port above the odd one and the ports run left to right, and
       the upper band holds 0 to 35 and the lower band 36 to 71. THE 36Q PHOTOGRAPH PRINTS FEWER NUMBERS THAN ITS
       DRAWING (only 1, 34 and 35 - see the 36Q's port-numbering), so the 72Q may print fewer than Figure 12
-      draws. With no photograph of the 72Q, Figure 12 is the only evidence and is followed, and this is
-      estimated. Numbering starts at 0, as the guide's CLI examples count (port 0 to port 71). Interface names
+      draws. With no photograph of the 72Q, Figure 12 (guide page 25), the maker's drawing, is the evidence and
+      is followed, so the confidence is drawing, with that risk noted. Numbering starts at 0, as the guide's CLI examples count (port 0 to port 71). Interface names
       are not printed on the metal and the guide does not state them, so none is carried.
   stack-orientation:
     confidence: estimated
@@ -328,13 +328,6 @@ gaps:
       The DC supply takes a D-sub 3W3 connector and the library has no 3W3 standard, so the DC supply draws the
       shell in its skin and offers no seat for the cable plug.
     wanted: a D-sub 3W3 connector in the connector registry
-  - what: dc-supply-face
-    scope: [psu-0, psu-1, psu-2, psu-3]
-    reason: needs-drawing
-    note: >-
-      The guide draws the DC supply only in perspective (Figures 29 and 40 to 43), so the connector side of its
-      face is placed by eye and is estimated. The fan, screws and handle are the AC supply's.
-    wanted: a flat elevation of the DC supply
   - what: console-lamp
     scope: [con]
     reason: vendor-silent

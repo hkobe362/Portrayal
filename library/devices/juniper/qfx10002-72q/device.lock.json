@@ -30,7 +30,7 @@
    "juniper/qfx10002-pwr-blnk@1"
   ]
  },
- "composed": "368e4d3a9e949cd0",
+ "composed": "1af1eb314756c1a7",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/laser-warning@1": "1.0.0+3e1b8adda2030577",
@@ -41,7 +41,7 @@
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "juniper/qfx10002-fan-afo@1": "1.0.0+431b14b141649646",
   "juniper/qfx10002-jpsu-1600w-ac-afo@1": "1.0.0+28e09b607c3eba64",
-  "juniper/qfx10002-jpsu-1600w-dc-afo@1": "1.0.0+57a92831fde05ada",
+  "juniper/qfx10002-jpsu-1600w-dc-afo@1": "1.0.0+63a6d256702d0f55",
   "juniper/qfx10002-pwr-blnk@1": "1.0.0+1eeace8e20bc1a34",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp-ganged@1": "1.4.1+6ac71d72bfdf9de9",
@@ -56,7 +56,7 @@
   "s"
  ],
  "format": 1,
- "gaps": "db7f33c28e64d17b",
+ "gaps": "8cbb1d3999992987",
  "groups": [
   "esd",
   "fan-leds",
@@ -1007,6 +1007,6 @@
  },
  "placement-surface": "e5e03a33f63d9e7a",
  "shape": "af357331ca8976f2",
- "surface": "4df2dba784875fbc",
+ "surface": "c8b4287ccaab81ef",
  "version": "0.1.0"
 }

@@ -27,12 +27,17 @@ provenance:
   sources: >-
     datasheet - QFX10002 Switch Hardware Guide (Juniper Networks, published 2026-02-11). Topic
     QFX10002 DC Power Supply Description, Figure 29 (g050378, the isometric of the supply),
-    Tables 24, 25 and 26, Table 27 and Figure 31 (the lamp), the DC connection topic and its
-    Figures 41 to 43, and Removing and Installing a Power Supply in a QFX10002. THE GUIDE DRAWS THIS
-    SUPPLY ONLY IN PERSPECTIVE. Searched Figures 4, 5, 12, 18, 19 and 28 to 31 and the install
-    figures for a flat elevation of a DC supply and found none: Figures 4 and 5 show AC supplies,
-    and the 36Q photograph shows AC supplies. The connector side of this face is therefore read off
-    the perspective Figures 29, 40, 41, 42 and 43 and is estimated.
+    Tables 24, 25 and 26, Table 27 and Figure 31 "DC Power Supply LED" (g050382, guide page 60),
+    the DC connection topic and its Figures 41 to 43, and Removing and Installing a Power Supply in
+    a QFX10002. Figure 31 is a flat front elevation of the DC supply (aspect 1.82, the module's
+    74.1 x 40.6 mm is 1.825): fan at the left, a round fixing between the fan and the connector, a
+    vertical D-sub connector with a standoff above and below, the status lamp at the upper right of
+    the connector column and the ejector lever to its right. The lamp, standoffs and fixing are
+    placed from it. Figures 4 and 5 and the 36Q photograph show AC supplies only. The connector
+    shell and the lever are placed from Figure 31 and checked against the perspective Figures 29,
+    40, 41, 42 and 43. The Figure 31 readings (lamp 66.4, 7.4 mm from the top left; lower standoff
+    centre at about y 37; fixing at 44.0, 18.5) were taken from the figure by the second-pass
+    reviewer and carried here; they were not re-measured when this was revised.
   size: >-
     drawing - the same bay frame as the AC supply, 74.1 x 40.6 mm, measured on Figure 4
     (g050372). The guide gives no dimensions for the supplies, and Figure 29 draws the DC module in
@@ -41,12 +46,14 @@ provenance:
     estimated - 185 mm, the same value as the AC supply and for the same reason: the guide states
     no depth.
   face: >-
-    estimated - the left half (fan housing, corner screws and handle) is the AC supply's, because
-    the perspective figures draw the same fan and handle and the same screws. The right half is
-    placed by eye from Figures 29 and 42: a vertical D-sub 3W3 shell centred at 54.5, 19.0 and
-    9.0 x 27.0 mm, a hex standoff above and below it for the cable plug's thumbscrews, a lamp above
-    and to the right, and the ejector lever on the right edge. The perspective cannot be measured,
-    so each of these is good to about 2 mm.
+    drawing - Figure 31, the flat elevation: a vertical D-sub 3W3 shell centred at 54.5, 19.0 and
+    9.0 x 27.0 mm, a hex standoff above and below it for the cable plug's thumbscrews (the lower
+    centred at y 37.0), a round fixing at 44.0, 18.5 between the fan and the connector, the lamp at
+    the upper right of the connector column and the ejector lever on the right edge. The fan housing,
+    corner screws and handle are the AC supply's (the same fan, handle and screws are drawn on
+    both). The shell size and the lever are carried from the earlier reading and agree with Figure 31
+    to about 1 mm. The hub label "ACDC 1600W" is copied from the studio photograph of the AC supply;
+    no photograph of the DC supply exists, so what the DC hub prints is not confirmed.
   handle-colour: >-
     photo-measured - as the AC supply. The guide's Table 24 says Juniper Gold; the studio
     photograph of the AC supply shows orange, and the same handle is drawn on this unit.
@@ -64,9 +71,9 @@ provenance:
     the optional right-angle cables CBL-JNP-PWR-DSUB2 and -DSUB3 carry no ground wire. The library
     has no 3W3 connector standard, so the shell is drawn in the skin and presents no seat.
   led: >-
-    datasheet - Table 27 and Figure 31: one bicolour lamp, with the same states as the AC
-    supply. Figure 29 callout 1 points at a round window above the connector, so the lamp is drawn
-    there. The position is read off an isometric and is estimated.
+    drawing - Table 27 and Figure 31: one bicolour lamp, with the same states as the AC supply,
+    centred at 66.4, 7.4 mm on the flat Figure 31 (upper right of the connector column, above the
+    lever). Figure 29 callout 1 points at the same lamp in perspective.
   relief: >-
     estimated - the handle stands proud of the fan in Figure 29. Its projection is not stated or
     measured.
@@ -76,7 +83,7 @@ states:
   - absent
 elements:
   led:
-    at: [59.0, 3.2]
+    at: [65.4, 6.4]
     size: [2.0, 2.0]
     class: led
     states:
