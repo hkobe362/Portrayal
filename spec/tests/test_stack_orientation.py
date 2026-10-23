@@ -304,6 +304,12 @@ THREE_HIGH = {
     # the stack, with a lamp band between them, and 50 is a single cage below (51 and 52,
     # 53 likewise), as guide figure 16's callouts 2 (four cages) and 5 (two cages) say
     "juniper/qfx5200-48y": {"port-50", "port-53"},
+    # the 7280CR3-96 is not one three-high stack and not two: the top row (81 to 96) is
+    # sixteen single cages with their own outline, and each block row (1 to 40, 41 to 80) is
+    # a two-high block outlined as one (guide figure C-8), 14.1 mm from the next. Pairing from
+    # the top takes the top row with the first block row, which leaves the second block's
+    # lower row over; the device's stack-exceptions name the cross-pairs it does not mean.
+    "arista/7280cr3-96": {f"port-{n}" for n in range(42, 73, 2)},
 }
 
 
