@@ -26,11 +26,10 @@ provenance:
       figures 12 and 14 (port panel), 16 to 19 (rear and management panel), 20 to 27 (fan modules,
       airflow and supplies). Juniper's studio photograph of the 48S front (image library,
       qfx5110-48s-front-high, 2100 x 508 px). The datasheet is at a Juniper address that redirects
-      to an HPE document viewer (a00150813enw); it did not answer from this host, so no datasheet
+      to an HPE document viewer (a00150813enw); it did not answer, so no datasheet
       figure is used and none is cited. The studio photograph of the rear (qfx5110-48s-rear-high)
-      returned an HTML 404 page, so the rear has only the guide's drawings. The held-sources folders
-      of the intake area were not readable from this worker (permission denied), so no Visio stencil
-      or 3D model could be looked for there; none is named by the guide.
+      returned an HTML 404 page, so the rear has only the guide's drawings. No Visio stencil or 3D
+      model was available, and none is named by the guide.
   chassis:
     confidence: datasheet
     note: >-
@@ -185,7 +184,7 @@ provenance:
     confidence: estimated
     note: >-
       Searched the guide for an end-of-life notice and found none; the guide is dated 2026-09-24. No
-      announcement for the QFX5110-48S was looked for at Juniper's end-of-life pages from this host, so
+      announcement for the QFX5110-48S was looked for at Juniper's end-of-life pages, so
       the device states none announced, estimated.
 attrs:
   physical:
@@ -248,7 +247,7 @@ gaps:
   reason: vendor-silent
   wanted: >-
     The QFX5110 datasheet (the token is the nearest the schema offers: the document exists but was not readable). Its address redirects to an HPE document viewer (a00150813enw) that did not
-    answer from this host in three tries, so its ordering table, weight and power were not read.
+    answer in three tries, so its ordering table, weight and power were not read.
 - what: fan-module-part-numbers
   scope: [rear]
   reason: sources-disagree

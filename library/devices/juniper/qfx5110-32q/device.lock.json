@@ -61,7 +61,7 @@
   "dc-f2b"
  ],
  "format": 1,
- "gaps": "9f98886b495f9ccf",
+ "gaps": "6418324a36340575",
  "groups": [
   "esd",
   "fan-leds",
@@ -1246,6 +1246,6 @@
  },
  "placement-surface": "dafa568f5de28b06",
  "shape": "965b6bd57c205b10",
- "surface": "5b7e195cf5472853",
+ "surface": "f1f62e978e78a41c",
  "version": "0.1.0"
 }
