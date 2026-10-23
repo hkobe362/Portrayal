@@ -2252,6 +2252,12 @@
   "L29": 2,
   "L57": 1
  },
+ "devices/juniper/ex4400-24mp/device.yaml": {
+  "L119": 1,
+  "L29": 4,
+  "L57": 1,
+  "L61": 18
+ },
  "devices/juniper/ex4400-24p/device.yaml": {
   "L119": 1,
   "L29": 4,
@@ -2263,6 +2269,23 @@
   "L29": 5,
   "L57": 1,
   "L61": 18
+ },
+ "devices/juniper/ex4400-24x/device.yaml": {
+  "L29": 5,
+  "L57": 1,
+  "L61": 19
+ },
+ "devices/juniper/ex4400-48f/device.yaml": {
+  "L119": 1,
+  "L29": 5,
+  "L57": 1,
+  "L61": 33
+ },
+ "devices/juniper/ex4400-48mp/device.yaml": {
+  "L119": 1,
+  "L29": 4,
+  "L57": 1,
+  "L61": 42
  },
  "devices/juniper/ex4400-48p/device.yaml": {
   "L119": 1,
@@ -2280,6 +2303,16 @@
   "L29": 4,
   "L57": 1,
   "L61": 48
+ },
+ "devices/juniper/ex4650-48y/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/ex9251/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9253/device.yaml": {
+  "L69": 1
  },
  "devices/juniper/mx10003/device.yaml": {
   "L119": 1,
@@ -2392,6 +2425,24 @@
   "L29": 2,
   "L57": 1
  },
+ "devices/juniper/qfx5110-32q/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 1
+ },
+ "devices/juniper/qfx5110-48s/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5120-32c/device.yaml": {
+  "L21": 5,
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5120-48t/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
  "devices/juniper/qfx5120-48y/device.yaml": {
   "L29": 2,
   "L57": 1
@@ -2416,6 +2467,27 @@
   "L57": 1,
   "L61": 3,
   "L69": 1
+ },
+ "devices/juniper/qfx5220-128c/device.yaml": {
+  "L39": 128,
+  "L57": 1,
+  "L61": 1
+ },
+ "devices/juniper/qfx5220-32cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5230-64cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5240-64od/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/qfx5240-64qd/device.yaml": {
+  "L29": 1,
+  "L57": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
