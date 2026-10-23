@@ -257,7 +257,11 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER QFX5210-64C MADE IT THIRTY-EIGHT: the guide says the switch has four fan modules and
+    # that an unrecoverable failure raises chassis alarms and can shut it down, gives the time it runs
+    # with one module out, and names no N+1 form, so the group states none.
+    assert "juniper/qfx5210-64c" in unstated
+    assert len(unstated) == 38, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
