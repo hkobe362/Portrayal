@@ -611,6 +611,10 @@ def test_the_comparison_layer_can_now_reach_them():
     ONE HUNDRED AND EIGHT IS THE JUNIPER EX4600-40F, 4+1 over five rear bays: the datasheet lists
     "Redundant (N+1) and hot-pluggable fan modules" and the hardware guide ships five fan
     modules numbered 0 to 4. The guide states no form of its own, so N is the five less one.
+
+    ONE HUNDRED AND NINE AND ONE HUNDRED AND TEN ARE THE JUNIPER QFX5100-24Q AND QFX5100-96S, N+1
+    over five and over three rear fan modules, from the same QFX5100 datasheet sentence. The
+    hardware guide gives the slots, 0 to 4 on the 1RU models and 0 to 2 on the 96S.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -623,4 +627,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
     # 107 since the Juniper EX4100-24T, -24P, -48T and -48P: 1+1 over two fan modules each (hardware guide)
     # 108 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
-    assert n == 108, n
+    # 110 since the Juniper QFX5100-24Q and -96S: N+1 over five and over three rear fan modules (datasheet)
+    assert n == 110, n
