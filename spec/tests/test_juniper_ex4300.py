@@ -1,4 +1,5 @@
-"""The Juniper EX4300 1G copper switches: EX4300-24T, -24P, -48T and -48P (#39).
+"""The Juniper EX4300 1G copper switches: EX4300-24T, -24P, -48T and -48P (#39), and, below them,
+the 32-port fibre EX4300-32F and the multigigabit EX4300-48MP, each with its own front panel.
 
 One device per front panel, each with its power, airflow and spare-chassis builds as
 `kind: orderable` configurations. The expected figures below are the hardware guide's
@@ -491,3 +492,349 @@ def test_the_airflow_label_is_the_guides_two_line_box_with_a_fan_glyph(comp):
             gap_x = max(a[0] - b[2], b[0] - a[2])
             gap_y = max(a[1] - b[3], b[1] - a[3])
             assert max(gap_x, gap_y) >= 0.3, (a, b)
+
+
+# ------------------------------------- the rest of the line: the 32-port fibre and the multigigabit
+#
+# Their own front panels, so their own devices: the EX4300-32F (32 SFP, four SFP+, two QSFP+) and the
+# EX4300-48MP (24 + 24 copper jacks, four dedicated QSFP+). Figures are the guide's (published
+# 2025-08-12): Table 10 for the envelope (each has its own line there), Tables 2, 3 and 8 for what
+# each ships with, Tables 30 and 31 and the datasheet's ordering information for the supplies and fans.
+
+# device: (model, Table 10 depth in cm with a power supply fitted, configurations -> part numbers)
+MORE = {
+    "ex4300-32f": ("EX4300-32F", 48.28,
+                   {"ac": ["EX4300-32F", "EX4300-32F-TAA"],
+                    "dc": ["EX4300-32F-DC", "EX4300-32F-DC-TAA"],
+                    "s": ["EX4300-32F-S"]}),
+    "ex4300-48mp": ("EX4300-48MP", 49.88,
+                    {"ac": ["EX4300-48MP"], "s": ["EX4300-48MP-S"]}),
+}
+MORE_PSUS = {"ex4300-jpsu-1400-ac-afo": ("JPSU-1400-AC-AFO", 1400, "front-to-back", "ac")}
+MORE_FANS = {"ex4300-48mp-fan-afo": ("EX4300-48MP-FAN", "front-to-back")}
+MORE_BLANKS = {"ex4300-32f": "ex4300-32f-uplink-blank", "ex4300-48mp": "ex4300-48mp-uplink-blank"}
+# the uplink modules the guide lists for each (Tables 5 and 6): none is in the library yet
+MORE_UPLINKS = {"ex4300-32f": ["EX-UM-2QSFP", "EX-UM-8X8SFP"],
+                "ex4300-48mp": ["EX-UM-2QSFP-MR", "EX-UM-4SFPP-MR"]}
+
+
+def xs_of_top_row(d, ref, mod):
+    """Left edges of one row of a stacked block, one per column, in order."""
+    row = {int(p["id"].split("-")[1]): p["at"][0] for p in placements(d, "front")
+           if p["ref"] == ref and p["id"].startswith("port-")
+           and int(p["id"].split("-")[1]) % 2 == mod}
+    return [row[k] for k in sorted(row)]
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_envelope_is_table_10(dev):
+    """Table 10 gives the 32F and the 48MP their own depths; the width and height are the family's."""
+    _, depth_cm, _ = MORE[dev]
+    d = load(dev)
+    c = d["chassis"]
+    assert c["ru"] == 1
+    assert c["height"] == pytest.approx(1.72 * INCH, abs=0.1)
+    assert c["width"] == pytest.approx(17.36 * INCH, abs=0.2)
+    assert c["depth"] == pytest.approx(depth_cm * 10, abs=0.2)
+    for v in ("front", "rear"):
+        assert d["views"][v]["size"] == {"w": c["width"], "h": c["height"]}
+    for v in ("top", "bottom"):
+        assert d["views"][v]["size"] == {"w": c["width"], "h": c["depth"]}
+    for v in ("left", "right"):
+        assert d["views"][v]["size"] == {"w": c["depth"], "h": c["height"]}
+
+
+def test_the_depths_are_not_the_24_and_48_port_depth():
+    assert load("ex4300-32f")["chassis"]["depth"] == pytest.approx(19.0 * INCH, abs=0.3)
+    assert load("ex4300-48mp")["chassis"]["depth"] == pytest.approx(19.64 * INCH, abs=0.3)
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_maker_and_names_are_as_printed(dev):
+    d = load(dev)
+    assert d["manufacturer"] == "Juniper"
+    assert d["model"] == MORE[dev][0]
+    assert d["portfolio"] == {"line": "EX Series", "family": "EX4300"}
+    assert d["maturity"] == "modelled"
+
+
+def test_the_32f_front_has_32_sfp_ports_in_four_gangs_and_four_sfp_plus_ports():
+    d = load("ex4300-32f")
+    cages = {p["id"]: p for p in placements(d, "front") if p["ref"] == "std/sfp-ganged@1"}
+    sfp = {int(i.split("-")[1]): p for i, p in cages.items() if i.startswith("port-")}
+    assert sorted(sfp) == list(range(32))
+    for k, p in sfp.items():
+        assert p["rel-pos"] == k and p["group"] == "sfp"
+        # a stacked pair: the upper cage upright (even number), the lower turned 180
+        assert p.get("rotate", 0) == (180 if k % 2 else 0)
+    # four columns to a gang at the figure's 14.8 pitch, a 5.0 gutter between gangs
+    xs = xs_of_top_row(d, "std/sfp-ganged@1", 0)
+    assert len(xs) == 16
+    steps = [round(b - a, 2) for a, b in zip(xs, xs[1:])]
+    assert steps.count(14.8) == 12 and sorted(s for s in steps if s != 14.8) == [19.8] * 3
+    uplinks = {int(i.split("-")[1]): p for i, p in cages.items() if i.startswith("uplink-")}
+    assert sorted(uplinks) == [0, 1, 2, 3]
+    assert all(p["group"] == "sfp-plus" and p["rel-pos"] == k for k, p in uplinks.items())
+    assert d["groups"]["sfp"]["attrs"] == {"media": "sfp", "speed": "1g"}
+    assert d["groups"]["sfp-plus"]["attrs"] == {"media": "sfp-plus", "speed": "10g"}
+    assert "poe" not in d["groups"]["sfp"]["attrs"]
+    # the printed numbers, spelled as the metal spells them
+    numerals = {s["for"]: s["text"] for s in d["views"]["front"]["silkscreen"]
+                if s.get("for", "").startswith(("port-", "uplink-")) and "text" in s}
+    assert numerals == {**{f"port-{k}": str(k) for k in range(32)},
+                        **{f"uplink-{k}": str(k) for k in range(4)}}
+    cut = {c["id"] for c in d["views"]["front"]["panel"]["cutouts"]}
+    assert {f"port-{k}" for k in range(32)} | {f"uplink-{k}" for k in range(4)} <= cut
+
+
+def test_each_32f_sfp_port_has_a_link_and_a_status_lamp():
+    d = load("ex4300-32f")
+    lamps = {}
+    for p in placements(d, "front"):
+        if p["id"].startswith("led-port-"):
+            lamps.setdefault(p["for"], []).append(p["id"])
+    assert set(lamps) == {f"port-{k}" for k in range(32)}
+    assert all(len(v) == 2 for v in lamps.values())
+
+
+def test_the_32f_front_has_the_console_lcd_buttons_lamps_and_the_large_uplink_slot():
+    d = load("ex4300-32f")
+    ids = {p["id"]: p["ref"] for p in placements(d, "front")}
+    assert ids["console"] == "juniper/ex4300-console-usb-mini@1"
+    assert ids["btn-menu"] == ids["btn-enter"] == "juniper/ex4300-lcd-button@1"
+    for lamp in ("led-alm", "led-sys", "led-mst"):
+        assert ids[lamp] == "common/led-dot@1"
+    slot = bays(d, "front")["uplink"]
+    # Figure 10 callout 1: the cover panel is the large opening at the left end, not the 74 mm one
+    assert slot["size"]["w"] > 80
+    assert slot["accepts"] == ["juniper/ex4300-32f-uplink-blank@1"]
+    assert slot["default"] == "juniper/ex4300-32f-uplink-blank@1"
+    assert {"EX4300-32F", "CON1"} <= {s.get("text") for s in d["views"]["front"]["silkscreen"]}
+
+
+def test_the_48mp_front_has_24_plus_24_jacks_poe_plus_plus_numbered_as_printed():
+    d = load("ex4300-48mp")
+    jacks = {int(p["id"].split("-")[1]): p for p in placements(d, "front")
+             if p["ref"] == "common/rj45-ganged-eth@1"}
+    assert sorted(jacks) == list(range(48))
+    for k, p in jacks.items():
+        assert p["rel-pos"] == k
+        assert p["group"] == ("rj45" if k < 24 else "rj45-10g")
+        assert p.get("rotate", 0) == (180 if k % 2 == 0 else 0)
+    g = d["groups"]
+    # Table 3: 24 10/100/1000BASE-T and 24 100/1000/2500/5000/10000BASE-T, all up to 95 W
+    assert g["rj45"]["attrs"] == {"media": "rj45", "speed": "1g", "poe": "802.3bt"}
+    assert g["rj45-10g"]["attrs"] == {"media": "rj45", "speed": "10g", "poe": "802.3bt"}
+    numerals = {s["for"]: s["text"] for s in d["views"]["front"]["silkscreen"]
+                if s.get("for", "").startswith("port-")}
+    assert numerals == {f"port-{k}": str(k) for k in range(48)}
+    cut = {c["id"] for c in d["views"]["front"]["panel"]["cutouts"]}
+    assert {f"port-{k}" for k in range(48)} <= cut
+
+
+def test_the_48mp_jacks_stand_on_the_ganged_pitch_with_three_unequal_gutters():
+    """Columns of six on the registry's 13.97; the photograph's three gaps between blocks differ."""
+    d = load("ex4300-48mp")
+    xs = xs_of_top_row(d, "common/rj45-ganged-eth@1", 0)
+    assert len(xs) == 24
+    steps = [round(b - a, 2) for a, b in zip(xs, xs[1:])]
+    assert steps.count(13.97) == 20
+    assert sorted(round(s - 13.97, 2) for s in steps if s != 13.97) == [5.2, 7.27, 9.65]
+
+
+def test_the_48mp_status_block_prints_the_photographs_legends_in_its_order():
+    d = load("ex4300-48mp")
+    front = d["views"]["front"]
+    ids = {p["id"]: p for p in placements(d, "front")}
+    for lamp in ("led-sys", "led-alm", "led-mst", "led-spd", "led-dx", "led-en", "led-poe"):
+        assert ids[lamp]["ref"] == "common/led-dot@1"
+    ys = lambda names: [ids[n]["at"][1] for n in names]
+    # the photograph prints SYS, ALM, MST top to bottom (the guide names them ALM, SYS, MST)
+    assert ys(["led-sys", "led-alm", "led-mst"]) == sorted(ys(["led-sys", "led-alm", "led-mst"]))
+    assert ys(["led-spd", "led-dx", "led-en", "led-poe"]) == sorted(ys(["led-spd", "led-dx", "led-en", "led-poe"]))
+    legends = {s["for"]: s["text"] for s in front["silkscreen"]
+               if s.get("for", "").startswith("led-")}
+    assert legends == {"led-sys": "SYS", "led-alm": "ALM", "led-mst": "MST", "led-spd": "SPD",
+                       "led-dx": "DX", "led-en": "EN", "led-poe": "POE"}
+    assert ids["btn-mode"]["group"] == "mode-button"
+    assert ids["console"]["ref"] == "juniper/ex4300-console-usb-mini@1"
+    assert "EX4300-48MP" in {s.get("text") for s in front["silkscreen"]}
+    slot = bays(d, "front")["uplink"]
+    assert slot["accepts"] == ["juniper/ex4300-48mp-uplink-blank@1"]
+
+
+@pytest.mark.parametrize("dev,ports", [("ex4300-32f", 2), ("ex4300-48mp", 4)])
+def test_the_more_rear_has_the_qsfp_ports_the_management_jacks_and_four_bays(dev, ports):
+    d = load(dev)
+    rear = {p["id"]: p for p in placements(d, "rear")}
+    for k in range(ports):
+        assert rear[f"vcp-{k}"]["ref"] == "std/qsfp-ganged@1" and rear[f"vcp-{k}"]["rel-pos"] == k
+    assert f"vcp-{ports}" not in rear
+    assert rear["mgmt"]["ref"] == "common/rj45-eth@1"
+    assert rear["usb"]["ref"] == "std/usb-a@1"
+    assert rear["con2" if dev == "ex4300-32f" else "con"]["ref"] == "std/rj45@2"
+    assert set(bays(d, "rear")) == {"fan-0", "fan-1", "psu-0", "psu-1"}
+    assert d["groups"]["vcp"]["attrs"] == {"media": "qsfp", "speed": "40g"}
+
+
+def test_the_48mp_qsfp_ports_stand_on_the_figures_wider_pitch():
+    d = load("ex4300-48mp")
+    at = {p["id"]: p["at"][0] for p in placements(d, "rear") if p["id"].startswith("vcp-")
+          and p["ref"] == "std/qsfp-ganged@1"}
+    steps = [round(at[f"vcp-{k + 1}"] - at[f"vcp-{k}"], 2) for k in range(3)]
+    assert all(s == pytest.approx(22.57, abs=0.05) for s in steps)
+
+
+@pytest.mark.parametrize("comp", sorted(MORE_PSUS))
+def test_the_1400_w_supply_states_its_part_number_output_and_airflow(comp):
+    pn, watts, flow, _ = MORE_PSUS[comp]
+    c = contract(comp)
+    assert c["class"] == "psu" and c["kind"] == "module"
+    assert c["attrs"]["part-number"] == pn and c["attrs"]["power-output-w"] == watts
+    assert c["attrs"]["airflow"] == flow and c["attrs"]["airflow-label"] == "AIR OUT (AFO)"
+    # Table 30: the 1400 W supply weighs 3.06 lb, the others 2.43
+    assert c["attrs"]["weight-kg"] == 1.39
+    assert any(p["ref"] == "std/c14-inlet@1" for p in c["parts"])
+
+
+@pytest.mark.parametrize("comp", sorted(MORE_FANS))
+def test_the_48mp_fan_is_its_own_part(comp):
+    pn, flow = MORE_FANS[comp]
+    c = contract(comp)
+    assert c["class"] == "fan" and c["attrs"]["part-number"] == pn and c["attrs"]["airflow"] == flow
+    # the datasheet orders EX4300-48MP-FAN beside EX4300-FAN, so the 24/48-port fan is not it
+    assert pn != contract("ex4300-fan-afo")["attrs"]["part-number"]
+    assert c["size"]["w"] < contract("ex4300-fan-afo")["size"]["w"]
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_bays_accept_what_the_guide_lists(dev):
+    d = load(dev)
+    if dev == "ex4300-32f":
+        # Table 40: the 350 W AC supply; Table 2: the 550 W DC supply (the -DC); the AFI parts per
+        # the datasheet's matrix and Table 2's -S row. Not the 715, 1100 or 1400 W supplies.
+        psus = {"juniper/ex4300-jpsu-350-ac-afo@1", "juniper/ex4300-jpsu-350-ac-afi@1",
+                "juniper/ex4300-jpsu-550-dc-afo@1", "juniper/ex4300-jpsu-550-dc-afi@1",
+                "juniper/ex4300-psu-blank@1"}
+        fans = {"juniper/ex4300-fan-afo@1", "juniper/ex4300-fan-afi@1"}
+    else:
+        # the guide: 715, 1100 and 1400 W AC, front-to-back only; no DC, no 350 W
+        psus = {"juniper/ex4300-jpsu-715-ac-afo@1", "juniper/ex4300-jpsu-1100-ac-afo@1",
+                "juniper/ex4300-jpsu-1400-ac-afo@1", "juniper/ex4300-psu-blank@1"}
+        fans = {"juniper/ex4300-48mp-fan-afo@1"}
+    for bid in ("psu-0", "psu-1"):
+        assert set(bays(d, "rear")[bid]["accepts"]) == psus
+    for bid in ("fan-0", "fan-1"):
+        assert set(bays(d, "rear")[bid]["accepts"]) == fans
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_configurations_list_their_part_numbers(dev):
+    d = load(dev)
+    want = MORE[dev][2]
+    assert set(d["configurations"]) == set(want)
+    for cfg, pns in want.items():
+        assert d["configurations"][cfg]["kind"] == "orderable"
+        assert list(d["configurations"][cfg]["part-numbers"]) == pns
+    assert [c for c, v in d["configurations"].items() if v.get("default")] == ["ac"]
+
+
+def test_the_32f_builds_seat_a_matching_supply_and_fan_set():
+    d = load("ex4300-32f")
+    ac = seated(d, "ac")
+    assert ac == {"uplink": "ex4300-32f-uplink-blank", "psu-0": "ex4300-jpsu-350-ac-afo",
+                  "psu-1": "ex4300-psu-blank", "fan-0": "ex4300-fan-afo", "fan-1": "ex4300-fan-afo"}
+    dc = seated(d, "dc")
+    assert dc["psu-0"] == "ex4300-jpsu-550-dc-afo" and dc["psu-1"] == "ex4300-psu-blank"
+    assert dc["fan-0"] == dc["fan-1"] == "ex4300-fan-afo"
+    assert d["configurations"]["dc"]["power"] == "dc"
+    for cfg, supply in (("ac", "ex4300-jpsu-350-ac-afo"), ("dc", "ex4300-jpsu-550-dc-afo")):
+        s = seated(d, cfg)
+        # Table 2: every shipped 32-port build is AIR OUT, supply and fans alike, front-to-back
+        assert contract(supply)["attrs"]["airflow"] == contract(s["fan-0"])["attrs"]["airflow"]
+        assert d["configurations"][cfg].get("airflow", d["chassis"]["airflow"]) == "front-to-back"
+    s = seated(d, "s")
+    assert s["psu-0"] == s["psu-1"] == s["fan-0"] == s["fan-1"] == ""
+    assert s["uplink"] == "ex4300-32f-uplink-blank"
+
+
+def test_the_48mp_builds_seat_the_1400_w_supply_and_its_own_fan():
+    d = load("ex4300-48mp")
+    assert seated(d, "ac") == {"uplink": "ex4300-48mp-uplink-blank", "psu-0": "ex4300-jpsu-1400-ac-afo",
+                               "psu-1": "ex4300-psu-blank", "fan-0": "ex4300-48mp-fan-afo",
+                               "fan-1": "ex4300-48mp-fan-afo"}
+    s = seated(d, "s")
+    assert s["psu-0"] == s["psu-1"] == s["fan-0"] == s["fan-1"] == ""
+    assert s["uplink"] == "ex4300-48mp-uplink-blank"
+    # Tables 7 and 28: AC only and front-to-back only, so neither a DC nor an AFI build exists
+    assert d["chassis"]["airflow"] == "front-to-back" and d["chassis"]["power"] == "ac"
+    assert not {"dc", "afi", "dc-afi"} & set(d["configurations"])
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_uplink_bay_takes_only_the_modules_the_library_holds(dev):
+    """The guide lists two uplink modules for each of these (Tables 5 and 6). None is in the library, so
+    the bay takes its cover panel alone and the gap names the modules left for a later slice."""
+    d = load(dev)
+    slot = bays(d, "front")["uplink"]
+    assert slot["accepts"] == [f"juniper/{MORE_BLANKS[dev]}@1"]
+    for ref in slot["accepts"]:
+        assert (LIB / "components" / ref.split("@")[0] / "v1/contract.yaml").exists()
+    gap = [g for g in d["gaps"] if g["what"] == "uplink-modules"]
+    assert len(gap) == 1
+    for module in MORE_UPLINKS[dev]:
+        assert module in gap[0]["wanted"]
+
+
+@pytest.mark.parametrize("target", ["netbox", "nautobot"])
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_dcim_types_export_one_per_orderable_configuration(target, dev):
+    """One device type per configuration, named by its first part number, one rack unit tall. The
+    Trade Agreement Act SKUs share their configuration's type."""
+    d = load(dev)
+    folder = LIB / "exports" / target / "device-types" / "Juniper"
+    for cfg, pns in MORE[dev][2].items():
+        doc = yaml.safe_load((folder / f"{pns[0]}.yaml").read_text())
+        assert doc["manufacturer"] == "Juniper" and doc["model"] == pns[0]
+        assert doc["u_height"] == 1.0
+        assert d["configurations"][cfg]["kind"] == "orderable"
+
+
+@pytest.mark.parametrize("dev,n", [("ex4300-32f", 36), ("ex4300-48mp", 48)])
+def test_the_more_exported_type_lists_the_front_ports(dev, n):
+    doc = yaml.safe_load((LIB / "exports/netbox/device-types/Juniper" /
+                          f"{MORE[dev][0]}.yaml").read_text())
+    names = {i["name"] for i in doc["interfaces"]}
+    front = ({f"port-{k}" for k in range(32)} | {f"uplink-{k}" for k in range(4)}
+             if dev == "ex4300-32f" else {f"port-{k}" for k in range(48)})
+    assert len(front) == n and front <= names
+    assert {f"vcp-{k}" for k in range(2 if dev == "ex4300-32f" else 4)} <= names
+
+
+@pytest.mark.parametrize("dev", MORE)
+def test_the_more_devices_draw_no_logo_and_reserve_its_place(dev):
+    d = load(dev)
+    for name, view in d["views"].items():
+        drawn = list(view.get("silkscreen") or []) + list((view.get("panel") or {}).get("decor") or [])
+        words = {str(i.get("text", "")).upper() for i in drawn}
+        assert not words & {"JUNIPER", "NETWORKS", "RUNNING JUNOS", "JUNOS"}, name
+    zones = [r for r in d["views"]["front"].get("regions") or [] if r["id"].startswith("logo-zone")]
+    assert zones and all("not drawn" in z["label"] for z in zones)
+
+
+def test_the_more_new_components_are_family_prefixed_and_state_their_size_source():
+    refs = set()
+    for dev in MORE:
+        d = load(dev)
+        for view in ("front", "rear"):
+            refs |= {p["ref"] for p in placements(d, view)}
+            for b in bays(d, view).values():
+                refs.update(b["accepts"])
+    mine = {r for r in refs if r.startswith("juniper/")}
+    # the one part reused from another EX line: the 48MP's rear reset pinhole is the EX4100's
+    assert mine and all(r.startswith("juniper/ex4300-") for r in mine - {"juniper/ex4100-reset-pinhole@1"})
+    for comp in (sorted(MORE_PSUS) + sorted(MORE_FANS) + sorted(MORE_BLANKS.values())):
+        c = contract(comp)
+        assert c["size-confidence"]
+        assert all(isinstance(v, str) for v in c["provenance"].values())
+    assert contract("ex4300-48mp-mode-button")["size-confidence"]

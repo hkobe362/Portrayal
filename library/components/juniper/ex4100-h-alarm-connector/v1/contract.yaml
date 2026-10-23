@@ -1,0 +1,40 @@
+format: 1
+kind: component
+name: ex4100-h-alarm-connector
+version: 1.0.0
+class: inlet
+behaviour: mounts
+profile: networking
+description: >-
+  The dry contact alarm connector of the Juniper EX4100-H switches: a green pluggable screw-terminal plug with six
+  wire openings on a 3.5 mm pitch and a captive screw at each end, seated in its header on the front panel. The poles
+  are GND, IN0, IN1, NO, COM and NC; the legends are printed on the panel beside it, so the part carries none. It is
+  drawn along its length, and the EX4100-H-12MP turns it upright. The plug ships preassembled to the switch.
+attrs:
+  media: dry-contact
+  positions: 6
+  pitch-mm: 3.5
+provenance:
+  sources: >-
+    drawing and photo-measured - EX4100-H Switch Hardware Guide (Juniper Networks, published 2026-10-01), Figures 1 and 3
+    (the front panels of the EX4100-H-12MP and EX4100-H-24MP, callouts 13 and 16) and Table 4, and Juniper's studio
+    photographs of the three models, front.
+  size: >-
+    estimated - read off the guide's flat figures after Gate 1 (Figure 3, 6.568 px/mm against the 439.0 mm body, its
+    height agreeing with the 43.3 mm table figure to 0.1 percent): 32.2 mm along its length and 7.6 across on the
+    EX4100-H-24MP, and 32.1 by 7.8 on the 12MP (Figure 1, 15.085 px/mm against 111.7 mm). 7.7 is carried for the
+    width across. The guide gives no dimension for the plug.
+  the-face: >-
+    estimated - eight positions: a captive screw at each end, centred 2.75 mm from the end, and six wire openings on
+    a 3.5 mm pitch between them, centred on the plug. The 24MP figure reads the openings at 3.46 mm and the 12MP's at
+    3.5. The openings and screw heads are drawn as the studio photographs show them; the depth of the plug is not
+    stated and is not set.
+  colour: photo-measured - the plug housing is a bright green (#4cae4f) in all three photographs.
+states: []
+elements:
+  body: {at: [0.0, 0.0], size: [32.2, 7.7], class: connector}
+size:
+  w: 32.2
+  h: 7.7
+size-confidence: {w: estimated, h: estimated}
+skins: [default]
