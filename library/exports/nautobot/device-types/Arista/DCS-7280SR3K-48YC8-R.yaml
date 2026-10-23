@@ -163,13 +163,14 @@ comments: "Arista 7280SR3-48YC8 - a fixed 1RU data-centre switch router with 48 
   \ says -40 to 70 C\n- features.eos-license: license group G2; minimum EOS 4.26.0 (7280SR3-48YC8), 4.25.1\
   \ (7280SR3K-48YC8), 4.27.2 (7280SR3K-48YC8A)\n- features.optics-qsfp28: 100G, 50G, 40G, 25G and 10G\
   \ with breakout, in the eight QSFP cages (data sheet)\n- features.optics-sfp28: 1G, 10G and 25G, in\
-  \ the 48 SFP cages (data sheet)\n- lifecycle.eol: none-announced\n- management.console: RJ-45 RS-232\
-  \ serial on the rear, 9600 baud 8N1, no flow control\n- management.oob: one 10/100/1000 management port\
-  \ on the rear\n- management.usb: one USB port on the rear, for software or configuration updates\n-\
-  \ performance.interfaces-max: 80\n- performance.latency: from 3.8 microseconds\n- performance.packet-buffer:\
-  \ 4 GB\n- performance.packets-per-second: 1 Bpps\n- performance.ports-max-speed: eight ports of 100\
-  \ Gbps; 16 of 50 Gbps; 8 of 40 Gbps; 80 of 25 or 10 Gbps; 48 of 1 Gbps\n- performance.throughput: 2.0\
-  \ (4.0) Tbps\n- physical.size-over-ears: 48.3 x 4.4 x 46.7 cm (19 x 1.75 x 18.4 in) with the mounting\
+  \ the 48 SFP cages (data sheet)\n- lifecycle.end-of-life: 2031-10-10\n- lifecycle.end-of-sale: 2026-10-10\n\
+  - lifecycle.eol: announced\n- lifecycle.eol-announcement: https://www.arista.com/en/support/advisories-notices/end-of-sale/23789-end-of-sale-of-the-arista-dcs-7280sr3k-48yc8-series\n\
+  - management.console: RJ-45 RS-232 serial on the rear, 9600 baud 8N1, no flow control\n- management.oob:\
+  \ one 10/100/1000 management port on the rear\n- management.usb: one USB port on the rear, for software\
+  \ or configuration updates\n- performance.interfaces-max: 80\n- performance.latency: from 3.8 microseconds\n\
+  - performance.packet-buffer: 4 GB\n- performance.packets-per-second: 1 Bpps\n- performance.ports-max-speed:\
+  \ eight ports of 100 Gbps; 16 of 50 Gbps; 8 of 40 Gbps; 80 of 25 or 10 Gbps; 48 of 1 Gbps\n- performance.throughput:\
+  \ 2.0 (4.0) Tbps\n- physical.size-over-ears: 48.3 x 4.4 x 46.7 cm (19 x 1.75 x 18.4 in) with the mounting\
   \ ears (guide Table 1)\n- physical.weight: 9.2 kg (20.2 lbs) for the 7280SR3-48YC8, 7280SR3K-48YC8 and\
   \ 7280SR3K-48YC8A (guide Table 1, data sheet 9.18 kg)\n- platform.cpu: Quad-Core x86 (7280SR3-48YC8\
   \ and 7280SR3K-48YC8); Eight-Core x86 (7280SR3K-48YC8A)\n- platform.memory: 8 GB (7280SR3-48YC8); 64\
