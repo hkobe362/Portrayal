@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-54
-version: 0.1.0
+version: 0.1.2
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-54
@@ -161,7 +161,9 @@ provenance:
       region. The model line is plain text and is drawn: figure C-1 prints "7280DR3AK-54" because it is
       a picture of the DR3AK-54, the encryption variant of this chassis, and the guide's one figure serves
       the DR3A-54, the DR3AK-54 and the DR3AM-54. The line here reads 7280DR3A-54, the plate of the device
-      this file is named for; the K and M variants print their own (see gaps).
+      this file is named for; the K and M variants print their own (see gaps). On the `ac-k` configuration
+      the line is therefore a stand-in for the figure's "7280DR3AK-54": silkscreen text takes no `only-in`,
+      so the face cannot print one plate on `ac-k` and another on `base` and `ac` without format code.
   rear-layout:
     confidence: estimated
     note: >-
@@ -240,7 +242,7 @@ attrs:
     weight-note: 27.9 kg (61.6 lbs) per Table 1 of the guide; "61.6 lbs (27.94 kg)" per the data sheet
     size-over-ears: >-
       48.3 x 8.8 x 76.4 cm (19 x 3.50 x 30.1 inches) per Table 1 of the guide, which includes the rack
-      ears; the data sheet gives 43.99 x 8.79 x 76.39 cm "inc. handles"
+      ears. The data sheet gives 43.99 x 8.79 x 76.39 cm "inc. handles".
   performance: {throughput: 21.6 (43.2) Tbps full duplex, packets-per-second: 8.1 Bpps, latency: from
       3.8 us, packet-buffer: 24 GB, max-400g-ports: 54, max-100g-ports: 216, max-50g-ports: 348, max-40g-ports: 54,
     max-25-10g-ports: 348, max-total-interfaces: 348}
@@ -248,8 +250,8 @@ attrs:
     power-draw-typical-w: 933
     power-draw-max-w: 1715
     power-draw-note: >-
-      Table 4 of the guide: "933 W / 1715 W" for the DR3A-54, DR3AM-54 and DR3AK-54; the data sheet measures
-      the typical at 25 C ambient with 50 percent load on all ports, excluding transceivers
+      Table 4 of the guide: "933 W / 1715 W" for the DR3A-54, DR3AM-54 and DR3AK-54. The data sheet measures
+      the typical at 25 C ambient with 50 percent load on all ports, excluding transceivers.
   thermal: {airflow: front-to-back}
   environmental: {operating-temp: 0 to 40 C (32 to 104 F), storage-temp: -25 to 70 C (-13 to 158 F), storage-temp-datasheet: '-40
       to 70 C (-40 to 158 F), per the data sheet', altitude: '0 to 3,000 m (0 to 10,000 ft)', humidity: '5
@@ -258,8 +260,8 @@ attrs:
       4.29.1 per the data sheet, feature-license: EOS Feature Licenses Group 5}
   features:
     optics-qsfp-dd: >-
-      datasheet: each QSFP-DD port runs 400G, or 200G, 100G, 50G, 40G (QSFP+) and 25/10G modes by breakout;
-      maximum values are uni-dimensional and may need breakout cables or transceivers.
+      datasheet: each QSFP-DD port runs 400G, or 200G, 100G, 50G, 40G (QSFP+) and 25/10G modes by breakout.
+      Maximum values are uni-dimensional and may need breakout cables or transceivers.
     optics-osfp: >-
       datasheet: the two OSFP-LS (line-system) ports are "for dense 400G-ZR deployment", and "Arista's
       R3A platforms are optimized to support high power 400ZR OSFP and QSFP-DD optical modules".
@@ -295,8 +297,9 @@ gaps:
   wanted: >-
     A FIGURE OF THE DR3A-54 AND THE DR3AM-54 FRONT. Figure C-1 is captioned for all three models but prints
     the plate "7280DR3AK-54", so it is a picture of the DR3AK-54. The model plate of the other two is
-    not shown, and this file prints "7280DR3A-54" on every configuration. A photograph of each plate closes
-    it.
+    not shown, and this file prints "7280DR3A-54" on every configuration, so on `ac-k` the plate is a
+    stand-in for the figure's "7280DR3AK-54" (silkscreen text takes no `only-in`; a per-configuration
+    plate needs a format change). A photograph of each plate closes the M one.
 - what: cage-turn
   scope:
   - front
@@ -1586,7 +1589,9 @@ configurations:
     kind: orderable
     description: >-
       The DR3AK-54 with large routes and TunnelSec: DCS-7280DR3AK-54-F, the same face, supplies and fans
-      as the base switch. Table 4 gives it the base switch's power draw.
+      as the base switch. Table 4 gives it the base switch's power draw. THE MODEL PLATE ON ITS FACE IS
+      A STAND-IN. Figure C-1 prints "7280DR3AK-54" on this build. The face prints "7280DR3A-54", because
+      silkscreen text takes no `only-in` and one plate serves every configuration (see gaps, front-faces-of-the-variants).
     part-numbers:
       DCS-7280DR3AK-54-F: {}
     bays: {psu-1: arista/7280dr3a-pwr-3000-ac@1, psu-2: arista/7280dr3a-pwr-3000-ac@1}

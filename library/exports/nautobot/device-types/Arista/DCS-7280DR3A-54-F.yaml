@@ -201,7 +201,7 @@ comments: 'Arista 7280DR3A-54 - a fixed 2RU data-centre router switch with 54 40
   and "Arista''s R3A platforms are optimized to support high power 400ZR OSFP and QSFP-DD optical modules".
 
   - features.optics-qsfp-dd: datasheet: each QSFP-DD port runs 400G, or 200G, 100G, 50G, 40G (QSFP+) and
-  25/10G modes by breakout; maximum values are uni-dimensional and may need breakout cables or transceivers.
+  25/10G modes by breakout. Maximum values are uni-dimensional and may need breakout cables or transceivers.
 
   - features.osfp-ls: 2 x OSFP-LS ports for dense 400G-ZR deployment
 
@@ -235,7 +235,7 @@ comments: 'Arista 7280DR3A-54 - a fixed 2RU data-centre router switch with 54 40
   - performance.throughput: 21.6 (43.2) Tbps full duplex
 
   - physical.size-over-ears: 48.3 x 8.8 x 76.4 cm (19 x 3.50 x 30.1 inches) per Table 1 of the guide,
-  which includes the rack ears; the data sheet gives 43.99 x 8.79 x 76.39 cm "inc. handles"
+  which includes the rack ears. The data sheet gives 43.99 x 8.79 x 76.39 cm "inc. handles".
 
   - physical.weight-note: 27.9 kg (61.6 lbs) per Table 1 of the guide; "61.6 lbs (27.94 kg)" per the data
   sheet
@@ -252,15 +252,15 @@ comments: 'Arista 7280DR3A-54 - a fixed 2RU data-centre router switch with 54 40
 
   - power.power-draw-max-w: 1715
 
-  - power.power-draw-note: Table 4 of the guide: "933 W / 1715 W" for the DR3A-54, DR3AM-54 and DR3AK-54;
-  the data sheet measures the typical at 25 C ambient with 50 percent load on all ports, excluding transceivers
+  - power.power-draw-note: Table 4 of the guide: "933 W / 1715 W" for the DR3A-54, DR3AM-54 and DR3AK-54.
+  The data sheet measures the typical at 25 C ambient with 50 percent load on all ports, excluding transceivers.
 
   - power.power-draw-typical-w: 933
 
   - thermal.airflow: front-to-back
 
 
-  Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.2. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'

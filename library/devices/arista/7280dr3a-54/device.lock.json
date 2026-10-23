@@ -46,7 +46,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "0f34b57fda47c3d5",
+ "gaps": "6350d404cea9d0b8",
  "groups": [
   "fans",
   "leds",
@@ -761,6 +761,6 @@
  },
  "placement-surface": "1e16dae20127446d",
  "shape": "309d5f8435072ca2",
- "surface": "7b4f8de5b3a1e723",
- "version": "0.1.0"
+ "surface": "ccafc61069a48c7e",
+ "version": "0.1.2"
 }
