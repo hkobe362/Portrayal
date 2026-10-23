@@ -8,6 +8,8 @@ weight: 6.92
 weight_unit: kg
 description: Juniper EX4100-H-24MP is a hardened (industrial), fanless 1RU multigigabit PoE++ access switch
   with 24 RJ-45 ports (eight 1/2.5 Gbps and sixteen 1 Gbps, all PoE++ at 90 W by default), four 1/10...
+front_image: true
+rear_image: true
 console-ports:
   - name: Console
     type: rj-45
@@ -151,7 +153,7 @@ comments: 'Juniper EX4100-H-24MP is a hardened (industrial), fanless 1RU multigi
   - power.power-input-dc: 20.4 through 72 VDC at the terminal block, nominal +24, -48 or -60 VDC (Table
   36)
 
-  - thermal.cooling: fanless, convection cooled (Table 10); 1 RU clear above and below
+  - thermal.cooling: fanless, convection cooled (Table 10); one rack unit clear above and below
 
 
   Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
