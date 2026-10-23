@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4100-24p
-version: 0.1.1
+version: 1.0.0
 maturity: modelled
 manufacturer: Juniper
 model: EX4100-24P
@@ -258,6 +258,13 @@ gaps:
   - right
   reason: needs-drawing
   wanted: A flat drawing or photograph of the lid, the underside and the side panels.
+- what: reset-pinhole-size
+  scope:
+  - front
+  reason: vendor-silent
+  wanted: >-
+    The diameter and depth of the Reset pinhole (callout 9). The guide names the Reset button and gives
+    no size, so the hole is drawn at 2.0 mm as an estimate.
 groups:
   rj45-a:
     term: Port
@@ -400,7 +407,7 @@ views:
       - {id: uplink-1, at: [391.0, 24.93], size: [14.25, 10.4], shape: rect}
       - {id: uplink-2, at: [405.25, 10.62], size: [14.25, 10.4], shape: rect}
       - {id: uplink-3, at: [405.25, 24.93], size: [14.25, 10.4], shape: rect}
-      - {id: reset-pinhole, at: [331.9, 36.7], size: [4.0, 4.0], shape: circle}
+      - {id: reset-pinhole, at: [332.9, 37.7], size: [2.0, 2.0], shape: circle}
       - {id: usb-c, at: [424.2, 38.5], size: [8.34, 2.56], shape: rect}
       - {id: mode-btn, at: [425.3, 30.4], size: [5.4, 5.4], shape: circle}
       - {id: led-vcp-1-link, at: [361.57, 21.8], size: [2.25, 2.0], shape: rect}
@@ -588,9 +595,9 @@ views:
         group: sfp-plus-leds, rel-pos: 6}
       - {ref: common/led-arrow-sm@1, id: led-uplink-2-status, at: [415.38, 21.8], skin: up, for: uplink-2,
         group: sfp-plus-leds, rel-pos: 7}
-      - ref: common/reset-button@1
+      - ref: juniper/ex4100-reset-pinhole@1
         id: reset-pinhole
-        at: [331.9, 36.7]
+        at: [332.9, 37.7]
         for: chassis
         group: mgmt
         rel-pos: 3
