@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050cx4m-48d8
-version: 0.1.1
+version: 1.0.0
 maturity: modelled
 manufacturer: Arista
 model: 7050CX4M-48D8
@@ -826,7 +826,7 @@ views:
         accepts:
         - arista/7050x4-pwr-1500-ac@1
         - arista/7050x4-pwr-1500-ac-rev@1
-        - arista/7050x4-pwr-1500-dc@1
+        - arista/7280r3-pwr-1500-dc@1
         - arista/7050x4-pwr-1500-dc-rev@1
         default: arista/7050x4-pwr-1500-ac@1
       - id: psu-2
@@ -837,7 +837,7 @@ views:
         accepts:
         - arista/7050x4-pwr-1500-ac@1
         - arista/7050x4-pwr-1500-ac-rev@1
-        - arista/7050x4-pwr-1500-dc@1
+        - arista/7280r3-pwr-1500-dc@1
         - arista/7050x4-pwr-1500-dc-rev@1
         default: arista/7050x4-pwr-1500-ac@1
       - id: fan-1
@@ -932,7 +932,7 @@ configurations:
       Two DC supplies and front-to-rear air: PWR-1511-DC-RED supplies and FAN-7012H-RED fan modules. The
       data sheet lists no DC part number for the switch; the supplies are spares, and a DC build is ordered
       through the "#" configurable SKU.
-    bays: {psu-1: arista/7050x4-pwr-1500-dc@1, psu-2: arista/7050x4-pwr-1500-dc@1}
+    bays: {psu-1: arista/7280r3-pwr-1500-dc@1, psu-2: arista/7280r3-pwr-1500-dc@1}
   dc-r:
     kind: example
     power: dc

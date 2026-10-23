@@ -16,23 +16,23 @@
    "arista/7050x4-pwr-1500-ac-rev@1",
    "arista/7050x4-pwr-1500-ac@1",
    "arista/7050x4-pwr-1500-dc-rev@1",
-   "arista/7050x4-pwr-1500-dc@1"
+   "arista/7280r3-pwr-1500-dc@1"
   ],
   "rear/bays/psu-2": [
    "arista/7050x4-pwr-1500-ac-rev@1",
    "arista/7050x4-pwr-1500-ac@1",
    "arista/7050x4-pwr-1500-dc-rev@1",
-   "arista/7050x4-pwr-1500-dc@1"
+   "arista/7280r3-pwr-1500-dc@1"
   ]
  },
- "composed": "d4a1beaa896855a3",
+ "composed": "eb3530634bba9325",
  "composed-refs": {
   "arista/7050x4-pwr-1500-ac-rev@1": "1.0.0+233af23a5deae5a3",
   "arista/7050x4-pwr-1500-ac@1": "1.0.0+f3d8cee5d8b57c4c",
-  "arista/7050x4-pwr-1500-dc-rev@1": "1.0.0+8639395fb129e743",
-  "arista/7050x4-pwr-1500-dc@1": "1.0.0+17352739b2cf416b",
+  "arista/7050x4-pwr-1500-dc-rev@1": "1.0.0+991a90b46a2390fa",
   "arista/7280cr3-fan-rev@1": "1.0.0+e82600fd5ce7ef43",
   "arista/7280cr3-fan@1": "1.0.0+f362d1f85cb0648b",
+  "arista/7280r3-pwr-1500-dc@1": "1.0.0+1dc288c0e21bed6f",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/terminal-screw-34@1": "1.0.1+a05c552610f166f2",
@@ -218,7 +218,7 @@
   "rear/placements/mgmt",
   "rear/placements/usb"
  ],
- "names": "bedb797d44219291",
+ "names": "f0f358b37643fd48",
  "placement-addressing": {
   "for": {
    "front/placements/led-fan": [
@@ -507,6 +507,6 @@
  },
  "placement-surface": "662533492d45df98",
  "shape": "c66b913f77b3a5f5",
- "surface": "7f797e50ab46c229",
- "version": "0.1.1"
+ "surface": "323f2a312b1b92bf",
+ "version": "1.0.0"
 }

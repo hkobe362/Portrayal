@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050x4-48y-4df
-version: 0.1.0
+version: 1.0.0
 maturity: modelled
 manufacturer: Arista
 model: 7050X4-48Y-4DF
@@ -1078,49 +1078,49 @@ views:
         group: psu-bays
         rel-pos: 1
         accepts:
-        - arista/7050x4-pwr-500-ac@1
-        - arista/7050x4-pwr-500-ac-rev@1
-        - arista/7050x4-pwr-500-dc@1
-        - arista/7050x4-pwr-500-dc-rev@1
-        default: arista/7050x4-pwr-500-ac@1
+        - arista/7280r3-pwr-500-ac@1
+        - arista/7280r3-pwr-500-ac-rev@1
+        - arista/7280r3-pwr-500-dc@1
+        - arista/7280r3-pwr-500-dc-rev@1
+        default: arista/7280r3-pwr-500-ac@1
       - id: psu-2
         at: [362.3, 1.85]
         size: {w: 73.5, h: 40.0}
         group: psu-bays
         rel-pos: 2
         accepts:
-        - arista/7050x4-pwr-500-ac@1
-        - arista/7050x4-pwr-500-ac-rev@1
-        - arista/7050x4-pwr-500-dc@1
-        - arista/7050x4-pwr-500-dc-rev@1
-        default: arista/7050x4-pwr-500-ac@1
+        - arista/7280r3-pwr-500-ac@1
+        - arista/7280r3-pwr-500-ac-rev@1
+        - arista/7280r3-pwr-500-dc@1
+        - arista/7280r3-pwr-500-dc-rev@1
+        default: arista/7280r3-pwr-500-ac@1
       - id: fan-1
         at: [107.7, 2.55]
         size: {w: 78.6, h: 38.6}
         group: fans
         rel-pos: 1
         accepts:
-        - arista/7050x4-fan-7011m@1
-        - arista/7050x4-fan-7011m-rev@1
-        default: arista/7050x4-fan-7011m@1
+        - arista/7280r3-fan-m@1
+        - arista/7280r3-fan-m-rev@1
+        default: arista/7280r3-fan-m@1
       - id: fan-2
         at: [191.0, 2.55]
         size: {w: 78.6, h: 38.6}
         group: fans
         rel-pos: 2
         accepts:
-        - arista/7050x4-fan-7011m@1
-        - arista/7050x4-fan-7011m-rev@1
-        default: arista/7050x4-fan-7011m@1
+        - arista/7280r3-fan-m@1
+        - arista/7280r3-fan-m-rev@1
+        default: arista/7280r3-fan-m@1
       - id: fan-3
         at: [274.3, 2.55]
         size: {w: 78.6, h: 38.6}
         group: fans
         rel-pos: 3
         accepts:
-        - arista/7050x4-fan-7011m@1
-        - arista/7050x4-fan-7011m-rev@1
-        default: arista/7050x4-fan-7011m@1
+        - arista/7280r3-fan-m@1
+        - arista/7280r3-fan-m-rev@1
+        default: arista/7280r3-fan-m@1
       placements:
       - ref: common/rj45-eth@1
         id: mgmt
@@ -1176,8 +1176,8 @@ configurations:
     description: >-
       The 7050X4-48Y-4DF with two AC supplies and rear-to-front air: PWR-511-AC-BLUE supplies and FAN-7011M-R
       fan modules, all with blue handles. Ordered as DCS-7050X4-48Y-4DF-R.
-    bays: {psu-1: arista/7050x4-pwr-500-ac-rev@1, psu-2: arista/7050x4-pwr-500-ac-rev@1, fan-1: arista/7050x4-fan-7011m-rev@1,
-      fan-2: arista/7050x4-fan-7011m-rev@1, fan-3: arista/7050x4-fan-7011m-rev@1}
+    bays: {psu-1: arista/7280r3-pwr-500-ac-rev@1, psu-2: arista/7280r3-pwr-500-ac-rev@1, fan-1: arista/7280r3-fan-m-rev@1,
+      fan-2: arista/7280r3-fan-m-rev@1, fan-3: arista/7280r3-fan-m-rev@1}
     part-numbers:
       DCS-7050X4-48Y-4DF-R: {}
   dc-f:
@@ -1187,7 +1187,7 @@ configurations:
       Two DC supplies and front-to-rear air: PWR-511-DC-RED supplies and FAN-7011M-F fan modules. The
       data sheet lists no DC part number for the switch; the supplies are spares, and a DC build is ordered
       through the "#" configurable SKU.
-    bays: {psu-1: arista/7050x4-pwr-500-dc@1, psu-2: arista/7050x4-pwr-500-dc@1}
+    bays: {psu-1: arista/7280r3-pwr-500-dc@1, psu-2: arista/7280r3-pwr-500-dc@1}
   dc-r:
     kind: example
     power: dc
@@ -1195,8 +1195,8 @@ configurations:
     description: >-
       Two DC supplies and rear-to-front air: PWR-511-DC-BLUE supplies and FAN-7011M-R fan modules. No
       DC part number is listed for the switch.
-    bays: {psu-1: arista/7050x4-pwr-500-dc-rev@1, psu-2: arista/7050x4-pwr-500-dc-rev@1, fan-1: arista/7050x4-fan-7011m-rev@1,
-      fan-2: arista/7050x4-fan-7011m-rev@1, fan-3: arista/7050x4-fan-7011m-rev@1}
+    bays: {psu-1: arista/7280r3-pwr-500-dc-rev@1, psu-2: arista/7280r3-pwr-500-dc-rev@1, fan-1: arista/7280r3-fan-m-rev@1,
+      fan-2: arista/7280r3-fan-m-rev@1, fan-3: arista/7280r3-fan-m-rev@1}
 datasheet:
   title: >-
     7050X4 Series 100/200/400G Data Center Switches Data Sheet (Arista Networks, 03-0057-27, Aug 27th,

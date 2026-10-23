@@ -1,38 +1,38 @@
 {
  "bay-accepts": {
   "rear/bays/fan-1": [
-   "arista/7050x4-fan-7011m-rev@1",
-   "arista/7050x4-fan-7011m@1"
+   "arista/7280r3-fan-m-rev@1",
+   "arista/7280r3-fan-m@1"
   ],
   "rear/bays/fan-2": [
-   "arista/7050x4-fan-7011m-rev@1",
-   "arista/7050x4-fan-7011m@1"
+   "arista/7280r3-fan-m-rev@1",
+   "arista/7280r3-fan-m@1"
   ],
   "rear/bays/fan-3": [
-   "arista/7050x4-fan-7011m-rev@1",
-   "arista/7050x4-fan-7011m@1"
+   "arista/7280r3-fan-m-rev@1",
+   "arista/7280r3-fan-m@1"
   ],
   "rear/bays/psu-1": [
-   "arista/7050x4-pwr-500-ac-rev@1",
-   "arista/7050x4-pwr-500-ac@1",
-   "arista/7050x4-pwr-500-dc-rev@1",
-   "arista/7050x4-pwr-500-dc@1"
+   "arista/7280r3-pwr-500-ac-rev@1",
+   "arista/7280r3-pwr-500-ac@1",
+   "arista/7280r3-pwr-500-dc-rev@1",
+   "arista/7280r3-pwr-500-dc@1"
   ],
   "rear/bays/psu-2": [
-   "arista/7050x4-pwr-500-ac-rev@1",
-   "arista/7050x4-pwr-500-ac@1",
-   "arista/7050x4-pwr-500-dc-rev@1",
-   "arista/7050x4-pwr-500-dc@1"
+   "arista/7280r3-pwr-500-ac-rev@1",
+   "arista/7280r3-pwr-500-ac@1",
+   "arista/7280r3-pwr-500-dc-rev@1",
+   "arista/7280r3-pwr-500-dc@1"
   ]
  },
- "composed": "0a28641d999be879",
+ "composed": "a23eb94e72a2c5c4",
  "composed-refs": {
-  "arista/7050x4-fan-7011m-rev@1": "1.0.0+80897c0ea4f796c0",
-  "arista/7050x4-fan-7011m@1": "1.0.0+699f313196a96ac3",
-  "arista/7050x4-pwr-500-ac-rev@1": "1.0.0+f7b4822b7d9fe30d",
-  "arista/7050x4-pwr-500-ac@1": "1.0.0+239b4e0c7efbc41a",
-  "arista/7050x4-pwr-500-dc-rev@1": "1.0.0+6366c47b9db356a7",
-  "arista/7050x4-pwr-500-dc@1": "1.0.0+b5c14e0177dccc55",
+  "arista/7280r3-fan-m-rev@1": "1.0.0+fc51720939894892",
+  "arista/7280r3-fan-m@1": "1.0.0+c69eb1148518a52e",
+  "arista/7280r3-pwr-500-ac-rev@1": "1.0.0+5b36e80dc5e4cef5",
+  "arista/7280r3-pwr-500-ac@1": "1.0.0+28bb4c32127e71cc",
+  "arista/7280r3-pwr-500-dc-rev@1": "1.0.0+e69db39b5efbee9f",
+  "arista/7280r3-pwr-500-dc@1": "1.0.0+ef326b6f8ceb234c",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/terminal-screw-34@1": "1.0.1+a05c552610f166f2",
@@ -289,7 +289,7 @@
   "rear/placements/mgmt",
   "rear/placements/usb"
  ],
- "names": "40fd57931693a90c",
+ "names": "0fbf8ddcd856ac9d",
  "placement-addressing": {
   "for": {
    "front/placements/led-fan": [
@@ -703,7 +703,7 @@
   "rear/placements/usb": "mgmt"
  },
  "placement-surface": "14609d4fb3a95278",
- "shape": "5a72d376b075d088",
- "surface": "1a064353c8606c54",
- "version": "0.1.0"
+ "shape": "c6ef8d1aa27d89c6",
+ "surface": "56b61f75c2211be2",
+ "version": "1.0.0"
 }

@@ -21,7 +21,7 @@ attrs:
   input-note: '-48 to -60 VDC, 38.0 A'
 provenance:
   size: >-
-    datasheet for the width, estimated for the height, as arista/7050x4-pwr-1500-dc: the 7050X4 Series
+    datasheet for the width, estimated for the height, as arista/7280r3-pwr-1500-dc (the same part number's red module): the 7050X4 Series
     Data Sheet (03-0057-27) lists "PWR-1511-DC-BLUE  Arista PSU, 1RU, DC/DC, 1500W, REVERSE, 73.5MM".
   part-number: >-
     datasheet - optional components and spares, as above. The datasheet lists no DC SKU of the switch;
@@ -29,7 +29,8 @@ provenance:
   power-output: >-
     datasheet - the "1500W" of the ordering description. An output.
   input: >-
-    datasheet - as arista/7050x4-pwr-1500-dc: guide table 3, "-48 to -60 VDC, 38.0 A", and the power
+    datasheet - the 7050X4 guide, where arista/7280r3-pwr-1500-dc (the red module) carries the 7280R3
+    guide's current: guide table 3, "-48 to -60 VDC, 38.0 A", and the power
     supply table's "35.2A Max (-48V)".
   face: >-
     estimated, AND NOT FROM THIS MODULE. No picture of a blue PWR-1511-DC is held. It is the red module

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050px4-32s
-version: 0.1.1
+version: 1.0.0
 maturity: modelled
 manufacturer: Arista
 model: 7050PX4-32S
@@ -432,10 +432,10 @@ views:
     components:
       bays:
         - {id: psu-1, at: [4.0, 1.85], size: {w: 73.5, h: 40.0}, group: psu-bays, rel-pos: 1,
-           accepts: [arista/7050x4-pwr-1500-ac@1, arista/7050x4-pwr-1500-ac-rev@1, arista/7050x4-pwr-1500-dc@1, arista/7050x4-pwr-1500-dc-rev@1],
+           accepts: [arista/7050x4-pwr-1500-ac@1, arista/7050x4-pwr-1500-ac-rev@1, arista/7280r3-pwr-1500-dc@1, arista/7050x4-pwr-1500-dc-rev@1],
            default: arista/7050x4-pwr-1500-ac@1}
         - {id: psu-2, at: [362.3, 1.85], size: {w: 73.5, h: 40.0}, group: psu-bays, rel-pos: 2,
-           accepts: [arista/7050x4-pwr-1500-ac@1, arista/7050x4-pwr-1500-ac-rev@1, arista/7050x4-pwr-1500-dc@1, arista/7050x4-pwr-1500-dc-rev@1],
+           accepts: [arista/7050x4-pwr-1500-ac@1, arista/7050x4-pwr-1500-ac-rev@1, arista/7280r3-pwr-1500-dc@1, arista/7050x4-pwr-1500-dc-rev@1],
            default: arista/7050x4-pwr-1500-ac@1}
         - {id: fan-1, at: [107.7, 2.55], size: {w: 78.6, h: 38.6}, group: fans, rel-pos: 1,
            accepts: [arista/7280cr3-fan@1, arista/7280cr3-fan-rev@1], default: arista/7280cr3-fan@1}
@@ -504,8 +504,8 @@ configurations:
       Two DC supplies and front-to-rear air: PWR-1511-DC-RED supplies and FAN-7011H-F fan modules. The data sheet lists no DC part number for the
       switch; the supplies are spares, and a DC build is ordered through the "#" configurable SKU.
     bays:
-      psu-1: arista/7050x4-pwr-1500-dc@1
-      psu-2: arista/7050x4-pwr-1500-dc@1
+      psu-1: arista/7280r3-pwr-1500-dc@1
+      psu-2: arista/7280r3-pwr-1500-dc@1
   dc-r:
     kind: example
     power: dc

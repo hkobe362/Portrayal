@@ -27,13 +27,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 LIB = ROOT / "library"
 
 P1500 = ["arista/7050x4-pwr-1500-ac@1", "arista/7050x4-pwr-1500-ac-rev@1",
-         "arista/7050x4-pwr-1500-dc@1", "arista/7050x4-pwr-1500-dc-rev@1"]
+         "arista/7280r3-pwr-1500-dc@1", "arista/7050x4-pwr-1500-dc-rev@1"]
 P1000 = ["arista/7280cr3-pwr-1000-ac@1", "arista/7280cr3-pwr-1000-ac-rev@1",
          "arista/7280cr3-pwr-1000-dc@1", "arista/7280cr3-pwr-1000-dc-rev@1"]
-P500 = ["arista/7050x4-pwr-500-ac@1", "arista/7050x4-pwr-500-ac-rev@1",
-        "arista/7050x4-pwr-500-dc@1", "arista/7050x4-pwr-500-dc-rev@1"]
+P500 = ["arista/7280r3-pwr-500-ac@1", "arista/7280r3-pwr-500-ac-rev@1",
+        "arista/7280r3-pwr-500-dc@1", "arista/7280r3-pwr-500-dc-rev@1"]
 F7011H = ["arista/7280cr3-fan@1", "arista/7280cr3-fan-rev@1"]
-F7011M = ["arista/7050x4-fan-7011m@1", "arista/7050x4-fan-7011m-rev@1"]
+F7011M = ["arista/7280r3-fan-m@1", "arista/7280r3-fan-m-rev@1"]
 F7012H = ["arista/7280dr3a-fan@1", "arista/7050x4-fan-7012h-rev@1"]
 
 QDD, QSFP56, QSFPG, OSFP, SFPG = ("std/qsfp-dd@1", "std/qsfp56@1", "std/qsfp-ganged@1", "std/osfp@1",
@@ -374,16 +374,12 @@ def test_the_new_components_are_family_prefixed_with_the_part_numbers_and_colour
     root = LIB / "components/arista"
     names = sorted(p.name for p in root.iterdir() if p.name.startswith("7050x4-"))
     assert names == [
-        "7050x4-fan-7011m", "7050x4-fan-7011m-rev", "7050x4-fan-7012h-rev",
-        "7050x4-pwr-1500-ac", "7050x4-pwr-1500-ac-rev", "7050x4-pwr-1500-dc", "7050x4-pwr-1500-dc-rev",
-        "7050x4-pwr-500-ac", "7050x4-pwr-500-ac-rev", "7050x4-pwr-500-dc", "7050x4-pwr-500-dc-rev"]
+        "7050x4-fan-7012h-rev",
+        "7050x4-pwr-1500-ac", "7050x4-pwr-1500-ac-rev", "7050x4-pwr-1500-dc-rev"]
     parts = {
-        "7050x4-fan-7011m": "FAN-7011M-F", "7050x4-fan-7011m-rev": "FAN-7011M-R",
         "7050x4-fan-7012h-rev": "FAN-7012H-BLUE",
         "7050x4-pwr-1500-ac": "PWR-1512-AC-RED", "7050x4-pwr-1500-ac-rev": "PWR-1512-AC-BLUE",
-        "7050x4-pwr-1500-dc": "PWR-1511-DC-RED", "7050x4-pwr-1500-dc-rev": "PWR-1511-DC-BLUE",
-        "7050x4-pwr-500-ac": "PWR-511-AC-RED", "7050x4-pwr-500-ac-rev": "PWR-511-AC-BLUE",
-        "7050x4-pwr-500-dc": "PWR-511-DC-RED", "7050x4-pwr-500-dc-rev": "PWR-511-DC-BLUE"}
+        "7050x4-pwr-1500-dc-rev": "PWR-1511-DC-BLUE"}
     for n, pn in parts.items():
         c = contract(n)
         assert list(c["part-numbers"]) == [pn], n
@@ -404,6 +400,17 @@ def test_the_reused_components_are_the_exact_part_numbers_other_arista_models_al
     assert list(contract("7280cr3-fan")["part-numbers"]) == ["FAN-7011H-F"]
     assert list(contract("7280cr3-fan-rev")["part-numbers"]) == ["FAN-7011H-R"]
     assert list(contract("7280dr3a-fan")["part-numbers"]) == ["FAN-7012H-RED"]
+    # the part numbers the 7280R3 models carry too are that line's components, not 7050X4 copies
+    for n, pn in {"7280r3-fan-m": "FAN-7011M-F", "7280r3-fan-m-rev": "FAN-7011M-R",
+                  "7280r3-pwr-1500-dc": "PWR-1511-DC-RED",
+                  "7280r3-pwr-500-ac": "PWR-511-AC-RED", "7280r3-pwr-500-ac-rev": "PWR-511-AC-BLUE",
+                  "7280r3-pwr-500-dc": "PWR-511-DC-RED", "7280r3-pwr-500-dc-rev": "PWR-511-DC-BLUE"}.items():
+        assert list(contract(n)["part-numbers"]) == [pn], n
+    held = {pn for p in (LIB / "components/arista").iterdir() if p.name.startswith("7050x4-")
+            for pn in contract(p.name)["part-numbers"]}
+    carried = {pn for p in (LIB / "components/arista").iterdir() if p.name.startswith("7280r3-")
+               for pn in contract(p.name)["part-numbers"]}
+    assert not held & carried
 
 
 # ------------------------------------------------------------------ the DCIM

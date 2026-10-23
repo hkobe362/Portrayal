@@ -1,0 +1,104 @@
+format: 1
+kind: module
+name: ex9253-jnp-pwr1100-dc
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  Juniper JNP-PWR1100-DC, the universal DC power supply of the EX9253. It outputs 1100 W from a single
+  -48 VDC feed (operating range -40 to -72 VDC) and has a terminal block with two studs at the left, a
+  fan behind a diagonal ejector handle at the right, a status lamp and an ejector tab. The EX9253 seats
+  up to six, in slots PSM0 to PSM5; the base order ships three and the redundant order four. Each has its
+  own fan and a dedicated feed. They are hot-removable and hot-insertable. Never mix them with AC
+  supplies.
+attrs:
+  role: dc-power-supply
+  power-output-w: 1100
+  inlet: dc-terminal
+  airflow: front-to-back
+  input: operating -40 to -72 VDC, nominal -48 and -60 VDC; 32 A at -48 VDC (guide Table 12)
+part-numbers:
+  JNP-PWR1100-DC (EX9253): {part: JNP-PWR1100-DC}
+provenance:
+  sources: >-
+    datasheet - EX9253 Switch Hardware Guide (published 2022-11-30): DC Power Supply Description,
+    Figures 16 and 17 (the supply, and its face drawn flat, g009811), Tables 11 and 12 (the electrical
+    figures), Table 5 (size and weight) and Tables 3 and 4 (the part number). EX9250 Ethernet Switch
+    Datasheet (1000632-006-EN, Sep 2021): the spare is JNP-PWR1100-DC, "Universal DC power supply,
+    1100 W", and the base and redundant orders ship JNP-PWR1100-DC-BB. The guide's name is carried. The
+    key of part-numbers carries the suffix (EX9253) so that its DCIM module type does not share a file
+    with the same part number in another line's slice.
+  size: >-
+    drawing - Table 5: 3.53 in (8.67 cm) wide and 1.63 in (4.14 cm) high. The rear panel of Figure 3
+    (3.03 px/mm) shows the three supplies of a column on a 40.3 mm pitch, so the face is 86.7 x 39.6
+    mm, the table's width and the figure's height, as for the AC supply.
+  depth: >-
+    datasheet - Table 5: 10.8 in (27.43 cm). No depth is written, because the component schema has no
+    depth key the explorer reads here; the figure is kept in this note.
+  face: >-
+    drawing - Figure 17 read at 9.46 px/mm on its 820 px width: the DC terminal block (callout 3) with two
+    studs and serrated nuts at 25.9 mm across and 12.2 and 27.4 mm down; the status lamp (callout 2) at the
+    upper left, 6.3 mm across and 7.4 mm down; the ejector tab (callout 1) at the left edge; and the fan with
+    its diagonal handle (callout 4) at the right. A small grounding stud sits at the lower left. The guide
+    labels no terminal; the polarity of the two studs is not stated. Every position is estimated to
+    about 0.7 mm.
+  handle: >-
+    estimated - the guide gives no colour for the handle or the tab; Figure 17 is a line drawing. They
+    are drawn in neutral greys.
+  power-output-w: >-
+    datasheet - guide Table 12: maximum output power 1100 W. An OUTPUT, since a supply provides power.
+  leds: >-
+    estimated - Figure 17 shows one status lamp and no table describes it. It is drawn as one lamp with
+    green and off states.
+states:
+- ok
+- fault
+- absent
+elements:
+  term-a:
+    at: [21.6, 7.6]
+    size: [8.6, 8.6]
+    class: screw
+  term-b:
+    at: [21.6, 22.8]
+    size: [8.6, 8.6]
+    class: screw
+  led-status:
+    at: [5.2, 6.3]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: ok, color: '#22c55e'}
+    - 'off'
+  tab:
+    at: [1.8, 12.4]
+    size: [4.6, 12.8]
+    class: latch
+  handle:
+    at: [46.0, 3.0]
+    size: [30.0, 33.6]
+    class: latch
+size:
+  w: 86.7
+  h: 39.6
+size-confidence: {w: datasheet, h: drawing}
+relief:
+  features:
+  - node: tab
+    out: 1.6
+    confidence: estimated
+    source: figure - the ejector tab stands proud of the face in Figure 16; its projection is not measured
+  - node: handle
+    out: 2.0
+    confidence: estimated
+    source: figure - the handle bar stands proud of the fan guard in Figure 16; its projection is not measured
+  - node: term-a
+    cyl: 1.2
+    confidence: estimated
+    source: figure - the stud and its nut stand proud of the terminal block; the projection is not measured
+  - node: term-b
+    cyl: 1.2
+    confidence: estimated
+    source: figure - the stud and its nut stand proud of the terminal block; the projection is not measured
+skins: [default]
