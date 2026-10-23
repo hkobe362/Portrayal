@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-54
-version: 0.1.2
+version: 1.0.0
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-54
@@ -166,13 +166,13 @@ provenance:
       A light plate at the upper left, 15.0 x 43.9 mm, carries the maker's wordmark, turned to read
       upward, beside the ToD connector and the clock jacks, and a narrow plate at the lower left
       (5.4 x 24.4 mm) carries the model line turned to read upward. The wordmark is not drawn; its
-      box is the `logo-zone` region. The model line is plain text and is drawn: figure C-1 prints
-      "7280DR3AK-54" because it is a picture of the DR3AK-54, the encryption variant of this chassis,
-      and the guide's one figure serves the DR3A-54, the DR3AK-54 and the DR3AM-54. The line here
-      reads 7280DR3A-54, the plate of the device this file is named for; the K and M variants print
-      their own (see gaps). On the `ac-k` configuration the line is therefore a stand-in for the
-      figure's "7280DR3AK-54": silkscreen text takes no `only-in`, so the face cannot print one
-      plate on `ac-k` and another on `base` and `ac` without format code.
+      box is the `logo-zone` region. The model line is plain text and is drawn by the label
+      component `arista/7280dr3a-model-plate`: figure C-1 prints "7280DR3AK-54" because it is a
+      picture of the DR3AK-54, the encryption variant of this chassis, and the guide's one figure
+      serves the DR3A-54, the DR3AK-54 and the DR3AM-54. The `ac-k` configuration places the `k`
+      skin, which prints that line. The other configurations place the default skin, which reads
+      7280DR3A-54, the plate of the device this file is named for. The M plate is not shown in the
+      guide, so on `ac-m` the default line is a stand-in (see gaps).
   rear-layout:
     confidence: estimated
     note: >-
@@ -309,9 +309,9 @@ gaps:
   wanted: >-
     A FIGURE OF THE DR3A-54 AND THE DR3AM-54 FRONT. Figure C-1 is captioned for all three models
     but prints the plate "7280DR3AK-54", so it is a picture of the DR3AK-54. The model plate of the
-    other two is not shown, and this file prints "7280DR3A-54" on every configuration, so on `ac-k`
-    the plate is a stand-in for the figure's "7280DR3AK-54" (silkscreen text takes no `only-in`;
-    a per-configuration plate needs a format change). A photograph of each plate closes the M one.
+    other two is not shown. The `ac-k` face prints the figure's "7280DR3AK-54"; the base switch's
+    plate reads "7280DR3A-54", and on `ac-m` that line is a stand-in for the M plate. A photograph
+    of each plate closes the base and M ones.
 - what: cage-turn
   scope: [front]
   reason: needs-drawing
@@ -674,7 +674,6 @@ views:
       - {id: led-port-55, at: [433.95, 47.2], size: [2.0, 2.0], shape: circle}
       - {id: led-port-56, at: [433.95, 70.0], size: [2.0, 2.0], shape: circle}
     silkscreen:
-    - {id: model-text, at: [3.8, 73.7], text: '7280DR3A-54', font-size: 2.0, anchor: middle, fill: '#26324f', rotate: -90, for: chassis}
     - {id: label-tod, at: [12.9, 18.4], text: 'ToD', font-size: 1.5, anchor: middle, fill: '#26324f', rotate: 90, for: tod}
     - {id: label-pps, at: [12.9, 32.2], text: 'PPS', font-size: 1.5, anchor: middle, fill: '#26324f', rotate: -90, for: pps}
     - {id: label-10mhz, at: [12.9, 40.2], text: '10MHz', font-size: 1.5, anchor: middle, fill: '#26324f', rotate: -90, for: clk-10mhz}
@@ -816,6 +815,10 @@ views:
           states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed-diagnostics, color: '#eab308'}]
       placements:
       - {block: qsfpdd-400g}
+      - {ref: arista/7280dr3a-model-plate@1, id: model-plate, at: [2.3, 65.7],
+         only-in: [base, ac, ac-m, dc]}
+      - {ref: arista/7280dr3a-model-plate@1, id: model-plate-k, at: [2.3, 65.7], skin: k,
+         only-in: [ac-k]}
       - {ref: std/osfp@1, id: port-55, at: [414.85, 41.65], rotate: 90, group: osfp-ls-400g, rel-pos: 1, attrs: {media: osfp, speed: 400g, role: line-system}}
       - {ref: std/osfp@1, id: port-56, at: [414.85, 64.95], rotate: 90, group: osfp-ls-400g, rel-pos: 2, attrs: {media: osfp, speed: 400g, role: line-system}}
       - {ref: common/rj45-eth@1, id: mgmt, at: [417.3, 3.8], group: mgmt, rel-pos: 1,
@@ -919,10 +922,8 @@ configurations:
     kind: orderable
     description: >-
       The DR3AK-54 with large routes and TunnelSec: DCS-7280DR3AK-54-F, the same face, supplies and
-      fans as the base switch. Table 4 gives it the base switch's power draw. THE MODEL PLATE ON ITS
-      FACE IS A STAND-IN. Figure C-1 prints "7280DR3AK-54" on this build. The face prints
-      "7280DR3A-54", because silkscreen text takes no `only-in` and one plate serves every
-      configuration (see gaps, front-faces-of-the-variants).
+      fans as the base switch. Table 4 gives it the base switch's power draw. Its face prints
+      "7280DR3AK-54" on the model plate, as figure C-1 does.
     part-numbers:
       DCS-7280DR3AK-54-F: {}
     bays:

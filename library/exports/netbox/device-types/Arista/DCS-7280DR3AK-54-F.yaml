@@ -166,9 +166,8 @@ comments: 'Arista 7280DR3A-54 - a fixed 2RU data-centre router switch with 54 40
 
 
   Configuration `ac-k`: The DR3AK-54 with large routes and TunnelSec: DCS-7280DR3AK-54-F, the same face,
-  supplies and fans as the base switch. Table 4 gives it the base switch''s power draw. THE MODEL PLATE
-  ON ITS FACE IS A STAND-IN. Figure C-1 prints "7280DR3AK-54" on this build. The face prints "7280DR3A-54",
-  because silkscreen text takes no `only-in` and one plate serves every configuration (see gaps, front-faces-of-the-variants).
+  supplies and fans as the base switch. Table 4 gives it the base switch''s power draw. Its face prints
+  "7280DR3AK-54" on the model plate, as figure C-1 does.
 
 
   Also sold or listed as: DCS-7280DR3A-54
@@ -262,7 +261,7 @@ comments: 'Arista 7280DR3A-54 - a fixed 2RU data-centre router switch with 54 40
   - thermal.airflow: front-to-back
 
 
-  Drawing version 0.1.2. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 1.0.0. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'

@@ -21,9 +21,10 @@
    "arista/7280dr3a-pwr-3000-dc@1"
   ]
  },
- "composed": "67868ccb79081ae5",
+ "composed": "1d50f62d5c018d3e",
  "composed-refs": {
   "arista/7280dr3a-fan@1": "1.0.0+0934e19cd23f017e",
+  "arista/7280dr3a-model-plate@1": "1.0.0+deb188fa04e79e62",
   "arista/7280dr3a-pwr-3000-ac@1": "1.0.0+91af2d0f335f840a",
   "arista/7280dr3a-pwr-3000-dc@1": "1.0.0+41a0c757321bc182",
   "common/led-arrow-sm@1": "1.1.0+f6e565f48fbd46a4",
@@ -46,7 +47,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "6350d404cea9d0b8",
+ "gaps": "4fc6faa9625fc448",
  "groups": [
   "fans",
   "leds",
@@ -243,6 +244,8 @@
   "front/placements/led-psu2",
   "front/placements/led-sys",
   "front/placements/mgmt",
+  "front/placements/model-plate",
+  "front/placements/model-plate-k",
   "front/placements/port-1",
   "front/placements/port-10",
   "front/placements/port-11",
@@ -309,7 +312,7 @@
   "rear/bays/psu-1",
   "rear/bays/psu-2"
  ],
- "names": "0d57919ad8862397",
+ "names": "4df3d12cd549c103",
  "placement-addressing": {
   "for": {
    "front/placements/led-fan": [
@@ -628,7 +631,7 @@
   }
  },
  "placement-attrs": "ac52b929aa58bd6b",
- "placement-geometry": "44136fa355b3678a",
+ "placement-geometry": "6d4649b997c96787",
  "placement-groups": {
   "front/placements/clk-10mhz": "timing",
   "front/placements/console": "mgmt",
@@ -693,6 +696,8 @@
   "front/placements/led-psu2": "leds",
   "front/placements/led-sys": "leds",
   "front/placements/mgmt": "mgmt",
+  "front/placements/model-plate": null,
+  "front/placements/model-plate-k": null,
   "front/placements/port-1": "qsfpdd-400g",
   "front/placements/port-10": "qsfpdd-400g",
   "front/placements/port-11": "qsfpdd-400g",
@@ -760,7 +765,7 @@
   "rear/bays/psu-2": "psus"
  },
  "placement-surface": "1e16dae20127446d",
- "shape": "309d5f8435072ca2",
- "surface": "ccafc61069a48c7e",
- "version": "0.1.2"
+ "shape": "5647b5e70e4efded",
+ "surface": "2c58354e8245b2f0",
+ "version": "1.0.0"
 }
