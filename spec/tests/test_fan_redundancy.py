@@ -664,4 +664,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # CR3-32P4, 1+1 over two on the CR3-36S, N+1 over two on the SR3-48YC8 and SR3-40YC6, and N+1 over four on
     # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
     # 134 since the Juniper QFX5100-24Q and -96S: N+1 over five and over three rear fan modules (datasheet)
-    assert n == 134, n
+    # 139 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
+    # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
+    assert n == 139, n
