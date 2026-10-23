@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4500-40f
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4500-40F
@@ -134,12 +134,15 @@ provenance:
       front-to-back airflow and orange for back-to-front, and it must match the EXHAUST (green) or INTAKE
       (orange) label seen through the fan tray vents.
   variants:
-    confidence: datasheet
+    confidence: estimated
     note: >-
       Table 3: the eight models are EX4500-40F-FB, -BF, -FB-C, -BF-C, -DC-C, -VC1-FB, -VC1-BF and -VC1-DC.
-      One front panel serves all eight. The -VC1 models print VIRTUAL CHASSIS under the model name (Figure
-      5), which is the one difference of print and is drawn for them alone. The -C models support Data
-      Center Bridging, which no face shows. The airflow, the supply and the rear module differ.
+      One front panel serves all eight. The guide says that switches with the label VIRTUAL CHASSIS on
+      the front panel support Data Center Bridging (the note under Table 3 and Figure 5, "Label Identifying
+      EX4500 Switches that Support DCB"). That is a one-way statement: Table 3 marks the -FB-C, -BF-C,
+      -DC-C and the three -VC1 models as supporting DCB, and the guide does not say whether the -C models
+      carry the label too. The label is drawn on the -VC1 models alone; that choice is estimated, not
+      stated by the guide. The airflow, the supply and the rear module differ.
   power:
     confidence: datasheet
     note: >-
@@ -263,6 +266,14 @@ gaps:
   wanted: >-
     A flat drawing of the Virtual Chassis module. The guide's Figures 7 and 12 are isometric, so the positions
     of its lamps and its two ports are estimated and the ports are plain openings.
+- what: vc-label-on-c-models
+  scope:
+  - front
+  reason: vendor-silent
+  wanted: >-
+    Whether the -FB-C, -BF-C and -DC-C models print VIRTUAL CHASSIS on the front panel. The guide says
+    that switches with the label support DCB and that the -C models support DCB, but not that the -C models
+    carry it. The legend is drawn on the -VC1 models alone, which is estimated.
 - what: usb-generation
   scope:
   - front
