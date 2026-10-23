@@ -1,0 +1,39 @@
+format: 1
+kind: component
+name: ex4100-h-psu-connector
+version: 1.0.0
+class: inlet
+behaviour: mounts
+profile: networking
+description: >-
+  The PSU connector of the Juniper EX4100-H-12MP: a green pluggable screw-terminal plug standing upright on the front
+  panel, with a captive screw at each end and five clamp positions on a 3.81 mm pitch between them. The switch has two,
+  labelled PSU 0 and PSU 1, and takes one external supply on each: the first and second positions are the 54 V pair, the
+  fourth and fifth the 12 V pair (the guide's interconnecting wire joins four of the five), and the middle one is not
+  labelled. The plug ships preassembled to the switch. The pole names are printed on the panel beside it, so the part
+  carries none.
+attrs:
+  media: dc-terminal
+  positions: 5
+  pitch-mm: 3.81
+provenance:
+  sources: >-
+    drawing and photo-measured - EX4100-H Switch Hardware Guide (Juniper Networks, published 2026-10-01), Figure 1
+    (callouts 3 and 8), the connection steps for the EX4100-H-12MP and Table 65 (two PSU terminal connectors,
+    preassembled), and Juniper's studio photograph of the EX4100-H-12MP, front.
+  size: >-
+    estimated - read off Figure 1 after Gate 1 (15.085 px/mm against the 111.7 mm body, its height agreeing with
+    152.4 mm to 0.1 percent): both plugs are 8.5 mm wide and 30.5 mm high, 34.5 mm apart on the same line. The guide
+    gives no dimension for the plug.
+  the-face: >-
+    estimated - the end screws are centred 3.2 mm from each end, and the five openings are on a 3.81 mm pitch, centred
+    on the plug (7.5 to 22.7 mm from the top), as Figure 1 draws them. The photograph shows five openings in a green
+    housing with a slotted screw at each end.
+  colour: photo-measured - the housing is a bright green (#4cae4f) in the photograph.
+elements:
+  body: {at: [0.0, 0.0], size: [8.5, 30.5], class: connector}
+size:
+  w: 8.5
+  h: 30.5
+size-confidence: {w: estimated, h: estimated}
+skins: [default]

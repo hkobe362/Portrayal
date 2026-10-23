@@ -257,7 +257,16 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER EX9253 MADE IT THIRTY-EIGHT: the guide says a fully configured switch needs all four
+    # fan trays and that a failed tray must be replaced at once, and names no N+1 form, so its group
+    # says so in a description and states no form.
+    assert "juniper/ex9253" in unstated
+    # THE JUNIPER QFX3500-48S4Q AND QFX3600-16Q MADE IT FORTY: each guide gives the fan trays
+    # (two, with two more fan modules on the QFX3500's management board; three on the QFX3600) and says
+    # a failed tray must be replaced within a minute, and neither names how many the switch can lose,
+    # so each group states no form.
+    assert {"juniper/qfx3500-48s4q", "juniper/qfx3600-16q"} <= set(unstated)
+    assert len(unstated) == 40, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -639,4 +648,11 @@ def test_the_comparison_layer_can_now_reach_them():
     # 117 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
     # 119 with the Juniper QFX5120-32C (5+1 over six rear fan modules) and QFX5120-48T (4+1 over five),
     # from the QFX5120 hardware guide, Fan Modules for QFX5120 Switches
-    assert n == 119, n
+    # 122 since the Juniper QFX5230-64CD, QFX5240-64OD and QFX5240-64QD: N+1 over four fan modules of two rotors each
+    # (hardware guides, Component Redundancy)
+    # 123 since the Juniper EX9251: 2+1 over three fan trays (hardware guide, Component Redundancy)
+    # 125 with the Juniper EX4300-32F and EX4300-48MP: n+0 over two fan modules each (hardware guide, Fan Modules)
+    # 132 with the seven Arista 7280R3 models (#1204): N+1 over three fan modules on the PR3-24, DR3-24 and
+    # CR3-32P4, 1+1 over two on the CR3-36S, N+1 over two on the SR3-48YC8 and SR3-40YC6, and N+1 over four on
+    # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
+    assert n == 132, n
