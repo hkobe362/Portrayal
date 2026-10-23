@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050px4-32s
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Arista
 model: 7050PX4-32S
@@ -53,9 +53,11 @@ provenance:
       Guide Table 1: 48.3 x 4.4 x 52.7 cm (19 x 1.75 x 20.7 inches), 12.1 kg (26.6 lbs). Data sheet: 43.9
       x 4.45 x 52.65 cm (17.3 x 1.75 x 20.72 in), 26.6 lbs (12.1 kg). The width: 48.3 cm is over the mounting
       ears, so the body between them, which is what is modelled, is the data sheet's 43.9 cm, 440.0 here.
-      The height is 43.7, as the other 1RU models (the guide rounds it to 4.4 cm; the data sheet's 4.45
-      is a rounding of 1.75 in). The depth is the guide's 52.7 cm (527.0); the data sheet's 52.65 cm differs
-      by half a millimetre, a rounding. 1RU.
+      The height is 43.7, as the other 1RU models (the guide prints 4.4 cm and 1.75 in, the data sheet
+      4.45 cm, so both print 44.5 mm for this model; the figure's own aspect, 828 x 82 px, is 10.1 and
+      matches 439.9 / 43.7 = 10.07, where 44.5 would give 9.89, so the figure was preferred over the printed
+      44.5 mm). The depth is the guide's 52.7 cm (527.0); the data sheet's 52.65 cm differs by half a
+      millimetre, a rounding. 1RU.
   ears:
     confidence: datasheet
     note: >-

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050dx4-32s
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Arista
 model: 7050DX4-32S
@@ -58,7 +58,9 @@ provenance:
       and the 7050DX4M-32S. Data sheet: 43.9 x 4.45 x 50.56 cm (17.3 x 1.75 x 19.9 in), 24.4 lbs (11.1 kg). The width:
       48.3 cm is over the mounting ears, so the body between them, which is what is modelled, is the data sheet's
       43.9 cm (the other models' 43.99), 440.0 here. The height is the data sheet's 43.7 for the other 1RU models
-      (the guide rounds it to 4.4 cm; this model's 4.45 reads a rounding of the same 1.72 in). The depth: the guide's
+      (the guide prints 4.4 cm and 1.75 in, the data sheet 4.45 cm, so both print 44.5 mm for this model; the
+      figure's own aspect, 828 x 82 px, is 10.1 and matches 439.9 / 43.7 = 10.07, where 44.5 would give 9.89, so the
+      figure was preferred over the printed 44.5 mm). The depth: the guide's
       Table 1 prints 50.1 cm AND 19.9 inches, which are 501.0 and 505.5 mm, so the guide disagrees with itself; the
       data sheet prints 50.56 cm (19.9 in). Two of the three figures agree, so the depth is 505.6 (the data sheet's
       50.56 cm, which is the guide's inches); the guide's 50.1 cm is the outlier: the gap `depth`. 1RU.

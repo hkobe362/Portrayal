@@ -153,13 +153,13 @@ module-bays:
     description: 'Accepts: 7050x4-pwr-1500-ac, 7050x4-pwr-1500-ac-rev, 7050x4-pwr-1500-dc, 7050x4-pwr-1500-dc-rev'
 comments: "Arista 7050CX4M-48D8 - a fixed 2RU data-centre switch with 48 x 100G QSFP28 ports, 8 x 400G\
   \ QSFP-DD ports and 2 x SFP+ ports, with MACsec, running EOS. The front carries the QSFP28 cages in\
-  \ four rows of twelve columns, in two halves of two rows with a grille between them, six blocks of two\
-  \ columns on each side. The eight QSFP-DD cages are four stacked columns between the left and right\
-  \ QSFP28 blocks. The two SFP+ cages are stacked at the right, under the management block, which holds\
-  \ the RJ-45 management port, the USB port and the RJ-45 console port, with the four system lamps (system,\
-  \ fan, PS1, PS2) beside it. The rear carries two hot-swap power supplies stacked at the right, four\
-  \ hot-swap fan modules, and an earth grounding pad. The same panel is ordered with front-to-rear air\
-  \ (-F) or rear-to-front air (-R).\n\nConfiguration `f`: The 7050CX4M-48D8 with MACsec, two AC supplies\
+  \ four rows of twelve columns, in two halves of two rows with a grille between them, three blocks of\
+  \ two columns (six columns) on each side. The eight QSFP-DD cages are four stacked columns between the\
+  \ left and right QSFP28 blocks. The two SFP+ cages are stacked at the right, under the management block,\
+  \ which holds the RJ-45 management port, the USB port and the RJ-45 console port, with the four system\
+  \ lamps (system, fan, PS1, PS2) beside it. The rear carries two hot-swap power supplies stacked at the\
+  \ right, four hot-swap fan modules, and an earth grounding pad. The same panel is ordered with front-to-rear\
+  \ air (-F) or rear-to-front air (-R).\n\nConfiguration `f`: The 7050CX4M-48D8 with MACsec, two AC supplies\
   \ and front-to-rear air: PWR-1512-AC-RED supplies and FAN-7012H-RED fan modules, all with red handles.\
   \ Ordered as DCS-7050CX4M-48D8-F.\n\nDatasheet: 7050X4 Series 100/200/400G Data Center Switches Data\
   \ Sheet (Arista Networks, 03-0057-27, Aug 27th, 2025)\n  https://www.arista.com/assets/data/pdf/Datasheets/7050X4-Datasheet.pdf\n\
@@ -188,6 +188,6 @@ comments: "Arista 7050CX4M-48D8 - a fixed 2RU data-centre switch with 48 x 100G 
   \ ambient with 50 percent load on all ports, excluding transceivers (data sheet)\n- power.power-typical-w:\
   \ 390\n- power.psu-redundancy: 1+1\n- thermal.airflow: front-to-rear or rear-to-front, set by the fan\
   \ modules and supplies fitted\n- thermal.fan-redundancy: 4 hot-swap fan modules, N+1\n\nDrawing version\
-  \ 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from an earlier export\
+  \ 0.1.1. A major bump means a slot moved or an id was renamed, so anything cached from an earlier export\
   \ may no longer line up.\nModel maturity: modelled. Every dimension in the source records where it came\
   \ from."

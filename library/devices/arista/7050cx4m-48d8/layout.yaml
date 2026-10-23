@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7050cx4m-48d8
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Arista
 model: 7050CX4M-48D8
@@ -9,7 +9,7 @@ portfolio: {line: 7000 Series, family: 7050X4}
 description: >-
   Arista 7050CX4M-48D8 - a fixed 2RU data-centre switch with 48 x 100G QSFP28 ports, 8 x 400G QSFP-DD ports and 2 x SFP+ ports,
   with MACsec, running EOS. The front carries the QSFP28 cages in four rows of twelve columns, in two halves of two rows with a
-  grille between them, six blocks of two columns on each side. The eight QSFP-DD cages are four stacked columns between the left
+  grille between them, three blocks of two columns (six columns) on each side. The eight QSFP-DD cages are four stacked columns between the left
   and right QSFP28 blocks. The two SFP+ cages are stacked at the right, under the management block, which holds the RJ-45
   management port, the USB port and the RJ-45 console port, with the four system lamps (system, fan, PS1, PS2) beside it. The rear
   carries two hot-swap power supplies stacked at the right, four hot-swap fan modules, and an earth grounding pad. The same panel is
@@ -64,9 +64,9 @@ provenance:
     note: >-
       Figure C-7 at 1.882 px/mm anchored on the 440 mm body, tab centres from a pixel scan. Forty-eight QSFP28 cages (ports 1 to 48) in four rows and
       twelve columns: two rows above the QSFP-DD zone's middle and two below, each pair of rows with a grille between, in blocks of two columns on a
-      19.0 mm pitch (the registry's ganged QSFP pitch) with 9.7 mm more between blocks, six blocks across each half row. The first column is centred
+      19.0 mm pitch (the registry's ganged QSFP pitch) with 9.7 mm more between blocks, three blocks of two columns (six columns) across each half row. The first column is centred
       21.3 mm from the left and the seventh 277.9 mm; the block spacing is 47.7 mm. The rows centre 31.6, 47.6, 61.2 and 76.8 mm below the top. Ports 1
-      to 24 are the upper pair of rows, odd numbers on top, 25 to 48 the lower; the left six blocks hold ports 1 to 12 and 25 to 36 and the right six 13
+      to 24 are the upper pair of rows, odd numbers on top, 25 to 48 the lower; the left six columns hold ports 1 to 12 and 25 to 36 and the right six 13
       to 24 and 37 to 48. Eight QSFP-DD cages (49 to 56) in four stacked columns, the first centred 165.0 mm from the left on a 27.9 mm pitch, rows 47.6 and
       61.2 mm below the top; they are 19.0 x 10.0 mm (std/qsfp-dd). Two SFP+ cages (57 over 58) at the right, centred 418.9 mm from the left, 61.4 and
       76.3 mm down. The belly-to-belly orientation is the library's convention (upper cage upright, lower turned 180); the figure is too small to show
