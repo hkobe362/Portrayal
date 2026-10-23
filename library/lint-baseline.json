@@ -1215,9 +1215,11 @@
   "L97": 1
  },
  "components/juniper/jnp10008-fan/v1/contract.yaml": {
+  "L123": 1,
   "L97": 1
  },
  "components/juniper/jnp10008-fan2/v1/contract.yaml": {
+  "L123": 1,
   "L97": 1
  },
  "components/juniper/jnp10008-fan3/v1/contract.yaml": {
@@ -2394,6 +2396,12 @@
   "L40": 2,
   "L57": 1,
   "L69": 1
+ },
+ "devices/juniper/qfx10008/device.yaml": {
+  "L33": 10
+ },
+ "devices/juniper/qfx10016/device.yaml": {
+  "L33": 10
  },
  "devices/juniper/qfx5100-48s/device.yaml": {
   "L29": 2,
