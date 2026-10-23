@@ -128,10 +128,10 @@ provenance:
       the coolant inlet (cold) plug at the right (callout 3, "Inlet (Cold)"). Each plug stands in a rounded
       housing 45 mm wide and 62 mm tall, 8.0 mm from its end, round plug 29.5 mm across at x 30.3 and
       500.2, y 62.2. The IT gear connector is a 26 mm wide blind-mate clip body with a round stud plate
-      either side (59 mm over both) and an earth mark above it. Fourteen round screw heads are spaced
-      over the plate (decor). The plugs are the guide's UQDB06 universal quick-disconnect blind-mate plugs
-      of the Open Compute standard, and the connector engages the busbar of the rack as the switch slides
-      in.
+      either side (59 mm over both) and an earth mark above it. Thirteen round screw heads are spaced
+      over the plate (decor; four small cross-head screws at the plug plates are not drawn). The plugs
+      are the guide's UQDB06 universal quick-disconnect blind-mate plugs of the Open Compute standard,
+      and the connector engages the busbar of the rack as the switch slides in.
   no-frus:
     confidence: datasheet
     note: >-
