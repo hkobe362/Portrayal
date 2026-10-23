@@ -388,8 +388,8 @@ def test_the_long_tail_is_still_left_alone():
         pytest.skip("library/dist not built")
     unc = json.loads(p.read_text())["unclaimed"]
     assert unc, "the census emptied - either everything was promoted or it broke"
-    # a quarter, not a third: every Arista 7280 model reuses spellings the earlier ones named, which
-    # turns a one-device spelling into a two-device one, and the share sat at 186 of 564 after them
+    # a quarter, not a third: as devices share spellings, one-device spellings become two-device ones;
+    # the share stood at 186 of 564 once the Arista 7280R3 and 7280DR3A-54 devices were both in
     assert sum(1 for n in unc.values() if n == 1) > len(unc) // 4
 
 
