@@ -538,7 +538,7 @@ def test_the_four_crossings_the_seat_gave_are_gone(census):
     # and one of the 7280DR3A-36's two rear grounding screws, 19.2 away from its neighbour
     # and the same screw of the 7280CR3-96, whose rear strip is drawn the same way
     # and one of the 7050CX4M-48D8's, on the same strip
-    assert len(crossed) == 28and not [k for k in crossed if census[k]["hard"]]
+    assert len(crossed) == 28 and not [k for k in crossed if census[k]["hard"]]
 
 
 def test_a_barrier_block_pole_is_no_turnable_seat():
