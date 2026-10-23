@@ -2402,6 +2402,18 @@
   "L61": 3,
   "L69": 1
  },
+ "devices/juniper/qfx5230-64cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5240-64od/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/qfx5240-64qd/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
   "L29": 1,
