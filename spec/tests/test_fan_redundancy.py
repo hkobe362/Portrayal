@@ -612,8 +612,11 @@ def test_the_comparison_layer_can_now_reach_them():
     "Redundant (N+1) and hot-pluggable fan modules" and the hardware guide ships five fan
     modules numbered 0 to 4. The guide states no form of its own, so N is the five less one.
 
-    ONE HUNDRED AND NINE AND ONE HUNDRED AND TEN ARE THE JUNIPER QFX5110-48S AND QFX5110-32Q, N+0
-    over five rear fan modules, from the QFX5110 hardware guide (2026-09-24): "All fan modules must
+    ONE HUNDRED AND NINE IS THE JUNIPER EX4650-48Y, 4+1 over five rear fan modules: the hardware
+    guide (published 2025-07-16) says the switch ships with "five fan modules (4+1 redundancy)".
+
+    ONE HUNDRED AND SIXTEEN AND ONE HUNDRED AND SEVENTEEN ARE THE JUNIPER QFX5110-48S AND QFX5110-32Q,
+    N+0 over five rear fan modules, from the QFX5110 hardware guide (2026-09-24): "All fan modules must
     be installed for optimal operation of the switch", and the switch runs 30 seconds without
     thermal shutdown while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
     """
@@ -628,5 +631,10 @@ def test_the_comparison_layer_can_now_reach_them():
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
     # 107 since the Juniper EX4100-24T, -24P, -48T and -48P: 1+1 over two fan modules each (hardware guide)
     # 108 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
-    # 110 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
-    assert n == 110, n
+    # 109 since the Juniper EX4650-48Y: 4+1 over five rear fan modules (hardware guide, EX4650 Switch First View)
+    # 111 with the Juniper QFX5220-32CD (5+1 over six rear fan modules) and QFX5220-128C ((5x2+1)+1 over
+    # six two-fan modules; hardware guide, QFX5220 Component Redundancy)
+    # 115 since the Juniper EX4400-24X, -48F, -24MP and -48MP: 1+1 over two fan modules each (hardware
+    # guide, Cooling System and Airflow: "two fan modules (1+1 redundancy)")
+    # 117 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
+    assert n == 117, n
