@@ -655,5 +655,7 @@ def test_the_comparison_layer_can_now_reach_them():
     # 132 with the seven Arista 7280R3 models (#1204): N+1 over three fan modules on the PR3-24, DR3-24 and
     # CR3-32P4, 1+1 over two on the CR3-36S, N+1 over two on the SR3-48YC8 and SR3-40YC6, and N+1 over four on
     # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
-    # 133 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
-    assert n == 133, n
+    # 137 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
+    # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
+    # 138 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
+    assert n == 138, n

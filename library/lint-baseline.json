@@ -8,6 +8,9 @@
  "components/arista/7010tx-fan/v1/contract.yaml": {
   "L27": 1
  },
+ "components/arista/7050x4-fan-7012h-rev/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/arista/7280cr3-fan-rev/v1/contract.yaml": {
   "L27": 1
  },
@@ -1785,6 +1788,21 @@
   "L29": 1,
   "L57": 1,
   "L61": 10
+ },
+ "devices/arista/7050cx4-24d8/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7050cx4m-48d8/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7050dx4-32s/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7050px4-32s/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7050x4-48y-4df/device.yaml": {
+  "L29": 2
  },
  "devices/arista/7280cr3-32d4/device.yaml": {
   "L29": 2
