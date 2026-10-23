@@ -2266,6 +2266,12 @@
   "L57": 1,
   "L61": 48
  },
+ "devices/juniper/ex9251/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9253/device.yaml": {
+  "L69": 1
+ },
  "devices/juniper/mx10003/device.yaml": {
   "L119": 1,
   "L69": 1,

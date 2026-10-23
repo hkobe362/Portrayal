@@ -53,9 +53,9 @@ provenance:
     in the corners where Figure 6 draws the windows; its 12.7 x 11.0 cell is smaller than the 15.8 x 13.2
     housing of the other jacks, as Figure 6's BITS box is not. It is centred on the figure's box.
   media: >-
-    the jacks are typed by what runs through them: the console is rj45-serial (RS-232), the ToD port rj45-tod.
-    BITS carries a clock whose rate and framing the guide does not give, so it takes no speed (see the
-    device's gap named bits-media).
+    the jacks are typed by what runs through them: the console is rj45-serial (RS-232), the ToD port rj45-tod
+    and the BITS port rj48, as the library types every BITS jack. The guide does not give BITS a rate or framing,
+    so it takes no speed (see the device's gap named bits-media).
   power: >-
     datasheet - guide Table 13: Routing Engine 58 W typical at 25 C and 65 W maximum at 55 C. A draw, since a
     board consumes power.
@@ -90,7 +90,7 @@ parts:
 - {ref: std/rj45@2, id: tod, group: timing, at: [128.4, 4.3], rotate: 180, attrs: {media: rj45-tod, function: time of day, note: reserved for future use}}
 - {ref: common/rj45-ganged-lamped@1, id: bits, group: timing, at: [149.45, 5.4], rotate: 180,
    states: {led-a: ['off', {name: locked, color: '#22c55e'}], led-b: ['off', {name: loss, color: '#f59e0b'}]},
-   attrs: {media: rj45, function: BITS clocking}}
+   attrs: {media: rj48, function: BITS clocking}}
 - {ref: std/smb@1, id: mhz-out, group: timing, at: [167.0, 9.2], attrs: {function: 10MHz out}}
 - {ref: std/smb@1, id: pps-out, group: timing, at: [177.2, 9.2], attrs: {function: PPS out}}
 - {ref: std/smb@1, id: mhz-in, group: timing, at: [167.0, 19.4], attrs: {function: 10MHz in}}

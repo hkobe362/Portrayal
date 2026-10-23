@@ -257,7 +257,11 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER EX9253 MADE IT THIRTY-EIGHT: the guide says a fully configured switch needs all four
+    # fan trays and that a failed tray must be replaced at once, and names no N+1 form, so its group
+    # says so in a description and states no form.
+    assert "juniper/ex9253" in unstated
+    assert len(unstated) == 38, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -623,4 +627,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
     # 107 since the Juniper EX4100-24T, -24P, -48T and -48P: 1+1 over two fan modules each (hardware guide)
     # 108 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
-    assert n == 108, n
+    # 109 since the Juniper EX9251: 2+1 over three fan trays (hardware guide, Component Redundancy)
+    assert n == 109, n

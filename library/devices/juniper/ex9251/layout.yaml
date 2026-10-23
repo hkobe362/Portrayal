@@ -15,16 +15,6 @@ description: >-
   Routing Engine is built in. One panel serves three orders: the AC model, the DC model and the spare
   chassis.
 profile: networking
-lint:
-  waive:
-    L113: >-
-      The GM/PTP SFP cage and the BITS RJ-45 jack carry no rate in the guide. It says only that GM/PTP connects the
-      switch to a timing device and is unsupported in this release, and that BITS is the building-integrated timing
-      supply clock interface. The jack's media cannot say so either: rj45-tod and rj48 would claim a signal the guide
-      does not name. The searches are recorded in the gaps named gm-ptp-speed and bits-media.
-    L29: >-
-      The fan tray's power is not published. The guide's power tables (12 to 14) give whole-switch figures and the
-      datasheet gives none per tray; the component declares power-absent, and this count is the honest report of it.
 provenance:
   sources:
     confidence: datasheet
@@ -330,14 +320,16 @@ gaps:
   wanted: >-
     The rate of the GM/PTP SFP cage and the optic it takes. The guide says only that it connects the switch
     to a timing device, and that support for it is not available in this release. Searched the guide for
-    GM/PTP: Figure 1 callout 16, Figure 48 callout 1, and no table.
+    GM/PTP: Figure 1 callout 16, Figure 48 callout 1, and no table. The cage is typed sfp-ptp so that it
+    claims no rate.
 - what: bits-media
   scope: [front]
   reason: vendor-silent
   wanted: >-
     What the BITS jack carries, a T1, an E1 or another clock signal. The guide calls it the building-integrated
     timing supply clock interface (Table 37) and gives no rate or framing. Searched the guide for BITS and for T1:
-    Tables 7, 36 and 37 and the connection procedure only.
+    Tables 7, 36 and 37 and the connection procedure only. The jack is typed rj48, as the library types every BITS
+    jack, which is a classification and not a reading of this guide.
 - what: usb-generation
   scope: [front]
   reason: vendor-silent
@@ -448,8 +440,9 @@ groups:
     attrs:
       redundancy: '2+1'
       redundancy-note: >-
-        Three fan trays in slots 0 to 2; if one fails the speed of the others is raised, and the guide says
-        all three and both supplies must be operational in a fully configured switch (Component Redundancy)
+        Guide, Component Redundancy lists the cooling system among the redundant components: the switch supports three
+        fan trays and, when one fan fails, "the speed of the remaining fans is automatically adjusted". The guide gives
+        no N+M form of its own, so N is the three less one
   fan-leds:
     term: LED
     role: indicator
@@ -493,7 +486,7 @@ views:
       - {id: bits, at: [264.3, 21.9], size: [15.8, 13.2]}
       - {id: con, at: [288.1, 21.9], size: [15.8, 13.2]}
       - {id: tod, at: [311.8, 21.9], size: [15.8, 13.2]}
-      - {id: usb, at: [333.35, 22.35], size: [4.5, 12.0]}
+      - {id: usb, at: [333.35, 22.5], size: [4.5, 12.0]}
       - {id: clk-10mhz-in, at: [347.9, 21.5], size: [4.83, 4.83], shape: circle}
       - {id: clk-10mhz-out, at: [347.9, 29.4], size: [4.83, 4.83], shape: circle}
       - {id: clk-1pps-in, at: [357.6, 21.5], size: [4.83, 4.83], shape: circle}
@@ -598,13 +591,13 @@ views:
       - {ref: common/led-arrow@1, id: led-port-1-7, at: [175.95, 20.4], skin: down, for: port-1-7, group: sfp-plus-leds, rel-pos: 7,
          states: ['off', {name: link, color: '#22c55e'}, {name: down, color: '#ef4444'}]}
       - {ref: common/esd-jack@1, id: esd-front-jack, at: [10.0, 26.5], for: chassis, group: esd, rel-pos: 0}
-      - {ref: std/sfp@1, id: gm-ptp, at: [27.65, 25.85], group: timing, rel-pos: 0, attrs: {media: sfp, role: ptp},
+      - {ref: std/sfp@1, id: gm-ptp, at: [27.65, 25.85], group: timing, rel-pos: 0, attrs: {media: sfp-ptp, role: ptp},
          description: 'the PTP grandmaster clock port, GM/PTP; the guide says support for it is not available in this release (Figure 1, callout 16)'}
       - {ref: common/rj45-eth@1, id: mgmt, at: [242.3, 21.9], rotate: 180, group: mgmt, rel-pos: 0,
          attrs: {media: rj45, speed: 1g, role: mgmt},
          description: 'the management Ethernet port, 10/100/1000 autosensing RJ-45, with a speed lamp and a link/activity lamp (Figure 1, callout 2; Figure 7, Table 7)'}
       - {ref: std/rj45@2, id: bits, at: [264.3, 21.9], rotate: 180, group: timing, rel-pos: 1,
-         attrs: {media: rj45, role: bits},
+         attrs: {media: rj48, role: bits},
          description: 'the BITS port, the building-integrated timing supply clock interface (Figure 1, callout 3; Figure 8)'}
       - {ref: common/led-dot@1, id: led-bits-act, at: [265.1, 22.7], for: bits, group: timing-leds, rel-pos: 0,
          states: ['off', {name: locked, color: '#22c55e'}],

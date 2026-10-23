@@ -277,20 +277,18 @@ groups:
     role: service
     index-origin: 0
     attrs:
-      redundancy: 'N+1'
+      redundancy: '3+1'
       redundancy-note: >-
-        Six slots, PSM0 to PSM5. A base order ships three supplies and a redundant order four, the redundant
-        order surviving the loss of one. Two high-line or three low-line AC supplies are the minimum for
-        non-redundant operation. Do not mix AC and DC supplies
+        Datasheet, Table 1: the EX9253 "holds up to six power supplies" with "-40 to -72 V DC (3+1 redundancy)" and the
+        same for 100-120 V AC and 200-240 V AC. Six slots, PSM0 to PSM5; a base order ships three supplies and a redundant
+        order four. Do not mix AC and DC supplies
   fans:
     term: Fan
     role: service
     index-origin: 0
-    attrs:
-      redundancy: '3+1'
-      redundancy-note: >-
-        Four fan trays, FT0 to FT3 from the left, each with two counter-rotating fans. The guide says a fully
-        configured switch needs all four to operate normally and a failed tray must be replaced at once
+    description: >-
+      Four fan trays, FT0 to FT3 from the left, each with two counter-rotating fans. The guide says a fully configured
+      switch needs all four to operate normally and a failed tray must be replaced at once; it states no N+M form
 views:
   front:
     size: {w: 442.0, h: 132.3}
@@ -376,6 +374,9 @@ configurations:
     description: >-
       The switch as the base AC order ships: one Routing Engine (RE0), three AC power supplies, four fan trays and the
       blank panels, with both line card slots covered. Line cards are ordered separately.
+    bays:
+      mpc-0: juniper/ex9253-lc-blnk@1
+      mpc-1: juniper/ex9253-lc-blnk@1
   base-ac:
     kind: orderable
     description: >-

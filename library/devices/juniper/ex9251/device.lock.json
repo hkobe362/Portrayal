@@ -20,7 +20,7 @@
    "juniper/jnp-pwr-blnk-1@1"
   ]
  },
- "composed": "0134b97960dae522",
+ "composed": "fad1624649306e86",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/ground-screw-10-32@1": "1.0.0+f0abf79f91058854",
@@ -32,7 +32,7 @@
   "juniper/ex4600-jpsu-650-ac-afo@1": "1.0.0+8e2c11074b587cc3",
   "juniper/ex4600-jpsu-650-dc-afo@1": "1.0.0+c452aabb8ae6000d",
   "juniper/ex9250-offline-button@1": "1.0.0+e47247289b227893",
-  "juniper/ex9251-fan-1ru@1": "1.0.0+c8195e15e5862421",
+  "juniper/ex9251-fan-1ru@1": "1.0.0+80d756ad839579d0",
   "juniper/jnp-pwr-blnk-1@1": "1.0.0+1a8636a6516101bd",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp-ganged@1": "1.4.1+6ac71d72bfdf9de9",
@@ -50,7 +50,7 @@
   "single-psu"
  ],
  "format": 1,
- "gaps": "9d6ebfa49b4a47dd",
+ "gaps": "ce5b6b68b49792bd",
  "groups": [
   "buttons",
   "esd",
@@ -396,7 +396,7 @@
    "rear/placements/led-fan-2": 2
   }
  },
- "placement-attrs": "78bf35c9223caf1d",
+ "placement-attrs": "d6c86fa3bb1c0cf9",
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
   "front/placements/bits": "timing",
@@ -469,7 +469,7 @@
   "rear/placements/led-fan-2": "fan-leds"
  },
  "placement-surface": "d073ff225305676d",
- "shape": "8fec861e4a2022d4",
- "surface": "81e338433b441f9e",
+ "shape": "bb666eb5115db8f1",
+ "surface": "232c4ec6d688d35a",
  "version": "0.1.0"
 }
