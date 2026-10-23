@@ -279,7 +279,7 @@ def test_the_k_a_build_carries_its_own_power_figure_in_its_description():
 @pytest.mark.parametrize("target", ["netbox", "nautobot"])
 def test_the_dcim_types_export_one_per_orderable_configuration_one_u_high(target):
     folder = LIB / "exports" / target / "device-types" / "Arista"
-    got = {p.stem for p in folder.glob("DCS-7280CR3*.yaml")}
+    got = {p.stem for p in folder.glob("DCS-7280CR3*32D4*.yaml")}
     assert got == {pn for pn, _ in ORDERABLE.values()}
     for pn, _ in ORDERABLE.values():
         doc = yaml.safe_load((folder / f"{pn}.yaml").read_text())
