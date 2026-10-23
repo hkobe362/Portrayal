@@ -205,9 +205,12 @@ provenance:
   lifecycle:
     confidence: estimated
     note: >-
-      Searched 2026-10-22 for an end-of-sale notice for the 7280CR3-36S, 7280CR3K-36S and 7280CR3K-36A
-      on Arista's advisories and notices pages: none found for these models (notices exist for the 7280CR2A,
-      7280CR2K and select 7280CR series).
+      Searched 2026-10-23 (web searches of Arista's end-of-sale notices). Notice 23790, "End of Sale of
+      the Arista DCS-7280CR3K-36S Series" (https://www.arista.com/en/support/advisories-notices/end-of-sale/23790-end-of-sale-of-the-arista-dcs-7280cr3k-36s-series),
+      announced April 10, 2026, covers the SKUs -F and # of the 7280CR3K-36S, with the last date to order
+      October 10, 2026, end of life October 10, 2031, and the 7280CR3K-36A as the suggested replacement.
+      It names neither the 7280CR3-36S nor the 7280CR3K-36A, and no notice for those was found, so the
+      device records the announcement and this note says which build it covers: the k-f build only.
   other-faces:
     confidence: datasheet
     note: >-
@@ -267,7 +270,12 @@ attrs:
     safety: EN 62368-1, IEC 62368-1, CSA/UL 62368-1
     certifications: BSMI, CE, KCC, NRTL, RCM, UKCA, VCCI, TEC, ANATEL, ICASA (data sheet)
     rohs: RoHS 2011/65/EU and 2015/863/EU (data sheet, Directives)
-  lifecycle: {eol: none-announced}
+  lifecycle:
+    eol: announced
+    eol-announcement: >-
+      https://www.arista.com/en/support/advisories-notices/end-of-sale/23790-end-of-sale-of-the-arista-dcs-7280cr3k-36s-series
+    end-of-sale: '2026-10-10'
+    end-of-life: '2031-10-10'
 chassis: {width: 440.0, height: 43.7, depth: 471.7, ru: 1, color: '#aaabad', airflow: front-to-back, power: ac}
 gaps:
 - what: config-scoped-device-attrs

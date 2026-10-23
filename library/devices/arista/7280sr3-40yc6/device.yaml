@@ -196,9 +196,9 @@ provenance:
   lifecycle:
     confidence: estimated
     note: >-
-      Searched 2026-10-22 for an end-of-sale notice for the 7280SR3-40YC6 and 7280SR3E-40YC6-M on Arista's
-      advisories and notices pages: none found for these models (notices exist for the 7280CR2A, 7280CR2K
-      and select 7280CR series).
+      Searched 2026-10-23 (web searches of Arista's end-of-sale notices) for a notice for the 7280SR3-40YC6
+      and 7280SR3E-40YC6-M: none found. The notices the searches returned were for older 7280 models and
+      for the 7280SR3K-48YC8 (notice 23789) and 7280CR3K-36S (notice 23790) series, not for this one.
   other-faces:
     confidence: datasheet
     note: >-

@@ -45,8 +45,8 @@ provenance:
       and carries geometry at 1.273 px/mm (the 440 mm body is the scale anchor, its left edge read at
       8.7 px as for the sibling 7280CR3-32D4 face). One pixel is 0.8 mm, so every position is good to
       about 0.8 mm, and every one is `estimated` because it is read off a picture and no dimension
-      states it. The old guide's Figure 51 was not compared pixel for pixel; it is cited as the
-      second reading of the same face and agrees on count and order. The status lamps are read
+      states it. The old guide's Figure 51 is the same 576 x 117 raster, compared pixel for
+      pixel (no pixel differs), so it is a repeat of the source and not a second reading. The status lamps are read
       from the green pixels of the lamps (550 px, 38 to 50 px down), which put them about 5 mm
       left of where the sibling 7280CR3-32D4 file puts its lamps (a reading of the same figure style).
   gate-1-rear:
@@ -192,9 +192,9 @@ provenance:
   lifecycle:
     confidence: estimated
     note: >-
-      Searched 2026-10-22 for an end-of-sale notice for the 7280PR3-24 and 7280PR3K-24 on Arista's
-      advisories and notices pages: none found for these models (notices exist for the 7280CR2A, 7280CR2K
-      and select 7280CR series).
+      Searched 2026-10-23 (web searches of Arista's end-of-sale notices) for a notice for the 7280PR3-24 and
+      7280PR3K-24: none found. The notices the searches returned were for older 7280 models and for the
+      7280SR3K-48YC8 (notice 23789) and 7280CR3K-36S (notice 23790) series, not for this one.
   other-faces:
     confidence: datasheet
     note: >-
