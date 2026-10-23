@@ -138,8 +138,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 108 since the Dell R760's eleven 2U risers, BOSS-N1 module and 86 mm supply name plans.
     # 113 with the R660xs's five risers counted on top of the R6615's and the R760's.
     # 127 since the Dell R960's fourteen: its 2400 W and 2800 W supplies and the adapter, the rear I/O board, ten risers.
-    assert len(named) == 127, \
-        f"expected 127 parts naming a plan drawing, found {len(named)}"
+    # 131 since the A100 40GB, H100 PCIe, H100 NVL and L4 cards.
+    assert len(named) == 131, \
+        f"expected 131 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -271,8 +272,9 @@ def test_the_index_carries_a_parts_other_faces():
     # 151 since the R6615's eight risers each carry the plan of the R660 riser they match.
     # 169 with the R660xs's five risers counted on top of the R6615's and the R760's.
     # 183 since the Dell R960's fourteen modules that name a plan (see the count above).
-    assert len(with_faces) == 183, \
-        f"expected exactly 183 of {len(entries)} entries to carry a faces " \
+    # 188 since the A100 40GB, H100 PCIe, H100 NVL, L40S and L4 cards.
+    assert len(with_faces) == 188, \
+        f"expected exactly 188 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
