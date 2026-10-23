@@ -29,12 +29,12 @@ provenance:
       (1500 x 199 px in the PDF, g100343 and g100344). They are read for counts and positions and are
       not copied. The QFX5220 datasheet could not be read: the maker's address for it (juniper.net/content/dam/www/assets/datasheets
       and the older assets/us/en/local/pdf/datasheets/1000653-en.pdf) redirects to an hpe.com PSNow page
-      that did not answer from this host, so no datasheet is registered and the datasheet-only figures
-      (forwarding rate, buffer, latency) are left out. The part numbers of the orderable variants come
-      from Juniper's Hardware Compatibility Tool page for the QFX5220-32CD (apps.juniper.net/hct), the
-      maker's own tool. No studio photograph was found on juniper.net, and no Visio stencil, 3D model
-      or intake folder is held on this host, so the guide's photographs are the only photographs. The
-      guide and the tool are the maker's and public. The guide is copyrighted and nothing in it is copied.
+      that did not answer when tried, so no datasheet is registered and the datasheet-only figures (forwarding
+      rate, buffer, latency) are left out. The part numbers of the orderable variants come from Juniper's
+      Hardware Compatibility Tool page for the QFX5220-32CD (apps.juniper.net/hct), the maker's own tool.
+      No studio photograph was found on juniper.net, and no Visio stencil or 3D model was found, so the
+      guide's photographs are the only photographs. The guide and the tool are the maker's and public.
+      The guide is copyrighted and nothing in it is copied.
   chassis:
     confidence: datasheet
     note: >-
@@ -291,8 +291,8 @@ gaps:
   reason: vendor-silent
   wanted: >-
     Packet rate, buffer size and latency. The guide states none of them. They are in the QFX5220 datasheet,
-    and Juniper's addresses for it redirect to an hpe.com PSNow page that did not answer from the build
-    host, so the datasheet was not read.
+    and Juniper's addresses for it redirect to an hpe.com PSNow page that did not answer when tried, so
+    the datasheet was not read.
 - what: module-depths
   scope:
   - rear
