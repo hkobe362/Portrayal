@@ -1174,6 +1174,9 @@
  "components/juniper/ex4100-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex4300-48mp-fan-afo/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/ex4300-fan-afi/v1/contract.yaml": {
   "L27": 1
  },
@@ -2227,6 +2230,14 @@
  },
  "devices/juniper/ex4300-24t/device.yaml": {
   "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/ex4300-32f/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/ex4300-48mp/device.yaml": {
+  "L29": 1,
   "L57": 1
  },
  "devices/juniper/ex4300-48p/device.yaml": {

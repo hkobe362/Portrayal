@@ -623,4 +623,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
     # 107 since the Juniper EX4100-24T, -24P, -48T and -48P: 1+1 over two fan modules each (hardware guide)
     # 108 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
-    assert n == 108, n
+    # 110 with the Juniper EX4300-32F and EX4300-48MP: n+0 over two fan modules each (hardware guide, Fan Modules)
+    assert n == 110, n
