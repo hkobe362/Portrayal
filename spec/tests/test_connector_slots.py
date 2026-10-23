@@ -116,7 +116,9 @@ def test_every_connector_presenting_part_is_a_connector_slot(comps):
                                    # a cover mount, not a connector - see the registry test above
                                    "breaker-1ru-guard",
                                    # the A100's faces compose these (P-0072)
-                                   "eps12v-8pin", "nvlink-a100-pcie"}
+                                   "eps12v-8pin", "nvlink-a100-pcie",
+                                   # the H100 PCIe's, H100 NVL's and L40S's east ends
+                                   "pcie-12vhpwr", "pcie-12v-2x6"}
                for c in entries)
     # a slot has no rate ladder, so no media ceiling
     assert all(c["media"] is None for c in entries)

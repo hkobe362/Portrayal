@@ -294,12 +294,19 @@ gap, or both of whose ends stand off the gap's width, keeps the front edge.
 The lay with the gap is kept only if it passed through one and is the better
 of the two by the measure that chooses between a cable's two ends: fewer
 crossings, then less bend short of its room, then shorter; so a cable that does
-not rise through a gap is laid as it was before. On the reference rack five of
-the lower leaf's eight cords rise through the gap at 42.3 mm from the rail,
-6.5 mm behind the strip's edge, clear of the strip and the rail: c9, c10, c11,
-c12 and c15, 125.7, 122.4, 129.3, 125.7 and 198.0 mm shorter than round the
-edge (611.2, 613.2, 616.1, 623.4 and 648.0 mm before); the other three keep
-the front edge. A full gap raises no finding or warning, and a bundle is held to the gap by
+not rise through a gap is laid as it was before. **A cord is taken up through
+the gap only where it can be drawn through it** (P-0218, decided 2026-10-22): an
+end that is a plug's reach point (or a point straight out of it) leaves the
+plug straight along its normal and turns onto the rise with a bend of at
+least the cable's radius, so the rise must stand that far beyond the reach
+point, and still clear of the strip by the radius and `CLEAR`. A gap whose
+rise cannot stand there is not offered, and the cord keeps the front edge.
+On the reference rack of the site's cable-lay demo, whose LC plugs reach
+32.5 mm and the rise stands at 42.3 from the rail (9.8 mm for 25), none of
+the lower leaf's cords takes the gap: c9, c10, c11 and c12 go round the
+front edge (610.9, 611.3, 615.8 and 623.3 mm, on 1 m stock). The general
+bend check still takes a plug's reach point as an ordinary corner, with the
+whole plug as its leg, on a route that uses no gap (a known limitation, P-0218). A full gap raises no finding or warning, and a bundle is held to the gap by
 its diameter alone; both are still open.
 
 **The gap is not a pathway a user can pin.** It is used by the automatic route
