@@ -218,6 +218,7 @@ attrs:
     storage: 64 GB SSD
     software: Junos OS
   features:
+    timing: RJ-45 grandmaster clock port (GM), 10 MHz output, 1 PPS output
     virtual-chassis: up to 10 switches in a ring with QFX5110 or QFX5100 members; also a Virtual Chassis Fabric leaf
     optics-sfp-plus: 10 GbE SFP+, 1 GbE SFP, SFP+ direct attach cable and active optical cable
     optics-qsfp28: 100 GbE QSFP28 and 40 GbE QSFP+, direct attach and active optical cables, breakout cables to SFP+
@@ -225,7 +226,6 @@ attrs:
     oob: management port C0 (RJ-45, em0, with a second C0 SFP cage) and C1 (SFP, em1)
     console: RJ-45 console port (CON)
     usb: one USB port for image updates
-    timing: RJ-45 grandmaster clock port (GM), 10 MHz output, 1 PPS output
   lifecycle:
     eol: none-announced
 chassis: {width: 440.9, height: 43.7, depth: 520.2, ru: 1, weight-kg: 10.43, color: '#757a80', airflow: front-to-back, power: ac}

@@ -12,8 +12,8 @@ description: >-
   port runs at 100 GbE or 40 GbE. The port side also carries the RJ-45 grandmaster clock port and the
   10 MHz and 1 PPS outputs. The rear carries two power supplies, five fan modules, the console, two management
   ports, a USB port, the reset button and the four chassis lamps. One front panel ships in four power
-  and airflow variants, with AC or DC supplies and airflow front-to-back (AIR OUT) or back-to-front (AIR
-  IN), and as a spare chassis without supplies or fan modules.
+  and airflow variants. They have AC or DC supplies, with airflow front-to-back (AIR OUT) or back-to-front
+  (AIR IN). A spare chassis ships without supplies or fan modules.
 profile: networking
 provenance:
   sources:
@@ -195,8 +195,8 @@ attrs:
     qsfp-plus-speeds: 40 GbE; or four 10 GbE with a breakout cable
     qsfp28-speeds: 100 GbE or 40 GbE
     system-modes: >-
-      default, and non-oversubscribed (ports 0 to 23 only, 960 Gbps); a 100 GbE optic in a QSFP28 port
-      disables ports 20 to 27 in default mode
+      default, and non-oversubscribed (ports 0 to 23 only, 960 Gbps). In default mode a 100 GbE optic
+      in a QSFP28 port disables ports 20 to 27
   power:
     power-typical-w: 132
     power-max-w: 200
@@ -218,6 +218,7 @@ attrs:
       short term, altitude: no performance degradation to 2000 m (6562 ft)}
   platform: {cpu: 1.8 GHz quad-core Intel, memory: 16 GB, storage: 64 GB SSD, software: Junos OS}
   features:
+    timing: RJ-45 grandmaster clock port (GM), 10 MHz output, 1 PPS output
     virtual-chassis: >-
       up to 10 switches in a ring with QFX5110 or QFX5100 members; also a Virtual Chassis Fabric spine
       or leaf
@@ -227,7 +228,6 @@ attrs:
     oob: management port C0 (RJ-45, em0, with a second C0 SFP cage) and C1 (SFP, em1)
     console: RJ-45 console port (CON)
     usb: one USB port for image updates
-    timing: RJ-45 grandmaster clock port (GM), 10 MHz output, 1 PPS output
   lifecycle: {eol: none-announced}
 chassis: {width: 440.9, height: 43.7, depth: 520.2, ru: 1, weight-kg: 11.16, color: '#767b82', airflow: front-to-back,
   power: ac}
@@ -616,17 +616,15 @@ views:
       path: M -1.6 1.4 L 0 -1.4 L 1.6 1.4 Z M -2.4 2.6 H -1.0 M 1.0 2.6 H 2.4
       fill: '#eef0f2'
       for: esd-front-jack
-    - id: silk-100g-box
-      at: [402.2, 22.65]
-      path: >-
-        M -19.9 -12.35 V -13.55 H -13.2 M -8.7 -13.55 H 5.8 M 10.3 -13.55 H 19.9 V 12.35 H 10.3 M 5.8
-        12.35 H -8.7 M -13.2 12.35 H -19.9 V 11.15
-      fill: '#e4e6e9'
-      for:
-      - port-28
-      - port-29
-      - port-30
-      - port-31
+    - {id: silk-100g-top-left, at: [382.3, 9.1], path: M 0 1.2 L 0 0 L 6.7 0, fill: '#e4e6e9', for: port-28}
+    - {id: silk-100g-top-mid, at: [393.5, 9.1], path: M 0 0 L 14.5 0, fill: '#e4e6e9', for: [port-28,
+        port-30]}
+    - {id: silk-100g-top-right, at: [412.5, 9.1], path: M 0 0 L 9.6 0, fill: '#e4e6e9', for: port-30}
+    - {id: silk-100g-side, at: [422.1, 9.1], path: M 0 0 L 0 25.9, fill: '#e4e6e9', for: [port-30, port-31]}
+    - {id: silk-100g-bottom-right, at: [412.5, 35.0], path: M 0 0 L 9.6 0, fill: '#e4e6e9', for: port-31}
+    - {id: silk-100g-bottom-mid, at: [393.5, 35.0], path: M 0 0 L 14.5 0, fill: '#e4e6e9', for: [port-29,
+        port-31]}
+    - {id: silk-100g-bottom-left, at: [382.3, 33.8], path: M 0 0 L 0 1.2 L 6.7 1.2, fill: '#e4e6e9', for: port-29}
     - {id: silk-100g, at: [423.2, 22.45], text: 100G, font-size: 1.7, anchor: start, fill: '#e4e6e9',
       for: [port-28, port-29, port-30, port-31]}
     components:
@@ -1466,9 +1464,9 @@ configurations:
     kind: orderable
     description: >-
       QFX5110-32Q-CHAS, the spare chassis, shipped without power supplies or fan modules (guide Table
-      3: "Order PSUs separately. Fan modules are not shipped by default."). Either AC or DC supplies and
-      AIR OUT or AIR IN fan modules are ordered separately, and supplies and fans of one airflow only
-      go in. The supply and fan bays are shown open.
+      3: "Order PSUs separately. Fan modules are not shipped by default."). AC or DC supplies and AIR
+      OUT or AIR IN fan modules are ordered separately. Supplies and fans of one airflow only go in. The
+      supply and fan bays are shown open.
     bays: {psu-0: '', psu-1: '', fan-0: '', fan-1: '', fan-2: '', fan-3: '', fan-4: ''}
     part-numbers:
       QFX5110-32Q-CHAS: {}

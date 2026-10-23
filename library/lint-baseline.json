@@ -2314,6 +2314,15 @@
   "L29": 2,
   "L57": 1
  },
+ "devices/juniper/qfx5110-32q/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 1
+ },
+ "devices/juniper/qfx5110-48s/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
  "devices/juniper/qfx5120-48y/device.yaml": {
   "L29": 2,
   "L57": 1
