@@ -2456,6 +2456,10 @@
   "L29": 2,
   "L57": 1
  },
+ "devices/juniper/qfx5250-64oe-l/device.yaml": {
+  "L57": 1,
+  "L61": 83
+ },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
   "L29": 1,
