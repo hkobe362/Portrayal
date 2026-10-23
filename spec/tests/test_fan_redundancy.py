@@ -257,7 +257,12 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER QFX3500-48S4Q AND QFX3600-16Q MADE IT THIRTY-NINE: each guide gives the fan trays
+    # (two, with two more fan modules on the QFX3500's management board; three on the QFX3600) and says
+    # a failed tray must be replaced within a minute, and neither names how many the switch can lose,
+    # so each group states no form.
+    assert {"juniper/qfx3500-48s4q", "juniper/qfx3600-16q"} <= set(unstated)
+    assert len(unstated) == 39, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
