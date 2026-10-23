@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-48mp
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-48MP
@@ -340,7 +340,6 @@ groups:
     attrs:
       media: rj45
       speed: 2.5g
-      speeds: [100m, 1g, 2.5g]
       poe: ieee-802.3bt
       poe-max-w: '90'
     description: >-
@@ -353,7 +352,6 @@ groups:
     attrs:
       media: rj45
       speed: 10g
-      speeds: [100m, 1g, 2.5g, 5g, 10g]
       poe: ieee-802.3bt
       poe-max-w: '90'
     description: >-

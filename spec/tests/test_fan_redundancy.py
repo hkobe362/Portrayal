@@ -612,4 +612,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # 102 with the Juniper QFX5100-48S and -48T: N+1 over five modules (datasheet, "Redundant (N+1)")
     # 103 with the Juniper QFX5130-32CD: 5+1 over six rear fan modules (hardware guide, QFX5130
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
-    assert n == 103, n
+    # 107 since the Juniper EX4400-24X, -48F, -24MP and -48MP: 1+1 over two fan modules each (hardware
+    # guide, Cooling System and Airflow: "two fan modules (1+1 redundancy)")
+    assert n == 107, n

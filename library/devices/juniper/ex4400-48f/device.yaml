@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-48f
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-48F
@@ -320,7 +320,7 @@ groups:
     term: Port
     role: traffic
     index-origin: 0
-    attrs: {media: sfp, speed: 1g, speeds: [100m, 1g]}
+    attrs: {media: sfp, speed: 1g}
     description: >-
       36 ports, numbered 0 to 35 as printed, upper cage of each column even. Each cage takes a 100 Mbps
       or 1GbE SFP transceiver
@@ -328,7 +328,7 @@ groups:
     term: Port
     role: traffic
     index-origin: 0
-    attrs: {media: sfp-plus, speed: 10g, speeds: [1g, 10g]}
+    attrs: {media: sfp-plus, speed: 10g}
     description: >-
       12 ports, numbered 36 to 47 as printed. Each cage takes a 1GbE SFP or a 10GbE SFP+ transceiver
   sfp-leds:

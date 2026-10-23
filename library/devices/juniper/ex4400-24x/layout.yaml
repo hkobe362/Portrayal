@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-24x
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-24X
@@ -310,7 +310,6 @@ groups:
     attrs:
       media: sfp-plus
       speed: 10g
-      speeds: [1g, 10g]
     description: >-
       24 ports, numbered 0 to 23 as printed, upper cage of each column even. Each cage takes a 1GbE
       SFP or a 10GbE SFP+ transceiver

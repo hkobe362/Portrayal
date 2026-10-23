@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4400-24mp
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4400-24MP
@@ -341,7 +341,7 @@ groups:
     term: Port
     role: traffic
     index-origin: 0
-    attrs: {media: rj45, speed: 10g, speeds: [100m, 1g, 2.5g, 5g, 10g], poe: ieee-802.3bt, poe-max-w: '90'}
+    attrs: {media: rj45, speed: 10g, poe: ieee-802.3bt, poe-max-w: '90'}
     description: >-
       24 ports, numbered 0 to 23 as printed, upper jack of each column even. Each port runs at 100 Mbps,
       1, 2.5, 5 or 10 Gbps
