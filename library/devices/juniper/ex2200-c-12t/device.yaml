@@ -301,16 +301,16 @@ views:
       - {id: mgmt, at: [209.3, 25.9], size: [15.8, 13.2], shape: rect}
       - {id: console-rj45, at: [209.3, 10.5], size: [15.8, 13.2], shape: rect}
       - {id: usb, at: [193.45, 24.3], size: [4.5, 12.0], shape: rect}
-      - {id: led-uplink-0-sfp-link, at: [124.5, 18.5], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-0-sfp-st, at: [124.5, 23.9], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-0-rj45-link, at: [124.5, 29.15], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-0-rj45-st, at: [124.5, 34.5], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-1-sfp-link, at: [167.9, 18.5], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-1-sfp-st, at: [167.9, 23.9], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-1-rj45-link, at: [167.9, 29.15], size: [2.0, 2.25], shape: rect}
-      - {id: led-uplink-1-rj45-st, at: [167.9, 34.5], size: [2.0, 2.25], shape: rect}
-      - {id: led-mgmt-link, at: [202.7, 29.15], size: [2.0, 2.25], shape: rect}
-      - {id: led-mgmt-st, at: [202.7, 34.5], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-0-sfp-link, at: [124.5, 18.375], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-0-sfp-st, at: [124.5, 23.775], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-0-rj45-link, at: [124.5, 29.025], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-0-rj45-st, at: [124.5, 34.375], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-1-sfp-link, at: [167.9, 18.375], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-1-sfp-st, at: [167.9, 23.775], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-1-rj45-link, at: [167.9, 29.025], size: [2.0, 2.25], shape: rect}
+      - {id: led-uplink-1-rj45-st, at: [167.9, 34.375], size: [2.0, 2.25], shape: rect}
+      - {id: led-mgmt-link, at: [202.7, 29.025], size: [2.0, 2.25], shape: rect}
+      - {id: led-mgmt-st, at: [202.7, 34.375], size: [2.0, 2.25], shape: rect}
       - {id: led-sys, at: [239.5, 18.5], size: [2.0, 2.0], shape: circle}
       - {id: led-alm, at: [239.5, 23.85], size: [2.0, 2.0], shape: circle}
       - {id: led-spd, at: [245.3, 18.5], size: [2.0, 2.0], shape: circle}

@@ -153,7 +153,7 @@ def test_the_full_width_jacks_pitch_and_shells(name):
     assert len([x for x in d["views"]["front"]["panel"]["decor"] if x.get("kind") == "jack-shell"]) == n // 6
     # the 24-port models are the 48-port face's right-hand half: their first jack is where the 48's third shell's is
     if MODELS[name]["ports"] == 24:
-        assert xs[0] == pytest.approx(10.4 + 2 * 90.2, abs=0.2)
+        assert xs[0] == pytest.approx(10.4 + 2 * (6 * 13.97 + 6.27), abs=0.05)
 
 
 @pytest.mark.parametrize("name", COMPACT)
@@ -203,7 +203,8 @@ def test_two_dual_purpose_uplinks_each_an_rj45_and_an_sfp_port(name):
     # LINK and ST for each of the four ports of the two uplinks
     assert len([i for i in pl if i.startswith("led-uplink-")]) == 8
     legends = [s["text"] for s in d["views"]["front"]["silkscreen"] if s.get("text") in ("LINK", "ST")]
-    assert legends.count("LINK") == 6 and legends.count("ST") == 6  # four per uplink pair, two for the management port
+    # LINK and ST over each of the four uplink ports, and one of each beside the management port
+    assert legends.count("LINK") == 5 and legends.count("ST") == 5
 
 
 @pytest.mark.parametrize("name", FULL)
@@ -264,7 +265,7 @@ def test_the_full_width_rear_has_the_management_console_usb_and_esd_ports(name):
     decor = {x.get("id"): x for x in d["views"]["rear"]["panel"]["decor"]}
     assert {"earth-terminal", "earth-hole-1", "earth-hole-2", "rps-plate", "rps-opening"} <= set(decor)
     # the RPS port is chassis art: the library has no connector for it
-    assert "rps" not in " ".join(pl)
+    assert not [p for p in pl.values() if "rps" in p["ref"]]
 
 
 @pytest.mark.parametrize("name", FULL)
@@ -388,10 +389,9 @@ def test_the_export_lists_the_guides_interfaces(name):
     ifaces = doc["interfaces"]
     names = [i["name"] for i in ifaces]
     assert len(names) == len(set(names))
-    # the jacks, the uplinks (4, or 2 + 2 on the compact models), the management and console jacks
-    uplinks = 4 if not m["compact"] else 4
-    mgmt = 2 if m["compact"] else 2
-    assert len(ifaces) >= m["ports"] + uplinks + mgmt
+    # the jacks, the four uplink ports (four SFP, or two RJ-45 and two SFP on the compact models) and the
+    # management port; the console ports are not network interfaces
+    assert len(ifaces) == m["ports"] + 4 + 1
 
 
 # --- the faces: logo, the reference, the sources -----------------------------
