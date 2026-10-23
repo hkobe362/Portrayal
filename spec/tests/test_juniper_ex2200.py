@@ -13,7 +13,10 @@ What the guide fixes, and so what these tests hold:
   Power Supply, Cooling System   the supply and the fans are built into the chassis, so no bay and no
              module is modelled for them
 """
+import os
 import pathlib
+import subprocess
+import sys
 
 import pytest
 import yaml
@@ -431,6 +434,11 @@ def test_the_device_is_generated_from_its_layout(name):
     assert lay["name"] == dev["name"] == name
     assert lay["configurations"] == dev["configurations"]
     assert lay["chassis"] == dev["chassis"]
+    # the whole file: the tool the repository uses re-expands the layout and compares it with device.yaml
+    r = subprocess.run([sys.executable, str(ROOT / "spec/tools/portrayal/expand.py"), "--check",
+                        str(DEV / name / "layout.yaml")], cwd=ROOT, capture_output=True, text=True,
+                       env=dict(os.environ, PYTHONPATH=str(ROOT / "spec/tools")))
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 # --- the components ----------------------------------------------------------

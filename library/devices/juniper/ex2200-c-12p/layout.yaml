@@ -115,9 +115,9 @@ provenance:
       the earth symbol over the second, the finned heatsink from 51.7 to 209.3 mm with one screw beside it, the
       AC inlet at 238.4 mm centre with its two-line legend (100-120V and 2.2A, 200-240V and 1.0A, as the figure
       prints; Table 12 gives 7 A and 2.9 A for PoE switches generally, a different thing, and is carried in the
-      attributes), and the ESD symbol over the ESD point at the right. The heatsink is drawn as a vent field
-      because that is how it reads; the guide says EX2200-C switches have no exhaust openings, so nothing is cut
-      through the rear. The serial number ID label (an empty rounded rectangle in the figure) is a paper label
+      attributes), and the ESD symbol over the ESD point at the right. The heatsink is drawn as a solid
+      finned block, a plain darker plate and not a vent, because Figure 6 shows a solid block and the guide says
+      EX2200-C switches have no exhaust openings, so nothing is cut through the rear; the fin slots are not drawn. The serial number ID label (an empty rounded rectangle in the figure) is a paper label
       carrying a real serial number and is not drawn.
   built-in-power-and-fans:
     confidence: datasheet
@@ -451,7 +451,7 @@ views:
       decor:
       - {id: earth-hole-1, kind: earth-hole, at: [16.25, 29.95], size: [3.9, 3.9], rx: 1.95, fill: '#2a2d31'}
       - {id: earth-hole-2, kind: earth-hole, at: [36.25, 29.95], size: [3.9, 3.9], rx: 1.95, fill: '#2a2d31'}
-      - {id: heatsink, kind: heatsink, at: [51.7, 5.6], size: [157.6, 36.0], pattern: vent, vent: 1.0}
+      - {id: heatsink, kind: heatsink, at: [51.7, 5.6], size: [157.6, 36.0], rx: 0.4, fill: '#6f7479'}
       cutouts:
       - {id: esd-rear, at: [259.15, 28.35], size: [4.3, 4.3], shape: circle}
       - {id: ac-inlet, at: [224.4, 11.4], size: [28.0, 20.0], shape: rect}
