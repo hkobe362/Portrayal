@@ -611,6 +611,14 @@ def test_the_comparison_layer_can_now_reach_them():
     ONE HUNDRED AND EIGHT IS THE JUNIPER EX4600-40F, 4+1 over five rear bays: the datasheet lists
     "Redundant (N+1) and hot-pluggable fan modules" and the hardware guide ships five fan
     modules numbered 0 to 4. The guide states no form of its own, so N is the five less one.
+
+    ONE HUNDRED AND NINE IS THE JUNIPER EX4650-48Y, 4+1 over five rear fan modules: the hardware
+    guide (published 2025-07-16) says the switch ships with "five fan modules (4+1 redundancy)".
+
+    ONE HUNDRED AND SIXTEEN AND ONE HUNDRED AND SEVENTEEN ARE THE JUNIPER QFX5110-48S AND QFX5110-32Q,
+    N+0 over five rear fan modules, from the QFX5110 hardware guide (2026-09-24): "All fan modules must
+    be installed for optimal operation of the switch", and the switch runs 30 seconds without
+    thermal shutdown while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -623,5 +631,13 @@ def test_the_comparison_layer_can_now_reach_them():
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
     # 107 since the Juniper EX4100-24T, -24P, -48T and -48P: 1+1 over two fan modules each (hardware guide)
     # 108 since the Juniper EX4600-40F: 4+1 over five rear fan modules (datasheet, hardware guide)
-    # 115 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
-    assert n == 115, n
+    # 109 since the Juniper EX4650-48Y: 4+1 over five rear fan modules (hardware guide, EX4650 Switch First View)
+    # 111 with the Juniper QFX5220-32CD (5+1 over six rear fan modules) and QFX5220-128C ((5x2+1)+1 over
+    # six two-fan modules; hardware guide, QFX5220 Component Redundancy)
+    # 115 since the Juniper EX4400-24X, -48F, -24MP and -48MP: 1+1 over two fan modules each (hardware
+    # guide, Cooling System and Airflow: "two fan modules (1+1 redundancy)")
+    # 117 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
+    # 119 with the Juniper QFX5120-32C (5+1 over six rear fan modules) and QFX5120-48T (4+1 over five),
+    # from the QFX5120 hardware guide, Fan Modules for QFX5120 Switches
+    # 126 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
+    assert n == 126, n
