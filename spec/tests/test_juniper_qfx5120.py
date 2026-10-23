@@ -516,6 +516,7 @@ def test_48t_has_48_basest_jacks_numbered_0_to_47_in_four_blocks_of_six_columns(
     xs = [jacks[2 * c]["at"][0] for c in range(24)]
     steps = [round(b - a, 2) for a, b in zip(xs, xs[1:])]
     within = [s for s in steps if s < 16]
+    # 14.08 mm is measured from the photograph, not the maker's figure
     assert len(within) == 20 and all(s == pytest.approx(14.08, abs=0.1) for s in within)
     # the ports 0 to 23 are all left of the QSFP28 block, 24 to 47 all right of it
     qx = [p["at"][0] for p in placements(d, "front") if ref_name(p["ref"]) == "qsfp-ganged"]

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5120-32c
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5120-32C
@@ -271,7 +271,7 @@ groups:
     role: traffic
     index-origin: 0
     attrs: {media: qsfp28, speed: 100g}
-    description: Ports 0 to 31, the even port above the odd (guide Table 7; Table 5 for channelization). Port 31 shares its lanes with SFP+ port 33.
+    description: Ports 0 to 31, the even port above the odd (guide Table 7; Table 5 for channelization). Port 31 shares its lanes with an SFP+ port (Table 5).
   sfp-plus:
     term: Port
     role: traffic
