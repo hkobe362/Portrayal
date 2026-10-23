@@ -619,6 +619,10 @@ PART_POWER = {
     # landed in one pluggable screw-clamp plug on the top face, the TM-7124S case
     # again. Still where a supply's wire is landed, so the same row (#737).
     "common/terminal-header-508-5f": "dc-terminal",
+    # AND THE EX4100-H-12MP's TWO PSU CONNECTORS, each a five-position pluggable plug that
+    # lands the 54 V and 12 V outputs of one external supply - DC at the chassis whatever the
+    # supply's input, so the same row for the same reason.
+    "juniper/ex4100-h-psu-connector": "dc-terminal",
     # AND A DISTRIBUTION PANEL'S FEED INPUT: a BATT terminal and an RTN terminal,
     # each two 3/8-16 studs taking a dual-hole lug. ONE POWER PORT PER FEED, both
     # poles, as every other row here is - so the part mapped is the feed, and
@@ -1008,6 +1012,15 @@ NOT_A_DCIM_PORT = {
     "common/terminal-header-508-2": "the AurCore AIS switches' RELAY output - a dry-contact alarm "
                                     "relay on a two-way pluggable terminal, not a network port or a "
                                     "console. Neither library has an alarm port (#737)",
+    "juniper/ex4100-h-alarm-connector": "the EX4100-H switches' dry contact alarm connector - two alarm "
+                                        "inputs and a relay output (NO, COM, NC) on a six-pole pluggable "
+                                        "terminal, not a network port or a console. Neither library has an "
+                                        "alarm port",
+    "juniper/ex4100-h-terminal-pad": "one of the twelve wire terminals behind the EX4100-H-24MP and -24F "
+                                     "terminal door - L, N and G for an AC supply, DC+, DC- and G for a DC "
+                                     "supply, for the supply slot of the same number. One terminal is not a "
+                                     "power port: the pair of poles a feed lands on is, and which feed a "
+                                     "slot carries depends on the supply seated",
     "std/vga": "VGA; neither library has a video port type",
     "common/vhdci-receptacle": "a VHDCI fan-out carrying sixteen timing outputs to a patch panel "
                                "over one cable; neither library has a type for it, and one row "
