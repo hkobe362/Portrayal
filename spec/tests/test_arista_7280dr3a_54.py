@@ -152,7 +152,16 @@ def test_the_front_carries_four_status_lamps_console_usb_management_and_timing()
 def test_the_front_prints_the_model_and_reserves_the_logo_zone():
     d = load()
     front = d["views"]["front"]
-    assert "7280DR3A-54" in {s.get("text") for s in front["silkscreen"]}
+    plates = {p["id"]: p for p in placements(d, "front") if p["ref"] == "arista/7280dr3a-model-plate@1"}
+    assert sorted(plates) == ["model-plate", "model-plate-k"]
+    # figure C-1 prints 7280DR3AK-54 on the K build, so the K skin is placed on ac-k alone
+    assert plates["model-plate-k"]["skin"] == "k" and plates["model-plate-k"]["only-in"] == ["ac-k"]
+    assert "skin" not in plates["model-plate"] and "ac-k" not in plates["model-plate"]["only-in"]
+    assert plates["model-plate"]["at"] == plates["model-plate-k"]["at"]
+    skins = LIB / "components/arista/7280dr3a-model-plate/v1/skins"
+    assert ">7280DR3A-54<" in (skins / "default.svg").read_text()
+    assert ">7280DR3AK-54<" in (skins / "k.svg").read_text()
+    assert "7280DR3A-54" not in {s.get("text") for s in front["silkscreen"]}
     zones = [r for r in front.get("regions") or [] if r["id"] == "logo-zone"]
     assert len(zones) == 1 and "not drawn" in zones[0]["label"]
     for name, v in d["views"].items():

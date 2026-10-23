@@ -52,6 +52,7 @@
   "fans",
   "leds",
   "mgmt",
+  "model-plate",
   "osfp-ls-400g",
   "port-leds",
   "psus",
@@ -312,7 +313,7 @@
   "rear/bays/psu-1",
   "rear/bays/psu-2"
  ],
- "names": "4df3d12cd549c103",
+ "names": "23f42942a661e838",
  "placement-addressing": {
   "for": {
    "front/placements/led-fan": [
@@ -563,6 +564,8 @@
    "front/placements/led-psu2": 4,
    "front/placements/led-sys": 1,
    "front/placements/mgmt": 1,
+   "front/placements/model-plate": 1,
+   "front/placements/model-plate-k": 2,
    "front/placements/port-1": 1,
    "front/placements/port-10": 10,
    "front/placements/port-11": 11,
@@ -696,8 +699,8 @@
   "front/placements/led-psu2": "leds",
   "front/placements/led-sys": "leds",
   "front/placements/mgmt": "mgmt",
-  "front/placements/model-plate": null,
-  "front/placements/model-plate-k": null,
+  "front/placements/model-plate": "model-plate",
+  "front/placements/model-plate-k": "model-plate",
   "front/placements/port-1": "qsfpdd-400g",
   "front/placements/port-10": "qsfpdd-400g",
   "front/placements/port-11": "qsfpdd-400g",
@@ -766,6 +769,6 @@
  },
  "placement-surface": "1e16dae20127446d",
  "shape": "5647b5e70e4efded",
- "surface": "2c58354e8245b2f0",
- "version": "1.0.0"
+ "surface": "135f819efbec6e15",
+ "version": "1.1.0"
 }

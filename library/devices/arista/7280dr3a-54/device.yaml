@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-54
-version: 1.0.0
+version: 1.1.0
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-54
@@ -445,6 +445,13 @@ groups:
       1 and 2 here as the guide's callout table does ("Line system port (OSFP)"), stacked at the lower
       right. The data sheet calls them OSFP-LS and says they are for dense 400G-ZR deployment.
     attrs: {media: osfp, speed: 400g}
+  model-plate:
+    term: Label
+    role: furniture
+    index-origin: 1
+    description: >-
+      the model line at the lower left of the front, one placement per printed line, the K build's in
+      place of the others'
   port-leds: {term: LED, role: indicator, index-origin: 1}
   leds: {term: LED, role: indicator, index-origin: 1}
   mgmt:
@@ -1359,9 +1366,10 @@ views:
         for: port-54
         group: port-leds
         rel-pos: 54
-      - {ref: arista/7280dr3a-model-plate@1, id: model-plate, at: [2.3, 65.7], only-in: [base, ac, ac-m,
-          dc]}
-      - {ref: arista/7280dr3a-model-plate@1, id: model-plate-k, at: [2.3, 65.7], skin: k, only-in: [ac-k]}
+      - {ref: arista/7280dr3a-model-plate@1, id: model-plate, at: [2.3, 65.7], group: model-plate, rel-pos: 1,
+        only-in: [base, ac, ac-m, dc]}
+      - {ref: arista/7280dr3a-model-plate@1, id: model-plate-k, at: [2.3, 65.7], skin: k, group: model-plate,
+        rel-pos: 2, only-in: [ac-k]}
       - ref: std/osfp@1
         id: port-55
         at: [414.85, 41.65]
