@@ -37,27 +37,33 @@ DEVICES = sorted(ENVELOPE_IN)
 
 AFO_AC, AFI_AC = "qfx5100-jpsu-650w-ac-afo", "qfx5100-jpsu-650w-ac-afi"
 AFO_DC, AFI_DC = "qfx5100-jpsu-650w-dc-afo", "qfx5100-jpsu-650w-dc-afi"
-FAN_AFO, FAN_AFI = "qfx5110-fanafo", "qfx5110-fanafi"
+# Table 11 (pp. 40-41): one fan module per model and airflow, and p. 44 says to use only the one for the model
+FAN = {
+    "qfx5110-48s": ("qfx5110-48s-fanafo", "qfx5110-48s-fanafi"),
+    "qfx5110-32q": ("qfx5110-32q-fanafo", "qfx5110-32q-fanafi"),
+}
+FAN_AFO_48S, FAN_AFI_48S = FAN["qfx5110-48s"]
+FAN_AFO_32Q, FAN_AFI_32Q = FAN["qfx5110-32q"]
+ALL_FANS = sorted((*FAN["qfx5110-48s"], *FAN["qfx5110-32q"]))
 
 # Table 3: configuration -> (part number, supply, fan, airflow, feed); a None supply is an open bay
 VARIANTS = {
     "qfx5110-48s": {
-        "ac-f2b": ("QFX5110-48S-AFO", AFO_AC, FAN_AFO, "front-to-back", "ac"),
-        "ac-b2f": ("QFX5110-48S-AFI", AFI_AC, FAN_AFI, "back-to-front", "ac"),
-        "dc-f2b": ("QFX5110-48S-DC-AFO", AFO_DC, FAN_AFO, "front-to-back", "dc"),
-        "dc-b2f": ("QFX5110-48S-DC-AFI", AFI_DC, FAN_AFI, "back-to-front", "dc"),
+        "ac-f2b": ("QFX5110-48S-AFO", AFO_AC, FAN_AFO_48S, "front-to-back", "ac"),
+        "ac-b2f": ("QFX5110-48S-AFI", AFI_AC, FAN_AFI_48S, "back-to-front", "ac"),
+        "dc-f2b": ("QFX5110-48S-DC-AFO", AFO_DC, FAN_AFO_48S, "front-to-back", "dc"),
+        "dc-b2f": ("QFX5110-48S-DC-AFI", AFI_DC, FAN_AFI_48S, "back-to-front", "dc"),
     },
     "qfx5110-32q": {
-        "ac-f2b": ("QFX5110-32Q-AFO", AFO_AC, FAN_AFO, "front-to-back", "ac"),
-        "ac-b2f": ("QFX5110-32Q-AFI", AFI_AC, FAN_AFI, "back-to-front", "ac"),
-        "dc-f2b": ("QFX5110-32Q-DC-AFO", AFO_DC, FAN_AFO, "front-to-back", "dc"),
-        "dc-b2f": ("QFX5110-32Q-DC-AFI", AFI_DC, FAN_AFI, "back-to-front", "dc"),
+        "ac-f2b": ("QFX5110-32Q-AFO", AFO_AC, FAN_AFO_32Q, "front-to-back", "ac"),
+        "ac-b2f": ("QFX5110-32Q-AFI", AFI_AC, FAN_AFI_32Q, "back-to-front", "ac"),
+        "dc-f2b": ("QFX5110-32Q-DC-AFO", AFO_DC, FAN_AFO_32Q, "front-to-back", "dc"),
+        "dc-b2f": ("QFX5110-32Q-DC-AFI", AFI_DC, FAN_AFI_32Q, "back-to-front", "dc"),
         "chas": ("QFX5110-32Q-CHAS", None, None, "front-to-back", "ac"),
     },
 }
 CASES = [(n, c) for n in sorted(VARIANTS) for c in VARIANTS[n]]
 SEATED_CASES = [(n, c) for n, c in CASES if VARIANTS[n][c][1]]
-FANS = {FAN_AFO, FAN_AFI}
 PSUS = {AFO_AC, AFI_AC, AFO_DC, AFI_DC}
 MODEL = {  # the part number the guide prints for each unit that the library carries
     AFO_AC: "JPSU-650W-AC-AFO", AFI_AC: "JPSU-650W-AC-AFI",
@@ -352,7 +358,7 @@ def test_the_spare_32q_chassis_shows_every_bay_open():
 def test_a_bay_accepts_the_modules_the_guide_lists(name):
     for b in bays(load_device(name), "rear"):
         got = {ref_name(r) for r in b["accepts"]}
-        assert got == (FANS if b["id"].startswith("fan-") else PSUS), b["id"]
+        assert got == (set(FAN[name]) if b["id"].startswith("fan-") else PSUS), b["id"]
         assert ref_name(b["default"]) in got
 
 
@@ -374,15 +380,25 @@ def test_a_supply_is_the_650w_unit_the_guide_names(part):
     assert attrs["power-output-w"] == 650
 
 
-@pytest.mark.parametrize("part", sorted(FANS))
-def test_a_fan_module_is_the_juniper_unit_for_this_airflow(part):
+@pytest.mark.parametrize("part", ALL_FANS)
+def test_a_fan_module_is_the_juniper_unit_for_this_model_and_airflow(part):
+    """Table 11: QFX5110-48S-FANAFI, -48S-FANAFO, -32Q-FANAFI and -32Q-FANAFO."""
     attrs = load_component(part)["attrs"]
     assert attrs["model"] == part.upper()
     assert attrs["airflow"] == ("front-to-back" if part.endswith("afo") else "back-to-front")
 
 
+@pytest.mark.parametrize("name", DEVICES)
+def test_no_qfx5110_chassis_seats_the_fan_module_of_another_model(name):
+    """Guide p. 44: only the replacement fan modules designed for the product number."""
+    other = {f for n, fans in FAN.items() if n != name for f in fans}
+    text = (DEV / name / "device.yaml").read_text()
+    assert not any(f"juniper/{f}@" in text for f in other)
+    assert "juniper/qfx5110-fanafo@" not in text and "juniper/qfx5110-fanafi@" not in text
+
+
 @pytest.mark.parametrize("front,back", [
-    (AFO_AC, AFI_AC), (AFO_DC, AFI_DC), (FAN_AFO, FAN_AFI),
+    (AFO_AC, AFI_AC), (AFO_DC, AFI_DC), FAN["qfx5110-48s"], FAN["qfx5110-32q"],
 ])
 def test_the_back_to_front_unit_has_a_blue_handle_and_the_front_to_back_a_gold_one(front, back):
     """Tables 11, 13 and 18: AFO (port-to-FRU) is Juniper Gold, AFI (FRU-to-port) is Juniper Azure Blue."""
@@ -395,10 +411,10 @@ def test_the_back_to_front_unit_has_a_blue_handle_and_the_front_to_back_a_gold_o
     assert r > bl and g > bl, "gold is not blue"
 
 
-def test_no_new_component_was_added_for_this_family():
-    """The supplies and fan modules are reused by part number; nothing under a qfx5110 prefix but the fans."""
+def test_the_family_adds_four_fan_modules_and_the_supplies_are_reused():
+    """The shared QFX5120 pair stays; each QFX5110 model has its own pair, and no supply is added."""
     names = {p.name for p in COMP.glob("qfx5110-*")}
-    assert names == {FAN_AFO, FAN_AFI}
+    assert names == {"qfx5110-fanafo", "qfx5110-fanafi", *ALL_FANS}
 
 
 # --- the DCIM export ---------------------------------------------------------

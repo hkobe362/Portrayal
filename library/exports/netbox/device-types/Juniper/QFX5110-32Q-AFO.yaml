@@ -99,19 +99,19 @@ interfaces:
 module-bays:
   - name: Fan 0
     position: fan-0
-    description: 'Accepts: qfx5110-fanafo, qfx5110-fanafi'
+    description: 'Accepts: qfx5110-32q-fanafo, qfx5110-32q-fanafi'
   - name: Fan 1
     position: fan-1
-    description: 'Accepts: qfx5110-fanafo, qfx5110-fanafi'
+    description: 'Accepts: qfx5110-32q-fanafo, qfx5110-32q-fanafi'
   - name: Fan 2
     position: fan-2
-    description: 'Accepts: qfx5110-fanafo, qfx5110-fanafi'
+    description: 'Accepts: qfx5110-32q-fanafo, qfx5110-32q-fanafi'
   - name: Fan 3
     position: fan-3
-    description: 'Accepts: qfx5110-fanafo, qfx5110-fanafi'
+    description: 'Accepts: qfx5110-32q-fanafo, qfx5110-32q-fanafi'
   - name: Fan 4
     position: fan-4
-    description: 'Accepts: qfx5110-fanafo, qfx5110-fanafi'
+    description: 'Accepts: qfx5110-32q-fanafo, qfx5110-32q-fanafi'
   - name: PSU 0
     position: psu-0
     description: 'Accepts: qfx5100-jpsu-650w-ac-afo, qfx5100-jpsu-650w-ac-afi, qfx5100-jpsu-650w-dc-afo,

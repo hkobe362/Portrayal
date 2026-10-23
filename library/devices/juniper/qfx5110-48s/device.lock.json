@@ -1,24 +1,24 @@
 {
  "bay-accepts": {
   "rear/bays/fan-0": [
-   "juniper/qfx5110-fanafi@1",
-   "juniper/qfx5110-fanafo@1"
+   "juniper/qfx5110-48s-fanafi@1",
+   "juniper/qfx5110-48s-fanafo@1"
   ],
   "rear/bays/fan-1": [
-   "juniper/qfx5110-fanafi@1",
-   "juniper/qfx5110-fanafo@1"
+   "juniper/qfx5110-48s-fanafi@1",
+   "juniper/qfx5110-48s-fanafo@1"
   ],
   "rear/bays/fan-2": [
-   "juniper/qfx5110-fanafi@1",
-   "juniper/qfx5110-fanafo@1"
+   "juniper/qfx5110-48s-fanafi@1",
+   "juniper/qfx5110-48s-fanafo@1"
   ],
   "rear/bays/fan-3": [
-   "juniper/qfx5110-fanafi@1",
-   "juniper/qfx5110-fanafo@1"
+   "juniper/qfx5110-48s-fanafi@1",
+   "juniper/qfx5110-48s-fanafo@1"
   ],
   "rear/bays/fan-4": [
-   "juniper/qfx5110-fanafi@1",
-   "juniper/qfx5110-fanafo@1"
+   "juniper/qfx5110-48s-fanafi@1",
+   "juniper/qfx5110-48s-fanafo@1"
   ],
   "rear/bays/psu-0": [
    "juniper/qfx5100-jpsu-650w-ac-afi@1",
@@ -33,7 +33,7 @@
    "juniper/qfx5100-jpsu-650w-dc-afo@1"
   ]
  },
- "composed": "4822a3e2bec9bfda",
+ "composed": "29cb7860a752b908",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
@@ -43,8 +43,8 @@
   "juniper/qfx5100-jpsu-650w-ac-afo@1": "1.0.0+b188603969963639",
   "juniper/qfx5100-jpsu-650w-dc-afi@1": "1.0.0+60d434a61b36b750",
   "juniper/qfx5100-jpsu-650w-dc-afo@1": "1.0.0+38f4a72bb29bab59",
-  "juniper/qfx5110-fanafi@1": "1.0.0+4988fa14a41cd849",
-  "juniper/qfx5110-fanafo@1": "1.0.0+5c47a99140587d6f",
+  "juniper/qfx5110-48s-fanafi@1": "1.0.0+95f8d89b40c212c4",
+  "juniper/qfx5110-48s-fanafo@1": "1.0.0+44d91f9b1a5900b3",
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp-ganged@1": "1.4.1+6ac71d72bfdf9de9",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
@@ -60,7 +60,7 @@
   "dc-f2b"
  ],
  "format": 1,
- "gaps": "9dd37b3135e1343b",
+ "gaps": "827db4fbd8fa9b25",
  "groups": [
   "esd",
   "fan-leds",
@@ -451,7 +451,7 @@
   "rear/placements/reset-btn",
   "rear/placements/usb"
  ],
- "names": "9d9e8f1fc863d89d",
+ "names": "9e2af5c8a4f52232",
  "placement-addressing": {
   "for": {
    "front/placements/esd-front-jack": [
@@ -1212,7 +1212,7 @@
   "rear/placements/usb": "mgmt"
  },
  "placement-surface": "49b025772755a88c",
- "shape": "a6845e605d217f63",
- "surface": "8633325b41cf6238",
+ "shape": "c6521ecc3b6d6ecd",
+ "surface": "658ff49531dc1bb8",
  "version": "0.1.0"
 }
