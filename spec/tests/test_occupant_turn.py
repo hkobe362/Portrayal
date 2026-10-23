@@ -403,7 +403,8 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # the Juniper QFX5120-32C places a single M4 earthing screw at each end of its rear: two more seats (down)
 # the Juniper EX9251 places two 10-32 earthing screws: two more seats (down)
 # the Arista 7280CR3-96's two rear grounding screws, the 7280DR3A-36's strip drawn the same: one seat down and one up
-WANT = {"down": 129, "left": 33, "up": 10, "right": 25}
+# the Arista 7050CX4M-48D8's two rear grounding screws (#1204, the same strip as the 7280DR3A-36's) add one seat down and one up
+WANT = {"down": 130, "left": 33, "up": 11, "right": 25}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -486,7 +487,7 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 85   # 63, the Arista 7280CR3-96 (as the DR3A-36), the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the Arista 7010TX-48, the Juniper QFX5200-48Y, the Juniper QFX5120-32C, the Juniper QFX5240-64OD and -64QD and the Juniper EX9251
+    assert len({k[0] for k in ring}) == 86   # 63, the Arista 7050CX4M-48D8, the Arista 7280CR3-96 (as the DR3A-36), the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the Arista 7010TX-48, the Juniper QFX5200-48Y, the Juniper QFX5120-32C, the Juniper QFX5240-64OD and -64QD and the Juniper EX9251
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
     assert len({k[0] for k in pairs}) == 41   # and the two Juniper QFX5240 earthing pads
     # a pair is turned only along itself
@@ -536,7 +537,8 @@ def test_the_four_crossings_the_seat_gave_are_gone(census):
     # and both screws of each of the four EX3400 earthing pairs, 16 away from each other
     # and one of the 7280DR3A-36's two rear grounding screws, 19.2 away from its neighbour
     # and the same screw of the 7280CR3-96, whose rear strip is drawn the same way
-    assert len(crossed) == 27 and not [k for k in crossed if census[k]["hard"]]
+    # and one of the 7050CX4M-48D8's, on the same strip
+    assert len(crossed) == 28 and not [k for k in crossed if census[k]["hard"]]
 
 
 def test_a_barrier_block_pole_is_no_turnable_seat():
