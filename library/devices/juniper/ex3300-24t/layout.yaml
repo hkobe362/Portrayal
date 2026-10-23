@@ -17,12 +17,6 @@ description: >-
   are built into the chassis. The DC-powered EX3300-24T-DC has the same front panel and a DC terminal
   block in place of the inlet. It is a configuration of this device.
 profile: networking
-lint:
-  waive:
-    L57: >-
-      The power supply and the fan are built in and no slot takes a module, so there is no chassis with
-      empty slots to call a base. Each configuration is an orderable build the guide's Table 3 lists,
-      and the default is the shipped AC one.
 provenance:
   sources:
     confidence: datasheet

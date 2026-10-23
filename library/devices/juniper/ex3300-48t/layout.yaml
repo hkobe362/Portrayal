@@ -16,12 +16,6 @@ description: >-
   and the fan are built into the chassis. The back-to-front EX3300-48T-BF has the same front panel, so it is a
   configuration of this device.
 profile: networking
-lint:
-  waive:
-    L57: >-
-      The power supply and the fan are built in and no slot takes a module, so there is no chassis with
-      empty slots to call a base. Each configuration is an orderable build the guide's Table 3 lists,
-      and the default is the shipped front-to-back one.
 provenance:
   sources:
     confidence: datasheet
