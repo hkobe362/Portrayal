@@ -104,8 +104,10 @@ provenance:
     confidence: photo-measured
     note: >-
       The datasheet's 24T view prints the numerals of ports 0 to 7 in orange and the others in white,
-      and its model plate reads "EX4200" in white and "8PoE" in orange. The -DC build carries no PoE,
-      and no source shows what its face prints, so it is drawn the same; see the gaps.
+      and its model plate reads "EX4200" in white and "8PoE" in orange. The -DC build carries no PoE (guide
+      Table 1, pp. 4-5; datasheet Table 1: 0 PoE ports), so the `ac` configuration places the "8PoE" legend
+      and the orange numerals as two small parts with `only-in`, and `dc` places white numerals and no
+      legend. No source shows the -DC face itself; see the gaps.
   port-lamps:
     confidence: datasheet
     note: >-
@@ -320,9 +322,9 @@ gaps:
   - front
   reason: needs-photo
   wanted: >-
-    What the -DC build prints on its model plate and whether its port numerals are orange. The guide shows
-    the same front for it and the datasheet photographs are of the PoE builds; the -DC build is drawn
-    as this device is.
+    What the -DC build prints on its model plate. The guide shows the same front for it and the datasheet
+    photographs are of the PoE builds. Because the build gives no PoE, the `dc` face is drawn without
+    the "8PoE" legend and with white numerals; the "EX4200" line is kept.
 - what: side-earthing-terminal
   scope:
   - left
@@ -448,18 +450,9 @@ views:
       - {id: led-mst, at: [426.8, 15.75], size: [2.0, 2.0], shape: circle}
     silkscreen:
     - {at: [304.5, 3.8], text: EX4200, font-size: 2.2, anchor: middle, fill: '#e4e6e9', for: chassis}
-    - {at: [334.3, 3.8], text: 8PoE, font-size: 2.2, anchor: middle, fill: '#f2a33a', for: chassis}
     - {at: [430.3, 9.55], text: ALM, font-size: 1.4, anchor: start, fill: '#e4e6e9', for: led-alm}
     - {at: [430.3, 13.35], text: SYS, font-size: 1.4, anchor: start, fill: '#e4e6e9', for: led-sys}
     - {at: [430.3, 17.25], text: MST, font-size: 1.4, anchor: start, fill: '#e4e6e9', for: led-mst}
-    - {at: [13.6, 9.4], text: '0', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-0}
-    - {at: [18.0, 10.4], text: '1', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-1}
-    - {at: [27.57, 9.4], text: '2', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-2}
-    - {at: [31.97, 10.4], text: '3', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-3}
-    - {at: [41.54, 9.4], text: '4', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-4}
-    - {at: [45.94, 10.4], text: '5', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-5}
-    - {at: [55.51, 9.4], text: '6', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-6}
-    - {at: [59.91, 10.4], text: '7', font-size: 2.2, anchor: middle, fill: '#f2a33a', for: port-7}
     - {at: [69.48, 9.4], text: '8', font-size: 2.2, anchor: middle, fill: '#e4e6e9', for: port-8}
     - {at: [73.88, 10.4], text: '9', font-size: 2.2, anchor: middle, fill: '#e4e6e9', for: port-9}
     - {at: [83.45, 9.4], text: '10', font-size: 2.2, anchor: middle, fill: '#e4e6e9', for: port-10}
@@ -643,6 +636,12 @@ views:
         group: rj45
         rel-pos: 23
         attrs: {media: rj45, speed: 1g}
+      - {ref: juniper/ex4200-poe-plate@1, id: poe-plate, at: [329.3, 0.9], for: chassis, only-in: [ac],
+        group: furniture, rel-pos: 2}
+      - {ref: juniper/ex4200-port-numerals@1, id: numerals-poe, skin: poe, at: [12.0, 7.2], for: chassis,
+        only-in: [ac], group: furniture, rel-pos: 3}
+      - {ref: juniper/ex4200-port-numerals@1, id: numerals-plain, skin: plain, at: [12.0, 7.2], for: chassis,
+        only-in: [dc], group: furniture, rel-pos: 4}
       - ref: juniper/ex4200-lcd-button@1
         id: btn-menu
         skin: menu

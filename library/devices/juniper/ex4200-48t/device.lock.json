@@ -25,7 +25,7 @@
    "juniper/ex4200-pwr3-930-ac@1"
   ]
  },
- "composed": "38723a1fba747858",
+ "composed": "dc870b1b9f09c7b0",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
@@ -34,8 +34,10 @@
   "common/screw-head@1": "1.1.0+0f38d482bcc27ec9",
   "juniper/ex4200-fan-tray@1": "1.0.0+96c6f50c36af4cea",
   "juniper/ex4200-lcd-button@1": "1.0.0+67298f45df82c76b",
+  "juniper/ex4200-poe-plate@1": "1.0.0+67a2e8d69292942f",
+  "juniper/ex4200-port-numerals@1": "1.0.0+acaf639f9e63de09",
   "juniper/ex4200-psu-cover@1": "1.0.0+1c2ced301fd9119c",
-  "juniper/ex4200-pwr-190-dc@1": "1.0.0+0b6134f81da00f1f",
+  "juniper/ex4200-pwr-190-dc@1": "1.0.1+78f70f627fef67ad",
   "juniper/ex4200-pwr-320-ac@1": "1.0.0+873ecda0690e8ff2",
   "juniper/ex4200-pwr-600-ac@1": "1.0.0+ac68bc95b0f925d7",
   "juniper/ex4200-pwr-930-ac@1": "1.0.0+def538e5c5800e4f",
@@ -54,7 +56,7 @@
   "s"
  ],
  "format": 1,
- "gaps": "0e5f88e0aba206b9",
+ "gaps": "7f5f5c51f7ba6faa",
  "groups": [
   "esd",
   "fans",
@@ -130,6 +132,9 @@
   "front/placements/led-alm",
   "front/placements/led-mst",
   "front/placements/led-sys",
+  "front/placements/numerals-plain",
+  "front/placements/numerals-poe",
+  "front/placements/poe-plate",
   "front/placements/port-0",
   "front/placements/port-1",
   "front/placements/port-10",
@@ -196,7 +201,7 @@
   "rear/placements/vcp-0",
   "rear/placements/vcp-1"
  ],
- "names": "b5eb18130e4f5578",
+ "names": "2289b909322b081b",
  "placement-addressing": {
   "for": {
    "front/placements/btn-enter": [
@@ -212,6 +217,15 @@
     "chassis"
    ],
    "front/placements/led-sys": [
+    "chassis"
+   ],
+   "front/placements/numerals-plain": [
+    "chassis"
+   ],
+   "front/placements/numerals-poe": [
+    "chassis"
+   ],
+   "front/placements/poe-plate": [
     "chassis"
    ],
    "rear/placements/esd-rear-jack": [
@@ -230,6 +244,9 @@
    "front/placements/led-alm": 0,
    "front/placements/led-mst": 2,
    "front/placements/led-sys": 1,
+   "front/placements/numerals-plain": 4,
+   "front/placements/numerals-poe": 3,
+   "front/placements/poe-plate": 2,
    "front/placements/port-0": 0,
    "front/placements/port-1": 1,
    "front/placements/port-10": 10,
@@ -291,7 +308,7 @@
   }
  },
  "placement-attrs": "033d3dcdbdf643bf",
- "placement-geometry": "44136fa355b3678a",
+ "placement-geometry": "6732baf4c90d1231",
  "placement-groups": {
   "front/bays/uplink": "uplink",
   "front/placements/btn-enter": "lcd-buttons",
@@ -301,6 +318,9 @@
   "front/placements/led-alm": "status-leds",
   "front/placements/led-mst": "status-leds",
   "front/placements/led-sys": "status-leds",
+  "front/placements/numerals-plain": "furniture",
+  "front/placements/numerals-poe": "furniture",
+  "front/placements/poe-plate": "furniture",
   "front/placements/port-0": "rj45",
   "front/placements/port-1": "rj45",
   "front/placements/port-10": "rj45",
@@ -361,7 +381,7 @@
   "rear/placements/vcp-1": "vcp"
  },
  "placement-surface": "53b0944cc9397771",
- "shape": "7663844dd0023802",
- "surface": "68325f623083314d",
+ "shape": "92238402aba8d387",
+ "surface": "55ef77343f964653",
  "version": "0.1.0"
 }

@@ -19,7 +19,7 @@
     <path d="M 4.0 7.8 H 7.2" stroke="#4b5057" stroke-width="0.35"/>
   </g>
   <g id="handle">
-    <path d="M 15.0 36.0 L 55.0 8.0" fill="none" stroke="#c9ccd0" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 15.26 36.37 L 55.26 8.37 L 54.74 7.63 L 14.74 35.63 Z" fill="none" stroke="#9ba0a6" stroke-width="0.25" stroke-linejoin="round"/>
   </g>
   <g id="terminals">
     <rect x="63.0" y="2.5" width="24.0" height="36.5" rx="0.8" fill="#15171a" stroke="#6b7078" stroke-width="0.3"/>

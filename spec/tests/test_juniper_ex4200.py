@@ -9,6 +9,7 @@ YAML a contributor edits, or the generated export a DCIM user imports; none read
 exporter holds, because a table that says so proves nothing about the file.
 """
 import pathlib
+import xml.etree.ElementTree as ET
 
 import pytest
 import yaml
@@ -74,6 +75,28 @@ def contract(name):
 
 def placements(d, view):
     return (d["views"][view].get("components") or {}).get("placements") or []
+
+
+def printed(d, cfg):
+    """The front legends as one configuration prints them: [(for, text, fill)].
+
+    The "8PoE" line and the numerals 0 to 7 of the -24T and -48T are small parts placed with
+    `only-in`, so a -DC build can leave the PoE colouring off. Their text is read from the skin.
+    """
+    out = [(s.get("for"), s["text"], s["fill"]) for s in d["views"]["front"]["silkscreen"]]
+    for p in placements(d, "front"):
+        name = name_of(p["ref"])
+        if name not in ("ex4200-poe-plate", "ex4200-port-numerals"):
+            continue
+        if p.get("only-in") and cfg not in p["only-in"]:
+            continue
+        skin = p.get("skin", "default")
+        svg = ET.parse(LIB / "components/juniper" / name / "v1/skins" / f"{skin}.svg").getroot()
+        group = svg.find(".//{*}g[@id='silkscreen']")
+        for t in group.findall("{*}text"):
+            tag = None if name == "ex4200-poe-plate" else f"port-{t.text}"
+            out.append((tag, t.text, group.get("fill")))
+    return out
 
 
 def bays(d, view):
@@ -154,8 +177,7 @@ def test_the_front_has_the_ports_the_guide_counts_numbered_as_printed(dev):
             assert p.get("rotate", 0) == (180 if k % 2 == 0 else 0)
         assert d["groups"]["rj45"]["attrs"] == {"media": "rj45", "speed": "1g"}
     # the printed numbers: one numeral per port, spelled as the metal spells it
-    numerals = {s["for"]: s["text"] for s in d["views"]["front"]["silkscreen"]
-                if s.get("for", "").startswith("port-")}
+    numerals = {f: t for f, t, _ in printed(d, "ac") if (f or "").startswith("port-")}
     assert numerals == {f"port-{k}": str(k) for k in range(n)}
     cut = {c["id"] for c in d["views"]["front"]["panel"]["cutouts"]}
     assert {f"port-{k}" for k in range(n)} <= cut
@@ -189,11 +211,22 @@ def test_poe_ports_print_their_numerals_in_orange(dev):
     """The datasheet photographs print the numerals of the PoE ports in orange and the rest white."""
     _, n, poe, *_ = DEVICES[dev]
     d = load(dev)
-    fills = {int(s["for"].split("-")[1]): s["fill"] for s in d["views"]["front"]["silkscreen"]
-             if s.get("for", "").startswith("port-")}
-    orange = {k for k, f in fills.items() if f == "#f2a33a"}
-    assert orange == set(range(poe))
-    assert len({fills[k] for k in range(poe, n)}) <= 1
+    for cfg in set(d["configurations"]) - {"dc"}:
+        fills = {int(f.split("-")[1]): c for f, _, c in printed(d, cfg)
+                 if (f or "").startswith("port-")}
+        orange = {k for k, c in fills.items() if c == "#f2a33a"}
+        assert orange == set(range(poe))
+        assert len({fills[k] for k in range(poe, n)}) <= 1
+
+
+@pytest.mark.parametrize("dev", [k for k, v in DEVICES.items() if "dc" in v[6] and v[2]])
+def test_the_dc_builds_print_no_poe_legend_and_plain_numerals(dev):
+    """Guide Table 1 and the text under it: a switch with a DC supply provides no PoE."""
+    d = load(dev)
+    assert d["configurations"]["dc"]["part-numbers"]
+    legends = printed(d, "dc")
+    assert not [t for _, t, _ in legends if "PoE" in t]
+    assert "#f2a33a" not in {c for _, _, c in legends}
 
 
 @pytest.mark.parametrize("dev", DEVICES)
@@ -435,5 +468,5 @@ def test_the_model_plate_prints_the_poe_count_or_the_sfp_count(dev):
     """The photographs print 8PoE, 24PoE, 48PoE or 24SFP after EX4200 on the plate."""
     _, n, poe, kind, *_ = DEVICES[dev]
     want = "24SFP" if kind.startswith("std/sfp") else f"{max(poe, 8) if poe <= 8 else n}PoE"
-    legends = {s["text"] for s in load(dev)["views"]["front"]["silkscreen"]}
+    legends = {t for _, t, _ in printed(load(dev), "ac")}
     assert want in legends

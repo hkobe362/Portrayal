@@ -25,7 +25,7 @@
    "juniper/ex4200-pwr3-930-ac@1"
   ]
  },
- "composed": "49d1bb86d091ef1a",
+ "composed": "b5c6c6a39ebbf3a1",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
@@ -34,7 +34,7 @@
   "juniper/ex4200-fan-tray@1": "1.0.0+96c6f50c36af4cea",
   "juniper/ex4200-lcd-button@1": "1.0.0+67298f45df82c76b",
   "juniper/ex4200-psu-cover@1": "1.0.0+1c2ced301fd9119c",
-  "juniper/ex4200-pwr-190-dc@1": "1.0.0+0b6134f81da00f1f",
+  "juniper/ex4200-pwr-190-dc@1": "1.0.1+78f70f627fef67ad",
   "juniper/ex4200-pwr-320-ac@1": "1.0.0+873ecda0690e8ff2",
   "juniper/ex4200-pwr-600-ac@1": "1.0.0+ac68bc95b0f925d7",
   "juniper/ex4200-pwr-930-ac@1": "1.0.0+def538e5c5800e4f",
