@@ -257,7 +257,12 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER EX4550-32F AND -32T MADE IT THIRTY-NINE: the guide says all three fan modules must
+    # be installed for optimal functioning and that the switch runs 30 seconds without thermal
+    # shutdown while one is replaced, and names no N+1 form, so each group quotes that and states no
+    # form. The EX4500-40F has one fan tray in one bay, so its group is not counted here at all.
+    assert {"juniper/ex4550-32f", "juniper/ex4550-32t"} <= set(unstated)
+    assert len(unstated) == 39, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
