@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4100-h-24mp
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4100-H-24MP
@@ -29,8 +29,7 @@ provenance:
       and ex4100-h-24mp-rear-high.jpg), confirm the colours, the lamps, what is printed and the seated supply; neither is copied here. The EX4100
       datasheet (https://www.juniper.net/content/dam/www/assets/datasheets/us/en/switches/ex4100-line-of-ethernet-switches-datasheet.pdf)
       redirects to an HPE PSNow document that did not answer, so no datasheet figure is used. No Visio stencil or 3D model of the EX4100-H was
-      found (the intake folders held for the Juniper EX and QFX lines could not be read from the machine this was built on, so none could be
-      looked in). Nothing is taken from a reseller. End of life was searched 2026-10-23 and no Juniper notice for the EX4100-H was found, so
+      found. Nothing is taken from a reseller. End of life was searched 2026-10-23 and no Juniper notice for the EX4100-H was found, so
       the lifecycle is none announced. Table 68 (the earthing parts) lists an EX4100-H-48MP beside the 12MP and the 24MP; no other table, figure or
       listing in the guide has a 48-port model, so none is modelled.
   chassis:
@@ -54,7 +53,9 @@ provenance:
       Table 7 and the mounting topics (Figures 67 to 69) - two-post rack mounting is the default, with the EX4100-H-2P-RMK kit provided in the box:
       a pair of side brackets that hang on shoulder screws and slide toward the rear, with M4 by 6 mm screws, mounting the switch flush with the
       front posts. The orderable four-post kits are EX4100-H-4P-RMK (screws, with rear mounting blades; the front brackets mount the switch flush
-      with the front posts) and EX4100-H-4P-TL-RMK (toolless rails). No position other than flush is stated and none is measured; the kits are in
+      with the front posts) and EX4100-H-4P-TL-RMK (toolless rails). No position other than flush is stated and none is measured. No kit contract is written: the guide gives
+      no rack-depth range, preset or rail depth for any of the three kits (Table 56 states only a 27 in minimum cabinet depth, which is a cabinet
+      figure and not a kit range), and a kit configuration needs one of the two, so a contract would carry an invented range. The kits stay in
       provenance only. The guide asks for 1 RU clear above and below.
   ports:
     confidence: photo-measured

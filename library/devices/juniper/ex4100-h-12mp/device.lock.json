@@ -20,7 +20,7 @@
   "std"
  ],
  "format": 1,
- "gaps": "31a2616fa14adcc6",
+ "gaps": "e4f86743ac93d210",
  "groups": [
   "alarm",
   "alarm-leds",
@@ -309,6 +309,6 @@
  },
  "placement-surface": "0ae1ffe73b9163c2",
  "shape": "5c6b8247ed7c0fcb",
- "surface": "960254465658331e",
- "version": "0.1.0"
+ "surface": "5d3b8f8e695264f9",
+ "version": "0.1.1"
 }

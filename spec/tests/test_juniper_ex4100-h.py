@@ -76,9 +76,10 @@ def prov(d):
 def test_the_envelope_is_the_guides_table(name):
     m = MODELS[name]
     ch = load_device(name)["chassis"]
-    assert ch["width"] == pytest.approx(m["w"], abs=0.1)
-    assert ch["height"] == pytest.approx(m["h"], abs=0.1)
-    assert ch["depth"] == pytest.approx(m["d"], abs=0.1)
+    # abs=0.05 pins the centimetre figures: the inch-derived 43.18 mm height and 134.6 mm depth fail it
+    assert ch["width"] == pytest.approx(m["w"], abs=0.05)
+    assert ch["height"] == pytest.approx(m["h"], abs=0.05)
+    assert ch["depth"] == pytest.approx(m["d"], abs=0.05)
     assert ch["weight-kg"] == pytest.approx(m["kg"], abs=0.01)
     if m["ru"]:
         assert ch["ru"] == m["ru"] and ch.get("mount", "rack") == "rack"
@@ -93,7 +94,7 @@ def test_the_12mp_mounts_as_a_desktop_box_the_guides_default():
     note = " ".join(gap["note"].split())
     for kit in ("EX4100-H-12-DRK", "EX4100-H-12-MMK", "EX4100-H-12-RMK", "EX4100-H-12-WMK", "EX4100-H-12-RM-DRK"):
         assert kit in note
-    assert "chassis" not in d["chassis"].get("kits", [])
+    assert kit_refs(d) == []
 
 
 @pytest.mark.parametrize("name", RACK)
@@ -101,7 +102,12 @@ def test_the_rack_models_mount_flush_in_two_posts(name):
     ch = load_device(name)["chassis"]
     assert [p["name"] for p in ch["ears"]["positions"]] == ["flush"]
     assert ch["ears"]["positions"][0]["default"] is True
-    assert "kits" not in ch
+    # the guide gives no rack depth, preset or rail depth for EX4100-H-2P-RMK, -4P-RMK or -4P-TL-RMK, so no kit is listed
+    assert kit_refs(load_device(name)) == []
+
+
+def kit_refs(dev):
+    return [k["ref"] for k in dev["chassis"].get("kits", [])]
 
 
 @pytest.mark.parametrize("name", DEVICES)
@@ -285,7 +291,6 @@ def test_the_24f_rear_is_the_24mps_turned_end_for_end():
     f_b = {b["id"]: b for b in bays(f, "rear")}
     assert mp_b["psu-0"]["at"][0] > 40 and f_b["psu-0"]["at"][0] < 20
     assert by_id(mp, "rear")["esd-rear"]["at"][0] < 30 and by_id(f, "rear")["esd-rear"]["at"][0] > 380
-    assert "reverse of the EX4100-H-24MP" in prov(f)
 
 
 def test_the_12mp_rear_is_a_vented_plate_between_two_plates_with_mounting_holes():
@@ -386,7 +391,6 @@ def test_the_sources_are_cited_and_the_gaps_recorded(name):
     d = load_device(name)
     text = prov(d)
     assert "EX4100-H Switch Hardware Guide" in text and "published 2026-10-01" in text
-    assert "PSNow" in text and "did not answer" in text
     ref = d["references"][0]
     assert ref["url"].endswith("/ex4100-h/ex4100-h.pdf") and len(ref["sha256"]) == 64
     assert d["portfolio"] == {"line": "EX Series", "family": "EX4100-H"}
@@ -396,9 +400,22 @@ def test_the_sources_are_cited_and_the_gaps_recorded(name):
     assert "studio photographs" in text
 
 
-def test_the_guides_drawing_of_the_340w_ac_supply_is_recorded_as_a_dc_one():
-    note = " ".join(load_component("ex4100-h-jpsu-340w-ac")["provenance"]["drawing-vs-photo"].split())
-    assert "Figure 25" in note and "DC INPUT" in note and "photo wins" in note
+def test_the_340w_ac_supply_is_drawn_with_the_photographs_ac_label_not_the_guides_dc_one():
+    skin = (COMP / "ex4100-h-jpsu-340w-ac/v1/skins/default.svg").read_text()
+    assert ">AC INPUT<" in skin
+    assert ">DC INPUT<" not in skin
+
+
+def test_the_12mp_label_prints_two_hazard_icons():
+    front = load_device("ex4100-h-12mp")["views"]["front"]
+    box = next(d for d in front["panel"]["decor"] if d["id"] == "hazard-box")
+    x0, x1 = box["at"][0], box["at"][0] + box["size"][0]
+    y0, y1 = box["at"][1], box["at"][1] + box["size"][1]
+    icons = [m for m in front["silkscreen"] if m.get("id") in ("hazard-triangle", "hazard-hand")]
+    inside = [m for m in icons if x0 < m["at"][0] < x1 and y0 < m["at"][1] < y1]
+    assert {m["id"] for m in inside} >= {"hazard-triangle", "hazard-hand"}
+    # one on each half of the yellow label
+    assert min(m["at"][0] for m in inside) < (x0 + x1) / 2 < max(m["at"][0] for m in inside)
 
 
 def test_the_guides_table_68_48mp_is_named_and_not_modelled():

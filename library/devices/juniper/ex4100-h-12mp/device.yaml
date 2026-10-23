@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4100-h-12mp
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4100-H-12MP
@@ -33,10 +33,8 @@ provenance:
       and ex4100-h-12mp-rear-high.jpg), confirm the colours, the lamps and what is printed; neither is
       copied here. The EX4100 datasheet (https://www.juniper.net/content/dam/www/assets/datasheets/us/en/switches/ex4100-line-of-ethernet-switches-datasheet.pdf)
       redirects to an HPE PSNow document that did not answer, so no datasheet figure is used. No Visio
-      stencil or 3D model of the EX4100-H was found (the intake folders held for the Juniper EX and QFX
-      lines could not be read from the machine this was built on, so none could be looked in). Nothing
-      is taken from a reseller. End of life was searched 2026-10-23 and no Juniper notice for the EX4100-H
-      was found, so the lifecycle is none announced.
+      stencil or 3D model of the EX4100-H was found. Nothing is taken from a reseller. End of life was
+      searched 2026-10-23 and no Juniper notice for the EX4100-H was found, so the lifecycle is none announced.
   chassis:
     confidence: datasheet
     note: >-
@@ -158,8 +156,8 @@ provenance:
       each of the two cross lines (six in all), and a plain plate each side with two round mounting holes.
       A small corner mark and an L mark on the left plate frame a label position. Scale 10.46 px/mm from
       the body width. The holes are the screws of the mounting kits (Figures 39 to 66 show the brackets
-      bolted to the switch with M5 L8 screws). The perforation is drawn as a rectangular vent field, not
-      hexagons.
+      bolted to the switch with M5 L8 screws). The perforation is drawn as a hexagonal pattern, as in
+      the photograph.
   colour:
     confidence: photo-measured
     note: >-
@@ -268,8 +266,11 @@ gaps:
   reason: needs-drawing
   note: >-
     The yellow label at the top of the face prints two icons, a hazard triangle with a bolt and a second
-    pictogram (a cord and a hand) that the guide does not name. Only the first is drawn.
-  wanted: the second icon's meaning
+    pictogram (a cord and a hand) that the guide does not name. The first is the kit's bolt mark in a
+    triangle; the second is drawn as a simplified hand over a cord, estimated from the photograph (centre
+    76.4 mm across, about 4.8 mm wide, read off the 2100 px photograph at 11.02 px/mm). No kit mark fits
+    it and the guide gives no figure for it, so the shape is approximate.
+  wanted: the second icon's meaning and a figure of it
 - what: label-plates
   scope:
   - front
@@ -576,6 +577,15 @@ views:
       for: chassis
       path: M 0.49 -1.4 L -0.77 0.21 L -0.07 0.21 L -0.49 1.4 L 0.77 -0.21 L 0.07 -0.21 Z
       filled: true
+    - id: hazard-hand
+      at: [76.4, 5.4]
+      path: >-
+        M -1.8 -1.6 V 0.3 M -0.6 -2.1 V 0.3 M 0.6 -2.1 V 0.3 M 1.8 -1.6 V 0.3 M -2.3 0.3 H 2.3 V 2.3 H
+        -2.3 Z M 2.3 1.3 Q 3.0 1.3 3.0 2.4
+      filled: false
+      stroke-width: 0.3
+      fill: '#1a1a1a'
+      for: chassis
     - {id: hot-surface-fill, at: [89.5, 3.4], path: M 0 0 L 6.0 11.0 H -6.0 Z, filled: true, fill: '#f3e21f',
       for: chassis}
     - {id: hot-surface-edge, at: [89.5, 3.4], path: M 0 0 L 6.0 11.0 H -6.0 Z, filled: false, stroke-width: 0.4,
