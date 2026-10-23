@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: 7280dr3a-54
-version: 1.1.0
+version: 1.1.1
 maturity: modelled
 manufacturer: Arista
 model: 7280DR3A-54
@@ -425,7 +425,8 @@ gaps:
   scope: [front]
   reason: vendor-silent
   wanted: >-
-    The K and M variants print their own model line on the plate. This file prints one line.
+    The M variant prints its own model line on the plate. The K plate is drawn from figure C-1;
+    the M plate has no figure, so `ac-m` prints the base line.
 groups:
   qsfpdd-400g:
     term: Port
