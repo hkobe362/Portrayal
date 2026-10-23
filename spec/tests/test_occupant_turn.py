@@ -399,8 +399,9 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # the four Juniper EX3400 earthing plates add eight ring-lug seats, four left and four right
 # the Arista 7280DR3A-36's two rear grounding screws, 19.2 apart, add one seat down and one up
 # the Juniper QFX5200-48Y places a single M4 earthing screw at each end of its FRU panel: two more seats (down)
+# the Juniper QFX5120-32C places a single M4 earthing screw at each end of its rear: two more seats (down)
 # the four Juniper EX3300 earthing plates (the EX3400's part, reused) add eight more, four left and four right
-WANT = {"down": 122, "left": 35, "up": 9, "right": 29}
+WANT = {"down": 124, "left": 35, "up": 9, "right": 29}
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -488,7 +489,7 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 84   # 63, the four Juniper EX3300,the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the Arista 7010TX-48 and the Juniper QFX5200-48Y
+    assert len({k[0] for k in ring}) == 85   # 63, the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the four Juniper EX3300, the Arista 7010TX-48, the Juniper QFX5200-48Y and the Juniper QFX5120-32C
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
     assert len({k[0] for k in pairs}) == 43
     # a pair is turned only along itself
