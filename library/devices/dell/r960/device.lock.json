@@ -900,7 +900,7 @@
    "dell/r960-fan@1"
   ]
  },
- "composed": "9ea9b4185902c03a",
+ "composed": "1ba6263c6f19dbf4",
  "composed-refs": {
   "common/dimm-plan@1": "1.2.0+e9ae6e3f8f5062ce",
   "common/drive-blank-25@2": "2.0.0+af7efd33cf1a467a",
@@ -946,28 +946,28 @@
   "dell/r960-pcie-filler-fh-2slot@1": "1.0.0+2fce805452c56d83",
   "dell/r960-pcie-filler-fh@1": "1.0.0+449b39c97974bc64",
   "dell/r960-pem-board@1": "1.0.0+38c29ea6d57f3183",
-  "dell/r960-psu-2400w-ac@1": "1.0.0+f7f0186047b981a6",
-  "dell/r960-psu-2800w-ac@1": "1.0.0+181041bc51a18d33",
+  "dell/r960-psu-2400w-ac@1": "1.0.0+ff1ffd7c954ccc10",
+  "dell/r960-psu-2800w-ac@1": "1.0.0+2f7842346916a18f",
   "dell/r960-psu-adapter-60mm@1": "1.0.0+8d1718bea469188f",
   "dell/r960-psu-blank@1": "1.0.0+90dde2ba51056041",
   "dell/r960-psu-plan@1": "1.0.0+d191f5cebd95121c",
   "dell/r960-rear-io-board@1": "1.0.0+023e07c2e00f4ddb",
-  "dell/r960-riser-1a@1": "1.0.0+3c9116c91be8cb2f",
-  "dell/r960-riser-1b@1": "1.0.0+af0addc2552cd6a1",
-  "dell/r960-riser-1c@1": "1.0.0+b2e3954e566bcee8",
+  "dell/r960-riser-1a@1": "1.0.0+5ef1adcf526ba7d9",
+  "dell/r960-riser-1b@1": "1.0.0+b62bcdff98c46dfa",
+  "dell/r960-riser-1c@1": "1.0.0+c7dc7add035fe053",
   "dell/r960-riser-2-blank@1": "1.0.0+ef7e45d6a46c8bb9",
   "dell/r960-riser-2-plan@1": "1.0.0+7645693ae79ae283",
-  "dell/r960-riser-2@1": "1.0.0+a7c50d2f07738254",
+  "dell/r960-riser-2@1": "1.0.0+a480038ec9223cdb",
   "dell/r960-riser-3-blank@1": "1.0.0+28a9ee436f5c0e64",
   "dell/r960-riser-3-plan@1": "1.0.0+f39f9d640f80d92f",
-  "dell/r960-riser-3a@1": "1.0.0+03e8759fe28bb2b9",
-  "dell/r960-riser-3b-cage@1": "1.0.0+ac811b4db553449d",
+  "dell/r960-riser-3a@1": "1.0.0+8ec73d2959c932c0",
+  "dell/r960-riser-3b-cage@1": "1.0.0+cf9a11304590b9f5",
   "dell/r960-riser-3b-scale-out@1": "1.0.0+0c75fb2f2dc56dbf",
   "dell/r960-riser-3b@1": "1.0.0+06537d8d879c80e5",
   "dell/r960-riser-4-plan@1": "1.0.0+64b2ba04fa0ae402",
-  "dell/r960-riser-4a@1": "1.0.0+6b58d3644be08d1a",
-  "dell/r960-riser-4b@1": "1.0.0+460b0534a5934aa6",
-  "dell/r960-riser-4c@1": "1.0.0+0613868e25293a83",
+  "dell/r960-riser-4a@1": "1.0.0+bfa41ad45a11464d",
+  "dell/r960-riser-4b@1": "1.0.0+6bf6ff5346e6ddc4",
+  "dell/r960-riser-4c@1": "1.0.0+66992ff33f8c633a",
   "dell/r960-riser-plan@1": "1.0.0+345d6c1c06d544b3",
   "dell/r960-support-bar@1": "1.0.0+78365a8ded32e9aa",
   "dell/r960-system-board@1": "1.0.0+b0dba18ea9afeb43",
@@ -1023,7 +1023,7 @@
   "sff8-rc3-1a-2-3a-4a"
  ],
  "format": 1,
- "gaps": "533589be1b0fbdf5",
+ "gaps": "f3feebe42c9ada08",
  "groups": [
   "blanks",
   "boss",
@@ -1979,7 +1979,7 @@
   }
  },
  "placement-attrs": "e62cd9b9c9e87217",
- "placement-geometry": "987cc73532190adb",
+ "placement-geometry": "8051f24de5ec0db1",
  "placement-groups": {
   "front-e3s16/bays/e3s-0": "drives-e3s",
   "front-e3s16/bays/e3s-1": "drives-e3s",
@@ -2256,5 +2256,5 @@
  "placement-surface": "d03f9bec86bc4ec8",
  "shape": "4944fa56dc80fe71",
  "surface": "9f1349b1af128ead",
- "version": "1.0.0"
+ "version": "2.0.0"
 }

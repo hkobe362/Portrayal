@@ -34,11 +34,12 @@ size-confidence: {w: photo-measured, h: photo-measured}
 relief:
   features:
   - node: plate
-    out: 20.0
+    out: 1.0
     shape: true
     color: '#cfd3d7'
     confidence: estimated
     source: >-
-      estimated by analogy with the R660's riser cages (dell/riser-1-fh-cage-16g@1); no R960 model
-      or side figure is held
+      estimated - the cage's plate is the rear wall's own sheet metal, and ISM table 7 puts nothing but the supplies'
+      handles past the wall; no R960 model or side figure is held. The first pass drew it 20.0 proud by analogy with the
+      R660's riser cages (dell/riser-1-fh-cage-16g@1), which stood the cages outside the 866.74 chassis
 skins: [default]
