@@ -657,4 +657,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
     # 137 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
-    assert n == 137, n
+    # 140 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
+    # QFX5241-64QD (N+1 over four): hardware guides, Component Redundancy
+    assert n == 140, n
