@@ -1034,6 +1034,11 @@ NOT_A_DCIM_PORT = {
                                      "contacts for an external alarm loop; neither DCIM has a "
                                      "port type for an alarm contact",
 
+    # --- Virtual Chassis ---------------------------------------------------------
+    "juniper/ex4200-vcp-port": "the 68-pin Virtual Chassis port of an EX4200: a proprietary stacking "
+                               "connector with no registered interface and no port type in either "
+                               "DCIM; the guide names it only as a 68-pin connector",
+
     # `dell/rj45-port-14g` USED TO BE HERE, as "a modelling gap, not an exporter
     # one": the NDC's four jacks carried no speed, so the exporter could not say
     # which two were 10GBASE-T and rightly refused to guess. #287 closed it by
