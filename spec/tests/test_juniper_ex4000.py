@@ -81,7 +81,11 @@ def silk_texts(dev, view):
 def test_the_envelope_is_table_26(name):
     m = MODELS[name]
     ch = load_device(name)["chassis"]
-    assert ch["ru"] == 1
+    if name in COMPACT:
+        # desktop mounting is the default for these four (hardware guide, printed page 85)
+        assert ch["mount"] == "desktop" and "ru" not in ch
+    else:
+        assert ch["ru"] == 1
     # Table 26 prints 1.75 in (4.44 cm) for the 8- and 12-port models and 1.71 in (4.34 cm) for the others
     assert ch["height"] == pytest.approx({1.75: 44.4, 1.71: 43.4}[m["h_in"]], abs=0.05)
     assert ch["width"] == pytest.approx(m["w_cm"] * 10, abs=0.1)
@@ -343,8 +347,8 @@ def test_the_dcim_device_type_exports_with_the_guides_u_height(name):
         doc = yaml.safe_load(f.read_text())
         assert doc["manufacturer"] == "Juniper"
         assert doc["model"] == part
-        # 1.71 in and 1.75 in are both one rack unit
-        assert doc["u_height"] == 1.0
+        # 1.71 in is one rack unit; the four desktop models are no rack unit
+        assert doc["u_height"] == (0.0 if name in COMPACT else 1.0)
         assert not doc.get("module-bays")
 
 

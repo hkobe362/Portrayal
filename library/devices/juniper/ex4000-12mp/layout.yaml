@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4000-12mp
-version: 1.0.0
+version: 2.0.0
 maturity: modelled
 manufacturer: Juniper
 model: EX4000-12MP
@@ -157,7 +157,7 @@ chassis:
   width: 264.0
   height: 44.4
   depth: 253.7
-  ru: 1
+  mount: desktop
   weight-kg: 3.2
   color: '#6a7380'
   silk: '#e4e6e9'

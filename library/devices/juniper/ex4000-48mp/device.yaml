@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4000-48mp
-version: 1.0.0
+version: 1.0.1
 maturity: modelled
 manufacturer: Juniper
 model: EX4000-48MP
@@ -144,8 +144,8 @@ provenance:
       position with the 2-in. recessed front-mounting brackets of the four-post kit EX-4PST-RMK (Table
       5, orderable; also a flush four-post mount). The enhanced toolless four-post kit JNP-4PST-RMK-1U-E
       (orderable) is a further kit. The recess is 2 in. (50.8 mm). No figure measures a bracket fold line,
-      so only the recess has an at, and the kits are not listed under kits in this slice: they are named
-      here and not modelled as kind kit contracts.
+      so only the recess has an at (the flush at: 0 is the datum of the face), and the kits are not listed
+      under kits in this slice: they are named here and not modelled as kind kit contracts.
   color:
     confidence: photo-measured
     note: >-

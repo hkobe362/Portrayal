@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4000-12t
-version: 1.0.0
+version: 2.0.0
 maturity: modelled
 manufacturer: Juniper
 model: EX4000-12T
@@ -180,8 +180,8 @@ attrs:
     usb: one USB 2.0 Type-A port on the front panel
   compliance: {seismic: tested for Zone 4 earthquake safety}
   lifecycle: {eol: none-announced}
-chassis: {width: 264.0, height: 44.4, depth: 245.0, ru: 1, weight-kg: 2.3, color: '#6a7380', silk: '#e4e6e9',
-  power: ac}
+chassis: {width: 264.0, height: 44.4, depth: 245.0, mount: desktop, weight-kg: 2.3, color: '#6a7380',
+  silk: '#e4e6e9', power: ac}
 gaps:
 - what: rack-kits
   scope:

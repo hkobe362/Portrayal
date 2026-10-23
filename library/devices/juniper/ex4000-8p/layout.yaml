@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex4000-8p
-version: 1.0.0
+version: 2.0.0
 maturity: modelled
 manufacturer: Juniper
 model: EX4000-8P
@@ -156,7 +156,7 @@ chassis:
   width: 264.0
   height: 44.4
   depth: 245.0
-  ru: 1
+  mount: desktop
   weight-kg: 2.6
   color: '#6a7380'
   silk: '#e4e6e9'
