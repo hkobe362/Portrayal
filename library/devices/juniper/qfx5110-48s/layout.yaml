@@ -348,10 +348,11 @@ groups:
     role: service
     index-origin: 0
     attrs:
-      redundancy: n+1
+      redundancy: n+0
       redundancy-note: >-
-        The guide gives five fan modules, slots 0 to 4 left to right; all should be installed for optimal
-        operation and the switch runs 30 seconds with one removed. It does not state N+1 in those words.
+        QFX5110 hardware guide (2026-09-24), Cooling System and Airflow Description: "All fan modules must be
+        installed for optimal operation of the switch" and the switch runs 30 seconds without thermal shutdown
+        while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
   fan-leds:
     term: LED
     role: indicator

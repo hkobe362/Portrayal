@@ -602,6 +602,11 @@ def test_the_comparison_layer_can_now_reach_them():
     ONE HUNDRED AND ONE AND ONE HUNDRED AND TWO ARE THE JUNIPER QFX5100-48S AND QFX5100-48T,
     N+1 over five rear fan modules, from the QFX5100 datasheet (July 2024): "Redundant (N+1)
     and hot-pluggable fan modules". The hardware guide gives the five slots.
+
+    THE JUNIPER QFX5110-48S AND QFX5110-32Q ARE N+0 OVER FIVE REAR FAN MODULES, from the QFX5110
+    hardware guide (2026-09-24): "All fan modules must be installed for optimal operation of the
+    switch", and the switch runs 30 seconds without thermal shutdown while one is replaced. The guide
+    states no N+1 form, so no spare fan is claimed.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -612,4 +617,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 102 with the Juniper QFX5100-48S and -48T: N+1 over five modules (datasheet, "Redundant (N+1)")
     # 103 with the Juniper QFX5130-32CD: 5+1 over six rear fan modules (hardware guide, QFX5130
     # Component Redundancy: "can operate with one fan module not in operation (5+1 redundancy)")
-    assert n == 103, n
+    # 105 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
+    assert n == 105, n
