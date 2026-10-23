@@ -2289,6 +2289,10 @@
   "L57": 1,
   "L61": 48
  },
+ "devices/juniper/ex4650-48y/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
  "devices/juniper/mx10003/device.yaml": {
   "L119": 1,
   "L69": 1,
@@ -2424,6 +2428,15 @@
   "L57": 1,
   "L61": 3,
   "L69": 1
+ },
+ "devices/juniper/qfx5220-128c/device.yaml": {
+  "L39": 128,
+  "L57": 1,
+  "L61": 1
+ },
+ "devices/juniper/qfx5220-32cd/device.yaml": {
+  "L29": 2,
+  "L57": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
