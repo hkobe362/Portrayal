@@ -619,6 +619,11 @@ def test_the_comparison_layer_can_now_reach_them():
     N+0 over five rear fan modules, from the QFX5110 hardware guide (2026-09-24): "All fan modules must
     be installed for optimal operation of the switch", and the switch runs 30 seconds without
     thermal shutdown while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
+
+    ONE HUNDRED AND TWENTY AND ONE HUNDRED AND TWENTY-ONE ARE THE JUNIPER QFX10008 AND QFX10016, 1+1 over
+    two rear fan trays each. The hardware guides (2025-12-11) say the switch keeps running for a limited
+    time on one tray without a thermal alarm, and the datasheet calls them dual hot-swappable fan trays
+    with redundant fans; the fans inside a tray speed up when one fails.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -639,4 +644,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 117 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
     # 119 with the Juniper QFX5120-32C (5+1 over six rear fan modules) and QFX5120-48T (4+1 over five),
     # from the QFX5120 hardware guide, Fan Modules for QFX5120 Switches
-    assert n == 119, n
+    # 121 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
+    assert n == 121, n

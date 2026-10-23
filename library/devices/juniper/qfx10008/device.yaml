@@ -460,6 +460,14 @@ configurations:
       psu3: juniper/qfx10000-pwr-cover@1
       psu4: juniper/qfx10000-pwr-cover@1
       psu5: juniper/qfx10000-pwr-cover@1
+      fpc0: juniper/qfx10000-lc-cover@1
+      fpc1: juniper/qfx10000-lc-cover@1
+      fpc2: juniper/qfx10000-lc-cover@1
+      fpc3: juniper/qfx10000-lc-cover@1
+      fpc4: juniper/qfx10000-lc-cover@1
+      fpc5: juniper/qfx10000-lc-cover@1
+      fpc6: juniper/qfx10000-lc-cover@1
+      fpc7: juniper/qfx10000-lc-cover@1
     part-numbers:
       QFX10008-BASE: {}
   base-h:
