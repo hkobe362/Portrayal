@@ -221,6 +221,13 @@ gaps:
   wanted: >-
     The handle colour of the fan modules and supplies. The guide's Tables 17, 20 and 24 give the labels only.
     The orange and blue of the EX4600 guide are used.
+- what: ac-input-rating
+  scope: [rear]
+  reason: sources-disagree
+  note: >-
+    The rating label in Figure 6 prints an AC input of 3 A (100-240V, 60-50Hz). Table 22 gives 7.8 A at the
+    low line and 3.8 A at the high line. The label is drawn as printed and the attribute carries Table 22.
+  wanted: which figure the real label prints, from a photograph of the rear plate
 - what: jack-pitch
   scope: [front]
   reason: sources-disagree
