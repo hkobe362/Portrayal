@@ -27,7 +27,7 @@
    "juniper/ex4500-psu-dc-fb@1"
   ]
  },
- "composed": "c88c13aca7130168",
+ "composed": "8e262000e022b20d",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-arrow-sm@1": "1.1.0+f6e565f48fbd46a4",
@@ -37,10 +37,10 @@
   "juniper/ex4500-fan-tray-bf@1": "1.0.0+c3644c4b88f7dbfa",
   "juniper/ex4500-fan-tray-fb@1": "1.0.0+a635de9d00f9c13f",
   "juniper/ex4500-lb@1": "1.0.0+828b349897b3344d",
-  "juniper/ex4500-psu-ac-bf@1": "1.0.0+167fdd315bb37cd1",
-  "juniper/ex4500-psu-ac-fb@1": "1.0.0+646979974679e122",
+  "juniper/ex4500-psu-ac-bf@1": "1.0.0+c8a855fa5e072dd8",
+  "juniper/ex4500-psu-ac-fb@1": "1.0.0+e85b0334b9474acc",
   "juniper/ex4500-psu-cover@1": "1.0.0+7581a57beee79c0a",
-  "juniper/ex4500-psu-dc-fb@1": "1.0.0+b6dc2bb54ddb4260",
+  "juniper/ex4500-psu-dc-fb@1": "1.0.0+3c68a8515160f682",
   "juniper/ex4500-uplink-cover@1": "1.0.0+9b3954f919071988",
   "juniper/ex4500-vc-legend@1": "1.0.0+705a6a7d97a056b6",
   "juniper/ex4500-vc1@1": "1.0.0+13db0530f8a8c32e",
@@ -889,6 +889,6 @@
  },
  "placement-surface": "3f108e35d2b83443",
  "shape": "105cff0ecbde7a8e",
- "surface": "53c437f6422906e5",
+ "surface": "815385ac3c66b33e",
  "version": "0.1.0"
 }

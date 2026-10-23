@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="76mm" height="39.8mm" viewBox="0 0 76 39.8">
   <rect id="face" x="0" y="0" width="76" height="39.8" rx="0.8" fill="#2c2f33" stroke="#17191c" stroke-width="0.4"/>
   <g id="lever">
-    <rect x="0.4" y="12.0" width="3.6" height="16.0" rx="0.8" fill="#f08a24" stroke="#9a5410" stroke-width="0.3"
+    <rect x="0.4" y="12.0" width="3.6" height="16.0" rx="0.8" fill="#f08a24" stroke="#925416" stroke-width="0.3"
           data-fill-from="handle-finish" data-stroke-derive="handle-finish"/>
   </g>
   <g id="fan-grille">

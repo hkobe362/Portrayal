@@ -2268,11 +2268,13 @@
  },
  "devices/juniper/ex4550-32f/device.yaml": {
   "L57": 1,
-  "L61": 3
+  "L61": 3,
+  "L69": 1
  },
  "devices/juniper/ex4550-32t/device.yaml": {
   "L57": 1,
-  "L61": 11
+  "L61": 11,
+  "L69": 1
  },
  "devices/juniper/ex4600-40f/device.yaml": {
   "L29": 4,

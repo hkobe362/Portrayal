@@ -296,7 +296,6 @@ groups:
     role: service
     index-origin: 1
     attrs:
-      redundancy: '3'
       redundancy-note: >-
         Three fan modules in slots 1 to 3 from left to right. The guide says all three must be installed
         for optimal functioning, and the switch runs 30 seconds while one is replaced

@@ -327,7 +327,6 @@ groups:
     role: service
     index-origin: 0
     attrs:
-      redundancy: '5'
       redundancy-note: >-
         One fan tray of five fans. The switch stays up if one fan fails at room temperature, and the whole tray is
         replaced, never one fan
