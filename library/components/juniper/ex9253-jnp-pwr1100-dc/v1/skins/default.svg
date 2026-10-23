@@ -23,10 +23,10 @@
     <circle cx="46.2" cy="34.0" r="1.6" fill="#3a3e43"/>
   </g>
   <g id="handle">
-    <path d="M 48.2 5.8 L 73.8 33.6" stroke="#4a4e54" stroke-width="3.6" stroke-linecap="round"/>
-    <path d="M 48.2 5.8 L 73.8 33.6" stroke="#6a6f76" stroke-width="1.0" stroke-linecap="round"/>
-    <circle cx="48.2" cy="5.8" r="1.5" fill="#1a1d20"/>
-    <circle cx="73.8" cy="33.6" r="1.5" fill="#1a1d20"/>
+    <path d="M 48.2 33.6 L 73.8 5.8" stroke="#4a4e54" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M 48.2 33.6 L 73.8 5.8" stroke="#6a6f76" stroke-width="1.0" stroke-linecap="round"/>
+    <circle cx="48.2" cy="33.6" r="1.5" fill="#1a1d20"/>
+    <circle cx="73.8" cy="5.8" r="1.5" fill="#1a1d20"/>
   </g>
   <rect id="tab" x="1.8" y="12.4" width="4.6" height="12.8" rx="0.8" fill="#9aa0a6" stroke="#5d6167" stroke-width="0.3"/>
   <circle id="led-status" cx="6.3" cy="7.4" r="1.1" fill="var(--led-color, #0f1113)" stroke="#3a3e43" stroke-width="0.3"/>

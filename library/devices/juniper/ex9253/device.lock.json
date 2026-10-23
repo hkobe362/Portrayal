@@ -57,14 +57,14 @@
    "juniper/ex9253-psu-blank@1"
   ]
  },
- "composed": "38ec560c4dc884e6",
+ "composed": "f6bbb8a5c3f9be26",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "common/rj45-ganged-lamped@1": "1.0.0+5031bf1a85fdb9be",
   "juniper/ex9253-fan-3ru@1": "1.0.0+1d8c3d661d109b75",
-  "juniper/ex9253-jnp-pwr1100-dc@1": "1.0.0+7ec0f443229fc7b6",
-  "juniper/ex9253-jnp-pwr1600-ac@1": "1.0.0+182e549092f6d786",
+  "juniper/ex9253-jnp-pwr1100-dc@1": "1.0.0+d204b43c2c09cf79",
+  "juniper/ex9253-jnp-pwr1600-ac@1": "1.0.0+370217971911127c",
   "juniper/ex9253-lc-blnk@1": "1.0.0+f47bcc0a3c96bb6c",
   "juniper/ex9253-psu-blank@1": "1.0.0+b6579263bafe997f",
   "juniper/ex9253-re-blnk@1": "1.0.0+68b52dbfd846ba3a",
@@ -156,6 +156,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "340faa726da42343",
- "surface": "7bb0d1a2dd967615",
+ "surface": "05a9520eb9cd180a",
  "version": "0.1.0"
 }

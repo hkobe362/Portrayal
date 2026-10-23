@@ -151,7 +151,6 @@ attrs:
     storage-temp: -40 to 70 C (-40 to 158 F) in the shipping container
     humidity: 5 to 90 percent noncondensing in operation; the datasheet gives 5 to 95 percent non-operating
     altitude: up to 10,000 ft (3,048 m) with no performance degradation
-    seismic: Telcordia Technologies Zone 4 earthquake requirements
   platform:
     cpu: 1.6 GHz Intel Xeon, 8 cores (datasheet)
     memory: up to 64 GB DRAM (datasheet)
@@ -165,12 +164,13 @@ attrs:
     oob: one RJ-45 management Ethernet port (MGMT) on each Routing Engine, 10/100/1000
     console: RJ-45 serial console port (CON) on each Routing Engine
     usb: one USB port on each Routing Engine
-    timing: BITS and ToD RJ-45, 10MHz and PPS SMB in and out, on each Routing Engine
+    clock-and-time-io: BITS and ToD RJ-45, 10MHz and PPS SMB in and out, on each Routing Engine
   compliance:
     safety: CAN/CSA-22.2 No. 60950-00/UL 1950, EN 60950, IEC 60950-1, EN 60825-1 (datasheet)
     emc: FCC 47 CFR Part 15 Class A, EN 55022, VCCI, BSMI CNS 13438, AS/NZS CISPR22 (datasheet)
     nebs: SR-3580 NEBS Criteria Level 3, GR-63-Core, GR-1089-Core (as the datasheet lists them)
     materials: RoHS 5/6 (datasheet)
+    seismic: Telcordia Technologies Zone 4 earthquake requirements
   lifecycle:
     eol: none-announced
 chassis: {width: 442.0, height: 132.3, depth: 762.0, ru: 3, weight-kg: 22.68, color: '#8b8e94', airflow: front-to-back, power: ac}

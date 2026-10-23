@@ -15,6 +15,16 @@ description: >-
   Routing Engine is built in. One panel serves three orders: the AC model, the DC model and the spare
   chassis.
 profile: networking
+lint:
+  waive:
+    L113: >-
+      The GM/PTP SFP cage and the BITS RJ-45 jack carry no rate in the guide. It says only that GM/PTP connects the
+      switch to a timing device and is unsupported in this release, and that BITS is the building-integrated timing
+      supply clock interface. The jack's media cannot say so either: rj45-tod and rj48 would claim a signal the guide
+      does not name. The searches are recorded in the gaps named gm-ptp-speed and bits-media.
+    L29: >-
+      The fan tray's power is not published. The guide's power tables (12 to 14) give whole-switch figures and the
+      datasheet gives none per tray; the component declares power-absent, and this count is the honest report of it.
 provenance:
   sources:
     confidence: datasheet
@@ -249,7 +259,6 @@ attrs:
     storage-temp: -40 to 70 C (-40 to 158 F) in the shipping container
     humidity: 5 to 90 percent noncondensing in operation; the datasheet gives 5 to 95 percent non-operating
     altitude: up to 10,000 ft (3,048 m) with no performance degradation
-    seismic: Telcordia Technologies Zone 4 earthquake requirements
   platform:
     cpu: 1.6 GHz Intel 8-core x86 (guide, Routing Engine)
     memory: 32 GB DDR4
@@ -264,12 +273,13 @@ attrs:
     oob: one RJ-45 management Ethernet port (MGMT), 10/100/1000
     console: RJ-45 serial console port (CON), RS-232
     usb: one USB port for installing Junos OS
-    timing: BITS RJ-45, ToD RJ-45, 1PPS and 10MHz SMB in and out, GM/PTP SFP
+    clock-and-time-io: BITS RJ-45, ToD RJ-45, 1PPS and 10MHz SMB in and out, GM/PTP SFP
   compliance:
     safety: CAN/CSA-22.2 No. 60950-00/UL 1950, EN 60950, IEC 60950-1, EN 60825-1 (datasheet)
     emc: FCC 47 CFR Part 15 Class A, EN 55022, VCCI, BSMI CNS 13438, AS/NZS CISPR22 (datasheet)
     nebs: SR-3580 NEBS Criteria Level 3, GR-63-Core, GR-1089-Core (as the datasheet lists them)
     materials: RoHS 5/6 (datasheet)
+    seismic: Telcordia Technologies Zone 4 earthquake requirements
   lifecycle:
     eol: none-announced
 chassis: {width: 447.0, height: 43.7, depth: 469.9, ru: 1, weight-kg: 10.3, color: '#8b8e94', airflow: front-to-back, power: ac}
@@ -421,6 +431,11 @@ groups:
     role: furniture
     index-origin: 0
     description: the wrist-strap ESD point at the lower left of the front, and the one at the rear
+  labels:
+    term: Label
+    role: furniture
+    index-origin: 0
+    description: the laser hazard mark beside the SFP+ block (guide Figure 1)
   grounding:
     term: Point
     role: furniture
@@ -465,14 +480,14 @@ views:
       - {block: qsfp28}
       - {block: sfp-plus}
       - {id: esd-front-jack, at: [10.0, 26.5], size: [6.0, 6.0], shape: circle}
-      - {id: led-port-1-0, at: [143.4, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-1, at: [133.4, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-2, at: [157.65, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-3, at: [147.65, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-4, at: [171.9, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-5, at: [161.9, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-6, at: [186.15, 20.6], size: [3.2, 2.8], shape: rect}
-      - {id: led-port-1-7, at: [176.15, 20.6], size: [3.2, 2.8], shape: rect}
+      - {id: led-port-1-0, at: [143.2, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-1, at: [133.2, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-2, at: [157.45, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-3, at: [147.45, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-4, at: [171.7, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-5, at: [161.7, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-6, at: [185.95, 20.4], size: [3.6, 3.2], shape: rect}
+      - {id: led-port-1-7, at: [175.95, 20.4], size: [3.6, 3.2], shape: rect}
       - {id: gm-ptp, at: [27.65, 25.85], size: [14.5, 10.0]}
       - {id: mgmt, at: [242.3, 21.9], size: [15.8, 13.2]}
       - {id: bits, at: [264.3, 21.9], size: [15.8, 13.2]}
@@ -627,7 +642,7 @@ views:
          attrs: {function: offline},
          description: 'turns the switch online or offline, or powers it on or off (Figure 1, callout 8)'}
       - {ref: common/reset-button@1, id: reset-btn, at: [425.7, 33.6], group: buttons, rel-pos: 1, for: chassis, attrs: {function: reset}}
-      - {ref: common/laser-warning@1, id: laser-mark, at: [130.3, 36.1], for: chassis}
+      - {ref: common/laser-warning@1, id: laser-mark, at: [130.3, 36.1], for: chassis, group: labels, rel-pos: 0}
     regions:
     - {id: logo-zone, at: [6.0, 1.4], size: {w: 22.7, h: 8.8}, label: 'Vendor logo; not drawn'}
     - {id: logo-zone-2, at: [423.2, 4.8], size: {w: 16.5, h: 6.0}, label: 'Junos OS mark; not drawn'}
