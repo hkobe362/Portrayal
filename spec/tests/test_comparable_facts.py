@@ -388,7 +388,9 @@ def test_the_long_tail_is_still_left_alone():
         pytest.skip("library/dist not built")
     unc = json.loads(p.read_text())["unclaimed"]
     assert unc, "the census emptied - either everything was promoted or it broke"
-    assert sum(1 for n in unc.values() if n == 1) > len(unc) // 3
+    # a quarter, not a third: every Arista 7280 model reuses spellings the earlier ones named, which
+    # turns a one-device spelling into a two-device one, and the share sat at 186 of 564 after them
+    assert sum(1 for n in unc.values() if n == 1) > len(unc) // 4
 
 
 # ---- superseded prose is claimed, not unclaimed -----------------------------
