@@ -120,7 +120,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "874f72059da4f7d7",
+ "gaps": "dd95a10517364d34",
  "groups": [
   "cooling",
   "fpcs",
@@ -232,6 +232,6 @@
  },
  "placement-surface": "bd322227e79ad6b5",
  "shape": "63f17efb5ba8d499",
- "surface": "74f46b264c33e124",
- "version": "3.0.0"
+ "surface": "522194dafa48519e",
+ "version": "3.0.1"
 }

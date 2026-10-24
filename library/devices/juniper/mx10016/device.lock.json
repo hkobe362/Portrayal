@@ -164,7 +164,7 @@
   "premium"
  ],
  "format": 1,
- "gaps": "7bf26bfb180a8f7c",
+ "gaps": "4e5aa829b049b8e2",
  "groups": [
   "cooling",
   "fpcs",
@@ -312,6 +312,6 @@
  },
  "placement-surface": "bd322227e79ad6b5",
  "shape": "1c1e6b7d540ca800",
- "surface": "1ba3b2a31851fb5b",
- "version": "3.0.0"
+ "surface": "060c533b5d67dad6",
+ "version": "3.0.1"
 }

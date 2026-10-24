@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: mx10008
-version: 3.0.0
+version: 3.0.1
 maturity: modelled
 manufacturer: Juniper
 model: MX10008
@@ -43,8 +43,10 @@ provenance:
       - see gaps. Each supply bay is 91.4 x 88.9 mm, the JNP10K-PWR-AC2 as the guide's Table 55
       gives it (3.6 in. wide, 3.5 in. high; guide page 184), and the six stand one above the next
       with no gap, as the figure draws them, the earthing terminal's strip below PSU 5. The bays
-      were 84.0 x 93.5 mm, spread over the fan trays' height. Two 175 mm fan trays fill the rest
-      of the width (they were 176 mm; 91.4 mm of supply leaves 350.6 mm)
+      were 84.0 x 93.5 mm, spread over the fan trays' height. The guide's Table 12 gives the fan
+      trays 6.6 in. (16.8 cm, about 167.6 mm) wide (guide page 61); the two fan bays are 175 mm, what
+      91.4 mm of supply leaves of the 350.6 mm beside it, and the parts are still drawn 176 mm from
+      the drawing, 8.4 mm wider than the guide's figure (see gaps)
   power:
     confidence: datasheet
     note: >-
@@ -108,11 +110,14 @@ gaps:
       version 1 to 91.4 x 88.9 mm by estimate
   - what: fan-tray-width
     scope: [cooling]
-    reason: vendor-silent
+    reason: sources-disagree
     wanted: >-
-      the width of the JNP10008-FAN, -FAN2 and -FAN3 fan trays; the guide gives no dimension for
-      them. The two bays are 175 mm, what the 442 mm body leaves beside the 91.4 mm supplies, and
-      the parts are drawn 176 mm
+      Table 12 of the guide gives the JNP10008-FAN, -FAN2 and -FAN3 fan trays 6.6 in. (16.8 cm) wide,
+      about 167.6 mm; juniper/jnp10008-fan@1, -fan2@1 and -fan3@1 are drawn 176 mm from the drawing
+      g050553. The two bays are 175 mm, what the 442 mm body leaves beside the 91.4 mm supplies, so
+      each part overhangs its bay by 1.00 mm (L33) while the guide's tray would fit it. The parts are
+      not redrawn here: their face art is fitted to 176 mm, and the QFX10008 seats the same parts, so
+      a new fan version is a separate change
   - what: line-card-catalogue
     scope: [fpcs]
     reason: needs-photo
@@ -336,3 +341,4 @@ datasheet:
   sha256: ab3515c71b3176e48185c8a6b686f03f90d8345cf7d067640490e4ef8e22564b
 references:
   - {title: 'Juniper MX10008 Universal Routing Platform Hardware Guide (2026-08-25)', sha256: a7b68beb8f0e21bf6f7e4b279ac62a0c8adccfcfc9925dff72ffe07b2c152d2d}
+  - {title: 'Juniper MX10008 Universal Routing Platform Hardware Guide (2026-09-24, the revision read for the fan-tray width, Table 12)', sha256: 89cd214e8497a7ba90d72179759c30c7c6a2eda7752b8d9e50fce20c67d30129}

@@ -133,18 +133,18 @@
    "juniper/qfx10000-pwr-dc@1"
   ]
  },
- "composed": "9251639a20c78fff",
+ "composed": "88b0a195a86bf1c3",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
   "juniper/jnp10k-pwr-ac2@2": "2.0.0+c839c49b15c20ea8",
-  "juniper/qfx10000-jnp10k-pwr-dc2@1": "1.0.0+f945ab104b75153c",
+  "juniper/qfx10000-jnp10k-pwr-dc2@1": "1.0.0+0bbe374dc7215037",
   "juniper/qfx10000-lc-cover@1": "1.0.0+418c197bfc45e70d",
-  "juniper/qfx10000-pwr-ac@1": "1.0.0+b12878908273409a",
-  "juniper/qfx10000-pwr-cover@1": "1.0.0+fcda796c7700fde8",
-  "juniper/qfx10000-pwr-dc@1": "1.0.0+8e07d98d9b3da83e",
+  "juniper/qfx10000-pwr-ac@1": "1.0.0+16a0dd981d6099d8",
+  "juniper/qfx10000-pwr-cover@1": "1.0.0+13d4aa9c504164d7",
+  "juniper/qfx10000-pwr-dc@1": "1.0.0+cf928919bd56565c",
   "juniper/qfx10000-re-cover@1": "1.0.0+92161ea74bc01aa9",
   "juniper/qfx10000-re@1": "1.0.0+9149d5fc7fd48095",
   "juniper/qfx10016-fan@1": "1.0.0+6fbd837107e65c1c",
@@ -322,5 +322,5 @@
  "placement-surface": "15f13ab45adccfbc",
  "shape": "3aba6cacb9366d8c",
  "surface": "b6facad9cdd3857d",
- "version": "2.0.0"
+ "version": "2.0.1"
 }

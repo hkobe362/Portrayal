@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: mx10016
-version: 3.0.0
+version: 3.0.1
 maturity: modelled
 manufacturer: Juniper
 model: MX10016
@@ -44,8 +44,10 @@ provenance:
       supplies; all ten bays are drawn. Each supply bay is 91.4 x 88.9 mm, the JNP10K-PWR-AC2 as the
       guide's Table 39 gives it (3.6 in. wide, 3.5 in. high; guide page 107), and the ten stand one
       above the next with no gap, as Figure 2 draws them, the earthing terminal's strip below PSU 9.
-      The bays were 84.0 x 91.0 mm, spread over the fan trays' height. Two 175 mm fan trays fill the
-      rest of the width (they were 176 mm; 91.4 mm of supply leaves 350.6 mm)
+      The bays were 84.0 x 91.0 mm, spread over the fan trays' height. The guide's Table 7 gives the fan
+      trays 6.6 in. (16.8 cm, about 167.6 mm) wide (guide pages 32 to 33); the two fan bays are 175
+      mm, what 91.4 mm of supply leaves of the 350.6 mm beside it, and the parts are still drawn 176
+      mm from the drawing, 8.4 mm wider than the guide's figure (see gaps)
   power:
     confidence: datasheet
     note: >-
@@ -107,11 +109,13 @@ gaps:
       version 1 to 91.4 x 88.9 mm by estimate
   - what: fan-tray-width
     scope: [cooling]
-    reason: vendor-silent
+    reason: sources-disagree
     wanted: >-
-      the width of the JNP10016-FAN and -FAN2 fan trays; the guide gives no dimension for them. The
-      two bays are 175 mm, what the 442 mm body leaves beside the 91.4 mm supplies, and the parts
-      are drawn 176 mm
+      Table 7 of the guide gives the JNP10016-FAN and -FAN2 fan trays 6.6 in. (16.8 cm) wide, about
+      167.6 mm; juniper/jnp10016-fan@1 and -fan2@1 are drawn 176 mm from the drawing g050702. The two
+      bays are 175 mm, what the 442 mm body leaves beside the 91.4 mm supplies, so each part
+      overhangs its bay by 1.00 mm (L33) while the guide's tray would fit it. The parts are not
+      redrawn here: their face art is fitted to 176 mm, and a new fan version is a separate change
   - what: line-card-catalogue
     scope: [fpcs]
     reason: needs-photo
