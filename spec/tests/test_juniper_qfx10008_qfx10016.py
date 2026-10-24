@@ -48,7 +48,7 @@ VARIANTS = {
     },
 }
 # the supplies every supply bay accepts: the four of Table 1, and the cover
-# (the JNP10K-PWR-AC2 is version 2 of juniper/jnp10k-pwr-ac2 in the QFX10008, version 1 in the QFX10016)
+# (the JNP10K-PWR-AC2 is version 2 of juniper/jnp10k-pwr-ac2 in both)
 PSU_ACCEPTS = {
     "qfx10008": {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
     "qfx10016": {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
@@ -264,8 +264,8 @@ def test_the_qfx10008_reuses_the_mx_fan_trays_the_guide_names_and_copies_none():
     assert not (COMP / "qfx10008-jnp10008-fan2").exists()
 
 
-def test_the_qfx10008_seats_version_2_of_the_jnp10k_pwr_ac2_drawn_to_table_16_and_leaves_version_1_alone():
-    """Table 16 (and the MX10008 guide's Table 55): 3.6 x 3.5 in. Version 1, 84 x 97 mm, stays the MX's."""
+def test_both_chassis_seat_version_2_of_the_jnp10k_pwr_ac2_drawn_to_table_16_and_leave_version_1_as_it_was():
+    """Table 16 (and the MX10008 guide's Table 55): 3.6 x 3.5 in. Version 1, 84 x 97 mm, is retired and not edited."""
     v1, v2 = load_component("jnp10k-pwr-ac2"), load_component("jnp10k-pwr-ac2", 2)
     assert v1["attrs"]["model"] == v2["attrs"]["model"] == "JNP10K-PWR-AC2"
     assert (v2["size"]["w"], v2["size"]["h"]) == (91.4, 88.9)
@@ -278,9 +278,8 @@ def test_the_qfx10008_seats_version_2_of_the_jnp10k_pwr_ac2_drawn_to_table_16_an
     for cid in ("base-h", "redund-h"):
         seats = [r for k, r in d["configurations"][cid]["bays"].items() if k.startswith("psu")]
         assert "juniper/jnp10k-pwr-ac2@2" in seats and "juniper/jnp10k-pwr-ac2@1" not in seats
-    # the QFX10016 keeps version 1
     refs16 = [r for b in bays(load_device("qfx10016"), "rear") if b["id"].startswith("psu") for r in b["accepts"]]
-    assert "juniper/jnp10k-pwr-ac2@1" in refs16 and "juniper/jnp10k-pwr-ac2@2" not in refs16
+    assert "juniper/jnp10k-pwr-ac2@2" in refs16 and "juniper/jnp10k-pwr-ac2@1" not in refs16
 
 
 # --- the configurations -------------------------------------------------------
@@ -413,7 +412,7 @@ def test_the_covers_are_not_the_mx_covers_whose_part_numbers_the_qfx_guides_neve
 
 def test_the_existing_mx_components_are_untouched():
     """Each is reused as it is: the versions and the lock of every one the QFX10000 seats are unchanged."""
-    for part, version in (("jnp10k-pwr-ac2", "1.1.0"), ("jnp10008-fan", "1.0.0"), ("jnp10008-fan2", "1.0.0")):
+    for part, version in (("jnp10008-fan", "1.0.0"), ("jnp10008-fan2", "1.0.0")):
         assert load_component(part)["version"] == version
 
 
