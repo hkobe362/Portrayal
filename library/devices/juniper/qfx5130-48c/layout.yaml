@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5130-48c
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5130-48C
@@ -90,9 +90,12 @@ provenance:
       odd one at the right, so the odd number of one column stands next to the even number of the next
       ("1 2"). The ports run 0 to 47 down each column and left to right, even above odd, and the
       uplinks 48 to 55 in the same way, with an up-arrow before each even number and a down-arrow after
-      each odd one. Interface names are not printed. The guide names ports 0 to 47 and 48 to 55 and does
-      not give interface names for the 48C; the QFX5130-32CD guide's et-0/0/N pattern is not carried over,
-      because the 48C guide does not repeat it.
+      each odd one. Interface names are not printed. The guide names ports 0 to 47 and 48 to 55, and its
+      configuration examples name the interfaces et-0/0/N: after Table 7 (the 48C and 48CM table), "to set
+      port 2 to 100 Gbps" it gives "set interfaces et-0/0/2 speed 100g" and notes "On QFX5130 devices, there
+      is a single FPC and PIC, which is always 0" (Setting Port Speed and Channelization, PDF page 39). So
+      port N is et-0/0/N, as for the QFX5130-32CD; that is recorded here and not in an interfaces block,
+      because the face does not print it.
   port-lamps:
     confidence: photo-measured
     note: >-

@@ -37,7 +37,7 @@
    "juniper/qfx5130-jpsu-1600-dc-afo@1"
   ]
  },
- "composed": "55b245659970201f",
+ "composed": "cba2d6e34a0b78b4",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
@@ -52,7 +52,7 @@
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp-dd@1": "1.3.1+c3cf5f2db67d8233",
   "std/rj45-ganged@2": "2.1.0+1c2030052f79bb8e",
-  "std/sfp-dd-ganged@1": "1.0.0+e9ff2aecc59cc71f",
+  "std/sfp-dd-ganged@1": "1.0.0+2aa24b256f4bf48f",
   "std/sfp@1": "1.4.1+3cc1934aedfbc611",
   "std/sma@1": "1.1.0+c03b381b56d53d11",
   "std/usb-a@1": "1.3.0+3c77f06ea6794bfc"
@@ -816,6 +816,6 @@
  },
  "placement-surface": "49d95dadbc9a4d52",
  "shape": "2bba2c776c10c9b8",
- "surface": "f3eeea89a5c5355b",
- "version": "0.1.0"
+ "surface": "afc1dedb55a20762",
+ "version": "0.1.1"
 }
