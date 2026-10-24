@@ -43,12 +43,12 @@
    "juniper/ex9200-pwr-mx480-2520-ac@1"
   ]
  },
- "composed": "e8e2115d530dd5be",
+ "composed": "995cbb59944c9b1c",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/esd-warning@1": "1.0.0+630c20786ff1f896",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
-  "juniper/ex9200-lc-sf-blank@1": "1.0.0+fe760b893e422bd3",
+  "juniper/ex9200-lc-sf-blank@1": "1.0.0+269a66fe95e5120e",
   "juniper/ex9200-pwr-mx480-2400-dc@1": "1.0.0+44d9ffffd33458f4",
   "juniper/ex9200-pwr-mx480-2520-ac@1": "1.0.0+008fbd303affacde",
   "juniper/ex9200-re2@1": "1.0.0+47cae2a7b5de70d8",
@@ -179,6 +179,6 @@
  },
  "placement-surface": "44136fa355b3678a",
  "shape": "53877757015d444c",
- "surface": "cacd7fa05fc710b3",
- "version": "0.1.0"
+ "surface": "ec45b482d23cdba7",
+ "version": "0.1.1"
 }

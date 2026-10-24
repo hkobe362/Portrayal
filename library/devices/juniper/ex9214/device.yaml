@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex9214
-version: 0.1.0
+version: 0.2.0
 maturity: modelled
 manufacturer: Juniper
 model: EX9214
@@ -82,14 +82,21 @@ provenance:
     note: >-
       EX9214 front photograph: SF0 and SF1 carry an EX9200-SF with a Routing Engine each, the shared slot 2|6 carries a third EX9200-SF with no Routing Engine, and nine slots
       carry line cards that the photograph does not name. Two slots, the sixth and the tenth from the left, carry blank panels. The line cards are not modelled. Every configuration seats the
-      generation its Table 5 row names. The device's defaults are the redundant EX9200-SF3 build with four AC supplies (EX9214-RED3C-AC), the newest.
+      generation its Table 5 row names. The device's default configuration is `base`; the redundant EX9200-SF3 build with four AC supplies (EX9214-RED3C-AC) is the newest configuration.
   rear:
     confidence: estimated
     note: >-
       EX9214 rear photograph, read on a millimetre grid: an exhaust grille across the top (to 100 mm down), an inlet strip with four right-angle C20 inlets and their
       switches (111 to 160 mm down) over a caution strip and a hex vent band (160 to 205 mm), four upright supplies 102 mm wide on a 105.2 mm pitch from 1.4 mm across, 212 mm down
       and 368 mm tall, and a beige plate under them (594.5 to 703 mm down) with the legends PEM0 to PEM3, four cable spools and an exhaust grille. A steel strip runs up the right
-      edge, with the yellow ESD label at its foot (428 mm across, 691 mm down).
+      edge, with the yellow ESD label at its foot (428 mm across, 691 mm down). Guide Figure 5 adds the four supply ejectors and the vented plate behind each, and two grounding points
+      on the lower plate; both are drawn from the figure, the ejector and vent sizes read off the isometric. The guide's text puts the earthing pair on the upper rear at 15.86 mm centres, the
+      figure labels it on the lower plate and the photograph shows none; the pair follows the figure's plate and the text's pitch (gap earthing-terminal).
+  ground-stud-size:
+    confidence: datasheet
+    note: >-
+      Guide, "Grounding Points Specifications for an EX9200 Switch": two threaded inserts that fit UNC 1/4-20 screws, on 0.625 in (15.86 mm) centres, which
+      `juniper/mx-ground-stud-pair-5-8@1` draws at 15.875. The size is the pair placement's `stud-size`.
   airflow:
     confidence: datasheet
     note: >-
@@ -231,13 +238,14 @@ gaps:
   reason: needs-drawing
   wanted: >-
     The four small input switches beside the C20 inlets on the strip above the supplies, and the cable spools on the beige plate. The photograph shows them; no figure
-    or text names them and no component draws them, so they are not drawn.
+    or text names them and no component draws them, so they are not drawn. (Figure 5 labels one input mode switch, on the supply itself, not on this strip.)
 - what: earthing-terminal
   scope: [rear]
   reason: needs-photo
   wanted: >-
-    The protective earthing terminal and the rear ESD point. The rear photograph shows a yellow ESD label at the lower right and no studs; the guide's isometric Figures 5 and
-    6 call out the earthing terminal without a dimension. Neither is placed.
+    The position of the protective earthing pair. The guide's text puts the two threaded inserts on the upper rear of the chassis at 15.86 mm centres; Figure 5 labels the two
+    grounding points on the lower plate under the supplies, apart; the rear photograph shows no studs. The pair is drawn on the lower plate, following the figure's place
+    and the text's pitch, and its position is estimated. A flat photograph of the plate would settle it.
 - what: eol
   scope: [front, rear]
   reason: vendor-silent
@@ -294,6 +302,11 @@ groups:
     role: furniture
     index-origin: 0
     description: the wrist-strap ESD points, one on the front plate under the craft interface and a label at the rear lower right (guide Figures 4 and 5)
+  grounding:
+    term: Stud
+    role: furniture
+    index-origin: 0
+    description: the protective earthing pair, two UNC 1/4-20 threaded inserts on 15.86 mm centres, drawn on the lower rear plate where guide Figure 5 labels them
 views:
   front:
     size:
@@ -303,8 +316,6 @@ views:
       decor:
       - {at: [8.0, 60.7], size: [423.4, 37.0], fill: '#2b2f33', confidence: estimated,
          source: 'photo - the dark plate under the craft interface, 60.7 to 97.2 mm down; see provenance upper-band'}
-      - {at: [386.7, 78.6], size: [18.4, 12.7], rx: 0.6, fill: '#f2c500', confidence: estimated,
-         source: 'photo - the yellow ESD warning label on the dark plate; the warning text on it is not transcribed'}
       - {at: [6.0, 625.0], size: [432.5, 72.6], pattern: vent, vent: 1.5, confidence: estimated,
          source: 'photo - the air intake grille under the lower fan tray, 625 to 697.6 mm down; see provenance lower-band'}
       cutouts:
@@ -354,6 +365,7 @@ views:
          default: juniper/ex9214-ffantray-mx960-hc@1, group: cooling, rel-pos: 2}
       placements:
       - {id: esd-front-jack, ref: common/esd-jack@1, at: [408.0, 84.1], for: chassis, group: esd, rel-pos: 0}
+      - {id: esd-front-label, ref: common/esd-warning@1, at: [394.0, 80.2], for: chassis, group: esd, rel-pos: 1}
   rear:
     size:
       w: 444.5
@@ -371,8 +383,26 @@ views:
       - {at: [428.0, 100.0], size: [16.5, 600.0], fill: '#8a8f95', confidence: estimated,
          source: 'photo - the steel strip up the right edge of the rear'}
       - {at: [8.0, 594.5], size: [398.7, 108.0], fill: '#d8d2c2', confidence: estimated,
-         source: 'photo - the beige plate under the supplies, with the legends PEM0 to PEM3, four cable spools and an exhaust grille; the spools and the grille are not drawn'}
+         source: 'photo - the beige plate under the supplies, with the legends PEM0 to PEM3, four cable spools and an exhaust grille; the spools are not drawn'}
+      - {at: [45.3, 610.0], size: [14.0, 14.0], rx: 7.0, fill: '#6d7278', confidence: estimated,
+         source: 'guide Figure 5 - the power supply ejector under PEM0, a round lever head on the lower plate; the size is read off the isometric'}
+      - {at: [150.5, 610.0], size: [14.0, 14.0], rx: 7.0, fill: '#6d7278', confidence: estimated,
+         source: 'guide Figure 5 - the power supply ejector under PEM1'}
+      - {at: [255.7, 610.0], size: [14.0, 14.0], rx: 7.0, fill: '#6d7278', confidence: estimated,
+         source: 'guide Figure 5 - the power supply ejector under PEM2'}
+      - {at: [360.9, 610.0], size: [14.0, 14.0], rx: 7.0, fill: '#6d7278', confidence: estimated,
+         source: 'guide Figure 5 - the power supply ejector under PEM3'}
+      - {at: [22.3, 632.0], size: [60.0, 44.0], pattern: holes, fill: '#8f897a', confidence: estimated,
+         source: 'guide Figure 5 - the vented plate behind the PEM0 ejector'}
+      - {at: [127.5, 632.0], size: [60.0, 44.0], pattern: holes, fill: '#8f897a', confidence: estimated,
+         source: 'guide Figure 5 - the vented plate behind the PEM1 ejector'}
+      - {at: [232.7, 632.0], size: [60.0, 44.0], pattern: holes, fill: '#8f897a', confidence: estimated,
+         source: 'guide Figure 5 - the vented plate behind the PEM2 ejector'}
+      - {at: [337.9, 632.0], size: [60.0, 44.0], pattern: holes, fill: '#8f897a', confidence: estimated,
+         source: 'guide Figure 5 - the vented plate behind the PEM3 ejector'}
       cutouts:
+      - {id: ground-stud-0, at: [194.6, 684.0], size: [7.0, 7.0], shape: circle}
+      - {id: ground-stud-1, at: [210.5, 684.0], size: [7.0, 7.0], shape: circle}
       - {id: inlet-0, at: [21.0, 126.8], size: [32.4, 24.4]}
       - {id: inlet-1, at: [120.1, 126.8], size: [32.4, 24.4]}
       - {id: inlet-2, at: [225.3, 126.8], size: [32.4, 24.4]}
@@ -402,6 +432,8 @@ views:
       - {id: inlet-2, ref: std/c20-inlet@1, at: [225.3, 126.8], for: pem2, group: inlets, rel-pos: 2, attrs: {function: AC-2 inlet PEM 2}}
       - {id: inlet-3, ref: std/c20-inlet@1, at: [329.3, 126.8], for: pem3, group: inlets, rel-pos: 3, attrs: {function: AC-2 inlet PEM 3}}
       - {id: esd-rear-label, ref: common/esd-warning@1, at: [424.15, 686.75], for: chassis, group: esd, rel-pos: 1}
+      - {id: ground-studs, ref: juniper/mx-ground-stud-pair-5-8@1, at: [194.6, 684.0], for: chassis, group: grounding, rel-pos: 0,
+         attrs: {stud-size: '1/4-20'}}
   left:
     size:
       w: 789.4

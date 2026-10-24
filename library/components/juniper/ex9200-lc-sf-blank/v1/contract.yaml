@@ -7,7 +7,7 @@ behaviour: fills
 profile: networking
 description: >-
   Blank cover panel for an empty line card or Switch Fabric slot of an EX9200 switch (EX9200-LC-SF-BLANK).
-  It is a plain dark plate with a short blue pull knob at each end. It stands in a horizontal slot of the
+  It is a plain dark plate with a short blue ejector handle at each end. It stands in a horizontal slot of the
   EX9204 and EX9208, and turned 90 degrees in a slot of the EX9214.
 part-numbers:
   EX9200-LC-SF-BLANK: {part: EX9200-LC-SF-BLANK}
@@ -27,9 +27,10 @@ provenance:
     dimensions a blank. The blank is drawn at the card's plate size.
   knobs: >-
     estimated - read off the EX9208 studio front photograph (1.31 px/mm), slot 2 from the bottom, the only blank
-    visible in the three EX9200 photographs: a dark plate with a short blue knob at each end, each with one screw.
-    The knob is about 19.6 mm long and 9 mm tall, as the MX blank's knob is measured on a 3.23 px/mm photograph;
-    at this resolution the EX knob reads the same to within the pixel (0.8 mm). Drawn at the MX figures.
+    visible in the three EX9200 photographs: a dark plate with a short blue ejector handle at each end, each with one screw
+    (the guide's removal steps rotate the ejector handles to unseat the cover panel, and EX9208 Figure 5 draws the blanks with the cards' lever ends).
+    The handle is about 19.6 mm long and 9 mm tall, as the MX blank's knob is measured on a 3.23 px/mm photograph;
+    at this resolution the EX handle reads the same to within the pixel (0.8 mm). Drawn at the MX figures.
   colour: >-
     photo - the EX9208 front photograph shows the blank in the same charcoal as the card plates and the knobs in
     the light blue of the ejector levers. The MX blank is silver; this one is not.

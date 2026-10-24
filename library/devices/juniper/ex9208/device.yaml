@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex9208
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX9208
@@ -77,7 +77,7 @@ provenance:
     note: >-
       EX9208 front photograph: SF0 and SF1 carry an EX9200-SF with an EX9200-RE seated in each, one slot above them carries a blank panel, and the
       other five carry line cards that the photograph does not name. The line cards are not modelled. Every configuration seats the generation its
-      Table 5 row names. The device's defaults are the redundant EX9200-SF3 build with four AC supplies (EX9208-RED3C-AC), the newest.
+      Table 5 row names. The device's default configuration is `base`; the redundant EX9200-SF3 build with four AC supplies (EX9208-RED3C-AC) is the newest configuration.
   rear:
     confidence: estimated
     note: >-

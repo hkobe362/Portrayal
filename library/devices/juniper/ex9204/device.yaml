@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ex9204
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: EX9204
@@ -94,8 +94,8 @@ provenance:
     note: >-
       EX9204 front photograph: slot 0 and slot 1|0 carry an EX9200-SF with an EX9200-RE seated in it, and slots 2 and 1 carry two line cards
       that the photograph does not name. The line cards are not modelled. The Switch Fabric
-      modules and Routing Engines are, and every configuration seats the generation its Table 5 row names. The device's defaults are the
-      redundant EX9200-SF3 build (EX9204-RED3C-AC), the newest.
+      modules and Routing Engines are, and every configuration seats the generation its Table 5 row names. The device's default
+      configuration is `base`: the line card slots and slot 1|0 hold blank panels and one Switch Fabric is seated. The redundant EX9200-SF3 build (EX9204-RED3C-AC) is the newest configuration.
   rear:
     confidence: estimated
     note: >-

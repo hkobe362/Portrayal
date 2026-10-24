@@ -405,7 +405,8 @@ def test_l147_fails_a_widening_a_point_that_is_not_presented_and_no_interface():
 # the Juniper EX9251 places two 10-32 earthing screws: two more seats (down)
 # the Arista 7280CR3-96's two rear grounding screws, the 7280DR3A-36's strip drawn the same: one seat down and one up
 # the Arista 7050CX4M-48D8's two rear grounding screws (#1204, the same strip as the 7280DR3A-36's) add one seat down and one up
-WANT = {"down": 132, "left": 37, "up": 11, "right": 31}   # the Juniper EX9204 and EX9208 stud pairs, drawn as the MX240's and MX480's
+# the Juniper EX9214's stud pair on its lower rear plate (guide Figure 5): two more seats (down)
+WANT = {"down": 134, "left": 37, "up": 11, "right": 31}   # the Juniper EX9204 and EX9208 stud pairs, drawn as the MX240's and MX480's
 # THE TWO-HOLE LUG on a pair host: 59 seats on 33 devices - three on each of
 # the eleven Amphenol 300CB08 panels, one on each AIS800, the seven MX, the
 # LMFS-F, two on the FX-16, one on the FX-8 and FX-4, the SR-1-DC block's
@@ -420,7 +421,7 @@ WANT = {"down": 132, "left": 37, "up": 11, "right": 31}   # the Juniper EX9204 a
 # and one two-hole lug on each EX3400, leading its wire right
 # and one on each of the four EX3300, the EX3400's plate again, leading its wire right
 # the two-stud M6 pad on the rear of each Juniper QFX5240 is one more pair seat, leading its wire down
-WANT_PAIRS = {"down": 49, "left": 15, "up": 1, "right": 10}
+WANT_PAIRS = {"down": 49, "left": 16, "up": 1, "right": 10}   # the Juniper EX9214's stud pair leads left
 NAMES = {0: "right", 90: "down", 180: "left", 270: "up"}
 LEADS = {"right": 0, "down": 90, "left": 180, "up": 270}
 PAIR_IFACES = ("stud-pair-5-8", "stud-pair-3-4", "stud-pair-1")
@@ -494,9 +495,9 @@ def _pairs(census):
 def test_the_default_distribution_is_pinned(census):
     ring, pairs = _ring(census), _pairs(census)
     assert dict(collections.Counter(r["dir"] for r in ring.values())) == WANT
-    assert len({k[0] for k in ring}) == 92   # 63, the Juniper EX9204 and EX9208, the Arista 7050CX4M-48D8, the Arista 7280CR3-96 (as the DR3A-36), the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the four Juniper EX3300, the Arista 7010TX-48, the Juniper QFX5200-48Y, the Juniper QFX5120-32C, the Juniper QFX5240-64OD and -64QD and the Juniper EX9251
+    assert len({k[0] for k in ring}) == 93   # 63, the Juniper EX9204, EX9208 and EX9214, the Arista 7050CX4M-48D8, the Arista 7280CR3-96 (as the DR3A-36), the Arista 7280DR3A-36, and the Eaton EVMI2130X, EVMA8365X and PDU12IEC, the seven ReadyLinks GL-x siblings, the four Juniper EX3400, the four Juniper EX3300, the Arista 7010TX-48, the Juniper QFX5200-48Y, the Juniper QFX5120-32C, the Juniper QFX5240-64OD and -64QD and the Juniper EX9251
     assert dict(collections.Counter(r["dir"] for r in pairs.values())) == WANT_PAIRS
-    assert len({k[0] for k in pairs}) == 47   # the Juniper EX9204 and EX9208 pair hosts, the four Juniper EX3300 and the two Juniper QFX5240 earthing pads
+    assert len({k[0] for k in pairs}) == 48   # the Juniper EX9204, EX9208 and EX9214 pair hosts, the four Juniper EX3300 and the two Juniper QFX5240 earthing pads
     # a pair is turned only along itself
     assert {r["turn"] for r in pairs.values()} == {0, 180}
 
