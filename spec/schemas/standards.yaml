@@ -518,6 +518,122 @@ standards:
       at 14.00 x 9.50 inside the 14.25 pitch, leaving a 0.25 shared wall. Depth 41.0
       is the bezel-to-connector distance, STEP planes at 40.9-42.7 (SFF-8433 C07/C08
       give 38.9/39.4 to the guide-pin centreline, a slightly different datum).
+  sfp-dd:
+    registry: >-
+      TE Connectivity customer drawing C-2359845 rev A (2020-06-18), cage
+      assembly SFP-DD 1x1, sheet 3 (bezel cutout) and sheet 1 (port opening);
+      TE application specification 114-60027 rev A (2020-06-18), Figure 4;
+      Molex product customer drawing 2048233001 rev A (2022-12-10), SFP-DD 1x1
+      cage, sheets 1 and 6; Molex application specification 2048230001 rev A
+      (2020-01-02). The SFP-DD MSA was not used.
+    w: 15.45
+    h: 10.4
+    radius: 0.3
+    confidence: drawing
+    depth: 38.9
+    depth-confidence: drawing
+    depth-notes: >-
+      Bezel face to the centreline of the connector guide pins, 38.90 +/-0.30,
+      TE 2359845 sheet 3 (single-side and belly-to-belly views). Molex's held
+      sheets give no bezel-to-connector figure. This is a guide-pin datum, not a
+      connector face, so it is not comparable with the 41.0 std/sfp carries,
+      which is measured to the connector planes.
+    cavity: {w: 14.0, h: 8.95}
+    cavity-confidence: drawing
+    pitch: 16.25
+    pitch-confidence: drawing
+    pitch-kind: floor
+    pitch-kind-note: >-
+      TE 2359845 sheet 3 labels 16.25 "MIN PITCH" and 114-60027 Figure 4 column
+      B (Min) repeats it for 1x1, so it is a floor. Molex 2048233001 states no
+      centreline pitch. Its sheet 6 dimensions a 1.30 MIN web between
+      neighbouring bezel cutouts, marked "for reference only" and said to vary
+      with the adjacent cage's hole distance, which would put a floor at
+      15.45 + 1.30 = 16.75 (derived, not stated). Its sheets 4 and 5 give
+      "adjacent cage pitch 3.5 MM minimum" for rework, which is a hole-to-hole
+      gap (1.00 + 2.50 on the drawing), not a centreline pitch. TE's 16.25 and
+      Molex's derived 16.75 differ by 0.50; the library takes TE's because it
+      is the one stated as a pitch.
+    media: sfp-dd
+    export-media: 100gbase-x-sfpdd
+    connector-positions: 40
+    connector-pitch: 0.8
+    lanes: 2
+    lanes-confidence: unconfirmed
+    speeds:
+      per-lane: [25g, 50g]
+      aggregate: [50g, 100g]
+    speeds-confidence: unconfirmed
+    backwards-compatible-with: sfp
+    backwards-confidence: unconfirmed
+    backwards-note: >-
+      UNCONFIRMED: only the SFP-DD MSA settles lane count, rate and whether an
+      SFP module is specified to work in the cage, and the MSA was not used.
+      What the makers' documents do state: the cage mates with "SFP-DD MSA
+      compliant transceivers" (TE note 3) and "SFP-DD transceivers" (Molex note
+      3); its connector is 40 positions at 0.8 mm pitch (TE 114-60027
+      section 1; the contact pattern is four rows of ten, TE sheet 4). That is
+      twice an SFP connector's 20 contacts, a figure from outside the makers'
+      documents and the only basis here for the lane count. The port interior, 14.00 x 8.95, is the figure std/sfp
+      records for an SFP cage body, and TE 3.2 A caps the module outside the
+      cage at 14 wide as sfp-module does, so an SFP module is the same size as
+      the opening; that is a dimension match, not a statement that the two
+      interoperate. `export-media` is the name NetBox (dcim/choices.py at
+      758af333) and Nautobot (at 45d26083) give an SFP-DD interface, both
+      labelled 100GE; neither has a 50G SFP-DD type.
+    notes: >-
+      Single cage. w and h are the bezel cutout both makers give, 15.45 +/-0.10
+      by 10.40 +/-0.10, R0.30 max, 0.8 to 2.6 thick bezel (TE) or 0.8 min
+      (Molex). A key notch stands 1.20 +/-0.10 above the top edge, 3.56 +/-0.10
+      wide at its base and 2.18 +/-0.10 at its top, 3.90 +/-0.10 off the cage
+      centreline (TE sheet 3; Molex sheets 1 and 6 agree); it is not drawn, so
+      the opening is the plain rectangle. `cavity` is the port opening inside
+      the cage, 14.00 +/-0.10 by 8.95 (+/-0.10 TE, +/-0.15 Molex). The cutout
+      bottom sits 0.175 +/-0.10 (TE) or 0.40 +/-0.10 (Molex) above the board;
+      the makers differ and the library draws neither. Belly-to-belly rows
+      both makers draw with the key notches outward; no row pitch is stated,
+      because it follows from the board thickness (TE 2.20 min, Molex 2.55 min
+      on the drawing and 2.70 min in its application specification).
+  sfp-dd-ganged:
+    registry: >-
+      TE application specification 114-60027 rev A (2020-06-18), 3.2 A and
+      Figure 4 (1x1 15.45, 1x4 58.20, 1x6 86.70, 1x8 115.20 by 10.4); TE
+      customer drawing C-2359845 rev A, sheets 1 and 3. The SFP-DD MSA was not
+      used.
+    w: 14.25
+    h: 10.4
+    radius: 0.3
+    confidence: drawing
+    depth: 38.9
+    depth-confidence: drawing
+    depth-notes: >-
+      As sfp-dd: bezel face to the centreline of the connector guide pins,
+      38.90 +/-0.30, TE 2359845 sheet 3.
+    cavity: {w: 14.0, h: 8.95}
+    cavity-confidence: drawing
+    media: sfp-dd
+    export-media: 100gbase-x-sfpdd
+    lanes: 2
+    lanes-confidence: unconfirmed
+    speeds:
+      per-lane: [25g, 50g]
+      aggregate: [50g, 100g]
+    speeds-confidence: unconfirmed
+    backwards-compatible-with: sfp
+    backwards-confidence: unconfirmed
+    notes: >-
+      Per-port share of a ganged SFP-DD bezel slot, as sfp-ganged is for SFP+.
+      TE 114-60027 3.2 A: "port-to-port centerline spacing is 14.25", and the
+      Figure 4 cutouts are N x 14.25 + 1.2 wide by 10.4 high, one continuous
+      slot, so w is the port pitch and neighbours abut. The same section caps
+      the module outside the cage at 14 wide. Only TE states a ganged
+      configuration with a figure; Molex's held documents list 1x2 to 1x8
+      cages (2048230001 section 1) and dimension none. The lower row of a
+      belly-to-belly pair is the upper row turned 180, notches outward (TE
+      sheet 3, Molex sheet 6). Neither maker states a row pitch - it follows
+      from the board thickness - so none is recorded here. The lint rules that
+      read the registry's `pitch` apply to sfp-dd, not this entry, because w is
+      already the pitch.
   rj45-ganged:
     registry: (ganged block aperture - no governing spec found)
     w: 12.7
