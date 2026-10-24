@@ -39,7 +39,7 @@ attrs:
   airflow: 'blower; it draws air from the card''s broad side and exhausts toward the bracket'
   nvlink: 'one connector on the top edge; low-profile bridges connect two RTX A5500, 112.5 GB/s bidirectional'
 faces:
-  rear: {ref: nvidia/rtx-a5500-a4500-tail@1}
+  rear: {ref: nvidia/rtx-a5000-tail@1}
 provenance:
   slot-width: >-
     datasheet - NVIDIA's RTX A5500 datasheet: "Form factor 4.4' H x 10.5' L, dual
@@ -215,7 +215,9 @@ provenance:
     nvidia/a10@1's place (105.6 to 123.6 on the card's x, 12.5 across the board's
     component face), black, with eight cells. No photograph of the card's end is
     held. THE PORT is `aux-power` on the rear face (`faces.rear`,
-    nvidia/rtx-a5500-a4500-tail@1): std/pcie-8pin-header@1, which presents
+    nvidia/rtx-a5000-tail@1, reused: the RTX A5000's end, a closed black plate 97.9 x
+    35.56 with the same header at the same place, which every figure of the RTX
+    A5500's end matches and no photograph contradicts): std/pcie-8pin-header@1, which presents
     `pcie-8pin` for a PCIe 8-pin cable and which the card exports as a power
     port.
   body-end: >-

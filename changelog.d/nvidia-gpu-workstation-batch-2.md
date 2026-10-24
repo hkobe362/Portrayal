@@ -6,8 +6,8 @@
   - `nvidia/rtx-a5500@1` and `nvidia/rtx-a4500@1`, the actively cooled dual-slot
     full-height cards (`slot-width: 2`), with four DisplayPort receptacles, the
     vent grid and four screws painted on the bracket and a 53-blade blower, measured
-    on PNY's straight-on photographs. They share the rear face
-    `nvidia/rtx-a5500-a4500-tail@1` (a PCIe 8-pin header, `aux-power`).
+    on PNY's straight-on photographs. They reuse the rear face
+    `nvidia/rtx-a5000-tail@1` (a PCIe 8-pin header, `aux-power`).
   - `nvidia/rtx-a2000@1`, the low-profile dual-slot card (`slot-width: 2`), for the
     RTX A2000 and the RTX A2000 12GB together: one board, one bracket, one shroud.
     Its plate is drawn, because `std/pcie-bracket-lp@1` is one slot across.
