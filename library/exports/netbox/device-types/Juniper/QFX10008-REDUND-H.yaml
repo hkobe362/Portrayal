@@ -47,27 +47,27 @@ module-bays:
     description: 'Accepts: qfx10000-lc-cover'
   - name: psu0
     position: psu0
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
   - name: psu1
     position: psu1
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
   - name: psu2
     position: psu2
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
   - name: psu3
     position: psu3
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
   - name: psu4
     position: psu4
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
   - name: psu5
     position: psu5
-    description: 'Accepts: qfx10000-pwr-ac, qfx10008-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
+    description: 'Accepts: qfx10000-pwr-ac, jnp10k-pwr-ac2, qfx10000-pwr-dc, qfx10000-jnp10k-pwr-dc2,
       qfx10000-pwr-cover'
 comments: 'Juniper QFX10008 - the 13RU, eight-slot modular chassis of the QFX10000 family. Two QFX10000-RE
   Routing and Control Boards stack under the badge strip beside the status lamp panel. Eight full-width
@@ -136,7 +136,7 @@ comments: 'Juniper QFX10008 - the 13RU, eight-slot modular chassis of the QFX100
   change
 
 
-  Drawing version 2.0.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 3.0.0. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'

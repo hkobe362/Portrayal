@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx10008
-version: 2.0.0
+version: 3.0.0
 maturity: modelled
 manufacturer: Juniper
 model: QFX10008
@@ -95,9 +95,9 @@ provenance:
   rear-fit:
     confidence: estimated
     note: >-
-      The JNP10K-PWR-AC2 is drawn here as juniper/qfx10008-pwr-ac2@1, to the guide's 3.6 x 3.5 in.
-      (Table 16), because juniper/jnp10k-pwr-ac2@1 is drawn 84.0 x 97.0 mm for the MX10008 and is not
-      edited. The JNP10008-FAN (Figure 104, "Installing a JNP10008-FAN Fan Tray in a QFX10008 Chassis")
+      The JNP10K-PWR-AC2 is drawn here as juniper/jnp10k-pwr-ac2@2, to the guides' 3.6 x 3.5 in.
+      (Table 16; the MX10008 guide's Table 55 agrees), because juniper/jnp10k-pwr-ac2@1 is drawn
+      84.0 x 97.0 mm for the MX10008 and is not edited. The JNP10008-FAN (Figure 104, "Installing a JNP10008-FAN Fan Tray in a QFX10008 Chassis")
       and JNP10008-FAN2 (Table 4) are reused as they are, as juniper/jnp10008-fan@1 and
       juniper/jnp10008-fan2@1, drawn 176 x 560 mm for the MX10008 from an isometric drawing. Both are
       accepted by the fan bays and neither is seated by a configuration; the bay is 168 x 569 mm
@@ -207,7 +207,7 @@ gaps:
     reason: needs-photo
     wanted: >-
       a flat figure or photograph of the JNP10K-PWR-AC2 face as seated in this chassis; the guide gives only
-      its outer size (Table 16) and isometric drawings, so juniper/qfx10008-pwr-ac2@1 refits the MX10008
+      its outer size (Table 16) and isometric drawings, so juniper/jnp10k-pwr-ac2@2 refits the MX10008
       unit's arrangement to 91.4 x 88.9 mm by estimate
   - what: rcb-dimensions
     scope: [res]
@@ -385,22 +385,22 @@ views:
     components:
       bays:
         - {id: psu0, at: [3.0, 3.0], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 0}
         - {id: psu1, at: [3.0, 91.9], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 1}
         - {id: psu2, at: [3.0, 180.8], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 2}
         - {id: psu3, at: [3.0, 269.7], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 3}
         - {id: psu4, at: [3.0, 358.6], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 4}
         - {id: psu5, at: [3.0, 447.5], size: {w: 91.4, h: 88.9},
-           accepts: [juniper/qfx10000-pwr-ac@1, juniper/qfx10008-pwr-ac2@1, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
+           accepts: [juniper/qfx10000-pwr-ac@1, juniper/jnp10k-pwr-ac2@2, juniper/qfx10000-pwr-dc@1, juniper/qfx10000-jnp10k-pwr-dc2@1, juniper/qfx10000-pwr-cover@1],
            default: juniper/qfx10000-pwr-ac@1, group: psus, rel-pos: 5}
         - {id: fan0, at: [96.0, 2.5], size: {w: 168.0, h: 569.0},
            accepts: [juniper/qfx10008-fan@1, juniper/jnp10008-fan@1, juniper/jnp10008-fan2@1], default: juniper/qfx10008-fan@1,
@@ -488,9 +488,9 @@ configurations:
       covers as QFX10008-BASE.
     bays:
       cb1: juniper/qfx10000-re-cover@1
-      psu0: juniper/qfx10008-pwr-ac2@1
-      psu1: juniper/qfx10008-pwr-ac2@1
-      psu2: juniper/qfx10008-pwr-ac2@1
+      psu0: juniper/jnp10k-pwr-ac2@2
+      psu1: juniper/jnp10k-pwr-ac2@2
+      psu2: juniper/jnp10k-pwr-ac2@2
       psu3: juniper/qfx10000-pwr-cover@1
       psu4: juniper/qfx10000-pwr-cover@1
       psu5: juniper/qfx10000-pwr-cover@1
@@ -512,12 +512,12 @@ configurations:
       which take AC, high-voltage AC or high-voltage DC. The guide's table lists two RCB/SSD covers for it
       although two RCBs are fitted; no cover is drawn.
     bays:
-      psu0: juniper/qfx10008-pwr-ac2@1
-      psu1: juniper/qfx10008-pwr-ac2@1
-      psu2: juniper/qfx10008-pwr-ac2@1
-      psu3: juniper/qfx10008-pwr-ac2@1
-      psu4: juniper/qfx10008-pwr-ac2@1
-      psu5: juniper/qfx10008-pwr-ac2@1
+      psu0: juniper/jnp10k-pwr-ac2@2
+      psu1: juniper/jnp10k-pwr-ac2@2
+      psu2: juniper/jnp10k-pwr-ac2@2
+      psu3: juniper/jnp10k-pwr-ac2@2
+      psu4: juniper/jnp10k-pwr-ac2@2
+      psu5: juniper/jnp10k-pwr-ac2@2
     part-numbers:
       QFX10008-REDUND-H: {}
   redund-dc:

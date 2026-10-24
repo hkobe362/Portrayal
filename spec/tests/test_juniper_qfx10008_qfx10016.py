@@ -36,9 +36,9 @@ FAN = {"qfx10008": "qfx10008-fan", "qfx10016": "qfx10016-fan"}
 VARIANTS = {
     "qfx10008": {
         "base": ("QFX10008-BASE", "ac", "qfx10000-pwr-ac", 3, 1),
-        "base-h": ("QFX10008-BASE-H", ["ac", "hvdc"], "qfx10008-pwr-ac2", 3, 1),
+        "base-h": ("QFX10008-BASE-H", ["ac", "hvdc"], "jnp10k-pwr-ac2", 3, 1),
         "redund": ("QFX10008-REDUND", "ac", "qfx10000-pwr-ac", 6, 2),
-        "redund-h": ("QFX10008-REDUND-H", ["ac", "hvdc"], "qfx10008-pwr-ac2", 6, 2),
+        "redund-h": ("QFX10008-REDUND-H", ["ac", "hvdc"], "jnp10k-pwr-ac2", 6, 2),
         "redund-dc": ("QFX10008-REDUND-DC", "dc", "qfx10000-pwr-dc", 6, 2),
     },
     "qfx10016": {
@@ -48,9 +48,9 @@ VARIANTS = {
     },
 }
 # the supplies every supply bay accepts: the four of Table 1, and the cover
-# (the JNP10K-PWR-AC2 is the QFX10008's own drawing of the part in the QFX10008, the MX drawing in the QFX10016)
+# (the JNP10K-PWR-AC2 is version 2 of juniper/jnp10k-pwr-ac2 in the QFX10008, version 1 in the QFX10016)
 PSU_ACCEPTS = {
-    "qfx10008": {"qfx10000-pwr-ac", "qfx10008-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
+    "qfx10008": {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
     "qfx10016": {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
 }
 FAN_ACCEPTS = {
@@ -62,7 +62,6 @@ MODEL = {
     "qfx10000-pwr-ac": "QFX10000-PWR-AC",
     "qfx10000-pwr-dc": "QFX10000-PWR-DC",
     "qfx10000-jnp10k-pwr-dc2": "JNP10K-PWR-DC2",
-    "qfx10008-pwr-ac2": "JNP10K-PWR-AC2",
     "qfx10000-re": "QFX10000-RE",
     "qfx10008-fan": "QFX10008-FAN",
     "qfx10016-fan": "QFX10016-FAN",
@@ -79,8 +78,8 @@ def load_device(name):
     return yaml.safe_load((DEV / name / "device.yaml").read_text())
 
 
-def load_component(name):
-    return yaml.safe_load((COMP / name / "v1" / "contract.yaml").read_text())
+def load_component(name, major=1):
+    return yaml.safe_load((COMP / name / f"v{major}" / "contract.yaml").read_text())
 
 
 def placements(dev, view):
@@ -265,16 +264,23 @@ def test_the_qfx10008_reuses_the_mx_fan_trays_the_guide_names_and_copies_none():
     assert not (COMP / "qfx10008-jnp10008-fan2").exists()
 
 
-def test_the_qfx10008_draws_the_jnp10k_pwr_ac2_to_table_16_and_leaves_the_mx_drawing_alone():
-    """Table 16: 3.6 x 3.5 in. The MX10008's juniper/jnp10k-pwr-ac2 is 84 x 97 mm and stays the MX's."""
-    c = load_component("qfx10008-pwr-ac2")
-    assert c["attrs"]["model"] == load_component("jnp10k-pwr-ac2")["attrs"]["model"] == "JNP10K-PWR-AC2"
-    assert (c["size"]["w"], c["size"]["h"]) == (91.4, 88.9)
-    assert c["attrs"]["power-output-w"] == 5500
-    assert (load_component("jnp10k-pwr-ac2")["size"]["w"], load_component("jnp10k-pwr-ac2")["size"]["h"]) == (84.0, 97.0)
+def test_the_qfx10008_seats_version_2_of_the_jnp10k_pwr_ac2_drawn_to_table_16_and_leaves_version_1_alone():
+    """Table 16 (and the MX10008 guide's Table 55): 3.6 x 3.5 in. Version 1, 84 x 97 mm, stays the MX's."""
+    v1, v2 = load_component("jnp10k-pwr-ac2"), load_component("jnp10k-pwr-ac2", 2)
+    assert v1["attrs"]["model"] == v2["attrs"]["model"] == "JNP10K-PWR-AC2"
+    assert (v2["size"]["w"], v2["size"]["h"]) == (91.4, 88.9)
+    assert v2["attrs"]["power-output-w"] == 5500
+    assert (v1["size"]["w"], v1["size"]["h"]) == (84.0, 97.0)
+    assert not (COMP / "qfx10008-pwr-ac2").exists()
     d = load_device("qfx10008")
-    assert all("jnp10k-pwr-ac2" not in str(b) for b in bays(d, "rear"))
-    assert all("jnp10k-pwr-ac2" not in str(c) for c in d["configurations"].values())
+    refs = [r for b in bays(d, "rear") if b["id"].startswith("psu") for r in b["accepts"]]
+    assert "juniper/jnp10k-pwr-ac2@2" in refs and "juniper/jnp10k-pwr-ac2@1" not in refs
+    for cid in ("base-h", "redund-h"):
+        seats = [r for k, r in d["configurations"][cid]["bays"].items() if k.startswith("psu")]
+        assert "juniper/jnp10k-pwr-ac2@2" in seats and "juniper/jnp10k-pwr-ac2@1" not in seats
+    # the QFX10016 keeps version 1
+    refs16 = [r for b in bays(load_device("qfx10016"), "rear") if b["id"].startswith("psu") for r in b["accepts"]]
+    assert "juniper/jnp10k-pwr-ac2@1" in refs16 and "juniper/jnp10k-pwr-ac2@2" not in refs16
 
 
 # --- the configurations -------------------------------------------------------
