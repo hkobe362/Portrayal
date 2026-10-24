@@ -46,11 +46,14 @@ plan: {ref: dell/r960-riser-plan@1}
 relief:
   features:
   - node: plate
-    out: 20.0
+    out: 1.0
     shape: true
     color: '#cfd3d7'
     confidence: estimated
-    source: estimated by analogy with the R660's riser cages; no R960 model or side figure is held
+    source: >-
+      estimated - the cage's plate is the rear wall's own sheet metal, and ISM table 7 puts nothing but the supplies'
+      handles past the wall; no R960 model or side figure is held. The first pass drew it 20.0 proud by analogy with the
+      R660's riser cages, which stood the cages outside the 866.74 chassis
 bays:
   slot-1:
     slot: {connector: x16, lanes: 16, height: full, length: full, processor: 3, generation: 5}

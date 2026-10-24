@@ -27,7 +27,7 @@
 format: 1
 kind: device
 name: r960
-version: 1.0.0
+version: 2.0.1
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R960
@@ -122,7 +122,7 @@ provenance:
       glbparts.py: the positions come from the un-exploded `Main Assembly` node only (the scene also holds exploded copies under `Extra
       content`), mapped as plan x = 228.0 - cad x1 (the system cover, cad x -216.0..228.0, is the 444 body) and plan y = 883.94 - cad z1 (the rear
       wall: the model's chassis front face at cad z 17.2 plus the ISM's 866.74, where its `Hole` cubes stand at 883.6, and the supply handles end
-      2.56 past it against ISM table 7's 2.455). What the model gives, each part citing its node: the six fans and the fan cage (`R960_
+      2.56 past it against ISM table 7's 2.455; the handle is modelled at 2.6 mm, the model's figure rounded, 0.145 mm longer than the manual's). What the model gives, each part citing its node: the six fans and the fan cage (`R960_
       CoolingFan`), the four heatsinks (`R960_ HeatSink SYS` and `R960_ HeatSink PEM`), the air shroud top cover (`R960_ AirShroudTopCover`) and the
       shroud under it (`R960_ GPU_AirShroud`), the support bar (`R960_ SupportBar`), the system cover and its latch (`R960_ SystemCover`), the supplies
       (`R960_ PSU Prefab`), the four risers (`Riser 1B - FL`, `Riser 2`, `Riser 3A - FL`, `Riser 4A - FL`) and the rows of the 64 memory sockets (`Memory
@@ -333,6 +333,26 @@ gaps:
       can is 233.5.
     wanted: >-
       a photograph of a 60 mm supply in its adapter from behind, and a side view of the adapter
+  - what: psu-face-recess-not-built
+    scope: [rear, psus]
+    reason: needs-drawing
+    note: >-
+      the 86 mm supplies' faces are recessed 30.9 mm inside the rear wall and their handles stand 33.5 proud of them, 2.6 past the wall (r960.glb, `R960_
+      PSU Prefab`; ISM table 7's Zc less Zb is 2.455). A rear bay seats its occupant with the face at the wall plane and gives it no recess, so the 3D scene
+      draws the face at the wall and the grip 2.6 proud (the part past the wall), where the first build stood the whole 33.5 handle and a 14.7 latch outside
+      the chassis. The supply's can and the top view are as measured; only the 30.9 mm between the wall and the face, and the latch's own height
+      inside it, are not shown. The 60 mm supplies seated in the adapter are the R660's part and still stand its 35.7 handle past the wall.
+    wanted: >-
+      a bay that can recess its occupant (a `floor` or `inset` on a rear bay), and a section through the R960's rear wall at a supply for the latch
+  - what: riser-cage-plate-depth-estimated
+    scope: [rear, risers]
+    reason: needs-drawing
+    note: >-
+      the risers' rear plates were drawn 20.0 mm proud of the rear wall by analogy with the R660's cages, which put them outside the 866.74 chassis (ISM table
+      7 puts only the supplies' handles past the wall). They are drawn 1.0 proud, estimated: no R960 model or side figure is held for a cage's
+      thickness or for how far the risers' PCBs stand behind it (the model's risers are drawn for the top view only).
+    wanted: >-
+      a side view or section of an R960 rear wall at a riser cage
   - what: full-height-slots-take-the-filler-only
     scope: [risers]
     reason: needs-drawing
@@ -863,14 +883,23 @@ views:
         - {ref: dell/r960-fan-cage@1, id: fan-cage, at: [8.7, 546.8],
            group: interior, rel-pos: 3, under: [system-cover],
            frames: [fan-1, fan-2, fan-3, fan-4, fan-5, fan-6]}
+        # THE PARTS ABOVE THE BOARDS STAND ON THE SYSTEM BOARD'S FLOOR like the heatsinks, `lift` being the
+        # part's lowest face above that floor in the model (its cad y less the floor's 14.3 = 174.3 - 160.0),
+        # so each tops out where the model has it under the lid and none stands above the 174.3 chassis
         - {ref: dell/r960-air-shroud-bottom-cover@1, id: air-shroud-bottom, at: [2.8, 224.1],
-           group: interior, rel-pos: 4, under: [support-bar, air-shroud-top, system-cover]}
+           group: interior, rel-pos: 4, in: system-board, lift: 59.7,
+           under: [support-bar, air-shroud-top, system-cover]}
         - {ref: dell/r960-support-bar@1, id: support-bar, at: [2.8, 339.9],
-           group: interior, rel-pos: 5, under: [system-cover]}
+           group: interior, rel-pos: 5, in: system-board, lift: 128.3, under: [system-cover]}
         - {ref: dell/r960-air-shroud-top-cover@1, id: air-shroud-top, at: [4.6, 362.3],
-           group: interior, rel-pos: 6, under: [support-bar, system-cover]}
+           group: interior, rel-pos: 6, in: system-board, lift: 78.3,
+           under: [support-bar, system-cover]}
+        # THE LID IS THE TOP FACE: its 13.0 mm (flanges and all) is the top of the 174.3 chassis, and the face
+        # draws it, so it stands 0.5 proud as the R760's and R660's lids stand 1.0, as a plate with nothing of
+        # its depth built: sunk to the top it would stand coplanar with the top and both side faces and
+        # z-fight with them. Its latch, 0.2 below the lid in the model, is 0.2 below it here
         - {ref: dell/r960-system-cover@1, id: system-cover, at: [0.0, 0.0],
-           group: covers, rel-pos: 1, under: [cage-cover]}
+           group: covers, rel-pos: 1, inset: 12.5, under: [cage-cover]}
         - {ref: dell/r960-drive-cage-cover@1, id: cage-cover, at: [1.0, 734.7],
            group: covers, rel-pos: 2}
   bottom:
