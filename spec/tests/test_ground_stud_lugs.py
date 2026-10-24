@@ -145,6 +145,8 @@ PAIRED = {
     "juniper/mx240": {"ground-studs": "1/4-20"},
     "juniper/mx480": {"ground-studs": "1/4-20"},
     "juniper/mx304": {"ground-plate": "M6"},
+    "juniper/ex9204": {"ground-studs": "1/4-20"},
+    "juniper/ex9208": {"ground-studs": "1/4-20"},
 }
 
 # the hosts the MX pairs and plates are placed as

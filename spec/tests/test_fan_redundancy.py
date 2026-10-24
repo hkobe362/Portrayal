@@ -673,4 +673,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
     # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
     # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
-    assert n == 147, n
+    # 150 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
+    assert n == 150, n

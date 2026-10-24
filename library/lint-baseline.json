@@ -1216,6 +1216,9 @@
  "components/juniper/ex4600-em-8f/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex9214-ffantray-mx960-hc/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/jnp-mic1/v1/contract.yaml": {
   "L96": 1,
   "L97": 1
@@ -2427,6 +2430,15 @@
  "devices/juniper/ex4650-48y/device.yaml": {
   "L29": 2,
   "L57": 1
+ },
+ "devices/juniper/ex9204/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9208/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9214/device.yaml": {
+  "L29": 2
  },
  "devices/juniper/ex9251/device.yaml": {
   "L29": 1
