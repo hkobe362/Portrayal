@@ -657,4 +657,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
     # 137 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
-    assert n == 137, n
+    # 138 with the Juniper EX8216: 2+0 over two nine-fan trays (hardware guide, Cooling System and Fan Tray: the
+    # switch runs only 2 minutes with a tray out; each tray keeps cooling with a single fan failed)
+    assert n == 138, n
