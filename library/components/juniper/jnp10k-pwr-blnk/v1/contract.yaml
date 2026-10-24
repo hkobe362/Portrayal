@@ -1,7 +1,7 @@
 format: 1
 kind: module
 name: jnp10k-pwr-blnk
-version: 1.0.0
+version: 1.0.1
 class: blank
 behaviour: fills
 profile: networking
@@ -9,6 +9,8 @@ description: >-
   Power supply slot cover for the MX10000 series. The MX10004, MX10008 and
   MX10016 ship one in each supply slot they leave unfilled. A plain panel the width
   of a supply, with a pull at the top.
+superseded-by: juniper/jnp10k-pwr-blnk@2
+unplaced: no device seats this major any more; juniper/jnp10k-pwr-blnk@2 replaced it at the size of the supply it covers for, 91.4 x 88.9 mm (juniper/jnp10k-pwr-ac2@2), where this one took the 84.0 x 97.0 mm of juniper/jnp10k-pwr-ac2@1, and this one is kept so a saved rack or a contract that names @1 still resolves
 attrs:
   model: JNP10K-PWR-BLNK
 provenance:
