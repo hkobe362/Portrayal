@@ -459,7 +459,6 @@ groups:
     role: service
     index-origin: 0
     attrs:
-      redundancy: rotor-level
       redundancy-note: >-
         QFX5130 hardware guide, QFX5130 Component Redundancy: the QFX5130-48C and QFX5130-48CM have six
         fan modules and support redundancy only at the rotor level; one rotor of a module may fail, and
