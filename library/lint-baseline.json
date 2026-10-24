@@ -2559,6 +2559,9 @@
   "L29": 1,
   "L57": 1
  },
+ "devices/juniper/qfx5700/device.yaml": {
+  "L29": 1
+ },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
   "L29": 1,
