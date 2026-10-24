@@ -1183,6 +1183,9 @@
  "components/juniper/ex4100-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex4200-fan-tray/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/ex4300-48mp-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
@@ -2302,6 +2305,34 @@
   "L57": 1,
   "L61": 3
  },
+ "devices/juniper/ex4200-24f/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24p/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24px/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24t/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48p/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48px/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48t/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
  "devices/juniper/ex4300-24p/device.yaml": {
   "L29": 2,
   "L57": 1
@@ -2372,6 +2403,21 @@
   "L29": 5,
   "L57": 1,
   "L61": 42
+ },
+ "devices/juniper/ex4500-40f/device.yaml": {
+  "L29": 4,
+  "L57": 1,
+  "L61": 20
+ },
+ "devices/juniper/ex4550-32f/device.yaml": {
+  "L57": 1,
+  "L61": 3,
+  "L69": 1
+ },
+ "devices/juniper/ex4550-32t/device.yaml": {
+  "L57": 1,
+  "L61": 11,
+  "L69": 1
  },
  "devices/juniper/ex4600-40f/device.yaml": {
   "L29": 4,
@@ -2587,6 +2633,10 @@
  "devices/juniper/qfx5240-64qd/device.yaml": {
   "L29": 1,
   "L57": 1
+ },
+ "devices/juniper/qfx5250-64oe-l/device.yaml": {
+  "L57": 1,
+  "L61": 83
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,

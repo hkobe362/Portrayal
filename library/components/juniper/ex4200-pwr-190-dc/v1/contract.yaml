@@ -1,0 +1,103 @@
+format: 1
+kind: module
+name: ex4200-pwr-190-dc
+version: 1.0.1
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  Juniper EX-PWR-190-DC, the 190 W DC power supply of the EX4200-24T-DC, -48T-DC and -24F-DC. It
+  seats in power supply slot 0 or 1 at the rear and sits flush with the chassis. It has dual input
+  feeds on a four-terminal block labelled A+, B+, A- and B-, shipped with a jumper from A+ to B+
+  and another from A- to B-, two lamps (LED A and LED B), a locking lever at the left, a
+  honeycomb fan exhaust and a handle running across the faceplate. It gives no PoE power.
+attrs:
+  part-number: EX-PWR-190-DC
+  role: dc-power-supply
+  inlet: dc-terminal
+  power-output-w: 190
+  input-voltage: 36-72 VDC, dual feed
+  input-current: 7 A maximum
+  weight-kg: 1.1
+  depth-beyond-chassis-mm: 0
+part-numbers:
+  EX-PWR-190-DC: {part: EX-PWR-190-DC}
+provenance:
+  part-number: >-
+    datasheet - EX4200 Ethernet Switch datasheet (Juniper Networks, 1000215-026-EN, Feb 2019),
+    ordering information, Power Supplies: EX-PWR-190-DC, "190 W DC Power Supply Unit (PSU)"
+  power-output-w: >-
+    datasheet - EX4200 Switch Hardware Guide (published 2022-01-16), Table 13: power supply output
+    190 W, DC input voltage 36 through 72 VDC, DC input current 7 A maximum, holdup 1 ms minimum.
+    An output, because a supply provides power
+  weight: >-
+    datasheet - guide Table 3: the 190 W DC supply weighs 2.5 lb (1.1 kg)
+  depth: >-
+    datasheet - guide Table 3: with a 190 W DC supply installed the chassis is 17 in (43.18 cm)
+    deep, and the guide says the supply is flush with the chassis
+  size: >-
+    estimated - 90.0 x 41.5 mm, the slot width and height read off the rear callout figure
+    (Figure 4, g020084; 1.271 px per mm across, 5 percent foreshortened vertically). The guide
+    gives no supply dimension
+  terminals: >-
+    datasheet - guide, DC Power Supplies and Figure 19 (g020202): four terminals labelled A+, B+,
+    A- and B-; "The A+ and B+ terminals are referred to as +RTN and A- and B- terminals are
+    referred to as -48 V". Drawn as four screw terminals; no component models a DC terminal block
+    with four poles, so they are art and not seats
+  face: >-
+    drawing - guide Figure 19 (DC Power Supply, g020202): locking lever at the top left, two round
+    lamps labelled LED-A and LED-B below it, a honeycomb exhaust, a diagonal handle and the terminal
+    block at the right. The installation text says "The handle on the 190 W DC power supply runs
+    across the faceplate", which the figure agrees with. No photograph is held, so its colour is
+    estimated
+  leds: >-
+    datasheet - guide Table 11: both lamps green when inputs A and B are normal and the output is
+    normal; both red when the inputs are normal and there is no output; a lamp flashes red when
+    its input has failed; both off when there is no input
+  power-draw: >-
+    NOT APPLICABLE - a supply states its output
+states:
+- ok
+- fault
+- absent
+elements:
+  led-a:
+    at: [4.9, 17.9]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - {name: red, color: '#e03a2f'}
+    - 'off'
+  led-b:
+    at: [4.9, 27.4]
+    size: [2.2, 2.2]
+    class: led
+    states:
+    - {name: green, color: '#39b54a'}
+    - {name: red, color: '#e03a2f'}
+    - 'off'
+  latch:
+    at: [1.5, 3.0]
+    size: [8.2, 9.6]
+    class: latch
+  handle:
+    at: [14.0, 6.0]
+    size: [44.0, 32.0]
+    class: latch
+size:
+  w: 90.0
+  h: 41.5
+size-confidence: {w: estimated, h: estimated}
+relief:
+  features:
+  - node: latch
+    out: 2.0
+    color: '#9ba0a6'
+    confidence: estimated
+    source: guide Figure 19 - the locking lever stands proud of the face; projection not measured
+  - node: handle
+    out: 3.0
+    color: '#c9ccd0'
+    confidence: estimated
+    source: guide Figure 19 - the handle stands proud of the face; projection not measured

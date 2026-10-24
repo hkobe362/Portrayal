@@ -270,7 +270,12 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # that an unrecoverable failure raises chassis alarms and can shut it down, gives the time it runs
     # with one module out, and names no N+1 form, so the group states none.
     assert "juniper/qfx5210-64c" in unstated
-    assert len(unstated) == 41, unstated
+    # THE JUNIPER EX4550-32F AND -32T MADE IT FORTY-THREE: the guide says all three fan modules must
+    # be installed for optimal functioning and that the switch runs 30 seconds without thermal
+    # shutdown while one is replaced, and names no N+1 form, so each group quotes that and states no
+    # form. The EX4500-40F has one fan tray in one bay, so its group is not counted here at all.
+    assert {"juniper/ex4550-32f", "juniper/ex4550-32t"} <= set(unstated)
+    assert len(unstated) == 43, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -667,4 +672,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 139 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
     # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
-    assert n == 140, n
+    # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
+    assert n == 147, n
