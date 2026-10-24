@@ -54,12 +54,6 @@ KNOWN_DIVERGENT = {
     # mm, the EX3400 supplies were measured at 71.2 x 39.0), so the two components export different
     # documents and the one module type written is the EX3400's. They are listed as shared
     # candidates for a later dedupe in the pull request that added them (Refs #39).
-    # THE JNP10K-PWR-AC2 IS DRAWN IN TWO VERSIONS, one part. Both the MX10008 and QFX10008 guides give
-    # 3.6 x 3.5 in. (91.4 x 88.9 mm); version 1 is drawn 84.0 x 97.0 mm from a photograph and the
-    # MX10004, MX10008 and MX10016 still seat it, version 2 is drawn to the guides and the QFX10008 seats
-    # it. The two differ only in the description the DCIM reads; the one module type written is version 1's.
-    # Moving the MX devices to version 2 and retiring version 1 takes this line off.
-    ("Juniper", "JNP10K-PWR-AC2"): "juniper/jnp10k-pwr-ac2",
     ("Juniper", "JPSU-150-AC-AFI"): "juniper/ex4100-jpsu-150-ac-afi",
     ("Juniper", "JPSU-150-AC-AFO"): "juniper/ex4100-jpsu-150-ac-afo",
     ("Juniper", "JPSU-150-DC-AFO"): "juniper/ex4100-jpsu-150-dc-afo",
