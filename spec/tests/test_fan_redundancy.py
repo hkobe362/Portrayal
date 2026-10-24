@@ -681,4 +681,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 148 with the Juniper QFX5700: n+1 over two fan trays of four fans each (datasheet, "N+1 fan rotor
     # redundancy at chassis level")
     # 150 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
-    assert n == 150, n
+    # 153 with the Arista 7280CR3A-24D12 (N+1 over three fan modules), -48D6 and -72 (N+1 over four): data sheet, "Hot-swappable Fans"
+    assert n == 153, n
