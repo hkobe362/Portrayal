@@ -679,4 +679,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
     # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
     # 149 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
-    assert n == 149, n
+    # 150 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
+    assert n == 150, n
