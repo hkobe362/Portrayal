@@ -35,19 +35,19 @@
    "juniper/jnp10004-fan2@1"
   ],
   "rear/bays/psu0": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu1": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu2": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ]
  },
- "composed": "6003d4b3679ae075",
+ "composed": "616baf13a161d3b4",
  "composed-refs": {
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -56,8 +56,8 @@
   "juniper/jnp10k-lc-blank@1": "1.0.0+2436e065a07cdf6b",
   "juniper/jnp10k-lc480@1": "1.1.0+cc9a4c04de3f8362",
   "juniper/jnp10k-lc9600@1": "1.1.0+d98d1cb5c441d3e9",
-  "juniper/jnp10k-pwr-ac2@1": "1.1.0+80cd0676c5b89325",
-  "juniper/jnp10k-pwr-blnk@1": "1.0.0+1cb408d8424a4a65",
+  "juniper/jnp10k-pwr-ac2@2": "2.0.0+c839c49b15c20ea8",
+  "juniper/jnp10k-pwr-blnk@2": "2.0.0+c57ad703f161b12b",
   "juniper/jnp10k-re-blnk@1": "1.0.0+c1d77e93362f9010",
   "juniper/jnp10k-re1@2": "2.1.0+80ff396be7681e75",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa",
@@ -72,7 +72,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "89ca5f82374fbf75",
+ "gaps": "dc9d2ffaf90943ae",
  "groups": [
   "cooling",
   "fpcs",
@@ -103,7 +103,7 @@
   "rear/bays/psu1",
   "rear/bays/psu2"
  ],
- "names": "19f4b56e91203a84",
+ "names": "2c739dfbabf83173",
  "placement-addressing": {
   "for": {
    "front/placements/led-cbs": [
@@ -162,7 +162,7 @@
   "rear/bays/psu2": "psus"
  },
  "placement-surface": "bd322227e79ad6b5",
- "shape": "3790ea91523219fb",
- "surface": "58e15f605eaf8219",
- "version": "2.1.0"
+ "shape": "d79f6380310b357e",
+ "surface": "08ecfdc4edf669bb",
+ "version": "3.0.1"
 }
