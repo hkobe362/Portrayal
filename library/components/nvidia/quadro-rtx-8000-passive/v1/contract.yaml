@@ -6,8 +6,8 @@ class: expansion-card
 behaviour: fills
 profile: server
 description: >-
-  NVIDIA Quadro RTX 8000 Server Card (48 GB GDDR6), the passively cooled
-  dual-slot full-height full-length card that NVIDIA's brief calls the Quadro RTX
+  NVIDIA Quadro RTX 8000 Server Card (48 GB GDDR6), a passively cooled
+  dual-slot full-height full-length card. NVIDIA's brief calls it the Quadro RTX
   8000 PCIe Server Card. The bracket face is one vent window crossed by braces
   and no ports. One NVLink bridge connector sits on the top edge under a cap. The
   far end is open and shows the heat sink's fins edge-on. It has one CPU 8-pin
