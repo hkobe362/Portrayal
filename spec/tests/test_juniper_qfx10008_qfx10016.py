@@ -36,9 +36,9 @@ FAN = {"qfx10008": "qfx10008-fan", "qfx10016": "qfx10016-fan"}
 VARIANTS = {
     "qfx10008": {
         "base": ("QFX10008-BASE", "ac", "qfx10000-pwr-ac", 3, 1),
-        "base-h": ("QFX10008-BASE-H", ["ac", "hvdc"], "jnp10k-pwr-ac2", 3, 1),
+        "base-h": ("QFX10008-BASE-H", ["ac", "hvdc"], "qfx10008-pwr-ac2", 3, 1),
         "redund": ("QFX10008-REDUND", "ac", "qfx10000-pwr-ac", 6, 2),
-        "redund-h": ("QFX10008-REDUND-H", ["ac", "hvdc"], "jnp10k-pwr-ac2", 6, 2),
+        "redund-h": ("QFX10008-REDUND-H", ["ac", "hvdc"], "qfx10008-pwr-ac2", 6, 2),
         "redund-dc": ("QFX10008-REDUND-DC", "dc", "qfx10000-pwr-dc", 6, 2),
     },
     "qfx10016": {
@@ -48,7 +48,11 @@ VARIANTS = {
     },
 }
 # the supplies every supply bay accepts: the four of Table 1, and the cover
-PSU_ACCEPTS = {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"}
+# (the JNP10K-PWR-AC2 is the QFX10008's own drawing of the part in the QFX10008, the MX drawing in the QFX10016)
+PSU_ACCEPTS = {
+    "qfx10008": {"qfx10000-pwr-ac", "qfx10008-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
+    "qfx10016": {"qfx10000-pwr-ac", "jnp10k-pwr-ac2", "qfx10000-pwr-dc", "qfx10000-jnp10k-pwr-dc2", "qfx10000-pwr-cover"},
+}
 FAN_ACCEPTS = {
     "qfx10008": {"qfx10008-fan", "jnp10008-fan", "jnp10008-fan2"},
     "qfx10016": {"qfx10016-fan"},
@@ -58,6 +62,7 @@ MODEL = {
     "qfx10000-pwr-ac": "QFX10000-PWR-AC",
     "qfx10000-pwr-dc": "QFX10000-PWR-DC",
     "qfx10000-jnp10k-pwr-dc2": "JNP10K-PWR-DC2",
+    "qfx10008-pwr-ac2": "JNP10K-PWR-AC2",
     "qfx10000-re": "QFX10000-RE",
     "qfx10008-fan": "QFX10008-FAN",
     "qfx10016-fan": "QFX10016-FAN",
@@ -236,7 +241,7 @@ def test_the_supply_slots_are_numbered_top_to_bottom_and_clear_of_the_earthing_t
 def test_a_supply_bay_accepts_the_supplies_the_guide_lists(name):
     for b in bays(load_device(name), "rear"):
         if b["id"].startswith("psu"):
-            assert {ref_name(r) for r in b["accepts"]} == PSU_ACCEPTS, b["id"]
+            assert {ref_name(r) for r in b["accepts"]} == PSU_ACCEPTS[name], b["id"]
             assert ref_name(b["default"]) == "qfx10000-pwr-ac"
 
 
@@ -260,9 +265,16 @@ def test_the_qfx10008_reuses_the_mx_fan_trays_the_guide_names_and_copies_none():
     assert not (COMP / "qfx10008-jnp10008-fan2").exists()
 
 
-def test_the_jnp10k_pwr_ac2_is_the_existing_component_and_is_not_copied():
-    assert load_component("jnp10k-pwr-ac2")["attrs"]["model"] == "JNP10K-PWR-AC2"
-    assert not [p for p in COMP.iterdir() if p.name.endswith("pwr-ac2") and p.name != "jnp10k-pwr-ac2"]
+def test_the_qfx10008_draws_the_jnp10k_pwr_ac2_to_table_16_and_leaves_the_mx_drawing_alone():
+    """Table 16: 3.6 x 3.5 in. The MX10008's juniper/jnp10k-pwr-ac2 is 84 x 97 mm and stays the MX's."""
+    c = load_component("qfx10008-pwr-ac2")
+    assert c["attrs"]["model"] == load_component("jnp10k-pwr-ac2")["attrs"]["model"] == "JNP10K-PWR-AC2"
+    assert (c["size"]["w"], c["size"]["h"]) == (91.4, 88.9)
+    assert c["attrs"]["power-output-w"] == 5500
+    assert (load_component("jnp10k-pwr-ac2")["size"]["w"], load_component("jnp10k-pwr-ac2")["size"]["h"]) == (84.0, 97.0)
+    d = load_device("qfx10008")
+    assert all("jnp10k-pwr-ac2" not in str(b) for b in bays(d, "rear"))
+    assert all("jnp10k-pwr-ac2" not in str(c) for c in d["configurations"].values())
 
 
 # --- the configurations -------------------------------------------------------
