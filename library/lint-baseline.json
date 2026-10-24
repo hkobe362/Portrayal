@@ -1806,6 +1806,9 @@
  "devices/arista/7050px4-32s/device.yaml": {
   "L29": 2
  },
+ "devices/arista/7050sdx4-48d8/device.yaml": {
+  "L29": 2
+ },
  "devices/arista/7050x4-48y-4df/device.yaml": {
   "L29": 2
  },

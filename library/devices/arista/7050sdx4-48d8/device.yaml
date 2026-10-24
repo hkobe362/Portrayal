@@ -9,12 +9,12 @@ portfolio: {line: 7000 Series, family: 7050X4}
 description: >-
   Arista 7050SDX4-48D8 - a fixed 1RU data-centre switch with 48 x 100G SFP-DD ports and 8 x 400G QSFP-DD
   ports, running EOS. The front carries the SFP-DD cages in two stacked rows, the odd number on top, in
-  four groups of six columns, with the eight QSFP-DD cages as four stacked columns between the second
-  and third groups. A lavender strip between the rows carries each SFP-DD cage's number and lamp and an
-  orange one the QSFP-DD cages'. Four system lamps (system, fan, PS1, PS2) are at the top right. The rear
-  carries two hot-swap 1000 W power supplies at the ends, three hot-swap fan modules, and the RJ-45 management
-  port, the USB port and the RJ-45 console port. The same panel is ordered with front-to-rear air (-F)
-  or rear-to-front air (-R).
+  four groups of six columns. The eight QSFP-DD cages are four stacked columns between the second and
+  third groups. A lavender strip between the rows carries each SFP-DD cage's number and lamp and an orange
+  one the QSFP-DD cages'. Four system lamps (system, fan, PS1, PS2) are at the top right. The rear carries
+  two hot-swap 1000 W power supplies at the ends and three hot-swap fan modules. It also has the RJ-45
+  management port, the USB port and the RJ-45 console port. The same panel is ordered with front-to-rear
+  air (-F) or rear-to-front air (-R).
 profile: networking
 provenance:
   sources:
@@ -546,13 +546,13 @@ views:
     - {at: [421.95, 22.7], text: '47', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-47}
     - {at: [427.68, 22.7], text: '48', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-48}
     - {at: [184.8, 22.7], text: '49', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-49}
-    - {at: [190.9, 22.7], text: '50', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-50}
+    - {at: [191.7, 22.7], text: '50', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-50}
     - {at: [203.8, 22.7], text: '51', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-51}
-    - {at: [209.9, 22.7], text: '52', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-52}
+    - {at: [210.7, 22.7], text: '52', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-52}
     - {at: [222.8, 22.7], text: '53', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-53}
-    - {at: [228.9, 22.7], text: '54', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-54}
+    - {at: [229.7, 22.7], text: '54', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-54}
     - {at: [241.8, 22.7], text: '55', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-55}
-    - {at: [247.9, 22.7], text: '56', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-56}
+    - {at: [248.7, 22.7], text: '56', font-size: 1.3, anchor: middle, fill: '#0f1f45', for: port-56}
     - {at: [2.9, 22.9], text: 7050SDX4-48D8, font-size: 1.6, anchor: middle, rotate: -90, fill: '#1f3a6e',
       for: chassis}
     - at: [415.6, 2.6]
@@ -564,8 +564,8 @@ views:
       for: led-system
     - {at: [422.4, 2.6], path: M -1.1 -1.1 L 1.1 1.1 M 1.1 -1.1 L -1.1 1.1, stroke-width: 0.5, fill: '#1f3a6e',
       for: led-fan}
-    - {at: [429.3, 3.1], text: PS1, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps1}
-    - {at: [436.2, 3.1], text: PS2, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps2}
+    - {at: [429.3, 3.035], text: PS1, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps1}
+    - {at: [436.2, 3.035], text: PS2, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps2}
     components:
       placements:
       - {ref: std/sfp-dd-ganged@1, id: port-1, at: [4.8, 10.0], group: sfp-dd, rel-pos: 1}

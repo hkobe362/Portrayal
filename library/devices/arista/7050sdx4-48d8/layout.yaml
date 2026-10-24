@@ -8,11 +8,11 @@ model: 7050SDX4-48D8
 portfolio: {line: 7000 Series, family: 7050X4}
 description: >-
   Arista 7050SDX4-48D8 - a fixed 1RU data-centre switch with 48 x 100G SFP-DD ports and 8 x 400G QSFP-DD ports, running
-  EOS. The front carries the SFP-DD cages in two stacked rows, the odd number on top, in four groups of six columns, with
-  the eight QSFP-DD cages as four stacked columns between the second and third groups. A lavender strip between the rows
+  EOS. The front carries the SFP-DD cages in two stacked rows, the odd number on top, in four groups of six columns.
+  The eight QSFP-DD cages are four stacked columns between the second and third groups. A lavender strip between the rows
   carries each SFP-DD cage's number and lamp and an orange one the QSFP-DD cages'. Four system lamps (system, fan, PS1, PS2)
-  are at the top right. The rear carries two hot-swap 1000 W power supplies at the ends, three hot-swap fan modules, and the
-  RJ-45 management port, the USB port and the RJ-45 console port. The same panel is ordered with front-to-rear air (-F) or
+  are at the top right. The rear carries two hot-swap 1000 W power supplies at the ends and three hot-swap fan modules.
+  It also has the RJ-45 management port, the USB port and the RJ-45 console port. The same panel is ordered with front-to-rear air (-F) or
   rear-to-front air (-R).
 profile: networking
 provenance:
@@ -362,8 +362,8 @@ views:
       - {at: [2.9, 22.9], text: 7050SDX4-48D8, font-size: 1.6, anchor: middle, rotate: -90, fill: '#1f3a6e', for: chassis}
       - {at: [415.6, 2.6], path: 'M -1.1 0 a 1.1 1.1 0 1 0 2.2 0 a 1.1 1.1 0 1 0 -2.2 0 M -0.4 0 a 0.4 0.4 0 1 0 0.8 0 a 0.4 0.4 0 1 0 -0.8 0', stroke-width: 0.26, fill: '#1f3a6e', for: led-system}
       - {at: [422.4, 2.6], path: 'M -1.1 -1.1 L 1.1 1.1 M 1.1 -1.1 L -1.1 1.1', stroke-width: 0.5, fill: '#1f3a6e', for: led-fan}
-      - {at: [429.3, 2.97], text: PS1, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps1}
-      - {at: [436.2, 2.97], text: PS2, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps2}
+      - {at: [429.3, 3.035], text: PS1, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps1}
+      - {at: [436.2, 3.035], text: PS2, font-size: 1.2, anchor: middle, fill: '#1f3a6e', for: led-ps2}
     components:
       blocks:
         - id: sfp-dd
