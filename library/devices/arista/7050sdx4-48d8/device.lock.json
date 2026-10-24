@@ -25,7 +25,7 @@
    "arista/7280cr3-pwr-1000-dc@1"
   ]
  },
- "composed": "8ea97f4cfc03512d",
+ "composed": "f48f427de0b29def",
  "composed-refs": {
   "arista/7280cr3-fan-rev@1": "1.0.0+e82600fd5ce7ef43",
   "arista/7280cr3-pwr-1000-ac-rev@1": "1.0.0+e3bcd185b1d111ef",
@@ -39,7 +39,7 @@
   "std/c14-inlet@1": "1.4.0+dfca1653bca2fa7c",
   "std/qsfp-dd@1": "1.3.1+c3cf5f2db67d8233",
   "std/rj45@2": "2.1.0+2c8fec73bdc493fb",
-  "std/sfp-dd-ganged@1": "1.0.0+e9ff2aecc59cc71f",
+  "std/sfp-dd-ganged@1": "1.0.0+2aa24b256f4bf48f",
   "std/usb-a@1": "1.3.0+3c77f06ea6794bfc"
  },
  "configs": [
@@ -749,5 +749,5 @@
  "placement-surface": "eb72d391184ea46b",
  "shape": "89ec2dde052fc09d",
  "surface": "9fc9f44c2895996a",
- "version": "1.0.0"
+ "version": "1.0.1"
 }

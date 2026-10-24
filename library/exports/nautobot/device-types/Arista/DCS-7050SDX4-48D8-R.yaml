@@ -177,6 +177,6 @@ comments: "Arista 7050SDX4-48D8 - a fixed 1RU data-centre switch with 48 x 100G 
   \ typical at 25 C ambient with 50 percent load on all ports, excluding transceivers (data sheet)\n-\
   \ power.power-typical-w: 165\n- power.psu-redundancy: 1+1\n- thermal.airflow: front-to-rear or rear-to-front,\
   \ set by the fan modules and supplies fitted\n- thermal.fan-redundancy: N+1 hot-swap fan modules\n\n\
-  Drawing version 1.0.0. A major bump means a slot moved or an id was renamed, so anything cached from\
+  Drawing version 1.0.1. A major bump means a slot moved or an id was renamed, so anything cached from\
   \ an earlier export may no longer line up.\nModel maturity: modelled. Every dimension in the source\
   \ records where it came from."
