@@ -115,7 +115,8 @@ provenance:
       estimated - the guide gives no rear figure of the non-PoE model: Figure 6 is the PoE+ model's and the
       guide says only that non-PoE models have no heatsink. The rear here is Figure 6's without the heatsink,
       its screw and the AC legend (the legend's current figures belong to the PoE model and are not carried
-      over): the two earthing holes 20 mm apart with the earth symbol over the second, the AC inlet at
+      over): the oblong slotted plate at the left (about 22 x 6 mm, as on the 12P; a plain darker plate, the slot
+      not cut through), the two earthing holes 20 mm apart with the earth symbol over the second, the AC inlet at
       238.4 mm centre and the ESD symbol over the ESD point at the right, positioned as measured on Figure 6
       (see the 12P). The guide says EX2200-C switches have no exhaust openings, so nothing is cut through the
       rear. The serial number ID label is a paper label carrying a real serial number and is not drawn.
@@ -440,6 +441,7 @@ views:
     size: {w: 269.2, h: 44.45}
     panel:
       decor:
+      - {id: slotted-plate, kind: slotted-plate, at: [5.8, 13.2], size: [22.2, 6.2], rx: 3.1, fill: '#4a4e53'}
       - {id: earth-hole-1, kind: earth-hole, at: [16.25, 29.95], size: [3.9, 3.9], rx: 1.95, fill: '#2a2d31'}
       - {id: earth-hole-2, kind: earth-hole, at: [36.25, 29.95], size: [3.9, 3.9], rx: 1.95, fill: '#2a2d31'}
       cutouts:

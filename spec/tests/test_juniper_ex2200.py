@@ -296,11 +296,29 @@ def test_the_compact_rear_is_fanless_with_a_heatsink_on_the_poe_model_only(name)
     assert not [x for x in decor if x.get("kind") in ("fan-grille", "exhaust-grille")]
     heat = [x for x in decor if x.get("kind") == "heatsink"]
     assert len(heat) == (1 if MODELS[name]["poe"] else 0)
+    # the heatsink is a solid block: the guide says EX2200-C switches have no exhaust openings, so no rear
+    # decor on a compact model may be a vent, and the heatsink carries no pattern either
+    for x in heat:
+        assert "pattern" not in x and "vent" not in x
+    assert not [x for x in decor if x.get("pattern") == "vent" or "vent" in x]
     pl = by_id(d, "rear")
     assert pl["ac-inlet"]["ref"] == "std/c14-inlet@1"
     assert pl["esd-rear-jack"]["ref"] == "common/esd-jack@1"
     assert {"earth-hole-1", "earth-hole-2"} <= {x.get("id") for x in decor}
     assert d["chassis"]["airflow"] == "passive"
+
+
+@pytest.mark.parametrize("name", COMPACT)
+def test_the_compact_rear_has_the_oblong_slotted_plate_above_the_first_earth_hole(name):
+    # Figure 6: an oblong plate about 22 x 6 mm at the left, over the first of the two earthing holes
+    d = load_device(name)
+    decor = {x.get("id"): x for x in d["views"]["rear"]["panel"]["decor"]}
+    plate = decor["slotted-plate"]
+    assert plate["kind"] == "slotted-plate"
+    assert 20 <= plate["size"][0] <= 24 and 5 <= plate["size"][1] <= 8
+    hole = decor["earth-hole-1"]
+    assert plate["at"][0] < hole["at"][0] < plate["at"][0] + plate["size"][0]
+    assert plate["at"][1] + plate["size"][1] < hole["at"][1]
 
 
 def test_the_dc_rear_has_the_four_terminals_and_no_inlet():
