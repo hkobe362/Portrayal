@@ -687,4 +687,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 157 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
     # QFX5241-64QD (N+1 over four): hardware guides, Component Redundancy
     # 160 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
-    assert n == 160, n
+    # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
+    assert n == 161, n

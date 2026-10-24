@@ -1847,6 +1847,9 @@
  "devices/arista/7280sr3-48yc8/device.yaml": {
   "L29": 2
  },
+ "devices/arista/7280tr3-40c6/device.yaml": {
+  "L29": 2
+ },
  "devices/casa/c100g/device.yaml": {
   "L119": 1,
   "L29": 2,
