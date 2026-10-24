@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: mx10016
-version: 2.1.0
+version: 4.0.0
 maturity: modelled
 manufacturer: Juniper
 model: MX10016
@@ -41,7 +41,17 @@ provenance:
     note: >-
       drawing - g050702 (isometric, fractions only): one full-height column of ten JNP10K-PWR
       supplies at the left, two full-height fan trays right. Base configuration ships five
-      supplies; all ten bays are drawn
+      supplies; all ten bays are drawn. Each supply bay is 91.4 x 88.9 mm, the JNP10K-PWR-AC2 as the
+      guide's Table 39 gives it (3.6 in. wide, 3.5 in. high; guide page 107), and the ten stand one
+      above the next with no gap, as Figure 2 draws them, the earthing terminal's strip below PSU 9.
+      The bays were 84.0 x 91.0 mm, spread over the fan trays' height. The guide's Table 7 gives the fan
+      trays 6.6 in. (16.8 cm, about 167.6 mm) wide and 36.6 in. (92.97 cm) high (guide pages 32 to
+      33), and juniper/jnp10016-fan@2 and juniper/jnp10016-fan2@2 are drawn at that size; juniper/jnp10016-fan@1
+      and juniper/jnp10016-fan2@1, 176 x 924 mm from the drawing, are kept for a saved rack that
+      names them. The two fan bays are 167.6 x 929.6
+      mm and stand against the supply column and against each other, centred in the 930 mm height (y
+      0.2). 91.4 + 2 x 167.6 mm is 426.6 mm of the 442 mm body, and no figure shows the other 15.4
+      mm, so it is left empty at the right edge, an estimate
   power:
     confidence: datasheet
     note: >-
@@ -94,6 +104,13 @@ gaps:
     reason: needs-photo
     wanted: the JNP10K-PWR-AC (first generation), AC3 and DC faces; only
       AC2 is modelled.
+  - what: psu-ac2-face
+    scope: [psus]
+    reason: needs-photo
+    wanted: >-
+      a flat figure or square-on photograph of the JNP10K-PWR-AC2 face; the guide gives its outer
+      size (Table 39) and isometric drawings, so juniper/jnp10k-pwr-ac2@2 refits the face of
+      version 1 to 91.4 x 88.9 mm by estimate
   - what: line-card-catalogue
     scope: [fpcs]
     reason: needs-photo
@@ -252,41 +269,41 @@ views:
       h: 930.0
     components:
       bays:
-        - {id: psu0, at: [3.0, 1.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu0, at: [0.0, 1.5], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 0}
-        - {id: psu1, at: [3.0, 94.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu1, at: [0.0, 90.4], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 1}
-        - {id: psu2, at: [3.0, 187.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu2, at: [0.0, 179.3], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 2}
-        - {id: psu3, at: [3.0, 280.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu3, at: [0.0, 268.2], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 3}
-        - {id: psu4, at: [3.0, 373.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu4, at: [0.0, 357.1], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 4}
-        - {id: psu5, at: [3.0, 466.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu5, at: [0.0, 446.0], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 5}
-        - {id: psu6, at: [3.0, 559.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu6, at: [0.0, 534.9], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 6}
-        - {id: psu7, at: [3.0, 652.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu7, at: [0.0, 623.8], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 7}
-        - {id: psu8, at: [3.0, 745.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu8, at: [0.0, 712.7], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 8}
-        - {id: psu9, at: [3.0, 838.5], size: {w: 84.0, h: 91.0},
-           accepts: [juniper/jnp10k-pwr-ac2@1, juniper/jnp10k-pwr-blnk@1], default: juniper/jnp10k-pwr-ac2@1,
+        - {id: psu9, at: [0.0, 801.6], size: {w: 91.4, h: 88.9},
+           accepts: [juniper/jnp10k-pwr-ac2@2, juniper/jnp10k-pwr-blnk@2], default: juniper/jnp10k-pwr-ac2@2,
            group: psus, rel-pos: 9}
-        - {id: fan0, at: [89.0, 3.0], size: {w: 176.0, h: 924.0},
-           accepts: [juniper/jnp10016-fan@1, juniper/jnp10016-fan2@1], default: juniper/jnp10016-fan@1,
+        - {id: fan0, at: [91.4, 0.2], size: {w: 167.6, h: 929.6},
+           accepts: [juniper/jnp10016-fan@2, juniper/jnp10016-fan2@2], default: juniper/jnp10016-fan@2,
            group: cooling, rel-pos: 0}
-        - {id: fan1, at: [266.0, 3.0], size: {w: 176.0, h: 924.0},
-           accepts: [juniper/jnp10016-fan@1, juniper/jnp10016-fan2@1], default: juniper/jnp10016-fan@1,
+        - {id: fan1, at: [259.0, 0.2], size: {w: 167.6, h: 929.6},
+           accepts: [juniper/jnp10016-fan@2, juniper/jnp10016-fan2@2], default: juniper/jnp10016-fan@2,
            group: cooling, rel-pos: 1}
   left:
     size:
@@ -348,11 +365,11 @@ configurations:
       are ordered separately.
     bays:
       cb1: juniper/jnp10k-re-blnk@1
-      psu5: juniper/jnp10k-pwr-blnk@1
-      psu6: juniper/jnp10k-pwr-blnk@1
-      psu7: juniper/jnp10k-pwr-blnk@1
-      psu8: juniper/jnp10k-pwr-blnk@1
-      psu9: juniper/jnp10k-pwr-blnk@1
+      psu5: juniper/jnp10k-pwr-blnk@2
+      psu6: juniper/jnp10k-pwr-blnk@2
+      psu7: juniper/jnp10k-pwr-blnk@2
+      psu8: juniper/jnp10k-pwr-blnk@2
+      psu9: juniper/jnp10k-pwr-blnk@2
       fpc0: juniper/jnp10k-lc-blank@1
       fpc1: juniper/jnp10k-lc-blank@1
       fpc2: juniper/jnp10k-lc-blank@1
@@ -386,8 +403,8 @@ configurations:
       Both routing and control boards, all ten power supplies, both JNP10016-FAN2 fan
       trays, and a cover in each line-card slot. Line cards are ordered separately.
     bays:
-      fan0: juniper/jnp10016-fan2@1
-      fan1: juniper/jnp10016-fan2@1
+      fan0: juniper/jnp10016-fan2@2
+      fan1: juniper/jnp10016-fan2@2
       fpc0: juniper/jnp10k-lc-blank@1
       fpc1: juniper/jnp10k-lc-blank@1
       fpc2: juniper/jnp10k-lc-blank@1

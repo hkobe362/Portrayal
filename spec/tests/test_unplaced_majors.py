@@ -264,15 +264,19 @@ def test_the_live_library_keeps_no_retired_major(tmp_path):
     for name in ("cisco/a9903-20hg-pec", "cisco/a9903-8hg-pec", "cisco/asr-9903-fan",
                  "cisco/pwr-1p6kw-ac", "cisco/pwr-1p6kw-dc"):
         kept[name] = [1, 2]
-    # TWO LIVE MAJORS, NEITHER RETIRED: the JNP10K-PWR-AC2 is drawn 84.0 x 97.0 mm at @1 (the
-    # MX10004, MX10008 and MX10016 and QFX10016 still seat it) and 91.4 x 88.9 mm at @2, the size both the
-    # MX10008 and QFX10008 guides give (the QFX10008 seats it). @1 carries no `superseded-by`
-    # until the MX devices move to @2 in a follow-up, which then retires it and removes this entry.
+    # DEPRECATED, NOT DELETED: the JNP10K-PWR-AC2 drawn 84.0 x 97.0 mm from a photograph at @1, where
+    # every Juniper guide gives 91.4 x 88.9 mm (@2), and the JNP10K-PWR-BLNK cover that took that
+    # size from it. The MX10004, MX10008, MX10016, QFX10008 and QFX10016 seat the @2 of the supply
+    # and the MX ones the @2 of the cover; each @1 stays so a manifest pinning it resolves, carries
+    # `superseded-by` and nothing seats it.
     kept["juniper/jnp10k-pwr-ac2"] = [1, 2]
+    kept["juniper/jnp10k-pwr-blnk"] = [1, 2]
+    # The six MX10000-line fan trays were drawn 176 mm wide where the guides give 167.6 mm; the @2 of
+    # each is seated and each @1 stays for a saved rack, `superseded-by` the @2.
+    for fan in ("jnp10004-fan2", "jnp10008-fan", "jnp10008-fan2", "jnp10008-fan3", "jnp10016-fan", "jnp10016-fan2"):
+        kept[f"juniper/{fan}"] = [1, 2]
     assert multi == kept, multi
     for name, majors in kept.items():
-        if name == "juniper/jnp10k-pwr-ac2":
-            continue
         if name.startswith(("juniper/", "cisco/")):
             old = LIB / "components" / name / f"v{majors[0]}" / "contract.yaml"
             assert (lint.load_yaml(old) or {}).get("superseded-by") == f"{name}@{majors[1]}", old
