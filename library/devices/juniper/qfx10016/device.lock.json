@@ -63,83 +63,83 @@
    "juniper/qfx10016-fan@1"
   ],
   "rear/bays/psu0": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu1": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu2": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu3": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu4": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu5": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu6": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu7": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu8": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ],
   "rear/bays/psu9": [
-   "juniper/jnp10k-pwr-ac2@1",
+   "juniper/jnp10k-pwr-ac2@2",
    "juniper/qfx10000-jnp10k-pwr-dc2@1",
    "juniper/qfx10000-pwr-ac@1",
    "juniper/qfx10000-pwr-cover@1",
    "juniper/qfx10000-pwr-dc@1"
   ]
  },
- "composed": "29507c42c1beaeca",
+ "composed": "9251639a20c78fff",
  "composed-refs": {
   "common/esd-jack@1": "1.0.0+0991d3874bfac0f4",
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-eth@1": "1.2.0+eb66828d7adf1ae4",
-  "juniper/jnp10k-pwr-ac2@1": "1.1.0+80cd0676c5b89325",
+  "juniper/jnp10k-pwr-ac2@2": "2.0.0+c839c49b15c20ea8",
   "juniper/qfx10000-jnp10k-pwr-dc2@1": "1.0.0+f945ab104b75153c",
   "juniper/qfx10000-lc-cover@1": "1.0.0+418c197bfc45e70d",
   "juniper/qfx10000-pwr-ac@1": "1.0.0+b12878908273409a",
@@ -160,7 +160,7 @@
   "redund-dc"
  ],
  "format": 1,
- "gaps": "029ad570168ad2d9",
+ "gaps": "e108d86c64b2be77",
  "groups": [
   "cooling",
   "esd",
@@ -213,7 +213,7 @@
   "rear/bays/psu9",
   "rear/placements/esd-rear-jack"
  ],
- "names": "fbc1ee5680d137d3",
+ "names": "cc72f3783a1c6cb1",
  "placement-addressing": {
   "for": {
    "front/placements/esd-front-jack": [
@@ -321,6 +321,6 @@
  },
  "placement-surface": "15f13ab45adccfbc",
  "shape": "3aba6cacb9366d8c",
- "surface": "8224848da7dd422d",
- "version": "1.0.0"
+ "surface": "b6facad9cdd3857d",
+ "version": "2.0.0"
 }

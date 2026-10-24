@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx10008
-version: 3.0.0
+version: 3.0.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX10008
@@ -96,8 +96,8 @@ provenance:
     confidence: estimated
     note: >-
       The JNP10K-PWR-AC2 is drawn here as juniper/jnp10k-pwr-ac2@2, to the guides' 3.6 x 3.5 in.
-      (Table 16; the MX10008 guide's Table 55 agrees), because juniper/jnp10k-pwr-ac2@1 is drawn
-      84.0 x 97.0 mm for the MX10008 and is not edited. The JNP10008-FAN (Figure 104, "Installing a JNP10008-FAN Fan Tray in a QFX10008 Chassis")
+      (Table 16; the MX10008 guide's Table 55 agrees); juniper/jnp10k-pwr-ac2@1, drawn
+      84.0 x 97.0 mm from a photograph, is retired. The JNP10008-FAN (Figure 104, "Installing a JNP10008-FAN Fan Tray in a QFX10008 Chassis")
       and JNP10008-FAN2 (Table 4) are reused as they are, as juniper/jnp10008-fan@1 and
       juniper/jnp10008-fan2@1, drawn 176 x 560 mm for the MX10008 from an isometric drawing. Both are
       accepted by the fan bays and neither is seated by a configuration; the bay is 168 x 569 mm

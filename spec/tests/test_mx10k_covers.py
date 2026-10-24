@@ -20,7 +20,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 LIB = ROOT / "library"
 COMP = LIB / "components" / "juniper"
 
-PWR = "juniper/jnp10k-pwr-blnk@1"
+PWR = "juniper/jnp10k-pwr-blnk@2"
+AC2 = "juniper/jnp10k-pwr-ac2@2"
 RE = "juniper/jnp10k-re-blnk@1"
 LC = "juniper/jnp10k-lc-blank@1"
 
@@ -37,8 +38,8 @@ def device(name):
     return load_yaml(LIB / "devices" / "juniper" / name / "device.yaml")
 
 
-def contract(name):
-    return load_yaml(COMP / name / "v1" / "contract.yaml")
+def contract(name, major=1):
+    return load_yaml(COMP / name / f"v{major}" / "contract.yaml")
 
 
 def bays(dev, view, prefix):
@@ -56,10 +57,10 @@ def rcb_prefix(name):
     return "re" if name == "mx10004" else ("cb")
 
 
-@pytest.mark.parametrize("part,model", [("jnp10k-pwr-blnk", "JNP10K-PWR-BLNK"),
-                                        ("jnp10k-re-blnk", "JNP10K-RE-BLNK")])
-def test_cover_carries_its_part_number_in_provenance(part, model):
-    c = contract(part)
+@pytest.mark.parametrize("part,major,model", [("jnp10k-pwr-blnk", 2, "JNP10K-PWR-BLNK"),
+                                              ("jnp10k-re-blnk", 1, "JNP10K-RE-BLNK")])
+def test_cover_carries_its_part_number_in_provenance(part, major, model):
+    c = contract(part, major)
     assert c["attrs"]["model"] == model
     assert model in c["provenance"]["part-number"]
     assert c["provenance"]["part-number"].startswith("vendor")
@@ -119,11 +120,11 @@ def rear_rects(tmp_path_factory):
 
 @pytest.mark.parametrize("name", sorted(COUNTS))
 def test_pwr_cover_fills_its_bay_as_the_supply_does(name, rear_rects):
-    """Read from the rendered rear view. The supply is a 97.0 mm part centred in its bay, so in
-    a shorter bay it stands proud of the opening evenly; the cover has to do the same, and
-    leave no band of the opening showing, rather than sit short of it."""
+    """Read from the rendered rear view. The supply is the size of its bay, 91.4 x 88.9 mm; the
+    cover takes the same size, so it fills the opening exactly and leaves no band of it showing,
+    and stands on the same edges as the supply."""
     found = rear_rects[name]
-    supplies = [v for v in found.values() if v[2] == "juniper/jnp10k-pwr-ac2@1"]
+    supplies = [v for v in found.values() if v[2] == AC2]
     covers = [v for v in found.values() if v[2] == PWR]
     assert supplies and covers, name
     for o, f, _ in covers:
@@ -139,14 +140,18 @@ def test_pwr_cover_fills_its_bay_as_the_supply_does(name, rear_rects):
 def test_pwr_cover_provenance_says_where_its_size_comes_from():
     """Juniper's guides give the supply's envelope but no figure for the cover, so the size is
     derived from the supply and the bay and must be marked so, not as a datasheet figure."""
-    c = contract("jnp10k-pwr-blnk")
+    c = contract("jnp10k-pwr-blnk", 2)
     size = " ".join(c["provenance"]["size"].split())
     assert size.startswith("derived")
-    assert "JNP10K-PWR-AC2" in size and "97.0" in size
+    assert "JNP10K-PWR-AC2" in size and "88.9" in size
     assert "datasheet" not in size.split(" - ")[0]
-    assert (c["size"]["w"], c["size"]["h"]) == (84.0, 97.0)
-    assert c["size"] == contract("jnp10k-pwr-ac2")["size"]
+    assert (c["size"]["w"], c["size"]["h"]) == (91.4, 88.9)
+    supply = contract("jnp10k-pwr-ac2", 2)["size"]
+    assert (c["size"]["w"], c["size"]["h"]) == (supply["w"], supply["h"])
     assert set(c["size-confidence"].values()) == {"estimated"}
+    old = contract("jnp10k-pwr-blnk", 1)
+    assert old["superseded-by"] == "juniper/jnp10k-pwr-blnk@2"
+    assert (old["size"]["w"], old["size"]["h"]) == (84.0, 97.0)
 
 
 @pytest.mark.parametrize("name", sorted(COUNTS))
@@ -191,6 +196,6 @@ def test_mx10016_premium_is_orderable_with_two_rcbs_and_ten_supplies():
     cbs = {b["id"]: over.get(b["id"], b["default"]) for b in bays(dev, "front", "cb")}
     assert list(cbs.values()) == ["juniper/jnp10k-re1@2"] * 2
     psus = {b["id"]: over.get(b["id"], b["default"]) for b in bays(dev, "rear", "psu")}
-    assert list(psus.values()) == ["juniper/jnp10k-pwr-ac2@1"] * 10
+    assert list(psus.values()) == [AC2] * 10
     fpcs = {b["id"]: over.get(b["id"]) for b in bays(dev, "front", "fpc")}
     assert set(fpcs.values()) == {LC} and len(fpcs) == 16

@@ -67,31 +67,31 @@
    "juniper/jnp10008-fan@1"
   ],
   "rear/bays/psu0": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu1": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu2": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu3": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu4": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ],
   "rear/bays/psu5": [
-   "juniper/jnp10k-pwr-ac2@1",
-   "juniper/jnp10k-pwr-blnk@1"
+   "juniper/jnp10k-pwr-ac2@2",
+   "juniper/jnp10k-pwr-blnk@2"
   ]
  },
- "composed": "93685c301c6403b0",
+ "composed": "06253ffa4821326c",
  "composed-refs": {
   "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -103,8 +103,8 @@
   "juniper/jnp10k-lc2101@1": "1.1.0+fff3bea0aaa97e31",
   "juniper/jnp10k-lc480@1": "1.1.0+cc9a4c04de3f8362",
   "juniper/jnp10k-lc9600@1": "1.1.0+d98d1cb5c441d3e9",
-  "juniper/jnp10k-pwr-ac2@1": "1.1.0+80cd0676c5b89325",
-  "juniper/jnp10k-pwr-blnk@1": "1.0.0+1cb408d8424a4a65",
+  "juniper/jnp10k-pwr-ac2@2": "2.0.0+c839c49b15c20ea8",
+  "juniper/jnp10k-pwr-blnk@2": "2.0.0+c57ad703f161b12b",
   "juniper/jnp10k-re-blnk@1": "1.0.0+c1d77e93362f9010",
   "juniper/jnp10k-re1@2": "2.1.0+80ff396be7681e75",
   "std/c20-inlet@1": "1.4.0+618074a1c18c1faa",
@@ -120,7 +120,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "9e27c0383b466d5c",
+ "gaps": "874f72059da4f7d7",
  "groups": [
   "cooling",
   "fpcs",
@@ -158,7 +158,7 @@
   "rear/bays/psu4",
   "rear/bays/psu5"
  ],
- "names": "c89f0456989725aa",
+ "names": "083810c04e5b34d4",
  "placement-addressing": {
   "for": {
    "front/placements/led-cbs": [
@@ -231,7 +231,7 @@
   "rear/bays/psu5": "psus"
  },
  "placement-surface": "bd322227e79ad6b5",
- "shape": "14ed4e53334b387d",
- "surface": "8efeae0bf3bad9ed",
- "version": "2.1.0"
+ "shape": "63f17efb5ba8d499",
+ "surface": "74f46b264c33e124",
+ "version": "3.0.0"
 }
