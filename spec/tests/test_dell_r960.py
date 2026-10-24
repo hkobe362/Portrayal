@@ -304,6 +304,107 @@ def test_memory_sockets_run_between_the_banks_as_figure_95_shows():
     assert x["dimm-a12"] < heat["heatsink-1"] + 48.7 < x["dimm-a9"]
 
 
+# --- nothing stands outside the chassis: what the 3D builder is told ------------------------
+
+# The 3D builder extrudes each part by the heights its drawing carries (`data-z-out`, and a handle's, bar's or
+# cylinder's length from its `data-z-lift`), measured from the face the part is on: outward and positive, sunk and
+# negative. The chassis is 444.0 x 174.3 x 866.74, so a part on the top face with a positive height stands above the
+# lid and one on the rear face stands past the rear wall. The first build had the air shrouds 98.0 and 80.7 mm above
+# the lid, the support bar 29.2, the cover 13.0 and its latch 12.8, the supplies' handles 33.5 past the rear wall and
+# the risers' plates 20.0, which showed the machine with a black block over its lid and its supplies out of its back.
+SKIN = 1.0   # a tab, a lamp or a pressed plate: the library's own lid has stood 1.0 proud since the R760
+# the few things that do stand past a face, each with the document or the part that says so
+STANDS_PAST = (
+    # (view, owner path, the most it may stand, why)
+    ("front", r"^bezel/", 14.0, "the security bezel: ISM table 7 and the spec sheet give 36 mm to the front with it and 22 without"),
+    ("front", r"^vga(/|$)", 6.73, "the D-sub shell of std/vga@1, the same part on every Dell front, inside the bezel's 14.0"),
+    ("rear", r"/video(/|$)", 6.73, "the D-sub shell of std/vga@1 on the rear I/O board"),
+    ("rear", r"^psu-\d/module/grip$", 2.6, "the 86 mm supplies' handle, at Dell's model's 2.6 (the allowance follows the model); ISM table 7's Zc less Zb is 2.455"),
+    ("rear", r"^psu-\d/module/psu/", 36.0, "the R660's 60 mm supply seated in the adapter: its own part, and a bay cannot recess it 30.9 mm"),
+)
+
+
+def _reach(el, parent):
+    """How far this node stands out of its face: its `out`, or a handle's/bar's/cylinder's length from its lift."""
+    lift, p = 0.0, el
+    while p is not None:
+        lift += float(p.get("data-z-lift") or 0)
+        p = parent.get(p)
+    out = [float(el.get(k)) for k in ("data-z-out",) if el.get(k) is not None]
+    out += [lift + float(el.get(k)) for k in ("data-z-uhandle", "data-z-bar", "data-z-cyl") if el.get(k) is not None]
+    return max(out) if out else None
+
+
+def _owner(el, parent):
+    while el is not None and el.get("data-path") is None:
+        el = parent.get(el)
+    return el.get("data-path") if el is not None else ""
+
+
+def _drawings():
+    """Every drawing the build lists for a configuration (6 views each), each one present: an empty glob reads nothing."""
+    _built(None)
+    configs = json.loads((DIST / "r960.configs.json").read_text())["configs"]
+    listed = {f for c in configs for f in c["files"].values()}
+    assert len(configs) >= 30 and len(listed) >= 20, (len(configs), len(listed))
+    assert {v for c in configs for v in c["files"]} >= {"front", "rear", "top", "left", "right", "bottom"}
+    missing = sorted(f for f in listed if not (DIST / f).exists())
+    assert not missing, f"drawings the build lists but library/dist lacks: {missing[:5]}"
+    return sorted(DIST / f for f in listed)
+
+
+def _stands_past():
+    """(drawing, view, owner, reach, allowed) for each node whose height is more than SKIN or more than its allowance."""
+    found = []
+    for svg in _drawings():
+        view = svg.name.removesuffix(".svg").rsplit(".", 1)[-1]
+        root = ET.parse(svg).getroot()
+        parent = {c: p for p in root.iter() for c in p}
+        for el in root.iter():
+            reach = _reach(el, parent)
+            if reach is None or reach <= SKIN:
+                continue
+            p, projection = el, False
+            while p is not None:
+                projection = projection or p.get("data-projection") is not None
+                p = parent.get(p)
+            if projection:      # the plan of a seated part is texture only: its body is built from its own face
+                continue
+            owner = _owner(el, parent)
+            allowed = max((a for v, rx, a, _ in STANDS_PAST if v == view and re.search(rx, owner)), default=SKIN)
+            if reach > allowed + 1e-6:
+                found.append((svg.name, view, owner, reach, allowed))
+    return found
+
+
+def test_no_part_stands_outside_the_chassis_in_any_drawing():
+    over = sorted({(v, o, r, a) for _, v, o, r, a in _stands_past()})
+    assert not over, "parts the 3D builder stands outside the 444.0 x 174.3 x 866.74 chassis:\n" + "\n".join(
+        f"  {o} stands {r:g} mm out of the {v}, at most {a:g}" for v, o, r, a in over)
+
+
+def test_the_stack_under_the_lid_stands_on_the_board_and_tops_out_below_it():
+    # the heights the model gives (cad y, the chassis top at 174.3), as depth below the lid: part -> (top, bottom)
+    top = {p["id"]: p for p in placements("top")}
+    model = {"air-shroud-bottom": (2.4, 100.3), "air-shroud-top": (1.0, 81.7), "support-bar": (2.5, 31.7)}
+    floor = doc()["chassis"]["height"] - component("r960-system-board")["size"]["d"]    # 14.3
+    for name, (below_top, below_bottom) in model.items():
+        p = top[name]
+        assert p["in"] == "system-board", f"{name} stands on the board like the heatsinks"
+        ref = component(p["ref"].split("/", 1)[1].split("@")[0])
+        cad_bottom = doc()["chassis"]["height"] - below_bottom
+        # the part's lowest face above the board's floor is the placement's `lift`, to the tenth the model is read to
+        assert abs(p["lift"] - (cad_bottom - floor)) <= 0.15, (name, p["lift"], cad_bottom - floor)
+        height = ref["relief"]["features"][0]["out"]
+        assert abs(height - (below_bottom - below_top)) <= 0.25, (name, height)
+    # the lid is the top face: a plate proud by what its 13.0 mm leaves after the inset, never more than the
+    # 1.0 the R760's and R660's stand, with the latch (12.8 in the model, 0.2 below the lid) under it
+    cover = top["system-cover"]
+    lid = component("r960-system-cover")["relief"]["features"]
+    proud = {f["node"]: f["out"] - cover["inset"] for f in lid}
+    assert 0 < proud["cover"] <= 1.0 and 0 < proud["latch"] < proud["cover"], proud
+
+
 # --- the DCIM exports: one device type per configuration ----------------------------
 
 # The exporter writes one device type per DISTINCT configuration, as it does for the R660 (26 types for 42 builds): a
