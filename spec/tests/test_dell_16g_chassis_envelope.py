@@ -9,7 +9,8 @@ on any part that stands out of its face further than a skin, or further than the
 The first build had the riser cages' plates 20.0 mm past the rear wall (the R660's own figure from Dell's service model,
 borrowed for the R760) and the lid's latch 2.0 mm above the top, 1.0 above the lid. The supplies' handles stand 35.6 mm
 past the wall because Dell's tables say so. A seated card's bracket flange stands past the wall, and so does the part of
-the riser that covers it (the cage's `flange-cover` node, and no other node of the cage). The R960's counterpart is
+the riser that covers it, as the R740xd's riser shroud does (the cage's `flange-cover` node, and no other node of the
+cage). The R960's counterpart is
 `test_dell_r960.py`.
 """
 import re
@@ -33,19 +34,22 @@ _COMMON = (
     # past the wall). A bay cannot recess its occupant, so it stands past the wall in a configuration with a card
     # seated. Named so that it shows here and in each device's `card-bracket-flange-past-the-wall` gap.
     ("rear", r"/slot-\d+/module/bracket$", 9.4, "a seated card's bracket flange; see the gap"),
-    # ALSO NOT A DELL DOCUMENT: the riser's metal over that flange stands past the wall with it. Dell's ISMs give no
-    # depth for the flange or for the cover; the cages' `flange-cover` node is the CEM's 9.40 flange depth plus one
-    # 0.86 sheet, an estimate (each cage's contract says so). Only that node, only in a riser cage, and only that far:
-    # the rest of a riser stays inside, as the plates (1.0) do.
-    ("rear", r"^riser-\d[a-z]?/module/plate$", 10.26, "the riser's metal over a seated card's flange", r"--flange-cover$"),
 )
+# ALSO NOT A DELL DOCUMENT: the riser's metal over that flange stands past the wall with it, as dell/r740xd draws its
+# riser shroud (17.76 proud, measured from Dell's service model, the flange ends sitting behind it). Dell's ISMs give no
+# depth for the flange or for the cover; each cage's `flange-cover` node carries the figure from Dell's service model
+# (the cage's contract says which are measured and which are carried). Only that node, only in a riser cage, and only
+# that far: the rest of a riser stays inside, as the plates (1.0) do.
+_COVER = ("rear", r"^riser-\d[a-z]?/module/plate$", 19.3, "the riser's metal over a seated card's flange", r"--flange-cover$")
 STANDS_PAST = {
-    "r760": _COMMON + (
+    # the R760's 19.3 is carried from the R660's model: its own poses its risers out of the chassis
+    "r760": _COMMON + (_COVER,) + (
         ("front", r"^bezel/", 14.0, "the security bezel: ISM table 10 (PDF page 34), Za 35.84 mm with it and 22.0 without"),
         ("rear", r"^psu-\d/module/grip$", 35.6, "the supplies' handle: ISM table 10, Zc 736.29 less Zb 700.7 is 35.59"),
         ("rear", r"^psu-\d/module/latch$", 35.6, "the supply's latch stands inside the handle's reach"),
     ),
-    "r660": _COMMON + (
+    # the R660's 19.3 and 19.2 are measured in its model (riser 2A and 3A); the other cages carry them
+    "r660": _COMMON + (_COVER,) + (
         ("front", r"^bezel/", 14.0, "the security bezel: ISM table 12 (PDF page 27), Za 35.84 mm with it and 22 without"),
         ("rear", r"^psu-\d/module/grip$", 35.7,
          "the supplies' handle: ISM table 12, Zc less Zb is 35.57 (787.04 less 751.47), Dell's model has 35.7"),

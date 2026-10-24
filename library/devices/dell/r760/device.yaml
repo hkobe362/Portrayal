@@ -19,7 +19,7 @@
 format: 1
 kind: device
 name: r760
-version: 2.0.3
+version: 2.0.4
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R760
@@ -397,12 +397,14 @@ gaps:
       the risers' cage plates are drawn 1.0 proud of the rear wall (the ISM's table 10, PDF page 34, puts nothing but
       the supplies' handles past it), and a seated card's bracket flange stands past the wall with the part of the riser
       that covers it. The flange is the bracket's own 9.4 return flange (std/pcie-bracket-lp@1 and -fh@2, PCIe CEM 5.0
-      figures 11-9 and 11-5) and the cover is each cage's `flange-cover` node at 10.26, the flange and one sheet: an
-      estimate, as the ISM gives no depth for either. A rear bay cannot recess its occupant, so the flange stands 9.4
-      past the wall in a configuration with a card seated. Dell's R760 service model gives no reach to read: its
-      supply runs to 861.8 and its risers end at 754 to 770, short of the wall.
+      figures 11-9 and 11-5) and the cover is each cage's `flange-cover` node, a column the flange ends sit behind, as
+      the R740xd draws its riser shroud. A rear bay cannot recess its occupant, so the flange stands 9.4 past the wall
+      in a configuration with a card seated, and a filler's bracket gets the cover as a card's does. The ISM gives no
+      depth for either. Dell's R760 service model poses its risers out of the chassis (its supply runs to 861.8 and its
+      risers end at 754 to 770, short of the wall), so the cover's 19.3 is carried from the R660's model, where riser
+      2A's covers reach 19.3 and 19.8 past the wall: an estimate here, not a measurement.
     wanted: >-
-      a side view or dimensioned drawing of a seated bracket under its riser's cover
+      a side view or dimensioned drawing of a seated bracket under its riser's cover, or the model with its risers seated
   - what: air-shroud-depth
     scope: [top]
     reason: sources-disagree

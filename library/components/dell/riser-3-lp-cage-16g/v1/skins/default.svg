@@ -9,10 +9,12 @@
        read as holes. `flange-cover` is the metal over the seated card's
        bracket flange, which the contract stands past the wall; it sits
        under the plate, so the flat drawing is the plate's alone. Its
-       rectangle is the flange's fold, 1.5 each side, over the flange's
-       length (the bay's seat of std/pcie-bracket-lp@1). -->
+       rectangle is the end column, from the window's end to the outer
+       face of the flange's fold (the bay's seat of std/pcie-bracket-lp@1),
+       the whole height of the cage: the way the R740xd's riser shroud is
+       a column the flange ends sit behind. -->
   <g id="flange-cover">
-    <path d="M74.74 1.82 H77.74 V18.43 H74.74 Z" fill="#cfd3d7"/>
+    <path d="M68.43 0.30 H77.74 V19.50 H68.43 Z" fill="#cfd3d7"/>
   </g>
   <g id="plate">
   <path fill-rule="evenodd" d="M0.30 0.30 H91.70 V19.50 H0.30 Z M9.75 4.30 H17.20 V1.92 H68.43 V19.50 H9.75 Z" fill="#cfd3d7" stroke="#9aa1a8" stroke-width="0.25"/>
