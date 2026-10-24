@@ -7,6 +7,8 @@ is_full_depth: true
 airflow: rear-to-front
 description: Arista 7050SDX4-48D8 - a fixed 1RU data-centre switch with 48 x 100G SFP-DD ports and 8 x
   400G QSFP-DD ports, running EOS
+front_image: true
+rear_image: true
 console-ports:
   - name: Console
     type: rj-45
