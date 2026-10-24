@@ -192,7 +192,9 @@ def test_the_fan_and_supply_modules_carry_the_data_sheets_part_numbers_and_airfl
 def test_the_new_components_are_family_prefixed_and_cite_a_size():
     root = LIB / "components/arista"
     names = sorted(p.name for p in root.iterdir() if p.name.startswith("7280dr3a-"))
-    assert names == ["7280dr3a-fan", "7280dr3a-pwr-2400-ac", "7280dr3a-pwr-2400-dc"]
+    # the DR3A-54's supplies (pwr-3000) sit beside these and are held by its own test
+    assert set(names) >= {"7280dr3a-fan", "7280dr3a-pwr-2400-ac", "7280dr3a-pwr-2400-dc"}
+    names = [n for n in names if "pwr-3000" not in n]
     for n in names:
         assert "size" in (contract(n).get("provenance") or {}), n
 
@@ -234,7 +236,7 @@ def test_the_dc_rear_differs_from_the_ac_rear_only_in_the_supplies():
 @pytest.mark.parametrize("target", ["netbox", "nautobot"])
 def test_the_dcim_types_export_one_per_orderable_configuration_two_u_high(target):
     folder = LIB / "exports" / target / "device-types" / "Arista"
-    got = {p.stem for p in folder.glob("DCS-7280DR3A*.yaml")}
+    got = {p.stem for p in folder.glob("DCS-7280DR3A*-36*.yaml")}
     assert got == set(ORDERABLE.values())
     for pn in ORDERABLE.values():
         doc = yaml.safe_load((folder / f"{pn}.yaml").read_text())
