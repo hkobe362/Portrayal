@@ -678,7 +678,12 @@ def test_the_comparison_layer_can_now_reach_them():
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
     # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
     # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
-    # 149 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
-    # 152 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
+    # 148 with the Juniper QFX5700: n+1 over two fan trays of four fans each (datasheet, "N+1 fan rotor
+    # redundancy at chassis level")
+    # 150 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
+    # 153 with the Arista 7280CR3A-24D12 (N+1 over three fan modules), -48D6 and -72 (N+1 over four): data sheet, "Hot-swappable Fans"
+    # 154 with the Juniper EX8216: 2+0 over two nine-fan trays (hardware guide, Cooling System and Fan Tray: the
+    # switch runs only 2 minutes with a tray out; each tray keeps cooling with a single fan failed)
+    # 157 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
     # QFX5241-64QD (N+1 over four): hardware guides, Component Redundancy
-    assert n == 152, n
+    assert n == 157, n
