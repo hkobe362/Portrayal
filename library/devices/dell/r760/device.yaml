@@ -19,7 +19,7 @@
 format: 1
 kind: device
 name: r760
-version: 2.0.1
+version: 2.0.2
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R760
@@ -386,9 +386,20 @@ gaps:
       deep, cad z 0.3..19.9 against the drive carriers' front face at z 19.5 (20.2 with the LED-number
       bodies); the ISM's table 10 gives 35.84 mm ear to front with the bezel and 22.0 without, which
       is 13.84 off the drives' face (the R660's table gives the same 13.84). Same measure, different value
-      by 5.9 mm. The part draws the model's 19.7; the ISM's figure is the part's `depth` provenance.
+      by 5.9 mm. The part's `depth` is the model's 19.7; its 3D plate is drawn to the ISM's 13.84, the figure
+      Dell's own table allows to stand out of the chassis.
     wanted: >-
       a side view or dimensioned drawing of the R760 with the bezel fitted
+  - what: card-bracket-flange-past-the-wall
+    scope: [rear, risers]
+    reason: needs-drawing
+    note: >-
+      the risers' cage plates are drawn 1.0 proud of the rear wall (the ISM's table 10, PDF page 34, puts nothing but
+      the supplies' handles past it); they were 20.0, which hid the 9.4 return flange a low-profile card's bracket
+      (std/pcie-bracket-lp@1) draws out of its face. A rear bay cannot recess its occupant, so in a configuration with
+      such a card seated the flange stands 8.4 past the wall.
+    wanted: >-
+      a bay that can recess its occupant (a `floor` or `inset` on a rear bay), or a side view of a seated bracket
   - what: air-shroud-depth
     scope: [top]
     reason: sources-disagree

@@ -6,8 +6,6 @@ u_height: 1.0
 is_full_depth: true
 description: 1U two-socket rack server, 16th generation - up to ten 2.5 inch front drive bays (or eight
   with a Smart Flow vent, sixteen EDSFF E3.S, or none), two 60 mm power supplies at opposite ends of the...
-front_image: true
-rear_image: true
 module-bays:
   - name: Fan 1
     position: fan-1
@@ -191,7 +189,7 @@ comments: '1U two-socket rack server, 16th generation - up to ten 2.5 inch front
   - physical.weight-max-kg: 22.51
 
 
-  Drawing version 5.2.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 5.2.1. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: draft. Every dimension in the source records where it came from.'

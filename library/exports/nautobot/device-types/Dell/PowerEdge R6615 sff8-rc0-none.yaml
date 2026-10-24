@@ -6,8 +6,6 @@ u_height: 1.0
 is_full_depth: true
 description: 1U single-socket rack server, 16th generation, one AMD EPYC 9004 series processor and twelve
   DDR5 slots - four 3.5 inch, eight or ten 2.5 inch, or fourteen or sixteen EDSFF E3.S front drive bays...
-front_image: true
-rear_image: true
 module-bays:
   - name: Fan 1
     position: fan-1
@@ -123,7 +121,7 @@ comments: '1U single-socket rack server, 16th generation, one AMD EPYC 9004 seri
   - physical.weight-max-kg: 20.2
 
 
-  Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.1. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: draft. Every dimension in the source records where it came from.'

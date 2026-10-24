@@ -53,12 +53,10 @@ size-confidence: {w: drawing, h: drawing}
 relief:
   features:
   - node: plate
-    out: 20.0
+    out: 1.0
     shape: true
     color: '#cfd3d7'
-    confidence: measured
+    confidence: estimated
     source: >-
-      Dell's service model r660.glb: riser 3A's cage 3DGeom~26245 begins at plan y -20.1, 20 mm proud of the rear wall, its bracket 12.2 proud inside it. Its windows are cut through it, so a card's face is seen down
-      them and the bracket's folded flange, 9.4 proud at the end the window
-      does not show, is inside the cage, as on the R740xd's riser shrouds.
+      estimated - the cage's plate is the rear wall's own sheet metal. The R660 ISM's table 12 (chassis dimensions, PDF page 27) puts the rear wall at Zb and nothing but the supplies' handles past it (Zc less Zb, 35.57 mm). Dell's service model r660.glb has riser 3A's cage 3DGeom~26245 begin at plan y -20.1, 20 mm proud of the plane the supplies' faces sit in, which stood the cage outside that chassis; the plate is drawn 1.0 and the model's figure is kept here as the disagreement. Its windows are cut through it, so a card's face is seen down them.
 skins: [default]

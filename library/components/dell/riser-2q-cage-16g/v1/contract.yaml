@@ -52,12 +52,10 @@ size-confidence: {w: drawing, h: drawing}
 relief:
   features:
   - node: plate
-    out: 20.0
+    out: 1.0
     shape: true
     color: '#cfd3d7'
     confidence: estimated
     source: >-
-      estimated by analogy with riser 2A's cage, 20 mm proud in Dell's service model; riser 2Q is not in the model. Its windows are cut through it, so a card's face is seen down
-      them and the bracket's folded flange, 9.4 proud at the end the window
-      does not show, is inside the cage, as on the R740xd's riser shrouds.
+      estimated - the cage's plate is the rear wall's own sheet metal. The R660 ISM's table 12 (chassis dimensions, PDF page 27) puts the rear wall at Zb and nothing but the supplies' handles past it (Zc less Zb, 35.57 mm); riser 2Q is not in Dell's service model. The first pass drew the plate 20 mm proud by analogy with riser 2A's cage, which stood it outside the chassis. Its windows are cut through it, so a card's face is seen down them.
 skins: [default]
