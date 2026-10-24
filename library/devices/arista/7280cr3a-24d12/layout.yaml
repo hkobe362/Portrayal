@@ -496,9 +496,9 @@ views:
         cutouts: true
         rotate: {bottom: 180}
         led:
-        - {ref: common/led-dot@1, id-format: 'led-port-{n}a', dx: 0.4, dy-top: -1.6, dy-bottom: 9.6, group: port-leds, rel-pos-stride: 2, rel-pos-offset: -1,
+        - {ref: common/led-dot@1, id-format: 'led-port-{n}a', dx: 0.4, dy-top: -2.1, dy-bottom: 10.0, group: port-leds, rel-pos-stride: 2, rel-pos-offset: -1,
            states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]}
-        - {ref: common/led-dot@1, id-format: 'led-port-{n}b', dx: 16.9, dy-top: -1.6, dy-bottom: 9.6, group: port-leds, rel-pos-stride: 2, rel-pos-offset: 0,
+        - {ref: common/led-dot@1, id-format: 'led-port-{n}b', dx: 16.9, dy-top: -2.1, dy-bottom: 10.0, group: port-leds, rel-pos-stride: 2, rel-pos-offset: 0,
            states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]}
       - id: qsfp28-100g
         ref: std/qsfp-ganged@1
@@ -511,9 +511,9 @@ views:
         cutouts: true
         rotate: {bottom: 180}
         led:
-        - {ref: common/led-dot@1, id-format: 'led-port-{n}a', dx: 0.4, dy-top: -1.6, dy-bottom: 9.6, group: port-leds, rel-pos-stride: 2, rel-pos-offset: -1,
+        - {ref: common/led-dot@1, id-format: 'led-port-{n}a', dx: 0.4, dy-top: -2.1, dy-bottom: 10.0, group: port-leds, rel-pos-stride: 2, rel-pos-offset: -1,
            states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]}
-        - {ref: common/led-dot@1, id-format: 'led-port-{n}b', dx: 16.9, dy-top: -1.6, dy-bottom: 9.6, group: port-leds, rel-pos-stride: 2, rel-pos-offset: 0,
+        - {ref: common/led-dot@1, id-format: 'led-port-{n}b', dx: 16.9, dy-top: -2.1, dy-bottom: 10.0, group: port-leds, rel-pos-stride: 2, rel-pos-offset: 0,
            states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]}
       - id: qsfpdd-400g
         ref: std/qsfp-dd@1
@@ -529,7 +529,7 @@ views:
           ref: common/led-dot@1
           id-format: 'led-port-{n}'
           group: port-leds
-          dx-by-row: [-1.4, 20.0]
+          dx-by-row: [-2.1, 20.0]
           dy-top: 7.7
           dy-bottom: 0.8
           rel-pos-offset: 24

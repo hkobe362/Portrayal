@@ -513,8 +513,8 @@ views:
           ref: common/led-dot@1
           id-format: 'led-port-{n}'
           group: port-leds
-          dx-by-col: [-1.65, 18.7]
-          dy: 5.0
+          dx-by-col: [-2.05, 18.7]
+          dy: 3.79
           states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]
       - id: qsfp28-100g
         ref: std/qsfp-ganged@1
@@ -532,8 +532,8 @@ views:
           ref: common/led-dot@1
           id-format: 'led-port-{n}'
           group: port-leds
-          dx-by-col: [-1.65, 18.7]
-          dy: 5.0
+          dx-by-col: [-2.05, 18.7]
+          dy: 3.79
           states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]
       - id: qsfp28-100g
         ref: std/qsfp-ganged@1
@@ -551,8 +551,8 @@ views:
           ref: common/led-dot@1
           id-format: 'led-port-{n}'
           group: port-leds
-          dx-by-col: [-1.65, 18.7]
-          dy: 5.0
+          dx-by-col: [-2.05, 18.7]
+          dy: 3.79
           states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]
       - id: qsfp28-100g
         ref: std/qsfp-ganged@1
@@ -570,8 +570,8 @@ views:
           ref: common/led-dot@1
           id-format: 'led-port-{n}'
           group: port-leds
-          dx-by-col: [-1.65, 18.7]
-          dy: 5.0
+          dx-by-col: [-2.05, 18.7]
+          dy: 3.79
           states: ['off', {name: link, color: '#22c55e'}, {name: disabled, color: '#eab308'}, {name: failed, color: '#eab308', behavior: blinking}]
       - id: qsfpdd-400g
         ref: std/qsfp-dd@1
