@@ -1821,6 +1821,15 @@
  "devices/arista/7280cr3-96/device.yaml": {
   "L29": 1
  },
+ "devices/arista/7280cr3a-24d12/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3a-48d6/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3a-72/device.yaml": {
+  "L29": 2
+ },
  "devices/arista/7280dr3-24/device.yaml": {
   "L29": 1
  },
@@ -2645,6 +2654,9 @@
  "devices/juniper/qfx5250-64oe-l/device.yaml": {
   "L57": 1,
   "L61": 83
+ },
+ "devices/juniper/qfx5700/device.yaml": {
+  "L29": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
