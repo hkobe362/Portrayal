@@ -7,7 +7,7 @@ profile: server
 description: >-
   The far end of the NVIDIA Tesla V100 PCIe card, seen from behind. It shows
   the open shroud with a dark opening, and the CPU 8-pin power connector at the
-  corner by the top edge. It is the card's `faces.rear`, and the Tesla P100
+  east edge. It is the card's `faces.rear`, and the Tesla P100
   PCIe's too: the two briefs draw one board.
 size: {w: 97.90, h: 38.00}
 size-confidence: {w: drawing, h: estimated}
@@ -32,13 +32,14 @@ provenance:
     drawing - see size-notes.
   connector: >-
     estimated - PB-08744: "a CPU 8-pin power connector on the East edge of the
-    board", and figure 4 draws it in an end view by the top edge. The part is
+    board", and figure 4 draws it in an end view beside the board, nearer the middle of the
+    board's height than the place used (by eye, not measured). The part is
     std/eps12v-header@1 (12.6 x 18.0, figure 4's 12.6 and an estimated 18.0),
     turned a quarter so its two columns of four become two rows, and centred on
     the housing the card's body draws at the A100 80GB's place
     (nvidia/a100-pcie-80gb-tail@1 `connector`, photo-measured there on its own
     card and borrowed here). No picture of this card's end exists, so the place
-    is the A100's and good to about 1 mm at best.
+    is the A100's, a placeholder whose error against this card is not known.
   end-plate: >-
     estimated - a black end plate over the board's side, 12.4 deep, and the
     shroud's rim below it with a dark opening. Figure 4's end view draws the

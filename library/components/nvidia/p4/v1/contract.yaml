@@ -22,7 +22,7 @@ unplaced: >-
 attrs:
   model: 'Tesla P4'
   part-numbers: 'NVPN 699-2G414-0200-100 (PG414 SKU 200, 75 W), NVPN 699-2G414-0201-100 (PG414 SKU 201, 50 W)'
-  board-sku: 'GP104-895-A1'
+  gpu-sku: 'GP104-895-A1'
   role: gpu
   form-factor: 'Half-height, half-length, single-slot, 6.6 in, low profile bracket'
   pcie-connector: x16
@@ -49,8 +49,8 @@ provenance:
     forbids reproducing its figures, so its facts are transcribed and none of its
     figures is copied.
   reference-photos: >-
-    NONE. NVIDIA and PNY publish no photograph of this card (the intake's
-    COVERAGE.md grid has none; NVIDIA's P4 page returns 404 and PNY has no page).
+    NONE. No photograph of this card was found at NVIDIA or PNY (NVIDIA's P4
+    page returns 404 and PNY has no page).
     The only pictures are figures 1 and 2 of the brief, line drawings. The bracket
     face is drawn from figure 1, in perspective, and every colour is a choice
     (see `body-colour`).

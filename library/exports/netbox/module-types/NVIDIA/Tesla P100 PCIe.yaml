@@ -12,8 +12,8 @@ power-ports:
 comments: 'NVIDIA Tesla P100 PCIe GPU Accelerator (16 GB or 12 GB HBM2), a passive dual-slot full-height
   full-length card. It is on NVIDIA''s Form Factor 3.0 board, the V100 PCIe''s outline. The two memory
   sizes are one card to NVIDIA''s brief, which draws one board for both. The bracket face is a plate with
-  a truss of vent openings and no ports. The far end is open. It has one CPU 8-pin power connector by
-  the top edge and no NVLink connector on a PCIe card. It plugs into one riser slot and covers the one
+  a truss of vent openings and no ports. The far end is open. It has one CPU 8-pin power connector at
+  the east edge and no NVLink connector on a PCIe card. It plugs into one riser slot and covers the one
   beside it.
 
 
@@ -21,13 +21,13 @@ comments: 'NVIDIA Tesla P100 PCIe GPU Accelerator (16 GB or 12 GB HBM2), a passi
 
   - airflow: bidirectional; the heat sink takes system airflow either way along the card
 
-  - board-sku: GP100-892-A1 (16 GB), GP100-893-A1 (12 GB)
-
   - cooling: passive
 
   - eol: none-announced
 
   - form-factor: Dual-slot, 10.5 in, NVIDIA Form Factor 3.0, full-height bracket
+
+  - gpu-sku: GP100-892-A1 (16 GB), GP100-893-A1 (12 GB)
 
   - memory: 16 GB HBM2 (4096-bit, up to 732 GB/s) or 12 GB HBM2 (3072-bit, up to 549 GB/s)
 

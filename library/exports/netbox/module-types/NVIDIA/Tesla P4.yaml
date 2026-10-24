@@ -16,13 +16,13 @@ comments: 'NVIDIA Tesla P4 GPU Accelerator (8 GB GDDR5) on its low profile brack
 
   - airflow: bidirectional
 
-  - board-sku: GP104-895-A1
-
   - cooling: passive
 
   - eol: none-announced
 
   - form-factor: Half-height, half-length, single-slot, 6.6 in, low profile bracket
+
+  - gpu-sku: GP104-895-A1
 
   - memory: 8 GB GDDR5, 256-bit, up to 192 GB/s
 

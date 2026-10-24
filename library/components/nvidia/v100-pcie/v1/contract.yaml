@@ -10,8 +10,8 @@ description: >-
   dual-slot full-height full-length card on NVIDIA's Form Factor 3.0 board. The
   two memory sizes are one card to the eye and to NVIDIA's brief, which draws
   one board for both. The bracket face is a plate with a truss of vent openings
-  and no ports. The far end is open. It has one CPU 8-pin power connector by
-  the top edge and no NVLink connector on a PCIe card. It plugs into one riser
+  and no ports. The far end is open. It has one CPU 8-pin power connector at
+  the east edge and no NVLink connector on a PCIe card. It plugs into one riser
   slot and covers the one beside it.
 slot-width: 2
 size: {w: 120.02, h: 41.91, d: 266.70}
@@ -25,7 +25,7 @@ unplaced: >-
 attrs:
   model: 'Tesla V100 PCIe'
   part-numbers: 'NVPN 699-2G500-0200-XXX (16 GB), NVPN 699-2G500-0202-XXX (32 GB)'
-  board-sku: 'GV100-893-A1 (16 GB), GV100-897-A1 (32 GB)'
+  gpu-sku: 'GV100-893-A1 (16 GB), GV100-897-A1 (32 GB)'
   role: gpu
   form-factor: 'Dual-slot, 10.5 in, NVIDIA Form Factor 3.0, full-height bracket'
   pcie-connector: x16
@@ -68,9 +68,9 @@ provenance:
     dimension. NVIDIA's brief forbids reproducing its figures, so its facts
     are transcribed and none of its figures is copied.
   reference-photos: >-
-    NONE. NVIDIA and PNY publish no photograph of this card (the intake's
-    COVERAGE.md grid has none for the V100, P100, P40 or P4; NVIDIA's V100
-    page redirects to the data-center index). The only picture of the bracket
+    NONE. No photograph of this card was found at NVIDIA or PNY, or for the
+    P100, P40 or P4 either (NVIDIA's V100 page redirects to the data-center
+    index). The only picture of the bracket
     is figure 1 of the brief, a LINE DRAWING in perspective, and figure 3,
     an orthographic line drawing of the broad side. Everything on the bracket
     face is drawn from those two, and every colour is a choice (see
@@ -138,8 +138,11 @@ provenance:
     of the L40's. Not measured.
   body-power-connector: >-
     estimated - PB-08744: "a CPU 8-pin power connector on the East edge of the
-    board", and figure 4 draws it in an end view, in the corner by the top edge
-    beside the board. The housing is drawn at the A100 80GB's place (x 105.6 to
+    board", and figure 4 draws it in an end view beside the board. THE FIGURE
+    PUTS IT NEARER THE MIDDLE OF THE BOARD'S HEIGHT THAN THE A100'S PHOTOGRAPH
+    DOES (by eye, about a sixth of the way down), and its scale is not known, so
+    it was not measured or reconciled (see `gaps`). The housing is drawn at the
+    A100 80GB's place by the top edge, kept as a placeholder (x 105.6 to
     124.0, as nvidia/a100-pcie-80gb@1 `body-power-connector`, photo-measured
     there on its own card, borrowed here), 18.4 along and 10.85 across, with eight
     cells in two rows of four on the 4.2 pitch. Its depth and colour are not seen
@@ -193,7 +196,9 @@ provenance:
     (needs-drawing); (5) the board's hook at 139.4 to 145.5 behind the bracket
     (needs-drawing); (6) the thickness, which no source states (vendor-silent);
     (7) a separate 16 GB and 32 GB module, which a module contract cannot
-    express; (8) the power connector's depth and colour (needs-photo).
+    express; (8) the power connector's depth, colour and place along the
+    board's height (needs-photo, needs-drawing: figure 4 puts it lower than
+    the A100's place, which is drawn).
   lifecycle: >-
     No end-of-life notice for the V100 PCIe was found. NVIDIA's own V100 page
     redirects to its data-center index and PNY lists no V100 page, which is
@@ -243,7 +248,7 @@ body:
   # dark cells, the 3D body of the tail face's `aux-power` port.
   - {id: power-8pin, at: [105.60, 3.50], size: [18.40, 10.85], from: 248.70, depth: 17.80,
      color: '#17191c', confidence: estimated,
-     source: 'the A100 80GB''s place (x 105.6 to 124.0, 2.3 from the top edge, top flush with the cover''s), borrowed from nvidia/a100-pcie-80gb@1; PB-08744 fig 4 puts it by the top edge; ends 0.2 short of the 266.70 end, its cells reaching it'}
+     source: 'the A100 80GB''s place (x 105.6 to 124.0, 2.3 from the top edge, top flush with the cover''s), borrowed from nvidia/a100-pcie-80gb@1 as a placeholder; PB-08744 fig 4 draws it lower, unmeasured; ends 0.2 short of the 266.70 end, its cells reaching it'}
   - {id: power-8pin-cell-1, at: [119.30, 4.80], size: [3.20, 3.20], from: 266.40, depth: 0.30,
      color: '#08090a', confidence: estimated,
      source: 'two rows of four cells on the 4.2 pitch, as the A100''s'}
