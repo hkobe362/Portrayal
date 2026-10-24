@@ -34,9 +34,8 @@ provenance:
       x 203 px, and the left and front-with-top views). The guide's figures 18 and 19 are the same
       48CM photographs at 3000 px. All of it is the maker's and public. The guide is copyrighted; the
       image library page states no terms of use for the photographs, so they are used only to read
-      positions and none is copied. Nothing in the held intake folder could be read on this host, so no
-      Visio stencil, no 3D model and no other photograph was available; no mechanical drawing or 3D model
-      was found on juniper.net either.
+      positions and none is copied. No Visio stencil or 3D model of the switch was available, and no
+      mechanical drawing or 3D model was found on juniper.net either.
   chassis:
     confidence: datasheet
     note: >-
