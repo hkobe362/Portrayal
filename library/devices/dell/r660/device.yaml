@@ -25,7 +25,7 @@
 format: 1
 kind: device
 name: r660
-version: 5.2.1
+version: 5.2.2
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R660
@@ -357,12 +357,15 @@ gaps:
     reason: needs-drawing
     note: >-
       the risers' cage plates are drawn 1.0 proud of the rear wall (the ISM's table 12, PDF page 27, puts nothing but
-      the supplies' handles past it); they were 20.0, which hid the 9.4 return flange a low-profile card's bracket
-      (std/pcie-bracket-lp@1) draws out of its face. A rear bay cannot recess its occupant, so in a configuration with
-      such a card seated the flange stands 8.4 past the wall. The cages' own windows, the Dell model's 20 mm cage and the
-      bracket's 8.2 to 9.2 inside it are not drawn.
+      the supplies' handles past it), and a seated card's bracket flange stands past the wall with the part of the riser
+      that covers it. The flange is the bracket's own 9.4 return flange (std/pcie-bracket-lp@1, PCIe CEM 5.0 figure
+      11-9) and the cover is each cage's `flange-cover` node at 10.26, the flange and one sheet: an estimate, as the
+      ISM gives no depth for either. A rear bay cannot recess its occupant, so the flange stands 9.4 past the wall in a
+      configuration with such a card seated. Dell's service model has the pieces over riser 2A's and 3A's flange ends
+      reach 19.2 to 19.8 and its low-profile brackets 8.2 to 9.2; its meshes are compressed, so only boxes were read
+      and the covers are not drawn to that reach or shape.
     wanted: >-
-      a bay that can recess its occupant (a `floor` or `inset` on a rear bay), or a side view of a seated bracket
+      a side view or dimensioned drawing of a seated bracket under its riser's cover, or the model's meshes decoded
 
 groups:
   drives:

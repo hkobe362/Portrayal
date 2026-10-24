@@ -8,7 +8,9 @@ on any part that stands out of its face further than a skin, or further than the
 
 The first build had the riser cages' plates 20.0 mm past the rear wall (the R660's own figure from Dell's service model,
 borrowed for the R760) and the lid's latch 2.0 mm above the top, 1.0 above the lid. The supplies' handles stand 35.6 mm
-past the wall because Dell's tables say so. The R960's counterpart is `test_dell_r960.py`.
+past the wall because Dell's tables say so. A seated card's bracket flange stands past the wall, and so does the part of
+the riser that covers it (the cage's `flange-cover` node, and no other node of the cage). The R960's counterpart is
+`test_dell_r960.py`.
 """
 import re
 import xml.etree.ElementTree as ET
@@ -21,16 +23,21 @@ DIST = ROOT / "library" / "dist"
 
 SKIN = 1.0   # a tab, a lamp or a pressed plate: the library's lids have stood 1.0 proud since the R760
 
-# what may stand past a face, per server: (view, owner path, the most it may stand, why)
+# what may stand past a face, per server: (view, owner path, the most it may stand, why[, node id it is limited to])
 _COMMON = (
     ("front", r"^vga(/|$)", 6.73, "the D-sub shell of std/vga@1 on the front panel, inside the bezel's 14 mm"),
     ("rear", r"/video(/|$)", 6.73, "the D-sub shell of std/vga@1 on the rear I/O board"),
-    # NOT A DELL DOCUMENT, and the one thing here that is not: a low-profile card's bracket carries the return flange
-    # std/pcie-bracket-lp@1 draws 9.4 out of its face (PCIe CEM 5.0 figure 11-9; the contract records the operator's
-    # reading that it points out). The riser cages' 20 mm plates used to hide it and the plates are now 1.0, and a bay
-    # cannot recess its occupant, so it stands past the wall in a configuration with a card seated. Named so that it
-    # shows here and in each device's `card-bracket-flange-past-the-wall` gap, and nothing else may join it.
-    ("rear", r"/slot-\d+/module/bracket$", 9.4, "a seated low-profile card's bracket flange; see the gap"),
+    # NOT A DELL DOCUMENT, and the one thing here that is not: a seated card's bracket carries the return flange
+    # std/pcie-bracket-lp@1 and -fh@2 draw 9.4 out of their face (PCIe CEM 5.0 figures 11-9 and 11-5; the contracts
+    # record the operator's reading that it points out, and the owner has confirmed that a seated card's flange stands
+    # past the wall). A bay cannot recess its occupant, so it stands past the wall in a configuration with a card
+    # seated. Named so that it shows here and in each device's `card-bracket-flange-past-the-wall` gap.
+    ("rear", r"/slot-\d+/module/bracket$", 9.4, "a seated card's bracket flange; see the gap"),
+    # ALSO NOT A DELL DOCUMENT: the riser's metal over that flange stands past the wall with it. Dell's ISMs give no
+    # depth for the flange or for the cover; the cages' `flange-cover` node is the CEM's 9.40 flange depth plus one
+    # 0.86 sheet, an estimate (each cage's contract says so). Only that node, only in a riser cage, and only that far:
+    # the rest of a riser stays inside, as the plates (1.0) do.
+    ("rear", r"^riser-\d[a-z]?/module/plate$", 10.26, "the riser's metal over a seated card's flange", r"--flange-cover$"),
 )
 STANDS_PAST = {
     "r760": _COMMON + (
@@ -84,7 +91,10 @@ def _stands_past(device):
             if projection:      # the plan of a seated part is texture only: its body is built from its own face
                 continue
             owner = _owner(el, parent)
-            allowed = max((a for v, rx, a, _ in STANDS_PAST[device] if v == view and re.search(rx, owner)), default=SKIN)
+            node = el.get("id") or ""
+            allowed = max((a for v, rx, a, _, *only in STANDS_PAST[device]
+                           if v == view and re.search(rx, owner) and (not only or re.search(only[0], node))),
+                          default=SKIN)
             if reach > allowed + 1e-6:
                 found.append((svg.name, view, owner, reach, allowed))
     return found
