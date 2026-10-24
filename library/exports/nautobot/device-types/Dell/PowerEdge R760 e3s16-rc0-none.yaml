@@ -6,6 +6,8 @@ u_height: 2.0
 is_full_depth: true
 description: 2U two-socket rack server, 16th generation - up to 24 x 2.5 inch front drive bays (or sixteen
   with the Smart Flow vent, eight, twelve 3.5 inch, or sixteen EDSFF E3.S), two 86 mm power supplies at...
+front_image: true
+rear_image: true
 module-bays:
   - name: Fan 1
     position: fan-1

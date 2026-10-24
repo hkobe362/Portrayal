@@ -5,6 +5,8 @@ slug: dell-poweredge-r6625-lff4-rc7-2a
 u_height: 1.0
 is_full_depth: true
 description: 1U one- or two-socket AMD EPYC rack server, 16th generation
+front_image: true
+rear_image: true
 module-bays:
   - name: Fan 1
     position: fan-1
