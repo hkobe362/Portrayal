@@ -275,11 +275,15 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # shutdown while one is replaced, and names no N+1 form, so each group quotes that and states no
     # form. The EX4500-40F has one fan tray in one bay, so its group is not counted here at all.
     assert {"juniper/ex4550-32f", "juniper/ex4550-32t"} <= set(unstated)
-    # THE JUNIPER QFX5130-48C MADE IT FORTY-FOUR: the guide gives six fan modules and redundancy only
+    # THE JUNIPER QFX10002-60C MADE IT FORTY-FOUR: it has the family's cooling text (each fan module a
+    # redundant unit of two fans, all three fitted, a time with one out) and no N+1 form, so its group
+    # quotes the sentences and states none.
+    assert "juniper/qfx10002-60c" in unstated
+    # THE JUNIPER QFX5130-48C MADE IT FORTY-FIVE: the guide gives six fan modules and redundancy only
     # at the rotor level (one failed rotor tolerated), which is not a count of modules the switch can
     # lose, so the group quotes that and states no form.
     assert "juniper/qfx5130-48c" in unstated
-    assert len(unstated) == 44, unstated
+    assert len(unstated) == 45, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -691,4 +695,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # 157 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
     # QFX5241-64QD (N+1 over four): hardware guides, Component Redundancy
     # 160 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
-    assert n == 160, n
+    # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
+    # 162 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
+    assert n == 162, n
