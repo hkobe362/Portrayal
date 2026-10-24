@@ -4,7 +4,8 @@ One device a front panel, `arista/<model>`: the 7280PR3-24, 7280DR3-24, 7280CR3-
 7280SR3-48YC8, 7280SR3-40YC6 and 7280CR3-96. The K, K-A and E-M builds share their base model's front
 figure (guide Appendix C), size (Table 1) and supplies (Table 4), so they are `kind: orderable`
 configurations of it with their own part numbers, each in its front-to-rear (-F) and rear-to-front (-R)
-builds where the data sheet lists both. The 7280TR3-40C6 is left out: the guide has no front figure for it.
+builds where the data sheet lists both. The 7280TR3-40C6 has no front figure in the guide and is in
+`test_arista_7280r3_rest.py`.
 The expected figures are Arista's: the 7280R3 Series Quick Start Guide (DOC-07041-01, Table 1 for the
 envelope, Tables 3 and 4 for the supplies, Appendix C and D for the faces) and the 7280R3 Series Data Sheet
 (03-0045-59, 11 August 2025: the model comparison tables and the ordering information). The 7280CR3-32D4 is
@@ -172,11 +173,11 @@ def test_the_device_has_a_layout_source_in_step_with_it(dev):
     assert (LIB / "devices/arista" / dev / "layout.yaml").is_file()
 
 
-def test_the_tr3_40c6_is_left_out_and_no_variant_is_a_device_of_its_own():
-    """The guide has no front figure for the 7280TR3-40C6, and a K, K-A or E-M build with its base
-    model's face is a configuration of it (the same hardware under another part number)."""
+def test_no_variant_is_a_device_of_its_own():
+    """A K, K-A or E-M build with its base model's face is a configuration of it (the same hardware
+    under another part number). The 7280TR3-40C6 has a face of its own and is in
+    `test_arista_7280r3_rest.py`."""
     names = {p.name for p in (LIB / "devices/arista").iterdir()}
-    assert not [n for n in names if "tr3" in n]
     for n in ("7280pr3k-24", "7280dr3k-24", "7280cr3k-32p4", "7280cr3k-36s", "7280sr3k-48yc8",
               "7280sr3e-40yc6-m", "7280cr3k-96"):
         assert n not in names, n
