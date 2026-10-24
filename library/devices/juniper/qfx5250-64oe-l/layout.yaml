@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5250-64oe-l
-version: 0.1.0
+version: 0.1.2
 maturity: modelled
 manufacturer: Juniper
 model: QFX5250-64OE-L
@@ -25,7 +25,7 @@ provenance:
       and 9), the front panel (figure 10, Table 7) and rear panel (figure 11, Table 8) with their flat figures
       g051820 and g051821, Table 2 (key specifications), Table 4 (physical specifications), Table 5 (environmental),
       Table 6 (models), Tables 9 and 10 (power and cooling, configurations), Tables 12 to 18 (lamps and buttons), Tables
-      19 and 20 (ports), Tables 21 to 24 (power and flow), Tables 25 and 26 (packing list) and the agency approvals.
+      19 and 20 (ports), the Channelization list (page 48), the section "Connect 1-PPS and 10-MHz Timing Devices" (page 85), Tables 21 to 24 (power and flow), Tables 25 and 26 (packing list) and the agency approvals.
       It is a public document of the maker. Terms: a copyright notice and an end-user licence agreement only. No
       public datasheet for the QFX5250 was found (the maker's datasheet pages and a search for one turned up
       none), and Juniper's image library has no photograph of this model at the address its other models use
@@ -101,6 +101,12 @@ provenance:
       none. The lamps ID, SYS, ALM and LEAKAGE are narrow vertical slots. At the left of the face, the two SFP28
       cages are stacked (callout 11), both turned a quarter turn with the latch on the right, framed by a printed
       bracket; below them is the serial-number pull-tab with its QR code (callout 12).
+  timing-connector:
+    confidence: datasheet
+    note: >-
+      Guide section "Connect 1-PPS and 10-MHz Timing Devices" (printed page 85, PDF page 92): the ports "require 2x1
+      DIN 1.0/2.3 latching plug connectors", which is the library's common/din-1-0-2-3-jack. The same section says
+      the ports can serve as inputs or outputs, and that the switch "does not currently support timing features".
   handles-and-levers:
     confidence: drawing
     note: >-
@@ -184,7 +190,7 @@ attrs:
   performance:
     throughput: 102.4 Tbps (guide Table 2)
     port-count: 64 OSFP at up to 1600 Gbps and 2 SFP28 (guide Table 2)
-    breakout-ports: 1x1600G, 2x800G, 2x400G, 4x400G, 4x200G, 8x200G and 8x100G; up to 512 ports (guide, Channelization)
+    breakout-ports: 1x1600G, 1x800G, 2x800G, 2x400G, 4x400G, 4x200G, 8x200G and 8x100G; up to 512 ports (guide, Channelization)
     osfp-speeds: 1600G, 800G, 400G, 200G and 100G, by transceiver (guide, Interface Naming; Table 19)
   power:
     power-typical-w: 3375
@@ -215,7 +221,7 @@ attrs:
     oob: one RJ-45 management port, 10 M, 100 M and 1 G (guide Table 20)
     console: one RJ-45 console port, shared between the CPU and the leakage detection controller board
     usb: one Type-A USB 3.0 port
-    timing-outputs: one 1 PPS output and one 10 MHz clock output on DIN connectors
+    timing-outputs: one 1 PPS and one 10 MHz port on 2x1 DIN 1.0/2.3 latching connectors. The guide says they can be inputs or outputs. It also says the switch does not currently support timing features (guide, Connect 1-PPS and 10-MHz Timing Devices)
   compliance:
     safety: IEC 62368-1:2014, 2018 and 2023; EN 62368-1:2014+A11:2017; UL 60950-1:2007 R10.14; CAN/CSA-C22.2 No. 60950-1-07; UL/CSA 62368-1:2025; IEC/EN 60825-1 (guide, Agency Approvals)
     emc: FCC 47 CFR Part 15; ICES-003 / ICES-GEN; EN 55032; EN 55035; CISPR 32; CISPR 35; EN 300 386 V1.6.1 and V2.2.1; IEC/EN 61000-3-2 and 61000-3-3; AS/NZS CISPR 32; VCCI-CISPR 32; BSMI CNS 15936; KS C 9835, 9832 and 9610 (guide, Agency Approvals)
@@ -257,12 +263,6 @@ gaps:
     What the small "U" and arch marks printed beside the two SFP28 cages mean; they are not drawn. The guide's
     callout 11 names only the cages. The SFP28 role is "in-band management ports" in the front-panel text and
     network ports in Table 19.
-- what: clock-connector-type
-  scope: [front]
-  reason: vendor-silent
-  wanted: >-
-    The connector type of the 10 MHz and 1 PPS outputs: the guide says "DIN connectors" and Table 20 "DIN",
-    without a size. They are drawn as the library's 1.0/2.3 push-pull jack, the DIN 41626 coaxial type.
 - what: console-jack-lamps
   scope: [front]
   reason: vendor-silent
@@ -312,7 +312,7 @@ groups:
     term: Port
     role: management
     index-origin: 0
-    description: the 10 MHz and 1 PPS output connectors, two coaxial jacks that carry the switch's timing references out
+    description: the 10 MHz and 1 PPS connectors, two coaxial jacks for the timing references, which the guide says can be inputs or outputs (the switch does not currently support timing features)
   status-leds:
     term: LED
     role: indicator

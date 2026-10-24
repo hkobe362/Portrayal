@@ -19,7 +19,7 @@
   "orv3-liquid"
  ],
  "format": 1,
- "gaps": "977b79221769fb0f",
+ "gaps": "71f87df85720535a",
  "groups": [
   "liquid-cooling",
   "mgmt",
@@ -828,6 +828,6 @@
  },
  "placement-surface": "67a950569889436c",
  "shape": "be86bdb371c0ecaa",
- "surface": "36893f9dd79aa23e",
- "version": "0.1.0"
+ "surface": "861e42e95c94a7ed",
+ "version": "0.1.2"
 }

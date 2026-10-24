@@ -276,12 +276,14 @@ comments: 'Juniper QFX5250-64OE-L, a 2OU liquid-cooled 1.6T data-centre leaf and
 
   - management.oob: one RJ-45 management port, 10 M, 100 M and 1 G (guide Table 20)
 
-  - management.timing-outputs: one 1 PPS output and one 10 MHz clock output on DIN connectors
+  - management.timing-outputs: one 1 PPS and one 10 MHz port on 2x1 DIN 1.0/2.3 latching connectors. The
+  guide says they can be inputs or outputs. It also says the switch does not currently support timing
+  features (guide, Connect 1-PPS and 10-MHz Timing Devices)
 
   - management.usb: one Type-A USB 3.0 port
 
-  - performance.breakout-ports: 1x1600G, 2x800G, 2x400G, 4x400G, 4x200G, 8x200G and 8x100G; up to 512
-  ports (guide, Channelization)
+  - performance.breakout-ports: 1x1600G, 1x800G, 2x800G, 2x400G, 4x400G, 4x200G, 8x200G and 8x100G; up
+  to 512 ports (guide, Channelization)
 
   - performance.osfp-speeds: 1600G, 800G, 400G, 200G and 100G, by transceiver (guide, Interface Naming;
   Table 19)
@@ -322,7 +324,7 @@ comments: 'Juniper QFX5250-64OE-L, a 2OU liquid-cooled 1.6T data-centre leaf and
   - thermal.cooling: 100 percent liquid-cooled; OAT PG 25 coolant through two UQDB06 plugs; no fans
 
 
-  Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.2. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'
