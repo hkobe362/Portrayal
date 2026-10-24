@@ -49,7 +49,7 @@ provenance:
     y 78.5 to 82.2.
   colour: >-
     borrowed - the guide's line drawings carry no colour and no photograph of this supply was
-    obtained. The dark grey finish of juniper/jnp10k-pwr-ac2@1 is used so the two sit together.
+    obtained. The dark grey finish of juniper/jnp10k-pwr-ac2@2 is used so the two sit together.
   lamps: >-
     datasheet - Table 30: lamps 1 and 2 are green within -40 to -72 VDC and yellow blinking when out of
     range; OK is green when the output is in range and yellow blinking when out of limits; the fault

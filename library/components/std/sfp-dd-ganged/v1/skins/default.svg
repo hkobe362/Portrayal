@@ -5,6 +5,5 @@
   <!-- cavity: the port opening inside the cage, 14.00 x 8.95, leaving a 0.25 shared wall -->
   <rect id="cavity" x="0.125" y="0.725" width="14" height="8.95" rx="0.3" fill="#0a0c0e"/>
   <rect id="cage-wall" x="0" y="0" width="0.125" height="10.4" fill="#3a4046"/>
-  <rect id="cage-lip" x="1.1" y="7.9" width="12.0" height="1.2" rx="0.3" fill="#2b2f33"/>
-  <rect id="module-slot" x="1.1" y="3.8" width="12.0" height="2.7" rx="0.4" fill="#000000"/>
+  <rect id="cage-wall-right" x="14.125" y="0" width="0.125" height="10.4" fill="#3a4046"/>
 </svg>
