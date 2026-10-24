@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: qfx5241-64qd
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Juniper
 model: QFX5241-64QD
@@ -90,7 +90,8 @@ provenance:
     note: >-
       Each network port has a single RGB lamp (guide, Network Port LEDs, Table 10): in the photograph
       a dot 2.0 mm across at the left of each cage, at the height of the cage's centre, 1.85 mm left of
-      the cell. The lamps are unlit. The SFP ports show no lamp and the guide describes none.
+      the cell. The lamps are unlit. The photograph shows no lamp at the SFP ports, while the guide's
+      Table 13 gives each SFP28 port one link-activity lamp; none is drawn.
   mgmt-panel:
     confidence: photo-measured
     note: >-
@@ -294,9 +295,16 @@ gaps:
   - front
   reason: vendor-silent
   wanted: >-
-    The lamps of the management jack. Guide figure 19 and Table 13 describe lamps on the management port;
+    The lamps of the management jack. Guide figure 20 and Table 12 describe lamps on the management port;
     the photograph shows them at the corners of the upper jack. The jack is drawn with the library's lamped
     jack.
+- what: sfp28-lamps
+  scope:
+  - front
+  reason: needs-photo
+  wanted: >-
+    The lamp of each SFP28 port. The guide's Table 13 gives each of the two ports one link-activity lamp;
+    neither the photograph nor the guide's figures show where it is.
 - what: clock-connector-type
   scope:
   - front
