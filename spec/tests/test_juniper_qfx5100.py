@@ -463,6 +463,6 @@ def test_the_dcim_device_types_export_one_per_orderable_configuration(name, cid)
 
 
 def test_no_other_juniper_qfx5100_export_exists():
-    got = {p.stem for p in (EXPORTS / "netbox/device-types/Juniper").glob("QFX5100-*.yaml")}
+    got = {p.stem for p in (EXPORTS / "netbox/device-types/Juniper").glob("QFX5100-48*.yaml")}
     want = {v[0] for per in VARIANTS.values() for v in per.values()}
     assert got == want

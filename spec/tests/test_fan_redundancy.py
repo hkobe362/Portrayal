@@ -257,7 +257,25 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # runs with one out but not how many it can lose, so each group quotes the sentences and
     # states no form.
     assert {"juniper/qfx10002-36q", "juniper/qfx10002-72q"} <= set(unstated)
-    assert len(unstated) == 37, unstated
+    # THE JUNIPER EX9253 MADE IT THIRTY-EIGHT: the guide says a fully configured switch needs all four
+    # fan trays and that a failed tray must be replaced at once, and names no N+1 form, so its group
+    # says so in a description and states no form.
+    assert "juniper/ex9253" in unstated
+    # THE JUNIPER QFX3500-48S4Q AND QFX3600-16Q MADE IT FORTY: each guide gives the fan trays
+    # (two, with two more fan modules on the QFX3500's management board; three on the QFX3600) and says
+    # a failed tray must be replaced within a minute, and neither names how many the switch can lose,
+    # so each group states no form.
+    assert {"juniper/qfx3500-48s4q", "juniper/qfx3600-16q"} <= set(unstated)
+    # THE JUNIPER QFX5210-64C MADE IT FORTY-ONE: the guide says the switch has four fan modules and
+    # that an unrecoverable failure raises chassis alarms and can shut it down, gives the time it runs
+    # with one module out, and names no N+1 form, so the group states none.
+    assert "juniper/qfx5210-64c" in unstated
+    # THE JUNIPER EX4550-32F AND -32T MADE IT FORTY-THREE: the guide says all three fan modules must
+    # be installed for optimal functioning and that the switch runs 30 seconds without thermal
+    # shutdown while one is replaced, and names no N+1 form, so each group quotes that and states no
+    # form. The EX4500-40F has one fan tray in one bay, so its group is not counted here at all.
+    assert {"juniper/ex4550-32f", "juniper/ex4550-32t"} <= set(unstated)
+    assert len(unstated) == 43, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -619,6 +637,10 @@ def test_the_comparison_layer_can_now_reach_them():
     N+0 over five rear fan modules, from the QFX5110 hardware guide (2026-09-24): "All fan modules must
     be installed for optimal operation of the switch", and the switch runs 30 seconds without
     thermal shutdown while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
+
+    ONE HUNDRED AND THIRTY-THREE AND ONE HUNDRED AND THIRTY-FOUR ARE THE JUNIPER QFX5100-24Q AND
+    QFX5100-96S, N+1 over five and over three rear fan modules, from the same QFX5100 datasheet
+    sentence. The hardware guide gives the slots, 0 to 4 on the 1RU models and 0 to 2 on the 96S.
     """
     from portrayal import comparable as C
     n = sum(1 for _, d in devices() if C.resolve(d).get("fan-redundancy"))
@@ -639,5 +661,16 @@ def test_the_comparison_layer_can_now_reach_them():
     # 117 with the Juniper QFX5110-48S and -32Q: n+0 over five modules (hardware guide, Cooling System)
     # 119 with the Juniper QFX5120-32C (5+1 over six rear fan modules) and QFX5120-48T (4+1 over five),
     # from the QFX5120 hardware guide, Fan Modules for QFX5120 Switches
-    # 126 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
-    assert n == 126, n
+    # 122 since the Juniper QFX5230-64CD, QFX5240-64OD and QFX5240-64QD: N+1 over four fan modules of two rotors each
+    # (hardware guides, Component Redundancy)
+    # 123 since the Juniper EX9251: 2+1 over three fan trays (hardware guide, Component Redundancy)
+    # 125 with the Juniper EX4300-32F and EX4300-48MP: n+0 over two fan modules each (hardware guide, Fan Modules)
+    # 132 with the seven Arista 7280R3 models (#1204): N+1 over three fan modules on the PR3-24, DR3-24 and
+    # CR3-32P4, 1+1 over two on the CR3-36S, N+1 over two on the SR3-48YC8 and SR3-40YC6, and N+1 over four on
+    # the CR3-96 (data sheet, "Hot-swappable Fans" row of each model comparison table)
+    # 134 since the Juniper QFX5100-24Q and -96S: N+1 over five and over three rear fan modules (datasheet)
+    # 139 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
+    # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
+    # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
+    # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
+    assert n == 147, n
