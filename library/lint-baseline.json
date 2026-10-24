@@ -1183,6 +1183,9 @@
  "components/juniper/ex4100-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex4200-fan-tray/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/ex4300-48mp-fan-afo/v1/contract.yaml": {
   "L27": 1
  },
@@ -1227,9 +1230,11 @@
   "L97": 1
  },
  "components/juniper/jnp10008-fan/v1/contract.yaml": {
+  "L123": 1,
   "L97": 1
  },
  "components/juniper/jnp10008-fan2/v1/contract.yaml": {
+  "L123": 1,
   "L97": 1
  },
  "components/juniper/jnp10008-fan3/v1/contract.yaml": {
@@ -1822,6 +1827,9 @@
  "devices/arista/7280dr3a-36/device.yaml": {
   "L29": 1
  },
+ "devices/arista/7280dr3a-54/device.yaml": {
+  "L29": 1
+ },
  "devices/arista/7280pr3-24/device.yaml": {
   "L29": 1
  },
@@ -2212,6 +2220,18 @@
  "devices/juniper/ex2300-24mp/device.yaml": {
   "L61": 15
  },
+ "devices/juniper/ex3300-24p/device.yaml": {
+  "L57": 1
+ },
+ "devices/juniper/ex3300-24t/device.yaml": {
+  "L57": 1
+ },
+ "devices/juniper/ex3300-48p/device.yaml": {
+  "L57": 1
+ },
+ "devices/juniper/ex3300-48t/device.yaml": {
+  "L57": 1
+ },
  "devices/juniper/ex3400-24p/device.yaml": {
   "L29": 1,
   "L57": 1,
@@ -2287,6 +2307,34 @@
   "L57": 1,
   "L61": 3
  },
+ "devices/juniper/ex4200-24f/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24p/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24px/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-24t/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48p/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48px/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/ex4200-48t/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
  "devices/juniper/ex4300-24p/device.yaml": {
   "L29": 2,
   "L57": 1
@@ -2357,6 +2405,21 @@
   "L29": 5,
   "L57": 1,
   "L61": 42
+ },
+ "devices/juniper/ex4500-40f/device.yaml": {
+  "L29": 4,
+  "L57": 1,
+  "L61": 20
+ },
+ "devices/juniper/ex4550-32f/device.yaml": {
+  "L57": 1,
+  "L61": 3,
+  "L69": 1
+ },
+ "devices/juniper/ex4550-32t/device.yaml": {
+  "L57": 1,
+  "L61": 11,
+  "L69": 1
  },
  "devices/juniper/ex4600-40f/device.yaml": {
   "L29": 4,
@@ -2475,6 +2538,12 @@
   "L57": 1,
   "L69": 1
  },
+ "devices/juniper/qfx10008/device.yaml": {
+  "L33": 4
+ },
+ "devices/juniper/qfx10016/device.yaml": {
+  "L33": 10
+ },
  "devices/juniper/qfx3500-48s4q/device.yaml": {
   "L29": 6,
   "L57": 1,
@@ -2486,6 +2555,10 @@
   "L57": 1,
   "L69": 1
  },
+ "devices/juniper/qfx5100-24q/device.yaml": {
+  "L29": 4,
+  "L57": 1
+ },
  "devices/juniper/qfx5100-48s/device.yaml": {
   "L29": 2,
   "L57": 1,
@@ -2494,6 +2567,11 @@
  "devices/juniper/qfx5100-48t/device.yaml": {
   "L29": 2,
   "L57": 1
+ },
+ "devices/juniper/qfx5100-96s/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L61": 8
  },
  "devices/juniper/qfx5110-32q/device.yaml": {
   "L29": 2,
@@ -2538,6 +2616,11 @@
   "L61": 3,
   "L69": 1
  },
+ "devices/juniper/qfx5210-64c/device.yaml": {
+  "L29": 2,
+  "L57": 1,
+  "L69": 1
+ },
  "devices/juniper/qfx5220-128c/device.yaml": {
   "L39": 128,
   "L57": 1,
@@ -2558,6 +2641,10 @@
  "devices/juniper/qfx5240-64qd/device.yaml": {
   "L29": 1,
   "L57": 1
+ },
+ "devices/juniper/qfx5250-64oe-l/device.yaml": {
+  "L57": 1,
+  "L61": 83
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,

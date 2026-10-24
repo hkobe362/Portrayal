@@ -596,6 +596,9 @@ PART_POWER = {
     # AND THE ARISTA 7010TX-48-DC's TWO-POLE BARRIER BLOCK under a clear cover, one per internal
     # supply: -48 V and RTN landed on ring lugs, the same row for the same reason.
     "arista/7010tx-dc-terminal": "dc-terminal",
+    # AND THE JUNIPER EX3300-24T-DC's FOUR-TERMINAL BLOCK (A+, B+, A-, B-) under a clear cover,
+    # the input of the switch's built-in DC supply: ring lugs on the terminals, the same row.
+    "juniper/ex3300-dc-terminal": "dc-terminal",
     # A PLUGGABLE TWO-POLE BLOCK IS WHERE THE WIRE LANDS TOO, so the same row: the
     # ECS4530-54CSFP-DC-I takes -48 V in a screw-clamp plug seated in a header, the
     # plug pulled out whole rather than lugs lifted off screws.
@@ -971,6 +974,12 @@ NOT_A_DCIM_PORT = {
                      "one - a device placement that states `pon` does, and exports "
                      "(device_port_type)",
 
+    # --- power: a connector no DCIM has a type for ---------------------------
+    "juniper/ex3300-rps-port": "the redundant power system port of the Juniper EX3300 switches: the "
+                               "guide names the port and gives no connector type or pinout, and no "
+                               "DCIM has a power port type for an RPS connector, so it cannot be "
+                               "typed honestly",
+
     # --- USB: real ports, no device-type field to put them in ----------------
     # A DCIM device type has console ports, power ports and interfaces. A USB
     # data port is none of those unless it is a console, which std/usb-a is on
@@ -1046,6 +1055,11 @@ NOT_A_DCIM_PORT = {
     "amphenol-ns/alarm-card-307608": "Form C alarm relay contacts on wire-wrap headers - dry "
                                      "contacts for an external alarm loop; neither DCIM has a "
                                      "port type for an alarm contact",
+
+    # --- Virtual Chassis ---------------------------------------------------------
+    "juniper/ex4200-vcp-port": "the 68-pin Virtual Chassis port of an EX4200: a proprietary stacking "
+                               "connector with no registered interface and no port type in either "
+                               "DCIM; the guide names it only as a 68-pin connector",
 
     # `dell/rj45-port-14g` USED TO BE HERE, as "a modelling gap, not an exporter
     # one": the NDC's four jacks carried no speed, so the exporter could not say

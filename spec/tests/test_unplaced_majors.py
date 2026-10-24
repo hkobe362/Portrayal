@@ -264,8 +264,15 @@ def test_the_live_library_keeps_no_retired_major(tmp_path):
     for name in ("cisco/a9903-20hg-pec", "cisco/a9903-8hg-pec", "cisco/asr-9903-fan",
                  "cisco/pwr-1p6kw-ac", "cisco/pwr-1p6kw-dc"):
         kept[name] = [1, 2]
+    # TWO LIVE MAJORS, NEITHER RETIRED: the JNP10K-PWR-AC2 is drawn 84.0 x 97.0 mm at @1 (the
+    # MX10004, MX10008 and MX10016 and QFX10016 still seat it) and 91.4 x 88.9 mm at @2, the size both the
+    # MX10008 and QFX10008 guides give (the QFX10008 seats it). @1 carries no `superseded-by`
+    # until the MX devices move to @2 in a follow-up, which then retires it and removes this entry.
+    kept["juniper/jnp10k-pwr-ac2"] = [1, 2]
     assert multi == kept, multi
     for name, majors in kept.items():
+        if name == "juniper/jnp10k-pwr-ac2":
+            continue
         if name.startswith(("juniper/", "cisco/")):
             old = LIB / "components" / name / f"v{majors[0]}" / "contract.yaml"
             assert (lint.load_yaml(old) or {}).get("superseded-by") == f"{name}@{majors[1]}", old
