@@ -1216,6 +1216,9 @@
  "components/juniper/ex4600-em-8f/v1/contract.yaml": {
   "L27": 1
  },
+ "components/juniper/ex9214-ffantray-mx960-hc/v1/contract.yaml": {
+  "L27": 1
+ },
  "components/juniper/jnp-mic1/v1/contract.yaml": {
   "L96": 1,
   "L97": 1
@@ -1262,11 +1265,7 @@
   "L97": 1
  },
  "components/juniper/jnp10k-pwr-ac2/v1/contract.yaml": {
-  "L123": 1,
   "L97": 1
- },
- "components/juniper/jnp10k-pwr-blnk/v1/contract.yaml": {
-  "L123": 1
  },
  "components/juniper/jnp304-blnk/v1/contract.yaml": {
   "L97": 1
@@ -1820,6 +1819,15 @@
  },
  "devices/arista/7280cr3-96/device.yaml": {
   "L29": 1
+ },
+ "devices/arista/7280cr3a-24d12/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3a-48d6/device.yaml": {
+  "L29": 2
+ },
+ "devices/arista/7280cr3a-72/device.yaml": {
+  "L29": 2
  },
  "devices/arista/7280dr3-24/device.yaml": {
   "L29": 1
@@ -2433,6 +2441,15 @@
   "L29": 2,
   "L57": 1
  },
+ "devices/juniper/ex9204/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9208/device.yaml": {
+  "L29": 1
+ },
+ "devices/juniper/ex9214/device.yaml": {
+  "L29": 2
+ },
  "devices/juniper/ex9251/device.yaml": {
   "L29": 1
  },
@@ -2446,18 +2463,19 @@
  },
  "devices/juniper/mx10004/device.yaml": {
   "L119": 1,
+  "L33": 2,
   "L69": 1,
   "L93": 1
  },
  "devices/juniper/mx10008/device.yaml": {
   "L119": 1,
-  "L33": 12,
+  "L33": 6,
   "L69": 1,
   "L93": 1
  },
  "devices/juniper/mx10016/device.yaml": {
   "L119": 1,
-  "L33": 20,
+  "L33": 4,
   "L69": 1,
   "L93": 1
  },
@@ -2543,9 +2561,6 @@
  },
  "devices/juniper/qfx10008/device.yaml": {
   "L33": 4
- },
- "devices/juniper/qfx10016/device.yaml": {
-  "L33": 10
  },
  "devices/juniper/qfx3500-48s4q/device.yaml": {
   "L29": 6,
@@ -2645,9 +2660,24 @@
   "L29": 1,
   "L57": 1
  },
+ "devices/juniper/qfx5241-32od/device.yaml": {
+  "L29": 1,
+  "L57": 1
+ },
+ "devices/juniper/qfx5241-64od/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
+ "devices/juniper/qfx5241-64qd/device.yaml": {
+  "L29": 2,
+  "L57": 1
+ },
  "devices/juniper/qfx5250-64oe-l/device.yaml": {
   "L57": 1,
   "L61": 83
+ },
+ "devices/juniper/qfx5700/device.yaml": {
+  "L29": 1
  },
  "devices/maiaedge/pbc-2000/device.yaml": {
   "L119": 1,
@@ -3062,8 +3092,5 @@
   "L29": 1,
   "L61": 1,
   "L93": 1
- },
- "\u2026": {
-  "L103": 1
  }
 }

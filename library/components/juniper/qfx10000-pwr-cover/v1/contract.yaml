@@ -23,7 +23,7 @@ provenance:
   part-number: >-
     The QFX10008 guide's Table 2 lists "Three power supply covers" and the QFX10016 guide's Table 3
     "Five power supply covers" and name no part number. The cover keeps a name of its own and is not
-    juniper/jnp10k-pwr-blnk@1, whose part number JNP10K-PWR-BLNK the QFX guides never print.
+    juniper/jnp10k-pwr-blnk@2, whose part number JNP10K-PWR-BLNK the QFX guides never print.
   face: >-
     estimated - no figure or photograph of the cover was obtained. The art follows the MX10000 power
     supply cover already in the library: a plain light panel with a pull. The outline is sourced and
