@@ -1,0 +1,88 @@
+format: 1
+kind: module
+name: qfx10000-pwr-dc
+version: 1.0.0
+class: psu
+behaviour: fills
+profile: networking
+description: >-
+  Juniper QFX10000-PWR-DC, the 2500 W DC power supply of the QFX10008 and QFX10016 modular
+  chassis, shipped only in the redundant DC build. Two independent pairs of DC input lugs run down
+  the left of the face, INPUT 1 and INPUT 2, each with a return and a -48/-60 V lug. A vertical
+  column of INP1, INP2, PWR OK and FAULT lamps sits beside a two-way enable DIP switch. A grab
+  handle, the captive screw and the power rocker complete the face. Airflow is port-to-FRU
+  (front-to-back), from an internal fan.
+attrs:
+  model: QFX10000-PWR-DC
+  role: dc-power-supply
+  power-output-w: 2500
+  inlet: dc-terminal
+  airflow: front-to-back
+  input-voltage: -40 to -72 VDC, -48 VDC nominal
+  input-current-a: 60
+  output: 12 VDC
+  hot-swap: 'yes'
+provenance:
+  sources: >-
+    datasheet - QFX10008 Switch Hardware Guide (Juniper Networks, published 2025-12-11): Table 1,
+    Table 24 and Table 25, Figure 11 and Figure 34 (isometrics), Figure 36 (g050572, the flat
+    faceplate with the four lamps numbered) and Table 29. The QFX10016 Switch Hardware Guide
+    (published 2025-12-11) carries the same part under Table 2 and Figure 12.
+  size: >-
+    datasheet - Table 25 gives 3.5 in. high by 3.6 in. wide, so 88.9 by 91.4 mm. Figure 36 measures
+    480 by 457 px at the body, an aspect of 1.050 against the table's 1.029, 2.1 percent out, so the
+    fractions are taken at 5.25 px per mm across and 5.14 down and the part sizes are the table's.
+  depth: >-
+    datasheet - Table 25: 14.4 in. (36.58 cm), 365.8 mm; inches and centimetres agree.
+  power: >-
+    datasheet - Table 24 and Table 1: output power 2500 W. That is an output figure, so it is carried
+    as power-output-w. The guide gives no draw or loss figure for the supply.
+  face: >-
+    drawing - module coordinates read off Figure 36 (g050572): the lug block x 1.9 to 24.4 and y 1.4 to
+    87.0 with four lug barrels centred at x 15.4 and y 19.8, 36.4, 52.9 and 69.5; the lamp column at
+    x 56.6 and y 43.8, 50.4, 57.0 and 63.8 (INP1, INP2, PWR OK, FAULT, top to bottom) with the legends
+    turned beside them; the DIP switch box x 45.7 to 52.6 and y 51.0 to 61.1; the grab handle x 41.9 to
+    85.7 and y 34.0 to 40.3; the captive screw centred at 54.3, 76.7; the rocker bezel x 63.6 to 76.8 and
+    y 64.0 to 82.1, printed | over a power symbol.
+  lugs: >-
+    datasheet - the description says each supply has two independent pairs of DC input lugs, Input 1
+    and Input 2, each carrying RTN and -48V/-60V. The figure draws four barrels behind a cover; they are
+    drawn as the barrels the figure shows and are not modelled as seatable terminals, because the guide
+    names no terminal part and no pitch.
+  colour: >-
+    borrowed - the guide's line drawings carry no colour and no photograph of this supply was
+    obtained. The dark grey finish of juniper/jnp10k-pwr-ac2@1, which stands in the same bay of the
+    same chassis, is used so the two sit together.
+  lamps: >-
+    datasheet - Table 29: INP1 and INP2 are green within -40 to -72 VDC and yellow blinking when out
+    of range; PWR OK is green when the output is in range and yellow blinking when it is out of limits;
+    FAULT is red when the supply has failed.
+states:
+  - ok
+  - fault
+  - absent
+elements:
+  led-inp1:
+    at: [55.1, 42.3]
+    size: [3.0, 3.0]
+    class: led
+    states: ['off', {name: ok, color: '#22c55e'}, {name: warning, color: '#f59e0b', behavior: blinking}]
+  led-inp2:
+    at: [55.1, 48.9]
+    size: [3.0, 3.0]
+    class: led
+    states: ['off', {name: ok, color: '#22c55e'}, {name: warning, color: '#f59e0b', behavior: blinking}]
+  led-pwr-ok:
+    at: [55.1, 55.5]
+    size: [3.0, 3.0]
+    class: led
+    states: ['off', {name: ok, color: '#22c55e'}, {name: warning, color: '#f59e0b', behavior: blinking}]
+  led-fault:
+    at: [55.1, 62.3]
+    size: [3.0, 3.0]
+    class: led
+    states: ['off', {name: fault, color: '#ef4444'}]
+  handle: {at: [41.9, 34.0], size: [43.8, 6.3], class: handle}
+size: {w: 91.4, h: 88.9, d: 365.8}
+size-confidence: {w: datasheet, h: datasheet, d: datasheet}
+skins: [default]
