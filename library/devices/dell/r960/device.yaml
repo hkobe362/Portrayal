@@ -27,7 +27,7 @@
 format: 1
 kind: device
 name: r960
-version: 2.0.0
+version: 2.0.1
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R960
@@ -122,7 +122,7 @@ provenance:
       glbparts.py: the positions come from the un-exploded `Main Assembly` node only (the scene also holds exploded copies under `Extra
       content`), mapped as plan x = 228.0 - cad x1 (the system cover, cad x -216.0..228.0, is the 444 body) and plan y = 883.94 - cad z1 (the rear
       wall: the model's chassis front face at cad z 17.2 plus the ISM's 866.74, where its `Hole` cubes stand at 883.6, and the supply handles end
-      2.56 past it against ISM table 7's 2.455). What the model gives, each part citing its node: the six fans and the fan cage (`R960_
+      2.56 past it against ISM table 7's 2.455; the handle is modelled at 2.6 mm, the model's figure rounded, 0.145 mm longer than the manual's). What the model gives, each part citing its node: the six fans and the fan cage (`R960_
       CoolingFan`), the four heatsinks (`R960_ HeatSink SYS` and `R960_ HeatSink PEM`), the air shroud top cover (`R960_ AirShroudTopCover`) and the
       shroud under it (`R960_ GPU_AirShroud`), the support bar (`R960_ SupportBar`), the system cover and its latch (`R960_ SystemCover`), the supplies
       (`R960_ PSU Prefab`), the four risers (`Riser 1B - FL`, `Riser 2`, `Riser 3A - FL`, `Riser 4A - FL`) and the rows of the 64 memory sockets (`Memory

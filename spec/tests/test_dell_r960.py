@@ -319,7 +319,7 @@ STANDS_PAST = (
     ("front", r"^bezel/", 14.0, "the security bezel: ISM table 7 and the spec sheet give 36 mm to the front with it and 22 without"),
     ("front", r"^vga(/|$)", 6.73, "the D-sub shell of std/vga@1, the same part on every Dell front, inside the bezel's 14.0"),
     ("rear", r"/video(/|$)", 6.73, "the D-sub shell of std/vga@1 on the rear I/O board"),
-    ("rear", r"^psu-\d/module/grip$", 2.6, "the 86 mm supplies' handle: ISM table 7's Zc less Zb is 2.455, Dell's model has 2.6"),
+    ("rear", r"^psu-\d/module/grip$", 2.6, "the 86 mm supplies' handle, at Dell's model's 2.6 (the allowance follows the model); ISM table 7's Zc less Zb is 2.455"),
     ("rear", r"^psu-\d/module/psu/", 36.0, "the R660's 60 mm supply seated in the adapter: its own part, and a bay cannot recess it 30.9 mm"),
 )
 
@@ -341,11 +341,22 @@ def _owner(el, parent):
     return el.get("data-path") if el is not None else ""
 
 
+def _drawings():
+    """Every drawing the build lists for a configuration (6 views each), each one present: an empty glob reads nothing."""
+    _built(None)
+    configs = json.loads((DIST / "r960.configs.json").read_text())["configs"]
+    listed = {f for c in configs for f in c["files"].values()}
+    assert len(configs) >= 30 and len(listed) >= 20, (len(configs), len(listed))
+    assert {v for c in configs for v in c["files"]} >= {"front", "rear", "top", "left", "right", "bottom"}
+    missing = sorted(f for f in listed if not (DIST / f).exists())
+    assert not missing, f"drawings the build lists but library/dist lacks: {missing[:5]}"
+    return sorted(DIST / f for f in listed)
+
+
 def _stands_past():
     """(drawing, view, owner, reach, allowed) for each node whose height is more than SKIN or more than its allowance."""
-    _built(None)
     found = []
-    for svg in sorted(DIST.glob("r960*.svg")):
+    for svg in _drawings():
         view = svg.name.removesuffix(".svg").rsplit(".", 1)[-1]
         root = ET.parse(svg).getroot()
         parent = {c: p for p in root.iter() for c in p}
