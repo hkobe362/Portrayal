@@ -161,7 +161,7 @@ def test_the_system_cover_is_444_by_754_1_and_13_deep_with_its_latch_where_the_m
 
 # --- the supplies: `PSU Prefab` x 4 ------------------------------------------------------------------
 
-def test_the_86_mm_supplies_run_233_5_into_the_chassis_and_stand_33_5_proud_of_their_face():
+def test_the_86_mm_supplies_run_233_5_into_the_chassis_and_stand_2_6_past_the_rear_wall():
     plan = contract("r960-psu-plan")
     assert (plan["size"]["w"], plan["size"]["h"]) == (86.3, 233.5)
     assert plan["size-confidence"] == {"w": "measured", "h": "measured"}
@@ -170,7 +170,9 @@ def test_the_86_mm_supplies_run_233_5_into_the_chassis_and_stand_33_5_proud_of_t
         assert c["size"]["d"] == 233.5 and c["size-confidence"]["d"] == "measured", name
         assert c["size-confidence"]["h"] == "measured", name      # Body_6.011, 40.1: the borrowed height confirmed
         grip = next(f for f in c["relief"]["features"] if f["node"] == "grip")
-        assert grip["uhandle"] == 33.5 and grip["confidence"] == "measured", name
+        # the model's handle is 33.5 from a face 30.9 inside the wall, 2.6 past it (ISM table 7: 2.455); a bay cannot
+        # recess its occupant, so the face stands at the wall and only the 2.6 is built (the envelope test reads it)
+        assert grip["uhandle"] == 2.6 and grip["confidence"] == "measured", name
     # the upper supplies project into the top view at the model's x, the can starting 30.9 in from the rear wall
     bays = rear_bays()
     assert near(bays["psu-3"]["plan"]["at"][0], 346.3) and near(bays["psu-3"]["plan"]["at"][1], 30.9)
