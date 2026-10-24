@@ -325,10 +325,12 @@ STANDS_PAST = (
     # 9.4 out of its face (PCIe CEM 5.0 figure 11-9; the contract records the operator's reading that it points out,
     # and the owner has confirmed that a seated card's flange stands past the wall). A bay cannot recess its occupant.
     ("rear", r"/slot-\d+/module/bracket$", 9.4, "a seated low-profile card's bracket flange"),
-    # ALSO NOT A DELL DOCUMENT: the riser's metal over that flange stands past the wall with it. Dell's ISM gives no
-    # depth for the flange or the cover; the riser's `flange-cover` node is the CEM's 9.40 flange depth plus one 0.86
-    # sheet, an estimate (the contract says so). Only that node, and only that far: the rest of the riser stays inside.
-    ("rear", r"^riser-\d/module$", 10.26, "the riser's metal over a seated card's flange", r"--flange-cover$"),
+    # ALSO NOT A DELL DOCUMENT: the riser's metal over that flange stands past the wall with it, as dell/r740xd's riser
+    # shroud does (17.76 proud, measured from Dell's service model). Dell's ISM gives no depth for the flange or the
+    # cover, and the R960 model poses its riser short of the wall; the riser's `flange-cover` node carries the R660
+    # model's 19.3 for riser 2A's cover (the contract says so). Only that node, and only that far: the rest of the
+    # riser stays inside.
+    ("rear", r"^riser-\d/module$", 19.3, "the riser's metal over a seated card's flange", r"--flange-cover$"),
 )
 
 
