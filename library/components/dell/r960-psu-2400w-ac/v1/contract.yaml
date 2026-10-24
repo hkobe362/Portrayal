@@ -46,15 +46,17 @@ relief:
   wall: '#3a4045'
   features:
   - node: grip
-    uhandle: 33.5
+    uhandle: 2.6
     color: '#e9ecef'
     confidence: measured
-    source: r960.glb `Body_2_5.005`, the handle, from the face at cad z 853.0 to 886.5
+    source: >-
+      r960.glb `Body_2_5.005`, the handle, as dell/r960-psu-2800w-ac@1: 2.6 past the rear wall, the face being
+      recessed 30.9 inside it and drawn at the wall
   - node: latch
-    out: 14.7
+    out: 1.0
     color: '#d9661a'
     confidence: estimated
-    source: borrowed from dell/psu-1400w-ac-60mm@1's latch, measured there
+    source: as dell/r960-psu-2800w-ac@1's latch, a 1.0 tab on the face the wall plane stands in for
 elements:
   grip:
     at: [43.0, 4.5]
