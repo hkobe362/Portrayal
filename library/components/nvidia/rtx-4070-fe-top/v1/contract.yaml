@@ -5,8 +5,8 @@ version: 1.0.0
 class: mechanical
 profile: server
 description: >-
-  The top edge of the NVIDIA RTX 4070 and RTX 4070 SUPER Founders Edition cards seen from outside, with the 16-pin power connector
-  in its notch. It is the card's `faces.plan`. It composes the connector that the
+  The top edge of the RTX 4070 and RTX 4070 SUPER Founders Edition cards, seen from outside. The 16-pin power connector
+  is in its notch. This is the card's `faces.plan`. It composes the connector that the
   adapter's plug mates.
 size: {w: 39.23, h: 244}
 size-confidence: {w: estimated, h: datasheet}

@@ -10,19 +10,17 @@ description: >-
   Edition card that is two slots wide. The bracket face carries three
   DisplayPort and one HDMI receptacle on the board's side, with four vent
   panes below them. The shroud is the X-shaped Founders Edition design. Its
-  fan pocket is at the far end, its model name is printed on the other pocket,
-  and the heat sink's fins show along the top edge. Its power connector is a
-  12-pin receptacle in a notch in the top edge. It plugs into one riser slot
+  fan pocket is at the far end and its model name is printed on the other
+  pocket. The heat sink's fins show along the top edge. Its power connector is
+  a 12-pin receptacle in a notch in the top edge. It plugs into one riser slot
   and covers the one beside it.
 slot-width: 2
-mates: pcie-fh
 size: {w: 120.02, h: 41.91, d: 285}
 size-confidence: {w: registry, h: registry, d: datasheet}
 unplaced: >-
   no bay in the library lists this card in `accepts`, and no bay states `interface: pcie-fh`. The card
-  states `mates: pcie-fh` as docs/cards-by-interface-design.md describes, so a bay that
-  states the interface would offer it; no part of the library does yet. No document held says any server takes
-  a consumer card.
+  does not state `mates: pcie-fh`: the library has not begun that migration (spec/tests/test_cards_by_interface.py
+  holds it at no part until it does). No document held says any server takes a consumer card.
 attrs:
   model: 'RTX 3080 Ti'
   edition: 'Founders Edition'
@@ -45,9 +43,10 @@ provenance:
     2-Slot, and the guide says to remove two slot covers (the guide's figure
     and NVIDIA's compare page). The face is one plate about 41 across. The
     card declares `slot-width: 2` as docs/pcie-two-slot-bays-design.md R1
-    defines it, and `mates: pcie-fh` as docs/cards-by-interface-design.md
-    describes (a card that mates the full-height bracket form; a two-slot card
-    says so by its width).
+    defines it. docs/cards-by-interface-design.md (#1171) adds `mates: pcie-
+    fh` for a card; the mechanism is in the tools but the library has not
+    begun the migration and a test holds every part to no `mates: pcie-fh`
+    yet, so this card does not state it.
   sources: >-
     NVIDIA GeForce RTX 3080 Ti Founders Edition - NVIDIA's GeForce RTX 3080
     and 3080 Ti page, https://www.nvidia.com/en-us/geforce/graphics-

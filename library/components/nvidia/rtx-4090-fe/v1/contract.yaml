@@ -10,19 +10,17 @@ description: >-
   card that is three slots wide. The bracket face carries three DisplayPort
   and one HDMI receptacle on the board's side, with four vent panes below
   them. The shroud is the X-shaped Founders Edition design. Its fan pocket is
-  at the far end, its model name is printed on the other pocket, and the heat
+  at the far end and its model name is printed on the other pocket. The heat
   sink's fins show along the top edge. Its power connector is a 16-pin
   (12VHPWR) receptacle in a notch in the top edge. It plugs into one riser
   slot and covers the two beside it.
 slot-width: 3
-mates: pcie-fh
 size: {w: 120.02, h: 62.23, d: 304}
 size-confidence: {w: registry, h: registry, d: datasheet}
 unplaced: >-
   no bay in the library lists this card in `accepts`, and no bay states `interface: pcie-fh`. The card
-  states `mates: pcie-fh` as docs/cards-by-interface-design.md describes, so a bay that
-  states the interface would offer it; no part of the library does yet. No document held says any server takes
-  a consumer card.
+  does not state `mates: pcie-fh`: the library has not begun that migration (spec/tests/test_cards_by_interface.py
+  holds it at no part until it does). No document held says any server takes a consumer card.
 attrs:
   model: 'RTX 4090'
   edition: 'Founders Edition'
@@ -45,12 +43,11 @@ provenance:
     start guide says 'Remove three adjacent slot covers'. The card declares
     `slot-width: 3` (the schema allows up to 4; docs/pcie-two-slot-bays-
     design.md leaves room for a three-slot card in a bay that lists two ids in
-    `span`), and `mates: pcie-fh`. The face is one plate three slot pitches
-    across: CEM draws no three-slot bracket, so the outline is the two-slot
-    bracket's with a third tab, as the guide's drawing shows three tabs.
-    CONFLICT: the intake's note that the 50-series guides say two covers for a
-    3-slot clearance box does not apply to this card; the 4090's own guide
-    says three.
+    `span`). The face is one plate three slot pitches across: CEM draws no
+    three-slot bracket, so the outline is the two-slot bracket's with a third
+    tab, as the guide's drawing shows three tabs. CONFLICT: the intake's note
+    that the 50-series guides say two covers for a 3-slot clearance box does
+    not apply to this card; the 4090's own guide says three.
   sources: >-
     NVIDIA GeForce RTX 4090 Founders Edition - NVIDIA's GeForce RTX 4090 page,
     https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/;

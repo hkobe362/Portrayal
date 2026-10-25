@@ -2,8 +2,8 @@
 - Five NVIDIA GeForce Founders Edition cards, the first batch of the GeForce
   line (#877). Each is a module with a bracket face, a 3D body and a NetBox and
   Nautobot module type. None is seated yet: no bay lists them in its `accepts`
-  and no bay states `interface: pcie-fh`, so each says `unplaced` and why. Each
-  states `mates: pcie-fh` (docs/cards-by-interface-design.md).
+  and no bay states `interface: pcie-fh`, so each says `unplaced` and why. None
+  states `mates: pcie-fh` yet: the library has not begun that migration.
   - `nvidia/rtx-3080-fe@1` and `nvidia/rtx-3080-ti-fe@1`, two-slot cards
     (`slot-width: 2`), drawn from NVIDIA's straight-on side elevation of the
     RTX 3080. Their rear face is `nvidia/rtx-3080-fe-tail@1`. The 12-pin power

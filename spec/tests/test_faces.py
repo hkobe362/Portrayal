@@ -280,8 +280,9 @@ def test_the_index_carries_a_parts_other_faces():
     # 194 since the L40, A30, A10, A2, T4 and H200 NVL cards.
     # 199 since the Quadro RTX 8000 and 6000 passive, RTX A6000, A5000 and A4000 cards.
     # 203 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
-    assert len(with_faces) == 203, \
-        f"expected exactly 203 of {len(entries)} entries to carry a faces " \
+    # 208 since the five GeForce Founders Edition cards.
+    assert len(with_faces) == 208, \
+        f"expected exactly 208 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
