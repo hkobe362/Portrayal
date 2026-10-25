@@ -270,7 +270,20 @@ def test_the_unstated_ones_are_the_ones_we_could_not_source():
     # that an unrecoverable failure raises chassis alarms and can shut it down, gives the time it runs
     # with one module out, and names no N+1 form, so the group states none.
     assert "juniper/qfx5210-64c" in unstated
-    assert len(unstated) == 41, unstated
+    # THE JUNIPER EX4550-32F AND -32T MADE IT FORTY-THREE: the guide says all three fan modules must
+    # be installed for optimal functioning and that the switch runs 30 seconds without thermal
+    # shutdown while one is replaced, and names no N+1 form, so each group quotes that and states no
+    # form. The EX4500-40F has one fan tray in one bay, so its group is not counted here at all.
+    assert {"juniper/ex4550-32f", "juniper/ex4550-32t"} <= set(unstated)
+    # THE JUNIPER QFX10002-60C MADE IT FORTY-FOUR: it has the family's cooling text (each fan module a
+    # redundant unit of two fans, all three fitted, a time with one out) and no N+1 form, so its group
+    # quotes the sentences and states none.
+    assert "juniper/qfx10002-60c" in unstated
+    # THE JUNIPER QFX5130-48C MADE IT FORTY-FIVE: the guide gives six fan modules and redundancy only
+    # at the rotor level (one failed rotor tolerated), which is not a count of modules the switch can
+    # lose, so the group quotes that and states no form.
+    assert "juniper/qfx5130-48c" in unstated
+    assert len(unstated) == 45, unstated
 
 
 def test_the_comparison_layer_can_now_reach_them():
@@ -633,6 +646,11 @@ def test_the_comparison_layer_can_now_reach_them():
     be installed for optimal operation of the switch", and the switch runs 30 seconds without
     thermal shutdown while one is replaced. The guide states no N+1 form, so no spare fan is claimed.
 
+    ONE HUNDRED AND TWENTY AND ONE HUNDRED AND TWENTY-ONE ARE THE JUNIPER QFX10008 AND QFX10016, 1+1 over
+    two rear fan trays each. The hardware guides (2025-12-11) say the switch keeps running for a limited
+    time on one tray without a thermal alarm, and the datasheet calls them dual hot-swappable fan trays
+    with redundant fans; the fans inside a tray speed up when one fails.
+
     ONE HUNDRED AND THIRTY-THREE AND ONE HUNDRED AND THIRTY-FOUR ARE THE JUNIPER QFX5100-24Q AND
     QFX5100-96S, N+1 over five and over three rear fan modules, from the same QFX5100 datasheet
     sentence. The hardware guide gives the slots, 0 to 4 on the 1RU models and 0 to 2 on the 96S.
@@ -666,4 +684,17 @@ def test_the_comparison_layer_can_now_reach_them():
     # 134 since the Juniper QFX5100-24Q and -96S: N+1 over five and over three rear fan modules (datasheet)
     # 139 with the five Arista 7050X4 devices: N+1 over three fan modules (DX4-32S, PX4-32S, CX4-24D8,
     # X4-48Y-4DF) or four (CX4M-48D8) (data sheet, model comparison, "Hot-swappable Fans")
-    assert n == 139, n
+    # 140 since the Arista 7280DR3A-54: n+1 over four fan modules (data sheet, "Hot-swappable Fans 4")
+    # 147 since the seven Juniper EX4200 models: n+0 over the one three-fan tray (hardware guide)
+    # 148 with the Juniper QFX5700: n+1 over two fan trays of four fans each (datasheet, "N+1 fan rotor
+    # redundancy at chassis level")
+    # 150 with the Juniper QFX10008 and QFX10016: 1+1 over two fan trays each (hardware guides, Fan Trays)
+    # 153 with the Arista 7280CR3A-24D12 (N+1 over three fan modules), -48D6 and -72 (N+1 over four): data sheet, "Hot-swappable Fans"
+    # 154 with the Juniper EX8216: 2+0 over two nine-fan trays (hardware guide, Cooling System and Fan Tray: the
+    # switch runs only 2 minutes with a tray out; each tray keeps cooling with a single fan failed)
+    # 157 with the Juniper QFX5241-32OD (N+1 over seven fan modules of two rotors each) and QFX5241-64OD and
+    # QFX5241-64QD (N+1 over four): hardware guides, Component Redundancy
+    # 160 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
+    # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
+    # 162 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
+    assert n == 162, n

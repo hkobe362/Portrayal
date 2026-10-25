@@ -44,7 +44,8 @@ provenance:
     measured - r960.glb: the can runs 233.5 into the chassis from the face (cad z 619.5 to 853.0), and the handle
     stands 33.5 proud of the face to cad z 886.5, 2.6 past the rear wall at 883.94 - ISM table 7's 2.455 between the rear
     wall and the handle (Zc less Zb). So the face is recessed 30.9 inside the rear wall, which the rear view does not
-    show. The first pass borrowed 222.0 from the 60 mm supply.
+    show. In 3D the face stands at the wall (a bay has no recess to give it) and the grip is built only as far as it
+    is past the wall, 2.6. The first pass borrowed 222.0 from the 60 mm supply.
   features: >-
     photo-measured - ISM figure 10 at 3.374 px/mm: the fan housing 5.0..43.6 across and 2.1..39.0
     down with a 19 mm hub centred at (23.7, 20.3) and four corner bosses; the translucent handle
@@ -74,17 +75,22 @@ relief:
   wall: '#3a4045'
   features:
   - node: grip
-    uhandle: 33.5
+    uhandle: 2.6
     color: '#e9ecef'
     confidence: measured
     source: >-
-      r960.glb `Body_2_5.005`, the handle, from the face at cad z 853.0 to 886.5; the first pass borrowed the
-      R660's 35.7 and the ISM's own table 7 gives 2.455 past the rear wall, which this agrees with
+      r960.glb `Body_2_5.005`, the handle, which stands 2.6 past the rear wall (cad z 883.94 to 886.5) and
+      agrees with ISM table 7's 2.455 (Zc less Zb). THE FACE IS DRAWN AT THE WALL BECAUSE A BAY CANNOT RECESS ITS
+      OCCUPANT: the model's handle is 33.5 long from a face 30.9 inside the wall, and drawn from the wall that length
+      stood 30.9 outside the chassis. Only the part past the wall is built
   - node: latch
-    out: 14.7
+    out: 1.0
     color: '#d9661a'
     confidence: estimated
-    source: borrowed from dell/psu-1400w-ac-60mm@1's latch, measured there
+    source: >-
+      the orange latch of dell/psu-1400w-ac-60mm@1 (14.7 there, measured) stands inside the 30.9 mm the face is
+      recessed on the R960, so no part of it is past the rear wall; it is drawn as a 1.0 tab on the face the wall
+      plane stands in for
 elements:
   grip:
     at: [43.0, 4.5]
