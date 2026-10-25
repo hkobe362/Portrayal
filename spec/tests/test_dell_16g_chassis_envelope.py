@@ -56,6 +56,19 @@ STANDS_PAST = {
         ("rear", r"^psu-\d/module/latch$", 35.7, "the supply's latch stands inside the handle's reach"),
     ),
 }
+# the R6615 and R6625 compose the R660's riser cages, covers and 60 mm supplies, and take its rules
+STANDS_PAST["r6615"] = STANDS_PAST["r660"]
+STANDS_PAST["r6625"] = STANDS_PAST["r660"]
+
+# What the walk must have covered, per device (its drawings, the nodes in them, and the rear-view flange covers),
+# so that a glob that matches nothing cannot pass. Set under what the first build walked.
+MIN_WALKED = {
+    # first build: r760 39 drawings, 29901 nodes, 50 covers; r660 40, 19955, 25; r6615 39, 16596, 24; r6625 31, 15118, 15
+    "r760": (30, 22000, 30),
+    "r660": (30, 15000, 15),
+    "r6615": (30, 12000, 15),
+    "r6625": (25, 11000, 10),
+}
 
 
 def _reach(el, parent):
@@ -75,16 +88,23 @@ def _owner(el, parent):
     return el.get("data-path") if el is not None else ""
 
 
-def _stands_past(device):
-    """(drawing, view, owner, reach, allowed) for each node whose height is more than SKIN or than its allowance."""
+def _stands_past(device, walked):
+    """(drawing, view, owner, reach, allowed) for each node whose height is more than SKIN or than its allowance.
+
+    `walked` is filled with the counts of drawings, nodes and rear-view flange covers the walk went through."""
     assert (DIST / f"{device}.configs.json").exists(), \
         f"library/dist has no {device} build: these read it, so run ./build.sh first"
     found = []
+    walked["drawings"] = walked["nodes"] = walked["covers"] = 0
     for svg in sorted(DIST.glob(f"{device}.*.svg")):
         view = svg.name.removesuffix(".svg").rsplit(".", 1)[-1]
         root = ET.parse(svg).getroot()
         parent = {c: p for p in root.iter() for c in p}
+        walked["drawings"] += 1
         for el in root.iter():
+            walked["nodes"] += 1
+            if view == "rear" and (el.get("id") or "").endswith("--flange-cover"):
+                walked["covers"] += 1
             reach = _reach(el, parent)
             if reach is None or reach <= SKIN:
                 continue
@@ -106,6 +126,11 @@ def _stands_past(device):
 
 @pytest.mark.parametrize("device", sorted(STANDS_PAST))
 def test_no_part_stands_outside_the_chassis_in_any_drawing(device):
-    over = sorted({(v, o, r, a) for _, v, o, r, a in _stands_past(device)})
+    walked = {}
+    found = _stands_past(device, walked)
+    floor = dict(zip(("drawings", "nodes", "covers"), MIN_WALKED[device]))
+    assert all(walked[k] >= n for k, n in floor.items()), \
+        f"the {device} walk is too thin to prove anything: walked {walked}, wanted at least {floor}"
+    over = sorted({(v, o, r, a) for _, v, o, r, a in found})
     assert not over, f"parts the 3D builder stands outside the {device} chassis:\n" + "\n".join(
         f"  {o} stands {r:g} mm out of the {v}, at most {a:g}" for v, o, r, a in over)

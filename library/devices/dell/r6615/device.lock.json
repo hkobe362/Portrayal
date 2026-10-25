@@ -567,7 +567,7 @@
   "sff8-rc8-2t3a"
  ],
  "format": 1,
- "gaps": "4fedf46aa8ce6137",
+ "gaps": "84d9297afb1c5564",
  "groups": [
   "boss",
   "covers",
@@ -1247,5 +1247,5 @@
  "placement-surface": "38316eb87c3a8f0d",
  "shape": "dd1c5c41286b5769",
  "surface": "4bf2eeaa408aaacd",
- "version": "0.1.3"
+ "version": "0.1.1"
 }
