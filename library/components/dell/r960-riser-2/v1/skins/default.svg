@@ -7,7 +7,8 @@
        height of the cage and cut round the two printed pockets (the bay's seat of
        std/pcie-bracket-lp@1, turned over: the flange is at the left): the way the R740xd's
        riser shroud is a column the flange ends sit behind. Slot 9's
-       flange is not covered: its fold, at 151.84, is past the cage's right edge, 149.7. -->
+       flange is not covered, because its seat is unresolved (its fold, at 151.84, falls past the
+       cage's right edge, 149.7, though the plate has metal right of window 9): see the contract. -->
   <rect id="slot-4" x="4.6" y="0.04" width="79.2" height="18.42" fill="none" stroke="none"/>
   <rect id="slot-9" x="73.5" y="0.04" width="79.2" height="18.42" fill="none" stroke="none"/>
   <g id="flange-cover">

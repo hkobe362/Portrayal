@@ -330,7 +330,7 @@ STANDS_PAST = (
     # cover, and the R960 model poses its riser short of the wall; the riser's `flange-cover` node carries the R660
     # model's 19.3 for riser 2A's cover (the contract says so). Only that node, and only that far: the rest of the
     # riser stays inside.
-    ("rear", r"^riser-\d/module$", 19.3, "the riser's metal over a seated card's flange", r"--flange-cover$"),
+    ("rear", r"^riser-2/module$", 19.3, "the riser's metal over a seated card's flange", r"--flange-cover$"),
 )
 
 
