@@ -9,12 +9,11 @@ description: >-
   NVIDIA RTX A400 (4 GB GDDR6) on its low profile bracket, an actively cooled
   half-height single-slot workstation card that takes no auxiliary power. The
   bracket face is a plate with four mini DisplayPort connectors along the board's
-  side, a latch slot beside each and the port numbers 1 to 4 printed between them.
-  The board stands bare for its first 44 mm, with its connectors, capacitors and
+  side and a latch slot beside each. The board stands bare for its first 44 mm, with its connectors, capacitors and
   chokes showing, and the dark shroud with the blower's opening on its broad side
   covers the rest. It plugs into one riser slot and covers none beside it. EVERY
   FIGURE OF ITS DRAWING IS THE RTX A1000's: PNY serves the A1000's pictures under
-  the A400's name, and the face is estimated from them (see the provenance).
+  the A400's name, and the face is estimated from them.
 size: {w: 79.20, h: 18.42, d: 162.56}
 size-confidence: {w: registry, h: registry, d: datasheet}
 unplaced: >-
