@@ -352,8 +352,9 @@ def test_the_census_every_cage_presenting_part_is_published(index, lib, families
     # PCIe 8-pin header), the Quadro RTX passive cards' (one CPU 8-pin header),
     # the RTX A6000's (one CPU 8-pin header), the RTX A5000's (one PCIe 8-pin
     # header), and the V100 PCIe's, shared with the P100 PCIe and the P40 (one
-    # CPU 8-pin header)
-    assert sum(1 for r in faces if _forwarded_connector(lib, _contract(r))) == 15
+    # CPU 8-pin header), and the RTX 6000, 4500 and 4000 Ada's (each one 16-pin
+    # header; the RTX 5000 Ada shares the 4500's)
+    assert sum(1 for r in faces if _forwarded_connector(lib, _contract(r))) == 18
     for ref, entry in index.items():
         skip = _forwarded_connector(lib, _contract(ref), face=ref in faces or ref in bays)
         forwarded += skip is not None
