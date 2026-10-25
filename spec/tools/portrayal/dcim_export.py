@@ -125,6 +125,14 @@ IFACE_TYPE = {
     # not look for it and the MX80's ports never typed. PART_IFACE has spelled it
     # this way all along for module ports; a test holds the two in step.
     ("xfp", "10g"): "10gbase-x-xfp",
+    # AN SFP-DD PORT IS NOT AN SFP28 ONE, and "sfp-dd" contains "sfp", so without
+    # its own family it typed as 25gbase-x-sfp28 (or 50gbase-x-sfp56 at 50g).
+    # `100gbase-x-sfpdd` is TYPE_100GE_SFP_DD in both targets (netbox-community/
+    # netbox netbox/dcim/choices.py at 758af333, nautobot/nautobot
+    # nautobot/dcim/choices.py at 45d26083). NEITHER HAS A 50G SFP-DD TYPE, so a
+    # port stating 50g has no row and is not typed; no default speed either, for
+    # a rate the cage makers' documents do not state (standards.yaml `sfp-dd`).
+    ("sfp-dd", "100g"): "100gbase-x-sfpdd",
     ("rj45", "10g"): "10gbase-t",
     ("rj45", "2.5g"): "2.5gbase-t",
     ("rj45", "1g"): "1000base-t",           # a 10/100/1000 port is `1g`, so 1000base-t
@@ -182,6 +190,11 @@ PART_IFACE = {
     "std/cfp2": "100gbase-x-cfp2",
     "std/cfp4": "100gbase-x-cfp4",
     "std/cxp": "100gbase-x-cxp",
+    # THE SFP-DD CAGES' OWN TOP RATE, as the SFP-DD interface in both targets is
+    # named; see IFACE_TYPE. The cage makers state no rate, so it is the targets'
+    # label and not a reading of the drawings.
+    "std/sfp-dd": "100gbase-x-sfpdd",
+    "std/sfp-dd-ganged": "100gbase-x-sfpdd",
 }
 # What a cage RUNS AT is a property of the card, not of the cage. So the cage ref
 # gives the family and the card's attrs give the speed within it.
@@ -827,6 +840,7 @@ PART_MEDIA = {
     # A PLACEMENT'S OWN 800G, so a QSFP-DD800 port that says so types from
     # itself; the card's `qsfp-dd-800g` gives the same answer (QDD800_ATTR).
     ("qsfp-dd", "800g"): "800gbase-x-qsfpdd",
+    ("sfp-dd", "100g"): "100gbase-x-sfpdd",
     ("sfp112", "100g"): "other",
     ("rj45-telemetry", None): "other",
     # COPPER ETHERNET AT A STATED RATE. An 8P8C shell says nothing about speed,
@@ -1376,6 +1390,7 @@ def iface_type(p, attrs, group_role=None):
            "qsfp" if "qsfp" in ref else
            "rj45" if "rj45" in ref else
            "xfp" if "xfp" in ref else
+           "sfp-dd" if "sfp-dd" in ref else      # after "qsfp": qsfp-dd contains it
            "sfp" if "sfp" in ref else None)
     if fam is None:
         return None
