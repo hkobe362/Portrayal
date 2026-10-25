@@ -10,9 +10,9 @@ description: >-
   full-height workstation card with a blower. The bracket face is silver with four
   DisplayPort connectors on the board's side and a column of square vent holes
   beside them. The shroud is matte black with a field of vent slits near the
-  bracket and the blower's opening on its broad side, a black backplate with the
-  blower's intake and a slotted top edge. It has one 16-pin CEM5 power connector at
-  the far end by the top edge. It plugs into one riser slot and covers none beside
+  bracket and the blower's opening on its broad side. The backplate is black with
+  the blower's intake, and the top edge is slotted. It has one 16-pin CEM5 power
+  connector at the far end by the top edge. It plugs into one riser slot and covers none beside
   it.
 size: {w: 120.02, h: 21.59, d: 241.30}
 size-confidence: {w: registry, h: registry, d: datasheet}

@@ -10,12 +10,12 @@ description: >-
   full-height full-length workstation card with a blower. The bracket face is dark
   nickel with four DisplayPort connectors on the board's side and one framed vent
   window beside them. The shroud is matte dark grey with the blower's opening on
-  its broad side, a black backplate and the heat sink's fins showing along the top
+  its broad side and a black backplate. The heat sink's fins show along the top
   edge. It has one 16-pin CEM5 power connector at the far end by the top edge. It
   plugs into one riser slot and covers the one beside it. EVERY FACE OF THIS CARD
-  IS ESTIMATED FROM THE RTX 4500 ADA: PNY serves that card's photographs under this
-  card's name and no other picture of the 5000 is held except NVIDIA's own render,
-  which cannot be scaled.
+  IS ESTIMATED FROM THE RTX 4500 ADA. PNY serves that card's photographs under
+  this card's name. No other picture of the 5000 is held except NVIDIA's own
+  render, which cannot be scaled.
 slot-width: 2
 size: {w: 120.02, h: 41.91, d: 266.70}
 size-confidence: {w: registry, h: registry, d: datasheet}
