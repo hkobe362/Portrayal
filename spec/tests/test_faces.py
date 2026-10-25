@@ -142,8 +142,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 134 since the A10, A2 and T4 cards.
     # 135 since the RTX A4000.
     # 139 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
-    assert len(named) == 139, \
-        f"expected 139 parts naming a plan drawing, found {len(named)}"
+    # 144 since the five GeForce Founders Edition cards.
+    assert len(named) == 144, \
+        f"expected 144 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
