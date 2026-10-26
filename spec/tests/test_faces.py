@@ -143,8 +143,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 135 since the RTX A4000.
     # 139 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 141 since the RTX A1000 and A400.
-    assert len(named) == 141, \
-        f"expected 141 parts naming a plan drawing, found {len(named)}"
+    # 142 since the RTX PRO 4000 Blackwell.
+    assert len(named) == 142, \
+        f"expected 142 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -281,8 +282,9 @@ def test_the_index_carries_a_parts_other_faces():
     # 199 since the Quadro RTX 8000 and 6000 passive, RTX A6000, A5000 and A4000 cards.
     # 203 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 207 since the RTX A5500 and A4500 (a rear face each) and the RTX A1000 and A400 (a plan each).
-    assert len(with_faces) == 207, \
-        f"expected exactly 207 of {len(entries)} entries to carry a faces " \
+    # 209 since the RTX PRO 5000 and RTX PRO 4000 Blackwell (a rear face each, and a plan for the 4000).
+    assert len(with_faces) == 209, \
+        f"expected exactly 209 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
