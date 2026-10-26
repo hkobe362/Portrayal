@@ -104,8 +104,10 @@ provenance:
     the standard's 120.02 (0.9 percent short); it confirms the plate's length
     and nothing else.
   face-ports: >-
-    drawing - the bracket's port places are read on the VECTOR figure of
-    NVIDIA's guide (the 4090 quick-start guide and the 4070 SUPER user guide,
+    estimated - the bracket's port places are BORROWED from other cards'
+    guides, not read on this card's own (the 3080's guide is raster and puts
+    the first DisplayPort about 4 mm nearer the tip); the bracket is taken to
+    be the same part. They are read on the VECTOR figure of NVIDIA's guide (the 4090 quick-start guide and the 4070 SUPER user guide,
     page 5, which draw one bracket in an oblique view): the callout dots on
     the page are vector circles at the port centres (y 199.7, 218.9, 238.6 and
     258.8 pt on both pages) and the bracket's flange hook and tab tips were
@@ -160,8 +162,9 @@ provenance:
     shroud). The shroud and the board agree to 0.4 mm across (97.6 against
     97.9); the shroud is drawn at the board's lower edge, x 28.41.
   body-shroud: >-
-    photo-measured - one dark slab from the board's component face (y 6.01) to
-    the far face (40.0), in three boxes split at the top edge's notch
+    estimated - BORROWED from the RTX 3080's elevation (this card has no
+    picture of its own). One dark slab from the board's component face (y
+    6.01) to the far face (40.0), in three boxes split at the top edge's notch
     (provenance body-power-connector) so that the notch is a real step in 3D.
     Its broad side is painted from the elevation: the X-shaped waist, the two
     pockets with their bright rims, the louvres beside the fan pocket and the
@@ -169,7 +172,8 @@ provenance:
     the Founders Edition design has there) is shown in no picture at its scale
     and is not drawn.
   body-fan: >-
-    photo-measured - the fan in the far pocket: ring 377 px across (1148 to
+    estimated - the fan in the far pocket, BORROWED from the RTX 3080's
+    elevation (no picture of this card): ring 377 px across (1148 to
     1525 along, 187 radius), centred at px (1337, 540); hub 68 px radius; 11
     blades counted in the photograph, drawn as sickles with a counter-
     clockwise lean; the ring's rim is dark and the blades carry a light edge.
@@ -264,13 +268,13 @@ body:
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0: the x16 pad run on 1.00 pitch'}
   - {id: shroud-a, at: [28.41, 6.01], size: [97.57, 33.99], from: 0.9, depth: 137.6,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
-     source: 'the broad-side elevation: one slab, bracket end to the notch (provenance body-shroud); thickness estimated (provenance thickness)'}
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
+     source: 'the broad-side elevation of the RTX 3080, borrowed: one slab, bracket end to the notch (provenance body-shroud); thickness estimated (provenance thickness)'}
   - {id: shroud-notch, at: [28.41, 6.01], size: [93.07, 33.99], from: 138.5, depth: 23,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
      source: 'as the shroud, under the connector''s notch (4.5 deep: the elevation''s top edge steps in there)'}
   - {id: shroud-b, at: [28.41, 6.01], size: [97.57, 33.99], from: 161.5, depth: 122.5,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
      source: 'as the shroud, from the notch to the end plate'}
   - {id: end-plate, at: [28.41, 6.01], size: [97.57, 33.99], from: 284, depth: 1,
      color: '#16171a', confidence: estimated,

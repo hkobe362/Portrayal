@@ -105,8 +105,10 @@ provenance:
     the standard's 120.02 (0.9 percent short); it confirms the plate's length
     and nothing else.
   face-ports: >-
-    drawing - the bracket's port places are read on the VECTOR figure of
-    NVIDIA's guide (the 4090 quick-start guide and the 4070 SUPER user guide,
+    estimated - the bracket's port places are BORROWED from other cards'
+    guides, not read on this card's own (its guide is raster and puts the
+    first DisplayPort about 4 mm nearer the tip); the bracket is taken to be
+    the same part. They are read on the VECTOR figure of NVIDIA's guide (the 4090 quick-start guide and the 4070 SUPER user guide,
     page 5, which draw one bracket in an oblique view): the callout dots on
     the page are vector circles at the port centres (y 199.7, 218.9, 238.6 and
     258.8 pt on both pages) and the bracket's flange hook and tab tips were

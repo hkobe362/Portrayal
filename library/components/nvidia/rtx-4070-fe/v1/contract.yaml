@@ -153,8 +153,9 @@ provenance:
     photograph, not with the CEM board plus 13.25). The board box runs 149.1
     behind the bracket, estimated and hidden by the shroud.
   body-shroud: >-
-    photo-measured - one dark slab from the board's component face (y 6.01) to
-    the far face (41.0), in three boxes split at the top edge's notch
+    estimated - BORROWED from the RTX 4070 SUPER's elevation (this card has
+    no picture of its own). One dark slab from the board's component face (y
+    6.01) to the far face (41.0), in three boxes split at the top edge's notch
     (provenance body-power-connector) so that the notch is a real step in 3D.
     Its broad side is painted from the elevation: the X-shaped waist, the two
     pockets with their bright rims, the louvres beside the fan pocket and the
@@ -162,11 +163,10 @@ provenance:
     the Founders Edition design has there) is shown in no picture at its scale
     and is not drawn.
   body-fan: >-
-    photo-measured - the fan in the far pocket: ring 550 px across, centred at
-    px (1418, 558); hub 100 px radius; 9 blades counted, drawn as sickles. At
-    6.049 px/mm that is a ring of 90.9 mm, a hub of 33.1. On the RTX 4070 the
-    blade count and the ring are the SUPER's (`estimated`: no picture of this
-    card at scale). Painted on the broad side; it is not an opening in the 3D
+    estimated - the fan in the far pocket, BORROWED from the RTX 4070 SUPER's
+    elevation (no picture of this card at scale): ring 550 px across, centred
+    at px (1418, 558); hub 100 px radius; 9 blades counted, drawn as sickles.
+    At 6.049 px/mm that is a ring of 90.9 mm, a hub of 33.1. Painted on the broad side; it is not an opening in the 3D
     body.
   body-top-edge: >-
     estimated - the top edge is seen only in 3/4 views (the 3080's gallery
@@ -187,8 +187,9 @@ provenance:
     top of the graphics card'). It is the 12VHPWR receptacle (the guide's
     inset shows twelve large cells and four small sense cells). The card
     composes std/12vhpwr-header@1 as `aux-power` on its top face
-    (`faces.plan`, nvidia/rtx-4070-fe-top@1), so it exports a power port; the
-    3D body draws the housing in the notch (20.85 x 11.7, 9.0 deep). The
+    (`faces.plan`, nvidia/rtx-4070-fe-top@1). DCIM exports no power port for
+    it for now: the owner chose to keep the header on the top face, and the
+    exporter reads only `faces.rear`. The 3D body draws the housing in the notch (20.85 x 11.7, 9.0 deep). The
     notch's place (about midway along the card) is read on the 3/4 pictures
     and guide drawings, and its size is a guess: centred 145 behind the
     bracket, 24 long, 4.5 deep (the 4090's scaled from the 4070 SUPER's). A
@@ -256,13 +257,13 @@ body:
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0: the x16 pad run on 1.00 pitch'}
   - {id: shroud-a, at: [26.73, 6.01], size: [100.34, 34.99], from: 0.9, depth: 132.1,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
-     source: 'the broad-side elevation: one slab, bracket end to the notch (provenance body-shroud); thickness stated (provenance thickness)'}
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
+     source: 'the broad-side elevation of the RTX 4070 SUPER, borrowed: one slab, bracket end to the notch (provenance body-shroud); thickness stated (provenance thickness)'}
   - {id: shroud-notch, at: [26.73, 6.01], size: [95.84, 34.99], from: 133, depth: 24,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
      source: 'as the shroud, under the connector''s notch (4.5 deep: the elevation''s top edge steps in there)'}
   - {id: shroud-b, at: [26.73, 6.01], size: [100.34, 34.99], from: 157, depth: 86,
-     color: '#1b1b1c', confidence: photo-measured, shows: [right, left, bottom],
+     color: '#1b1b1c', confidence: estimated, shows: [right, left, bottom],
      source: 'as the shroud, from the notch to the end plate'}
   - {id: end-plate, at: [26.73, 6.01], size: [100.34, 34.99], from: 243, depth: 1,
      color: '#16171a', confidence: estimated,

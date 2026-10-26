@@ -180,8 +180,9 @@ provenance:
     top of the graphics card'). It is the 12VHPWR receptacle (the guide's
     inset shows twelve large cells and four small sense cells). The card
     composes std/12vhpwr-header@1 as `aux-power` on its top face
-    (`faces.plan`, nvidia/rtx-4070-fe-top@1), so it exports a power port; the
-    3D body draws the housing in the notch (20.85 x 11.7, 9.0 deep). The
+    (`faces.plan`, nvidia/rtx-4070-fe-top@1). DCIM exports no power port for
+    it for now: the owner chose to keep the header on the top face, and the
+    exporter reads only `faces.rear`. The 3D body draws the housing in the notch (20.85 x 11.7, 9.0 deep). The
     notch's place (about midway along the card) is read on the 3/4 pictures
     and guide drawings, and its size is a guess: centred 145 behind the
     bracket, 24 long, 4.5 deep (the 4090's scaled from the 4070 SUPER's). A
