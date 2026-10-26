@@ -24,8 +24,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc2": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -48,8 +47,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/scb0": [
    "juniper/scb-mx@3"
@@ -171,7 +169,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "cab4ec7fa31cd416",
+ "gaps": "b2cd5cb20843b99c",
  "groups": [
   "cooling",
   "craft",
@@ -201,7 +199,7 @@
   "rear/placements/esd-rear-jack",
   "rear/placements/ground-studs"
  ],
- "names": "0d821a2b1bcb9217",
+ "names": "8dd714df41b1074e",
  "placement-addressing": {
   "for": {
    "front/placements/esd-front-jack": [
@@ -252,5 +250,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "28eeef23947bab08",
  "surface": "5b19c03967ef21b9",
- "version": "5.0.2"
+ "version": "6.0.0"
 }
