@@ -27,7 +27,7 @@
 format: 1
 kind: device
 name: r960
-version: 2.0.1
+version: 2.0.2
 maturity: draft
 manufacturer: Dell
 model: PowerEdge R960
@@ -353,6 +353,18 @@ gaps:
       thickness or for how far the risers' PCBs stand behind it (the model's risers are drawn for the top view only).
     wanted: >-
       a side view or section of an R960 rear wall at a riser cage
+  - what: riser-2-slot-9-flange-seat-unresolved
+    scope: [rear, risers]
+    reason: needs-drawing
+    note: >-
+      riser 2's `flange-cover` stands over slot 4's flange only. Slot 9's flange has no cover because the bay's estimated seat (unrotated, taken from the R660's
+      offset from window to bracket) puts its fold 2.1 past the cage's right edge, and the cage's own drawing has 12.2 mm of plate right of window 9, so this
+      is a consequence of an unresolved seat and not a measurement that no metal is there. The seat is unresolved because the figures disagree: slot 4 is
+      turned over and its opening lines up with its window, slot 9's does not (3.8 to 6.4 mm off); turning slot 9 over to match slot 4 and ISM figure 104's
+      two cards (both the same way up) lines its opening up but puts the far end of its 79.2 mm bracket 4.6 past the edge instead; and Dell's model has the
+      riser 2 assembly 158.3 mm wide against the 149.7 read off ISM figure 10. The cage's width, the windows or the seat is wrong, and no document held says which.
+    wanted: >-
+      a straight-on rear photograph of an R960 riser 2 with both slots filled, or its cage drawn with dimensions
   - what: full-height-slots-take-the-filler-only
     scope: [risers]
     reason: needs-drawing
