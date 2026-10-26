@@ -24,8 +24,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc1": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -48,8 +47,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc2": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -72,8 +70,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc3": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -96,8 +93,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc4": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -120,8 +116,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/dpc5": [
    "juniper/dpc-r-4xge-xfp@3",
@@ -144,8 +139,7 @@
    "juniper/mpc7e-mrate@2",
    "juniper/ms-dpc@2",
    "juniper/ms-mpc@2",
-   "juniper/mx-dpc-blank@2",
-   "juniper/scb-mx@3"
+   "juniper/mx-dpc-blank@2"
   ],
   "front/bays/scb0": [
    "juniper/scb-mx@3"
@@ -247,7 +241,7 @@
   "dc"
  ],
  "format": 1,
- "gaps": "86418402b99915e5",
+ "gaps": "a9e71dd5dc7fe323",
  "groups": [
   "cooling",
   "craft",
@@ -281,7 +275,7 @@
   "rear/placements/esd-rear-jack",
   "rear/placements/ground-studs"
  ],
- "names": "df4c87c904f7a5cd",
+ "names": "f298332530d62789",
  "placement-addressing": {
   "for": {
    "front/placements/esd-front-jack": [
@@ -340,5 +334,5 @@
  "placement-surface": "44136fa355b3678a",
  "shape": "fc9ed7825cf4965e",
  "surface": "2efef37452778eb6",
- "version": "6.0.2"
+ "version": "7.0.0"
 }
