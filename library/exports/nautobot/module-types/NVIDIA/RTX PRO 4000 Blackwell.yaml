@@ -10,9 +10,9 @@ power-ports:
 comments: 'NVIDIA RTX PRO 4000 Blackwell (24 GB GDDR7), an actively cooled single-slot full-height workstation
   card with a blower. The bracket face is silver with four DisplayPort connectors on the board''s side
   and a column of square vent holes beside them. The shroud is dark grey with a field of long vent slits
-  near the bracket and the blower''s opening on its broad side, and a black backplate. It has one 16-pin
-  PCIe CEM5 power connector at the far end by the top edge. It plugs into one riser slot and covers none
-  beside it.
+  near the bracket. The blower''s opening is on its broad side, and the backplate is black. It has one
+  16-pin PCIe CEM5 power connector at the far end by the top edge. It plugs into one riser slot and covers
+  none beside it.
 
 
   Facts carried in the model that this schema has no field for:

@@ -1,17 +1,15 @@
 ---
 manufacturer: NVIDIA
 model: RTX PRO 5000 Blackwell
-description: 'NVIDIA RTX PRO 5000 Blackwell (48 GB GDDR7) and RTX PRO 5000 72GB Blackwell, one actively
-  cooled dual-slot full-height full-length workstation card in two memory sizes: the board, the bracket
-  and...'
+description: NVIDIA RTX PRO 5000 Blackwell (48 GB GDDR7) and RTX PRO 5000 72GB Blackwell
 power-ports:
   - name: '{module}/aux-power'
     type: other
     label: 12VHPWR 16-pin
-comments: 'NVIDIA RTX PRO 5000 Blackwell (48 GB GDDR7) and RTX PRO 5000 72GB Blackwell, one actively cooled
-  dual-slot full-height full-length workstation card in two memory sizes: the board, the bracket and the
-  shroud are the same. The bracket face is silver with four DisplayPort connectors on the board''s side
-  and a framed field of eleven vent slots beside them. The shroud is matte near-black with the blower''s
+comments: 'NVIDIA RTX PRO 5000 Blackwell (48 GB GDDR7) and RTX PRO 5000 72GB Blackwell. It is one actively
+  cooled dual-slot full-height full-length workstation card in two memory sizes. The board, the bracket
+  and the shroud are the same. The bracket face is silver with four DisplayPort connectors on the board''s
+  side and a framed field of eleven vent slots beside them. The shroud is matte near-black with the blower''s
   opening on its broad side and a black backplate. The heat sink''s ridged top shows along the top edge.
   It has one 16-pin PCIe CEM5 power connector at the far end by the top edge. It plugs into one riser
   slot and covers the one beside it.

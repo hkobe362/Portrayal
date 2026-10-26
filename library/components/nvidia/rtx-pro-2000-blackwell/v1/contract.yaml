@@ -8,13 +8,13 @@ profile: server
 description: >-
   NVIDIA RTX PRO 2000 Blackwell (16 GB GDDR7), an actively cooled low-profile
   dual-slot workstation card with a small blower. It takes no auxiliary power. It
-  ships on a low-profile bracket with a full-height support bracket in the box, and
-  the face drawn here is the full-height bracket, the only one PNY photographs: a
-  silver plate two slots across with four mini DisplayPort connectors on the board's
-  side, a latch slot beside each, and a grid of square vent holes in a pressed
-  panel held by two Torx screws. The shroud is dark grey with the blower's opening
-  on its broad side and a black backplate. It plugs into one riser slot and covers
-  the one beside it.
+  ships on a low-profile bracket, with a full-height support bracket in the box.
+  The face drawn here is the full-height bracket, the only one PNY photographs.
+  It is a silver plate two slots across. It has four mini DisplayPort connectors
+  on the board's side, with a latch slot beside each. A grid of square vent holes
+  sits in a pressed panel held by two Torx screws. The shroud is dark grey with the
+  blower's opening on its broad side and a black backplate. It plugs into one
+  riser slot and covers the one beside it.
 slot-width: 2
 size: {w: 120.02, h: 41.91, d: 167.64}
 size-confidence: {w: registry, h: registry, d: datasheet}
