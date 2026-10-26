@@ -80,12 +80,12 @@ provenance:
     and the V notches between them. The raster guide shows 3 tabs. No straight-on view of any GeForce bracket exists. The
     bracket is taken to be the same part as the 4090's and the 4080's.
   face-ports: >-
-    estimated - the port places are BORROWED from the vector guides of the 4080 SUPER and 4090 (page 5 of each, one bracket
-    drawing; see nvidia/rtx-4080-super-fe@1): the three DisplayPort receptacles are centred 105.0, 86.5 and 67.5 from the tip
-    and the HDMI receptacle 52.9; each is good to about 2 mm. The 3090's OWN guide is raster, and the figure's oblique view
-    reads the places 107.7, 88.8, 68.4 and 49.2 (fractions of the plate along the same oblique axis, 0.90, 0.74, 0.57 and
-    0.41, rough to 0.03): the HDMI differs by 3.7 mm and the first DisplayPort by 2.7 mm from the borrowed. The vector places
-    are used; the bracket is taken to be the same part. The order, flange end to tab end, is DisplayPort, DisplayPort,
+    estimated - the port places are BORROWED from the RTX 4090 contract (nvidia/rtx-4090-fe@1, batch 1, merged; the RTX 4070
+    SUPER's are the same): the three DisplayPort shells are at 95.7, 78.0 and 59.9 from the tip and the HDMI shell at 42.25,
+    each good to about 2 mm. The 3090's OWN guide is raster, and the figure's oblique view reads the places 107.7, 88.8, 68.4
+    and 49.2 (fractions of the plate along the same oblique axis, 0.90, 0.74, 0.57 and 0.41, rough to 0.03): the HDMI differs
+    by 6.5 mm from the borrowed one. The 4090's spacing is used because it keeps a gap between every shell (1.3, 1.7 and
+    3.2 mm); the bracket is taken to be the same part. The order, flange end to tab end, is DisplayPort, DisplayPort,
     DisplayPort, HDMI, as the guide names them ('DisplayPort 1.4a Connectors (Qty 3)', 'HDM 2.1 Connector'). A DisplayPort
     shell is drawn 16.4 long and 7.1 across and an HDMI shell 14.5 by 6.0: those sizes are estimated. THE LIBRARY HAS NO
     DISPLAYPORT OR HDMI PART OR INTERFACE, so each receptacle is an element of class `connector` painted in the skin and not
@@ -167,8 +167,8 @@ provenance:
     that clearly allows its use.
   conflicts: >-
     CONFLICTS SETTLED: (a) the case diagram's 12.3 in x 5.4 in read 312.4 x 137.2 mm against the page's 313 x 138: the page's
-    are used; (b) the raster guide's figure puts the ports 2.7 to 3.7 mm from the vector guides' places: the vector places
-    are used (the bracket is taken to be the same part); (c) the figure and both guide revisions say 'HDM 2.1': the text is
+    are used; (b) the raster guide's figure puts the ports up to 6.5 mm from the 4090's places: the 4090's places are
+    used, because they keep a gap between every shell (the bracket is taken to be the same part); (c) the figure and both guide revisions say 'HDM 2.1': the text is
     HDMI 2.1; (d) the family page's Founders Edition table lists the 3090 and 3090 Ti side by side at 350 and 450 W: the 3090 is
     350 W; (e) the guide names the connector '12-pin Power Connector' and the family page '2x PCIe 8-pin (adapter to 1x 12-pin
     included)': both are true.
@@ -217,10 +217,10 @@ body:
      color: '#b9bcbf', confidence: estimated,
      source: 'the retention tab of skins/default.svg; 0.9 thick, estimated'}
 elements:
-  display-port-1: {at: [96.8, 6.10], size: [16.40, 7.10], class: connector}
-  display-port-2: {at: [78.3, 6.10], size: [16.40, 7.10], class: connector}
-  display-port-3: {at: [59.3, 6.10], size: [16.40, 7.10], class: connector}
-  hdmi: {at: [45.65, 6.40], size: [14.50, 6.00], class: connector}
+  display-port-1: {at: [95.7, 6.10], size: [16.40, 7.10], class: connector}
+  display-port-2: {at: [78, 6.10], size: [16.40, 7.10], class: connector}
+  display-port-3: {at: [59.9, 6.10], size: [16.40, 7.10], class: connector}
+  hdmi: {at: [42.25, 6.40], size: [14.50, 6.00], class: connector}
   vent-1: {at: [25, 15.30], size: [20.20, 44], class: vent}
   vent-2: {at: [46.7, 15.30], size: [20.20, 44], class: vent}
   vent-3: {at: [68.4, 15.30], size: [20.20, 44], class: vent}

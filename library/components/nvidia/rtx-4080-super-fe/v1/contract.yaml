@@ -77,20 +77,20 @@ provenance:
     step and the V notches between them. The guide shows 3 tabs and a hook-shaped flange that this skin does not draw. No
     straight-on view of any GeForce bracket exists. This bracket is taken to be the same part as the 4090's.
   face-ports: >-
-    drawing - the port places are read on the VECTOR figure of NVIDIA's own guide for this card (page 5; the callout dots
-    are vector circles at the DisplayPort centres, y 199.7, 218.9 and 238.6 pt, and the HDMI's callout dot sits at y 253.8 pt,
-    at the centre of the connector that the drawing shows from 246.5 to 260.9 pt). The page's bracket drawing is the 4090's
-    (same vector paths), so the 4090 mapping of page y to the plate was used: fraction along the plate from the tab tips =
-    0.875 - 0.00804 x (y - 199.7), which gives 0.875, 0.721, 0.562 and 0.441. Times the standard 120.02 plate, the three
-    DisplayPort receptacles are centred 105.0, 86.5 and 67.5 from the tip and the HDMI receptacle 52.9. The order, flange end
-    to tab end, is DisplayPort, DisplayPort, DisplayPort, HDMI, as the guide names them. Each place is good to about 2 mm (the
-    view is oblique). A DisplayPort shell is drawn 16.4 long and 7.1 across and an HDMI shell 14.5 by 6.0: those sizes are
-    estimated (as the RTX A6000's photographed shells). THE LIBRARY HAS NO DISPLAYPORT OR HDMI PART OR INTERFACE, so each
-    receptacle is an element of class `connector` painted in the skin and not a seated part. NO STRAIGHT-ON VIEW OF ANY
-    GEFORCE BRACKET EXISTS, so this face is the least certain part of the card. It reads differently from the RTX 4090
-    contract (batch 1), which took the HDMI at its callout dot (49.5): the guide draws the dot of the 4080 SUPER at the
-    connector's centre and the 4080 and 4090 pages draw the same connector with the dot at its lower end. The 4090 contract was
-    not edited.
+    drawing - the port places and the shells' lengths are read on the VECTOR figure of NVIDIA's own guide for this card (page
+    5), from the four black filled receptacle shapes themselves, not the callout dots. The shapes run, in page y (pt): the
+    first DisplayPort 195.3 to 208.1 (its flange end is hidden behind the bracket's hook, so it is taken as long as the next
+    two, to 191.7), the second 209.3 to 225.7, the third 226.9 to 243.3 and the HDMI 246.9 to 260.2. The page's bracket
+    drawing is the 4090's (same vector paths), so the 4090 mapping of page y to the plate was used: millimetres from the tab
+    tips = 105.0 - 0.965 x (y - 199.7). That puts the three DisplayPort shells at 96.9 to 112.7, 80.0 to 95.8 and 62.4 to 78.2
+    from the tip (15.8 long each, as drawn) and the HDMI shell at 45.6 to 58.5 (12.9 long, as drawn). The gaps between shells
+    are 1.1, 1.8 and 3.9 mm: no two touch. The order, flange end to tab end, is DisplayPort, DisplayPort, DisplayPort, HDMI,
+    as the guide names them. Each place is good to about 2 mm (the view is oblique) but the gaps are read inside one drawing.
+    A shell is drawn 7.1 across for a DisplayPort and 6.0 for the HDMI: those depths are estimated (as the RTX A6000's
+    photographed shells). THE LIBRARY HAS NO DISPLAYPORT OR HDMI PART OR INTERFACE, so each receptacle is an element of class
+    `connector` painted in the skin and not a seated part. NO STRAIGHT-ON VIEW OF ANY GEFORCE BRACKET EXISTS, so this face is
+    the least certain part of the card. It reads differently from the RTX 4090 contract (batch 1), which places its shells
+    from the callout dots and not from the shapes. The 4090 contract was not edited.
   face-vent: >-
     estimated - the guide's drawing shows four grilles in a row below the ports with narrow bars between them and three
     screws at the tab end, one on each slot's centre line (the 3-slot guide draws three). Places are read as fractions of the
@@ -116,8 +116,13 @@ provenance:
     estimated - one dark slab from the board's component face (y 6.01) to the far face (61.0), in three boxes split at the top
     edge's notch (provenance body-power-connector) so that the notch is a real step in 3D. Its broad side is painted: the
     X-shaped waist, the two pockets with their bright rims, the louvres beside the fan pocket and the printed model name
-    ('RTX 4080 SUPER' is plain text; the maker's mark is a logo-zone). It is borrowed from the 4090's skin (itself the
-    4070 SUPER's elevation scaled) and is not a measurement of this card. The BACK of the card (its backplate and the second
+    ('RTX 4080' in bold and 'SUPER' smaller, lighter and in a thin outline, both plain text centred on the pocket's centre line
+    across and along; the maker's mark is a logo-zone). The shroud's outline, pockets and fan are borrowed from the 4090's skin
+    (itself the 4070 SUPER's elevation scaled) and are not a measurement of this card: THE GUIDE'S VECTOR SHROUD CANNOT SETTLE
+    THEM, because page 5 of the 4080 SUPER guide is path for path the 4090 guide's (1095 of 1095 paths but the HDMI callout) and
+    prints no model name or SUPER mark, so every shroud dimension stays `estimated` at the 4090's. The name's size, weight and
+    centring are read on NVIDIA's og picture of the 4080 SUPER (3/4 view, not scaled: the name block sits in the middle of the
+    pocket, 'SUPER' in a smaller, lighter outlined box after 'RTX 4080'); the lengths of the two words are a guess. The BACK of the card (its backplate and the second
     fan) is shown in no picture at its scale and is not drawn.
   body-fan: >-
     estimated - the fan in the far pocket is the 4090 skin's: ring about 113 mm, hub 41 mm, 11 blades. The 3/4 pictures show
@@ -164,7 +169,7 @@ provenance:
     because the text of the same guide is the 4080 SUPER's (304 x 137 x 61, three covers); (c) the guide names the connector
     'PCIe Gen5 16-pin'; the CEM calls it 12VHPWR (5.0) or 12V-2x6 (5.1): std/12vhpwr-header@1 is composed because the guide
     does not name 5.1; (d) the 4080 SUPER guide's HDMI callout sits at y 253.8 and the 4080 and 4090 guides' at 258.8 on one
-    drawing: the connector's drawn centre (253.7) is used.
+    drawing: the shells are placed from the receptacle shapes, which are the same in all three guides.
 body:
   depth: 304
   color: '#1b1b1c'
@@ -210,10 +215,10 @@ body:
      color: '#b9bcbf', confidence: estimated,
      source: 'the retention tab of skins/default.svg; 0.9 thick, estimated'}
 elements:
-  display-port-1: {at: [96.8, 6.10], size: [16.40, 7.10], class: connector}
-  display-port-2: {at: [78.3, 6.10], size: [16.40, 7.10], class: connector}
-  display-port-3: {at: [59.3, 6.10], size: [16.40, 7.10], class: connector}
-  hdmi: {at: [45.65, 6.40], size: [14.50, 6.00], class: connector}
+  display-port-1: {at: [96.9, 6.10], size: [15.80, 7.10], class: connector}
+  display-port-2: {at: [80.0, 6.10], size: [15.80, 7.10], class: connector}
+  display-port-3: {at: [62.4, 6.10], size: [15.80, 7.10], class: connector}
+  hdmi: {at: [45.6, 6.40], size: [12.90, 6.00], class: connector}
   vent-1: {at: [25, 15.30], size: [20.20, 44], class: vent}
   vent-2: {at: [46.7, 15.30], size: [20.20, 44], class: vent}
   vent-3: {at: [68.4, 15.30], size: [20.20, 44], class: vent}
