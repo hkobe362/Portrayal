@@ -143,9 +143,10 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 135 since the RTX A4000.
     # 139 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 141 since the RTX A1000 and A400.
-    # 142 since the RTX 4000 Ada.
-    assert len(named) == 142, \
-        f"expected 142 parts naming a plan drawing, found {len(named)}"
+    # 146 since the five GeForce Founders Edition cards.
+    # 147 since the RTX 4000 Ada.
+    assert len(named) == 147, \
+        f"expected 147 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -282,9 +283,10 @@ def test_the_index_carries_a_parts_other_faces():
     # 199 since the Quadro RTX 8000 and 6000 passive, RTX A6000, A5000 and A4000 cards.
     # 203 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 207 since the RTX A5500 and A4500 (a rear face each) and the RTX A1000 and A400 (a plan each).
-    # 211 since the RTX 6000, 5000, 4500 and 4000 Ada cards (the RTX 2000 Ada has none).
-    assert len(with_faces) == 211, \
-        f"expected exactly 211 of {len(entries)} entries to carry a faces " \
+    # 212 since the five GeForce Founders Edition cards.
+    # 216 since the RTX 6000, 5000, 4500 and 4000 Ada cards (the RTX 2000 Ada has none).
+    assert len(with_faces) == 216, \
+        f"expected exactly 216 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
