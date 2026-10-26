@@ -144,8 +144,9 @@ def test_the_accessor_answers_for_every_part_that_names_a_plan():
     # 139 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 141 since the RTX A1000 and A400.
     # 146 since the five GeForce Founders Edition cards.
-    assert len(named) == 146, \
-        f"expected 146 parts naming a plan drawing, found {len(named)}"
+    # 150 since the RTX 4080 SUPER, 4080, 4060 Ti and 3090 Founders Edition cards.
+    assert len(named) == 150, \
+        f"expected 150 parts naming a plan drawing, found {len(named)}"
 
 
 def run83(doc, path="t/contract.yaml", name="t/thing@1", lib=LIB):
@@ -283,8 +284,9 @@ def test_the_index_carries_a_parts_other_faces():
     # 203 since the V100 PCIe, P100 PCIe, P40 and P4 cards.
     # 207 since the RTX A5500 and A4500 (a rear face each) and the RTX A1000 and A400 (a plan each).
     # 212 since the five GeForce Founders Edition cards.
-    assert len(with_faces) == 212, \
-        f"expected exactly 212 of {len(entries)} entries to carry a faces " \
+    # 216 since the RTX 4080 SUPER, 4080, 4060 Ti and 3090 Founders Edition cards.
+    assert len(with_faces) == 216, \
+        f"expected exactly 216 of {len(entries)} entries to carry a faces " \
         f"key, found {len(with_faces)}"
 
 
