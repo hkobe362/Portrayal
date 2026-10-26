@@ -18,22 +18,22 @@
        chamfer at the flange end on the window's side, a dark opening and two rows
        of pins. Each is drawn once at its own place; the library has no
        DisplayPort part. Centres 40.09, 62.14, 82.94 and 103.73 along the bracket. -->
-  <g id="display-port-1" transform="translate(31.09 5.8)">
+  <g id="display-port-4" transform="translate(31.09 5.8)">
     <path d="M0.8 0 L17.2 0 A0.8 0.8 0 0 1 18.0 0.8 L18.0 3.8 L14.3 7.5 L0.8 7.5 A0.8 0.8 0 0 1 0 6.7 L0 0.8 A0.8 0.8 0 0 1 0.8 0 Z" fill="#b3b2b1" stroke="#4a4948" stroke-width="0.3"/>
     <path d="M1.0 1.0 L17.0 1.0 L17.0 3.5 L13.9 6.5 L1.0 6.5 Z" fill="#141516"/>
     <path d="M2.6 2.4 H15.6 M2.6 4.3 H13.4" stroke="#7d8288" stroke-width="0.7" stroke-dasharray="0.5 0.45" fill="none"/>
   </g>
-  <g id="display-port-2" transform="translate(53.14 5.8)">
+  <g id="display-port-3" transform="translate(53.14 5.8)">
     <path d="M0.8 0 L17.2 0 A0.8 0.8 0 0 1 18.0 0.8 L18.0 3.8 L14.3 7.5 L0.8 7.5 A0.8 0.8 0 0 1 0 6.7 L0 0.8 A0.8 0.8 0 0 1 0.8 0 Z" fill="#b3b2b1" stroke="#4a4948" stroke-width="0.3"/>
     <path d="M1.0 1.0 L17.0 1.0 L17.0 3.5 L13.9 6.5 L1.0 6.5 Z" fill="#141516"/>
     <path d="M2.6 2.4 H15.6 M2.6 4.3 H13.4" stroke="#7d8288" stroke-width="0.7" stroke-dasharray="0.5 0.45" fill="none"/>
   </g>
-  <g id="display-port-3" transform="translate(73.94 5.8)">
+  <g id="display-port-2" transform="translate(73.94 5.8)">
     <path d="M0.8 0 L17.2 0 A0.8 0.8 0 0 1 18.0 0.8 L18.0 3.8 L14.3 7.5 L0.8 7.5 A0.8 0.8 0 0 1 0 6.7 L0 0.8 A0.8 0.8 0 0 1 0.8 0 Z" fill="#b3b2b1" stroke="#4a4948" stroke-width="0.3"/>
     <path d="M1.0 1.0 L17.0 1.0 L17.0 3.5 L13.9 6.5 L1.0 6.5 Z" fill="#141516"/>
     <path d="M2.6 2.4 H15.6 M2.6 4.3 H13.4" stroke="#7d8288" stroke-width="0.7" stroke-dasharray="0.5 0.45" fill="none"/>
   </g>
-  <g id="display-port-4" transform="translate(94.73 5.8)">
+  <g id="display-port-1" transform="translate(94.73 5.8)">
     <path d="M0.8 0 L17.2 0 A0.8 0.8 0 0 1 18.0 0.8 L18.0 3.8 L14.3 7.5 L0.8 7.5 A0.8 0.8 0 0 1 0 6.7 L0 0.8 A0.8 0.8 0 0 1 0.8 0 Z" fill="#b3b2b1" stroke="#4a4948" stroke-width="0.3"/>
     <path d="M1.0 1.0 L17.0 1.0 L17.0 3.5 L13.9 6.5 L1.0 6.5 Z" fill="#141516"/>
     <path d="M2.6 2.4 H15.6 M2.6 4.3 H13.4" stroke="#7d8288" stroke-width="0.7" stroke-dasharray="0.5 0.45" fill="none"/>

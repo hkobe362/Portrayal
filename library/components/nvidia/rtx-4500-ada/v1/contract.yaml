@@ -112,7 +112,11 @@ provenance:
     same scales. Each shell is 18.0 long and 7.5 across (y 5.8 to 13.3), with the
     D shape's chamfer at the flange end on the window's side. Their centres along
     the bracket are 40.09, 62.14, 82.94 and 103.73, a pitch of 21.2. The photograph
-    prints the port numbers 1 to 4 by the shells; they are not drawn. Readings are
+    prints the port numbers 1 to 4 in faint small figures, each on the flange side
+    of its receptacle, 1 beside the flange-most one (legible only when the picture
+    is enlarged; they are not drawn). So `display-port-1` is the receptacle nearest
+    the flange (x 94.73) and `display-port-4` the one nearest the tip (x 31.09), as
+    printed. Readings are
     good to about 0.5 mm. THE LIBRARY HAS NO DISPLAYPORT PART OR INTERFACE, so each
     is an element of class `connector` painted in the skin and not a seated part;
     nothing mates it and the module type carries no port for them (the
@@ -130,7 +134,8 @@ provenance:
     painted line, not relief.
   face-markings: >-
     photo-measured - the bracket carries no lamp and no label; its only printing
-    is the warning triangle and the port numbers named above.
+    is the warning triangle and the faint port numbers 1 to 4 named under
+    `face-displayports` (not drawn).
   thickness: >-
     estimated - the datasheet states no thickness. The shroud's far face is put at
     y 40.0, as nvidia/rtx-a6000@1 has it, 1.57 inside the bracket's far edge
@@ -329,10 +334,10 @@ body:
      color: '#7c7b7a', confidence: estimated,
      source: 'the second retention tab of skins/default.svg; 0.9 thick, estimated'}
 elements:
-  display-port-1: {at: [31.09, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-2: {at: [53.14, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-3: {at: [73.94, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-4: {at: [94.73, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-1: {at: [94.73, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-2: {at: [73.94, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-3: {at: [53.14, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-4: {at: [31.09, 5.80], size: [18.00, 7.50], class: connector}
   vent: {at: [35.58, 15.60], size: [74.67, 23.14], class: vent}
   screw-1: {at: [30.72, 15.74], size: [4.70, 4.70], class: screw}
   screw-2: {at: [111.16, 15.74], size: [4.70, 4.70], class: screw}

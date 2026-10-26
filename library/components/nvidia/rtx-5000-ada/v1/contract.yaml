@@ -100,7 +100,9 @@ provenance:
     The photograph filed under this card is that card's.
   face-displayports: >-
     estimated - the RTX 4500 Ada's: four shells 18.0 long and 7.5 across (y 5.8 to
-    13.3) with centres 40.09, 62.14, 82.94 and 103.73 along the bracket. THE LIBRARY
+    13.3) with centres 40.09, 62.14, 82.94 and 103.73 along the bracket. As on the
+    RTX 4500 Ada's photograph, which prints 1 to 4 in faint figures from the flange
+    end, `display-port-1` is the receptacle nearest the flange (x 94.73). THE LIBRARY
     HAS NO DISPLAYPORT PART OR INTERFACE, so each is an element of class
     `connector` painted in the skin and not a seated part; nothing mates it and the
     module type carries no port for them (the `display-ports` attr says 4 x
@@ -293,10 +295,10 @@ body:
      color: '#7c7b7a', confidence: estimated,
      source: 'the second retention tab of skins/default.svg; 0.9 thick, estimated'}
 elements:
-  display-port-1: {at: [31.09, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-2: {at: [53.14, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-3: {at: [73.94, 5.80], size: [18.00, 7.50], class: connector}
-  display-port-4: {at: [94.73, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-1: {at: [94.73, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-2: {at: [73.94, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-3: {at: [53.14, 5.80], size: [18.00, 7.50], class: connector}
+  display-port-4: {at: [31.09, 5.80], size: [18.00, 7.50], class: connector}
   vent: {at: [35.58, 15.60], size: [74.67, 23.14], class: vent}
   screw-1: {at: [30.72, 15.74], size: [4.70, 4.70], class: screw}
   screw-2: {at: [111.16, 15.74], size: [4.70, 4.70], class: screw}

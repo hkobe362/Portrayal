@@ -104,8 +104,11 @@ provenance:
     the board's side at the top). Each shell is 17.6 long and 6.8 across (y 6.18 to
     12.94), with the D shape's chamfer at the flange end on the vent column's side.
     Their centres along the bracket are 40.16, 61.70, 82.34 and 102.87, a pitch of
-    20.9. The photograph prints the port numbers by the shells; they are not drawn.
-    Readings are good to about 0.5 mm. THE LIBRARY HAS NO DISPLAYPORT PART OR
+    20.9. The photograph prints the port numbers 1 to 4 in faint small figures, each
+    on the flange side of its receptacle, 1 beside the flange-most one (legible only
+    when the picture is enlarged; they are not drawn). So `display-port-1` is the
+    receptacle nearest the flange (x 94.07) and `display-port-4` the one nearest the
+    tip (x 31.36), as printed. Readings are good to about 0.5 mm. THE LIBRARY HAS NO DISPLAYPORT PART OR
     INTERFACE, so each is an element of class `connector` painted in the skin and
     not a seated part; nothing mates it and the module type carries no port for
     them (the `display-ports` attr says 4 x DisplayPort 1.4a, the datasheet's
@@ -117,7 +120,7 @@ provenance:
     and 114.67, heads 4.1 across. There is no raised frame and no other opening.
   face-markings: >-
     photo-measured - the bracket carries no lamp and no label; its only printing is
-    the port numbers named above.
+    the faint port numbers 1 to 4 named under `face-displayports` (not drawn).
   thickness: >-
     estimated - nothing held states the card's thickness. The single-slot
     component envelope on the component side of a PCIe card is 14.47 (PCIe CEM
@@ -316,10 +319,10 @@ body:
 parts:
   - {ref: std/pcie-bracket-fh@2, id: bracket, at: [0, 0], behind: true}
 elements:
-  display-port-1: {at: [31.36, 6.18], size: [17.60, 6.80], class: connector}
-  display-port-2: {at: [52.90, 6.18], size: [17.60, 6.80], class: connector}
-  display-port-3: {at: [73.54, 6.18], size: [17.60, 6.80], class: connector}
-  display-port-4: {at: [94.07, 6.18], size: [17.60, 6.80], class: connector}
+  display-port-1: {at: [94.07, 6.18], size: [17.60, 6.80], class: connector}
+  display-port-2: {at: [73.54, 6.18], size: [17.60, 6.80], class: connector}
+  display-port-3: {at: [52.90, 6.18], size: [17.60, 6.80], class: connector}
+  display-port-4: {at: [31.36, 6.18], size: [17.60, 6.80], class: connector}
   vent: {at: [34.70, 14.70], size: [75.78, 3.70], class: vent}
   screw-1: {at: [29.53, 14.50], size: [4.10, 4.10], class: screw}
   screw-2: {at: [112.62, 14.50], size: [4.10, 4.10], class: screw}

@@ -112,7 +112,12 @@ provenance:
     same scales. Each shell is 18.6 long and 7.6 across (y 5.68 to 13.27), with the
     D shape's chamfer at the flange end on the window's side. Their centres along
     the bracket are 40.12, 61.55, 82.65 and 103.42, a pitch of 21.1. Readings are
-    good to about 0.5 mm. THE LIBRARY HAS NO DISPLAYPORT PART OR INTERFACE, so each
+    good to about 0.5 mm. The photograph prints no port number (checked enlarged), so
+    no source numbers these four: `display-port-1` is the receptacle nearest the tip
+    (x 30.82) and `display-port-4` the one nearest the flange by the order the
+    RTX A6000 and RTX A4000 use, which is a convention and not a reading (the RTX
+    4500, 4000 and 2000 Ada photographs print their numbers from the flange end).
+    THE LIBRARY HAS NO DISPLAYPORT PART OR INTERFACE, so each
     is an element of class `connector` painted in the skin and not a seated part;
     nothing mates it and the module type carries no port for them (the
     `display-ports` attr says 4 x DisplayPort 1.4a, the datasheet's words). The pins
@@ -120,8 +125,15 @@ provenance:
   face-grille: >-
     photo-measured - one framed vent window beside the DisplayPorts. The bezel is
     87.3 long and 25.0 across (x 29.24 to 116.5, y 14.84 to 39.85); the dark window
-    is x 33.5 to 111.0 and y 15.5 to 38.3, with the heat-sink fins behind it: 17
-    on a pitch of 4.34 (19.75 px), the first at x 36.27. Four Torx screws stand
+    is x 33.5 to 111.0 and y 15.5 to 38.3, with the heat-sink fins behind it: 35
+    lines on a pitch of 2.17 (9.9 px), the first at x 36.05 and the last at 109.93.
+    A luminance scan down the window's centre column of nvidia-rtx-6000-left.png
+    (rows 175 to 540, columns 410 to 450) finds a line every 9.5 to 10 px (the
+    Fourier period is 9.8 px, 33.6 cycles over 330 px), alternating a bright line
+    (the 18 drawn as `#fins`, 4.34 apart) and a dimmer one between (the 17 drawn as
+    `#fins-dim`); the fins are drawn as straight lines from the window's top to its
+    bottom, and their depth and the dim lines' true nature (a second fin edge or the
+    gap's shadow) are not read. Four Torx screws stand
     at x 31.21 and 113.43 and y 17.74 and 36.5, at the window's four corners, heads
     about 4.4 across. The window's corners are cut round the screws in the
     photograph; that is not drawn, and the bezel's raised edge is a painted line, not

@@ -110,7 +110,12 @@ provenance:
     13.06), with its opening cut on the grid's side and its tongue drawn as one bar.
     Their centres along the bracket are 72.20, 59.76, 46.90 and 34.21 (the middles of
     the shells, rows 320.5, 394.5, 471 and 546.5), a pitch of 12.66. The photograph
-    prints the port numbers 1 to 4 by the shells; they are not drawn. THE LIBRARY HAS
+    prints the port numbers 1 to 4, each on the tip side of its receptacle, and they
+    are drawn (`#silkscreen`, 1.7 tall, centred at x 65.7, 53.2, 40.5 and 28.0 and
+    y 11.7, read at 5.949 and 5.906 px/mm; see `face-markings`). So `display-port-1`
+    is the receptacle nearest the flange (x 67.60), `display-port-2`, `-3` and `-4`
+    following toward the tip: the element ids follow the photograph's numbers, the
+    one numbering source held for any of these cards. THE LIBRARY HAS
     NO DISPLAYPORT PART OR INTERFACE, and none for a mini DisplayPort, so each is an
     element of class `connector` painted in the skin and not a seated part; nothing
     mates it and the module type carries no port for them (the `display-ports` attr
@@ -133,7 +138,9 @@ provenance:
     not a six-lobe star.
   face-markings: >-
     photo-measured - the bracket carries no lamp and no label; its only printing is
-    the port numbers named above.
+    the port numbers 1 to 4, which are drawn in light print beside the small squares
+    (the first three) and below the fourth port, each 1.7 tall; their place is read
+    to about 0.5 mm and the glyph is the skin's sans-serif, not the printed one.
   bracket-variants: >-
     NOT DRAWN: THE LOW-PROFILE BRACKET. The quick-start guide lists "Support Full
     Height Bracket" in the card's box, so the card ships on a low-profile bracket
@@ -150,14 +157,19 @@ provenance:
     side, are at the top (small y), which is where the receptacles are.
   body: >-
     the board, its edge and the pads follow PCIe CEM 5.0 (figures 6-5 and 11-3, as
-    nvidia/a2@1 has them for a low profile card): the card 55.65 high above its lower
+    the RTX 6000, 4500 and 4000 Ada have them): the card 55.65 high above its lower
     edge, which is 13.25 above the finger datum W (at x 15.16 on this full-height
-    bracket), the key datum 58.15 behind the bracket and the x16 finger tab to the
-    standard's 81.88 past it. NVIDIA prints no figure for this card. The broad-side
-    photograph agrees: the shroud's top edge is at 83.1 from the tip against the
-    board's 84.06, the gold fingers from 48.4 to 129.0 behind the bracket (CEM 46.35
-    to 129.95, the rendered fingers about 4 percent short) and the key's gap at 59.6
-    against CEM's 59.35. The lower edge has a step at the far end from 142.5 to 160.0
+    bracket), the key datum 57.15 behind the bracket, the full-height datum those
+    three use, and the x16 finger tab to the standard's 81.88 past it. (An earlier
+    figure, the low-profile key datum 58.15 copied from nvidia/a2@1, is dropped: this
+    card is drawn on its full-height bracket, and the photographs show the fingers
+    starting at the same place on all four cards.) NVIDIA prints no figure for this
+    card. The broad-side photograph agrees on the height: the shroud's top edge is at
+    83.1 from the tip against the board's 84.06. THE PHOTOGRAPH'S FINGERS DO NOT
+    FOLLOW CEM exactly: the gold fingers run from 48.4 to 129.0 behind the bracket
+    against CEM's 45.35 to 128.95 (the same start as the RTX 6000 Ada's 48.2 and the
+    RTX 4500 Ada's 48.7), and the key's gap is read at 59.6 against CEM's 58.35; the
+    body keeps CEM's and this is a gap. The lower edge has a step at the far end from 142.5 to 160.0
     behind the bracket, 4.2 deep (the shroud's lower edge steps up 17 px with sloped
     ends), drawn as one box 17.5 long. THE BOARD STARTS 0.90 behind the bracket, as
     nvidia/a10@1 has it (estimated).
@@ -236,16 +248,16 @@ body:
   - {id: board-east, at: [28.41, 4.44], size: [55.65, 1.57], from: 160.00, depth: 7.24,
      color: '#1d2420', confidence: registry, shows: [right],
      source: 'the lower edge again east of the step, to the 167.64 end less the 0.4 step (provenance body-end)'}
-  - {id: edge-tab-short, at: [15.16, 4.44], size: [13.25, 1.57], from: 45.95, depth: 11.20,
+  - {id: edge-tab-short, at: [15.16, 4.44], size: [13.25, 1.57], from: 45.00, depth: 11.20,
      color: '#1d2420', confidence: registry,
-     source: 'CEM 5.0 fig 6-5 at the low profile key datum 58.15 behind the bracket, tab 13.25 deep, 12.15 to the tab end, notch 1.90 (nvidia/a2@1); the photograph''s key gap is at 59.6'}
-  - {id: edge-tab-long, at: [15.16, 4.44], size: [13.25, 1.57], from: 59.10, depth: 80.93,
+     source: 'CEM 5.0 fig 6-5: key datum 57.15 behind the bracket, tab 13.25 deep, 12.15 to the tab end, notch 1.90; the photograph''s key gap is at 59.6 (provenance body)'}
+  - {id: edge-tab-long, at: [15.16, 4.44], size: [13.25, 1.57], from: 58.10, depth: 80.93,
      color: '#1d2420', confidence: registry,
-     source: 'CEM 5.0: the x16 tab runs 81.88 past the key datum 58.15, to 140.03'}
-  - {id: edge-pads-short, at: [17.76, 4.39], size: [3.00, 1.67], from: 46.35, depth: 10.60,
+     source: 'CEM 5.0: the tab runs 81.88 past the key datum, to 139.03'}
+  - {id: edge-pads-short, at: [17.76, 4.39], size: [3.00, 1.67], from: 45.35, depth: 10.60,
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0 fig 6-5: pads 2.60..5.60 up the tab, pins 1-11 on 1.00 pitch'}
-  - {id: edge-pads-long, at: [17.76, 4.39], size: [3.00, 1.67], from: 59.35, depth: 70.60,
+  - {id: edge-pads-long, at: [17.76, 4.39], size: [3.00, 1.67], from: 58.35, depth: 70.60,
      color: '#d4a72c', confidence: registry,
      source: 'CEM 5.0: the x16 pad run on 1.00 pitch'}
   - {id: shroud, at: [28.41, 6.01], size: [55.65, 33.99], from: 0.90, depth: 141.60,

@@ -36,28 +36,48 @@
   </g>
   <!-- the window's bezel: a frame 87.3 long and 25.0 across around the vent -->
   <rect id="bezel" x="29.24" y="14.84" width="87.26" height="25.01" rx="1.6" fill="none" stroke="#6b6866" stroke-width="0.35"/>
-  <!-- the vent window with the heat-sink fins behind it: 17 fins on a 4.34 pitch,
-       the first at x 36.27 -->
+  <!-- the vent window with the heat-sink fins behind it: 35 lines on a 2.17 pitch
+       from x 36.05, bright and dim alternating (the bright ones every 4.34) -->
   <rect x="30.6" y="15.4" width="85.0" height="23.5" rx="1.0" fill="#0b0c0d"/>
   <rect id="vent" x="33.5" y="15.5" width="77.5" height="22.8" rx="0.8" fill="#0b0c0d" stroke="#3a3e43" stroke-width="0.3"/>
   <g id="fins" fill="#5a5d60">
-    <rect x="35.97" y="15.8" width="0.6" height="22.2"/>
-    <rect x="40.31" y="15.8" width="0.6" height="22.2"/>
-    <rect x="44.65" y="15.8" width="0.6" height="22.2"/>
-    <rect x="48.99" y="15.8" width="0.6" height="22.2"/>
-    <rect x="53.33" y="15.8" width="0.6" height="22.2"/>
-    <rect x="57.67" y="15.8" width="0.6" height="22.2"/>
-    <rect x="62.01" y="15.8" width="0.6" height="22.2"/>
-    <rect x="66.35" y="15.8" width="0.6" height="22.2"/>
-    <rect x="70.69" y="15.8" width="0.6" height="22.2"/>
-    <rect x="75.03" y="15.8" width="0.6" height="22.2"/>
-    <rect x="79.37" y="15.8" width="0.6" height="22.2"/>
-    <rect x="83.71" y="15.8" width="0.6" height="22.2"/>
-    <rect x="88.05" y="15.8" width="0.6" height="22.2"/>
-    <rect x="92.39" y="15.8" width="0.6" height="22.2"/>
-    <rect x="96.73" y="15.8" width="0.6" height="22.2"/>
-    <rect x="101.07" y="15.8" width="0.6" height="22.2"/>
-    <rect x="105.41" y="15.8" width="0.6" height="22.2"/>
+    <rect x="35.75" y="15.8" width="0.6" height="22.2"/>
+    <rect x="40.09" y="15.8" width="0.6" height="22.2"/>
+    <rect x="44.44" y="15.8" width="0.6" height="22.2"/>
+    <rect x="48.79" y="15.8" width="0.6" height="22.2"/>
+    <rect x="53.13" y="15.8" width="0.6" height="22.2"/>
+    <rect x="57.48" y="15.8" width="0.6" height="22.2"/>
+    <rect x="61.82" y="15.8" width="0.6" height="22.2"/>
+    <rect x="66.17" y="15.8" width="0.6" height="22.2"/>
+    <rect x="70.52" y="15.8" width="0.6" height="22.2"/>
+    <rect x="74.86" y="15.8" width="0.6" height="22.2"/>
+    <rect x="79.21" y="15.8" width="0.6" height="22.2"/>
+    <rect x="83.56" y="15.8" width="0.6" height="22.2"/>
+    <rect x="87.90" y="15.8" width="0.6" height="22.2"/>
+    <rect x="92.25" y="15.8" width="0.6" height="22.2"/>
+    <rect x="96.59" y="15.8" width="0.6" height="22.2"/>
+    <rect x="100.94" y="15.8" width="0.6" height="22.2"/>
+    <rect x="105.29" y="15.8" width="0.6" height="22.2"/>
+    <rect x="109.63" y="15.8" width="0.6" height="22.2"/>
+  </g>
+  <g id="fins-dim" fill="#3d4043">
+    <rect x="38.02" y="15.8" width="0.4" height="22.2"/>
+    <rect x="42.37" y="15.8" width="0.4" height="22.2"/>
+    <rect x="46.71" y="15.8" width="0.4" height="22.2"/>
+    <rect x="51.06" y="15.8" width="0.4" height="22.2"/>
+    <rect x="55.40" y="15.8" width="0.4" height="22.2"/>
+    <rect x="59.75" y="15.8" width="0.4" height="22.2"/>
+    <rect x="64.10" y="15.8" width="0.4" height="22.2"/>
+    <rect x="68.44" y="15.8" width="0.4" height="22.2"/>
+    <rect x="72.79" y="15.8" width="0.4" height="22.2"/>
+    <rect x="77.14" y="15.8" width="0.4" height="22.2"/>
+    <rect x="81.48" y="15.8" width="0.4" height="22.2"/>
+    <rect x="85.83" y="15.8" width="0.4" height="22.2"/>
+    <rect x="90.17" y="15.8" width="0.4" height="22.2"/>
+    <rect x="94.52" y="15.8" width="0.4" height="22.2"/>
+    <rect x="98.87" y="15.8" width="0.4" height="22.2"/>
+    <rect x="103.21" y="15.8" width="0.4" height="22.2"/>
+    <rect x="107.56" y="15.8" width="0.4" height="22.2"/>
   </g>
   <!-- four Torx screws at the window's corners, beyond the vent's two ends -->
   <g id="screw-1"><circle cx="31.21" cy="17.74" r="2.2" fill="#6f6c6a" stroke="#2a2927" stroke-width="0.3"/><circle cx="31.21" cy="17.74" r="0.9" fill="#1d1f21"/></g>
