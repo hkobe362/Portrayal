@@ -12,7 +12,7 @@ description: >-
 size: {w: 44.45, h: 133.35, d: 25.0}
 size-confidence: {w: estimated, h: estimated, d: estimated}
 attrs:
-  model: 'Power supply slot blank'
+  model: 'Nexus 9500 power supply slot blank'
   role: 'airflow-blank'
   eol: 'unknown'
 provenance:

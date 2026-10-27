@@ -183,24 +183,24 @@
    "cisco/n9k-sc-a@1"
   ]
  },
- "composed": "8a94beb4e41336ec",
+ "composed": "ac36fa7d18805aeb",
  "composed-refs": {
   "cisco/n9k-c9500-lc-cv@1": "1.0.0+1fe3af5ac951df01",
-  "cisco/n9k-c9508-fan-pwr@1": "1.0.0+735d245c4e8a3e21",
+  "cisco/n9k-c9508-fan-pwr@1": "1.0.0+64fb73979d22139b",
   "cisco/n9k-c9508-fan2@1": "1.0.0+a94064c6edc5f34c",
   "cisco/n9k-c9508-fan@1": "1.0.0+a44a0bf7f68559ba",
-  "cisco/n9k-c9508-fm-cv@1": "1.0.0+c55bdd8d38bf80f5",
+  "cisco/n9k-c9508-fm-cv@1": "1.0.0+c903428b30a5d451",
   "cisco/n9k-c9508-fm-e2@1": "1.0.0+be4595d60601818e",
   "cisco/n9k-c9508-fm-e@1": "1.0.0+757dd31173c9fe61",
   "cisco/n9k-c9508-fm-g@1": "1.0.0+d54120aa0d8f4fbe",
   "cisco/n9k-c9508-fm-r2@1": "1.0.0+ec1d8c8bb69913e0",
   "cisco/n9k-c9508-fm-r@1": "1.0.0+7c9d7d0070f4437d",
   "cisco/n9k-c9508-fm-s@1": "1.0.0+a7d86766d621d369",
-  "cisco/n9k-c9508-fm-z@1": "1.0.0+bf37c55c01008349",
+  "cisco/n9k-c9508-fm-z@1": "1.0.0+28ec1634684a9199",
   "cisco/n9k-c9508-fm@1": "1.0.0+ddade2b9155259d5",
   "cisco/n9k-pac-3000w-b@1": "1.0.0+92806fcbde7ab652",
-  "cisco/n9k-pdc-3000w-b@1": "1.0.0+524beff9f133c0a0",
-  "cisco/n9k-psu-blank@1": "1.0.0+4639f870728c7b4b",
+  "cisco/n9k-pdc-3000w-b@1": "1.0.0+4f6c47bcb20152e2",
+  "cisco/n9k-psu-blank@1": "1.0.0+8c073e71f7b6d822",
   "cisco/n9k-puv-3000w-b@1": "1.0.0+8e7b882ec831d1eb",
   "cisco/n9k-puv2-3000w-b@1": "1.0.0+2a19319bc2acf2d1",
   "cisco/n9k-sc-a@1": "1.0.0+bad08754c6d8919a",
@@ -222,7 +222,7 @@
   "psu-universal"
  ],
  "format": 1,
- "gaps": "d4118b11356b702e",
+ "gaps": "7d2c2c0871633153",
  "groups": [
   "fabric",
   "fan-trays",
@@ -375,7 +375,7 @@
   "rear/bays/sc-2": "system-controllers"
  },
  "placement-surface": "b2cb1df9715ad427",
- "shape": "1a5b8ad8e97933e8",
- "surface": "0509fdf42aa85e50",
- "version": "0.1.0"
+ "shape": "1dbb36836e0cd096",
+ "surface": "739032ab5f3a72da",
+ "version": "1.0.0"
 }

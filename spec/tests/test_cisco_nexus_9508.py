@@ -220,7 +220,8 @@ def test_base_seats_the_common_equipment(device):
     assert s["sc-1"] == s["sc-2"] == "cisco/n9k-sc-a@1"
     assert [s[f"fan-{n}"] for n in (1, 2, 3)] == ["cisco/n9k-c9508-fan@1"] * 3
     assert [s[f"fm-{n}"] for n in range(2, 7)] == ["cisco/n9k-c9508-fm-e2@1"] * 5
-    assert s["fm-1"] == "cisco/n9k-c9508-fm-z@1"
+    # an empty odd fabric slot takes the FM-CV (PDF p9, pp113-116); the FM-Z is for an empty even slot (p135)
+    assert s["fm-1"] == "cisco/n9k-c9508-fm-cv@1"
     assert [s[f"ps-{n}"] for n in range(1, 5)] == ["cisco/n9k-pac-3000w-b@1"] * 4
     assert [s[f"ps-{n}"] for n in range(5, 9)] == ["cisco/n9k-psu-blank@1"] * 4
     assert {s[f"lc-{n}"] for n in range(1, 9)} == {"cisco/n9k-c9500-lc-cv@1"}
@@ -272,7 +273,11 @@ def test_module_power_figures_are_the_planning_table():
             "n9k-c9508-fan": (176, 250), "n9k-c9508-fan2": (450, 900),
             "n9k-c9508-fm": (176, 251), "n9k-c9508-fm-s": (340, 400),
             "n9k-c9508-fm-e2": (266, 420), "n9k-c9508-fm-g": (685, 936),
-            "n9k-c9508-fm-r": (240, 250), "n9k-c9508-fm-r2": (280, 320)}
+            "n9k-c9508-fm-r": (240, 250), "n9k-c9508-fm-r2": (280, 320),
+            "n9k-c9508-fan-pwr": (45, 90),                           # PDF p19; the FM-G example counts two at 180 W
+            # FM-E 455/570 W is the first of the two lines in the shared FM-E/FM-E2 row (PDF p17), read by line
+            # order; only the FM-E2 line is confirmed, by the Step 2 example at 420 W
+            "n9k-c9508-fm-e": (455, 570)}
     for name, (typ, top) in want.items():
         a = contract(name)["attrs"]
         assert (a["power-draw-typical-w"], a["power-draw-max-w"]) == (typ, top), name

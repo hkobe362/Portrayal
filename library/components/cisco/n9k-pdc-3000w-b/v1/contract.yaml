@@ -36,7 +36,10 @@ provenance:
     dissipation.
   lamps: >-
     install guide - "Power Supply LEDs", OK and FAIL or FAIL/ID, upper left. Positions estimated. The
-    DC procedure names the output lamp "OUT"; the LED table names it OK, which is used.
+    DC procedure names the output lamp "OUT"; the LED table names it OK, which is used. GAP: the DC
+    connection and installation procedures (printed pp35 and 106, PDF pp41 and 112) also tell the reader to
+    verify that the Input 1 (IN1) and Input 2 (IN2) lamps light, and the LED table (PDF p137) does not list
+    them. No figure shows where they sit, so they are not drawn; the module has only OK and FAIL.
   skin: >-
     estimated - the terminal box, its cover and the four posts are described in "Connecting a 3-kW DC Power
     Supply to a DC Power Source" and drawn in the figures of PDF pp108-110; none dimensions them.

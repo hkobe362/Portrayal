@@ -14,6 +14,8 @@ size-confidence: {w: estimated, h: estimated, d: estimated}
 attrs:
   model: 'N9K-C9508-FAN-PWR'
   role: 'fan-power-card'
+  power-draw-typical-w: 45
+  power-draw-max-w: 90
   eol: 'unknown'
 provenance:
   size: >-
@@ -26,8 +28,8 @@ provenance:
     for N9K-C9508-FAN2 modules."
   power: >-
     datasheet - "Planning for Power Requirements" table (printed p13, PDF p19), "Blank Fan Power Card
-    (N9K-C9508-FAN-PWR)": 45 W typical, 90 W maximum. Recorded here rather than as a draw because the part is
-    a blank for the purpose of the library.
+    (N9K-C9508-FAN-PWR)": 45 W typical, 90 W maximum. The guide's FM-G budget example counts two of them at 180
+    W. Recorded as a draw so a build's total includes the card.
   skin: >-
     estimated - a plain plate with a power connector and two captive screws; no figure draws the card.
   lifecycle: >-

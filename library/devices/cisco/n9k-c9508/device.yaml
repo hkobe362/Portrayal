@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: n9k-c9508
-version: 0.1.0
+version: 1.0.0
 maturity: modelled
 manufacturer: Cisco
 model: N9K-C9508
@@ -64,7 +64,7 @@ provenance:
     confidence: estimated
     note: >-
       estimated - the rear is derived the same way. The guide's rear figure (PDF p12) is isometric. Three
-      fan trays of 5.04 in (128.02 mm) fill the width from the left, each 18.08 in (459.2 mm) tall with its
+      fan trays of 5.04 in (128.02 mm) are centred across the width, each 18.08 in (459.2 mm) tall with its
       brackets; the six fabric modules, 2.46 in (62.48 mm) wide, sit behind them on a pitch of half a fan
       tray, so FM 1 and FM 2 are behind FAN 1, FM 3 and FM 4 behind FAN 2, FM 5 and FM 6 behind FAN 3 (the
       guide says the even-numbered fabric slot is the one behind a fan tray that powers it). The two system
@@ -82,10 +82,12 @@ provenance:
     confidence: datasheet
     note: >-
       datasheet - "Overview" note: three fabric modules go in FM 2, 4 and 6; four in FM 2, 3, 4 and 6; five in
-      FM 2 to 6; six in FM 1 to 6. Slots left empty take N9K-C9508-FM-CV (any fabric other than -FM-G), the
-      N9K-C9508-FM-Z blank that powers the fan tray (Table 1), or N9K-C9508-FAN-PWR (with -FM-G and
-      N9K-C9508-FAN2). With N9K-C9508-FM-R2 no fabric slot may be empty. A bay holds any of them; the
-      pairing rules are the guide's and are not enforced by the model.
+      FM 2 to 6; six in FM 1 to 6. Slots left empty take N9K-C9508-FAN-PWR (with -FM-G and N9K-C9508-FAN2) or,
+      with any other fabric module, a blank by slot: an empty odd slot (FM 1, FM 3, FM 5) takes N9K-C9508-FM-CV
+      (Overview note, PDF p9; migration cautions, PDF pp113-116), and an empty even slot (FM 2, FM 4, FM 6)
+      takes N9K-C9508-FM-Z, which powers the fan tray (Fan Tray LEDs, PDF p135). Table 1 (PDF p7) lists only
+      the FM-Z in its blank column. With N9K-C9508-FM-R2 no fabric slot may be empty. A bay holds any of
+      them; the pairing rules are the guide's and are not enforced by the model.
   power-slots:
     confidence: datasheet
     note: >-
@@ -105,8 +107,11 @@ provenance:
       drawing - the clearance figure (PDF p24) shows the chassis between front and rear vertical rack posts
       with its front at the front posts; the front figure (PDF p11, callout 5) shows "2 vertical mounting
       brackets that are used to mount the chassis onto rack" at the sides of the front. The shipped position
-      is therefore flush, and no `at` is written: no figure dimensions the bracket. A rear-mount position is
-      not given by the guide. The bottom-support rails (kit N9K-C9500-RMK; the accessory kit is N9K-ACC-KIT in
+      is therefore flush, and no `at` is written: no figure gives the bracket's depth position. The clearance
+      figure (PDF p24, callout 14) prints "Width of the chassis plus vertical mounting brackets on each side"
+      as 19.2 in (48.8 cm), against the 17.5 in chassis: about 21.6 mm of bracket on each side. The ear model
+      takes a depth offset and a height and no width, so that span is carried here and in a gap, not drawn.
+      A rear-mount position is not given by the guide. The bottom-support rails (kit N9K-C9500-RMK; the accessory kit is N9K-ACC-KIT in
       the procedure and N9K-C9500-ACK in its table) carry the weight; the rack must be a four-post rack 24 to 32
       in deep between rails. No kit is listed under `chassis.kits`: the first `kind: kit` contract in the
       library broke six existing tests, so the kit is left out of this batch.
@@ -123,7 +128,7 @@ provenance:
   lifecycle:
     confidence: datasheet
     note: >-
-      datasheet - Cisco's support page lists the Nexus 9508 as available (intake grid A, row 70). Sale status of
+      datasheet - Cisco's support page lists the Nexus 9508 as available (support page "Cisco Nexus 9000 Series Switches", https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html). Sale status of
       each module is per module: N9K-SUP-A, N9K-SUP-B, N9K-C9508-FM, -FM-S and -FM-E are end-of-sale by
       notice; the others have no status on the support page and are recorded as unknown.
 attrs:
@@ -164,6 +169,14 @@ gaps:
     The guide gives a typical and maximum draw per module and no figure for the chassis itself; the chassis
     total is whatever its occupants sum to. The line cards are not in this batch, so a total here is a floor.
   wanted: a chassis-level draw from Cisco, or confirmation that the sum of the module table is the answer
+- what: bracket-width
+  scope: [front]
+  reason: needs-drawing
+  note: >-
+    The clearance figure (PDF p24, callout 14) gives the width of the chassis plus the vertical mounting
+    brackets as 19.2 in (48.8 cm). The ear model has no field for an overall width, so the mounting-bracket
+    region is not sized by it and the front face stays the 444.5 mm chassis width.
+  wanted: ear support for an overall width, or a dimensioned front view of the bracket
 - what: no-flat-views
   scope: [front, rear]
   reason: needs-drawing
@@ -302,7 +315,7 @@ views:
       - {id: fan-1, at: [30.2, 6.35], size: {w: 128.02, h: 459.2}, accepts: ['cisco/n9k-c9508-fan@1', 'cisco/n9k-c9508-fan2@1'], group: fan-trays, rel-pos: 0, default: cisco/n9k-c9508-fan@1}
       - {id: fan-2, at: [158.22, 6.35], size: {w: 128.02, h: 459.2}, accepts: ['cisco/n9k-c9508-fan@1', 'cisco/n9k-c9508-fan2@1'], group: fan-trays, rel-pos: 1, default: cisco/n9k-c9508-fan@1}
       - {id: fan-3, at: [286.24, 6.35], size: {w: 128.02, h: 459.2}, accepts: ['cisco/n9k-c9508-fan@1', 'cisco/n9k-c9508-fan2@1'], group: fan-trays, rel-pos: 2, default: cisco/n9k-c9508-fan@1}
-      - {id: fm-1, at: [30.965, 27.67], size: {w: 62.48, h: 416.56}, accepts: ['cisco/n9k-c9508-fm@1', 'cisco/n9k-c9508-fm-s@1', 'cisco/n9k-c9508-fm-e@1', 'cisco/n9k-c9508-fm-e2@1', 'cisco/n9k-c9508-fm-g@1', 'cisco/n9k-c9508-fm-r@1', 'cisco/n9k-c9508-fm-r2@1', 'cisco/n9k-c9508-fm-z@1', 'cisco/n9k-c9508-fm-cv@1', 'cisco/n9k-c9508-fan-pwr@1'], under: fan-1, group: fabric, rel-pos: 0, default: cisco/n9k-c9508-fm-z@1}
+      - {id: fm-1, at: [30.965, 27.67], size: {w: 62.48, h: 416.56}, accepts: ['cisco/n9k-c9508-fm@1', 'cisco/n9k-c9508-fm-s@1', 'cisco/n9k-c9508-fm-e@1', 'cisco/n9k-c9508-fm-e2@1', 'cisco/n9k-c9508-fm-g@1', 'cisco/n9k-c9508-fm-r@1', 'cisco/n9k-c9508-fm-r2@1', 'cisco/n9k-c9508-fm-z@1', 'cisco/n9k-c9508-fm-cv@1', 'cisco/n9k-c9508-fan-pwr@1'], under: fan-1, group: fabric, rel-pos: 0, default: cisco/n9k-c9508-fm-cv@1}
       - {id: fm-2, at: [94.975, 27.67], size: {w: 62.48, h: 416.56}, accepts: ['cisco/n9k-c9508-fm@1', 'cisco/n9k-c9508-fm-s@1', 'cisco/n9k-c9508-fm-e@1', 'cisco/n9k-c9508-fm-e2@1', 'cisco/n9k-c9508-fm-g@1', 'cisco/n9k-c9508-fm-r@1', 'cisco/n9k-c9508-fm-r2@1', 'cisco/n9k-c9508-fm-z@1', 'cisco/n9k-c9508-fm-cv@1', 'cisco/n9k-c9508-fan-pwr@1'], under: fan-1, group: fabric, rel-pos: 1, default: cisco/n9k-c9508-fm-e2@1}
       - {id: fm-3, at: [158.985, 27.67], size: {w: 62.48, h: 416.56}, accepts: ['cisco/n9k-c9508-fm@1', 'cisco/n9k-c9508-fm-s@1', 'cisco/n9k-c9508-fm-e@1', 'cisco/n9k-c9508-fm-e2@1', 'cisco/n9k-c9508-fm-g@1', 'cisco/n9k-c9508-fm-r@1', 'cisco/n9k-c9508-fm-r2@1', 'cisco/n9k-c9508-fm-z@1', 'cisco/n9k-c9508-fm-cv@1', 'cisco/n9k-c9508-fan-pwr@1'], under: fan-2, group: fabric, rel-pos: 2, default: cisco/n9k-c9508-fm-e2@1}
       - {id: fm-4, at: [222.995, 27.67], size: {w: 62.48, h: 416.56}, accepts: ['cisco/n9k-c9508-fm@1', 'cisco/n9k-c9508-fm-s@1', 'cisco/n9k-c9508-fm-e@1', 'cisco/n9k-c9508-fm-e2@1', 'cisco/n9k-c9508-fm-g@1', 'cisco/n9k-c9508-fm-r@1', 'cisco/n9k-c9508-fm-r2@1', 'cisco/n9k-c9508-fm-z@1', 'cisco/n9k-c9508-fm-cv@1', 'cisco/n9k-c9508-fan-pwr@1'], under: fan-2, group: fabric, rel-pos: 3, default: cisco/n9k-c9508-fm-e2@1}
@@ -343,8 +356,8 @@ configurations:
     source: >-
       derived - Cisco publishes no bundle for the Nexus 9508 in the guide, so the library defines one from the
       guide's own power-budget example (Planning for Power Requirements, Step 2: two N9K-SUP-B+, two N9K-SC-A,
-      five N9K-C9508-FM-E2, three N9K-C9508-FAN): those parts in their slots, the fabric-module slot FM 1
-      blanked with N9K-C9508-FM-Z, four N9K-PAC-3000W-B supplies in PS 1 to PS 4 with a blank over each other
+      five N9K-C9508-FM-E2, three N9K-C9508-FAN): those parts in their slots, the empty odd fabric-module
+      slot FM 1 blanked with N9K-C9508-FM-CV (the guide's rule for an empty odd slot), four N9K-PAC-3000W-B supplies in PS 1 to PS 4 with a blank over each other
       supply slot, and a line-card blank in each of the eight line-card slots. The example gives no supplies
       and no line cards, so the four supplies are the library's choice.
     description: >-
