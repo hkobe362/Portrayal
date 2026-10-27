@@ -1997,6 +1997,18 @@
   "L29": 1,
   "L69": 1
  },
+ "devices/cisco/ncs-5001/device.yaml": {
+  "L113": 1,
+  "L29": 2,
+  "L40": 1,
+  "L57": 1
+ },
+ "devices/cisco/ncs-5002/device.yaml": {
+  "L113": 1,
+  "L29": 2,
+  "L40": 2,
+  "L57": 1
+ },
  "devices/cisco/ws-c4948e/device.yaml": {
   "L29": 1,
   "L61": 16
