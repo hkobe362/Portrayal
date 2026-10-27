@@ -27,13 +27,14 @@ def _std():
 
 def test_the_entry_carries_the_drawings_figures():
     """Molex SD-54819-026 sheet 1, front view: the shield case is 7.7 wide
-    over its widest line and 3.95 high (the side view's 3.95; the front view's
-    3.55 is housing top to base and 3.1 is the plug opening); the side view
-    gives the shell 9 long. The plug opening inside it is 6.9 wide (front
+    over its widest line and 3.9 high (the 3.1 opening plus two 0.4 walls; the
+    side view's printed 3.95 runs from the shell's top to the seating plane, and
+    the front view's 3.55 from the top of the opening to the base); the side
+    view gives the part 9 long overall. The plug opening inside it is 6.9 wide (front
     view) by 3.1 high. Sheet 2's 4.2 and 4.5 are bracketed reference heights
     that include the spring tabs, so they are not the panel aperture."""
     e = _std()["mini-usb-b"]
-    assert (e["w"], e["h"], e["depth"]) == (7.7, 3.95, 9.0)
+    assert (e["w"], e["h"], e["depth"]) == (7.7, 3.9, 9.0)
     assert e["confidence"] == "drawing" and e["depth-confidence"] == "drawing"
     for cited in ("Molex", "54819-0519", "SD-54819-026", "rev A",
                   "molex.com/content/dam/molex/molex-dot-com/products/automated/"
@@ -60,8 +61,8 @@ def _lint_l9(tmp_path, w, h):
 
 
 def test_a_component_at_the_registered_size_passes_and_half_a_millimetre_wider_fails(tmp_path):
-    assert _lint_l9(tmp_path, 7.7, 3.95) == []
-    wide = _lint_l9(tmp_path, 8.2, 3.95)
+    assert _lint_l9(tmp_path, 7.7, 3.9) == []
+    wide = _lint_l9(tmp_path, 8.2, 3.9)
     assert len(wide) == 1 and "7.7" in wide[0], wide
 
 
