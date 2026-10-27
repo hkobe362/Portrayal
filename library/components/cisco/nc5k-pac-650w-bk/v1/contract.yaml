@@ -38,7 +38,8 @@ provenance:
     estimated - as for NC5K-PAC-650W-FR: no held document states dimensions; 98 x 40 is the aspect of the guide's
     Figure 21 applied to a one-rack-unit slot height.
   elements: >-
-    estimated - as for NC5K-PAC-650W-FR; read off Figures 1, 19 and 20, which are three-quarter views.
+    estimated - as for NC5K-PAC-650W-FR: the layout is adapted from `cisco/nxa-pac-650w`, with only y shifted, and
+    Figures 1, 19 and 20, which are three-quarter views, were used only to confirm the arrangement.
   latch-colour: >-
     NOT STATED for either airflow; the replacement steps say only that a replacement has "the same coloring as
     the other fan and power supply modules in the same chassis". Drawn neutral grey.

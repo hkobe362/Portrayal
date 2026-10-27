@@ -105,14 +105,13 @@ def test_each_configuration_seats_matching_parts_with_matching_airflow(name):
     bays = {b["id"]: b for b in d["views"]["rear"]["components"]["bays"]}
     seen = set()
     for cname, cfg in cfgs.items():
-        assert cfg["kind"] == "orderable"
+        assert cfg["kind"] == ("base" if cfg.get("default") else "example")
+        assert not cfg.get("part-numbers"), cname
         psu, fan = PSU[(cfg["power"], cfg["airflow"])], FAN[name][cfg["airflow"]]
         seated = {}
         for bay in bays:
             seated[bay] = ref_name((cfg.get("bays") or {}).get(bay) or bays[bay]["default"])
         assert seated == {"psu-1": psu, "psu-2": psu, "fan-1": fan, "fan-2": fan}, cname
-        label = f"{d['model']} {cfg['power'].upper()} port-side {'intake' if cfg['airflow'] == 'front-to-back' else 'exhaust'}"
-        assert sorted(cfg["part-numbers"]) == sorted([label, psu.upper(), fan.upper()]), cname
         for part in (psu, fan):
             assert contract(part)["attrs"]["airflow"] == cfg["airflow"], (cname, part)
         assert contract(psu)["attrs"]["input"] == cfg["power"]
@@ -136,10 +135,10 @@ def test_sale_status_is_not_guessed(name):
 
 
 @pytest.mark.parametrize("name", sorted(ENVELOPE))
-def test_dcim_device_types_export_one_per_configuration_at_the_guides_u_height(name):
+def test_dcim_device_type_is_one_per_chassis_at_the_guides_u_height(name):
+    # the builds are examples with no SKU, so no build-named device type is exported
     model = device(name)["model"]
     files = sorted((LIB / "exports/netbox/device-types/Cisco").glob(f"{model}*.yaml"))
     types = [yaml.safe_load(f.read_text()) for f in files]
-    assert len(types) == 4, [f.name for f in files]
-    assert all(t["u_height"] == ENVELOPE[name]["ru"] for t in types)
-    assert len({t["model"] for t in types}) == 4
+    assert [t["model"] for t in types] == [model], [f.name for f in files]
+    assert types[0]["u_height"] == ENVELOPE[name]["ru"]

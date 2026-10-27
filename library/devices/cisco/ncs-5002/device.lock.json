@@ -21,10 +21,10 @@
    "cisco/nc5k-pdc-930w-fr@1"
   ]
  },
- "composed": "c6db03bb37193ac4",
+ "composed": "0373a93780fb2ed9",
  "composed-refs": {
-  "cisco/nc5k-pac-650w-bk@1": "1.0.0+366867c004ab3cb8",
-  "cisco/nc5k-pac-650w-fr@1": "1.0.0+a25f7327633ae0ab",
+  "cisco/nc5k-pac-650w-bk@1": "1.0.0+fd14b1472810f440",
+  "cisco/nc5k-pac-650w-fr@1": "1.0.0+15f2c02dd6cf7445",
   "cisco/nc5k-pdc-930w-bk@1": "1.0.0+6b4df5bd665d6936",
   "cisco/nc5k-pdc-930w-fr@1": "1.0.0+07527d20b69bf619",
   "cisco/ncs-5002-fn-bk@1": "1.0.0+ac0b7394c165d6cd",
@@ -44,7 +44,7 @@
   "dc-port-side-intake"
  ],
  "format": 1,
- "gaps": "9cfd8416015c886d",
+ "gaps": "5f58e804823e400c",
  "groups": [
   "fans",
   "leds",
@@ -437,6 +437,6 @@
  },
  "placement-surface": "c75861a8f989aac5",
  "shape": "3d778e64df5321e3",
- "surface": "97458ac1066da145",
- "version": "1.0.0"
+ "surface": "74500b714f7d45a8",
+ "version": "1.0.1"
 }

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ncs-5002
-version: 1.0.0
+version: 1.0.1
 maturity: modelled
 manufacturer: Cisco
 model: NCS 5002
@@ -130,11 +130,10 @@ provenance:
   configuration-names:
     confidence: estimated
     note: >-
-      THE GUIDE GIVES NO CHASSIS PART NUMBER. Its only orderable codes for this router are the supplies and fan modules (Tables 4
-      and 5) and the accessory kit NCS-5002-ACSR, and it says "power supply options need to be configured with the base
-      chassis". Each configuration therefore lists the two real part numbers it seats, and one plain label ("NCS 5002 AC
-      port-side intake" and so on) that is NOT a Cisco SKU and names the build for the DCIM export, which writes one device type
-      per chassis key.
+      THE GUIDE GIVES NO CHASSIS PART NUMBER AND NO CODE FOR ANY BUILD. Its only orderable codes for this router are the
+      supplies and fan modules (Tables 4 and 5) and the accessory kit NCS-5002-ACSR, and it says "power supply options need to
+      be configured with the base chassis". The four configurations are therefore one `kind: base` build (AC, port-side intake) and three `kind: example` builds, with no
+      `part-numbers`: each says which supplies and fan modules it seats, and none is an orderable SKU.
   lifecycle:
     confidence: estimated
     note: >-
@@ -225,6 +224,13 @@ gaps:
   reason: vendor-silent
   wanted: >-
     The fan module's power draw, and the chassis' own draw. Appendix C gives supply ratings only.
+- what: air-filters
+  scope: [front, rear]
+  reason: vendor-silent
+  wanted: >-
+    The air filters, which the guide draws but does not size or number. Port-side intake takes a three-piece filter on
+    the port-side faceplate (Figure 22); port-side exhaust takes clip-on filters on the supply and fan fronts (Figure 23,
+    drawn on this chassis's two-fan rear). No part number, size or position is held for either.
 - what: the-four-undrawn-faces
   scope: [top, bottom, left, right]
   reason: needs-drawing
@@ -387,54 +393,44 @@ views:
       Not drawn by any held source. The guide's figures show one side wall and say nothing of the other.
 configurations:
   ac-port-side-intake:
-    kind: orderable
+    kind: base
     default: true
     power: ac
     airflow: front-to-back
+    source: >-
+      derived - the guide prints no ordering code for any build, so the library defines the base as the first build the
+      guide lists: AC supplies and front-to-back fan modules (Tables 4 and 5).
     description: >-
       Two NC5K-PAC-650W-FR supplies and two NCS-5002-FN-FR fan modules: AC power, front-to-back airflow (port-side intake).
-    part-numbers:
-      NCS 5002 AC port-side intake: {}
-      NC5K-PAC-650W-FR: {}
-      NCS-5002-FN-FR: {}
   ac-port-side-exhaust:
-    kind: orderable
+    kind: example
     power: ac
     airflow: back-to-front
     description: >-
       Two NC5K-PAC-650W-BK supplies and two NCS-5002-FN-BK fan modules: AC power, back-to-front airflow (port-side exhaust).
-    part-numbers:
-      NCS 5002 AC port-side exhaust: {}
-      NC5K-PAC-650W-BK: {}
-      NCS-5002-FN-BK: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pac-650w-bk@1
       psu-2: cisco/nc5k-pac-650w-bk@1
       fan-1: cisco/ncs-5002-fn-bk@1
       fan-2: cisco/ncs-5002-fn-bk@1
   dc-port-side-intake:
-    kind: orderable
+    kind: example
     power: dc
     airflow: front-to-back
     description: >-
       Two NC5K-PDC-930W-FR supplies and two NCS-5002-FN-FR fan modules: DC power, front-to-back airflow (port-side intake).
-    part-numbers:
-      NCS 5002 DC port-side intake: {}
-      NC5K-PDC-930W-FR: {}
-      NCS-5002-FN-FR: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pdc-930w-fr@1
       psu-2: cisco/nc5k-pdc-930w-fr@1
   dc-port-side-exhaust:
-    kind: orderable
+    kind: example
     power: dc
     airflow: back-to-front
     description: >-
       Two NC5K-PDC-930W-BK supplies and two NCS-5002-FN-BK fan modules: DC power, back-to-front airflow (port-side exhaust).
-    part-numbers:
-      NCS 5002 DC port-side exhaust: {}
-      NC5K-PDC-930W-BK: {}
-      NCS-5002-FN-BK: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pdc-930w-bk@1
       psu-2: cisco/nc5k-pdc-930w-bk@1

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ncs-5001
-version: 0.1.1
+version: 0.1.2
 maturity: modelled
 manufacturer: Cisco
 model: NCS 5001
@@ -89,7 +89,7 @@ provenance:
       97% of the near edge (412.5 mm of 442.5) and, by the figure's foreshortening, about a ninth of the lid depth (54.0
       mm), a two-millimetre lip of lid beyond it. Fractions of a perspective drawing, so every number is an estimate. The
       guide's maintenance text says "a replaceable air filter is located on the front of the chassis" and names no position
-      or size, so the strip is not a filter.
+      or size, and the guide does not identify the strip as that filter.
   rear-face:
     confidence: estimated
     note: >-
@@ -130,16 +130,15 @@ provenance:
       screw holes" in the chassis, so other positions exist, and none is measured; they are not written. NO KIT IS MODELLED:
       Table 8 lists the rack-mount kit as four brackets, sixteen M4 screws, four rack-mount guides and two slider rails, and
       Appendix A lists accessory kit NCS-5001-ACSR with two of each bracket and guide, so the guide disagrees with itself on the
-      counts; no document held gives a bracket's, a guide's or a slider's dimensions or the kit's depth range, and the library has
-      no kit to follow. See the gaps.
+      counts; no document held gives a bracket's, a guide's or a slider's dimensions or the kit's depth range. The library's kit
+      contracts (`cisco/69-2037`, `cisco/n9k-c9500-rmk`) are for other boxes and none fits this one. See the gaps.
   configuration-names:
     confidence: estimated
     note: >-
-      THE GUIDE GIVES NO CHASSIS PART NUMBER. Its only orderable codes for this router are the supplies and fan modules (Tables 2
-      and 3) and the accessory kit NCS-5001-ACSR, and it says "power supply options need to be configured with the base
-      chassis". Each configuration therefore lists the two real part numbers it seats, and one plain label ("NCS 5001 AC
-      port-side intake" and so on) that is NOT a Cisco SKU and names the build for the DCIM export, which writes one device type
-      per chassis key.
+      THE GUIDE GIVES NO CHASSIS PART NUMBER AND NO CODE FOR ANY BUILD. Its only orderable codes for this router are the
+      supplies and fan modules (Tables 2 and 3) and the accessory kit NCS-5001-ACSR, and it says "power supply options need to
+      be configured with the base chassis". The four configurations are therefore one `kind: base` build (AC, port-side intake) and three `kind: example` builds, with no
+      `part-numbers`: each says which supplies and fan modules it seats, and none is an orderable SKU.
   lifecycle:
     confidence: estimated
     note: >-
@@ -225,11 +224,18 @@ gaps:
   reason: vendor-silent
   wanted: >-
     The fan module's power draw, and the chassis' own draw. Appendix C gives supply ratings only.
+- what: air-filters
+  scope: [front, rear]
+  reason: vendor-silent
+  wanted: >-
+    The air filters, which the guide draws but does not size or number. Port-side intake takes a three-piece filter on
+    the port-side faceplate (Figure 22); port-side exhaust takes clip-on filters on the supply and fan fronts (Figure 23).
+    No part number, size or position is held for either.
 - what: the-four-undrawn-faces
   scope: [top, bottom, left, right]
   reason: needs-drawing
   wanted: >-
-    A drawing of the lid, the underside and the side walls. The guide shows them in three-quarter view only, with six
+    A drawing of the rest of the lid, the underside and the side walls. The guide shows them in three-quarter view only, with six
     bracket holes on a side wall and a grounding label on the fan side.
 groups:
   sfp-plus:
@@ -356,54 +362,44 @@ views:
       Not drawn by any held source. The guide's figures show one side wall and say nothing of the other.
 configurations:
   ac-port-side-intake:
-    kind: orderable
+    kind: base
     default: true
     power: ac
     airflow: front-to-back
+    source: >-
+      derived - the guide prints no ordering code for any build, so the library defines the base as the first build the
+      guide lists: AC supplies and front-to-back fan modules (Tables 2 and 3).
     description: >-
       Two NC5K-PAC-650W-FR supplies and two NCS-5001-FN-FR fan modules: AC power, front-to-back airflow (port-side intake).
-    part-numbers:
-      NCS 5001 AC port-side intake: {}
-      NC5K-PAC-650W-FR: {}
-      NCS-5001-FN-FR: {}
   ac-port-side-exhaust:
-    kind: orderable
+    kind: example
     power: ac
     airflow: back-to-front
     description: >-
       Two NC5K-PAC-650W-BK supplies and two NCS-5001-FN-BK fan modules: AC power, back-to-front airflow (port-side exhaust).
-    part-numbers:
-      NCS 5001 AC port-side exhaust: {}
-      NC5K-PAC-650W-BK: {}
-      NCS-5001-FN-BK: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pac-650w-bk@1
       psu-2: cisco/nc5k-pac-650w-bk@1
       fan-1: cisco/ncs-5001-fn-bk@1
       fan-2: cisco/ncs-5001-fn-bk@1
   dc-port-side-intake:
-    kind: orderable
+    kind: example
     power: dc
     airflow: front-to-back
     description: >-
       Two NC5K-PDC-930W-FR supplies and two NCS-5001-FN-FR fan modules: DC power, front-to-back airflow (port-side intake).
-    part-numbers:
-      NCS 5001 DC port-side intake: {}
-      NC5K-PDC-930W-FR: {}
-      NCS-5001-FN-FR: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pdc-930w-fr@1
       psu-2: cisco/nc5k-pdc-930w-fr@1
   dc-port-side-exhaust:
-    kind: orderable
+    kind: example
     power: dc
     airflow: back-to-front
     description: >-
       Two NC5K-PDC-930W-BK supplies and two NCS-5001-FN-BK fan modules: DC power, back-to-front airflow (port-side exhaust).
-    part-numbers:
-      NCS 5001 DC port-side exhaust: {}
-      NC5K-PDC-930W-BK: {}
-      NCS-5001-FN-BK: {}
+      An illustration: the guide prints no ordering code for this build.
     bays:
       psu-1: cisco/nc5k-pdc-930w-bk@1
       psu-2: cisco/nc5k-pdc-930w-bk@1

@@ -1,10 +1,10 @@
 ---
 manufacturer: Cisco
-model: NCS 5002 DC port-side exhaust
-slug: cisco-ncs-5002-dc-port-side-exhaust
+model: NCS 5002
+slug: cisco-ncs-5002
 u_height: 2.0
 is_full_depth: true
-airflow: rear-to-front
+airflow: front-to-rear
 description: Cisco Network Convergence System 5002, a two-rack-unit router with eighty 1/10G SFP+ ports
   and four 100G QSFP28 ports, built as two stacked boards
 front_image: true
@@ -204,8 +204,8 @@ comments: 'Cisco Network Convergence System 5002, a two-rack-unit router with ei
   The guide says nothing about end-of-sale; the status is unknown.
 
 
-  Configuration `dc-port-side-exhaust`: Two NC5K-PDC-930W-BK supplies and two NCS-5002-FN-BK fan modules:
-  DC power, back-to-front airflow (port-side exhaust).
+  Configuration `ac-port-side-intake`: Two NC5K-PAC-650W-FR supplies and two NCS-5002-FN-FR fan modules:
+  AC power, front-to-back airflow (port-side intake).
 
 
   Also sold or listed as: NCS-5002
@@ -235,7 +235,7 @@ comments: 'Cisco Network Convergence System 5002, a two-rack-unit router with ei
   - power.power-supply-options: NC5K-PAC-650W-FR/-BK (AC), NC5K-PDC-930W-FR/-BK (DC), two, 1+1 redundant
 
 
-  Drawing version 1.0.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 1.0.1. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'
