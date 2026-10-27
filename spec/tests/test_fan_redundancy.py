@@ -698,4 +698,6 @@ def test_the_comparison_layer_can_now_reach_them():
     # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
     # 162 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
     # 163 with the Cisco Nexus 9508: 2+1 over three fan trays (hardware guide, Replacing a Fan Tray)
-    assert n == 163, n
+    # 165 with the Cisco NCS 5001 and NCS 5002: 1+1 over two fan modules each (NCS 5000 hardware installation
+    # guide, Fan Modules: "slots for two 1+1 redundant fan modules")
+    assert n == 165, n
