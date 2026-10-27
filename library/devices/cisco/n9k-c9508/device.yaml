@@ -23,10 +23,10 @@ provenance:
     note: >-
       Cisco N9508 NX-OS Mode Switch Hardware Installation Guide (140 pp; first published 2014-11-21, last
       modified 2026-09-17), https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/hw/n9508_hig/guide/b_n9508_nxos-mode_hardware_install_guide.pdf
-      (read from a copy held offline; page numbers below are PDF pages, and the printed page is six lower).
+      (page numbers below are PDF pages, and the printed page is six lower).
       Cisco's Nexus 9504 and 9516 hardware installation guides were read to confirm that the supervisors, the
       system controller and the 3000 W supplies are the same parts. The NetBox devicetype-library file for
-      N9K-C9508 (u_height 13) and its elevation images are NOT held on the modelling host - only a path
+      N9K-C9508 (u_height 13) and its elevation images were NOT available to this work - only a path
       listing of that library is - so no NetBox elevation was compared. No data sheet, photograph, 3D model or
       stencil is held for the 9508.
   chassis:
