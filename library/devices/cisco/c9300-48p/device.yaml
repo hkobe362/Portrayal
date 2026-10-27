@@ -18,16 +18,6 @@ description: >-
   in one bay with the power supply slot cover in the other. The -A and -E suffixes of the part number
   are software licences and not hardware, so there is one device.
 profile: networking
-lint:
-  waive:
-    L29: >-
-      The fan module's draw is not published. The guide's Table 48 gives the fan module's environmental
-      range, size, weight and airflow and no wattage, and no other table of the guide gives one; nothing
-      is written in its place.
-    L57: >-
-      The switch has no traffic slot a base configuration could empty: the network module bay ships with
-      its blank and the supplies, fans and ports are fixed, so the shipped build is the orderable one
-      and a base configuration would be the same drawing under a second name.
 provenance:
   sources:
     confidence: datasheet
@@ -1191,7 +1181,7 @@ views:
         at: [25.8, 6.35]
         group: usb-storage
         rel-pos: 2
-        attrs: {role: ssd, usb: '3.0'}
+        attrs: {role: storage, usb: '3.0'}
       - ref: std/rj45-ganged@2
         id: console
         at: [18.95, 22.7]
@@ -1283,14 +1273,17 @@ views:
     empty: >-
       Not drawn flat by any source held. Figure 1 shows the side isometrically with a vent grille.
 configurations:
+  shipped:
+    kind: base
+    description: >-
+      The switch as it powers on: one PWR-C1-715WAC-P in the first power supply slot with the slot cover
+      in the second, three FAN-T2 fan modules and the network module bay blank.
+    default: true
   c9300-48p:
     kind: orderable
     description: >-
-      The switch as shipped: one PWR-C1-715WAC-P in the first power supply slot with the slot cover in
-      the second, three FAN-T2 fan modules and the network module bay blank. Table 18 gives the 715 W
-      Platinum supply as the default of the C9300-48P and the Power Supply Modules text says every switch
-      ships with a blank in the second slot.
-    default: true
+      The C9300-48P as ordered. Table 18 gives the 715 W Platinum supply as its default and the Power
+      Supply Modules text says every switch ships with a blank in the second slot.
     part-numbers:
       C9300-48P: {}
   dual-715wac-p:

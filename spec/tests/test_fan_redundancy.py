@@ -697,4 +697,5 @@ def test_the_comparison_layer_can_now_reach_them():
     # 160 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
     # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
     # 162 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
-    assert n == 162, n
+    # 164 with the Cisco C9300-48P and C9300-48T: 2+1 over three fan modules (hardware installation guide, Fan Module)
+    assert n == 164, n

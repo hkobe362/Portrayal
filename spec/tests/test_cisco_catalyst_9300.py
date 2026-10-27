@@ -220,13 +220,15 @@ def test_the_configurations_say_what_they_are(dev):
     cfgs = d["configurations"]
     orderable = {k: v for k, v in cfgs.items() if v["kind"] == "orderable"}
     assert list(orderable) == [name]
-    assert orderable[name]["default"] is True
     assert orderable[name]["part-numbers"] == {m["model"]: {}}
+    # the drawn default is the shipped base: the default supply and the cover, nothing else
+    assert [k for k, v in cfgs.items() if v["kind"] == "base"] == ["shipped"]
+    assert cfgs["shipped"]["default"] is True and "bays" not in cfgs["shipped"]
     # every supply of Table 35 has a configuration that seats it, as an illustration
     seated = {c["bays"].get("psu-1") for c in cfgs.values() if "bays" in c}
     seated.add(f"cisco/{m['psu']}@1")
     assert {f"cisco/{n}@1" for n in SUPPLIES} <= seated
-    assert {c["kind"] for k, c in cfgs.items() if k != name} == {"example"}
+    assert {c["kind"] for k, c in cfgs.items() if k not in (name, "shipped")} == {"example"}
     assert "empty-supply-bay" in cfgs
 
 
