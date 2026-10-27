@@ -175,7 +175,7 @@ attrs:
     timing: >-
       1PPS and 10MHz SMB ports, a GPS/GNSS SMA antenna port and a ToD RJ-45 port. The guide says PTP grandmaster
       function is supported beginning with NX-OS release 10.3(2)F.
-    usb: 1 USB port
+  management: {usb: 1 USB port}
   compliance:
     regulatory: >-
       Products should comply with CEMarkings according to directives 2004/108/EC and 2006/95/EC.
@@ -762,19 +762,19 @@ views:
     - {id: silk-49, at: [373.3, 9.5], text: '49', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-49}
     - {id: silk-arrow-49, at: [374.2, 8.9], fill: '#1a1d1f', for: port-49, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-50, at: [377.5, 8.9], fill: '#1a1d1f', for: port-50, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-50, at: [376.9, 8.9], fill: '#1a1d1f', for: port-50, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-50, at: [379.9, 9.5], text: '50', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-50}
     - {id: silk-51, at: [396.2, 9.5], text: '51', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-51}
     - {id: silk-arrow-51, at: [397.1, 8.9], fill: '#1a1d1f', for: port-51, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-52, at: [400.4, 8.9], fill: '#1a1d1f', for: port-52, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-52, at: [399.8, 8.9], fill: '#1a1d1f', for: port-52, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-52, at: [402.8, 9.5], text: '52', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-52}
     - {id: silk-53, at: [419.1, 9.5], text: '53', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-53}
     - {id: silk-arrow-53, at: [420.0, 8.9], fill: '#1a1d1f', for: port-53, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-54, at: [423.3, 8.9], fill: '#1a1d1f', for: port-54, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-54, at: [422.7, 8.9], fill: '#1a1d1f', for: port-54, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-54, at: [425.7, 9.5], text: '54', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-54}
     - {id: silk-1pps, at: [1.0, 16.0], text: 1PPS, font-size: 1.6, anchor: start, fill: '#1a1d1f', for: clk-1pps}

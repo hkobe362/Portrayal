@@ -7,8 +7,8 @@ behaviour: mounts
 profile: networking
 description: >-
   The inner rail of the Cisco NXK-ACC-KIT2-2RU rack-mount kit, two to a kit. It screws to the
-  side of the chassis with flat-head screws and slides into the outer rail; its retainer
-  screws fasten the chassis to the rack. Drawn as a plain plate: no guide dimensions it.
+  side of the chassis and slides into the outer rail. Drawn as a plain plate: no guide
+  dimensions it.
 size: {w: 8.0, h: 20.0}
 size-confidence: {w: estimated, h: estimated}
 provenance:

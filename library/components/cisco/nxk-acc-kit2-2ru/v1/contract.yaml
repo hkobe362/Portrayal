@@ -3,10 +3,9 @@ kind: kit
 name: nxk-acc-kit2-2ru
 version: 1.0.0
 description: >-
-  The Cisco NXK-ACC-KIT2-2RU rack-mount kit: two inner rails that screw to the chassis side,
-  two outer rails that latch to the front and rear posts of a rack, and flat-head screws. The
-  outer rails extend to the rear posts, the chassis slides onto them, and the inner rails'
-  retainer screws fasten it to the front posts.
+  The Cisco NXK-ACC-KIT2-2RU rack-mount kit. It holds two inner rails that screw to the
+  chassis side, two outer rails that latch to the front and rear posts, and flat-head screws.
+  The chassis slides onto the outer rails.
 motion: fixed
 parts:
   - {ref: cisco/nxk-acc-kit2-2ru-inner-rail@1, id: inner-rail, count: 2}

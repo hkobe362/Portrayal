@@ -1993,9 +1993,18 @@
   "L69": 1,
   "L93": 1
  },
+ "devices/cisco/n9k-c93108tc-fx3/device.yaml": {
+  "L29": 1
+ },
  "devices/cisco/n9k-c93180yc-ex/device.yaml": {
   "L29": 1,
   "L69": 1
+ },
+ "devices/cisco/n9k-c93180yc-fx3/device.yaml": {
+  "L29": 1
+ },
+ "devices/cisco/n9k-c93180yc-fx3s/device.yaml": {
+  "L29": 1
  },
  "devices/cisco/ws-c4948e/device.yaml": {
   "L29": 1,

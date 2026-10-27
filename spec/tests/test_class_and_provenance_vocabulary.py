@@ -41,8 +41,10 @@ MERGED = {"cooling": "fan", "fastener": "screw", "panel": "display",
 
 @pytest.fixture(scope="module")
 def contracts():
-    return {f"{c.parts[-4]}/{c.parts[-3]}@{c.parts[-2][1:]}": yaml.safe_load(c.read_text()) or {}
+    docs = {f"{c.parts[-4]}/{c.parts[-3]}@{c.parts[-2][1:]}": yaml.safe_load(c.read_text()) or {}
             for c in sorted(LIB.glob("components/*/*/v*/contract.yaml"))}
+    # a `kind: kit` is a set of parts and has no class, no size and no skin
+    return {ref: d for ref, d in docs.items() if d.get("kind") != "kit"}
 
 
 @pytest.fixture(scope="module")

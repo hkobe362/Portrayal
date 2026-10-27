@@ -67,7 +67,8 @@ def test_every_component_major_in_the_library_has_a_row(generated):
     matching, this fails rather than passing quietly.
     """
     on_disk = {f"`{c.parts[-4]}/{c.parts[-3]}@{c.parts[-2][1:]}`"
-               for c in LIB.glob("components/*/*/v*/contract.yaml")}
+               for c in LIB.glob("components/*/*/v*/contract.yaml")
+               if "\nkind: kit\n" not in "\n" + c.read_text()}  # a kit has no row, it is in kits.json
     assert len(on_disk) > 400, f"only {len(on_disk)} contracts found - the walk is broken"
     missing = sorted(ref for ref in on_disk if ref not in generated)
     assert not missing, f"{len(missing)} component(s) have no row, e.g. {missing[:5]}"

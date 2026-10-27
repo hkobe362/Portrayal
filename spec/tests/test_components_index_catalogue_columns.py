@@ -28,6 +28,8 @@ def _rows():
         if not line.startswith("| `"):
             continue
         cells = [c.strip() for c in line.strip("|").split(" | ")]
+        if cells[1] not in ("component", "module"):
+            continue    # the page's "Rail kits" table, whose rows are kits, which components.json leaves out
         rows[cells[0].strip("`")] = (cells[4], int(cells[5]), int(cells[6]))
     return rows
 

@@ -6,12 +6,11 @@ class: psu
 behaviour: fills
 profile: networking
 description: >-
-  The 1200 W HVAC/HVDC power supply of the Cisco Nexus 9300 fixed switches, N9K-PUV-1200W:
-  one part for both airflow directions, white latch. The housing of the family's other RSP1
-  supplies: a round fan grille at the left behind a four-screw guard, a FAIL and an OK lamp
-  in a column at the far left, a pull handle beside the fan, an Anderson Saf-D-Grid inlet
-  and a white release latch at the right edge. No picture of this supply is held, so the
-  face is drawn from its AC sibling with the inlet the guide names.
+  The 1200 W HVAC/HVDC power supply of the Cisco Nexus 9300 fixed switches, N9K-PUV-1200W.
+  One part serves both airflow directions and has a white latch. It has a round fan grille, a
+  FAIL and an OK lamp, a pull handle, an Anderson Saf-D-Grid inlet and a release latch. No
+  picture of this supply is held. The face is drawn from its AC sibling with the inlet the
+  guide names.
 size: {w: 96.8, h: 38.6}
 size-confidence: {w: estimated, h: estimated}
 attrs:

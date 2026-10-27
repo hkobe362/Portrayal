@@ -6,11 +6,10 @@ class: psu
 behaviour: fills
 profile: networking
 description: >-
-  The 500 W AC power supply of the Cisco Nexus 93108TC-FX3 fixed switch, ordered as
+  The 500 W AC power supply of the Cisco Nexus 93108TC-FX3 fixed switch. It is ordered as
   NXA-PAC-500W-PI (port-side intake, burgundy latch) or NXA-PAC-500W-PE (port-side exhaust,
-  blue latch). A bright housing with a round fan grille at the left behind a four-screw
-  guard, a FAIL and an OK lamp in a column at the far left, a pull handle beside the fan,
-  an IEC C14 inlet turned on its side and the coloured release latch at the right edge.
+  blue latch). It has a round fan grille, a FAIL and an OK lamp, a pull handle, an IEC C14
+  inlet on its side and a coloured release latch.
 size: {w: 96.8, h: 38.6}
 size-confidence: {w: estimated, h: estimated}
 attrs:

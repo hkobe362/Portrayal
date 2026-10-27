@@ -128,7 +128,9 @@ def _bay_modules():
     for f in libwalk.iter_devices(LIB) + libwalk.iter_components(LIB):
         doc = load_yaml(f) or {}
         walk(doc)
-        for cfg in (doc.get("configurations") or {}).values():
+        cfgs = doc.get("configurations") or {}
+        # a `kind: kit` writes its configurations as a list of rail assemblies
+        for cfg in (cfgs.values() if isinstance(cfgs, dict) else []):
             found.update(((cfg or {}).get("bays") or {}).values())
     return {r for r in found if isinstance(r, str)}
 

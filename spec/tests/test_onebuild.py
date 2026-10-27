@@ -103,7 +103,9 @@ def test_the_index_is_this_trees_and_not_library_dist():
     idx = onebuild.components_index()
     assert (ROOT / "library/dist") not in idx.parents and idx != ROOT / "library/dist"
     comps = json.loads((idx / "components.json").read_text())["components"]
-    on_disk = len(list((ROOT / "library/components").glob("*/*/v*/contract.yaml")))
+    # a `kind: kit` is published in kits.json, not in components.json
+    on_disk = sum(1 for c in (ROOT / "library/components").glob("*/*/v*/contract.yaml")
+                  if "\nkind: kit\n" not in "\n" + c.read_text())
     assert len(comps) == on_disk > 100, (len(comps), on_disk)
 
 

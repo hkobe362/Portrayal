@@ -6,13 +6,11 @@ class: psu
 behaviour: fills
 profile: networking
 description: >-
-  The 930 W DC power supply of the Cisco Nexus 9300 fixed switches, ordered as NXA-PDC-930W-PI
-  (port-side intake, burgundy latch) or NXA-PDC-930W-PE (port-side exhaust, blue latch).
-  The housing of the family's other RSP1 supplies: a round fan grille at the left behind a
-  four-screw guard, a FAIL and an OK lamp in a column at the far left, a pull handle beside
-  the fan, a DC power inlet window and the coloured release latch at the right edge. No
-  picture of this supply is held, so the face is drawn from its AC sibling and the inlet is
-  a plain recess.
+  The 930 W DC power supply of the Cisco Nexus 9300 fixed switches. It is ordered as
+  NXA-PDC-930W-PI (port-side intake, burgundy latch) or NXA-PDC-930W-PE (port-side exhaust,
+  blue latch). It has a round fan grille, a FAIL and an OK lamp, a pull handle, a DC inlet and
+  a coloured release latch. No picture of this supply is held. The face is drawn from its AC
+  sibling and the inlet is a plain recess.
 size: {w: 96.8, h: 38.6}
 size-confidence: {w: estimated, h: estimated}
 attrs:

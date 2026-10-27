@@ -3,10 +3,10 @@ kind: kit
 name: nxk-acc-kit-1ru
 version: 1.0.0
 description: >-
-  The Cisco NXK-ACC-KIT-1RU rack-mount kit for 1 RU Nexus fixed switches: two front brackets,
-  two rear brackets and two slider rails, with a ground lug kit and screws. The brackets
-  screw to the switch side, the rails to the rear posts of a four-post rack, and the switch
-  slides onto the rails and is screwed to the front posts.
+  The Cisco NXK-ACC-KIT-1RU rack-mount kit for 1 RU Nexus fixed switches. It holds two front
+  brackets, two rear brackets and two slider rails, with a ground lug kit and screws. The
+  brackets screw to the switch side and the rails to the rear posts of a four-post rack. The
+  switch slides onto the rails.
 motion: fixed
 parts:
   - {ref: cisco/nxk-acc-kit-1ru-front-bracket@1, id: front-bracket, count: 2}

@@ -7,9 +7,9 @@ behaviour: fills
 profile: networking
 description: >-
   The fan module of the Cisco Nexus 93108TC-FX3 fixed switch, ordered as NXA-SFAN-35CFM-PI
-  (port-side intake, burgundy) or NXA-SFAN-35CFM-PE (port-side exhaust, blue). Two rotors
-  behind a honeycomb grille that fills the face, a pair of coloured squeeze latches across
-  its middle and a ringed screw mark in the upper left corner.
+  (port-side intake, burgundy) or NXA-SFAN-35CFM-PE (port-side exhaust, blue). It has two
+  rotors behind a honeycomb grille, two coloured squeeze latches across its middle and a
+  ringed screw mark in the upper left corner.
 size: {w: 40.8, h: 40.7}
 size-confidence: {w: estimated, h: estimated}
 attrs:

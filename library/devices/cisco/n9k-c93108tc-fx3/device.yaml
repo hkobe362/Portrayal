@@ -145,7 +145,7 @@ attrs:
     ports-t: 'guide: "48 100M/1G/10GBASE-T ports (ports 1-48)"'
     optics-qsfp28: 'guide: "6 40/100-Gigabit ports QSFP28 (ports 49-54)"'
     management-ports: 'guide: "Two management ports (one 10/100/1000BASE-T port and one SFP port)"'
-    usb: 1 USB port
+  management: {usb: 1 USB port}
   compliance:
     regulatory: >-
       Products should comply with CEMarkings according to directives 2004/108/EC and 2006/95/EC.
@@ -690,19 +690,19 @@ views:
     - {id: silk-49, at: [374.7, 9.5], text: '49', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-49}
     - {id: silk-arrow-49, at: [375.6, 8.9], fill: '#1a1d1f', for: port-49, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-50, at: [378.9, 8.9], fill: '#1a1d1f', for: port-50, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-50, at: [378.3, 8.9], fill: '#1a1d1f', for: port-50, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-50, at: [381.3, 9.5], text: '50', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-50}
     - {id: silk-51, at: [397.0, 9.5], text: '51', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-51}
     - {id: silk-arrow-51, at: [397.9, 8.9], fill: '#1a1d1f', for: port-51, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-52, at: [401.2, 8.9], fill: '#1a1d1f', for: port-52, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-52, at: [400.6, 8.9], fill: '#1a1d1f', for: port-52, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-52, at: [403.6, 9.5], text: '52', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-52}
     - {id: silk-53, at: [419.3, 9.5], text: '53', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-53}
     - {id: silk-arrow-53, at: [420.2, 8.9], fill: '#1a1d1f', for: port-53, path: M -0.65 0.57785 L 0.65
         0.57785 L 0 -0.57785 Z, filled: true}
-    - {id: silk-arrow-54, at: [423.5, 8.9], fill: '#1a1d1f', for: port-54, path: M -0.65 -0.57785 L 0.65
+    - {id: silk-arrow-54, at: [422.9, 8.9], fill: '#1a1d1f', for: port-54, path: M -0.65 -0.57785 L 0.65
         -0.57785 L 0 0.57785 Z, filled: true}
     - {id: silk-54, at: [425.9, 9.5], text: '54', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-54}
     - {id: silk-bcn, at: [17.4, 40.15], text: BCN, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-bcn}
