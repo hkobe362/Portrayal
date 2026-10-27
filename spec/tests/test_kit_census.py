@@ -30,6 +30,7 @@ import yaml
 import onebuild
 import test_class_and_provenance_vocabulary as vocab
 from portrayal import components_catalogue as cat
+from portrayal.manifest import load_yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 LIB = ROOT / "library"
@@ -106,7 +107,7 @@ def test_every_kit_in_the_library_is_in_kits_json_and_the_kit_table_only():
     """The real library, whatever kits it holds: a kit on disk is published in
     kits.json and listed under "Rail kits", and the component totals of
     components.json and of the page agree with the contracts that are not kits."""
-    docs = {f"{c.parts[-4]}/{c.parts[-3]}@{c.parts[-2][1:]}": yaml.safe_load(c.read_text()) or {}
+    docs = {f"{c.parts[-4]}/{c.parts[-3]}@{c.parts[-2][1:]}": load_yaml(c) or {}
             for c in LIB.glob("components/*/*/v*/contract.yaml")}
     kit_refs = {ref for ref, d in docs.items() if d.get("kind") == "kit"}
     placed = set(docs) - kit_refs
