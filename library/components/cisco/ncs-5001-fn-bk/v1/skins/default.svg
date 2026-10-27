@@ -11,7 +11,6 @@
     <rect x="3" y="2" width="82" height="36" rx="0.6" fill="none" stroke="#4a4f55" stroke-width="0.3"/>
   </g>
   <g id="handle">
-    <rect x="14" y="15.5" width="60" height="9" rx="3.0" fill="#4a4f55" stroke="#15181b" stroke-width="0.3"/>
-    <rect x="18" y="18.5" width="52" height="3" rx="1.5" fill="#26292d"/>
+    <path d="M14 10H74A6 6 0 0 1 80 16V24A6 6 0 0 1 74 30H14A6 6 0 0 1 8 24V16A6 6 0 0 1 14 10ZM15 13.5H73A2.5 2.5 0 0 1 75.5 16V24A2.5 2.5 0 0 1 73 26.5H15A2.5 2.5 0 0 1 12.5 24V16A2.5 2.5 0 0 1 15 13.5Z" fill="#4a4f55" fill-rule="evenodd" stroke="#15181b" stroke-width="0.3"/>
   </g>
 </svg>

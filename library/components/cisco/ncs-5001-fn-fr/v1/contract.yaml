@@ -1,13 +1,13 @@
 format: 1
 kind: module
 name: ncs-5001-fn-fr
-version: 1.0.0
+version: 1.0.1
 class: fan
 behaviour: fills
 profile: networking
 description: >-
   The one-rack-unit fan module of the Cisco NCS 5001, ordered as NCS-5001-FN-FR: front-to-back airflow, which
-  the guide calls port-side intake. A dark honeycomb grille filling the face with a pull handle across its
+  the guide calls port-side intake. A dark honeycomb grille filling the face with a pull-handle loop across its
   middle. Hot-swappable; the router runs on one of its two fan modules. The back-to-front twin is
   NCS-5001-FN-BK.
 size: {w: 88.0, h: 40.0}
@@ -32,9 +32,14 @@ provenance:
     (the two fan modules together take about 36% of the width between the supplies), height is the one-rack-unit
     slot. Figure 1 is a three-quarter view, so the width is an estimate to roughly ten percent.
   elements: >-
-    estimated - Figure 1 and Figure 17 show a dark mesh face with a handle bar across it; the replacement steps
+    estimated - Figure 1 and Figure 17 show a dark mesh face with a handle across it; the replacement steps
     say to "press the two sides of the fan module handle next to where it connects to the fan module". The guide's
     LED appendix names no fan-module lamp, so none is drawn.
+  handle: >-
+    estimated - Figure 1 (printed page 2, the back view) draws each fan module's handle as an open loop that
+    spans nearly the module's width, with the mesh seen through its window, and not as a flat bar. The loop is
+    drawn 72 mm wide and 20 mm tall (a fraction of the module read off the figure, which is a greyscale
+    three-quarter view and cannot be measured) with a 3.5 mm band; the band's thickness is a guess.
   latch-colour: >-
     NOT STATED. The guide gives no handle colour for either airflow ("the same coloring as the other fan and power
     supply modules"), and its fan figures are greyscale.
@@ -43,7 +48,7 @@ provenance:
 states: [absent]
 elements:
   grille: {at: [3.0, 2.0], size: [82.0, 36.0], class: rotor}
-  handle: {at: [14.0, 15.5], size: [60.0, 9.0], class: handle}
+  handle: {at: [8.0, 10.0], size: [72.0, 20.0], class: handle}
 relief:
   wall: '#15181b'
   features:
@@ -55,7 +60,7 @@ relief:
       uhandle: 12.0
       color: '#4a4f55'
       confidence: estimated
-      source: Figure 17 shows the handle as a bar standing clear of the face; 12 mm is a reading of its proportions.
+      source: Figure 17 shows the handle as a loop standing clear of the face; 12 mm is a reading of its proportions.
 skins: [default]
 body:
   depth: 100

@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ncs-5002
-version: 0.1.0
+version: 1.0.0
 maturity: modelled
 manufacturer: Cisco
 model: NCS 5002
@@ -66,7 +66,20 @@ provenance:
       and a cluster of lamps, jacks and a USB port (lower half). Twenty cages a row is the guide's 80
       over four rows; ten a group is the cage count in each group of Figure 4; the 2.5 mm gutter is a
       guess. Two QSFP28 a half is the guide's four over two halves, drawn as one column of two. The row
-      pitch is the registry's 15.0 mm stack figure with each pair centred in its 44.45 mm half.
+      pitch is the registry's 15.0 mm stack figure. THE SEAM BETWEEN THE TWO PAIRS IS 3.0 MM: on Figure
+      4 (printed page 4) the gap between the upper half's lower row and the lower half's upper row measures
+      about 10 px against the 310 px height of the face's near end (88.9 mm, about 3.5 px per mm), and
+      the two pairs with that seam are centred on the face, 17.5 mm clear above and below. An earlier
+      draft centred each pair in its half and left a 19 mm band. The measure is on a three-quarter view,
+      so it is an estimate to a millimetre or two. The console, management jack, USB port and lamp keep
+      their offsets from the lower pair.
+  intake-mesh:
+    confidence: estimated
+    note: >-
+      NOT DRAWN. Figure 4 (printed page 4) shows no black perforated strip: the lid is plain to its front
+      edge and the front is the two cage fields, which read dark at this resolution. The 5001's perforated
+      strip on the lid (Figure 2) has no counterpart here, so no vent is drawn on this device. The vendor
+      logo at the upper left stays reserved as `logo-zone`.
   stack-orientation:
     confidence: estimated
     note: >-
@@ -183,6 +196,14 @@ gaps:
     A flat front and rear elevation, or a photograph taken square on. The guide's Figures 3 and 4 are
     greyscale three-quarter views, so every position is estimated and no printed numeral or legend can
     be read.
+- what: seam-width
+  scope:
+  - front
+  reason: needs-drawing
+  wanted: >-
+    The width of the seam between the two stacked halves and the margin above and below the cage fields.
+    They are read off Figure 4 as 3.0 mm and 17.5 mm from a three-quarter view, and a flat elevation would
+    settle them to the millimetre.
 - what: printed-legends
   scope:
   - front
@@ -292,191 +313,183 @@ views:
     size: {w: 442.5, h: 88.9}
     panel:
       cutouts:
-      - {id: port-1, at: [62.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-2, at: [62.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-3, at: [76.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-4, at: [76.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-5, at: [90.5, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-6, at: [90.5, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-7, at: [104.75, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-8, at: [104.75, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-9, at: [119.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-10, at: [119.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-11, at: [133.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-12, at: [133.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-13, at: [147.5, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-14, at: [147.5, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-15, at: [161.75, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-16, at: [161.75, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-17, at: [176.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-18, at: [176.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-19, at: [190.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-20, at: [190.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-21, at: [207.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-22, at: [207.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-23, at: [221.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-24, at: [221.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-25, at: [235.5, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-26, at: [235.5, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-27, at: [249.75, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-28, at: [249.75, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-29, at: [264.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-30, at: [264.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-31, at: [278.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-32, at: [278.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-33, at: [292.5, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-34, at: [292.5, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-35, at: [306.75, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-36, at: [306.75, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-37, at: [321.0, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-38, at: [321.0, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-39, at: [335.25, 9.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-40, at: [335.25, 24.15], size: [14.25, 10.4], shape: rect}
-      - {id: port-41, at: [62.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-42, at: [62.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-43, at: [76.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-44, at: [76.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-45, at: [90.5, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-46, at: [90.5, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-47, at: [104.75, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-48, at: [104.75, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-49, at: [119.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-50, at: [119.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-51, at: [133.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-52, at: [133.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-53, at: [147.5, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-54, at: [147.5, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-55, at: [161.75, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-56, at: [161.75, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-57, at: [176.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-58, at: [176.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-59, at: [190.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-60, at: [190.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-61, at: [207.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-62, at: [207.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-63, at: [221.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-64, at: [221.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-65, at: [235.5, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-66, at: [235.5, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-67, at: [249.75, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-68, at: [249.75, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-69, at: [264.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-70, at: [264.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-71, at: [278.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-72, at: [278.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-73, at: [292.5, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-74, at: [292.5, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-75, at: [306.75, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-76, at: [306.75, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-77, at: [321.0, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-78, at: [321.0, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-79, at: [335.25, 53.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-80, at: [335.25, 68.6], size: [14.25, 10.4], shape: rect}
-      - {id: port-81, at: [364.0, 8.4], size: [20.0, 10.15], shape: rect}
-      - {id: port-82, at: [364.0, 25.2], size: [20.0, 10.15], shape: rect}
-      - {id: port-83, at: [364.0, 52.85], size: [20.0, 10.15], shape: rect}
-      - {id: port-84, at: [364.0, 69.65], size: [20.0, 10.15], shape: rect}
-      - {id: led-power, at: [8.0, 63.45], size: [2.0, 2.0], shape: circle}
-      - {id: console, at: [24.0, 52.65], size: [12.7, 11.0], shape: rect}
-      - {id: mgmt, at: [24.0, 63.75], size: [12.7, 11.0], shape: rect}
-      - {id: usb, at: [41.0, 56.5], size: [4.5, 12.0], shape: rect}
+      - {id: port-1, at: [62.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-2, at: [62.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-3, at: [76.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-4, at: [76.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-5, at: [90.5, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-6, at: [90.5, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-7, at: [104.75, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-8, at: [104.75, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-9, at: [119.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-10, at: [119.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-11, at: [133.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-12, at: [133.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-13, at: [147.5, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-14, at: [147.5, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-15, at: [161.75, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-16, at: [161.75, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-17, at: [176.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-18, at: [176.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-19, at: [190.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-20, at: [190.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-21, at: [207.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-22, at: [207.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-23, at: [221.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-24, at: [221.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-25, at: [235.5, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-26, at: [235.5, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-27, at: [249.75, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-28, at: [249.75, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-29, at: [264.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-30, at: [264.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-31, at: [278.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-32, at: [278.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-33, at: [292.5, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-34, at: [292.5, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-35, at: [306.75, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-36, at: [306.75, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-37, at: [321.0, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-38, at: [321.0, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-39, at: [335.25, 17.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-40, at: [335.25, 32.5], size: [14.25, 10.4], shape: rect}
+      - {id: port-41, at: [62.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-42, at: [62.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-43, at: [76.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-44, at: [76.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-45, at: [90.5, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-46, at: [90.5, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-47, at: [104.75, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-48, at: [104.75, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-49, at: [119.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-50, at: [119.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-51, at: [133.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-52, at: [133.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-53, at: [147.5, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-54, at: [147.5, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-55, at: [161.75, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-56, at: [161.75, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-57, at: [176.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-58, at: [176.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-59, at: [190.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-60, at: [190.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-61, at: [207.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-62, at: [207.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-63, at: [221.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-64, at: [221.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-65, at: [235.5, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-66, at: [235.5, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-67, at: [249.75, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-68, at: [249.75, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-69, at: [264.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-70, at: [264.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-71, at: [278.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-72, at: [278.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-73, at: [292.5, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-74, at: [292.5, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-75, at: [306.75, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-76, at: [306.75, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-77, at: [321.0, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-78, at: [321.0, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-79, at: [335.25, 45.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-80, at: [335.25, 60.9], size: [14.25, 10.4], shape: rect}
+      - {id: port-81, at: [364.0, 16.75], size: [20.0, 10.15], shape: rect}
+      - {id: port-82, at: [364.0, 33.55], size: [20.0, 10.15], shape: rect}
+      - {id: port-83, at: [364.0, 45.15], size: [20.0, 10.15], shape: rect}
+      - {id: port-84, at: [364.0, 61.95], size: [20.0, 10.15], shape: rect}
+      - {id: led-power, at: [8.0, 55.75], size: [2.0, 2.0], shape: circle}
+      - {id: console, at: [24.0, 44.95], size: [12.7, 11.0], shape: rect}
+      - {id: mgmt, at: [24.0, 56.05], size: [12.7, 11.0], shape: rect}
+      - {id: usb, at: [41.0, 48.8], size: [4.5, 12.0], shape: rect}
     components:
       placements:
-      - {ref: std/sfp-ganged@1, id: port-1, at: [62.0, 9.15], group: sfp-plus-upper, rel-pos: 1}
-      - {ref: std/sfp-ganged@1, id: port-2, at: [62.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 2}
-      - {ref: std/sfp-ganged@1, id: port-3, at: [76.25, 9.15], group: sfp-plus-upper, rel-pos: 3}
-      - {ref: std/sfp-ganged@1, id: port-4, at: [76.25, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 4}
-      - {ref: std/sfp-ganged@1, id: port-5, at: [90.5, 9.15], group: sfp-plus-upper, rel-pos: 5}
-      - {ref: std/sfp-ganged@1, id: port-6, at: [90.5, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 6}
-      - {ref: std/sfp-ganged@1, id: port-7, at: [104.75, 9.15], group: sfp-plus-upper, rel-pos: 7}
-      - {ref: std/sfp-ganged@1, id: port-8, at: [104.75, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 8}
-      - {ref: std/sfp-ganged@1, id: port-9, at: [119.0, 9.15], group: sfp-plus-upper, rel-pos: 9}
-      - {ref: std/sfp-ganged@1, id: port-10, at: [119.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 10}
-      - {ref: std/sfp-ganged@1, id: port-11, at: [133.25, 9.15], group: sfp-plus-upper, rel-pos: 11}
-      - {ref: std/sfp-ganged@1, id: port-12, at: [133.25, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 12}
-      - {ref: std/sfp-ganged@1, id: port-13, at: [147.5, 9.15], group: sfp-plus-upper, rel-pos: 13}
-      - {ref: std/sfp-ganged@1, id: port-14, at: [147.5, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 14}
-      - {ref: std/sfp-ganged@1, id: port-15, at: [161.75, 9.15], group: sfp-plus-upper, rel-pos: 15}
-      - {ref: std/sfp-ganged@1, id: port-16, at: [161.75, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 16}
-      - {ref: std/sfp-ganged@1, id: port-17, at: [176.0, 9.15], group: sfp-plus-upper, rel-pos: 17}
-      - {ref: std/sfp-ganged@1, id: port-18, at: [176.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 18}
-      - {ref: std/sfp-ganged@1, id: port-19, at: [190.25, 9.15], group: sfp-plus-upper, rel-pos: 19}
-      - {ref: std/sfp-ganged@1, id: port-20, at: [190.25, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 20}
-      - {ref: std/sfp-ganged@1, id: port-21, at: [207.0, 9.15], group: sfp-plus-upper, rel-pos: 21}
-      - {ref: std/sfp-ganged@1, id: port-22, at: [207.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 22}
-      - {ref: std/sfp-ganged@1, id: port-23, at: [221.25, 9.15], group: sfp-plus-upper, rel-pos: 23}
-      - {ref: std/sfp-ganged@1, id: port-24, at: [221.25, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 24}
-      - {ref: std/sfp-ganged@1, id: port-25, at: [235.5, 9.15], group: sfp-plus-upper, rel-pos: 25}
-      - {ref: std/sfp-ganged@1, id: port-26, at: [235.5, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 26}
-      - {ref: std/sfp-ganged@1, id: port-27, at: [249.75, 9.15], group: sfp-plus-upper, rel-pos: 27}
-      - {ref: std/sfp-ganged@1, id: port-28, at: [249.75, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 28}
-      - {ref: std/sfp-ganged@1, id: port-29, at: [264.0, 9.15], group: sfp-plus-upper, rel-pos: 29}
-      - {ref: std/sfp-ganged@1, id: port-30, at: [264.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 30}
-      - {ref: std/sfp-ganged@1, id: port-31, at: [278.25, 9.15], group: sfp-plus-upper, rel-pos: 31}
-      - {ref: std/sfp-ganged@1, id: port-32, at: [278.25, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 32}
-      - {ref: std/sfp-ganged@1, id: port-33, at: [292.5, 9.15], group: sfp-plus-upper, rel-pos: 33}
-      - {ref: std/sfp-ganged@1, id: port-34, at: [292.5, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 34}
-      - {ref: std/sfp-ganged@1, id: port-35, at: [306.75, 9.15], group: sfp-plus-upper, rel-pos: 35}
-      - {ref: std/sfp-ganged@1, id: port-36, at: [306.75, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 36}
-      - {ref: std/sfp-ganged@1, id: port-37, at: [321.0, 9.15], group: sfp-plus-upper, rel-pos: 37}
-      - {ref: std/sfp-ganged@1, id: port-38, at: [321.0, 24.15], rotate: 180, group: sfp-plus-upper, rel-pos: 38}
-      - {ref: std/sfp-ganged@1, id: port-39, at: [335.25, 9.15], group: sfp-plus-upper, rel-pos: 39}
-      - {ref: std/sfp-ganged@1, id: port-40, at: [335.25, 24.15], rotate: 180, group: sfp-plus-upper,
-        rel-pos: 40}
-      - {ref: std/sfp-ganged@1, id: port-41, at: [62.0, 53.6], group: sfp-plus-lower, rel-pos: 41}
-      - {ref: std/sfp-ganged@1, id: port-42, at: [62.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 42}
-      - {ref: std/sfp-ganged@1, id: port-43, at: [76.25, 53.6], group: sfp-plus-lower, rel-pos: 43}
-      - {ref: std/sfp-ganged@1, id: port-44, at: [76.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 44}
-      - {ref: std/sfp-ganged@1, id: port-45, at: [90.5, 53.6], group: sfp-plus-lower, rel-pos: 45}
-      - {ref: std/sfp-ganged@1, id: port-46, at: [90.5, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 46}
-      - {ref: std/sfp-ganged@1, id: port-47, at: [104.75, 53.6], group: sfp-plus-lower, rel-pos: 47}
-      - {ref: std/sfp-ganged@1, id: port-48, at: [104.75, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 48}
-      - {ref: std/sfp-ganged@1, id: port-49, at: [119.0, 53.6], group: sfp-plus-lower, rel-pos: 49}
-      - {ref: std/sfp-ganged@1, id: port-50, at: [119.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 50}
-      - {ref: std/sfp-ganged@1, id: port-51, at: [133.25, 53.6], group: sfp-plus-lower, rel-pos: 51}
-      - {ref: std/sfp-ganged@1, id: port-52, at: [133.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 52}
-      - {ref: std/sfp-ganged@1, id: port-53, at: [147.5, 53.6], group: sfp-plus-lower, rel-pos: 53}
-      - {ref: std/sfp-ganged@1, id: port-54, at: [147.5, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 54}
-      - {ref: std/sfp-ganged@1, id: port-55, at: [161.75, 53.6], group: sfp-plus-lower, rel-pos: 55}
-      - {ref: std/sfp-ganged@1, id: port-56, at: [161.75, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 56}
-      - {ref: std/sfp-ganged@1, id: port-57, at: [176.0, 53.6], group: sfp-plus-lower, rel-pos: 57}
-      - {ref: std/sfp-ganged@1, id: port-58, at: [176.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 58}
-      - {ref: std/sfp-ganged@1, id: port-59, at: [190.25, 53.6], group: sfp-plus-lower, rel-pos: 59}
-      - {ref: std/sfp-ganged@1, id: port-60, at: [190.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 60}
-      - {ref: std/sfp-ganged@1, id: port-61, at: [207.0, 53.6], group: sfp-plus-lower, rel-pos: 61}
-      - {ref: std/sfp-ganged@1, id: port-62, at: [207.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 62}
-      - {ref: std/sfp-ganged@1, id: port-63, at: [221.25, 53.6], group: sfp-plus-lower, rel-pos: 63}
-      - {ref: std/sfp-ganged@1, id: port-64, at: [221.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 64}
-      - {ref: std/sfp-ganged@1, id: port-65, at: [235.5, 53.6], group: sfp-plus-lower, rel-pos: 65}
-      - {ref: std/sfp-ganged@1, id: port-66, at: [235.5, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 66}
-      - {ref: std/sfp-ganged@1, id: port-67, at: [249.75, 53.6], group: sfp-plus-lower, rel-pos: 67}
-      - {ref: std/sfp-ganged@1, id: port-68, at: [249.75, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 68}
-      - {ref: std/sfp-ganged@1, id: port-69, at: [264.0, 53.6], group: sfp-plus-lower, rel-pos: 69}
-      - {ref: std/sfp-ganged@1, id: port-70, at: [264.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 70}
-      - {ref: std/sfp-ganged@1, id: port-71, at: [278.25, 53.6], group: sfp-plus-lower, rel-pos: 71}
-      - {ref: std/sfp-ganged@1, id: port-72, at: [278.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 72}
-      - {ref: std/sfp-ganged@1, id: port-73, at: [292.5, 53.6], group: sfp-plus-lower, rel-pos: 73}
-      - {ref: std/sfp-ganged@1, id: port-74, at: [292.5, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 74}
-      - {ref: std/sfp-ganged@1, id: port-75, at: [306.75, 53.6], group: sfp-plus-lower, rel-pos: 75}
-      - {ref: std/sfp-ganged@1, id: port-76, at: [306.75, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 76}
-      - {ref: std/sfp-ganged@1, id: port-77, at: [321.0, 53.6], group: sfp-plus-lower, rel-pos: 77}
-      - {ref: std/sfp-ganged@1, id: port-78, at: [321.0, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 78}
-      - {ref: std/sfp-ganged@1, id: port-79, at: [335.25, 53.6], group: sfp-plus-lower, rel-pos: 79}
-      - {ref: std/sfp-ganged@1, id: port-80, at: [335.25, 68.6], rotate: 180, group: sfp-plus-lower, rel-pos: 80}
-      - {ref: std/qsfp28@1, id: port-81, at: [364.0, 8.4], group: qsfp28-upper, rel-pos: 81}
-      - {ref: std/qsfp28@1, id: port-82, at: [364.0, 25.2], rotate: 180, group: qsfp28-upper, rel-pos: 82}
-      - {ref: std/qsfp28@1, id: port-83, at: [364.0, 52.85], group: qsfp28-lower, rel-pos: 83}
-      - {ref: std/qsfp28@1, id: port-84, at: [364.0, 69.65], rotate: 180, group: qsfp28-lower, rel-pos: 84}
+      - {ref: std/sfp-ganged@1, id: port-1, at: [62.0, 17.5], group: sfp-plus-upper, rel-pos: 1}
+      - {ref: std/sfp-ganged@1, id: port-2, at: [62.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 2}
+      - {ref: std/sfp-ganged@1, id: port-3, at: [76.25, 17.5], group: sfp-plus-upper, rel-pos: 3}
+      - {ref: std/sfp-ganged@1, id: port-4, at: [76.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 4}
+      - {ref: std/sfp-ganged@1, id: port-5, at: [90.5, 17.5], group: sfp-plus-upper, rel-pos: 5}
+      - {ref: std/sfp-ganged@1, id: port-6, at: [90.5, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 6}
+      - {ref: std/sfp-ganged@1, id: port-7, at: [104.75, 17.5], group: sfp-plus-upper, rel-pos: 7}
+      - {ref: std/sfp-ganged@1, id: port-8, at: [104.75, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 8}
+      - {ref: std/sfp-ganged@1, id: port-9, at: [119.0, 17.5], group: sfp-plus-upper, rel-pos: 9}
+      - {ref: std/sfp-ganged@1, id: port-10, at: [119.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 10}
+      - {ref: std/sfp-ganged@1, id: port-11, at: [133.25, 17.5], group: sfp-plus-upper, rel-pos: 11}
+      - {ref: std/sfp-ganged@1, id: port-12, at: [133.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 12}
+      - {ref: std/sfp-ganged@1, id: port-13, at: [147.5, 17.5], group: sfp-plus-upper, rel-pos: 13}
+      - {ref: std/sfp-ganged@1, id: port-14, at: [147.5, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 14}
+      - {ref: std/sfp-ganged@1, id: port-15, at: [161.75, 17.5], group: sfp-plus-upper, rel-pos: 15}
+      - {ref: std/sfp-ganged@1, id: port-16, at: [161.75, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 16}
+      - {ref: std/sfp-ganged@1, id: port-17, at: [176.0, 17.5], group: sfp-plus-upper, rel-pos: 17}
+      - {ref: std/sfp-ganged@1, id: port-18, at: [176.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 18}
+      - {ref: std/sfp-ganged@1, id: port-19, at: [190.25, 17.5], group: sfp-plus-upper, rel-pos: 19}
+      - {ref: std/sfp-ganged@1, id: port-20, at: [190.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 20}
+      - {ref: std/sfp-ganged@1, id: port-21, at: [207.0, 17.5], group: sfp-plus-upper, rel-pos: 21}
+      - {ref: std/sfp-ganged@1, id: port-22, at: [207.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 22}
+      - {ref: std/sfp-ganged@1, id: port-23, at: [221.25, 17.5], group: sfp-plus-upper, rel-pos: 23}
+      - {ref: std/sfp-ganged@1, id: port-24, at: [221.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 24}
+      - {ref: std/sfp-ganged@1, id: port-25, at: [235.5, 17.5], group: sfp-plus-upper, rel-pos: 25}
+      - {ref: std/sfp-ganged@1, id: port-26, at: [235.5, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 26}
+      - {ref: std/sfp-ganged@1, id: port-27, at: [249.75, 17.5], group: sfp-plus-upper, rel-pos: 27}
+      - {ref: std/sfp-ganged@1, id: port-28, at: [249.75, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 28}
+      - {ref: std/sfp-ganged@1, id: port-29, at: [264.0, 17.5], group: sfp-plus-upper, rel-pos: 29}
+      - {ref: std/sfp-ganged@1, id: port-30, at: [264.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 30}
+      - {ref: std/sfp-ganged@1, id: port-31, at: [278.25, 17.5], group: sfp-plus-upper, rel-pos: 31}
+      - {ref: std/sfp-ganged@1, id: port-32, at: [278.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 32}
+      - {ref: std/sfp-ganged@1, id: port-33, at: [292.5, 17.5], group: sfp-plus-upper, rel-pos: 33}
+      - {ref: std/sfp-ganged@1, id: port-34, at: [292.5, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 34}
+      - {ref: std/sfp-ganged@1, id: port-35, at: [306.75, 17.5], group: sfp-plus-upper, rel-pos: 35}
+      - {ref: std/sfp-ganged@1, id: port-36, at: [306.75, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 36}
+      - {ref: std/sfp-ganged@1, id: port-37, at: [321.0, 17.5], group: sfp-plus-upper, rel-pos: 37}
+      - {ref: std/sfp-ganged@1, id: port-38, at: [321.0, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 38}
+      - {ref: std/sfp-ganged@1, id: port-39, at: [335.25, 17.5], group: sfp-plus-upper, rel-pos: 39}
+      - {ref: std/sfp-ganged@1, id: port-40, at: [335.25, 32.5], rotate: 180, group: sfp-plus-upper, rel-pos: 40}
+      - {ref: std/sfp-ganged@1, id: port-41, at: [62.0, 45.9], group: sfp-plus-lower, rel-pos: 41}
+      - {ref: std/sfp-ganged@1, id: port-42, at: [62.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 42}
+      - {ref: std/sfp-ganged@1, id: port-43, at: [76.25, 45.9], group: sfp-plus-lower, rel-pos: 43}
+      - {ref: std/sfp-ganged@1, id: port-44, at: [76.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 44}
+      - {ref: std/sfp-ganged@1, id: port-45, at: [90.5, 45.9], group: sfp-plus-lower, rel-pos: 45}
+      - {ref: std/sfp-ganged@1, id: port-46, at: [90.5, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 46}
+      - {ref: std/sfp-ganged@1, id: port-47, at: [104.75, 45.9], group: sfp-plus-lower, rel-pos: 47}
+      - {ref: std/sfp-ganged@1, id: port-48, at: [104.75, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 48}
+      - {ref: std/sfp-ganged@1, id: port-49, at: [119.0, 45.9], group: sfp-plus-lower, rel-pos: 49}
+      - {ref: std/sfp-ganged@1, id: port-50, at: [119.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 50}
+      - {ref: std/sfp-ganged@1, id: port-51, at: [133.25, 45.9], group: sfp-plus-lower, rel-pos: 51}
+      - {ref: std/sfp-ganged@1, id: port-52, at: [133.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 52}
+      - {ref: std/sfp-ganged@1, id: port-53, at: [147.5, 45.9], group: sfp-plus-lower, rel-pos: 53}
+      - {ref: std/sfp-ganged@1, id: port-54, at: [147.5, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 54}
+      - {ref: std/sfp-ganged@1, id: port-55, at: [161.75, 45.9], group: sfp-plus-lower, rel-pos: 55}
+      - {ref: std/sfp-ganged@1, id: port-56, at: [161.75, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 56}
+      - {ref: std/sfp-ganged@1, id: port-57, at: [176.0, 45.9], group: sfp-plus-lower, rel-pos: 57}
+      - {ref: std/sfp-ganged@1, id: port-58, at: [176.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 58}
+      - {ref: std/sfp-ganged@1, id: port-59, at: [190.25, 45.9], group: sfp-plus-lower, rel-pos: 59}
+      - {ref: std/sfp-ganged@1, id: port-60, at: [190.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 60}
+      - {ref: std/sfp-ganged@1, id: port-61, at: [207.0, 45.9], group: sfp-plus-lower, rel-pos: 61}
+      - {ref: std/sfp-ganged@1, id: port-62, at: [207.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 62}
+      - {ref: std/sfp-ganged@1, id: port-63, at: [221.25, 45.9], group: sfp-plus-lower, rel-pos: 63}
+      - {ref: std/sfp-ganged@1, id: port-64, at: [221.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 64}
+      - {ref: std/sfp-ganged@1, id: port-65, at: [235.5, 45.9], group: sfp-plus-lower, rel-pos: 65}
+      - {ref: std/sfp-ganged@1, id: port-66, at: [235.5, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 66}
+      - {ref: std/sfp-ganged@1, id: port-67, at: [249.75, 45.9], group: sfp-plus-lower, rel-pos: 67}
+      - {ref: std/sfp-ganged@1, id: port-68, at: [249.75, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 68}
+      - {ref: std/sfp-ganged@1, id: port-69, at: [264.0, 45.9], group: sfp-plus-lower, rel-pos: 69}
+      - {ref: std/sfp-ganged@1, id: port-70, at: [264.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 70}
+      - {ref: std/sfp-ganged@1, id: port-71, at: [278.25, 45.9], group: sfp-plus-lower, rel-pos: 71}
+      - {ref: std/sfp-ganged@1, id: port-72, at: [278.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 72}
+      - {ref: std/sfp-ganged@1, id: port-73, at: [292.5, 45.9], group: sfp-plus-lower, rel-pos: 73}
+      - {ref: std/sfp-ganged@1, id: port-74, at: [292.5, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 74}
+      - {ref: std/sfp-ganged@1, id: port-75, at: [306.75, 45.9], group: sfp-plus-lower, rel-pos: 75}
+      - {ref: std/sfp-ganged@1, id: port-76, at: [306.75, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 76}
+      - {ref: std/sfp-ganged@1, id: port-77, at: [321.0, 45.9], group: sfp-plus-lower, rel-pos: 77}
+      - {ref: std/sfp-ganged@1, id: port-78, at: [321.0, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 78}
+      - {ref: std/sfp-ganged@1, id: port-79, at: [335.25, 45.9], group: sfp-plus-lower, rel-pos: 79}
+      - {ref: std/sfp-ganged@1, id: port-80, at: [335.25, 60.9], rotate: 180, group: sfp-plus-lower, rel-pos: 80}
+      - {ref: std/qsfp28@1, id: port-81, at: [364.0, 16.75], group: qsfp28-upper, rel-pos: 81}
+      - {ref: std/qsfp28@1, id: port-82, at: [364.0, 33.55], rotate: 180, group: qsfp28-upper, rel-pos: 82}
+      - {ref: std/qsfp28@1, id: port-83, at: [364.0, 45.15], group: qsfp28-lower, rel-pos: 83}
+      - {ref: std/qsfp28@1, id: port-84, at: [364.0, 61.95], rotate: 180, group: qsfp28-lower, rel-pos: 84}
       - ref: common/led-dot@1
         id: led-power
-        at: [8.0, 63.45]
+        at: [8.0, 55.75]
         group: leds
         rel-pos: 1
         for: chassis
@@ -486,20 +499,20 @@ views:
         - {name: fault, color: '#f59e0b'}
       - ref: std/rj45-ganged@2
         id: console
-        at: [24.0, 52.65]
+        at: [24.0, 44.95]
         rotate: 180
         group: mgmt
         rel-pos: 1
         attrs: {media: rj45-serial, role: console}
       - ref: common/rj45-ganged-eth@1
         id: mgmt
-        at: [24.0, 63.75]
+        at: [24.0, 56.05]
         group: mgmt
         rel-pos: 2
         attrs: {media: rj45, role: mgmt}
       - ref: std/usb-a@1
         id: usb
-        at: [37.25, 60.25]
+        at: [37.25, 52.55]
         rotate: 90
         group: mgmt
         rel-pos: 3

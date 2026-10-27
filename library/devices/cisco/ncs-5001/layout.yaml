@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: ncs-5001
-version: 0.1.0
+version: 0.1.1
 maturity: modelled
 manufacturer: Cisco
 model: NCS 5001
@@ -80,12 +80,24 @@ provenance:
       port-1 to port-40 (SFP+) and port-41 to port-44 (QSFP28) follow the library's convention for stacked cages, down
       each column with the upper cage first. That order is a choice and not a reading. Interface names (the guide does
       not give them for the 5001) are not recorded.
+  intake-mesh:
+    confidence: estimated
+    note: >-
+      Figure 2 (printed page 2, front view) shows a black perforated strip along the port-side edge, as long as the cage
+      field and beyond it, with the cages in the face below it. IT IS ON THE LID, NOT ON THE FACE: the strip lies in the
+      top surface at the front edge, so it is drawn in the top view and the front elevation stays plain. From about 4% to
+      97% of the near edge (412.5 mm of 442.5) and, by the figure's foreshortening, about a ninth of the lid depth (54.0
+      mm), a two-millimetre lip of lid beyond it. Fractions of a perspective drawing, so every number is an estimate. The
+      guide's maintenance text says "a replaceable air filter is located on the front of the chassis" and names no position
+      or size, so the strip is not a filter.
   rear-face:
     confidence: estimated
     note: >-
       Figure 1 (back, fan side), left to right as drawn: a power supply, two fan modules, a centre block, a power
-      supply. The centre block holds a USB port stood on end and, beside it, two round features the guide does not
-      name; they are not drawn (see the gaps). Module widths are fractions of the face width along its near edge: a
+      supply. The centre block holds a USB port stood on end and, to its left, two round features the guide does not
+      name; they are drawn as two unnamed 8 mm discs at about 0.2 and 0.45 of the block from its fan-side edge, a third of
+      a fan-module height across (see the gaps). Each fan module's handle is the loop the figure shows, not a bar (the fan
+      module's own provenance has the figure and size). Module widths are fractions of the face width along its near edge: a
       supply reads about a quarter, a fan about a fifth, the centre block a tenth. Slot height is the one-rack-unit
       face less a little clearance.
   console-and-management:
@@ -192,8 +204,9 @@ gaps:
   scope: [rear]
   reason: vendor-silent
   wanted: >-
-    What the two round features beside the USB port on the fan side are. Figure 1 shows them; the text names only the
-    USB interface.
+    What the two round features beside the USB port on the fan side are, and their size. Figure 1 shows them and the text
+    names only the USB interface; "An ESD socket is provided on the chassis" gives no position, so they are drawn as
+    unnamed discs and not as ESD sockets.
 - what: rack-kit
   scope: [front, rear]
   reason: vendor-silent
@@ -302,6 +315,9 @@ views:
   rear:
     size: {w: 442.5, h: 43.7}
     panel:
+      decor:
+      - {id: round-1, at: [288.5, 20.0], size: [8.0, 8.0], rx: 4.0, fill: '#2b2f33', confidence: estimated, source: 'Figure 1, printed page 2: the left of the two round features beside the USB port, about 0.2 of the centre block from its fan-side edge, a third of a fan-module height across; unnamed in the text'}
+      - {id: round-2, at: [300.0, 20.0], size: [8.0, 8.0], rx: 4.0, fill: '#2b2f33', confidence: estimated, source: 'Figure 1, printed page 2: the right of the two round features, left of the USB port; unnamed in the text'}
       cutouts:
       - {id: usb, at: [316.0, 16.0], size: [4.5, 12.0], shape: rect}
     components:
@@ -320,10 +336,11 @@ views:
       - {ref: std/usb-a@1, id: usb, at: [312.25, 19.75], rotate: 90, group: mgmt, rel-pos: 3,
          attrs: {media: usb-a}}
   top:
+    # REAR AT y=0, FRONT AT y=490.2 - the library's plan convention.
     size: {w: 442.5, h: 490.2}
-    empty: >-
-      Not drawn flat by any held source. The guide's Figures 1, 2, 7 and 8 show the lid in three-quarter view, with a label
-      area and a perforated strip along the port-side edge; nothing there can be measured.
+    panel:
+      decor:
+      - {id: intake-mesh, at: [16.0, 434.2], size: [412.5, 54.0], pattern: vent, vent: 1.0, confidence: estimated, source: 'Figure 2, printed page 2: the black perforated strip on the lid along the port-side edge, from about 4% to 97% of the near edge; about a ninth of the lid depth in the figure, a two-millimetre lip of lid beyond it'}
   bottom:
     size: {w: 442.5, h: 490.2}
     empty: >-

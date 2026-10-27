@@ -44,7 +44,7 @@
   "dc-port-side-intake"
  ],
  "format": 1,
- "gaps": "df65182d6b431cc1",
+ "gaps": "9cfd8416015c886d",
  "groups": [
   "fans",
   "leds",
@@ -436,7 +436,7 @@
   "rear/bays/psu-2": "psus"
  },
  "placement-surface": "c75861a8f989aac5",
- "shape": "6c660a97afc65387",
- "surface": "6129fc43b68a5c89",
- "version": "0.1.0"
+ "shape": "3d778e64df5321e3",
+ "surface": "97458ac1066da145",
+ "version": "1.0.0"
 }

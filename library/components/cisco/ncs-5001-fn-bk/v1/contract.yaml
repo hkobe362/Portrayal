@@ -1,14 +1,14 @@
 format: 1
 kind: module
 name: ncs-5001-fn-bk
-version: 1.0.0
+version: 1.0.1
 class: fan
 behaviour: fills
 profile: networking
 description: >-
   The one-rack-unit fan module of the Cisco NCS 5001, ordered as NCS-5001-FN-BK: back-to-front airflow, which
   the guide calls port-side exhaust. The same face as the front-to-back NCS-5001-FN-FR: a dark honeycomb grille
-  filling the face with a pull handle across its middle. Hot-swappable.
+  filling the face with a pull-handle loop across its middle. Hot-swappable.
 size: {w: 88.0, h: 40.0}
 size-confidence: {w: estimated, h: estimated}
 part-numbers:
@@ -31,6 +31,9 @@ provenance:
   elements: >-
     estimated - as for NCS-5001-FN-FR; Figures 1 and 17, three-quarter views. No fan-module lamp is named, so none
     is drawn.
+  handle: >-
+    estimated - as for NCS-5001-FN-FR: Figure 1 (printed page 2) draws the handle as an open loop spanning nearly
+    the module's width, drawn 72 mm wide and 20 mm tall with a 3.5 mm band, not as a flat bar.
   latch-colour: >-
     NOT STATED for either airflow; the guide's fan figures are greyscale.
   depth: >-
@@ -38,7 +41,7 @@ provenance:
 states: [absent]
 elements:
   grille: {at: [3.0, 2.0], size: [82.0, 36.0], class: rotor}
-  handle: {at: [14.0, 15.5], size: [60.0, 9.0], class: handle}
+  handle: {at: [8.0, 10.0], size: [72.0, 20.0], class: handle}
 relief:
   wall: '#15181b'
   features:
@@ -50,7 +53,7 @@ relief:
       uhandle: 12.0
       color: '#4a4f55'
       confidence: estimated
-      source: Figure 17 shows the handle as a bar standing clear of the face; 12 mm is a reading of its proportions.
+      source: Figure 17 shows the handle as a loop standing clear of the face; 12 mm is a reading of its proportions.
 skins: [default]
 body:
   depth: 100
