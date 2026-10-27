@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: crs328-24p-4s-plus-rm
-version: 1.0.0
+version: 2.0.0
 maturity: modelled
 manufacturer: MikroTik
 model: CRS328-24P-4S+RM
@@ -68,6 +68,18 @@ provenance:
       and the registry jack is centred in it. The two round buttons are drawn 4.3 mm across at centres 332.7 and 342.7
       mm, 33.3 mm. The orange PoE-out band and the plate colours are the photograph's medians (band #e9b159, plate
       #bcbdbd, face #e9e9e9).
+  poe-band:
+    confidence: estimated
+    note: >-
+      estimated - the drawing shows no band. Measured on photograph 1493 against the front plate edges, which the
+      drawing fixes, at the render's 4.5 px per mm across the face; the photo looks down, so y is taken at the
+      face's 0.82 compression. The band is a frame on the tops of the three plates and down the left of the
+      first. Its top bar is 4.0 mm deep, from 7.6 mm to the plate tops at 11.6 mm, and runs from the first plate's
+      left edge (63.0 mm) to the third plate's right edge (264.0 mm), across the two gaps, and the numbered upper lamps sit on its top
+      edge. At the left it widens into a wing 8.9 mm wide at the top (54.1 to 63.0 mm) whose outer edge slants
+      inward to 61.5 mm at the plates' foot, 37.7 mm. The wing carries the 26 V, 53 V and PoE out lamps and legends; it is drawn in three pieces (above the lamps, a
+      strip behind them, below them) so no printed piece lies under a lamp.
+      The edge positions are read to about 1 mm.
   lamps:
     confidence: estimated
     note: >-
@@ -78,8 +90,12 @@ provenance:
       lamp below, both numbered with the port. The lamp pair is 5.8 mm apart, centred 0.5 mm left of the column, the
       upper lamp centre at 7.0 mm and the lower at 41.0 mm. The numbers are printed inside the lamp boxes; silkscreen
       is painted under a placed lamp, so they are drawn just above the upper lamp (4.6 mm) and just above the lower one
-      (39.0 mm). Left of the first plate are two small round lamps, green and red, beside the legends 26 V and 53 V
-      and PoE out, at 56.2 and 59.6 mm. Under the console are four lamps PWR, USR, FAN and PoE at 309.9, 317.0, 323.9
+      (39.0 mm). On the band's left wing are three round lamps (2.0 mm, the library's led-dot) at centres 55.9, 58.8
+      and 61.6 mm, 10.4 mm down, read off photograph 1493 at 4.5 px per mm across the face: the first is green, the
+      second red and the third black, under the legends 26 V, 53 V and PoE out. The green and red are given as
+      the lamp's lit colour (#22c55e, #ef4444); the black one is unlit. The legends are 1.8 mm, turned to read
+      upward as printed, the largest the 2.9 mm lamp pitch allows. The quick guide G1-b holds no LED table and
+      the brochure none, so what the three lamps show is a gap. Under the console are four lamps PWR, USR, FAN and PoE at 309.9, 317.0, 323.9
       and 330.9 mm, the FAN and PoE pair on an orange strip headed FAULT. No document held says what a lamp shows.
   port-numbering:
     confidence: estimated
@@ -200,8 +216,9 @@ gaps:
   reason: vendor-silent
   note: >-
     Searched the brochure, the product page and the saved quick guide page for an LED table: none. The lamps carry the
-    component's own vocabulary and no colour or meaning is stated. The two lamps above and below each port are not
-    explained either.
+    component's own vocabulary and no meaning is stated. The two lamps above and below each port are not explained
+    either, nor are the 26 V, 53 V and PoE out lamps; the photograph shows them green, red and black, and the green
+    and red are given as lit colours on the first two.
   wanted: MikroTik's LED description for the CRS328-24P-4S+RM.
 - what: weight
   scope: [front]
@@ -255,13 +272,14 @@ groups:
     term: LED
     role: indicator
     index-origin: 1
-    description: the 26 V and 53 V PoE-out lamps and the PWR, USR, FAN and PoE lamps
+    description: the 26 V, 53 V and PoE out lamps and the PWR, USR, FAN and PoE lamps
 views:
   front:
     size: {w: 443.0, h: 44.3}
     panel:
       decor:
-      - {id: poe-band, kind: poe-band, at: [54.5, 8.6], size: [212.0, 3.0], fill: '#e9b159'}
+      - {id: poe-band, kind: poe-band, at: [63.0, 7.6], size: [201.0, 4.0], fill: '#e9b159'}
+      - {id: poe-band-wing-lamps, kind: poe-band, at: [54.9, 9.4], size: [8.1, 2.0], fill: '#e9b159'}
       - {id: fault-strip, kind: fault-strip, at: [322.7, 38.2], size: [18.8, 6.0], fill: '#e9b159'}
       - {id: plate-1, kind: jack-plate, at: [63.0, 11.6], size: [59.9, 26.1], fill: '#bcbdbd'}
       - {id: plate-2, kind: jack-plate, at: [133.3, 11.6], size: [59.9, 26.1], fill: '#bcbdbd'}
@@ -283,9 +301,12 @@ views:
       - {id: led-usr, at: [315.5, 39.5], size: [3.0, 3.0], shape: rect}
       - {id: led-fan, at: [322.4, 39.5], size: [3.0, 3.0], shape: rect}
       - {id: led-poe, at: [329.4, 39.5], size: [3.0, 3.0], shape: rect}
-      - {id: led-26v, at: [54.7, 4.8], size: [3.0, 3.0], shape: rect}
-      - {id: led-53v, at: [58.1, 4.8], size: [3.0, 3.0], shape: rect}
+      - {id: led-26v, at: [54.9, 9.4], size: [2.0, 2.0], shape: circle}
+      - {id: led-53v, at: [57.8, 9.4], size: [2.0, 2.0], shape: circle}
+      - {id: led-poe-out, at: [60.6, 9.4], size: [2.0, 2.0], shape: circle}
     silkscreen:
+    - {id: poe-band-wing-top, at: [54.1, 7.6], path: M 0 0 H 8.9 V 1.8 H 0.44 Z, filled: true, fill: '#e9b159', for: chassis}
+    - {id: poe-band-wing-low, at: [55.03, 11.4], path: M 0 0 H 7.97 V 26.3 H 6.47 Z, filled: true, fill: '#e9b159', for: chassis}
     - {block: rj45}
     - {at: [319.75, 23.6], text: CONSOLE, font-size: 1.6, anchor: middle, fill: '#2b2b2b', for: console}
     - {at: [332.7, 29.7], text: RESET, font-size: 1.6, anchor: middle, fill: '#2b2b2b', for: btn-reset}
@@ -296,9 +317,9 @@ views:
     - {at: [330.9, 39.3], text: PoE, font-size: 1.4, anchor: middle, fill: '#2b2b2b', for: led-poe}
     - {at: [337.2, 41.6], text: FAULT, font-size: 1.4, anchor: middle, fill: '#2b2b2b', for: chassis}
     - {at: [307.6, 29.5], text: 'SFP+', font-size: 1.8, anchor: middle, rotate: -90, fill: '#2b2b2b', for: cage-1}
-    - {at: [56.9, 12.5], text: 26 V, font-size: 1.4, anchor: middle, rotate: -90, fill: '#2b2b2b', for: chassis}
-    - {at: [59.7, 12.5], text: 53 V, font-size: 1.4, anchor: middle, rotate: -90, fill: '#2b2b2b', for: chassis}
-    - {at: [62.4, 15.0], text: PoE out, font-size: 1.4, anchor: middle, rotate: -90, fill: '#2b2b2b', for: chassis}
+    - {at: [56.46, 16.0], text: 26 V, font-size: 1.8, anchor: middle, rotate: -90, fill: '#2b2b2b', for: led-26v}
+    - {at: [59.36, 16.0], text: 53 V, font-size: 1.8, anchor: middle, rotate: -90, fill: '#2b2b2b', for: led-53v}
+    - {at: [62.16, 17.0], text: PoE out, font-size: 1.8, anchor: middle, rotate: -90, fill: '#2b2b2b', for: led-poe-out}
     - {at: [279.3, 39.0], text: '1', font-size: 1.6, anchor: middle, fill: '#2b2b2b', for: led-sfp-1}
     - {at: [286.7, 39.0], text: '2', font-size: 1.6, anchor: middle, fill: '#2b2b2b', for: led-sfp-2}
     - {at: [293.3, 39.0], text: '3', font-size: 1.6, anchor: middle, fill: '#2b2b2b', for: led-sfp-3}
@@ -379,8 +400,11 @@ views:
       - {ref: common/led-sq@1, id: led-usr, at: [315.5, 39.5], for: chassis, group: status-leds, rel-pos: 2}
       - {ref: common/led-sq@1, id: led-fan, at: [322.4, 39.5], for: chassis, group: status-leds, rel-pos: 3}
       - {ref: common/led-sq@1, id: led-poe, at: [329.4, 39.5], for: chassis, group: status-leds, rel-pos: 4}
-      - {ref: common/led-sq@1, id: led-26v, at: [54.7, 4.8], for: chassis, group: status-leds, rel-pos: 5}
-      - {ref: common/led-sq@1, id: led-53v, at: [58.1, 4.8], for: chassis, group: status-leds, rel-pos: 6}
+      - {ref: common/led-dot@1, id: led-26v, at: [54.9, 9.4], for: chassis, group: status-leds, rel-pos: 5,
+         states: ['off', {name: green, color: '#22c55e'}]}
+      - {ref: common/led-dot@1, id: led-53v, at: [57.8, 9.4], for: chassis, group: status-leds, rel-pos: 6,
+         states: ['off', {name: red, color: '#ef4444'}]}
+      - {ref: common/led-dot@1, id: led-poe-out, at: [60.6, 9.4], for: chassis, group: status-leds, rel-pos: 7}
       - {ref: common/reset-button@1, id: btn-reset, at: [330.7, 31.3], for: chassis, group: controls, rel-pos: 1,
          attrs: {function: reset}}
       - {ref: common/reset-button@1, id: btn-mode, at: [340.7, 31.3], for: chassis, group: controls, rel-pos: 2,

@@ -1,7 +1,8 @@
 {
  "bay-accepts": {},
- "composed": "ad1a6015ecc735c1",
+ "composed": "f6035964ecc9abe3",
  "composed-refs": {
+  "common/led-dot@1": "1.1.0+f09babec64cd84f9",
   "common/led-sq@1": "1.0.0+fc038211dab485f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-ganged-eth-plain@1": "1.0.0+3bd0f8c628445a0b",
@@ -13,7 +14,7 @@
   "base"
  ],
  "format": 1,
- "gaps": "ab2307ae3a7ba20f",
+ "gaps": "94189da7c6e6c948",
  "groups": [
   "console",
   "controls",
@@ -35,6 +36,7 @@
   "front/cutout/led-53v",
   "front/cutout/led-fan",
   "front/cutout/led-poe",
+  "front/cutout/led-poe-out",
   "front/cutout/led-port-1-low",
   "front/cutout/led-port-1-up",
   "front/cutout/led-port-10-low",
@@ -124,6 +126,7 @@
   "front/placements/led-53v",
   "front/placements/led-fan",
   "front/placements/led-poe",
+  "front/placements/led-poe-out",
   "front/placements/led-port-1-low",
   "front/placements/led-port-1-up",
   "front/placements/led-port-10-low",
@@ -203,7 +206,7 @@
   "front/placements/port-8",
   "front/placements/port-9"
  ],
- "names": "075b893d50556e9c",
+ "names": "c8e5e26744e9b283",
  "placement-addressing": {
   "for": {
    "front/placements/btn-mode": [
@@ -222,6 +225,9 @@
     "chassis"
    ],
    "front/placements/led-poe": [
+    "chassis"
+   ],
+   "front/placements/led-poe-out": [
     "chassis"
    ],
    "front/placements/led-port-1-low": [
@@ -399,6 +405,7 @@
    "front/placements/led-53v": 6,
    "front/placements/led-fan": 3,
    "front/placements/led-poe": 4,
+   "front/placements/led-poe-out": 7,
    "front/placements/led-port-1-low": 2,
    "front/placements/led-port-1-up": 1,
    "front/placements/led-port-10-low": 20,
@@ -493,6 +500,7 @@
   "front/placements/led-53v": "status-leds",
   "front/placements/led-fan": "status-leds",
   "front/placements/led-poe": "status-leds",
+  "front/placements/led-poe-out": "status-leds",
   "front/placements/led-port-1-low": "port-leds",
   "front/placements/led-port-1-up": "port-leds",
   "front/placements/led-port-10-low": "port-leds",
@@ -572,8 +580,8 @@
   "front/placements/port-8": "rj45",
   "front/placements/port-9": "rj45"
  },
- "placement-surface": "44136fa355b3678a",
- "shape": "3b1c77be4e4f8bed",
- "surface": "7912ae6a22d87894",
- "version": "1.0.0"
+ "placement-surface": "e2cf2fae7afe12b0",
+ "shape": "e54f17ce5c136566",
+ "surface": "0b58293e13a6efca",
+ "version": "2.0.0"
 }
