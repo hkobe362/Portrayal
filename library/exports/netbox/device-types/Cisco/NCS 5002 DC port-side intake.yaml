@@ -7,6 +7,8 @@ is_full_depth: true
 airflow: front-to-rear
 description: Cisco Network Convergence System 5002, a two-rack-unit router with eighty 1/10G SFP+ ports
   and four 100G QSFP28 ports, built as two stacked boards
+front_image: true
+rear_image: true
 console-ports:
   - name: Console
     type: rj-45
