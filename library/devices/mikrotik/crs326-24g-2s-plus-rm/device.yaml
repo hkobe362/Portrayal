@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: crs326-24g-2s-plus-rm
-version: 0.1.0
+version: 1.0.1
 maturity: modelled
 manufacturer: MikroTik
 model: CRS326-24G-2S+RM
@@ -15,8 +15,9 @@ description: >-
   ACT/LINK and 10G lamps. It has the PWR and USR lamps, the RES reset button and the CONSOLE jack. The
   rear carries the DC jack (DC 10-28V as printed), a cable-restraint slot, the earthing stud and the vents.
   There is no built-in mains supply: a 24 V 1.2 A adapter ships in the box, so there are no power bays.
-  The round opening on the rear is a vent; the product page lists passive cooling, so no fan is drawn.
-  The CSS326-24G-2S+RM is a separate product with its own hardware and is its own device.
+  The round opening on the rear is a stamped fan-guard grille with four fan-mount holes and no fan fitted.
+  The product page lists passive cooling, so no fan is drawn. The CSS326-24G-2S+RM is a separate product
+  with its own hardware and is its own device.
 profile: networking
 provenance:
   sources:
@@ -66,8 +67,10 @@ provenance:
       cages are 15.7 mm wide at centres 238.5 and 260.2 mm (21.7 mm apart), top at 25.0 mm. The lamp band
       along the bottom starts at 35.4 mm. The CONSOLE jack position is the empty square the drawing keeps
       at the left, 15.2 x 11.5 mm; the 15.8 x 13.2 mm registry jack is centred in it, 1.7 mm taller than
-      the drawn square. Colours are medians of the straight-on CSS326 studio photograph (plate #dadada,
-      jack plates #bebebe, lamp band #8f8f8e).
+      the drawn square, so its bottom edge (22.7 + 13.2 = 35.9) runs 0.5 mm into the lamp band, which
+      starts at 35.4; the photograph shows the jack reaching the band the same way and the overlap is
+      kept. Colours are medians of the straight-on CSS326 studio photograph (plate #dadada, jack plates
+      #bebebe, lamp band #8f8f8e).
   port-numbering:
     confidence: photo-measured
     note: >-
@@ -108,26 +111,32 @@ provenance:
       runs on to hold the DC jack, 58 mm long against the CSS's 31 mm, and the CRS prints DC 10-28V where
       the CSS prints DC 8 - 30V. The earthing stud has a wing nut (the drawing's 11 mm). It is drawn as
       chassis art at the stud's position from the photograph, because the library's common/ground-stud
-      draws a hex nut and a lug seat the stud does not have. The CRS prints an earth symbol above it;
-      the CSS prints none.
+      draws a hex nut and a lug seat the stud does not have; the gap `earth-stud-part` asks for a wing-nut
+      stud part. The CRS prints an earth symbol above it; the CSS prints none. The DC jack is the placed
+      common/dc-barrel (`dc-in`), its bore centred on the photograph's.
   dc-input:
     confidence: photo-measured
     note: >-
       The brochure lists the supported input voltage as 9 - 30 V (jack or passive PoE); the product page
       10-30 V for both inputs; the rear prints DC 10-28V. The three disagree and none is the others' scope:
-      the rear legend is drawn as printed and the brochure and page ranges are in attrs. The jack is drawn
-      as chassis art, 13 mm across with a 10 mm bore, from photograph 1941, and not as common/dc-barrel:
-      that part is placed on exactly four other devices, a census test pins them, and its interface note
-      says no held document states a barrel size, while the CSS326 quick guide does (5.5 mm outside, 2
-      mm inside, pin positive). The CRS quick guide is not held as text, so no barrel size is asserted
-      for the CRS.
+      the rear legend is drawn as printed and the brochure and page ranges are in attrs. The jack is the
+      placed common/dc-barrel (`dc-in`), positioned on the bore of photograph 1941. The CRS quick guide
+      is not held as text, so no barrel size is asserted for the CRS.
+  dc-in-rating:
+    confidence: datasheet
+    note: >-
+      The rear prints "DC 10-28V" beside the jack (photograph 1941): the `input-voltage` of the dc-in
+      jack, carried as printed. The brochure's Included list gives a 24 V 1.2 A adapter, the `current-max-a`.
+      The brochure's 9 - 30 V and the product page's 10-30 V are in `attrs.power`. The CRS326 documents
+      held give no barrel size (the CSS326 quick guide states one, not this model's document); the jack
+      is the library's one nominal `dc-barrel`.
   built-in-power-and-fans:
     confidence: datasheet
     note: >-
       Powering is by the DC jack or by passive PoE on port 1, with a 24 V 1.2 A adapter in the box (brochure,
       Included); no power supply is built in, so none is drawn and there are no power bays. The product
-      page gives the cooling type as passive; the round ring on the rear is therefore drawn as a vent
-      and not a fan.
+      page gives the cooling type as passive. The round opening on the rear is a stamped fan-guard grille
+      with four fan-mount holes and no fan fitted, so it is drawn as a vent and not a fan.
   ears:
     confidence: drawing
     note: >-
@@ -174,6 +183,15 @@ gaps:
     The dimensions drawing has no rear view; the rear is read off studio photographs that look down on
     it, so the y positions are estimated.
   wanted: A dimensioned rear view.
+- what: earth-stud-part
+  scope:
+  - rear
+  reason: needs-drawing
+  note: >-
+    The earthing stud has a wing nut (photograph 1941; the drawing's 11 mm). common/ground-stud draws
+    a hex nut and a lug seat, so the stud is chassis art and exports no earth. The reason is the nearest
+    the schema has: the part itself is what is missing, and the library has no `needs-part` reason.
+  wanted: A wing-nut earth stud part, so the stud is placed and not drawn as chassis art.
 - what: led-states
   scope:
   - front
@@ -222,6 +240,7 @@ groups:
   controls: {term: Button, role: management, index-origin: 1, description: the RES reset button}
   status-leds: {term: LED, role: indicator, index-origin: 1, description: the PWR and USR lamps}
   furniture: {term: Item, role: furniture, index-origin: 1}
+  inlets: {term: Inlet, role: service, index-origin: 1}
 views:
   front:
     size: {w: 443.0, h: 44.5}
@@ -233,53 +252,53 @@ views:
       - {id: lamp-band, kind: lamp-band, at: [2.2, 35.4], size: [438.6, 7.4], fill: '#8f8f8e'}
       cutouts:
       - {id: port-1, at: [39.75, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-1, at: [41.05, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-1, at: [41.05, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-2, at: [39.75, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-2, at: [46.95, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-2, at: [46.95, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-3, at: [53.72, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-3, at: [55.02, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-3, at: [55.02, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-4, at: [53.72, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-4, at: [60.92, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-4, at: [60.92, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-5, at: [67.69, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-5, at: [68.99, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-5, at: [68.99, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-6, at: [67.69, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-6, at: [74.89, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-6, at: [74.89, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-7, at: [81.66, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-7, at: [82.96, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-7, at: [82.96, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-8, at: [81.66, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-8, at: [88.86, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-8, at: [88.86, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-9, at: [103.25, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-9, at: [104.55, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-9, at: [104.55, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-10, at: [103.25, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-10, at: [110.45, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-10, at: [110.45, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-11, at: [117.22, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-11, at: [118.52, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-11, at: [118.52, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-12, at: [117.22, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-12, at: [124.42, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-12, at: [124.42, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-13, at: [131.19, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-13, at: [132.49, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-13, at: [132.49, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-14, at: [131.19, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-14, at: [138.39, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-14, at: [138.39, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-15, at: [145.16, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-15, at: [146.46, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-15, at: [146.46, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-16, at: [145.16, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-16, at: [152.36, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-16, at: [152.36, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-17, at: [166.75, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-17, at: [168.05, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-17, at: [168.05, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-18, at: [166.75, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-18, at: [173.95, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-18, at: [173.95, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-19, at: [180.72, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-19, at: [182.02, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-19, at: [182.02, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-20, at: [180.72, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-20, at: [187.92, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-20, at: [187.92, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-21, at: [194.69, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-21, at: [195.99, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-21, at: [195.99, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-22, at: [194.69, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-22, at: [201.89, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-22, at: [201.89, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-23, at: [208.66, 24.0], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-23, at: [209.96, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-23, at: [209.96, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: port-24, at: [208.66, 10.6], size: [12.7, 11.0], shape: rect}
-      - {id: led-port-24, at: [215.86, 36.5], size: [3.0, 3.0], shape: circle}
+      - {id: led-port-24, at: [215.86, 36.5], size: [3.0, 3.0], shape: rect}
       - {id: console, at: [17.5, 22.7], size: [15.8, 13.2], shape: rect}
       - {id: cage-1, at: [231.25, 25.0], size: [14.5, 10.0], shape: rect}
       - {id: cage-2, at: [252.95, 25.0], size: [14.5, 10.0], shape: rect}
@@ -343,7 +362,7 @@ views:
         at: [39.75, 24.0]
         group: rj45
         rel-pos: 1
-        attrs: {media: rj45, speed: 1g}
+        attrs: {media: rj45, speed: 1g, poe: 'passive PD (in), 9 - 30 V'}
       - ref: common/rj45-ganged-eth-plain@1
         id: port-2
         at: [39.75, 10.6]
@@ -569,9 +588,6 @@ views:
       - {id: knockout-2, kind: knockout, at: [289.55, 14.9], size: [15.3, 16.6], rx: 7.0, fill: '#d0d0d0'}
       - {at: [311.3, 14.0], size: [44.9, 19.0], pattern: vent, vent: 1.0}
       - {id: cable-slot, kind: cable-slot, at: [363.4, 18.6], size: [58.3, 13.0], rx: 6.0, fill: '#a9acaf'}
-      - {id: dc-jack-ring, kind: dc-jack, at: [408.0, 19.0], size: [13.0, 13.0], rx: 6.5, fill: '#c3c3c3'}
-      - {id: dc-jack-bore, kind: dc-jack-bore, at: [409.5, 20.5], size: [10.0, 10.0], rx: 5.0, fill: '#26292c'}
-      - {id: dc-jack-pin, kind: dc-jack-pin, at: [413.1, 24.1], size: [2.8, 2.8], rx: 1.4, fill: '#7d838a'}
       - {id: earth-stud-base, kind: earth-stud, at: [427.0, 31.7], size: [8.0, 8.0], rx: 4.0, fill: '#b4b8bc'}
       - {id: earth-stud-nut, kind: earth-stud, at: [429.0, 33.7], size: [4.0, 4.0], rx: 2.0, fill: '#8d9298'}
     silkscreen:
@@ -588,6 +604,12 @@ views:
       for: chassis
     components:
       placements:
+      - ref: common/dc-barrel@1
+        id: dc-in
+        at: [408.5, 19.0]
+        group: inlets
+        rel-pos: 1
+        attrs: {input-voltage: 10-28 VDC, current-max-a: 1.2}
       - {ref: common/ground-symbol@1, id: earth-mark, at: [432.3, 21.7], for: chassis, group: furniture,
         rel-pos: 1}
       - {ref: common/screw-head@1, id: rear-screw-1, at: [47.2, 3.5], group: furniture, rel-pos: 2}

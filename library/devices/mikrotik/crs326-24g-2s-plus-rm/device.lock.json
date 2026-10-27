@@ -1,7 +1,8 @@
 {
  "bay-accepts": {},
- "composed": "5edeaf2e1b523193",
+ "composed": "f43b6d662984ea7a",
  "composed-refs": {
+  "common/dc-barrel@1": "1.0.1+b8ccd45ccce33262",
   "common/ground-symbol@1": "1.0.0+938c617ba0a96a89",
   "common/led-sq@1": "1.0.0+fc038211dab485f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
@@ -15,11 +16,12 @@
   "base"
  ],
  "format": 1,
- "gaps": "4b72da8f878e9375",
+ "gaps": "7dca4f1ab93cf617",
  "groups": [
   "console",
   "controls",
   "furniture",
+  "inlets",
   "port-leds",
   "rj45",
   "sfp-leds",
@@ -143,12 +145,13 @@
   "front/placements/port-7",
   "front/placements/port-8",
   "front/placements/port-9",
+  "rear/placements/dc-in",
   "rear/placements/earth-mark",
   "rear/placements/rear-screw-1",
   "rear/placements/rear-screw-2",
   "rear/placements/rear-screw-3"
  ],
- "names": "350c56d1a429231e",
+ "names": "a16c69b25fa30712",
  "placement-addressing": {
   "for": {
    "front/placements/btn-res": [
@@ -307,13 +310,14 @@
    "front/placements/port-7": 7,
    "front/placements/port-8": 8,
    "front/placements/port-9": 9,
+   "rear/placements/dc-in": 1,
    "rear/placements/earth-mark": 1,
    "rear/placements/rear-screw-1": 2,
    "rear/placements/rear-screw-2": 3,
    "rear/placements/rear-screw-3": 4
   }
  },
- "placement-attrs": "2d693a353b2449e8",
+ "placement-attrs": "b279cf8597174a4d",
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
   "front/placements/btn-res": "controls",
@@ -374,13 +378,14 @@
   "front/placements/port-7": "rj45",
   "front/placements/port-8": "rj45",
   "front/placements/port-9": "rj45",
+  "rear/placements/dc-in": "inlets",
   "rear/placements/earth-mark": "furniture",
   "rear/placements/rear-screw-1": "furniture",
   "rear/placements/rear-screw-2": "furniture",
   "rear/placements/rear-screw-3": "furniture"
  },
  "placement-surface": "44136fa355b3678a",
- "shape": "75d69eb1cf733b64",
- "surface": "ee58dad6e12273cd",
- "version": "0.1.0"
+ "shape": "46ccad6e5a832ef6",
+ "surface": "3f83816edf016ade",
+ "version": "1.0.1"
 }

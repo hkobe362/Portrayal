@@ -11,6 +11,9 @@ from pathlib import Path
 import pytest
 import yaml
 
+from portrayal import dcim_export as dx
+from portrayal import devicelock
+
 ROOT = Path(__file__).resolve().parents[2]
 DEVICES = ROOT / "library/devices/mikrotik"
 NAMES = ["crs326-24g-2s-plus-rm", "css326-24g-2s-plus-rm"]
@@ -19,6 +22,17 @@ MODELS = {"crs326-24g-2s-plus-rm": "CRS326-24G-2S+RM", "css326-24g-2s-plus-rm": 
 
 def load(name):
     return yaml.safe_load((DEVICES / name / "device.yaml").read_text())
+
+
+# the rear legend each model prints, as the placement's input-voltage
+RATED = {"crs326-24g-2s-plus-rm": ("10-28 VDC",), "css326-24g-2s-plus-rm": ("8-30 VDC",)}
+# port 1's passive PoE input, from each model's brochure (CRS) and quick guide (CSS)
+POE_IN = {"crs326-24g-2s-plus-rm": "passive PD (in), 9 - 30 V",
+          "css326-24g-2s-plus-rm": "passive PD (in), 11 - 30 V"}
+
+
+def d_cutouts(name):
+    return load(name)["views"]["front"]["panel"]["cutouts"]
 
 
 def placements(d, view):
@@ -105,13 +119,83 @@ def test_only_the_crs_has_the_rj45_console():
 @pytest.mark.parametrize("name", NAMES)
 def test_power_is_a_dc_jack_not_a_built_in_supply(name):
     d = load(name)
-    # the jack is drawn as chassis art: common/dc-barrel is pinned to four other devices
+    # the jack is the placed common/dc-barrel, as on every other device with one, not chassis art
+    jack = [p for p in placements(d, "rear") if p["ref"] == "common/dc-barrel@1"]
+    assert [p["id"] for p in jack] == ["dc-in"]
+    assert jack[0]["attrs"] == {"input-voltage": RATED[name][0], "current-max-a": 1.2}
     decor = {x.get("id") for x in d["views"]["rear"]["panel"]["decor"]}
-    assert {"dc-jack-ring", "dc-jack-bore", "dc-jack-pin"} <= decor
-    assert not [p for p in placements(d, "rear") if "dc-barrel" in p["ref"]]
+    assert not {"dc-jack-ring", "dc-jack-bore", "dc-jack-pin"} & decor
+    assert d["provenance"]["dc-in-rating"]["confidence"] == "datasheet"
     assert not (d["views"]["front"].get("components") or {}).get("bays")
     assert not (d["views"]["rear"].get("components") or {}).get("bays")
     assert d["chassis"]["power"] == "dc"
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_port_1_carries_the_passive_poe_input_as_an_attr(name):
+    d = load(name)
+    jacks = {p["id"]: p for p in placements(d, "front") if p["ref"] == "common/rj45-ganged-eth-plain@1"}
+    assert jacks["port-1"]["attrs"] == {"media": "rj45", "speed": "1g", "poe": POE_IN[name]}
+    assert all("poe" not in jacks[f"port-{n}"]["attrs"] for n in range(2, 25))
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_the_lamp_cutouts_are_square_as_the_lamp_part_is(name):
+    cut = {c["id"]: c for c in d_cutouts(name)}
+    for n in range(1, 25):
+        assert cut[f"led-port-{n}"]["shape"] == "rect"
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_the_rear_opening_is_a_fan_guard_grille_with_no_fan(name):
+    d = load(name)
+    text = " ".join(d["description"].split())
+    assert "fan-guard grille with four fan-mount holes and no fan fitted" in text
+    assert "passive cooling" in text and "is a vent" not in text
+    assert d["attrs"]["thermal"]["cooling"].startswith("passive")
+
+
+@pytest.mark.parametrize("name", NAMES)
+def test_the_earth_stud_is_chassis_art_with_a_gap_for_its_part(name):
+    d = load(name)
+    gap = [g for g in d["gaps"] if g["what"] == "earth-stud-part"]
+    assert len(gap) == 1 and gap[0]["scope"] == ["rear"]
+    assert "wing-nut" in gap[0]["wanted"]
+    decor = {x.get("id") for x in d["views"]["rear"]["panel"]["decor"]}
+    assert {"earth-stud-base", "earth-stud-nut"} <= decor
+
+
+def test_the_css_quick_guide_is_cited_with_its_document_number_and_date():
+    d = load(NAMES[1])
+    assert "Document #49066 Modified on: 26.APR.2019" in " ".join(d["provenance"]["sources"]["note"].split())
+    quick = [r for r in d["references"] if "quick guide" in r["title"]]
+    assert len(quick) == 1
+    assert "Document #49066 Modified on: 26.APR.2019" in quick[0]["title"]
+    assert "no date" not in quick[0]["title"]
+
+
+def test_the_css_rear_is_estimated_like_the_crs():
+    assert load(NAMES[0])["provenance"]["rear-layout"]["confidence"] == "estimated"
+    assert load(NAMES[1])["provenance"]["rear-layout"]["confidence"] == "estimated"
+
+
+def test_the_two_devices_differ_where_their_brochures_do():
+    """Switch chip, flash, temperature, power, VLANs, OS, console and the rear legend."""
+    got = {}
+    for name in NAMES:
+        d = load(name)
+        legends = [s["text"] for s in d["views"]["rear"]["silkscreen"] if str(s.get("text", "")).startswith("DC")]
+        got[name] = (
+            d["attrs"]["platform"]["switch-chip"], d["attrs"]["platform"]["storage"],
+            d["attrs"]["platform"]["os"], d["attrs"]["environmental"]["operating-temp-c"],
+            d["attrs"]["power"]["power-max-w"], d["attrs"]["features"]["vlan-limit"], legends,
+        )
+    assert got[NAMES[0]] == ("98DX3236A1", "16 MB flash", "SwOS / RouterOS (dual boot)", "-40 to 60 (tested)",
+                             24, "IEEE 802.1Q, up to 4K VLANs", ["DC 10-28V"])
+    assert got[NAMES[1]] == ("98DX3216A1", "2 MB flash", "SwOS", "-20 to 70 (tested)",
+                             19, "IEEE 802.1Q, up to 250 VLANs", ["DC 8 - 30V"])
+    assert load(NAMES[0])["attrs"]["platform"]["ram"] == "512 MB"
+    assert "ram" not in load(NAMES[1])["attrs"]["platform"]
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -123,9 +207,7 @@ def test_the_logo_is_reserved_not_drawn(name):
 
 @pytest.mark.parametrize("name", NAMES)
 def test_dcim_device_type_exports_one_per_device(name):
-    """One orderable configuration, one exported device type, u_height 1.
-
-    The export files are written by the exporter itself (dcim_export.py --device), never by hand."""
+    """One orderable configuration, one exported device type, u_height 1, the DC jack as `dc-in`."""
     docs = [
         yaml.safe_load(f.read_text())
         for f in (ROOT / "library/exports/netbox/device-types/MikroTik").glob("*.yaml")
@@ -136,9 +218,30 @@ def test_dcim_device_type_exports_one_per_device(name):
     assert mine[0]["manufacturer"] == "MikroTik"
     assert sum(1 for i in mine[0]["interfaces"] if i["type"] == "1000base-t") == 24
     assert len(mine[0]["interfaces"]) == 26
+    assert [p["name"] for p in mine[0]["power-ports"]] == ["dc-in"]
 
 
-def test_the_lock_files_exist_for_both_devices():
+@pytest.mark.parametrize("target", ["netbox", "nautobot"])
+@pytest.mark.parametrize("name", NAMES)
+def test_the_committed_exports_are_what_the_exporter_writes_now(name, target, tmp_path, monkeypatch):
+    """Runs the exporter on the build and compares its file with the committed one, so a device
+    edited without regenerating its export fails here and not only in CI's "exports are current"."""
+    dist = ROOT / "library/dist"
+    assert (dist / "devices.json").exists(), "run ./build.sh first: this reads library/dist"
+    monkeypatch.setattr(dx, "RASTER", False)
+    dx.export_device(dx.Dist(str(dist)), name, str(tmp_path), str(dist))
+    rel = Path(target) / "device-types" / "MikroTik" / f"{MODELS[name]}.yaml"
+    assert (tmp_path / rel).read_text() == (ROOT / "library/exports" / rel).read_text()
+
+
+def test_the_lock_files_match_the_devices():
+    """The lock entry of each device is what devicelock computes from it now, at its own version."""
+    lib = ROOT / "library"
+    assert not [f for f in devicelock.check(lib) if f[0].startswith("mikrotik/")]
+    known = devicelock.load_lock(lib)["devices"]
     for name in NAMES:
-        lock = json.loads((DEVICES / name / "device.lock.json").read_text())
-        assert lock
+        entry = known[f"mikrotik/{name}"]
+        assert entry["version"] == load(name)["version"]
+        per_device = json.loads((DEVICES / name / "device.lock.json").read_text())
+        assert per_device["gaps"] == entry["gaps"]
+        assert "dc-in" in " ".join(per_device["ids"])

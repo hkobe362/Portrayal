@@ -2,8 +2,9 @@
 (#789, docs/connectors-dc-terminal-design.md).
 
 ONE SIZE, BY RULING. The library treats the DC barrel jack as one nominal
-connector, `dc-barrel`: barrel diameters vary by product and no document held
-for any of the four devices that place common/dc-barrel@1 states one. What a
+connector, `dc-barrel`: barrel diameters vary by product and of the six devices
+that place common/dc-barrel@1 only one document held, the CSS326-24G-2S+RM quick
+guide, states one. What a
 jack is fed is carried as attributes of its placement, `input-voltage` and
 `current-max-a`, from that device's own documents, and neither the interface
 nor the plug states a rating. generic/dc-barrel-plug@1 is drawn at the common
@@ -48,7 +49,11 @@ PLACED = {
     "nokia/xs-010x-r": ("rear", "dc-in", None, "12 VDC", 1.0, "Table 2-2"),
     "nokia/xs-010xr-p": ("rear", "dc-in", None, "12 VDC", 1.0, "Table 4-2"),
     "telco-systems/tm-280": ("front", "dc-in", None, "5 VDC", 3.0, "5VDC @3A (max)"),
+    "mikrotik/crs326-24g-2s-plus-rm": ("rear", "dc-in", None, "10-28 VDC", 1.2, "DC 10-28V"),
+    "mikrotik/css326-24g-2s-plus-rm": ("rear", "dc-in", None, "8-30 VDC", 1.2, "DC 8 - 30V"),
 }
+# the one placing device whose own document states a barrel size
+SIZE_STATED = {"mikrotik/css326-24g-2s-plus-rm"}
 EACH_DEVICE = pytest.mark.parametrize("device", sorted(PLACED))
 
 
@@ -88,7 +93,7 @@ def test_dc_barrel_is_one_connector_and_claims_no_size_or_rating():
     note = entry["note"]
     assert "ONE nominal connector" in note
     assert "diameters vary by product" in note
-    assert "none of the documents" in note and "four devices" in note
+    assert "six devices" in note and "only the CSS326-24G-2S+RM quick guide states one" in note
     assert "input-voltage" in note and "current-max-a" in note
     assert "not by the interface" in note and PLUG in note
     for key in ("barrel-jack", "barrel-plug"):
@@ -117,14 +122,14 @@ def test_the_jack_gained_its_interface_and_kept_its_drawing():
 
 
 def test_the_jack_states_no_rating_of_its_own():
-    """Four devices feed it two different voltages; the part carries neither."""
+    """Six devices feed it four different voltages; the part carries none."""
     attrs = _contract(JACK)["attrs"]
     assert not {"input-voltage", "current-max-a", "voltage"} & set(attrs)
 
 
-# --- 2. the four placements, and their ratings ----------------------------------
+# --- 2. the six placements, and their ratings ------------------------------------
 
-def test_the_jack_is_placed_on_exactly_these_four_devices():
+def test_the_jack_is_placed_on_exactly_these_six_devices():
     """The census: every placement of the jack in the library, and nothing
     composes it inside another part."""
     found = set()
@@ -134,7 +139,7 @@ def test_the_jack_is_placed_on_exactly_these_four_devices():
             for p in ((view or {}).get("components") or {}).get("placements") or []:
                 if p.get("ref") == JACK:
                     found.add(f"{f.parts[-3]}/{f.parts[-2]}")
-    assert found == set(PLACED) and len(found) == 4
+    assert found == set(PLACED) and len(found) == 6
     composed = []
     for f in sorted((LIB / "components").glob("*/*/v*/contract.yaml")):
         c = yaml.safe_load(f.read_text())
@@ -152,13 +157,17 @@ def test_each_placement_states_what_its_device_is_fed(device):
     note = " ".join(prov["note"].split())
     assert quoted in note, note
     assert "`input-voltage`" in note and "`current-max-a`" in note
-    assert "no barrel size" in note
+    if device in SIZE_STATED:
+        assert "5.5 mm outside, 2 mm inside, pin positive" in note
+    else:
+        assert "no barrel size" in note
 
 
 def test_the_ratings_differ_which_is_why_they_are_not_the_parts():
     volts = {PLACED[d][3] for d in PLACED}
     amps = {PLACED[d][4] for d in PLACED}
-    assert volts == {"12 VDC", "5 VDC"} and amps == {1.0, 3.0}
+    assert volts == {"12 VDC", "5 VDC", "10-28 VDC", "8-30 VDC"}
+    assert amps == {1.0, 3.0, 1.2}
 
 
 def test_the_attribute_names_are_ones_the_library_already_used():

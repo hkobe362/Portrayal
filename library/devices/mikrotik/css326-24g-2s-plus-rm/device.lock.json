@@ -1,7 +1,8 @@
 {
  "bay-accepts": {},
- "composed": "4c8fb47330a78b04",
+ "composed": "99d3b9a311c59fab",
  "composed-refs": {
+  "common/dc-barrel@1": "1.0.1+b8ccd45ccce33262",
   "common/led-sq@1": "1.0.0+fc038211dab485f9",
   "common/reset-button@1": "1.1.0+cda1cbe1d930fdbc",
   "common/rj45-ganged-eth-plain@1": "1.0.0+3bd0f8c628445a0b",
@@ -13,10 +14,11 @@
   "base"
  ],
  "format": 1,
- "gaps": "57ec627b89c24366",
+ "gaps": "c1f1c29bf7b2a4fa",
  "groups": [
   "controls",
   "furniture",
+  "inlets",
   "port-leds",
   "rj45",
   "sfp-leds",
@@ -138,11 +140,12 @@
   "front/placements/port-7",
   "front/placements/port-8",
   "front/placements/port-9",
+  "rear/placements/dc-in",
   "rear/placements/rear-screw-1",
   "rear/placements/rear-screw-2",
   "rear/placements/rear-screw-3"
  ],
- "names": "62319feb5dea62c8",
+ "names": "0610cae238af6713",
  "placement-addressing": {
   "for": {
    "front/placements/btn-res": [
@@ -297,12 +300,13 @@
    "front/placements/port-7": 7,
    "front/placements/port-8": 8,
    "front/placements/port-9": 9,
+   "rear/placements/dc-in": 1,
    "rear/placements/rear-screw-1": 1,
    "rear/placements/rear-screw-2": 2,
    "rear/placements/rear-screw-3": 3
   }
  },
- "placement-attrs": "4a2c9113975f7ec1",
+ "placement-attrs": "d0106f5b55f20262",
  "placement-geometry": "44136fa355b3678a",
  "placement-groups": {
   "front/placements/btn-res": "controls",
@@ -362,12 +366,13 @@
   "front/placements/port-7": "rj45",
   "front/placements/port-8": "rj45",
   "front/placements/port-9": "rj45",
+  "rear/placements/dc-in": "inlets",
   "rear/placements/rear-screw-1": "furniture",
   "rear/placements/rear-screw-2": "furniture",
   "rear/placements/rear-screw-3": "furniture"
  },
  "placement-surface": "44136fa355b3678a",
- "shape": "83b77dfe30adddd6",
- "surface": "976a856a3451614e",
- "version": "0.1.0"
+ "shape": "fa9bd038cf790cf4",
+ "surface": "d2e97832146b062f",
+ "version": "1.0.1"
 }

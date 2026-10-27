@@ -63,6 +63,9 @@ interfaces:
     type: 1000base-t
   - name: port-24
     type: 1000base-t
+power-ports:
+  - name: dc-in
+    type: other
 comments: 'MikroTik CRS326-24G-2S+RM is a fixed 1U Cloud Router Switch. It has 24 10/100/1000 Ethernet
   ports, two SFP+ cages and an RJ45 serial console, and runs SwOS or RouterOS (dual boot). The front carries
   the 24 jacks in three blocks of four columns by two rows. They are numbered 1 to 24 as printed, with
@@ -71,8 +74,9 @@ comments: 'MikroTik CRS326-24G-2S+RM is a fixed 1U Cloud Router Switch. It has 2
   their ACT/LINK and 10G lamps. It has the PWR and USR lamps, the RES reset button and the CONSOLE jack.
   The rear carries the DC jack (DC 10-28V as printed), a cable-restraint slot, the earthing stud and the
   vents. There is no built-in mains supply: a 24 V 1.2 A adapter ships in the box, so there are no power
-  bays. The round opening on the rear is a vent; the product page lists passive cooling, so no fan is
-  drawn. The CSS326-24G-2S+RM is a separate product with its own hardware and is its own device.
+  bays. The round opening on the rear is a stamped fan-guard grille with four fan-mount holes and no fan
+  fitted. The product page lists passive cooling, so no fan is drawn. The CSS326-24G-2S+RM is a separate
+  product with its own hardware and is its own device.
 
 
   Configuration `base`: CRS326-24G-2S+RM - 24 10/100/1000 ports, two SFP+ cages and the RJ45 console.
@@ -112,7 +116,7 @@ comments: 'MikroTik CRS326-24G-2S+RM is a fixed 1U Cloud Router Switch. It has 2
   - thermal.cooling: passive (product page); no fan
 
 
-  Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 1.0.1. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'
