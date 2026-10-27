@@ -66,17 +66,14 @@ def test_identity_follows_the_nexus_naming(device):
     assert [r for r in device["views"]["front"]["regions"] if r["id"] == "logo-zone"]
 
 
-def test_no_ear_is_drawn_and_every_kit_is_a_kit(device):
+def test_no_ear_is_drawn_and_the_shipped_position_is_flush(device):
     placed = [p["ref"] for v in device["views"].values()
               for p in (v.get("components") or {}).get("placements", [])]
     assert "common/rack-ear@1" not in placed
     positions = device["chassis"]["ears"]["positions"]
     assert [p["name"] for p in positions if p.get("default")] == ["flush"]
     assert all("at" not in p for p in positions), "no figure dimensions the bracket"
-    for k in device["chassis"]["kits"]:
-        name = k["ref"].split("/")[1].split("@")[0]
-        assert contract(name)["kind"] == "kit"
-    assert contract("n9k-c9500-rmk")["configurations"][0]["depth"] == [609.6, 812.8]
+    assert "kits" not in device["chassis"], "the rack kit waits for tooling that copes with a kit contract"
 
 
 # ---- slot and bay counts, numbering, per face
@@ -295,12 +292,14 @@ def test_device_type_exports_with_u_height_13():
     assert files, "run dcim_export.py for n9k-c9508"
     doc = yaml.safe_load(files[0].read_text())
     assert doc["u_height"] == 13
-    assert doc["part_number"] == "N9K-C9508"
+    assert doc["model"] == "N9K-C9508"
     assert doc["manufacturer"] == "Cisco"
+    assert doc["airflow"] == "front-to-rear"
+    assert len(doc["module-bays"]) == 29, "18 on the front, 11 on the rear"
 
 
 @pytest.mark.parametrize("name", EVERY_MODULE)
 def test_module_types_export(name):
-    files = list((EXPORTS / "netbox/module-types/Cisco").glob(f"{name.upper()}.yaml"))
-    assert files, f"no NetBox module type for {name}"
-    assert (EXPORTS / "nautobot/module-types/Cisco" / files[0].name).exists()
+    file = contract(name)["attrs"]["model"] + ".yaml"     # a module is exported under its model
+    assert (EXPORTS / "netbox/module-types/Cisco" / file).exists(), f"no NetBox module type for {name}"
+    assert (EXPORTS / "nautobot/module-types/Cisco" / file).exists()

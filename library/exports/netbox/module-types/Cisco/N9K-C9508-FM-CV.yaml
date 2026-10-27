@@ -1,0 +1,17 @@
+---
+manufacturer: Cisco
+model: N9K-C9508-FM-CV
+description: Cisco Nexus 9508 fabric-module blank card (N9K-C9508-FM-CV)
+comments: 'Cisco Nexus 9508 fabric-module blank card (N9K-C9508-FM-CV). A plain cover that fills a fabric-module
+  slot holding no fabric module. The guide says to fill empty fabric slots with it when the fabric modules
+  are any type other than the N9K-C9508-FM-G; it is a different part number from the N9K-C9508-FM-Z, which
+  also passes power to the fan tray.
+
+
+  Facts carried in the model that this schema has no field for:
+
+  - eol: unknown
+
+  - role: airflow-blank
+
+  Contract version 1.0.0 (cisco/n9k-c9508-fm-cv).'
