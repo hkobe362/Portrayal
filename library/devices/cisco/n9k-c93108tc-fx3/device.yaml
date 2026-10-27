@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: n9k-c93108tc-fx3
-version: 1.0.1
+version: 3.0.0
 maturity: modelled
 manufacturer: Cisco
 model: N9K-C93108TC-FX3
@@ -92,7 +92,9 @@ provenance:
       Callout 3 is "BCN, STS, ENV LEDs"; appendix C says they sit "on the left side of the front". The
       figure draws three lamps in a row under the first jacks, each with its legend to its left, at 20.2,
       29.5 and 39.3 mm across and 39.4 mm down. The vertical is measured from the figure's top and bottom
-      edges, 127 px for 43.7 mm, 2.9 px per mm; the lamp rows and the legend sit 4.3 mm above the bottom
+      edges, 127 px for 43.7 mm, 2.9 px per mm. The lamps are flat rectangles, about twice as wide as high, so
+      they are common/led-rect-sm@1 (2.8 x 1.6), the part the rear's lamps use, centred on those points,
+      and not the square lamp; the lamp rows and the legend sit 4.3 mm above the bottom
       edge. The legend after them reads CISCO NEXUS N9K-C93108TC-FX3, from 41.8 mm; the library's practice
       for a Cisco face is that text, as on the 93180YC-EX, and no logo artwork. The figure's mark at the
       top left is not drawn. Under the jacks the figure draws two rows of small cells: an upper row from
@@ -142,7 +144,7 @@ provenance:
 attrs:
   physical:
     weight-note: >-
-      15.8 lb (7.1 kg) chassis; each fan module 0.28 lb (0.13 kg); each power supply 2.42 lb (1.1 kg)
+      15.8 lb (7.1 kg) chassis; each fan module 0.28 lb (0.13 kg); each 500 W AC power supply 2.42 lb (1.1 kg), no weight given for the other supplies
   power: {power-typical-w: 420, power-max-w: 464, power-envelope: unstated, heat-dissipation-btu-hr: 1583,
     power-input-ac: '100 to 240 V, 50 to 60 Hz', power-input-hvac: 200 to 277 V, power-input-dc: '-48
       to -72 V nominal, as printed', power-input-hvdc: 240 to 380 V, power-supply-options: '500W AC, 1200W
@@ -186,6 +188,17 @@ chassis:
   - {ref: cisco/nxk-acc-kit-1ru@1, supply: optional}
   - {ref: cisco/nxk-acc-kit2-2ru@1, supply: optional}
 gaps:
+- what: kit-contents-table-empty
+  scope:
+  - front
+  reason: vendor-silent
+  note: >-
+    The guide's appendix D, Additional Kits (page 59 to 60, PDF page 65 to 66), has no content. The
+    NXK-ACC-KIT-1RU parts are read from the rack-mount procedure (page 20) alone: front brackets, rear
+    brackets and slider rails, with countersink screws and no ground lug kit.
+  wanted: >-
+    The NXK-ACC-KIT-1RU contents table for this switch, as the FX3 and FX3S guides print it. The parts
+    carried agree with those guides.
 - what: kit-named-without-contents
   scope:
   - front
@@ -207,6 +220,14 @@ gaps:
     A drawing of the lid, the underside and the two side walls. The guide's overview shows one side wall
     in three-quarter view and calls out its mounting-bracket screw holes and a grounding pad; none is
     flat and none can be measured. Each face carries an `empty:` sentence.
+- what: supply-weights-not-given
+  scope:
+  - rear
+  reason: vendor-silent
+  note: >-
+    The guide's weights table gives 2.42 lb (1.1 kg) against the 500 W AC supply and has no row for the
+    1200 W HVAC/HVDC or the 930 W DC supply. No weight is carried for either.
+  wanted: The weight of the N9K-PUV-1200W and the NXA-PDC-930W, from a document that prints it.
 - what: other-supplies-have-no-picture
   scope:
   - rear
@@ -414,9 +435,9 @@ views:
       - {id: led-port-53, at: [414.9, 22.4], size: [2.25, 2.0], shape: circle}
       - {id: port-54, at: [412.9, 26.0], size: [20.0, 10.15], shape: rect}
       - {id: led-port-54, at: [428.65, 22.4], size: [2.25, 2.0], shape: circle}
-      - {id: led-bcn, at: [18.7, 37.9], size: [3.0, 3.0], shape: rect}
-      - {id: led-sts, at: [27.95, 37.9], size: [3.0, 3.0], shape: rect}
-      - {id: led-env, at: [37.8, 37.9], size: [3.0, 3.0], shape: rect}
+      - {id: led-bcn, at: [18.8, 38.6], size: [2.8, 1.6], shape: rect}
+      - {id: led-sts, at: [28.05, 38.6], size: [2.8, 1.6], shape: rect}
+      - {id: led-env, at: [37.9, 38.6], size: [2.8, 1.6], shape: rect}
     silkscreen:
     - {at: [13.5, 7.6], text: '1', font-size: 2.0, anchor: end, fill: '#1a1d1f', for: port-1}
     - {at: [18.5, 7.6], text: '2', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-2}
@@ -1246,18 +1267,18 @@ views:
         for: port-54
         group: port-leds
         rel-pos: 54
-      - ref: common/led-sq@1
+      - ref: common/led-rect-sm@1
         id: led-bcn
-        at: [18.7, 37.9]
+        at: [18.8, 38.6]
         group: leds
         rel-pos: 1
         for: chassis
         states:
         - 'off'
         - {name: beacon, color: '#3b82f6', behavior: blinking}
-      - ref: common/led-sq@1
+      - ref: common/led-rect-sm@1
         id: led-sts
-        at: [27.95, 37.9]
+        at: [28.05, 38.6]
         group: leds
         rel-pos: 2
         for: chassis
@@ -1267,9 +1288,9 @@ views:
         - {name: booting, color: '#f59e0b', behavior: blinking}
         - {name: minor-alarm, color: '#f59e0b'}
         - {name: major-alarm, color: '#ef4444'}
-      - ref: common/led-sq@1
+      - ref: common/led-rect-sm@1
         id: led-env
-        at: [37.8, 37.9]
+        at: [37.9, 38.6]
         group: leds
         rel-pos: 3
         for: chassis

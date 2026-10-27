@@ -21,7 +21,6 @@ attrs:
   input-voltage: '100-240 Vac (range 90-264 Vac); 200-277 Vac (range 180-305 Vac); 240-380 Vdc'
   input-current-max: '10 A at 100 Vac'
   efficiency: 'Climate Savers Platinum Efficiency (80Plus Platinum certified)'
-  weight-kg: 1.1
   airflow: dual-direction
 provenance:
   model: >-
@@ -40,8 +39,9 @@ provenance:
     AND THE TABLE SAYS 1230 W; the table is carried as `power-output-w` and no document
     gives the output at 100 to 240 Vac, so no lower figure is stated. THE DC INPUT RANGE IS
     PRINTED "Range: 1204-400 Vdc", which cannot be right beside "192 to 400 VDC" in the
-    same table, and is not carried; the nominal range, 240-380 Vdc, is. The weight is the
-    guides' weights table, 2.42 lb (1.1 kg).
+    same table, and is not carried; the nominal range, 240-380 Vdc, is. NO WEIGHT IS CARRIED:
+    the guides' weights tables give 2.42 lb (1.1 kg) only against the AC supply rows, and
+    none has a row for this supply.
   size: >-
     estimated - THE GUIDES STATE NO DIMENSION, only "Form factor RSP1", which they print for
     this supply, the 650 W AC supply and the 930 W DC supply alike. The size is

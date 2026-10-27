@@ -216,8 +216,8 @@ comments: '48x 100M/1/10/25G SFP28 and 6x 10/25/40/50/100G QSFP28 1RU data-centr
 
   - management.usb: 1 USB port
 
-  - physical.weight-note: 21 lb (9.52 kg) chassis; each fan module 0.26 lb (0.12 kg); each power supply
-  2.42 lb (1.1 kg)
+  - physical.weight-note: 21 lb (9.52 kg) chassis; each fan module 0.26 lb (0.12 kg); each 650 W AC power
+  supply 2.42 lb (1.1 kg), no weight given for the other supplies
 
   - power.heat-dissipation-btu-hr: 2047.285
 
@@ -238,7 +238,7 @@ comments: '48x 100M/1/10/25G SFP28 and 6x 10/25/40/50/100G QSFP28 1RU data-centr
   - power.power-typical-w: 375
 
 
-  Drawing version 0.1.0. A major bump means a slot moved or an id was renamed, so anything cached from
+  Drawing version 0.1.2. A major bump means a slot moved or an id was renamed, so anything cached from
   an earlier export may no longer line up.
 
   Model maturity: modelled. Every dimension in the source records where it came from.'

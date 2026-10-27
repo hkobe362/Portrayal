@@ -1,8 +1,6 @@
 ---
 manufacturer: Cisco
 model: N9K-PUV-1200W
-weight: 1.1
-weight_unit: kg
 description: The 1200 W HVAC/HVDC power supply of the Cisco Nexus 9300 fixed switches, N9K-PUV-1200W
 power-ports:
   - name: '{module}/inlet'
@@ -28,7 +26,5 @@ comments: 'The 1200 W HVAC/HVDC power supply of the Cisco Nexus 9300 fixed switc
   - input-voltage: 100-240 Vac (range 90-264 Vac); 200-277 Vac (range 180-305 Vac); 240-380 Vdc
 
   - power-output-w: 1230
-
-  - weight-kg: 1.1
 
   Contract version 1.0.0 (cisco/n9k-puv-1200w).'

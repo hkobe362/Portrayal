@@ -23,16 +23,16 @@
    "cisco/nxa-pdc-930w@1"
   ]
  },
- "composed": "bb51ac8155f3eb51",
+ "composed": "fdc8e1717aca1885",
  "composed-refs": {
-  "cisco/n9k-puv-1200w@1": "1.0.0+fa0002a57fed5288",
+  "cisco/n9k-puv-1200w@1": "1.0.0+3b71a55f590d70a1",
   "cisco/nxa-fan-35cfm@1": "1.0.0+e248be813e8cc13d",
   "cisco/nxa-pac-650w@1": "1.0.0+112109d00572884c",
-  "cisco/nxa-pdc-930w@1": "1.0.0+2bcb6afbd3e16bdd",
+  "cisco/nxa-pdc-930w@1": "1.0.0+83a00390c0486148",
   "cisco/nxk-acc-kit-1ru-front-bracket@1": "1.0.0+e175430bfe9c81f0",
   "cisco/nxk-acc-kit-1ru-rear-bracket@1": "1.0.0+b04fe0873a0221c7",
   "cisco/nxk-acc-kit-1ru-slider-rail@1": "1.0.0+9184fb20e1ef7847",
-  "cisco/nxk-acc-kit-1ru@1": "1.0.0+cad3b8d8ae1bc167",
+  "cisco/nxk-acc-kit-1ru@1": "1.0.0+93f45259d791728f",
   "cisco/nxk-acc-kit2-2ru-inner-rail@1": "1.0.0+9f2a5e9d6ebbf0be",
   "cisco/nxk-acc-kit2-2ru-outer-rail@1": "1.0.0+31083d608be33574",
   "cisco/nxk-acc-kit2-2ru@1": "1.0.0+f4aededfae23bff7",
@@ -62,7 +62,7 @@
   "hvac-hvdc-1200w-port-side-intake"
  ],
  "format": 1,
- "gaps": "6818d42285097ec3",
+ "gaps": "2e6bf69dabad6938",
  "groups": [
   "fans",
   "furniture",
@@ -794,6 +794,6 @@
  },
  "placement-surface": "174c0fb04dbe3319",
  "shape": "39a85957f85aa539",
- "surface": "c7f2f14d8fc13508",
- "version": "0.1.0"
+ "surface": "163fdd8a1856a3a6",
+ "version": "0.1.2"
 }

@@ -21,12 +21,14 @@ provenance:
   contents: >-
     The kit's contents table, "Rack Mount Kit NXK-ACC-KIT-1RU", in appendix D of the Cisco
     N93180YC-FX3 NX-OS Mode Switch Hardware Installation Guide (First Published 2021-02-16,
-    Last Modified 2026-07-27), in the Cisco N93180YC-FX3S guide (Last Modified 2026-07-27) and
-    in the Cisco N93108TC-FX3 guide (Last Modified 2026-07-16): "Rack-mount kit - Front
-    brackets (2) - Rear brackets (2) - Slider rails (2) - M4 Phillips pan-head screws (10)",
-    "Ground lug kit - Two-hole lug (1) - M4 x 8-mm Phillips pan-head screws (2)", and a
-    console cable ordered separately. The screws and the lug kit are hardware and are not
-    parts here.
+    Last Modified 2026-07-27, page 61) and in the Cisco N93180YC-FX3S guide (Last Modified
+    2026-07-27, page 65): "Rack-mount kit - Front brackets (2) - Rear brackets (2) - Slider
+    rails (2) - M4 Phillips pan-head screws (10)", "Ground lug kit - Two-hole lug (1) - M4 x
+    8-mm Phillips pan-head screws (2)", and a console cable ordered separately. The Cisco
+    N93108TC-FX3 guide (Last Modified 2026-07-16) has no such table: its appendix D is empty.
+    Its rack-mount procedure (page 20) lists the same three parts, front brackets, rear
+    brackets and slider rails, with "M4 x 0.7 x 8-mm Phillips countersink screws (10-12)" and
+    no lug kit. The screws and the lug kit are hardware and are not parts here.
   depth: >-
     datasheet - the rack-and-cabinet requirements in the same three guides: the distance
     between the outside face of the front mounting rail and the outside face of the back

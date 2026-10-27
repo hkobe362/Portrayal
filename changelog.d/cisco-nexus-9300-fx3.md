@@ -6,5 +6,9 @@
   AC, 1200 W HVAC/HVDC and 930 W DC supplies. Four DCIM device types are exported:
   `N9K-C93180YC-FX3`, `N9K-C93180YC-FX3H`, `N9K-C93180YC-FX3S` and `N9K-C93108TC-FX3`. New
   components: the fan modules `cisco/nxa-fan-35cfm` and `cisco/nxa-sfan-35cfm`, the supplies
-  `cisco/nxa-pac-500w`, `cisco/nxa-pdc-930w` and `cisco/n9k-puv-1200w`, and the first two rack
-  kits, `cisco/nxk-acc-kit-1ru` and `cisco/nxk-acc-kit2-2ru`, each with its parts.
+  `cisco/nxa-pac-500w`, `cisco/nxa-pdc-930w` and `cisco/n9k-puv-1200w`, and the library's Nexus
+  9300 rack kits, `cisco/nxk-acc-kit-1ru` and `cisco/nxk-acc-kit2-2ru`, each with its parts.
+
+### Changed
+- The DCIM export names a device type from the configuration that states no airflow of its own when
+  no configuration is the default or the base, instead of the first one by name.

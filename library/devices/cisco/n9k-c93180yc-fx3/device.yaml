@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: n9k-c93180yc-fx3
-version: 0.1.0
+version: 0.1.3
 maturity: modelled
 manufacturer: Cisco
 model: N9K-C93180YC-FX3
@@ -160,7 +160,7 @@ provenance:
 attrs:
   physical:
     weight-note: >-
-      21 lb (9.52 kg) chassis; each fan module 0.26 lb (0.12 kg); each power supply 2.42 lb (1.1 kg)
+      21 lb (9.52 kg) chassis; each fan module 0.26 lb (0.12 kg); each 650 W AC power supply 2.42 lb (1.1 kg), no weight given for the other supplies
   power: {power-typical-w: 375, power-max-w: 600, power-envelope: unstated, heat-dissipation-btu-hr: 2047.285,
     power-input-ac: '100 to 240 V, 50 to 60 Hz', power-input-hvac: 200 to 277 V, power-input-dc: '-48
       to -72 V nominal, as printed', power-input-hvdc: 240 to 380 V, power-supply-options: '650W AC, 1200W
@@ -259,9 +259,10 @@ gaps:
   reason: vendor-silent
   note: >-
     The guide's Installing the Airflow Sleeve says the sleeve "is only compatible with rack mount kit
-    (N3K-C3064-ACC-KIT)". Its installation options list NXK-ACC-KIT-1RU alone, and its sleeve table names
-    neither the FX3 nor the FX3H.
-  wanted: Whether the N3K-C3064-ACC-KIT fits this switch, and what it holds. It is not listed.
+    (N3K-C3064-ACC-KIT)". Its Airflow Sleeve table (page 28, PDF page 34) lists the N9K-C93180YC-FX3,
+    672.49 to 784.25 mm, and does not name the FX3H. Its installation options list NXK-ACC-KIT-1RU alone,
+    and no guide gives the contents of the N3K-C3064-ACC-KIT.
+  wanted: What the N3K-C3064-ACC-KIT holds, and whether it is a kit this switch is sold with. It is not listed.
 - what: the-four-undrawn-faces
   scope:
   - top
@@ -273,6 +274,14 @@ gaps:
     A drawing of the lid, the underside and the two side walls. The guide's overview shows one side wall
     in three-quarter view and calls out its mounting-bracket screw holes and a grounding pad; none is
     flat and none can be measured. Each face carries an `empty:` sentence.
+- what: supply-weights-not-given
+  scope:
+  - rear
+  reason: vendor-silent
+  note: >-
+    The guide's weights table gives 2.42 lb (1.1 kg) against the 650 W AC supply and has no row for the
+    1200 W HVAC/HVDC or the 930 W DC supply. No weight is carried for either.
+  wanted: The weight of the N9K-PUV-1200W and the NXA-PDC-930W, from a document that prints it.
 - what: other-supplies-and-fans-have-no-picture
   scope:
   - rear

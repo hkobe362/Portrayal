@@ -21,7 +21,6 @@ attrs:
   input-voltage: '-48 to -72 Vdc nominal (range -40 to -60 Vdc), as printed'
   input-current-max: '23 A at -48 Vdc'
   efficiency: 'Greater than 92% at 50% load'
-  weight-kg: 1.1
   airflow: front-to-back
 provenance:
   model: >-
@@ -37,8 +36,9 @@ provenance:
     A at -48 Vdc", inrush 35 A, hold-up 8 ms at 930 W, 12 Vdc output and standby, efficiency
     "Greater than 92% at 50% load", form factor RSP1. THE INPUT RANGE IS PRINTED AGAINST
     ITSELF: "Nominal range: -48 to -72 Vdc nominal (Range: -40 to -60 Vdc" - a range inside
-    the nominal one - and is carried as printed, not corrected. The weight is the guides'
-    weights table, 2.42 lb (1.1 kg). The installation chapter says "All DC power supplies
+    the nominal one - and is carried as printed, not corrected. NO WEIGHT IS CARRIED: the
+    guides' weights tables give 2.42 lb (1.1 kg) only against the AC supply rows, and none
+    has a row for this supply. The installation chapter says "All DC power supplies
     have reverse polarity protection".
   size: >-
     estimated - THE GUIDES STATE NO DIMENSION, only "Form factor RSP1", which they print for
