@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: n9k-c9508
-version: 1.0.0
+version: 1.0.1
 maturity: modelled
 manufacturer: Cisco
 model: N9K-C9508
@@ -22,7 +22,8 @@ provenance:
     confidence: datasheet
     note: >-
       Cisco N9508 NX-OS Mode Switch Hardware Installation Guide (140 pp; first published 2014-11-21, last
-      modified 2026-09-17), https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/hw/n9508_hig/guide/b_n9508_nxos-mode_hardware_install_guide.pdf
+      modified 2026-09-17),
+      https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/hw/n9508_hig/guide/b_n9508_nxos-mode_hardware_install_guide.pdf
       (page numbers below are PDF pages, and the printed page is six lower).
       Cisco's Nexus 9504 and 9516 hardware installation guides were read to confirm that the supervisors, the
       system controller and the 3000 W supplies are the same parts. The NetBox devicetype-library file for
@@ -84,7 +85,7 @@ provenance:
       datasheet - "Overview" note: three fabric modules go in FM 2, 4 and 6; four in FM 2, 3, 4 and 6; five in
       FM 2 to 6; six in FM 1 to 6. Slots left empty take N9K-C9508-FAN-PWR (with -FM-G and N9K-C9508-FAN2) or,
       with any other fabric module, a blank by slot: an empty odd slot (FM 1, FM 3, FM 5) takes N9K-C9508-FM-CV
-      (Overview note, PDF p9; migration cautions, PDF pp113-116), and an empty even slot (FM 2, FM 4, FM 6)
+      (Overview note, PDF p10; migration cautions, PDF pp113-116), and an empty even slot (FM 2, FM 4, FM 6)
       takes N9K-C9508-FM-Z, which powers the fan tray (Fan Tray LEDs, PDF p135). Table 1 (PDF p7) lists only
       the FM-Z in its blank column. With N9K-C9508-FM-R2 no fabric slot may be empty. A bay holds any of
       them; the pairing rules are the guide's and are not enforced by the model.
@@ -111,8 +112,8 @@ provenance:
       figure (PDF p24, callout 14) prints "Width of the chassis plus vertical mounting brackets on each side"
       as 19.2 in (48.8 cm), against the 17.5 in chassis: about 21.6 mm of bracket on each side. The ear model
       takes a depth offset and a height and no width, so that span is carried here and in a gap, not drawn.
-      A rear-mount position is not given by the guide. The bottom-support rails (kit N9K-C9500-RMK; the accessory kit is N9K-ACC-KIT in
-      the procedure and N9K-C9500-ACK in its table) carry the weight; the rack must be a four-post rack 24 to 32
+      A rear-mount position is not given by the guide. The bottom-support rails (kit N9K-C9500-RMK; the
+      accessory kit is N9K-ACC-KIT in the procedure and N9K-C9500-ACK in its table) carry the weight; the rack must be a four-post rack 24 to 32
       in deep between rails. No kit is listed under `chassis.kits`: the first `kind: kit` contract in the
       library broke six existing tests, so the kit is left out of this batch.
   airflow:
@@ -128,7 +129,9 @@ provenance:
   lifecycle:
     confidence: datasheet
     note: >-
-      datasheet - Cisco's support page lists the Nexus 9508 as available (support page "Cisco Nexus 9000 Series Switches", https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html). Sale status of
+      datasheet - Cisco's support page lists the Nexus 9508 as available (support page "Cisco Nexus 9000
+      Series Switches",
+      https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html). Sale status of
       each module is per module: N9K-SUP-A, N9K-SUP-B, N9K-C9508-FM, -FM-S and -FM-E are end-of-sale by
       notice; the others have no status on the support page and are recorded as unknown.
 attrs:

@@ -22,7 +22,7 @@ provenance:
     estimated - the guide gives dimensions for the fabric module (2.46 in by 16.4 in by 11.7 in) and none
     for its blank, so the blank takes the fabric module's slot envelope.
   purpose: >-
-    install guide - "Overview" note (PDF p9): with any fabric module other than N9K-C9508-FM-G, "any empty
+    install guide - "Overview" note (PDF p10): with any fabric module other than N9K-C9508-FM-G, "any empty
     slots should be filled with N9K-C9508-FM-CV cards". The migration procedures (PDF pp113-116) say to
     fill an empty FM1, FM3 or FM5 with "blank modules (N9K-C95xx-FM-CV)" and to fill FM2, FM4 or FM6 with
     fabric modules to power the fan trays. The coverage list of the intake names

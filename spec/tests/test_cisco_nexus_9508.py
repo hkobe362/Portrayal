@@ -220,7 +220,7 @@ def test_base_seats_the_common_equipment(device):
     assert s["sc-1"] == s["sc-2"] == "cisco/n9k-sc-a@1"
     assert [s[f"fan-{n}"] for n in (1, 2, 3)] == ["cisco/n9k-c9508-fan@1"] * 3
     assert [s[f"fm-{n}"] for n in range(2, 7)] == ["cisco/n9k-c9508-fm-e2@1"] * 5
-    # an empty odd fabric slot takes the FM-CV (PDF p9, pp113-116); the FM-Z is for an empty even slot (p135)
+    # an empty odd fabric slot takes the FM-CV (PDF p10, pp113-116); the FM-Z is for an empty even slot (p135)
     assert s["fm-1"] == "cisco/n9k-c9508-fm-cv@1"
     assert [s[f"ps-{n}"] for n in range(1, 5)] == ["cisco/n9k-pac-3000w-b@1"] * 4
     assert [s[f"ps-{n}"] for n in range(5, 9)] == ["cisco/n9k-psu-blank@1"] * 4

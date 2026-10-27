@@ -27,7 +27,7 @@ provenance:
     LEDs" calls it a "fabric blank module with fan tray power connector (N9K-C9508-FM-Z)" and says the even
     numbered fabric slot behind a fan tray needs a working fabric module or this blank to power the tray.
   conflict: >-
-    install guide - the Overview note (PDF p9) says "any empty slots should be filled with N9K-C9508-FM-CV
+    install guide - the Overview note (PDF p10) says "any empty slots should be filled with N9K-C9508-FM-CV
     cards" and the migration procedures (PDF pp113-116) say to fill an empty FM 1, FM 3 or FM 5 with
     N9K-C95xx-FM-CV and FM 2, FM 4 or FM 6 with fabric modules to power the fan trays. The FM-Z therefore
     goes in an empty even slot, where it powers the fan tray (Fan Tray LEDs, PDF p135), and the FM-CV in an
