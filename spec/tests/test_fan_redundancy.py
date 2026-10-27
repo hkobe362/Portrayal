@@ -697,6 +697,7 @@ def test_the_comparison_layer_can_now_reach_them():
     # 160 since the Juniper EX9204, EX9208 and EX9214: one fan tray each (hardware guides, Cooling System)
     # 161 with the Arista 7280TR3-40C6: N+1 over two fan modules (data sheet, "Hot-swappable Fans 2 (N+1 redundant)")
     # 162 with the Arista 7050SDX4-48D8: N+1 over three fan modules (data sheet, "Hot-swappable Fans")
-    # 165 with the Cisco Nexus 93180YC-FX3, 93180YC-FX3S and 93108TC-FX3: n+1 over four fan modules (installation
+    # 163 with the Cisco Nexus 9508: 2+1 over three fan trays (hardware guide, Replacing a Fan Tray)
+    # 166 with the Cisco Nexus 93180YC-FX3, 93180YC-FX3S and 93108TC-FX3: n+1 over four fan modules (installation
     # guides, Overview), the last as 3+1 (its guide: powers down with fewer than 3 fans operational)
-    assert n == 165, n
+    assert n == 166, n
