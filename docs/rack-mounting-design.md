@@ -14,8 +14,8 @@ Tracked in #904. Follows #865, which added `chassis.ears: behind` and
 | the move off `common/rack-ear@1` (#910) | open: 36 devices still place it |
 | the worked examples (#912 to #915) | not built |
 
-**No kit is in the library yet,** and no device lists one. Every kit and every
-kit ref in this note is an example. The examples use the made-up namespace
+**The library holds two kits,** `cisco/69-2037` and `cisco/n9k-c9500-rmk`, and
+no device lists one yet. Every other kit and kit ref in this note is an example. The examples use the made-up namespace
 `acme`, as [format-stability.md](format-stability.md) does. Four devices state
 `chassis.ears`.
 
