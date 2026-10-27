@@ -23,12 +23,12 @@
    "cisco/nxa-pdc-930w@1"
   ]
  },
- "composed": "ce8b0f87bc717b9d",
+ "composed": "787400123371ff02",
  "composed-refs": {
   "cisco/n9k-puv-1200w@1": "1.0.0+fa0002a57fed5288",
   "cisco/nxa-pac-500w@1": "1.0.0+bb4fccb83e6d4520",
   "cisco/nxa-pdc-930w@1": "1.0.0+2bcb6afbd3e16bdd",
-  "cisco/nxa-sfan-35cfm@1": "1.0.0+1be5fd96c3746cf1",
+  "cisco/nxa-sfan-35cfm@1": "1.0.0+8dab2da6d6e804e5",
   "cisco/nxk-acc-kit-1ru-front-bracket@1": "1.0.0+e175430bfe9c81f0",
   "cisco/nxk-acc-kit-1ru-rear-bracket@1": "1.0.0+b04fe0873a0221c7",
   "cisco/nxk-acc-kit-1ru-slider-rail@1": "1.0.0+9184fb20e1ef7847",
@@ -60,7 +60,7 @@
   "hvac-hvdc-1200w-port-side-intake"
  ],
  "format": 1,
- "gaps": "fe82f027c5e35824",
+ "gaps": "be9f6d858803cb0f",
  "groups": [
   "fans",
   "furniture",
@@ -760,7 +760,7 @@
   "rear/placements/usb": "mgmt"
  },
  "placement-surface": "895ba65e9b718179",
- "shape": "72ce8ae5859b8000",
- "surface": "8158e82f45baafdb",
- "version": "0.1.0"
+ "shape": "e88f33c225fe5768",
+ "surface": "6045120452c1b872",
+ "version": "1.0.1"
 }

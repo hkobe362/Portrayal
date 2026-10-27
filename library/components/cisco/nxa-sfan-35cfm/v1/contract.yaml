@@ -8,8 +8,8 @@ profile: networking
 description: >-
   The fan module of the Cisco Nexus 93108TC-FX3 fixed switch, ordered as NXA-SFAN-35CFM-PI
   (port-side intake, burgundy) or NXA-SFAN-35CFM-PE (port-side exhaust, blue). It has two
-  rotors behind a honeycomb grille, two coloured squeeze latches across its middle and a
-  ringed screw mark in the upper left corner.
+  rotors behind a honeycomb grille. A grey handle runs across its middle, with a coloured
+  squeeze bar at each side of the hub. A ringed screw mark sits in the upper left corner.
 size: {w: 40.8, h: 40.7}
 size-confidence: {w: estimated, h: estimated}
 attrs:
@@ -41,10 +41,17 @@ provenance:
     guide's, which reads 39.9 by 39.3, so the two parts are not given one size.
   elements: >-
     estimated - laid out as the guide's rear figure shows them: a honeycomb disc above and
-    another below a middle band, a latch at each end of the band with a square hub between,
-    a screw mark in the upper left corner. The right latch carries a barcode label in the
-    figure; a label is paper and is not drawn. Sizes are cisco/nxa-fan-30cfm@1's rescaled to
-    this envelope; the figure is too coarse to read more.
+    another below a middle band, a handle at each end of the band with a square hub between,
+    a screw mark in the upper left corner. REVISED AGAINST THE FIGURE (505475, 14.2 px per mm
+    in a 5x enlargement of fan 1, measured from the frame's left edge): the left handle is a
+    pad with four grip marks at 6.1 and 7.8 mm across and 18.2 and 22.2 mm down, and a squeeze
+    bar from 9.4 to 14.0 mm; the right handle is a plain pad whose squeeze bar runs from 27.0
+    to 31.6 mm, and it carries a barcode label in the figure; a label is paper and is not
+    drawn. The pads are drawn grey, as the figure's handle is, and the figure is uncoloured,
+    so the squeeze bars keep the datasheet's burgundy or blue. Sizes are
+    cisco/nxa-fan-30cfm@1's rescaled to this envelope; the figure is too coarse to read more.
+    The fan is not shared with the 93180YC-FX3, which uses cisco/nxa-fan-35cfm@1, a different
+    part number, and the 93180YC-FX3 is unchanged.
   lamp: >-
     datasheet for the states - the guide's appendix, "Fan Module LEDs": Status green
     (operational), red (not operational), off (no power). THE LAMP IS PLACED AT THE FIGURE'S
@@ -62,6 +69,8 @@ elements:
   grille: {at: [2.5, 1.5], size: [35.9, 37.8], class: rotor}
   latch-left: {at: [0.4, 13.2], size: [13.0, 14.1], class: latch}
   latch-right: {at: [27.4, 13.2], size: [13.0, 14.1], class: latch}
+  pull-left: {at: [9.4, 13.2], size: [4.6, 14.1], class: latch}
+  pull-right: {at: [27.0, 13.2], size: [4.6, 14.1], class: latch}
 fields:
   latch-finish:
     label: Latch colour
@@ -91,6 +100,17 @@ relief:
       confidence: estimated
       source: >-
         cisco/nxa-sfan-35cfm@1's own elements key - as latch-left.
+    - node: pull-left
+      out: 7.0
+      confidence: estimated
+      source: >-
+        cisco/nxa-sfan-35cfm@1's own elements key - the squeeze bar stands proud of its pad by
+        an unstated amount; one millimetre more than the pad is assumed.
+    - node: pull-right
+      out: 7.0
+      confidence: estimated
+      source: >-
+        cisco/nxa-sfan-35cfm@1's own elements key - as pull-left.
 skins: [default]
 body:
   depth: 100

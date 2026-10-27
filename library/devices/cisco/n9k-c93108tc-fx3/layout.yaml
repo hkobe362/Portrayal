@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: n9k-c93108tc-fx3
-version: 0.1.0
+version: 1.0.1
 maturity: modelled
 manufacturer: Cisco
 model: N9K-C93108TC-FX3
@@ -95,10 +95,15 @@ provenance:
     confidence: estimated
     note: >-
       Callout 3 is "BCN, STS, ENV LEDs"; appendix C says they sit "on the left side of the front".
-      The figure draws three square lamps in a row under the first jacks, each with its legend
-      to its left, at 20.2, 29.5 and 39.3 mm and 39.7 mm down. The legend after them, in the
-      figure, reads CISCO NEXUS N9K-C93108TC-FX3; the maker's name is not drawn and the rest is
-      printed from where NEXUS starts.
+      The figure draws three lamps in a row under the first jacks, each with its legend to its
+      left, at 20.2, 29.5 and 39.3 mm across and 39.4 mm down. The vertical is measured from
+      the figure's top and bottom edges, 127 px for 43.7 mm, 2.9 px per mm; the lamp rows and
+      the legend sit 4.3 mm above the bottom edge. The legend after them reads CISCO NEXUS
+      N9K-C93108TC-FX3, from 41.8 mm; the library's practice for a Cisco face is that text,
+      as on the 93180YC-EX, and no logo artwork. The figure's mark at the top left is not
+      drawn. Under the jacks the figure draws two rows of small cells: an upper row from 75.2
+      mm to the right end, beside the legend, and a lower row that runs the whole width from
+      18.3 to 421.5 mm.
   rear-face:
     confidence: estimated
     note: >-
@@ -107,7 +112,11 @@ provenance:
       management jack, the SFP management port, the USB port stood on end, and supply 2. THE
       OUT-OF-BAND BLOCK SITS BETWEEN THE FANS AND SUPPLY 2, not beyond supply 2 as on the
       93180YC-EX. Two lamps with a screw between them stand under the jacks, with the legends
-      BCN and STS, which the figure prints.
+      BCN and STS, which the figure prints. The fan handles were redrawn from a 5x enlargement
+      of fan 1 (grey pads, a squeeze bar at each side of the hub, grip marks on the left). The
+      figure draws the management SFP cage with a latch plate across the foot of its opening;
+      the library's std/sfp@1 has one skin and no cage with a bail, so the cage is the plain
+      one. A bail skin on std/sfp@1 would rehash 121 devices.
   power:
     confidence: datasheet
     note: >-
@@ -206,6 +215,13 @@ gaps:
   wanted: >-
     A stated size for the supply and the fan module. The guide gives "Form factor RSP1" for
     every supply and nothing for the fan.
+- what: management-sfp-bail
+  scope: [rear]
+  reason: needs-drawing
+  wanted: >-
+    A cage skin with a bail. The guide's rear figure draws the management SFP port with a
+    latch plate across the foot of its opening; the library's SFP cage has one skin and none
+    shows a bail, and a second skin on it would move every device that seats it.
 - what: fan-redundancy
   scope: [fans]
   reason: vendor-silent
@@ -278,13 +294,14 @@ views:
       - {id: lane-53-2, at: [420.75, 22.20], size: [1.50, 2.40], fill: '#1a1d1f'}
       - {id: lane-53-3, at: [423.10, 22.20], size: [1.50, 2.40], fill: '#1a1d1f'}
       - {id: lane-53-4, at: [425.45, 22.20], size: [1.50, 2.40], fill: '#1a1d1f'}
-      - {id: vent-bottom, at: [75.20, 39.00], size: [346.00, 4.50], pattern: vent, pattern-pitch: [4.70, 3.00], vent: 1}
+      - {id: vent-bottom, at: [75.20, 38.60], size: [346.30, 2.00], pattern: vent, pattern-pitch: [4.70, 3.00], vent: 1}
+      - {id: vent-bottom-low, at: [18.30, 41.30], size: [403.20, 2.20], pattern: vent, pattern-pitch: [4.70, 3.00], vent: 1}
       cutouts:
       - {block: rj45}
       - {block: qsfp28}
-      - {id: led-bcn, at: [18.70, 38.20], size: [3.0, 3.0], shape: rect}
-      - {id: led-sts, at: [27.95, 38.20], size: [3.0, 3.0], shape: rect}
-      - {id: led-env, at: [37.80, 38.20], size: [3.0, 3.0], shape: rect}
+      - {id: led-bcn, at: [18.70, 37.90], size: [3.0, 3.0], shape: rect}
+      - {id: led-sts, at: [27.95, 37.90], size: [3.0, 3.0], shape: rect}
+      - {id: led-env, at: [37.80, 37.90], size: [3.0, 3.0], shape: rect}
     silkscreen:
     - {block: rj45}
     - {id: silk-arrows-1, at: [15.65, 7.00], mark: arrow-pair, size: 1.3, gap: 0.5, fill: '#1a1d1f', for: [port-1, port-2]}
@@ -323,10 +340,10 @@ views:
     - {id: silk-arrow-53, at: [420.20, 8.90], mark: arrow-up, size: 1.3, fill: '#1a1d1f', for: port-53}
     - {id: silk-arrow-54, at: [422.90, 8.90], mark: arrow-down, size: 1.3, fill: '#1a1d1f', for: port-54}
     - {id: silk-54, at: [425.90, 9.50], text: '54', font-size: 2.0, anchor: start, fill: '#1a1d1f', for: port-54}
-    - {id: silk-bcn, at: [17.40, 40.15], text: BCN, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-bcn}
-    - {id: silk-sts, at: [26.70, 40.15], text: STS, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-sts}
-    - {id: silk-env, at: [36.50, 40.15], text: ENV, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-env}
-    - {id: silk-model, at: [48.50, 40.80], text: NEXUS N9K-C93108TC-FX3, font-size: 1.9, anchor: start, fill: '#1a1d1f', for: chassis}
+    - {id: silk-bcn, at: [17.40, 39.90], text: BCN, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-bcn}
+    - {id: silk-sts, at: [26.70, 39.90], text: STS, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-sts}
+    - {id: silk-env, at: [36.50, 39.90], text: ENV, font-size: 1.4, anchor: end, fill: '#1a1d1f', for: led-env}
+    - {id: silk-model, at: [41.80, 40.10], text: CISCO NEXUS N9K-C93108TC-FX3, font-size: 1.9, anchor: start, fill: '#1a1d1f', for: chassis}
     components:
       blocks:
       - id: rj45
@@ -375,11 +392,11 @@ views:
       placements:
       - {block: rj45}
       - {block: qsfp28}
-      - {ref: common/led-sq@1, id: led-bcn, at: [18.70, 38.20], group: leds, rel-pos: 1, for: chassis,
+      - {ref: common/led-sq@1, id: led-bcn, at: [18.70, 37.90], group: leds, rel-pos: 1, for: chassis,
          states: ['off', {name: beacon, color: '#3b82f6', behavior: blinking}]}
-      - {ref: common/led-sq@1, id: led-sts, at: [27.95, 38.20], group: leds, rel-pos: 2, for: chassis,
+      - {ref: common/led-sq@1, id: led-sts, at: [27.95, 37.90], group: leds, rel-pos: 2, for: chassis,
          states: ['off', {name: ok, color: '#22c55e'}, {name: booting, color: '#f59e0b', behavior: blinking}, {name: minor-alarm, color: '#f59e0b'}, {name: major-alarm, color: '#ef4444'}]}
-      - {ref: common/led-sq@1, id: led-env, at: [37.80, 38.20], group: leds, rel-pos: 3, for: chassis,
+      - {ref: common/led-sq@1, id: led-env, at: [37.80, 37.90], group: leds, rel-pos: 3, for: chassis,
          states: ['off', {name: ok, color: '#22c55e'}, {name: fault, color: '#f59e0b'}]}
     regions:
     - {id: logo-zone, at: [2.5, 6.4], size: {w: 6.6, h: 3.8}, label: 'Vendor logo; not drawn'}

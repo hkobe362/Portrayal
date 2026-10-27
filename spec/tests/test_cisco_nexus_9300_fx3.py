@@ -206,7 +206,10 @@ def test_no_ear_and_no_logo_is_drawn_and_a_logo_zone_is_reserved(name):
         for p in placements(d, view).values():
             assert p["ref"] != "common/rack-ear@1"
         for s in d["views"][view].get("silkscreen") or []:
-            assert "cisco" not in str(s.get("text", "")).lower().replace("nexus", ""), s
+            # the maker's name is text in the model legend, as on the 93180YC-EX; no artwork
+            if "cisco" in str(s.get("text", "")).lower():
+                assert s["id"] == "silk-model" and s["text"].startswith("CISCO NEXUS "), s
+            assert "logo" not in str(s.get("mark", "")).lower(), s
     zones = [r for r in d["views"]["front"].get("regions") or [] if r["id"] == "logo-zone"]
     assert len(zones) == 1
 
