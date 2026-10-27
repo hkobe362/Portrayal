@@ -312,8 +312,9 @@ places. It lives under the vendor namespace like any other contract
 same versions and devicelock. The design, and the sources it was drawn from,
 are in [docs/rack-mounting-design.md](../../docs/rack-mounting-design.md).
 
-The library holds no kit yet. This is an example of the shape, under the
-made-up namespace `acme`:
+The library holds two kits, `cisco/69-2037` and `cisco/n9k-c9500-rmk`, and no
+device lists one yet. This is an example of the shape, under the made-up
+namespace `acme`:
 
 ```yaml
 format: 1
