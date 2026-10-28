@@ -37,7 +37,7 @@
    "cisco/pwr-c1-715wdc@1"
   ]
  },
- "composed": "ada9cf6f816d241d",
+ "composed": "036aa3cc5bc872c7",
  "composed-refs": {
   "cisco/c9300-mode-button@1": "1.0.0+073ca76e0d3d3faf",
   "cisco/c9300-nm-blank@1": "1.0.0+56d1df7fee6e04f5",
@@ -53,7 +53,7 @@
   "cisco/pwr-c1-715wac@1": "1.0.0+92b81bbd666e4157",
   "cisco/pwr-c1-715wdc@1": "1.0.0+e22ca0190e672b51",
   "cisco/stackpower-port@1": "1.0.0+9861daf8e0a1000a",
-  "cisco/stackwise-480-port@1": "1.0.0+0e1faa1ca00d4571",
+  "cisco/stackwise-480-port@1": "1.1.0+b6df0bdfc9e06240",
   "common/button-led-sq@1": "1.0.0+014c982622647eba",
   "common/ground-screw@1": "1.0.0+c6ffaf7f04592a09",
   "common/led-arrow-sm@1": "1.1.0+f6e565f48fbd46a4",
@@ -799,7 +799,7 @@
   "rear/placements/usb-ssd": "usb-storage"
  },
  "placement-surface": "30d45299c8daceeb",
- "shape": "c7e773e0bfb31d9c",
- "surface": "88d7d9554cba5c2c",
- "version": "0.1.0"
+ "shape": "b735aa4e72b042f4",
+ "surface": "9a1385e49f6b0c38",
+ "version": "1.0.0"
 }

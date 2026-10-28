@@ -161,6 +161,22 @@ def test_rear_console_management_stack_and_power_stack_connectors(dev):
     assert {pl["spwr-1"]["ref"], pl["spwr-2"]["ref"]} == {"cisco/stackpower-port@1"}
 
 
+def test_each_stackwise_carrier_holds_three_connectors(dev):
+    # the NetBox rear elevation draws three stacked connectors in each carrier; the guide's two
+    # ports are the two carriers, so the port count stays two
+    _, d, _ = dev
+    c = contract("stackwise-480-port")
+    openings = sorted((e["at"][1], e["size"]) for e in c["elements"].values())
+    assert len(openings) == 3
+    assert all(size == [14.9, 5.2] for _, size in openings)
+    assert openings[-1][0] + 5.2 <= c["size"]["h"] + 1e-6
+    pl = placements(d, "rear")
+    for k in ("stack-1", "stack-2"):
+        top, h = pl[k]["at"][1], c["size"]["h"]
+        carrier = next(x for x in d["views"]["rear"]["panel"]["decor"] if x["id"].startswith("stackwise-carrier"))
+        assert carrier["at"][1] <= top and top + h <= carrier["at"][1] + carrier["size"][1]
+
+
 def test_the_poe_lamp_is_on_the_poe_switch_only():
     assert "led-poe" in placements(load("c9300-48p"), "front")
     assert "led-poe" not in placements(load("c9300-48t"), "front")

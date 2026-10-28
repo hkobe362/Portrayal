@@ -1,7 +1,7 @@
 format: 1
 kind: device
 name: c9300-48t
-version: 0.1.0
+version: 1.0.0
 maturity: modelled
 manufacturer: Cisco
 model: C9300-48T
@@ -341,8 +341,8 @@ views:
       - {id: usb-ssd, at: [25.80, 6.35], size: [12.0, 4.5], shape: rect}
       - {id: console, at: [18.95, 22.70], size: [12.7, 11.0], shape: rect}
       - {id: mgmt, at: [33.15, 22.70], size: [12.7, 11.0], shape: rect}
-      - {id: stack-1, at: [94.35, 19.50], size: [14.9, 5.2], shape: rect}
-      - {id: stack-2, at: [158.05, 19.50], size: [14.9, 5.2], shape: rect}
+      - {id: stack-1, at: [94.35, 10.20], size: [14.9, 23.8], shape: rect}
+      - {id: stack-2, at: [158.05, 10.20], size: [14.9, 23.8], shape: rect}
       - {id: spwr-1, at: [233.00, 3.90], size: [23.6, 18.5], shape: rect}
       - {id: spwr-2, at: [233.00, 24.00], size: [23.6, 18.5], shape: rect}
       - {id: led-rear-console, at: [26.60, 37.40], size: [2.0, 2.0], shape: circle}
@@ -377,8 +377,8 @@ views:
          states: ['off', {name: active, color: '#22c55e'}]}
       - {ref: common/led-dot@1, id: led-beacon, at: [43.70, 37.90], group: leds, rel-pos: 7, for: chassis,
          states: ['off', {name: lit, color: '#3b82f6'}]}
-      - {ref: cisco/stackwise-480-port@1, id: stack-1, at: [94.35, 19.50], group: stackwise, rel-pos: 1}
-      - {ref: cisco/stackwise-480-port@1, id: stack-2, at: [158.05, 19.50], group: stackwise, rel-pos: 2}
+      - {ref: cisco/stackwise-480-port@1, id: stack-1, at: [94.35, 10.20], group: stackwise, rel-pos: 1}
+      - {ref: cisco/stackwise-480-port@1, id: stack-2, at: [158.05, 10.20], group: stackwise, rel-pos: 2}
       - {ref: cisco/stackpower-port@1, id: spwr-1, at: [233.00, 3.90], group: stackpower, rel-pos: 1}
       - {ref: cisco/stackpower-port@1, id: spwr-2, at: [233.00, 24.00], group: stackpower, rel-pos: 2}
     regions:
