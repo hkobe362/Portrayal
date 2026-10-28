@@ -11,4 +11,5 @@
 
 ### Changed
 - The DCIM export names a device type from the configuration that states no airflow of its own when
-  no configuration is the default or the base, instead of the first one by name.
+  no configuration is the default or the base, instead of the first one by name. Tests cover the
+  ranking and the FX3H type's front-to-rear airflow.

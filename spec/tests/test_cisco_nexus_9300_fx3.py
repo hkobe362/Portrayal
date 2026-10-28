@@ -10,6 +10,8 @@ and the kit text of the rack-mounting chapter. Each test reads the YAML a contri
 the generated export a DCIM user imports.
 """
 import pathlib
+import subprocess
+import sys
 
 import pytest
 import yaml
@@ -338,6 +340,20 @@ def test_the_dcim_types_export_one_per_orderable_part_number_one_u_high(target):
         doc = yaml.safe_load((folder / f"{pn}.yaml").read_text())
         assert doc["manufacturer"] == "Cisco" and doc["model"] == pn
         assert doc["u_height"] == 1.0
+
+
+def test_the_exported_93180yc_fx3h_type_is_front_to_rear(tmp_path):
+    """Run the exporter rather than read the committed file: the airflow comes from
+    which build names the type, and only a fresh run shows that choice."""
+    dist = LIB / "dist"
+    if not (dist / "listings.json").exists():
+        pytest.skip("library/dist not built")
+    r = subprocess.run([sys.executable, str(ROOT / "spec/tools/portrayal/dcim_export.py"),
+                        "--dist", str(dist), "--out", str(tmp_path), "--no-raster",
+                        "--device", FX3], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr[-800:]
+    doc = yaml.safe_load((tmp_path / "netbox/device-types/Cisco/N9K-C93180YC-FX3H.yaml").read_text())
+    assert doc["airflow"] == "front-to-rear"
 
 
 def test_the_exported_93108tc_type_lists_the_54_ports_and_the_management_ports():
