@@ -77,8 +77,7 @@
   "psu-350wac",
   "psu-350wac-p",
   "psu-715wac",
-  "psu-715wdc",
-  "shipped"
+  "psu-715wdc"
  ],
  "format": 1,
  "gaps": "260ecbbade3acc2f",
@@ -348,7 +347,7 @@
   "rear/placements/stack-2",
   "rear/placements/usb-ssd"
  ],
- "names": "69474b79fbe46c25",
+ "names": "4bd8bc2976dc2ed4",
  "placement-addressing": {
   "for": {
    "front/placements/led-active": [
@@ -801,6 +800,6 @@
  },
  "placement-surface": "30d45299c8daceeb",
  "shape": "c7e773e0bfb31d9c",
- "surface": "b1b280a262553c71",
+ "surface": "88d7d9554cba5c2c",
  "version": "0.1.0"
 }

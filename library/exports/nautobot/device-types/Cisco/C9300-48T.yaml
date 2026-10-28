@@ -148,8 +148,10 @@ comments: '48x 10/100/1000 RJ-45 1RU stackable access switch running Cisco IOS X
   not hardware, so there is one device.
 
 
-  Configuration `c9300-48t`: The C9300-48T as ordered. Table 18 gives the 350 W Platinum supply as its
-  default and the Power Supply Modules text says every switch ships with a blank in the second slot.
+  Configuration `c9300-48t`: The switch as shipped: one PWR-C1-350WAC-P in the first power supply slot
+  with the slot cover in the second, three FAN-T2 fan modules and the network module bay blank. Table
+  18 gives the 350 W Platinum supply as the default of the C9300-48T and the Power Supply Modules text
+  says every switch ships with a blank in the second slot.
 
 
   Also sold or listed as: Catalyst 9300-48T

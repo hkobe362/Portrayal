@@ -1174,17 +1174,14 @@ views:
     empty: >-
       Not drawn flat by any source held. The guide shows the side isometrically with a vent grille.
 configurations:
-  shipped:
-    kind: base
-    description: >-
-      The switch as it powers on: one PWR-C1-350WAC-P in the first power supply slot with the slot cover
-      in the second, three FAN-T2 fan modules and the network module bay blank.
-    default: true
   c9300-48t:
     kind: orderable
     description: >-
-      The C9300-48T as ordered. Table 18 gives the 350 W Platinum supply as its default and the Power
-      Supply Modules text says every switch ships with a blank in the second slot.
+      The switch as shipped: one PWR-C1-350WAC-P in the first power supply slot with the slot cover in
+      the second, three FAN-T2 fan modules and the network module bay blank. Table 18 gives the 350 W
+      Platinum supply as the default of the C9300-48T and the Power Supply Modules text says every switch
+      ships with a blank in the second slot.
+    default: true
     part-numbers:
       C9300-48T: {}
   dual-350wac-p:
