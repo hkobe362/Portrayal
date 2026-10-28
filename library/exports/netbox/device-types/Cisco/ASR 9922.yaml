@@ -8,6 +8,8 @@ weight: 136.0
 weight_unit: kg
 airflow: front-to-rear
 description: Cisco ASR 9922 Router - 44 RU and the largest of the family
+front_image: true
+rear_image: true
 module-bays:
   - name: fc-0
     position: fc-0
